@@ -1,0 +1,28 @@
+name: use_case
+description: Provides base classes for making use cases for the app
+publish_to: 'none'
+resolution: workspace
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  analyzer: ^8.0.0
+  build: ^4.0.0
+  either_dart: ^1.0.0
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  glob: ^2.1.0
+  meta: ^1.16.0
+  module_injector: any
+  source_gen: ^4.0.0
+
+dev_dependencies:
+  build_runner: ^2.5.4
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true

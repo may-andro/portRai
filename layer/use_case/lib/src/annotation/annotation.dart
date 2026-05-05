@@ -1,0 +1,1 @@
+export 'localizable.dart';
