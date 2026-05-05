@@ -1,0 +1,273 @@
+name: portrai_workspace
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+workspace:
+  - layer/cache
+  - layer/core
+  - layer/design_system
+  - layer/feature_flag
+  - layer/error_reporter
+  - layer/firebase
+  - layer/log_reporter
+  - layer/module_injector
+  - layer/remote
+  - layer/tracking
+  - layer/use_case
+  - app/portrai
+  - app/storybook
+  - tool/firestore_export_import
+
+dev_dependencies:
+  custom_lint: ^0.8.0
+  lint: ^2.8.0
+  melos: ^7.1.1
+  build_runner: ^2.14.1
+
+melos:
+  command:
+    bootstrap:
+      environment:
+        sdk: '^3.9.2'
+        flutter: ^3.35.4
+      dependencies:
+        collection: ^1.19.1
+        equatable: ^2.0.7
+        intl: ^0.20.2
+        json_annotation: ^4.9.0
+        meta: ^1.16.0
+        package_info_plus: ^9.0.0
+        recase: ^4.1.0
+        visibility_detector: ^0.4.0+2
+      dev_dependencies:
+        build_runner: ^2.5.4
+        json_serializable: ^6.11.1
+        mocktail: ^1.0.4
+        test: ^1.24.4
+      hooks:
+        post: dart run build_runner build --delete-conflicting-outputs
+    clean:
+      hooks:
+        post: melos exec --flutter --concurrency=1 -- "flutter clean"
+  scripts:
+    format_check:
+      run: melos exec dart format . --set-exit-if-changed
+      description: Run `dart format` checks for all packages.
+    analyze:
+      run: flutter analyze .
+      description: Run `dart analyze` for all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: true
+    analyze_fix:
+      run: |
+        dart fix --dry-run
+        dart fix --apply
+        dart format .
+        flutter analyze
+        flutter pub get
+      description: Run `flutter analyze` and fix issues in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: true
+    clean_cache:
+      run: |
+        flutter clean
+        flutter pub cache repair
+        flutter pub get
+      description: Clean cache.
+      exec:
+        concurrency: 1
+    clean_ios:
+      run: |
+        rm -rf ios/Pods/*
+        rm -f ios/Podfile.lock
+        rm -r ios/.symlinks
+        rm -rf ~/.pub-cache/hosted/pub.dartlang.org/ 
+        rm -f ios/Flutter/Flutter.podspec
+        flutter clean
+        flutter pub get
+        cd ios 
+        pod cache clean --all
+        pod repo update
+        cd ..
+        flutter pub get
+        cd ios
+        pod install
+      description: Clean cache.
+    flutter_upgrade:
+      run: flutter pub upgrade
+      description: Run `flutter pub upgrade` in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: true
+    get:
+      run: flutter pub get
+      description: Run `flutter pub get` in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: true
+    get_cli:
+      run: dart pub get
+      description: Run `dart pub get` in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: false
+    # Generative scripts for application
+    gen:
+      run: dart run build_runner build --delete-conflicting-outputs
+      description: Run `build_runner` in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: build_runner
+    gen_splash:
+      run: |
+        flutter clean
+        flutter pub get
+        dart run flutter_native_splash:create --path=native_splash.yaml
+      description: Generate splash screen for all flavors.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: flutter_native_splash
+    gen_icon:
+      run: |
+        flutter pub run flutter_launcher_icons -f flutter_launcher_icons.yaml
+      description: Generate icons for the app.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: flutter_launcher_icons
+    gen_l10n:
+      run: |
+        flutter gen-l10n
+      description: Generate locale for the app.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: flutter_localizations
+    # Test scripts for application
+    test:
+      run: flutter test --exclude-tags 'golden'
+      description: Run `flutter test` in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: true
+    update_golden:
+      run: flutter test --tags golden --update-goldens
+      description: Update `golden` test files in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: alchemist
+    test_golden:
+      run: flutter test --tags golden
+      description: Run `golden` tests in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: alchemist
+    test_golden_ci:
+      run: flutter test --tags golden --dart-define=CI=true
+      description: Run `golden` tests in all packages.
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: alchemist
+    test_with_coverage:
+      run: flutter test --exclude-tags golden --coverage --machine > test-results.json --no-pub
+      description: Run all the test with coverage
+      exec:
+        concurrency: 1
+      packageFilters:
+        flutter: true
+        dirExists: test
+    # Deploy scripts for web release
+    deploy_portrai:
+      run: |
+        cd app/partrai
+        echo "Clean existing repository"
+        flutter clean
+        echo "Getting packages"
+        flutter pub get 
+        echo "Building web with Flutter"
+        flutter build web --release
+        echo "Deploying to Firebase"
+        firebase deploy --only hosting
+      description: Deploy and host flutter web page
+    deploy_widgetbook:
+      run: |
+        cd app/widgetbook
+        echo "Clean existing repository"
+        flutter clean
+        echo "Getting packages"
+        flutter pub get 
+        echo "Building web with Flutter"
+        flutter build web --release
+        echo "Deploying to Firebase"
+        firebase deploy --only hosting:wahl-consultancy-storybook-320bf-5669e --project wahl-consultancy-storybook-320bf-5669e
+      description: Host flutter web page
+    deploy_privacy_policy:
+      run: |
+        cd tool/privacy_policy
+        echo "Deploying to Firebase"
+        firebase deploy --only hosting:privacy-policy-320bf
+      description: Host static privacy policy web page
+    deploy_terms_and_conditions:
+      run: |
+        cd tool/terms_and_condition
+        echo "Deploying to Firebase"
+        firebase deploy --only hosting:terms-and-condition-320bf
+      description: Host static privacy policy web page
+    # Firestore Export/Import CLI scripts
+    # Import (Firestore -> JSON) all collections in one go
+    firestore_import:
+      run: |
+        cd tool/firestore_export_import
+        echo "Downloading experiences..."
+        dart run bin/firestore_export_import.dart import --collection experiences --secrets .data/service_account.json --output .data/experiences.json
+        echo "Downloading services..."
+        dart run bin/firestore_export_import.dart import --collection services --secrets .data/service_account.json --output .data/services.json
+        echo "Downloading profile..."
+        dart run bin/firestore_export_import.dart import --collection profile --secrets .data/service_account.json --output .data/profile.json
+        echo "Downloading projects..."
+        dart run bin/firestore_export_import.dart import --collection projects --secrets .data/service_account.json --output .data/projects.json
+        echo "Downloading expertise..."
+        dart run bin/firestore_export_import.dart import --collection expertise --secrets .data/service_account.json --output .data/expertise.json
+        echo "Downloading testimonials..."
+        dart run bin/firestore_export_import.dart import --collection testimonials --secrets .data/service_account.json --output .data/testimonials.json
+        echo "All collections downloaded successfully!"
+      description: Download all collections (experiences, services, profile, projects, expertise, testimonials) from Firestore to .data/
+    # Export (JSON -> Firestore) all collections in one go
+    firestore_export:
+      run: |
+        cd tool/firestore_export_import
+        echo "Uploading experiences..."
+        dart run bin/firestore_export_import.dart export --collection experiences --secrets .data/service_account.json --path .data/experiences.json
+        echo "Uploading services..."
+        dart run bin/firestore_export_import.dart export --collection services --secrets .data/service_account.json --path .data/services.json
+        echo "Uploading profile..."
+        dart run bin/firestore_export_import.dart export --collection profile --secrets .data/service_account.json --path .data/profile.json
+        echo "Uploading projects..."
+        dart run bin/firestore_export_import.dart export --collection projects --secrets .data/service_account.json --path .data/projects.json
+        echo "Uploading expertise..."
+        dart run bin/firestore_export_import.dart export --collection expertise --secrets .data/service_account.json --path .data/expertise.json
+        echo "Uploading testimonials..."
+        dart run bin/firestore_export_import.dart export --collection testimonials --secrets .data/service_account.json --path .data/testimonials.json
+        echo "All collections uploaded successfully!"
+      description: Upload all collections (experiences, services, profile, projects, expertise, testimonials) from .data/ to Firestore
+    # Deploy scripts for firebase
+    deploy_functions:
+      run: |
+        cd tool/firebase_function/functions
+        firebase deploy --only functions
+      description: Deploy firebase functions
