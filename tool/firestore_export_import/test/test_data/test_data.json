@@ -1,0 +1,37 @@
+{
+  "documents": [
+    {
+      "docId": "202535_NL-1000.1",
+      "fields": {
+        "MEDIA_TYPE": "Digital Billboard",
+        "OBJECT_FACE_ID": "NL-1000.1",
+        "FACENR": 1,
+        "STREET": "Braak",
+        "STATION": "Deventer",
+        "MUNICIPALITY_PART": "Deventer",
+        "YYYYWW": 202535,
+        "LATITUDE": 52.245572,
+        "LONGITUDE": 6.146366,
+        "OBJECTNR": "NL-1000",
+        "KEY": "202535_NL-1000.1",
+        "EXPRESSION": "Business District Wk35",
+        "CAMPAIGN": "New Year Discounts",
+        "geo": {
+          "mapValue": {
+            "fields": {
+              "geopoint": {
+                "geoPointValue": {
+                  "latitude": 52.245572,
+                  "longitude": 6.146366
+                }
+              },
+              "geohash": {
+                "stringValue": "u1k35z58"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
