@@ -1,0 +1,11 @@
+builders:
+  failure_translator:
+    import: "package:use_case/src/annotation/builder.dart"
+    builder_factories: ["failureTranslatorBuilder"]
+    build_extensions:
+      "$lib$":
+        - "generated/failure_translator.g.dart"
+    auto_apply: none
+    build_to: source
+    runs_before: []
+
