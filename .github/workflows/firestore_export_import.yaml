@@ -1,0 +1,36 @@
+name: firestore_export_import
+
+on:
+  pull_request:
+    paths:
+      - 'tool/firestore_export_import/**'
+      - '.github/workflows/firestore_export_import.yaml'
+
+jobs:
+  analyze_and_test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Verify formatting
+        working-directory: tool/firestore_export_import
+        run: dart format --set-exit-if-changed .
+
+      - name: Static analysis
+        working-directory: tool/firestore_export_import
+        run: dart analyze --fatal-infos .
+
+      - name: Run tests
+        working-directory: tool/firestore_export_import
+        run: dart test

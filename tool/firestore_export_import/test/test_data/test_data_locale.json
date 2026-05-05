@@ -1,0 +1,11 @@
+{
+  "en": {
+    "title": "Software Engineer",
+    "company": "ACME Corp",
+    "yearsOfExperience": 5,
+    "salary": 95000.50,
+    "isRemote": true,
+    "tags": ["flutter", "dart"]
+  }
+}
+
