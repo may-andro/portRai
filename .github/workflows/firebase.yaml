@@ -1,0 +1,37 @@
+name: firebase
+
+on:
+  pull_request:
+    paths:
+      - 'layer/firebase/**'
+      - '.github/workflows/firebase.yaml'
+
+jobs:
+  analyze_and_test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        working-directory: layer/firebase
+        run: dart format --set-exit-if-changed .
+
+      - name: Static analysis
+        working-directory: layer/firebase
+        run: dart analyze --fatal-infos .
+
+      - name: Run tests
+        working-directory: layer/firebase
+        run: flutter test
+
