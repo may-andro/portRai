@@ -1,0 +1,7 @@
+builders:
+  module_injector_generator:
+    import: "package:module_injector/builder.dart"
+    builder_factories: ["moduleInjectorBuilder"]
+    build_extensions: { ".dart": [".di.g.dart"] }
+    auto_apply: dependents
+    build_to: source
