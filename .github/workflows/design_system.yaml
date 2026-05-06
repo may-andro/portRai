@@ -1,0 +1,37 @@
+name: design_system
+
+on:
+  pull_request:
+    paths:
+      - 'layer/design_system/**'
+      - '.github/workflows/design_system.yaml'
+
+jobs:
+  analyze_and_test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        working-directory: layer/design_system
+        run: dart format --set-exit-if-changed .
+
+      - name: Static analysis
+        working-directory: layer/design_system
+        run: dart analyze --fatal-infos .
+
+      - name: Run golden tests (CI mode)
+        working-directory: layer/design_system
+        run: flutter test --dart-define=CI=true
+
