@@ -1,0 +1,63 @@
+name: Create Storybook Release Notes
+
+on:
+  workflow_call:
+    inputs:
+      preRelease:
+        type: boolean
+        required: false
+        default: false
+        description: Whether the created release is a pre-release
+
+jobs:
+  build-release-notes:
+    name: Build Release Notes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create changelog header
+        run: echo "# Release Notes" > changelog.md
+
+      - name: Get current tag
+        id: current-tag
+        run: |
+          echo "tag=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: Get previous tag
+        id: previous-tag
+        run: |
+          prev_tag="$(git tag --sort=-committerdate -l '*-storybook-prod' | grep -v $GITHUB_REF_NAME | head -n 1)"
+          echo "tag=${prev_tag}" >> $GITHUB_OUTPUT
+
+      - name: Debug tags
+        run: |
+          echo "Current tag: ${{ steps.current-tag.outputs.tag }}"
+          echo "Previous tag: ${{ steps.previous-tag.outputs.tag }}"
+
+      - name: Generate changelog
+        run: |
+          if [ -n "${{ steps.previous-tag.outputs.tag }}" ]; then
+            git log --pretty="format:* %s" ${{ steps.previous-tag.outputs.tag }}..${{ steps.current-tag.outputs.tag }} >> changelog.md
+          else
+            git log --pretty="format:* %s" ${{ steps.current-tag.outputs.tag }} >> changelog.md
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: changelog.md
+          prerelease: ${{ inputs.preRelease }}
+          name: Storybook ${{ steps.current-tag.outputs.tag }}
+
+      - name: Upload changelog artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-${{ github.sha }}
+          path: changelog.md
+          retention-days: 30

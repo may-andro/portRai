@@ -1,0 +1,43 @@
+name: Storybook Preview Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'app/storybook/**'
+      - 'layer/design_system/**'
+      - '.github/workflows/storybook_*.yaml'
+      - '.github/workflows/storybook/**'
+      - '.github/actions/setup-storybook-flutter/**'
+
+permissions: write-all
+
+jobs:
+  # Format check, static analysis and unit tests run as parallel jobs
+  # inside a single reusable workflow call.
+  quality:
+    name: Quality Checks
+    uses: ./.github/workflows/storybook/_quality.yaml
+
+  # Build starts once all quality checks pass.
+  build:
+    name: Build
+    needs: [quality]
+    uses: ./.github/workflows/storybook/_build.yaml
+
+  # Deploy preview after build is complete.
+  deploy:
+    name: Deploy Preview
+    needs: [build]
+    uses: ./.github/workflows/storybook/_deploy.yaml
+    with:
+      channelId: 'preview'
+      artifact-name: ${{ needs.build.outputs.artifact-name }}
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

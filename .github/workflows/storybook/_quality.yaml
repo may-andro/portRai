@@ -1,0 +1,76 @@
+name: Storybook Quality Checks
+
+on:
+  workflow_call:
+
+env:
+  FLUTTER_VERSION: 3.35.4
+  STORYBOOK_PATH: ./app/storybook
+
+jobs:
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-storybook-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          storybook-path: ${{ env.STORYBOOK_PATH }}
+
+      - name: Format check
+        working-directory: ${{ env.STORYBOOK_PATH }}
+        run: dart format . --set-exit-if-changed
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-storybook-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          storybook-path: ${{ env.STORYBOOK_PATH }}
+          run-codegen: 'true'
+
+      - name: Analyze code
+        working-directory: ${{ env.STORYBOOK_PATH }}
+        run: flutter analyze
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-storybook-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          storybook-path: ${{ env.STORYBOOK_PATH }}
+          run-codegen: 'true'
+
+      - name: Run unit tests
+        working-directory: ${{ env.STORYBOOK_PATH }}
+        run: flutter test --exclude-tags golden --coverage --machine > test-results.json
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: ${{ env.STORYBOOK_PATH }}/test-results.json
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: ${{ env.STORYBOOK_PATH }}/coverage/
+
+      - name: Generate test report
+        uses: dorny/test-reporter@v1.9.1
+        if: always()
+        with:
+          name: Test Results
+          path: ${{ env.STORYBOOK_PATH }}/test-results.json
+          reporter: flutter-json
+          working-directory: ${{ env.STORYBOOK_PATH }}
