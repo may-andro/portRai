@@ -1,0 +1,45 @@
+name: Storybook Production Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - '*-storybook-prod'
+
+permissions: write-all
+
+jobs:
+  # Format check, static analysis and unit tests run as parallel jobs
+  # inside a single reusable workflow call.
+  quality:
+    name: Quality Checks
+    uses: ./.github/workflows/_storybook_quality.yaml
+
+  # Build starts once all quality checks pass.
+  build:
+    name: Build
+    needs: [quality]
+    uses: ./.github/workflows/_storybook_build.yaml
+
+  # Release notes run independently, in parallel with build/deploy.
+  release-notes:
+    name: Release Notes
+    needs: [quality]
+    uses: ./.github/workflows/_storybook_release_notes.yaml
+    with:
+      preRelease: false
+
+  # Deploy after build is complete.
+  deploy:
+    name: Deploy to Production
+    needs: [build]
+    uses: ./.github/workflows/_storybook_deploy.yaml
+    with:
+      channelId: 'live'
+      artifact-name: ${{ needs.build.outputs.artifact-name }}
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

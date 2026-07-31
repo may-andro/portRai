@@ -1,0 +1,48 @@
+name: Storybook Deploy
+
+on:
+  workflow_call:
+    inputs:
+      channelId:
+        type: string
+        required: true
+        description: Firebase hosting channel (live or preview)
+      artifact-name:
+        type: string
+        required: true
+        description: Name of the build artifact to deploy
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT:
+        required: true
+      FIREBASE_PROJECT_ID:
+        required: true
+
+env:
+  STORYBOOK_PATH: app/storybook
+
+jobs:
+  deploy:
+    name: Deploy to Firebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # firebase.json/.firebaserc live in app/storybook and declare a
+      # "storybook" hosting target, so the artifact must be unpacked into
+      # app/storybook/build/web (the "public" dir configured there).
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ env.STORYBOOK_PATH }}/build/web
+
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          entryPoint: ${{ env.STORYBOOK_PATH }}
+          channelId: ${{ inputs.channelId }}
+          target: storybook

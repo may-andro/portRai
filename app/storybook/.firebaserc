@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "portrai-96f2b"
+  },
+  "targets": {
+    "portrai-96f2b": {
+      "hosting": {
+        "storybook": [
+          "portrai-storybook"
+        ]
+      }
+    }
+  }
+}
