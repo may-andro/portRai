@@ -1,0 +1,37 @@
+name: Storybook Build
+
+on:
+  workflow_call:
+    outputs:
+      artifact-name:
+        description: "Name of the build artifact"
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+env:
+  FLUTTER_VERSION: 3.35.4
+  STORYBOOK_PATH: ./app/storybook
+
+jobs:
+  build:
+    name: Build Web
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: storybook-build-${{ github.sha }}
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-storybook-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          storybook-path: ${{ env.STORYBOOK_PATH }}
+          run-codegen: 'true'
+
+      - name: Build web
+        working-directory: ${{ env.STORYBOOK_PATH }}
+        run: flutter build web --release
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-build-${{ github.sha }}
+          path: ${{ env.STORYBOOK_PATH }}/build/web/
+          retention-days: 7

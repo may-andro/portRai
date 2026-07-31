@@ -12,7 +12,7 @@ on:
       - 'app/storybook/**'
       - 'layer/design_system/**'
       - '.github/workflows/storybook_*.yaml'
-      - '.github/workflows/storybook/**'
+      - '.github/workflows/_storybook_*.yaml'
       - '.github/actions/setup-storybook-flutter/**'
 
 permissions: write-all
@@ -22,19 +22,19 @@ jobs:
   # inside a single reusable workflow call.
   quality:
     name: Quality Checks
-    uses: ./.github/workflows/storybook/_quality.yaml
+    uses: ./.github/workflows/_storybook_quality.yaml
 
   # Build starts once all quality checks pass.
   build:
     name: Build
     needs: [quality]
-    uses: ./.github/workflows/storybook/_build.yaml
+    uses: ./.github/workflows/_storybook_build.yaml
 
   # Deploy preview after build is complete.
   deploy:
     name: Deploy Preview
     needs: [build]
-    uses: ./.github/workflows/storybook/_deploy.yaml
+    uses: ./.github/workflows/_storybook_deploy.yaml
     with:
       channelId: 'preview'
       artifact-name: ${{ needs.build.outputs.artifact-name }}

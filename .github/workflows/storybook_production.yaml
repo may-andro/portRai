@@ -16,19 +16,19 @@ jobs:
   # inside a single reusable workflow call.
   quality:
     name: Quality Checks
-    uses: ./.github/workflows/storybook/_quality.yaml
+    uses: ./.github/workflows/_storybook_quality.yaml
 
   # Build starts once all quality checks pass.
   build:
     name: Build
     needs: [quality]
-    uses: ./.github/workflows/storybook/_build.yaml
+    uses: ./.github/workflows/_storybook_build.yaml
 
   # Release notes run independently, in parallel with build/deploy.
   release-notes:
     name: Release Notes
     needs: [quality]
-    uses: ./.github/workflows/storybook/_release_notes.yaml
+    uses: ./.github/workflows/_storybook_release_notes.yaml
     with:
       preRelease: false
 
@@ -36,7 +36,7 @@ jobs:
   deploy:
     name: Deploy to Production
     needs: [build]
-    uses: ./.github/workflows/storybook/_deploy.yaml
+    uses: ./.github/workflows/_storybook_deploy.yaml
     with:
       channelId: 'live'
       artifact-name: ${{ needs.build.outputs.artifact-name }}
