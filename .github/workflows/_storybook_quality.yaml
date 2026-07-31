@@ -12,6 +12,9 @@ jobs:
     name: Format Check
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         uses: ./.github/actions/setup-storybook-flutter
         with:
@@ -26,6 +29,9 @@ jobs:
     name: Static Analysis
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         uses: ./.github/actions/setup-storybook-flutter
         with:
@@ -41,6 +47,9 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         uses: ./.github/actions/setup-storybook-flutter
         with:
