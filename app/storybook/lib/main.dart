@@ -1,8 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:storybook/assets/assets.gen.dart';
 import 'package:storybook/main.directories.g.dart';
 import 'package:storybook/src/widget/home_screen.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -50,14 +48,7 @@ class StorybookApp extends StatelessWidget {
               ),
               const SizedBox(width: 16),
             ],
-            title: SvgPicture.asset(
-              (context.isDarkMode
-                      ? Assets.image.logoDark
-                      : Assets.image.logoLight)
-                  .path,
-              width: 40,
-              height: 40,
-            ),
+            title: SizedBox(width: 40, height: 40, child: DSImage.logo()),
           ),
           body: child,
         );

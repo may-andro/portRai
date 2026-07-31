@@ -1,6 +1,5 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:storybook/assets/assets.gen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -34,13 +33,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.asset(
-                  isDark
-                      ? Assets.image.logoDark.path
-                      : Assets.image.logoLight.path,
-                  width: 64,
-                  height: 64,
-                ),
+                SizedBox(width: 64, height: 64, child: DSImage.logo()),
                 const SizedBox(height: 24),
                 Text(
                   'PortRai Storybook',
