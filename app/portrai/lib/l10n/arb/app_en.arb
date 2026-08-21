@@ -1,0 +1,407 @@
+{
+  "close": "Close",
+  "@close": {
+    "description": "Generic close button text"
+  },
+  "companyName": "PortRai",
+  "@companyName": {
+    "description": "Company name"
+  },
+  "contactMe": "Contact Me",
+  "@contactMe": {
+    "description": "Label for contacting"
+  },
+  "copyright": "© {year} All rights reserved by PortRai",
+  "@copyright": {
+    "description": "Copyright text",
+    "placeholders": {
+      "year": {
+        "type": "String",
+        "example": "2026"
+      }
+    }
+  },
+  "downloadAppAt": "Download on",
+  "@downloadAppAt": {
+    "description": "Label prefix for app store download"
+  },
+  "downloadResume": "Resume",
+  "@downloadResume": {
+    "description": "Label for resume download"
+  },
+  "downloadTheApp": "Download the App",
+  "@downloadTheApp": {
+    "description": "Label for app download"
+  },
+  "errorEmailLaunch": "Unable to open your email app. Please try again",
+  "@errorEmailLaunch": {
+    "description": "Error when email app fails to launch"
+  },
+  "errorExperienceData": "Failed to process experience data. Please try again",
+  "@errorExperienceData": {
+    "description": "Error when experience data cannot be processed"
+  },
+  "errorExperienceNetwork": "Can't load experience. Check your internet connection",
+  "@errorExperienceNetwork": {
+    "description": "Error when experience fails to load due to network"
+  },
+  "errorExperienceNotFound": "Experience not found",
+  "@errorExperienceNotFound": {
+    "description": "Error when specific experience doesn't exist"
+  },
+  "errorExperienceUnauthorized": "You don't have permission to view this experience",
+  "@errorExperienceUnauthorized": {
+    "description": "Error when user lacks authorization to view experience"
+  },
+  "errorExperienceUnknown": "Something went wrong. Please try again",
+  "@errorExperienceUnknown": {
+    "description": "Error for unexpected experience loading failure"
+  },
+  "errorExperiencesData": "Failed to process experiences. Please try again",
+  "@errorExperiencesData": {
+    "description": "Error when experiences data cannot be processed"
+  },
+  "errorExperiencesNetwork": "Can't load experiences. Check your internet connection",
+  "@errorExperiencesNetwork": {
+    "description": "Error when experiences fail to load due to network"
+  },
+  "errorExperiencesNotFound": "No experiences found",
+  "@errorExperiencesNotFound": {
+    "description": "Error when no experiences exist"
+  },
+  "errorExperiencesUnauthorized": "You don't have permission to view experiences",
+  "@errorExperiencesUnauthorized": {
+    "description": "Error when user lacks authorization for experiences"
+  },
+  "errorExperiencesUnknown": "Something went wrong. Please try again",
+  "@errorExperiencesUnknown": {
+    "description": "Error for unexpected experiences loading failure"
+  },
+  "errorExpertiseData": "Failed to process expertise data. Please try again",
+  "@errorExpertiseData": {
+    "description": "Error when expertise data cannot be processed"
+  },
+  "errorExpertiseNetwork": "Can't load expertise. Check your internet connection",
+  "@errorExpertiseNetwork": {
+    "description": "Error when expertise fails to load due to network"
+  },
+  "errorExpertiseNotFound": "No expertise found",
+  "@errorExpertiseNotFound": {
+    "description": "Error when no expertise exists"
+  },
+  "errorExpertiseUnauthorized": "You don't have permission to view expertise",
+  "@errorExpertiseUnauthorized": {
+    "description": "Error when user lacks authorization for expertise"
+  },
+  "errorExpertiseUnknown": "Something went wrong loading expertise. Please try again",
+  "@errorExpertiseUnknown": {
+    "description": "Error for unexpected expertise loading failure"
+  },
+  "errorExternalUrlLaunch": "Unable to open this link. Please try again",
+  "@errorExternalUrlLaunch": {
+    "description": "Error when external URL fails to open"
+  },
+  "errorGeneric": "Something went wrong. Please try again",
+  "@errorGeneric": {
+    "description": "Generic error for unexpected failures"
+  },
+  "errorLocaleFailedToLoadFromCache": "Failed to load language settings",
+  "@errorLocaleFailedToLoadFromCache": {
+    "description": "Error when locale cannot be loaded from storage"
+  },
+  "errorLocaleFailedToLoadUnknownReason": "Failed to load language settings",
+  "@errorLocaleFailedToLoadUnknownReason": {
+    "description": "Error when locale loading fails unexpectedly"
+  },
+  "errorLocaleFailedToSaveToCache": "Failed to save language settings",
+  "@errorLocaleFailedToSaveToCache": {
+    "description": "Error when locale cannot be saved"
+  },
+  "errorLocaleFailedToUpdateServiceLocator": "Failed to update language settings",
+  "@errorLocaleFailedToUpdateServiceLocator": {
+    "description": "Error when service locator update fails"
+  },
+  "errorLocaleFailedToUpdateUnknownReason": "Failed to update language settings",
+  "@errorLocaleFailedToUpdateUnknownReason": {
+    "description": "Error when locale update fails unexpectedly"
+  },
+  "errorNoEmailAppFound": "No email app found. Please install an email app",
+  "@errorNoEmailAppFound": {
+    "description": "Error when device has no email app"
+  },
+  "errorPortfolioNotFound": "Portfolio not found",
+  "@errorPortfolioNotFound": {
+    "description": "Error when portfolio doesn't exist"
+  },
+  "errorPortfolioUnknown": "Something went wrong loading portfolio. Please try again",
+  "@errorPortfolioUnknown": {
+    "description": "Error for unexpected portfolio loading failure"
+  },
+  "errorProfileData": "Failed to process profile data. Please try again",
+  "@errorProfileData": {
+    "description": "Error when profile data cannot be processed"
+  },
+  "errorProfileNetwork": "Can't load profile. Check your internet connection",
+  "@errorProfileNetwork": {
+    "description": "Error when profile fails to load due to network"
+  },
+  "errorProfileNotFound": "Profile not found",
+  "@errorProfileNotFound": {
+    "description": "Error when profile doesn't exist"
+  },
+  "errorProfileUnauthorized": "You don't have permission to view this profile",
+  "@errorProfileUnauthorized": {
+    "description": "Error when user lacks authorization for profile"
+  },
+  "errorProfileUnknown": "Something went wrong loading profile. Please try again",
+  "@errorProfileUnknown": {
+    "description": "Error for unexpected profile loading failure"
+  },
+  "errorProjectData": "Failed to process project data. Please try again",
+  "@errorProjectData": {
+    "description": "Error when project data cannot be processed"
+  },
+  "errorProjectNetwork": "Can't load project. Check your internet connection",
+  "@errorProjectNetwork": {
+    "description": "Error when project fails to load due to network"
+  },
+  "errorProjectNotFound": "Project not found",
+  "@errorProjectNotFound": {
+    "description": "Error when project doesn't exist"
+  },
+  "errorProjectUnauthorized": "You don't have permission to view this project",
+  "@errorProjectUnauthorized": {
+    "description": "Error when user lacks authorization for project"
+  },
+  "errorProjectUnknown": "Something went wrong loading project. Please try again",
+  "@errorProjectUnknown": {
+    "description": "Error for unexpected project loading failure"
+  },
+  "errorServicesData": "Failed to process services data. Please try again",
+  "@errorServicesData": {
+    "description": "Error when services data cannot be processed"
+  },
+  "errorServicesNetwork": "Can't load services. Check your internet connection",
+  "@errorServicesNetwork": {
+    "description": "Error when services fail to load due to network"
+  },
+  "errorServicesNotFound": "No services found",
+  "@errorServicesNotFound": {
+    "description": "Error when no services exist"
+  },
+  "errorServicesUnauthorized": "You don't have permission to view services",
+  "@errorServicesUnauthorized": {
+    "description": "Error when user lacks authorization for services"
+  },
+  "errorServicesUnknown": "Something went wrong loading services. Please try again",
+  "@errorServicesUnknown": {
+    "description": "Error for unexpected services loading failure"
+  },
+  "errorTestimonialData": "Failed to process testimonial data. Please try again",
+  "@errorTestimonialData": {
+    "description": "Error when testimonial data cannot be processed"
+  },
+  "errorTestimonialNetwork": "Can't load testimonial. Check your internet connection",
+  "@errorTestimonialNetwork": {
+    "description": "Error when testimonial fails to load due to network"
+  },
+  "errorTestimonialNotFound": "Testimonial not found",
+  "@errorTestimonialNotFound": {
+    "description": "Error when testimonial doesn't exist"
+  },
+  "errorTestimonialUnauthorized": "You don't have permission to view this testimonial",
+  "@errorTestimonialUnauthorized": {
+    "description": "Error when user lacks authorization for testimonial"
+  },
+  "errorTestimonialUnknown": "Something went wrong loading testimonial. Please try again",
+  "@errorTestimonialUnknown": {
+    "description": "Error for unexpected testimonial loading failure"
+  },
+  "errorTestimonialsData": "Failed to process testimonials. Please try again",
+  "@errorTestimonialsData": {
+    "description": "Error when testimonials data cannot be processed"
+  },
+  "errorTestimonialsNetwork": "Can't load testimonials. Check your internet connection",
+  "@errorTestimonialsNetwork": {
+    "description": "Error when testimonials fail to load due to network"
+  },
+  "errorTestimonialsNotFound": "No testimonials found",
+  "@errorTestimonialsNotFound": {
+    "description": "Error when no testimonials exist"
+  },
+  "errorTestimonialsUnauthorized": "You don't have permission to view testimonials",
+  "@errorTestimonialsUnauthorized": {
+    "description": "Error when user lacks authorization for testimonials"
+  },
+  "errorTestimonialsUnknown": "Something went wrong loading testimonials. Please try again",
+  "@errorTestimonialsUnknown": {
+    "description": "Error for unexpected testimonials loading failure"
+  },
+  "errorWebEmailLaunch": "Unable to send email. Please try again",
+  "@errorWebEmailLaunch": {
+    "description": "Error when web email fails to launch"
+  },
+  "footerContactTitle": "Got an idea? Need a developer? Let's connect!",
+  "@footerContactTitle": {
+    "description": "Footer call-to-action for contact"
+  },
+  "footerPitch": "Building digital experiences that matter",
+  "@footerPitch": {
+    "description": "Footer tagline"
+  },
+  "help": "Help",
+  "@help": {
+    "description": "Help label"
+  },
+  "hireMe": "Work with Me",
+  "@hireMe": {
+    "description": "Hire me call-to-action"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language settings label"
+  },
+  "localeSelectionTitle": "Choose Language",
+  "@localeSelectionTitle": {
+    "description": "Language selection screen title"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy link"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  "routeNotFoundButton": "Go to Home",
+  "@routeNotFoundButton": {
+    "description": "Button to navigate home when route not found"
+  },
+  "routeNotFoundMessage": "Oops! This page doesn't exist.",
+  "@routeNotFoundMessage": {
+    "description": "Message when page not found"
+  },
+  "routeNotFoundTitle": "Page Not Found",
+  "@routeNotFoundTitle": {
+    "description": "Title when page not found"
+  },
+  "selectedLanguage": "Current Language",
+  "@selectedLanguage": {
+    "description": "Current language label"
+  },
+  "splashContactSupport": "contact support",
+  "@splashContactSupport": {
+    "description": "Support contact link on splash error"
+  },
+  "splashErrorMessage": "Something went wrong during startup. Please restart the app or",
+  "@splashErrorMessage": {
+    "description": "Error message on splash screen"
+  },
+  "splashErrorTitle": "Setup Failed",
+  "@splashErrorTitle": {
+    "description": "Error title on splash screen"
+  },
+  "splashProdMessage": "Setting up your experience...",
+  "@splashProdMessage": {
+    "description": "Loading message on splash screen"
+  },
+  "splashStagingDoneMessage": "Setup complete",
+  "@splashStagingDoneMessage": {
+    "description": "Completion message during setup"
+  },
+  "splashStagingPostRegisterMessage": "Finalizing setup",
+  "@splashStagingPostRegisterMessage": {
+    "description": "Post-registration setup message"
+  },
+  "splashStagingRegisteringMessage": "Registering dependencies",
+  "@splashStagingRegisteringMessage": {
+    "description": "Dependency registration message"
+  },
+  "splashStagingStartMessage": "Starting initialization",
+  "@splashStagingStartMessage": {
+    "description": "Initialization start message"
+  },
+  "portfolioSectionIntroduction": "Introduction",
+  "@portfolioSectionIntroduction": {
+    "description": "Portfolio introduction section title"
+  },
+  "portfolioSectionExpertises": "Expertises",
+  "@portfolioSectionExpertises": {
+    "description": "Portfolio expertises section title"
+  },
+  "portfolioSectionProjects": "Projects",
+  "@portfolioSectionProjects": {
+    "description": "Portfolio projects section title"
+  },
+  "portfolioSectionServices": "Services",
+  "@portfolioSectionServices": {
+    "description": "Portfolio services section title"
+  },
+  "portfolioSectionExperience": "Experience",
+  "@portfolioSectionExperience": {
+    "description": "Portfolio experience section title"
+  },
+  "portfolioSectionAboutMe": "About Me",
+  "@portfolioSectionAboutMe": {
+    "description": "Portfolio about me section title"
+  },
+  "portfolioSectionTestimonials": "Testimonials",
+  "@portfolioSectionTestimonials": {
+    "description": "Portfolio testimonials section title"
+  },
+  "talkToMe": "Let's Talk",
+  "@talkToMe": {
+    "description": "Talk to me call-to-action"
+  },
+  "termsAndConditions": "Terms & Conditions",
+  "@termsAndConditions": {
+    "description": "Terms and conditions link"
+  },
+  "totalExperienceInYears": "Years of Experience",
+  "@totalExperienceInYears": {
+    "description": "Total experience label"
+  },
+  "totalProjectsDelivered": "Projects Delivered",
+  "@totalProjectsDelivered": {
+    "description": "Total projects label"
+  },
+  "errorFeatureFlagNotFound": "Feature flag not found",
+  "@errorFeatureFlagNotFound": {
+    "description": "Error when feature flag doesn't exist"
+  },
+  "errorFeatureFlagUnknown": "Failed to check feature flag. Please try again",
+  "@errorFeatureFlagUnknown": {
+    "description": "Error when feature flag check fails"
+  },
+  "errorFeatureFlagsNotFound": "No feature flags found",
+  "@errorFeatureFlagsNotFound": {
+    "description": "Error when no feature flags are available"
+  },
+  "errorFeatureFlagsUnknown": "Failed to load feature flags. Please try again",
+  "@errorFeatureFlagsUnknown": {
+    "description": "Error when loading all feature flags fails"
+  },
+  "errorFeatureFlagUpdateFailed": "Failed to update feature flag",
+  "@errorFeatureFlagUpdateFailed": {
+    "description": "Error when feature flag update fails"
+  },
+  "errorFeatureFlagUpdateUnknown": "Failed to save changes. Please try again",
+  "@errorFeatureFlagUpdateUnknown": {
+    "description": "Error when feature flag update fails unexpectedly"
+  },
+  "errorFeatureFlagsResetFailed": "Failed to reset feature flags. Please try again",
+  "@errorFeatureFlagsResetFailed": {
+    "description": "Error when feature flags reset fails"
+  },
+  "version": "Made with Flutter · {appVersion}",
+  "@version": {
+    "description": "App version text",
+    "placeholders": {
+      "appVersion": {
+        "type": "String",
+        "example": "v1.0.0"
+      }
+    }
+  }
+}
+
