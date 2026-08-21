@@ -4,7 +4,7 @@ publish_to: 'none'
 resolution: workspace
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.11.0
 
 dependencies:
   analyzer: ^13.3.0
@@ -14,7 +14,7 @@ dependencies:
   get_it: ^9.0.0
   glob: ^2.1.0
   meta: ^1.16.0
-  source_gen: ^4.3.0
+  source_gen: ^4.0.0
 
 dev_dependencies:
   flutter_test:
