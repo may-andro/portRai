@@ -20,11 +20,8 @@ void main() {
         localLogReporter.debug('test message', tag: 'TAG');
 
         verify(
-          () => mockLogger.d(
-            'TAG: test message',
-            error: null,
-            stackTrace: null,
-          ),
+          () =>
+              mockLogger.d('TAG: test message', error: null, stackTrace: null),
         ).called(1);
       });
 
@@ -58,11 +55,8 @@ void main() {
         localLogReporter.error('error message', tag: 'ERR');
 
         verify(
-          () => mockLogger.e(
-            'ERR: error message',
-            error: null,
-            stackTrace: null,
-          ),
+          () =>
+              mockLogger.e('ERR: error message', error: null, stackTrace: null),
         ).called(1);
       });
 
@@ -84,4 +78,3 @@ void main() {
     });
   });
 }
-

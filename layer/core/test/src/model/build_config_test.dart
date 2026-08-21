@@ -148,7 +148,9 @@ void main() {
 
     group('properties', () {
       test('should store the provided build environment', () {
-        final devConfig = BuildConfig(buildEnvironment: BuildEnvironment.staging);
+        final devConfig = BuildConfig(
+          buildEnvironment: BuildEnvironment.staging,
+        );
         final prodConfig = BuildConfig(buildEnvironment: BuildEnvironment.prod);
 
         expect(devConfig.buildEnvironment, equals(BuildEnvironment.staging));

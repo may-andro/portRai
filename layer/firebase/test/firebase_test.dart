@@ -30,13 +30,15 @@ void main() {
         expect(snapshot.docs.first.data()['name'], 'Alice');
       });
 
-      test('should throw FirestoreUnknownException for empty collection path',
-          () async {
-        expect(
-          () => controller.addToCollection('', testData),
-          throwsA(isA<FirestoreUnknownException>()),
-        );
-      });
+      test(
+        'should throw FirestoreUnknownException for empty collection path',
+        () async {
+          expect(
+            () => controller.addToCollection('', testData),
+            throwsA(isA<FirestoreUnknownException>()),
+          );
+        },
+      );
 
       test('should throw FirestoreUnknownException for empty data', () async {
         expect(
@@ -55,8 +57,7 @@ void main() {
           data: testData,
         );
 
-        final doc =
-            await fakeFirestore.collection(collection).doc(docId).get();
+        final doc = await fakeFirestore.collection(collection).doc(docId).get();
         expect(doc.exists, isTrue);
         expect(doc.data()!['name'], 'Alice');
       });
@@ -76,10 +77,7 @@ void main() {
     // ── getDocumentFromCollection ────────────────────────────────────────────
     group('getDocumentFromCollection', () {
       test('should return document data when it exists', () async {
-        await fakeFirestore
-            .collection(collection)
-            .doc(docId)
-            .set(testData);
+        await fakeFirestore.collection(collection).doc(docId).set(testData);
 
         final result = await controller.getDocumentFromCollection(
           collection,
@@ -90,16 +88,16 @@ void main() {
         expect(result!['name'], 'Alice');
       });
 
-      test('should throw FirestoreDocumentNotFoundException when not found',
-          () async {
-        expect(
-          () => controller.getDocumentFromCollection(
-            collection,
-            'nonexistent',
-          ),
-          throwsA(isA<FirestoreDocumentNotFoundException>()),
-        );
-      });
+      test(
+        'should throw FirestoreDocumentNotFoundException when not found',
+        () async {
+          expect(
+            () =>
+                controller.getDocumentFromCollection(collection, 'nonexistent'),
+            throwsA(isA<FirestoreDocumentNotFoundException>()),
+          );
+        },
+      );
 
       test('should throw for empty collection path', () async {
         expect(
@@ -112,78 +110,70 @@ void main() {
     // ── updateDocumentFromCollection ─────────────────────────────────────────
     group('updateDocumentFromCollection', () {
       test('should update an existing document', () async {
-        await fakeFirestore
-            .collection(collection)
-            .doc(docId)
-            .set(testData);
+        await fakeFirestore.collection(collection).doc(docId).set(testData);
 
-        await controller.updateDocumentFromCollection(
-          collection,
-          docId,
-          {'name': 'Bob'},
-        );
+        await controller.updateDocumentFromCollection(collection, docId, {
+          'name': 'Bob',
+        });
 
-        final doc =
-            await fakeFirestore.collection(collection).doc(docId).get();
+        final doc = await fakeFirestore.collection(collection).doc(docId).get();
         expect(doc.data()!['name'], 'Bob');
       });
 
       test(
-          'should throw FirestoreDocumentNotFoundException when doc not found',
-          () async {
-        expect(
-          () => controller.updateDocumentFromCollection(
-            collection,
-            'nonexistent',
-            {'name': 'Bob'},
-          ),
-          throwsA(isA<FirestoreDocumentNotFoundException>()),
-        );
-      });
+        'should throw FirestoreDocumentNotFoundException when doc not found',
+        () async {
+          expect(
+            () => controller.updateDocumentFromCollection(
+              collection,
+              'nonexistent',
+              {'name': 'Bob'},
+            ),
+            throwsA(isA<FirestoreDocumentNotFoundException>()),
+          );
+        },
+      );
     });
 
     // ── deleteDocumentFromCollection ─────────────────────────────────────────
     group('deleteDocumentFromCollection', () {
       test('should delete an existing document', () async {
-        await fakeFirestore
-            .collection(collection)
-            .doc(docId)
-            .set(testData);
+        await fakeFirestore.collection(collection).doc(docId).set(testData);
 
         await controller.deleteDocumentFromCollection(
           collectionPath: collection,
           documentPath: docId,
         );
 
-        final doc =
-            await fakeFirestore.collection(collection).doc(docId).get();
+        final doc = await fakeFirestore.collection(collection).doc(docId).get();
         expect(doc.exists, isFalse);
       });
 
       test(
-          'should throw FirestoreDocumentNotFoundException when doc not found',
-          () async {
-        expect(
-          () => controller.deleteDocumentFromCollection(
-            collectionPath: collection,
-            documentPath: 'nonexistent',
-          ),
-          throwsA(isA<FirestoreDocumentNotFoundException>()),
-        );
-      });
+        'should throw FirestoreDocumentNotFoundException when doc not found',
+        () async {
+          expect(
+            () => controller.deleteDocumentFromCollection(
+              collectionPath: collection,
+              documentPath: 'nonexistent',
+            ),
+            throwsA(isA<FirestoreDocumentNotFoundException>()),
+          );
+        },
+      );
     });
 
     // ── getCollectionQuerySnapshot ───────────────────────────────────────────
     group('getCollectionQuerySnapshot', () {
       test('should return all documents from collection', () async {
-        await fakeFirestore
-            .collection(collection)
-            .doc('a')
-            .set({'name': 'Alice', 'age': 30});
-        await fakeFirestore
-            .collection(collection)
-            .doc('b')
-            .set({'name': 'Bob', 'age': 25});
+        await fakeFirestore.collection(collection).doc('a').set({
+          'name': 'Alice',
+          'age': 30,
+        });
+        await fakeFirestore.collection(collection).doc('b').set({
+          'name': 'Bob',
+          'age': 25,
+        });
 
         final result = await controller.getCollectionQuerySnapshot(collection);
 
@@ -191,14 +181,14 @@ void main() {
       });
 
       test('should filter by field equality', () async {
-        await fakeFirestore
-            .collection(collection)
-            .doc('a')
-            .set({'name': 'Alice', 'age': 30});
-        await fakeFirestore
-            .collection(collection)
-            .doc('b')
-            .set({'name': 'Bob', 'age': 25});
+        await fakeFirestore.collection(collection).doc('a').set({
+          'name': 'Alice',
+          'age': 30,
+        });
+        await fakeFirestore.collection(collection).doc('b').set({
+          'name': 'Bob',
+          'age': 25,
+        });
 
         final result = await controller.getCollectionQuerySnapshot(
           collection,
@@ -221,24 +211,26 @@ void main() {
     // ── batchUpdateDocuments ─────────────────────────────────────────────────
     group('batchUpdateDocuments', () {
       test('should update multiple documents in a batch', () async {
-        await fakeFirestore
-            .collection(collection)
-            .doc('a')
-            .set({'name': 'Alice'});
-        await fakeFirestore
-            .collection(collection)
-            .doc('b')
-            .set({'name': 'Bob'});
+        await fakeFirestore.collection(collection).doc('a').set({
+          'name': 'Alice',
+        });
+        await fakeFirestore.collection(collection).doc('b').set({
+          'name': 'Bob',
+        });
 
         await controller.batchUpdateDocuments(collection, [
-          {'documentPath': 'a', 'data': {'name': 'Alice Updated'}},
-          {'documentPath': 'b', 'data': {'name': 'Bob Updated'}},
+          {
+            'documentPath': 'a',
+            'data': {'name': 'Alice Updated'},
+          },
+          {
+            'documentPath': 'b',
+            'data': {'name': 'Bob Updated'},
+          },
         ]);
 
-        final docA =
-            await fakeFirestore.collection(collection).doc('a').get();
-        final docB =
-            await fakeFirestore.collection(collection).doc('b').get();
+        final docA = await fakeFirestore.collection(collection).doc('a').get();
+        final docB = await fakeFirestore.collection(collection).doc('b').get();
         expect(docA.data()!['name'], 'Alice Updated');
         expect(docB.data()!['name'], 'Bob Updated');
       });
@@ -250,73 +242,96 @@ void main() {
         );
       });
 
-      test('should throw when a document in the batch does not exist',
-          () async {
-        expect(
-          () => controller.batchUpdateDocuments(collection, [
-            {'documentPath': 'nonexistent', 'data': {'name': 'X'}},
-          ]),
-          throwsA(isA<FirestoreDocumentNotFoundException>()),
-        );
-      });
+      test(
+        'should throw when a document in the batch does not exist',
+        () async {
+          expect(
+            () => controller.batchUpdateDocuments(collection, [
+              {
+                'documentPath': 'nonexistent',
+                'data': {'name': 'X'},
+              },
+            ]),
+            throwsA(isA<FirestoreDocumentNotFoundException>()),
+          );
+        },
+      );
     });
   });
 
   // ─── handleFirestoreException ──────────────────────────────────────────────
   group('handleFirestoreException', () {
-    test('should return FirestoreDocumentNotFoundException for not-found code',
-        () {
-      final error = FirebaseException(plugin: 'firestore', code: 'not-found');
-      final result =
-          handleFirestoreException(error, StackTrace.current, 'op');
-      expect(result, isA<FirestoreDocumentNotFoundException>());
-    });
+    test(
+      'should return FirestoreDocumentNotFoundException for not-found code',
+      () {
+        final error = FirebaseException(plugin: 'firestore', code: 'not-found');
+        final result = handleFirestoreException(
+          error,
+          StackTrace.current,
+          'op',
+        );
+        expect(result, isA<FirestoreDocumentNotFoundException>());
+      },
+    );
 
-    test('should return FirestorePermissionDeniedException for permission-denied',
-        () {
-      final error =
-          FirebaseException(plugin: 'firestore', code: 'permission-denied');
-      final result =
-          handleFirestoreException(error, StackTrace.current, 'op');
-      expect(result, isA<FirestorePermissionDeniedException>());
-    });
+    test(
+      'should return FirestorePermissionDeniedException for permission-denied',
+      () {
+        final error = FirebaseException(
+          plugin: 'firestore',
+          code: 'permission-denied',
+        );
+        final result = handleFirestoreException(
+          error,
+          StackTrace.current,
+          'op',
+        );
+        expect(result, isA<FirestorePermissionDeniedException>());
+      },
+    );
 
     test('should return FirestoreTimeoutException for unavailable', () {
-      final error =
-          FirebaseException(plugin: 'firestore', code: 'unavailable');
-      final result =
-          handleFirestoreException(error, StackTrace.current, 'op');
+      final error = FirebaseException(plugin: 'firestore', code: 'unavailable');
+      final result = handleFirestoreException(error, StackTrace.current, 'op');
       expect(result, isA<FirestoreTimeoutException>());
     });
 
-    test('should return FirestoreQuotaExceededException for resource-exhausted',
-        () {
-      final error = FirebaseException(
-        plugin: 'firestore',
-        code: 'resource-exhausted',
-      );
-      final result =
-          handleFirestoreException(error, StackTrace.current, 'op');
-      expect(result, isA<FirestoreQuotaExceededException>());
-    });
+    test(
+      'should return FirestoreQuotaExceededException for resource-exhausted',
+      () {
+        final error = FirebaseException(
+          plugin: 'firestore',
+          code: 'resource-exhausted',
+        );
+        final result = handleFirestoreException(
+          error,
+          StackTrace.current,
+          'op',
+        );
+        expect(result, isA<FirestoreQuotaExceededException>());
+      },
+    );
 
     test('should return FirestoreUnknownException for unrecognised code', () {
-      final error =
-          FirebaseException(plugin: 'firestore', code: 'some-unknown-code');
-      final result =
-          handleFirestoreException(error, StackTrace.current, 'op');
+      final error = FirebaseException(
+        plugin: 'firestore',
+        code: 'some-unknown-code',
+      );
+      final result = handleFirestoreException(error, StackTrace.current, 'op');
       expect(result, isA<FirestoreUnknownException>());
     });
 
-    test('should return FirestoreNetworkException for network-related message',
-        () {
-      final result = handleFirestoreException(
-        Exception('network connection lost'),
-        StackTrace.current,
-        'op',
-      );
-      expect(result, isA<FirestoreNetworkException>());
-    });
+    test(
+      'should return FirestoreNetworkException for network-related message',
+      () {
+        final result = handleFirestoreException(
+          Exception('network connection lost'),
+          StackTrace.current,
+          'op',
+        );
+        expect(result, isA<FirestoreNetworkException>());
+      },
+    );
 
     test('should return FirestoreUnknownException for generic exceptions', () {
       final result = handleFirestoreException(
