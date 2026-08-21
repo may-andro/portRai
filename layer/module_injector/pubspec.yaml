@@ -11,7 +11,7 @@ dependencies:
   build: ^4.0.0
   flutter:
     sdk: flutter
-  get_it: ^8.2.0
+  get_it: ^9.0.0
   glob: ^2.1.0
   meta: ^1.16.0
   source_gen: ^4.0.0
