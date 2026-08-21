@@ -17,7 +17,7 @@ void main() {
       ),
       TestCase(
         'custom color',
-        const SizedBox(
+        SizedBox(
           width: 120,
           height: 60,
           child: DSLoadingWidget(
