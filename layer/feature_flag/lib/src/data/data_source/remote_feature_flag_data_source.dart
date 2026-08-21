@@ -13,10 +13,10 @@ class RemoteFeatureFlagDataSource implements FeatureFlagDataSource {
   List<FeatureFlag> initFeatureFlags() {
     final configValues = _fbRemoteConfigController.getAllConfigsValue();
     return configValues.entries
-        .map((entry) => FeatureFlag(
-              key: entry.key,
-              isEnabled: entry.value.asBool(),
-            ))
+        .map(
+          (entry) =>
+              FeatureFlag(key: entry.key, isEnabled: entry.value.asBool()),
+        )
         .toList();
   }
 

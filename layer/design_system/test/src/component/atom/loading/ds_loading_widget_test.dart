@@ -28,11 +28,7 @@ void main() {
       ),
       TestCase(
         'small size',
-        const SizedBox(
-          width: 80,
-          height: 40,
-          child: DSLoadingWidget(size: 24),
-        ),
+        const SizedBox(width: 80, height: 40, child: DSLoadingWidget(size: 24)),
       ),
       TestCase(
         'large size',
@@ -45,4 +41,3 @@ void main() {
     ],
   );
 }
-

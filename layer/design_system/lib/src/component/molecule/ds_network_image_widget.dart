@@ -45,7 +45,8 @@ class _DSNetworkImageWidgetState extends State<DSNetworkImageWidget> {
   void initState() {
     super.initState();
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
-        List<ConnectivityResult> result,) {
+      List<ConnectivityResult> result,
+    ) {
       if (imageState?.extendedImageLoadState == LoadState.failed &&
           result.none((s) => s == ConnectivityResult.none)) {
         imageState?.reLoadImage();
@@ -84,7 +85,7 @@ class _DSNetworkImageWidgetState extends State<DSNetworkImageWidget> {
             if (widget.autoSizeImage) {
               return AspectRatio(
                 aspectRatio:
-                state.extendedImageInfo!.image.width /
+                    state.extendedImageInfo!.image.width /
                     state.extendedImageInfo!.image.height,
                 child: ExtendedRawImage(
                   image: state.extendedImageInfo?.image,

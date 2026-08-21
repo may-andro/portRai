@@ -29,7 +29,7 @@ class FeatureFlagController {
     try {
       _featureFlagMap.clear();
       final featureFlags = await _dataSource.initFeatureFlags();
-      
+
       for (final flag in featureFlags) {
         _featureFlagMap[flag.key] = flag;
       }

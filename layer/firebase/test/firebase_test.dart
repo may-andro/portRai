@@ -242,20 +242,17 @@ void main() {
         );
       });
 
-      test(
-        'should throw when a document in the batch does not exist',
-        () {
-          expect(
-            () => controller.batchUpdateDocuments(collection, [
-              {
-                'documentPath': 'nonexistent',
-                'data': {'name': 'X'},
-              },
-            ]),
-            throwsA(isA<FirestoreDocumentNotFoundException>()),
-          );
-        },
-      );
+      test('should throw when a document in the batch does not exist', () {
+        expect(
+          () => controller.batchUpdateDocuments(collection, [
+            {
+              'documentPath': 'nonexistent',
+              'data': {'name': 'X'},
+            },
+          ]),
+          throwsA(isA<FirestoreDocumentNotFoundException>()),
+        );
+      });
     });
   });
 

@@ -24,7 +24,9 @@ void main() {
 
     group('constructor delegation', () {
       test('should delegate to cache data source when environment is dev', () {
-        final buildConfig = BuildConfig(buildEnvironment: BuildEnvironment.staging);
+        final buildConfig = BuildConfig(
+          buildEnvironment: BuildEnvironment.staging,
+        );
 
         final dataSource = BuildEnvFeatureFlagDataSource(
           buildConfig,

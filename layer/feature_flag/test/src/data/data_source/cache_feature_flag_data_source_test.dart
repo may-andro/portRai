@@ -64,9 +64,18 @@ void main() {
             FeatureFlag(key: 'feature_analytics', isEnabled: true),
           ];
           const expectedFlags = [
-            FeatureFlag(key: 'feature_login', isEnabled: false), // Overridden by cache
-            FeatureFlag(key: 'feature_dashboard', isEnabled: true), // Overridden by cache
-            FeatureFlag(key: 'feature_analytics', isEnabled: true), // From remote
+            FeatureFlag(
+              key: 'feature_login',
+              isEnabled: false,
+            ), // Overridden by cache
+            FeatureFlag(
+              key: 'feature_dashboard',
+              isEnabled: true,
+            ), // Overridden by cache
+            FeatureFlag(
+              key: 'feature_analytics',
+              isEnabled: true,
+            ), // From remote
           ];
 
           when(() => mockCache.getAll()).thenAnswer((_) async => cachedFlags);
@@ -154,7 +163,10 @@ void main() {
             FeatureFlag(key: 'remote_only', isEnabled: false),
           ];
           const expectedFlags = [
-            FeatureFlag(key: 'shared_flag', isEnabled: false), // Overridden by cache
+            FeatureFlag(
+              key: 'shared_flag',
+              isEnabled: false,
+            ), // Overridden by cache
             FeatureFlag(key: 'remote_only', isEnabled: false), // From remote
           ];
 
