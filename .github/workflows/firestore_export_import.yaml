@@ -21,6 +21,7 @@ jobs:
           sdk: 3.13.1
 
       - name: Install dependencies
+        working-directory: tool/firestore_export_import
         run: dart pub get
 
       - name: Verify formatting
