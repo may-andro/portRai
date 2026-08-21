@@ -58,6 +58,7 @@ extension StringDateFormatting on String {
   DateTime get toMonthAndYear {
     return DateFormat('MMMM, yyyy').parse(this);
   }
+
   /// Format as "dd MMM yyyy, hh:mm a"
   DateTime get toFormattedDateTime {
     return DateFormat('dd MMM yyyy, hh:mm a').parse(this);

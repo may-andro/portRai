@@ -67,9 +67,7 @@ class SqfliteDbAdapter implements DbAdapter {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> findBy(
-    Map<String, Object?> conditions,
-  ) {
+  Future<List<Map<String, dynamic>>> findBy(Map<String, Object?> conditions) {
     final db = _requireDb();
     final where = _buildWhere(conditions);
     final args = _buildWhereArgs(conditions);
@@ -79,9 +77,7 @@ class SqfliteDbAdapter implements DbAdapter {
   }
 
   @override
-  Future<Map<String, dynamic>?> findOneBy(
-    Map<String, Object?> conditions,
-  ) {
+  Future<Map<String, dynamic>?> findOneBy(Map<String, Object?> conditions) {
     final db = _requireDb();
     final where = _buildWhere(conditions);
     final args = _buildWhereArgs(conditions);
