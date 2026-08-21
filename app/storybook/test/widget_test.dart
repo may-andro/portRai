@@ -8,11 +8,11 @@ void main() {
   testWidgets('should render Widgetbook', (WidgetTester tester) async {
     // Set a large screen size to avoid overflow issues
     await tester.binding.setSurfaceSize(const Size(1920, 1080));
-    
+
     await tester.pumpWidget(const StorybookApp());
 
     expect(find.byType(Widgetbook), findsOneWidget);
-    
+
     // Reset surface size
     addTearDown(() => tester.binding.setSurfaceSize(null));
   });
