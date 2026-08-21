@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   analyzer: ^13.3.0
-  build: ^4.0.0
+  build: ^4.0.10
   either_dart: ^1.0.0
   equatable: ^2.0.7
   flutter:
