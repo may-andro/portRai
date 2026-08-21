@@ -16,9 +16,7 @@ class SettingLoadingState extends SettingState {
 }
 
 class SettingLoadedState extends SettingState {
-  const SettingLoadedState({
-    required this.isLanguageSelectorEnabled,
-  });
+  const SettingLoadedState({required this.isLanguageSelectorEnabled});
 
   final bool isLanguageSelectorEnabled;
 

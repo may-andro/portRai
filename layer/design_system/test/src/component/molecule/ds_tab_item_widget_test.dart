@@ -26,7 +26,6 @@ void main() {
           title: 'Services',
           onTap: () {},
           isSelected: false,
-          isIndicatorEnabled: true,
         ),
       ),
     ],

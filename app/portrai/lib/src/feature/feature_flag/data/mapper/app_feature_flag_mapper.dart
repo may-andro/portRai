@@ -10,11 +10,11 @@ class AppFeatureFlagMapper
 
   @override
   layer.FeatureFlag from(AppFeatureFlagEntity entity) => layer.FeatureFlag(
-        key: entity.flag.key,
-        isEnabled: entity.isEnabled,
-        isOverridden: entity.isOverridden,
-        remoteValue: entity.remoteValue,
-      );
+    key: entity.flag.key,
+    isEnabled: entity.isEnabled,
+    isOverridden: entity.isOverridden,
+    remoteValue: entity.remoteValue,
+  );
 
   @override
   AppFeatureFlagEntity to(layer.FeatureFlag model) {
@@ -52,8 +52,7 @@ class AppFeatureFlagMapper
       AppFeatureFlag.darkMode => 'Enable dark mode theme support',
       AppFeatureFlag.betaFeatures => 'Enable experimental beta features',
       AppFeatureFlag.offlineMode => 'Enable offline mode for the app',
-      AppFeatureFlag.languageSelector =>
-        'Show language selection in settings',
+      AppFeatureFlag.languageSelector => 'Show language selection in settings',
     };
   }
 }

@@ -13,9 +13,12 @@ Widget buildSpacer(BuildContext context) {
     max: 4,
     divisions: 15,
   );
-  
-  final isVertical = context.knobs.boolean(label: 'Vertical', initialValue: true);
-  
+
+  final isVertical = context.knobs.boolean(
+    label: 'Vertical',
+    initialValue: true,
+  );
+
   if (isVertical) {
     return Center(
       child: DSCardWidget(
@@ -47,7 +50,7 @@ Widget buildSpacer(BuildContext context) {
       ),
     );
   }
-  
+
   return Center(
     child: DSCardWidget(
       child: Padding(

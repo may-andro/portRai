@@ -17,7 +17,7 @@ void main() {
       ),
       TestCase(
         'custom color',
-        SizedBox(
+        const SizedBox(
           width: 120,
           height: 60,
           child: DSLoadingWidget(
@@ -26,13 +26,13 @@ void main() {
           ),
         ),
       ),
-      TestCase(
+      const TestCase(
         'small size',
-        const SizedBox(width: 80, height: 40, child: DSLoadingWidget(size: 24)),
+        SizedBox(width: 80, height: 40, child: DSLoadingWidget(size: 24)),
       ),
-      TestCase(
+      const TestCase(
         'large size',
-        const SizedBox(
+        SizedBox(
           width: 160,
           height: 80,
           child: DSLoadingWidget(size: 60),

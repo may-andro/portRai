@@ -11,32 +11,38 @@ Widget buildButton(BuildContext context) {
     options: DSButtonVariant.values,
     labelBuilder: (value) => value.name,
   );
-  
+
   final size = context.knobs.object.dropdown(
     label: 'Size',
     options: DSButtonSize.values,
     labelBuilder: (value) => value.name,
   );
-  
+
   final border = context.knobs.object.dropdown(
     label: 'Border',
     options: DSButtonBorder.values,
     labelBuilder: (value) => value.name,
   );
-  
-  final isDisabled = context.knobs.boolean(label: 'Disabled', initialValue: false);
-  final isLoading = context.knobs.boolean(label: 'Loading', initialValue: false);
-  
+
+  final isDisabled = context.knobs.boolean(
+    label: 'Disabled',
+    initialValue: false,
+  );
+  final isLoading = context.knobs.boolean(
+    label: 'Loading',
+    initialValue: false,
+  );
+
   final hasIcon = context.knobs.boolean(label: 'Has Icon', initialValue: false);
-  
+
   final iconDirection = context.knobs.object.dropdown(
     label: 'Icon Direction',
     options: DSButtonIconDirection.values,
     labelBuilder: (value) => value.name,
   );
-  
+
   final label = context.knobs.string(label: 'Label', initialValue: 'Button');
-  
+
   return Center(
     child: DSButtonWidget(
       label: label,
@@ -59,13 +65,13 @@ Widget buildIconButton(BuildContext context) {
     options: CommonIcons.commonIcons.take(10).toList(),
     labelBuilder: (icon) => icon.toString().split('.').last,
   );
-  
+
   final size = context.knobs.object.dropdown(
     label: 'Size',
     options: DSIconButtonSize.values,
     labelBuilder: (value) => value.name,
   );
-  
+
   final buttonColorMap = context.brandColorsMap;
   final buttonColorName = context.knobs.object.dropdown(
     label: 'Button Color',
@@ -74,7 +80,7 @@ Widget buildIconButton(BuildContext context) {
     initialOption: 'Primary',
   );
   final buttonColor = buttonColorMap[buttonColorName]!;
-  
+
   final iconColorMap = context.brandColorsMap;
   final iconColorName = context.knobs.object.dropdown(
     label: 'Icon Color',
@@ -83,9 +89,12 @@ Widget buildIconButton(BuildContext context) {
     initialOption: 'On Primary',
   );
   final iconColor = iconColorMap[iconColorName]!;
-  
-  final isLoading = context.knobs.boolean(label: 'Loading', initialValue: false);
-  
+
+  final isLoading = context.knobs.boolean(
+    label: 'Loading',
+    initialValue: false,
+  );
+
   return Center(
     child: DSIconButtonWidget(
       selectedIcon,

@@ -306,7 +306,7 @@ class _DesktopExpandedWidget extends StatelessWidget {
     return ClipRect(
       child: SizeTransition(
         sizeFactor: expandAnimation,
-        axisAlignment: -1.0,
+        alignment: Alignment.topCenter,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

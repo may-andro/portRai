@@ -19,8 +19,12 @@ class FeatureFlagsUnknownFailure extends GetAllFeatureFlagsFailure {
 }
 
 @register
-class GetAllFeatureFlagsUseCase extends BaseNoParamUseCase<
-    List<AppFeatureFlagEntity>, GetAllFeatureFlagsFailure> {
+class GetAllFeatureFlagsUseCase
+    extends
+        BaseNoParamUseCase<
+          List<AppFeatureFlagEntity>,
+          GetAllFeatureFlagsFailure
+        > {
   GetAllFeatureFlagsUseCase(this._repository);
 
   final AppFeatureFlagRepository _repository;
@@ -28,7 +32,7 @@ class GetAllFeatureFlagsUseCase extends BaseNoParamUseCase<
   @protected
   @override
   Future<Either<GetAllFeatureFlagsFailure, List<AppFeatureFlagEntity>>>
-      execute() async {
+  execute() async {
     final flags = _repository.getAllFeatureFlags();
     if (flags.isEmpty) {
       return const Left(FeatureFlagsNotFoundFailure());

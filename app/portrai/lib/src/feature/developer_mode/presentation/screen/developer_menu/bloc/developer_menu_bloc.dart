@@ -5,7 +5,7 @@ import 'package:portrai/src/feature/developer_mode/presentation/screen/developer
 
 @register
 class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
-  DeveloperMenuBloc() : super(DeveloperMenuInitialState()) {
+  DeveloperMenuBloc() : super(const DeveloperMenuInitialState()) {
     on<LoadDeveloperMenuEvent>(_onLoad);
     on<ForceFatalCrashEvent>(_onForceFatalCrash);
     on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
@@ -14,11 +14,8 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     on<ViewStateVisibleEvent>(_onViewStateVisible);
   }
 
-  void _onLoad(
-    LoadDeveloperMenuEvent event,
-    Emitter<DeveloperMenuState> emit,
-  ) {
-    emit(DeveloperMenuLoadedState());
+  void _onLoad(LoadDeveloperMenuEvent event, Emitter<DeveloperMenuState> emit) {
+    emit(const DeveloperMenuLoadedState());
   }
 
   void _onForceFatalCrash(

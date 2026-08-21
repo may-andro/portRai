@@ -12,27 +12,27 @@ Widget buildLoading(BuildContext context) {
     min: 20,
     max: 100,
   );
-  
-  final colorMap = {
-    ...context.brandColorsMap,
-    ...context.semanticColorsMap,
-  };
-  
+
+  final colorMap = {...context.brandColorsMap, ...context.semanticColorsMap};
+
   final selectedColorName = context.knobs.object.dropdown(
     label: 'Color',
     options: colorMap.keys.toList(),
     labelBuilder: (name) => name,
   );
-  
+
   final selectedColor = colorMap[selectedColorName]!;
-  
-  final inCard = context.knobs.boolean(label: 'Show in Card', initialValue: false);
-  
+
+  final inCard = context.knobs.boolean(
+    label: 'Show in Card',
+    initialValue: false,
+  );
+
   final loadingWidget = DSLoadingWidget(
     size: size.toDouble(),
     color: selectedColor,
   );
-  
+
   if (inCard) {
     return Center(
       child: DSCardWidget(
@@ -55,6 +55,6 @@ Widget buildLoading(BuildContext context) {
       ),
     );
   }
-  
+
   return Center(child: loadingWidget);
 }

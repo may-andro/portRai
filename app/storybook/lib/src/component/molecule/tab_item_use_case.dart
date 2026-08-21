@@ -7,13 +7,22 @@ import '../../extensions/extensions.dart';
 @UseCase(name: 'Tab Item', type: DSTabItemWidget)
 Widget buildTabItem(BuildContext context) {
   final title = context.knobs.string(label: 'Title', initialValue: 'Home');
-  
-  final isSelected = context.knobs.boolean(label: 'Selected', initialValue: false);
-  
-  final isIndicatorEnabled = context.knobs.boolean(label: 'Show Indicator', initialValue: true);
-  
-  final showTabBar = context.knobs.boolean(label: 'Show Complete Tab Bar', initialValue: false);
-  
+
+  final isSelected = context.knobs.boolean(
+    label: 'Selected',
+    initialValue: false,
+  );
+
+  final isIndicatorEnabled = context.knobs.boolean(
+    label: 'Show Indicator',
+    initialValue: true,
+  );
+
+  final showTabBar = context.knobs.boolean(
+    label: 'Show Complete Tab Bar',
+    initialValue: false,
+  );
+
   if (showTabBar) {
     return Center(
       child: DSCardWidget(
@@ -63,7 +72,7 @@ Widget buildTabItem(BuildContext context) {
       ),
     );
   }
-  
+
   return Center(
     child: DSTabItemWidget(
       title: title,

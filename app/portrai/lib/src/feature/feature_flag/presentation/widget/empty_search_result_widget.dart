@@ -2,10 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 class EmptySearchResultWidget extends StatelessWidget {
-  const EmptySearchResultWidget({
-    super.key,
-    required this.searchQuery,
-  });
+  const EmptySearchResultWidget({super.key, required this.searchQuery});
 
   final String searchQuery;
 

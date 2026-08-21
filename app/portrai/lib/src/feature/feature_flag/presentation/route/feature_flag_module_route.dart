@@ -8,10 +8,9 @@ class FeatureFlagModuleRoute extends ModuleRoute {
     required super.builder,
   });
 
-  static final FeatureFlagModuleRoute featureFlag =
-      FeatureFlagModuleRoute._(
-        name: 'feature_flag',
-        path: '/feature-flag',
-        builder: (_, _, _) => const FeatureFlagScreen(),
-      );
+  static final FeatureFlagModuleRoute featureFlag = FeatureFlagModuleRoute._(
+    name: 'feature_flag',
+    path: '/feature-flag',
+    builder: (_, _, _) => const FeatureFlagScreen(),
+  );
 }

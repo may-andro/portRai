@@ -6,31 +6,41 @@ import '../../extensions/extensions.dart';
 
 @UseCase(name: 'Title Description', type: DSTitleDescriptionWidget)
 Widget buildTitleDescription(BuildContext context) {
-  final title = context.knobs.string(label: 'Title', initialValue: 'Product Title');
-  
+  final title = context.knobs.string(
+    label: 'Title',
+    initialValue: 'Product Title',
+  );
+
   final description = context.knobs.string(
     label: 'Description',
-    initialValue: 'This is a detailed description of the product that provides more information.',
+    initialValue:
+        'This is a detailed description of the product that provides more information.',
   );
-  
+
   final titleMaxLines = context.knobs.int.slider(
     label: 'Title Max Lines',
     initialValue: 2,
     min: 1,
     max: 5,
   );
-  
+
   final descriptionMaxLines = context.knobs.int.slider(
     label: 'Description Max Lines',
     initialValue: 3,
     min: 1,
     max: 10,
   );
-  
-  final isCentered = context.knobs.boolean(label: 'Centered', initialValue: false);
-  
-  final inCard = context.knobs.boolean(label: 'Show in Card', initialValue: true);
-  
+
+  final isCentered = context.knobs.boolean(
+    label: 'Centered',
+    initialValue: false,
+  );
+
+  final inCard = context.knobs.boolean(
+    label: 'Show in Card',
+    initialValue: true,
+  );
+
   final widget = DSTitleDescriptionWidget(
     title: title,
     description: description,
@@ -38,17 +48,14 @@ Widget buildTitleDescription(BuildContext context) {
     descriptionMaxLines: descriptionMaxLines,
     isCenteredContent: isCentered,
   );
-  
+
   if (inCard) {
     return Center(
       child: DSCardWidget(
-        child: Padding(
-          padding: EdgeInsets.all(context.space()),
-          child: widget,
-        ),
+        child: Padding(padding: EdgeInsets.all(context.space()), child: widget),
       ),
     );
   }
-  
+
   return Center(child: widget);
 }

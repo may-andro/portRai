@@ -15,12 +15,11 @@ class ContentWidget extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           FeatureFlagInitialState() ||
-          FeatureFlagLoadingState() =>
-            const _LoadingWidget(),
+          FeatureFlagLoadingState() => const _LoadingWidget(),
           final FeatureFlagLoadedState state => _SuccessWidget(state: state),
           final FeatureFlagErrorState state => _ErrorWidget(
-              message: state.message,
-            ),
+            message: state.message,
+          ),
         };
       },
     );
@@ -75,7 +74,9 @@ class _SuccessWidget extends StatelessWidget {
       impressionId: 'feature_flag_loaded_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
       child: DSResponsiveContainerWidget(
-        key: ValueKey('feature_flag_content_${state.viewMode}_${state.searchQuery}_${state.allFlags.length}'),
+        key: ValueKey(
+          'feature_flag_content_${state.viewMode}_${state.searchQuery}_${state.allFlags.length}',
+        ),
         mobileBuilder: (_) => FeatureFlagContentWidget(state),
         tabletBuilder: (_) => FeatureFlagContentWidget(state),
         desktopBuilder: (_) => FeatureFlagContentWidget(state),

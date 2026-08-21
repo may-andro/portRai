@@ -7,28 +7,37 @@ import '../../extensions/extensions.dart';
 @UseCase(name: 'TextField', type: DSTextFieldWidget)
 Widget buildTextField(BuildContext context) {
   final labelText = context.knobs.string(label: 'Label', initialValue: 'Label');
-  
-  final hintText = context.knobs.string(label: 'Hint', initialValue: 'Enter text here');
-  
-  final helperText = context.knobs.stringOrNull(label: 'Helper Text', initialValue: null);
-  
+
+  final hintText = context.knobs.string(
+    label: 'Hint',
+    initialValue: 'Enter text here',
+  );
+
+  final helperText = context.knobs.stringOrNull(
+    label: 'Helper Text',
+    initialValue: null,
+  );
+
   final fieldType = context.knobs.object.dropdown(
     label: 'Field Type',
     options: TextFieldType.values,
     labelBuilder: (value) => value.name,
   );
-  
+
   final maxLines = context.knobs.int.slider(
     label: 'Max Lines',
     initialValue: 1,
     min: 1,
     max: 10,
   );
-  
+
   final enabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
-  
-  final readOnly = context.knobs.boolean(label: 'Read Only', initialValue: false);
-  
+
+  final readOnly = context.knobs.boolean(
+    label: 'Read Only',
+    initialValue: false,
+  );
+
   final keyboardTypes = [
     ('Text', TextInputType.text),
     ('Email', TextInputType.emailAddress),
@@ -36,15 +45,18 @@ Widget buildTextField(BuildContext context) {
     ('Number', TextInputType.number),
     ('Multiline', TextInputType.multiline),
   ];
-  
+
   final selectedKeyboardType = context.knobs.object.dropdown(
     label: 'Keyboard Type',
     options: keyboardTypes.map((e) => e.$2).toList(),
     labelBuilder: (type) => keyboardTypes.firstWhere((e) => e.$2 == type).$1,
   );
-  
-  final hasSuffixIcon = context.knobs.boolean(label: 'Has Suffix Icon', initialValue: false);
-  
+
+  final hasSuffixIcon = context.knobs.boolean(
+    label: 'Has Suffix Icon',
+    initialValue: false,
+  );
+
   return Center(
     child: DSTextFieldWidget(
       labelText: labelText,

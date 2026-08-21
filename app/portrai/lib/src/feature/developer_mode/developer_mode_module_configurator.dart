@@ -11,7 +11,8 @@ class DeveloperModeModuleConfigurator extends SimpleModuleConfigurator {
 
   @override
   void postDependenciesSetup(ServiceLocator sl) {
-    sl.get<ModuleRouteController>()
-      .register(DeveloperMenuModuleRoute.developerMenu);
+    sl.get<ModuleRouteController>().register(
+      DeveloperMenuModuleRoute.developerMenu,
+    );
   }
 }

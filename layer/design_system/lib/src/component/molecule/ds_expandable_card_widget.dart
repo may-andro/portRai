@@ -140,7 +140,7 @@ class _DSExpandableBodyWidget extends StatelessWidget {
     return ClipRect(
       child: SizeTransition(
         sizeFactor: expandAnimation,
-        axisAlignment: -1.0,
+        alignment: Alignment.topCenter,
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             context.space(factor: 2),

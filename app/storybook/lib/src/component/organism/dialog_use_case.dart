@@ -10,7 +10,7 @@ Widget buildDialogSimple(BuildContext context) {
   final grey7 = context.colorPalette.neutral.grey7;
   final headlineSmall = context.typography.headlineSmall;
   final bodyMedium = context.typography.bodyMedium;
-  
+
   return Center(
     child: DSButtonWidget(
       label: 'Show Dialog',
@@ -21,11 +21,7 @@ Widget buildDialogSimple(BuildContext context) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                DSTextWidget(
-                  'Welcome!',
-                  color: grey9,
-                  style: headlineSmall,
-                ),
+                DSTextWidget('Welcome!', color: grey9, style: headlineSmall),
                 DSVerticalSpacerWidget(1),
                 DSTextWidget(
                   'This is a simple dialog widget example.',
@@ -56,7 +52,7 @@ Widget buildDialogConfirmation(BuildContext context) {
   final grey7 = context.colorPalette.neutral.grey7;
   final headlineSmall = context.typography.headlineSmall;
   final bodyMedium = context.typography.bodyMedium;
-  
+
   return Center(
     child: DSButtonWidget(
       label: 'Delete Item',
@@ -121,7 +117,7 @@ Widget buildDialogForm(BuildContext context) {
   // Capture theme values before dialog
   final grey9 = context.colorPalette.neutral.grey9;
   final headlineSmall = context.typography.headlineSmall;
-  
+
   return Center(
     child: DSButtonWidget(
       label: 'Add New Item',
@@ -185,7 +181,7 @@ Widget buildDialogSuccess(BuildContext context) {
   final grey7 = context.colorPalette.neutral.grey7;
   final headlineSmall = context.typography.headlineSmall;
   final bodyMedium = context.typography.bodyMedium;
-  
+
   return Center(
     child: DSButtonWidget(
       label: 'Complete Action',
@@ -202,11 +198,7 @@ Widget buildDialogSuccess(BuildContext context) {
                   size: DSIconSize.large,
                 ),
                 DSVerticalSpacerWidget(1),
-                DSTextWidget(
-                  'Success!',
-                  color: grey9,
-                  style: headlineSmall,
-                ),
+                DSTextWidget('Success!', color: grey9, style: headlineSmall),
                 DSVerticalSpacerWidget(1),
                 DSTextWidget(
                   'Your action was completed successfully.',
