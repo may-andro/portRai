@@ -8,6 +8,7 @@
 **/google-services.json
 **/GoogleService-Info.plist
 **/firebase_options.dart
+**/assets/dashboard/
 
 # ==========================================
 # Flutter / Dart / Pub
