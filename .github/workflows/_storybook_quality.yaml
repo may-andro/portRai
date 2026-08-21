@@ -80,6 +80,6 @@ jobs:
         if: always()
         with:
           name: Test Results
-          path: ${{ env.STORYBOOK_PATH }}/test-results.json
+          path: test-results.json
           reporter: flutter-json
           working-directory: ${{ env.STORYBOOK_PATH }}
