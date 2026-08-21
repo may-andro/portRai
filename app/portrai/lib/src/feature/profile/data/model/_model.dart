@@ -1,0 +1,10 @@
+export 'availability_model.dart';
+export 'coordinates_model.dart';
+export 'education_model.dart';
+export 'language_model.dart';
+export 'location_model.dart';
+export 'profile_model.dart';
+export 'published_at_model.dart';
+export 'resume_model.dart';
+export 'social_link_model.dart';
+export 'working_hours_model.dart';

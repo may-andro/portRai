@@ -1,0 +1,10 @@
+export 'availability_mapper.dart';
+export 'coordinates_mapper.dart';
+export 'education_mapper.dart';
+export 'language_mapper.dart';
+export 'location_mapper.dart';
+export 'profile_mapper.dart';
+export 'published_at_mapper.dart';
+export 'resume_mapper.dart';
+export 'social_link_mapper.dart';
+export 'working_hours_mapper.dart';
