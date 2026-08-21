@@ -21,3 +21,11 @@ analyzer:
     todo: ignore
     unawaited_futures: warning
     prefer_single_quotes: warning
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
