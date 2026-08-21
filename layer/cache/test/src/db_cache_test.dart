@@ -22,7 +22,7 @@ class SimpleTestModel {
 
 class SimpleTestModelCache extends DBCache<SimpleTestModel> {
   SimpleTestModelCache({this.version = 1, this.ttl = Duration.zero})
-      : super(adapter: SqfliteDbAdapter());
+    : super(adapter: SqfliteDbAdapter());
 
   final int version;
   final Duration ttl;
@@ -81,7 +81,7 @@ class TestModel {
 
 class TestModelCache extends DBCache<TestModel> {
   TestModelCache({this.version = 1, this.ttl = Duration.zero})
-      : super(adapter: SqfliteDbAdapter());
+    : super(adapter: SqfliteDbAdapter());
 
   final int version;
   final Duration ttl;

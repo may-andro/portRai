@@ -73,8 +73,9 @@ void main() {
 
       test('should return null when cache is expired', () async {
         // Manually set a value with an old timestamp so it's expired.
-        adapter._strings['test_cache'] =
-            jsonEncode(keyValueCache.serializeValue('test'));
+        adapter._strings['test_cache'] = jsonEncode(
+          keyValueCache.serializeValue('test'),
+        );
         // Don't set expiration timestamp → defaults to 0 → expired.
 
         final result = await keyValueCache.get();
