@@ -19,9 +19,7 @@ void main() {
       test('should delegate to logger.d with message and tag', () {
         localLogReporter.debug('test message', tag: 'TAG');
 
-        verify(
-          () => mockLogger.d('TAG: test message'),
-        ).called(1);
+        verify(() => mockLogger.d('TAG: test message')).called(1);
       });
 
       test('should pass error and stacktrace to logger.d', () {
@@ -43,9 +41,7 @@ void main() {
       test('should handle null tag', () {
         localLogReporter.debug('msg');
 
-        verify(
-          () => mockLogger.d('null: msg'),
-        ).called(1);
+        verify(() => mockLogger.d('null: msg')).called(1);
       });
     });
 
@@ -53,9 +49,7 @@ void main() {
       test('should delegate to logger.e with message and tag', () {
         localLogReporter.error('error message', tag: 'ERR');
 
-        verify(
-          () => mockLogger.e('ERR: error message'),
-        ).called(1);
+        verify(() => mockLogger.e('ERR: error message')).called(1);
       });
 
       test('should pass error and stacktrace to logger.e', () {
