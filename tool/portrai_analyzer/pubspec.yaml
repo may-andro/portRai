@@ -1,0 +1,19 @@
+name: portrai_analyzer
+description: Custom analyzer plugin with lint rules for the portrai workspace.
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.0
+
+# Pin analyzer and analyzer_plugin to the exact versions that
+# analysis_server_plugin depends on, so we can review any change to them.
+dependencies:
+  analysis_server_plugin: 0.3.5
+  analyzer: 10.0.0
+  analyzer_plugin: 0.14.0
+
+dev_dependencies:
+  analyzer_testing: 0.1.8
+  test: ^1.25.0
+  test_reflective_loader: ^0.4.0
