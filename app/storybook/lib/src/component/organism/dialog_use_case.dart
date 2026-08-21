@@ -1,7 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
-import '../../extensions/extensions.dart';
 
 @UseCase(name: 'Dialog - Simple', type: DSDialogWidget)
 Widget buildDialogSimple(BuildContext context) {

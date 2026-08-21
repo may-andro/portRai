@@ -6,15 +6,10 @@ import '../../../../util/alchemist_utils.dart';
 void main() {
   groupGoldenForBrightnessAndDS(
     'DSLoadingWidget',
-        (theme) =>
-    [
+    (theme) => [
       const TestCase(
         'default (primary color)',
-        SizedBox(
-          width: 120,
-          height: 60,
-          child: DSLoadingWidget(size: 40),
-        ),
+        SizedBox(width: 120, height: 60, child: DSLoadingWidget(size: 40)),
       ),
       TestCase(
         'custom color',
@@ -33,11 +28,7 @@ void main() {
       ),
       const TestCase(
         'large size',
-        SizedBox(
-          width: 160,
-          height: 80,
-          child: DSLoadingWidget(size: 60),
-        ),
+        SizedBox(width: 160, height: 80, child: DSLoadingWidget(size: 60)),
       ),
     ],
   );
