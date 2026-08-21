@@ -171,24 +171,33 @@ extension AllColors on BuildContext {
   /// Get contrasting text color for a container background
   DSColor getContainerTextColor(DSColor? backgroundColor) {
     if (backgroundColor == null) return colorPalette.neutral.grey9;
-    if (backgroundColor == colorPalette.brand.primaryContainer)
+    if (backgroundColor == colorPalette.brand.primaryContainer) {
       return colorPalette.brand.onPrimaryContainer;
-    if (backgroundColor == colorPalette.brand.secondaryContainer)
+    }
+    if (backgroundColor == colorPalette.brand.secondaryContainer) {
       return colorPalette.brand.onSecondaryContainer;
-    if (backgroundColor == colorPalette.brand.tertiaryContainer)
+    }
+    if (backgroundColor == colorPalette.brand.tertiaryContainer) {
       return colorPalette.brand.onTertiaryContainer;
-    if (backgroundColor == colorPalette.semantic.errorContainer)
+    }
+    if (backgroundColor == colorPalette.semantic.errorContainer) {
       return colorPalette.semantic.onErrorContainer;
-    if (backgroundColor == colorPalette.semantic.successContainer)
+    }
+    if (backgroundColor == colorPalette.semantic.successContainer) {
       return colorPalette.semantic.onSuccessContainer;
-    if (backgroundColor == colorPalette.semantic.warningContainer)
+    }
+    if (backgroundColor == colorPalette.semantic.warningContainer) {
       return colorPalette.semantic.onWarningContainer;
-    if (backgroundColor == colorPalette.semantic.infoContainer)
+    }
+    if (backgroundColor == colorPalette.semantic.infoContainer) {
       return colorPalette.semantic.onInfoContainer;
-    if (backgroundColor == colorPalette.surface.surface)
+    }
+    if (backgroundColor == colorPalette.surface.surface) {
       return colorPalette.surface.onSurface;
-    if (backgroundColor == colorPalette.surface.surfaceVariant)
+    }
+    if (backgroundColor == colorPalette.surface.surfaceVariant) {
       return colorPalette.surface.onSurfaceVariant;
+    }
     return colorPalette.neutral.grey9;
   }
 }
