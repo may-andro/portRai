@@ -1,0 +1,47 @@
+targets:
+  $default:
+    sources:
+      include:
+        - "pubspec.yaml"
+        - $package$
+        - assets/**
+        - lib/**
+    builders:
+      # JSON Serialization builder for data models and tracking actions
+      json_serializable|json_serializable:
+        enabled: true
+        options:
+          # Generate both toJson and fromJson methods
+          any_map: false
+          # Check for required fields in JSON
+          checked: true
+          # Create factory constructors with const when possible
+          create_factory: true
+          create_to_json: true
+          # Disallow extra keys in JSON (strict mode)
+          disallow_unrecognized_keys: false
+          # Generate explicit toJson for nested objects
+          explicit_to_json: false
+          # Use field naming to generate JSON keys
+          field_rename: none
+          # Include fields with null values in JSON
+          include_if_null: true
+
+      # Custom use_case failure translator builder
+      use_case|failure_translator:
+        enabled: true
+        generate_for:
+          - lib/**
+
+      # Module Injector code generator
+      module_injector|module_injector_generator:
+        enabled: true
+        generate_for:
+          - lib/**/*_module_configurator.dart
+
+# Global build configuration
+global_options:
+  # Performance optimizations
+  json_serializable:
+    runs_before:
+      - use_case|failure_translator
