@@ -1,0 +1,10 @@
+export 'availability_entity.dart';
+export 'coordinates_entity.dart';
+export 'education_entity.dart';
+export 'language_entity.dart';
+export 'location_entity.dart';
+export 'profile_entity.dart';
+export 'published_at_entity.dart';
+export 'resume_entity.dart';
+export 'social_link_entity.dart';
+export 'working_hours_entity.dart';
