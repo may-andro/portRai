@@ -32,7 +32,7 @@ void main() {
 
       test(
         'should throw FirestoreUnknownException for empty collection path',
-        () async {
+        () {
           expect(
             () => controller.addToCollection('', testData),
             throwsA(isA<FirestoreUnknownException>()),
@@ -40,7 +40,7 @@ void main() {
         },
       );
 
-      test('should throw FirestoreUnknownException for empty data', () async {
+      test('should throw FirestoreUnknownException for empty data', () {
         expect(
           () => controller.addToCollection(collection, {}),
           throwsA(isA<FirestoreUnknownException>()),
@@ -62,7 +62,7 @@ void main() {
         expect(doc.data()!['name'], 'Alice');
       });
 
-      test('should throw for empty document path', () async {
+      test('should throw for empty document path', () {
         expect(
           () => controller.addDocumentToCollection(
             collectionPath: collection,
@@ -90,7 +90,7 @@ void main() {
 
       test(
         'should throw FirestoreDocumentNotFoundException when not found',
-        () async {
+        () {
           expect(
             () =>
                 controller.getDocumentFromCollection(collection, 'nonexistent'),
@@ -99,7 +99,7 @@ void main() {
         },
       );
 
-      test('should throw for empty collection path', () async {
+      test('should throw for empty collection path', () {
         expect(
           () => controller.getDocumentFromCollection('', docId),
           throwsA(isA<FirestoreUnknownException>()),
@@ -122,7 +122,7 @@ void main() {
 
       test(
         'should throw FirestoreDocumentNotFoundException when doc not found',
-        () async {
+        () {
           expect(
             () => controller.updateDocumentFromCollection(
               collection,
@@ -151,7 +151,7 @@ void main() {
 
       test(
         'should throw FirestoreDocumentNotFoundException when doc not found',
-        () async {
+        () {
           expect(
             () => controller.deleteDocumentFromCollection(
               collectionPath: collection,
@@ -200,7 +200,7 @@ void main() {
         expect(result.first['name'], 'Alice');
       });
 
-      test('should throw for invalid limit', () async {
+      test('should throw for invalid limit', () {
         expect(
           () => controller.getCollectionQuerySnapshot(collection, limit: 0),
           throwsA(isA<FirestoreUnknownException>()),
@@ -235,7 +235,7 @@ void main() {
         expect(docB.data()!['name'], 'Bob Updated');
       });
 
-      test('should throw for empty updates list', () async {
+      test('should throw for empty updates list', () {
         expect(
           () => controller.batchUpdateDocuments(collection, []),
           throwsA(isA<FirestoreUnknownException>()),
@@ -244,7 +244,7 @@ void main() {
 
       test(
         'should throw when a document in the batch does not exist',
-        () async {
+        () {
           expect(
             () => controller.batchUpdateDocuments(collection, [
               {

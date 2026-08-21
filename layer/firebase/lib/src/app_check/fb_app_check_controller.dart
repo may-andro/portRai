@@ -18,10 +18,10 @@ class FbAppCheckController {
     try {
       await _firebaseAppCheck.activate(
         providerWeb: ReCaptchaV3Provider(token),
-        androidProvider: kDebugMode
+        providerAndroid: kDebugMode
             ? AndroidProvider.debug
             : AndroidProvider.playIntegrity,
-        appleProvider: kDebugMode
+        providerApple: kDebugMode
             ? AppleProvider.debug
             : AppleProvider.appAttest,
       );
