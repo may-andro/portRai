@@ -6,7 +6,8 @@ import '../../../../util/alchemist_utils.dart';
 void main() {
   groupGoldenForBrightnessAndDS(
     'DSLoadingWidget',
-    (theme) => [
+        (theme) =>
+    [
       const TestCase(
         'default (primary color)',
         SizedBox(

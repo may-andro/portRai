@@ -22,10 +22,7 @@ void main() {
       ),
       TestCase(
         'unselected with indicator',
-        DSTabItemWidget(
-          title: 'Services',
-          onTap: () {},
-        ),
+        DSTabItemWidget(title: 'Services', onTap: () {}),
       ),
     ],
   );
