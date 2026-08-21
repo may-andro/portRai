@@ -1,0 +1,31 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "portrai-96f2b",
+          "appId": "1:646538071739:android:f86d4cb34beb135f18e39e",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "portrai-96f2b",
+          "appId": "1:646538071739:ios:b53303d1449708aa18e39e",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "portrai-96f2b",
+          "configurations": {
+            "android": "1:646538071739:android:f86d4cb34beb135f18e39e",
+            "ios": "1:646538071739:ios:b53303d1449708aa18e39e",
+            "web": "1:646538071739:web:38cf0b2895a7623a18e39e"
+          }
+        }
+      }
+    }
+  }
+}
