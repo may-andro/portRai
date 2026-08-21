@@ -7,9 +7,9 @@ void main() {
   groupGoldenForBrightnessAndDS(
     'DSLoadingWidget',
     (theme) => [
-      TestCase(
+      const TestCase(
         'default (primary color)',
-        const SizedBox(
+        SizedBox(
           width: 120,
           height: 60,
           child: DSLoadingWidget(size: 40),

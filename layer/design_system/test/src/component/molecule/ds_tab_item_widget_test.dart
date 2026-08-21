@@ -25,7 +25,6 @@ void main() {
         DSTabItemWidget(
           title: 'Services',
           onTap: () {},
-          isSelected: false,
         ),
       ),
     ],
