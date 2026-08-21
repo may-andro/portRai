@@ -19,11 +19,11 @@ class FbAppCheckController {
       await _firebaseAppCheck.activate(
         providerWeb: ReCaptchaV3Provider(token),
         providerAndroid: kDebugMode
-            ? AndroidProvider.debug
-            : AndroidProvider.playIntegrity,
+            ? const AndroidDebugProvider()
+            : const AndroidPlayIntegrityProvider(),
         providerApple: kDebugMode
-            ? AppleProvider.debug
-            : AppleProvider.appAttest,
+            ? const AppleDebugProvider()
+            : const AppleAppAttestProvider(),
       );
       await _firebaseAppCheck.setTokenAutoRefreshEnabled(true);
     } catch (e, st) {
