@@ -25,6 +25,7 @@ jobs:
         run: flutter pub get
 
       - name: Generate code
+        working-directory: layer/feature_flag
         run: flutter pub run build_runner build
 
       - name: Verify formatting
