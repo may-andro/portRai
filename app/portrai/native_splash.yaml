@@ -1,0 +1,33 @@
+flutter_native_splash:
+  # Background colors
+  color: "#F6F6F6"
+  color_dark: "#1E1E1E"
+
+  # Platform-specific images (using circular versions)
+  image_android: assets/splash/logo.png
+  image_ios: assets/splash/logo.png
+  image_web: assets/splash/logo.png
+
+  # Dark mode images (using circular versions)
+  image_dark_android: assets/splash/logo.png
+  image_dark_ios: assets/splash/logo.png
+  image_dark_web: assets/splash/logo.png
+
+  # Android 12+ specific configuration with branding
+  android_12:
+    color: "#F6F6F6"
+    icon_background_color: "#1E1E1E"
+    image: assets/splash/logo_android12.png
+    color_dark: "#1E1E1E"
+    icon_background_color_dark: "#F6F6F6"
+    image_dark: assets/splash/logo_android12.png
+
+  # Web specific settings
+  web_image_mode: center
+
+  # General settings
+  android_gravity: center
+  # ios_content_mode: scaleAspectFit
+
+  # Fullscreen mode
+  # fullscreen: true
