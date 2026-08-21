@@ -31,7 +31,7 @@ dependencies:
   meta: ^1.16.0
   module_injector: any
   open_mail: ^1.2.1
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.0.0
   remote: any
   rxdart: ^0.28.0
   tracking: any

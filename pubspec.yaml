@@ -38,7 +38,7 @@ melos:
         intl: ^0.20.2
         json_annotation: ^4.9.0
         meta: ^1.16.0
-        package_info_plus: ^9.0.0
+        package_info_plus: ^10.0.0
         recase: ^4.1.0
         visibility_detector: ^0.4.0+2
       dev_dependencies:

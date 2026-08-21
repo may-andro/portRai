@@ -14,7 +14,7 @@ dependencies:
   design_system:
     path: ../../layer/design_system
   flutter_native_splash: ^2.4.6
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.0.0
   widgetbook: ^3.25.0
   widgetbook_annotation: ^3.7.0
 dev_dependencies:
