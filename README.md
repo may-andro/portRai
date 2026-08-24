@@ -106,8 +106,8 @@ Foundation Layers (design_system, core, module_injector)
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/port-rai.git
-   cd port-rai
+   git clone https://github.com/may-andro/portRai.git
+   cd portRai
    ```
 
 2. **Install Melos** (if not already installed):
