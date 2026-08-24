@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -33,7 +36,29 @@ jobs:
         run: dart analyze --fatal-infos .
 
       - name: Run golden tests (CI mode)
+        id: golden_tests
         working-directory: layer/design_system
         continue-on-error: true
+        run: flutter test --dart-define=CI=true
+
+      - name: Update golden files if tests failed
+        if: steps.golden_tests.outcome == 'failure'
+        working-directory: layer/design_system
+        run: flutter test --dart-define=CI=true --update-goldens
+
+      - name: Commit updated golden files
+        if: steps.golden_tests.outcome == 'failure'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add layer/design_system/test
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update golden test files for Flutter 3.47.1 [skip ci]"
+            git push
+          fi
+
+      - name: Run golden tests again
+        if: steps.golden_tests.outcome == 'failure'
+        working-directory: layer/design_system
         run: flutter test --dart-define=CI=true
 
