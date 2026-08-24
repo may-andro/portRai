@@ -2,7 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
-import '../../extensions/extensions.dart';
 
 @UseCase(name: 'Labeled Info Row', type: DSLabeledInfoRowWidget)
 Widget buildLabeledInfoRow(BuildContext context) {
@@ -15,21 +14,30 @@ Widget buildLabeledInfoRow(BuildContext context) {
     Icons.notifications,
     Icons.security,
   ];
-  
+
   final selectedIcon = context.knobs.object.dropdown(
     label: 'Icon',
     options: icons,
     labelBuilder: (icon) => icon.toString().split('.').last,
   );
-  
+
   final label = context.knobs.string(label: 'Label', initialValue: 'Email');
-  
-  final value = context.knobs.string(label: 'Value', initialValue: 'john.doe@example.com');
-  
-  final isClickable = context.knobs.boolean(label: 'Clickable', initialValue: false);
-  
-  final showMultiple = context.knobs.boolean(label: 'Show Multiple in Card', initialValue: false);
-  
+
+  final value = context.knobs.string(
+    label: 'Value',
+    initialValue: 'john.doe@example.com',
+  );
+
+  final isClickable = context.knobs.boolean(
+    label: 'Clickable',
+    initialValue: false,
+  );
+
+  final showMultiple = context.knobs.boolean(
+    label: 'Show Multiple in Card',
+    initialValue: false,
+  );
+
   if (showMultiple) {
     return Center(
       child: DSCardWidget(
@@ -73,7 +81,7 @@ Widget buildLabeledInfoRow(BuildContext context) {
       ),
     );
   }
-  
+
   return Center(
     child: DSLabeledInfoRowWidget(
       icon: selectedIcon,

@@ -182,7 +182,7 @@ class _MobileExpandedWidget extends StatelessWidget {
     return ClipRect(
       child: SizeTransition(
         sizeFactor: expandAnimation,
-        axisAlignment: -1.0,
+        alignment: Alignment.topCenter,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
           child: Column(

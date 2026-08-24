@@ -77,4 +77,3 @@ class DSLabeledInfoRowWidget extends StatelessWidget {
     return content;
   }
 }
-

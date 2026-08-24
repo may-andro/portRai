@@ -2,7 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
-import '../../extensions/extensions.dart';
 
 @UseCase(name: 'Quote Text', type: DSQuoteTextWidget)
 Widget buildQuoteText(BuildContext context) {
@@ -10,16 +9,19 @@ Widget buildQuoteText(BuildContext context) {
     label: 'Quote Text',
     initialValue: 'The only way to do great work is to love what you do.',
   );
-  
+
   final maxLines = context.knobs.int.slider(
     label: 'Max Lines',
     initialValue: 2,
     min: 1,
     max: 10,
   );
-  
-  final inProfile = context.knobs.boolean(label: 'Show in Profile Card', initialValue: false);
-  
+
+  final inProfile = context.knobs.boolean(
+    label: 'Show in Profile Card',
+    initialValue: false,
+  );
+
   if (inProfile) {
     return Center(
       child: DSCardWidget(
@@ -63,25 +65,19 @@ Widget buildQuoteText(BuildContext context) {
                 color: context.colorPalette.outline.outlineVariant,
               ),
               DSVerticalSpacerWidget(1),
-              DSQuoteTextWidget(
-                text: text,
-                maxLines: maxLines,
-              ),
+              DSQuoteTextWidget(text: text, maxLines: maxLines),
             ],
           ),
         ),
       ),
     );
   }
-  
+
   return Center(
     child: DSCardWidget(
       child: Padding(
         padding: EdgeInsets.all(context.space()),
-        child: DSQuoteTextWidget(
-          text: text,
-          maxLines: maxLines,
-        ),
+        child: DSQuoteTextWidget(text: text, maxLines: maxLines),
       ),
     ),
   );

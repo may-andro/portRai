@@ -34,8 +34,8 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
     Emitter<FeatureFlagState> emit,
   ) async {
     // Preserve existing state properties if available
-    final previousState = state is FeatureFlagLoadedState 
-        ? state as FeatureFlagLoadedState 
+    final previousState = state is FeatureFlagLoadedState
+        ? state as FeatureFlagLoadedState
         : null;
 
     emit(const FeatureFlagLoadingState());
@@ -67,10 +67,9 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
       return flag.flag == updatedFlag.flag ? updatedFlag : flag;
     }).toList();
 
-    emit(currentState.copyWith(
-      allFlags: updatedFlags,
-      hasManipulatedFlags: true,
-    ));
+    emit(
+      currentState.copyWith(allFlags: updatedFlags, hasManipulatedFlags: true),
+    );
 
     await _updateFeatureFlagUseCase(updatedFlag);
   }
@@ -80,14 +79,14 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
     Emitter<FeatureFlagState> emit,
   ) async {
     // Preserve viewMode and searchQuery during reset
-    final previousState = state is FeatureFlagLoadedState 
-        ? state as FeatureFlagLoadedState 
+    final previousState = state is FeatureFlagLoadedState
+        ? state as FeatureFlagLoadedState
         : null;
 
     emit(const FeatureFlagLoadingState());
 
     await _resetFeatureFlagsUseCase();
-    
+
     // Load flags with preserved state, but reset hasManipulatedFlags
     final result = await _getAllFeatureFlagsUseCase();
     result.fold(

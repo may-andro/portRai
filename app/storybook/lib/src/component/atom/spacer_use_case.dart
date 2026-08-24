@@ -2,7 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
-import '../../extensions/extensions.dart';
 
 @UseCase(name: 'Spacer', type: DSVerticalSpacerWidget)
 Widget buildSpacer(BuildContext context) {
@@ -13,9 +12,12 @@ Widget buildSpacer(BuildContext context) {
     max: 4,
     divisions: 15,
   );
-  
-  final isVertical = context.knobs.boolean(label: 'Vertical', initialValue: true);
-  
+
+  final isVertical = context.knobs.boolean(
+    label: 'Vertical',
+    initialValue: true,
+  );
+
   if (isVertical) {
     return Center(
       child: DSCardWidget(
@@ -47,7 +49,7 @@ Widget buildSpacer(BuildContext context) {
       ),
     );
   }
-  
+
   return Center(
     child: DSCardWidget(
       child: Padding(

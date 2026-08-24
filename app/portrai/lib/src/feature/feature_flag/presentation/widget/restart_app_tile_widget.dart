@@ -1,13 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../app/restart_app.dart';
+import 'package:portrai/src/app/restart_app.dart';
 
 class RestartAppTileWidget extends StatelessWidget {
-  const RestartAppTileWidget({
-    required this.hasManipulatedFlags,
-    super.key,
-  });
+  const RestartAppTileWidget({required this.hasManipulatedFlags, super.key});
 
   final bool hasManipulatedFlags;
 

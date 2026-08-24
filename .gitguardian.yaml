@@ -1,0 +1,13 @@
+version: 2
+
+# Paths to ignore in GitGuardian scans
+paths-ignore:
+  # Test fixtures with dummy credentials - safe to commit
+  - tool/firestore_export_import/test/test_data/**
+  - "**/test_data/**"
+  - "**/test/fixtures/**"
+
+# Ignore specific secret types in test directories
+matches-ignore:
+  - name: Test fixtures
+    match: tool/firestore_export_import/test/test_data/service_account.json

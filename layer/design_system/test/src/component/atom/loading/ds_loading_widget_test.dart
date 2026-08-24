@@ -7,13 +7,9 @@ void main() {
   groupGoldenForBrightnessAndDS(
     'DSLoadingWidget',
     (theme) => [
-      TestCase(
+      const TestCase(
         'default (primary color)',
-        const SizedBox(
-          width: 120,
-          height: 60,
-          child: DSLoadingWidget(size: 40),
-        ),
+        SizedBox(width: 120, height: 60, child: DSLoadingWidget(size: 40)),
       ),
       TestCase(
         'custom color',
@@ -26,23 +22,14 @@ void main() {
           ),
         ),
       ),
-      TestCase(
+      const TestCase(
         'small size',
-        const SizedBox(
-          width: 80,
-          height: 40,
-          child: DSLoadingWidget(size: 24),
-        ),
+        SizedBox(width: 80, height: 40, child: DSLoadingWidget(size: 24)),
       ),
-      TestCase(
+      const TestCase(
         'large size',
-        const SizedBox(
-          width: 160,
-          height: 80,
-          child: DSLoadingWidget(size: 60),
-        ),
+        SizedBox(width: 160, height: 80, child: DSLoadingWidget(size: 60)),
       ),
     ],
   );
 }
-

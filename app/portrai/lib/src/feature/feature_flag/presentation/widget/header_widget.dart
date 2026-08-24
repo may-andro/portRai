@@ -1,12 +1,11 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../bloc/feature_flag_bloc.dart';
-import '../bloc/feature_flag_event.dart';
-import '../bloc/feature_flag_state.dart';
-import 'restart_app_tile_widget.dart';
-import 'search_widget.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/bloc/feature_flag_bloc.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/bloc/feature_flag_event.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/bloc/feature_flag_state.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/widget/restart_app_tile_widget.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/widget/search_widget.dart';
 
 class HeaderWidget extends StatefulWidget {
   const HeaderWidget({super.key});
@@ -89,8 +88,8 @@ class _HeaderWidgetState extends State<HeaderWidget> {
               searchQuery: searchQuery,
               onSearch: (value) {
                 context.read<FeatureFlagBloc>().add(
-                      SearchFeatureFlagsEvent(value),
-                    );
+                  SearchFeatureFlagsEvent(value),
+                );
               },
               isEnabled: state.allFlags.isNotEmpty || searchQuery.isNotEmpty,
             ),

@@ -60,7 +60,12 @@ class FeatureFlagLoadedState extends FeatureFlagState {
   }
 
   @override
-  List<Object?> get props => [allFlags, searchQuery, hasManipulatedFlags, viewMode];
+  List<Object?> get props => [
+    allFlags,
+    searchQuery,
+    hasManipulatedFlags,
+    viewMode,
+  ];
 }
 
 class FeatureFlagErrorState extends FeatureFlagState {

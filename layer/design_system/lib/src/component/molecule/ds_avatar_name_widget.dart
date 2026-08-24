@@ -87,5 +87,3 @@ class DSAvatarNameWidget extends StatelessWidget {
     );
   }
 }
-
-

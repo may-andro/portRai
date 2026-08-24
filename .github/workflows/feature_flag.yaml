@@ -19,9 +19,14 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.1
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Generate code
+        working-directory: layer/feature_flag
+        run: flutter pub run build_runner build
 
       - name: Verify formatting
         working-directory: layer/feature_flag

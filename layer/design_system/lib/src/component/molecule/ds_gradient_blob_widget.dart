@@ -49,4 +49,3 @@ class DSGradientBlobWidget extends StatelessWidget {
         );
   }
 }
-

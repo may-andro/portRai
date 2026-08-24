@@ -3,6 +3,8 @@
 # ==========================================
 **/.data/
 **/service_account.json
+# Exception: Test fixture file (dummy credentials)
+!tool/firestore_export_import/test/test_data/service_account.json
 **/*.keystore
 **/*.jks
 **/google-services.json

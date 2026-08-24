@@ -26,7 +26,7 @@ class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
 
     // Merge: cached flags override delegate flags, new delegate flags are added
     final merged = _mergeFlags(delegateFlags, cachedFlags);
-    
+
     // Cache any new flags from delegate
     final newFlags = _findNewFlags(delegateFlags, cachedFlags);
     if (newFlags.isNotEmpty) {
@@ -46,6 +46,7 @@ class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
     }
     return _featureFlagCache.put(featureFlag);
   }
+
   List<FeatureFlag> _mergeFlags(
     List<FeatureFlag> delegateFlags,
     List<FeatureFlag> cachedFlags,

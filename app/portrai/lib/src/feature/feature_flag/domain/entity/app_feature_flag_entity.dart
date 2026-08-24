@@ -22,13 +22,13 @@ class AppFeatureFlagEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        flag,
-        isEnabled,
-        isOverridden,
-        remoteValue,
-        displayName,
-        description,
-      ];
+    flag,
+    isEnabled,
+    isOverridden,
+    remoteValue,
+    displayName,
+    description,
+  ];
 
   String get name => displayName ?? _formatKey(flag.name);
 
@@ -44,9 +44,11 @@ class AppFeatureFlagEntity extends Equatable {
   String _formatKey(String key) {
     return key
         .split(RegExp(r'(?=[A-Z])'))
-        .map((word) => word.isEmpty
-            ? ''
-            : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}')
+        .map(
+          (word) => word.isEmpty
+              ? ''
+              : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}',
+        )
         .join(' ');
   }
 

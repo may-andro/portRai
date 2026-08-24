@@ -35,11 +35,17 @@ class GetDataToUploadUseCase {
       final documents = rawDocuments as List<dynamic>;
       entries = documents.map((doc) {
         final d = doc as Map<String, dynamic>;
-        return MapEntry(d['docId'] as String, d['fields'] as Map<String, dynamic>);
+        return MapEntry(
+          d['docId'] as String,
+          d['fields'] as Map<String, dynamic>,
+        );
       });
     } else {
       entries = json.entries.map(
-        (e) => MapEntry(e.key, (e.value as Map<dynamic, dynamic>).cast<String, dynamic>()),
+        (e) => MapEntry(
+          e.key,
+          (e.value as Map<dynamic, dynamic>).cast<String, dynamic>(),
+        ),
       );
     }
 

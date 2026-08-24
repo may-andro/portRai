@@ -1,15 +1,14 @@
 name: firestore_export_import
 description: A command-line application for exporting and importing content to/from Firestore.
 version: 1.0.0
-resolution: workspace
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.11.0
 
 dependencies:
   args: ^2.7.0
-  get_it: ^8.2.0
-  googleapis: ^15.0.0
+  get_it: ^9.0.0
+  googleapis: ^16.0.0
   googleapis_auth: ^2.0.0
   http: ^1.5.0
   logger: ^2.6.2

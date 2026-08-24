@@ -19,11 +19,13 @@ void _addHttpClientToDI() {
 }
 
 void _addLoggerToDI() {
-  locator.registerLazySingleton<Logger>(() => Logger(
-    printer: SimplePrinter(printTime: true),
-    output: ConsoleOutput(),
-    level: Level.debug,
-  ));
+  locator.registerLazySingleton<Logger>(
+    () => Logger(
+      printer: SimplePrinter(printTime: true),
+      output: ConsoleOutput(),
+      level: Level.debug,
+    ),
+  );
 }
 
 void _addUseCasesToDI() {

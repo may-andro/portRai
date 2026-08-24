@@ -12,16 +12,16 @@ Widget buildTextWidget(BuildContext context) {
     options: styleMap.keys.toList(),
     labelBuilder: (name) => name,
   );
-  
+
   final selectedStyle = styleMap[selectedStyleName]!;
-  
+
   final text = context.knobs.string(
     label: 'Text',
     initialValue: 'The quick brown fox jumps over the lazy dog',
   );
-  
+
   final isItalic = context.knobs.boolean(label: 'Italic', initialValue: false);
-  
+
   final decoration = context.knobs.object.dropdown(
     label: 'Decoration',
     options: [
@@ -31,20 +31,20 @@ Widget buildTextWidget(BuildContext context) {
     ],
     labelBuilder: (value) => value.toString().split('.').last,
   );
-  
+
   final alignment = context.knobs.object.dropdown(
     label: 'Text Align',
     options: [TextAlign.left, TextAlign.center, TextAlign.right],
     labelBuilder: (value) => value.toString().split('.').last,
   );
-  
+
   final maxLines = context.knobs.int.slider(
     label: 'Max Lines',
     initialValue: 3,
     min: 1,
     max: 10,
   );
-  
+
   return Center(
     child: DSTextWidget(
       text,

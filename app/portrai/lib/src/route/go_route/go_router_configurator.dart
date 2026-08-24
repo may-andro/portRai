@@ -26,7 +26,7 @@ class GoRouterConfigurator {
       routes: route.children.map(_convertModuleRoute).toList(),
       redirect: route.requiresAuth
           ? (context, state) {
-              // TODO: Replace with your actual authentication logic
+              // TODO(auth): Replace with your actual authentication logic
               const isAuthenticated = false; // Example placeholder
               if (!isAuthenticated) {
                 return '/login'; // Update to your login route

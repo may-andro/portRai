@@ -13,7 +13,7 @@ Widget buildCard(BuildContext context) {
     labelBuilder: (name) => name,
   );
   final selectedElevation = elevationMap[selectedElevationName]!;
-  
+
   final radiusMap = context.radiusOptionsMap;
   final selectedRadiusName = context.knobs.object.dropdown(
     label: 'Radius',
@@ -21,7 +21,7 @@ Widget buildCard(BuildContext context) {
     labelBuilder: (name) => name,
   );
   final selectedRadius = radiusMap[selectedRadiusName]!;
-  
+
   final backgroundColorMap = context.containerColorsMap;
   final selectedBackgroundName = context.knobs.object.dropdown(
     label: 'Background Color',
@@ -29,18 +29,24 @@ Widget buildCard(BuildContext context) {
     labelBuilder: (name) => name,
   );
   final selectedBackground = backgroundColorMap[selectedBackgroundName];
-  
-  final isClickable = context.knobs.boolean(label: 'Clickable', initialValue: false);
-  
+
+  final isClickable = context.knobs.boolean(
+    label: 'Clickable',
+    initialValue: false,
+  );
+
   final hasIcon = context.knobs.boolean(label: 'Has Icon', initialValue: false);
-  
-  final cardTitle = context.knobs.string(label: 'Title', initialValue: 'Card Title');
-  
+
+  final cardTitle = context.knobs.string(
+    label: 'Title',
+    initialValue: 'Card Title',
+  );
+
   final cardDescription = context.knobs.string(
     label: 'Description',
     initialValue: 'This is a card widget with customizable properties.',
   );
-  
+
   return Center(
     child: DSCardWidget(
       elevation: selectedElevation,

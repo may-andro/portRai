@@ -144,9 +144,6 @@ String _toSnakeCase(String camelCase) {
       )
       // Insert underscore between a lowercase letter / digit and an uppercase letter.
       // "Button_Widget" → already correct; "textWidget" → "text_Widget"
-      .replaceAllMapped(
-        RegExp(r'([a-z\d])([A-Z])'),
-        (m) => '${m[1]}_${m[2]}',
-      )
+      .replaceAllMapped(RegExp(r'([a-z\d])([A-Z])'), (m) => '${m[1]}_${m[2]}')
       .toLowerCase();
 }

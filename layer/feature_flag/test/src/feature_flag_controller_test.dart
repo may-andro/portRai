@@ -176,7 +176,9 @@ void main() {
         when(
           () => mockDataSource.initFeatureFlags(),
         ).thenAnswer((_) => mockFlags);
-        when(() => mockDataSource.updateFeatureFlag(any())).thenAnswer((_) async {});
+        when(
+          () => mockDataSource.updateFeatureFlag(any()),
+        ).thenAnswer((_) async {});
         await controller.initFeatureFlags();
       });
 

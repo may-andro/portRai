@@ -6,7 +6,7 @@ resolution: workspace
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.11.0
 
 dependencies:
   cache: any
@@ -24,14 +24,14 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_native_splash: ^2.4.6
-  go_router: ^16.0.0
+  go_router: ^17.0.0
   intl: ^0.20.2
   json_annotation: ^4.9.0
   log_reporter: any
   meta: ^1.16.0
   module_injector: any
   open_mail: ^1.2.1
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.0.0
   remote: any
   rxdart: ^0.28.0
   tracking: any

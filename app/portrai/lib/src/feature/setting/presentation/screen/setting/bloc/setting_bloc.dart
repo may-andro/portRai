@@ -8,8 +8,8 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/set
 
 @register
 class SettingBloc extends Bloc<SettingEvent, SettingState> {
-  SettingBloc(this._isFeatureEnabledUseCase) 
-      : super(const SettingInitialState()) {
+  SettingBloc(this._isFeatureEnabledUseCase)
+    : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
 
@@ -30,8 +30,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       (isEnabled) => isEnabled,
     );
 
-    emit(SettingLoadedState(
-      isLanguageSelectorEnabled: isLanguageSelectorEnabled,
-    ));
+    emit(
+      SettingLoadedState(isLanguageSelectorEnabled: isLanguageSelectorEnabled),
+    );
   }
 }

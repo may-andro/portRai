@@ -12,24 +12,27 @@ Widget buildDivider(BuildContext context) {
     min: 1,
     max: 8,
   );
-  
-  final isVertical = context.knobs.boolean(label: 'Vertical', initialValue: false);
-  
+
+  final isVertical = context.knobs.boolean(
+    label: 'Vertical',
+    initialValue: false,
+  );
+
   final colorMap = {
     ...context.brandColorsMap,
     'Outline': context.colorPalette.outline.outline,
     'Outline Variant': context.colorPalette.outline.outlineVariant,
     'Grey 5': context.colorPalette.neutral.grey5,
   };
-  
+
   final selectedColorName = context.knobs.object.dropdown(
     label: 'Color',
     options: colorMap.keys.toList(),
     labelBuilder: (name) => name,
   );
-  
+
   final selectedColor = colorMap[selectedColorName]!;
-  
+
   if (isVertical) {
     return Center(
       child: Row(
@@ -58,7 +61,7 @@ Widget buildDivider(BuildContext context) {
       ),
     );
   }
-  
+
   return Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,

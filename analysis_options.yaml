@@ -17,8 +17,6 @@ linter:
     always_use_package_imports: true
 
 analyzer:
-  plugins:
-    - custom_lint
   language:
     strict-raw-types: true
     strict-inference: true

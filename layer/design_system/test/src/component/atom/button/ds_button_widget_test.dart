@@ -67,13 +67,7 @@ void main() {
           size: DSButtonSize.medium,
         ),
       ),
-      TestCase(
-        'large',
-        DSButtonWidget(
-          label: 'Large',
-          onPressed: () {},
-        ),
-      ),
+      TestCase('large', DSButtonWidget(label: 'Large', onPressed: () {})),
       // Icons
       TestCase(
         'icon left',

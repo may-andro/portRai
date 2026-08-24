@@ -4,17 +4,14 @@ import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/bloc/_bloc.dart';
 
 class FeatureFlagItemWidget extends StatelessWidget {
-  const FeatureFlagItemWidget({
-    super.key,
-    required this.flag,
-  });
+  const FeatureFlagItemWidget({super.key, required this.flag});
 
   final AppFeatureFlagEntity flag;
 
   @override
   Widget build(BuildContext context) {
     final isEnabled = flag.isEnabled;
-    
+
     return Padding(
       padding: EdgeInsets.only(bottom: context.space()),
       child: DSCardWidget(
@@ -62,7 +59,8 @@ class FeatureFlagItemWidget extends StatelessWidget {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: context.colorPalette.semantic.warning.color,
+                                color:
+                                    context.colorPalette.semantic.warning.color,
                                 shape: BoxShape.circle,
                               ),
                             ),
