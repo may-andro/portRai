@@ -43,6 +43,21 @@ runs:
       shell: bash
       run: flutter pub get
 
+    - name: Create assets from templates
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: |
+        # Copy .template.json files to actual .json files for CI
+        if [ -d "assets/dashboard" ]; then
+          for template in assets/dashboard/*.template.json; do
+            if [ -f "$template" ]; then
+              target="${template%.template.json}.json"
+              cp "$template" "$target"
+              echo "Created: $target"
+            fi
+          done
+        fi
+
     - name: Run code generators
       if: inputs.run-codegen == 'true'
       shell: bash
