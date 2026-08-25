@@ -41,6 +41,13 @@ runs:
         dart pub global activate coverage
         dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
 
+    - name: Install lcov
+      if: inputs.collect-coverage == 'true'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+
     - name: Generate coverage report
       if: inputs.collect-coverage == 'true'
       uses: zgosalvez/github-actions-report-lcov@v4.1.22
