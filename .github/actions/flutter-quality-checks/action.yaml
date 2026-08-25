@@ -9,6 +9,14 @@ inputs:
     description: Test command to run
     required: false
     default: 'flutter test'
+  collect-coverage:
+    description: Whether to collect test coverage
+    required: false
+    default: 'false'
+  upload-coverage:
+    description: Whether to upload coverage to Codecov
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -26,4 +34,25 @@ runs:
     - name: Run tests
       shell: bash
       working-directory: ${{ inputs.module-path }}
-      run: ${{ inputs.test-command }}
+      run: |
+        if [ "${{ inputs.collect-coverage }}" = "true" ]; then
+          ${{ inputs.test-command }} --coverage
+        else
+          ${{ inputs.test-command }}
+        fi
+
+    - name: Upload coverage to artifact
+      if: inputs.collect-coverage == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-${{ hashFiles(format('{0}/pubspec.yaml', inputs.module-path)) }}
+        path: ${{ inputs.module-path }}/coverage/
+        retention-days: 7
+
+    - name: Upload to Codecov
+      if: inputs.upload-coverage == 'true'
+      uses: codecov/codecov-action@v4
+      with:
+        directory: ${{ inputs.module-path }}/coverage/
+        flags: ${{ inputs.module-path }}
+        fail_ci_if_error: false

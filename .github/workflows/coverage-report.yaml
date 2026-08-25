@@ -1,0 +1,124 @@
+name: Coverage Report
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  collect-coverage:
+    name: Collect & Report Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: ./all-coverage
+          merge-multiple: false
+
+      - name: Merge coverage reports
+        run: |
+          # Install lcov for merging coverage reports
+          sudo apt-get update
+          sudo apt-get install -y lcov
+          
+          # Find all lcov.info files
+          find ./all-coverage -name "lcov.info" -type f > coverage-files.txt
+          
+          if [ -s coverage-files.txt ]; then
+            # Merge all coverage files
+            lcov $(cat coverage-files.txt | sed 's/^/--add-tracefile /' | tr '\n' ' ') \
+              --output-file merged-coverage.info
+            
+            # Generate summary
+            lcov --summary merged-coverage.info > coverage-summary.txt 2>&1
+            cat coverage-summary.txt
+          else
+            echo "No coverage files found"
+            exit 0
+          fi
+
+      - name: Upload merged coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./merged-coverage.info
+          flags: merged
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Comment coverage on PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read coverage summary if it exists
+            let summary = '';
+            try {
+              summary = fs.readFileSync('coverage-summary.txt', 'utf8');
+            } catch (err) {
+              console.log('No coverage summary found');
+              return;
+            }
+            
+            // Extract coverage percentage
+            const match = summary.match(/lines\.*:\s*(\d+\.\d+)%/);
+            const coverage = match ? match[1] : 'unknown';
+            
+            // Create comment body
+            const body = `## 📊 Test Coverage Report
+            
+            **Overall Coverage:** ${coverage}%
+            
+            <details>
+            <summary>Coverage Details</summary>
+            
+            \`\`\`
+            ${summary}
+            \`\`\`
+            
+            </details>
+            
+            View detailed report on [Codecov](https://codecov.io/gh/${{ github.repository }}/pull/${{ github.event.pull_request.number }})
+            `;
+            
+            // Find existing coverage comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Test Coverage Report')
+            );
+            
+            // Update or create comment
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }

@@ -26,3 +26,5 @@ jobs:
         with:
           module-path: layer/design_system
           test-command: flutter test --dart-define=CI=true
+          collect-coverage: 'true'
+          upload-coverage: 'true'
