@@ -117,15 +117,20 @@ jobs:
           path: ${{ inputs.app-path }}/build/web
 
       - name: Prepare Firebase credentials
+        id: creds
         run: |
-          # Decode base64-encoded service account
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > ${{ runner.temp }}/firebase-creds.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=${{ runner.temp }}/firebase-creds.json" >> $GITHUB_ENV
+          # Decode base64-encoded service account to raw JSON
+          DECODED_JSON=$(echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d)
+          # Store as multiline output
+          echo "json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DECODED_JSON" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ steps.creds.outputs.json }}
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
           entryPoint: ${{ inputs.app-path }}
           channelId: ${{ inputs.channel-id != '' && inputs.channel-id || (inputs.build-type == 'preview' && 'preview' || 'live') }}
