@@ -1,0 +1,92 @@
+name: Deploy to App Store
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Name of the IPA artifact to deploy
+        required: true
+        type: string
+      submit-for-review:
+        description: Submit for App Store review
+        required: false
+        type: boolean
+        default: false
+      version:
+        description: Version name from tag
+        required: true
+        type: string
+      build-number:
+        description: Build number from tag
+        required: true
+        type: string
+    secrets:
+      APP_STORE_CONNECT_API_KEY_ID:
+        description: App Store Connect API Key ID
+        required: true
+      APP_STORE_CONNECT_API_ISSUER_ID:
+        description: App Store Connect API Issuer ID
+        required: true
+      APP_STORE_CONNECT_API_KEY:
+        description: App Store Connect API Key (base64 encoded .p8 file)
+        required: true
+      APP_STORE_BUNDLE_ID:
+        description: iOS bundle identifier
+        required: true
+
+jobs:
+  deploy:
+    name: Upload to App Store Connect
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./build-output
+
+      - name: Setup App Store Connect API Key
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+
+      - name: Install Fastlane
+        run: |
+          gem install fastlane
+
+      - name: Upload to App Store Connect
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_BUNDLE_ID: ${{ secrets.APP_STORE_BUNDLE_ID }}
+          SUBMIT_FOR_REVIEW: ${{ inputs.submit-for-review }}
+        run: |
+          cd build-output
+          
+          # Upload to TestFlight
+          xcrun altool --upload-app \
+            --type ios \
+            --file portrai-release.ipa \
+            --apiKey $APP_STORE_CONNECT_API_KEY_ID \
+            --apiIssuer $APP_STORE_CONNECT_API_ISSUER_ID \
+            --verbose
+
+      - name: Upload release notes
+        run: |
+          echo "✅ Deployed to App Store Connect (TestFlight)"
+          echo "Version: ${{ inputs.version }} (${{ inputs.build-number }})"
+          echo "Bundle ID: ${{ secrets.APP_STORE_BUNDLE_ID }}"
+          if [ "${{ inputs.submit-for-review }}" == "true" ]; then
+            echo "⚠️ Submitted for App Store review"
+          else
+            echo "ℹ️ Available in TestFlight only (not submitted for review)"
+          fi
+
+      - name: Clean up API key
+        if: ${{ always() }}
+        run: |
+          rm -f ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8

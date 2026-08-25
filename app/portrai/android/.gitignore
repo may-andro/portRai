@@ -12,3 +12,9 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Android signing keys (NEVER commit!)
+.signing/
+
+# Play Store service account (NEVER commit!)
+.playstore/

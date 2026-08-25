@@ -5,34 +5,23 @@ on:
     paths:
       - 'layer/error_reporter/**'
       - '.github/workflows/error_reporter.yaml'
+      - '.github/actions/**'
 
 jobs:
   analyze_and_test:
     name: Analyze & Test
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      
+      - name: Setup Flutter Module
+        uses: ./.github/actions/setup-flutter-module
         with:
-          channel: stable
-          flutter-version: 3.47.1
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Verify formatting
-        working-directory: layer/error_reporter
-        run: dart format --set-exit-if-changed .
-
-      - name: Static analysis
-        working-directory: layer/error_reporter
-        run: dart analyze --fatal-infos .
-
-      - name: Run tests
-        working-directory: layer/error_reporter
-        run: flutter test
-
+          module-path: layer/error_reporter
+      
+      - name: Quality Checks
+        uses: ./.github/actions/flutter-quality-checks
+        with:
+          module-path: layer/error_reporter

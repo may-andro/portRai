@@ -32,7 +32,7 @@ jobs:
       - name: Get previous tag
         id: previous-tag
         run: |
-          prev_tag="$(git tag --sort=-committerdate -l '*-storybook-prod' | grep -v $GITHUB_REF_NAME | head -n 1)"
+          prev_tag="$(git tag --sort=-committerdate -l '*+*-prod-storybook' | grep -v $GITHUB_REF_NAME | head -n 1)"
           echo "tag=${prev_tag}" >> $GITHUB_OUTPUT
 
       - name: Debug tags

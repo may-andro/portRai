@@ -1,11 +1,12 @@
-name: firebase
+name: portrai
 
 on:
   pull_request:
     paths:
-      - 'layer/firebase/**'
-      - '.github/workflows/firebase.yaml'
+      - 'app/portrai/**'
+      - '.github/workflows/portrai.yaml'
       - '.github/actions/**'
+  workflow_call:  # Allow this workflow to be called by other workflows
 
 jobs:
   analyze_and_test:
@@ -19,9 +20,9 @@ jobs:
       - name: Setup Flutter Module
         uses: ./.github/actions/setup-flutter-module
         with:
-          module-path: layer/firebase
+          module-path: app/portrai
       
       - name: Quality Checks
         uses: ./.github/actions/flutter-quality-checks
         with:
-          module-path: layer/firebase
+          module-path: app/portrai

@@ -1,0 +1,29 @@
+name: Flutter Quality Checks
+description: Run formatting, analysis, and tests for a Flutter module
+
+inputs:
+  module-path:
+    description: Path to the Flutter module to check
+    required: true
+  test-command:
+    description: Test command to run
+    required: false
+    default: 'flutter test'
+
+runs:
+  using: composite
+  steps:
+    - name: Verify formatting
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart format --set-exit-if-changed .
+
+    - name: Static analysis
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart analyze --fatal-infos .
+
+    - name: Run tests
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: ${{ inputs.test-command }}

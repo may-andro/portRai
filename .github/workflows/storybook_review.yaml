@@ -1,4 +1,4 @@
-name: Storybook Production Release
+name: Storybook Review Release
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -7,7 +7,7 @@ concurrency:
 on:
   push:
     tags:
-      - '*+*-prod-storybook'
+      - '*+*-review-storybook'
 
 permissions: write-all
 
@@ -26,29 +26,20 @@ jobs:
     with:
       app-path: ./app/storybook
       app-name: storybook
-      build-type: production
+      build-type: preview
       force-release: true
 
-  # Release notes run independently, in parallel with build/deploy.
-  release-notes:
-    name: Release Notes
-    needs: [quality]
-    uses: ./.github/workflows/_storybook_release_notes.yaml
-    with:
-      preRelease: false
-
-  # Deploy after build is complete.
   deploy:
-    name: Deploy to Production
+    name: Deploy Review
     needs: [build]
     uses: ./.github/workflows/_deploy_firebase.yaml
     with:
       app-path: app/storybook
       platform: web
-      build-type: production
+      build-type: preview
       artifact-name: ${{ needs.build.outputs.artifact-name }}
       hosting-target: storybook
-      channel-id: 'live'
+      channel-id: 'review'
     secrets:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
       FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

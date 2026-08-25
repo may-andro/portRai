@@ -1,0 +1,25 @@
+name: Dart Quality Checks
+description: Run formatting, analysis, and tests for a Dart module
+
+inputs:
+  module-path:
+    description: Path to the Dart module to check
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Verify formatting
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart format --set-exit-if-changed .
+
+    - name: Static analysis
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart analyze --fatal-infos .
+
+    - name: Run tests
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart test

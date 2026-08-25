@@ -1,0 +1,216 @@
+name: Portrai Production Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - '*+*-prod'
+
+permissions: write-all
+
+jobs:
+  # Extract version and build number from tag
+  extract-version:
+    name: Extract Version Info
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      build-number: ${{ steps.extract.outputs.build-number }}
+      release-notes: ${{ steps.generate-notes.outputs.notes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Extract version and build
+        id: extract
+        uses: ./.github/actions/extract-version-build
+      
+      - name: Generate release notes
+        id: generate-notes
+        run: |
+          # Find previous production tag
+          prev_tag="$(git tag --sort=-committerdate -l '*+*-prod' | grep -v $GITHUB_REF_NAME | head -n 1)"
+          
+          # Generate release notes
+          {
+            echo "notes<<EOF"
+            echo "Version ${{ steps.extract.outputs.version }} (Build ${{ steps.extract.outputs.build-number }})"
+            echo ""
+            echo "Production Release"
+            echo ""
+            if [ -n "$prev_tag" ]; then
+              echo "Changes since $prev_tag:"
+              git log --pretty="format:• %s" $prev_tag..$GITHUB_REF_NAME
+            else
+              echo "Initial production release"
+              git log --pretty="format:• %s" $GITHUB_REF_NAME --max-count=20
+            fi
+            echo ""
+            echo ""
+            echo "Released by: ${{ github.actor }}"
+            echo "Commit: ${GITHUB_SHA:0:8}"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+  # Quality checks must pass before building
+  quality:
+    name: Quality Checks
+    needs: [extract-version]
+    uses: ./.github/workflows/portrai.yaml
+
+  # Build all platforms in parallel after quality checks pass
+  build-android:
+    name: Build Android
+    needs: [extract-version, quality]
+    uses: ./.github/workflows/_build_android.yaml
+    with:
+      app-path: ./app/portrai
+      build-type: production
+      version: ${{ needs.extract-version.outputs.version }}
+      build-number: ${{ needs.extract-version.outputs.build-number }}
+    secrets:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.PORTRAI_ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PORTRAI_ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.PORTRAI_ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.PORTRAI_ANDROID_KEY_PASSWORD }}
+      GOOGLE_SERVICES_JSON: ${{ secrets.PORTRAI_GOOGLE_SERVICES_JSON }}
+
+  build-ios:
+    name: Build iOS
+    needs: [extract-version, quality]
+    uses: ./.github/workflows/_build_ios.yaml
+    with:
+      app-path: ./app/portrai
+      build-type: production
+      version: ${{ needs.extract-version.outputs.version }}
+      build-number: ${{ needs.extract-version.outputs.build-number }}
+    secrets:
+      GOOGLE_SERVICES_PLIST: ${{ secrets.PORTRAI_GOOGLE_SERVICES_PLIST }}
+
+  build-web:
+    name: Build Web
+    needs: [extract-version, quality]
+    uses: ./.github/workflows/_build_web.yaml
+    with:
+      app-path: ./app/portrai
+      app-name: portrai
+      build-type: production
+      version: ${{ needs.extract-version.outputs.version }}
+      build-number: ${{ needs.extract-version.outputs.build-number }}
+
+  # Deploy after builds complete
+  # Firebase App Distribution (for testers)
+  deploy-android-firebase:
+    name: Deploy Android to Firebase
+    needs: [build-android, extract-version]
+    uses: ./.github/workflows/_deploy_firebase.yaml
+    with:
+      app-path: app/portrai
+      platform: android
+      build-type: production
+      artifact-name: ${{ needs.build-android.outputs.artifact-name }}
+      release-notes: ${{ needs.extract-version.outputs.release-notes }}
+    secrets:
+      FIREBASE_APP_ID_ANDROID: ${{ secrets.PORTRAI_FIREBASE_APP_ID_ANDROID }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.PORTRAI_FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+
+  deploy-ios-firebase:
+    name: Deploy iOS to Firebase
+    needs: [build-ios, extract-version]
+    uses: ./.github/workflows/_deploy_firebase.yaml
+    with:
+      app-path: app/portrai
+      platform: ios
+      build-type: production
+      artifact-name: ${{ needs.build-ios.outputs.artifact-name }}
+      release-notes: ${{ needs.extract-version.outputs.release-notes }}
+    secrets:
+      FIREBASE_APP_ID_IOS: ${{ secrets.PORTRAI_FIREBASE_APP_ID_IOS }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.PORTRAI_FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+
+  # Store deployments (production)
+  deploy-playstore:
+    name: Deploy to Play Store
+    needs: [build-android, extract-version]
+    uses: ./.github/workflows/_deploy_playstore.yaml
+    with:
+      artifact-name: ${{ needs.build-android.outputs.artifact-name }}
+      track: internal
+      version: ${{ needs.extract-version.outputs.version }}
+      build-number: ${{ needs.extract-version.outputs.build-number }}
+    secrets:
+      PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PORTRAI_PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+      PLAY_STORE_PACKAGE_NAME: ${{ secrets.PORTRAI_PLAY_STORE_PACKAGE_NAME }}
+
+  deploy-appstore:
+    name: Deploy to App Store
+    needs: [build-ios, extract-version]
+    uses: ./.github/workflows/_deploy_appstore.yaml
+    with:
+      artifact-name: ${{ needs.build-ios.outputs.artifact-name }}
+      submit-for-review: false
+      version: ${{ needs.extract-version.outputs.version }}
+      build-number: ${{ needs.extract-version.outputs.build-number }}
+    secrets:
+      APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.PORTRAI_APP_STORE_CONNECT_API_KEY_ID }}
+      APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.PORTRAI_APP_STORE_CONNECT_API_ISSUER_ID }}
+      APP_STORE_CONNECT_API_KEY: ${{ secrets.PORTRAI_APP_STORE_CONNECT_API_KEY }}
+      APP_STORE_BUNDLE_ID: ${{ secrets.PORTRAI_APP_STORE_BUNDLE_ID }}
+
+  deploy-web:
+    name: Deploy Web
+    needs: [build-web]
+    uses: ./.github/workflows/_deploy_firebase.yaml
+    with:
+      app-path: app/portrai
+      platform: web
+      build-type: production
+      artifact-name: ${{ needs.build-web.outputs.artifact-name }}
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+
+  # Create GitHub release for production
+  create-release:
+    name: Create GitHub Release
+    needs: [deploy-android-firebase, deploy-ios-firebase, deploy-web, deploy-playstore, deploy-appstore]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current tag
+        id: current-tag
+        run: echo "tag=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+
+      - name: Get previous tag
+        id: previous-tag
+        run: |
+          prev_tag="$(git tag --sort=-committerdate -l '*+*-prod' | grep -v $GITHUB_REF_NAME | head -n 1)"
+          echo "tag=${prev_tag}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        run: |
+          echo "# Portrai Production Release" > changelog.md
+          echo "" >> changelog.md
+          echo "## What's Changed" >> changelog.md
+          if [ -n "${{ steps.previous-tag.outputs.tag }}" ]; then
+            git log --pretty="format:* %s (%an)" ${{ steps.previous-tag.outputs.tag }}..${{ steps.current-tag.outputs.tag }} >> changelog.md
+          else
+            git log --pretty="format:* %s (%an)" ${{ steps.current-tag.outputs.tag }} >> changelog.md
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: changelog.md
+          name: Portrai ${{ steps.current-tag.outputs.tag }}

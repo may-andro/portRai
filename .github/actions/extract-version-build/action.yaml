@@ -1,0 +1,40 @@
+name: Extract Version and Build Number
+description: Extracts version and build number from git tag (format VERSION+BUILD-TYPE, e.g., 1.1.4+202530-prod)
+
+outputs:
+  version:
+    description: Version number (e.g., 1.1.4)
+    value: ${{ steps.extract.outputs.version }}
+  build-number:
+    description: Build number (e.g., 202530)
+    value: ${{ steps.extract.outputs.build-number }}
+  version-with-build:
+    description: Version with build number (e.g., 1.1.4+202530)
+    value: ${{ steps.extract.outputs.version-with-build }}
+
+runs:
+  using: composite
+  steps:
+    - name: Extract version and build number from tag
+      id: extract
+      shell: bash
+      run: |
+        # Get the tag name (e.g., 1.1.4+202530-prod)
+        TAG_NAME="${GITHUB_REF#refs/tags/}"
+        echo "Tag: $TAG_NAME"
+        
+        # Remove the suffix (-prod, -review, etc.) to get version+build
+        VERSION_WITH_BUILD="${TAG_NAME%-*}"
+        echo "Version with build: $VERSION_WITH_BUILD"
+        
+        # Split by + to get version and build number
+        VERSION="${VERSION_WITH_BUILD%+*}"
+        BUILD_NUMBER="${VERSION_WITH_BUILD#*+}"
+        
+        echo "Version: $VERSION"
+        echo "Build number: $BUILD_NUMBER"
+        
+        # Set outputs
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "build-number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+        echo "version-with-build=$VERSION_WITH_BUILD" >> $GITHUB_OUTPUT

@@ -47,3 +47,20 @@ app.*.map.json
 # Web related
 /web/sqflite_sw.js
 /web/sqlite3.wasm
+
+# Firebase credentials
+.firebase_distribution/
+
+# iOS signing and App Store credentials
+/ios/.signing/
+/ios/.appstore/
+
+# Android signing and Play Store credentials
+/android/.signing/
+/android/.playstore/
+
+# Web deploy credentials
+/web/.deploy/
+
+# Firebase base64 encoded credentials
+.firebase_distribution/service-account-base64.txt

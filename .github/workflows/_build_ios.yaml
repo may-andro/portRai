@@ -1,0 +1,92 @@
+name: Build iOS
+
+on:
+  workflow_call:
+    inputs:
+      app-path:
+        description: Path to the Flutter app (e.g., ./app/portrai)
+        required: true
+        type: string
+      build-type:
+        description: Build type (preview or production)
+        required: true
+        type: string
+      version:
+        description: Version number (e.g., 1.1.4)
+        required: true
+        type: string
+      build-number:
+        description: Build number (e.g., 202530)
+        required: true
+        type: string
+    outputs:
+      artifact-name:
+        description: Name of the build artifact
+        value: ${{ jobs.build.outputs.artifact-name }}
+    secrets:
+      GOOGLE_SERVICES_PLIST:
+        description: Base64 encoded GoogleService-Info.plist for Firebase
+        required: true
+
+env:
+  FLUTTER_VERSION: 3.47.1
+
+jobs:
+  build:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    outputs:
+      artifact-name: portrai-ios-${{ inputs.build-type }}-${{ github.sha }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-flutter-module
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          module-path: ${{ inputs.app-path }}
+
+      - name: Inject GoogleService-Info.plist
+        run: echo "${{ secrets.GOOGLE_SERVICES_PLIST }}" | base64 -d > ${{ inputs.app-path }}/ios/Runner/GoogleService-Info.plist
+
+      - name: Build iOS (Preview - No Codesign)
+        if: ${{ inputs.build-type == 'preview' }}
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          flutter build ios --debug --no-codesign --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug -archivePath build/Runner.xcarchive archive CODE_SIGNING_ALLOWED=NO
+
+      - name: Build iOS (Production - Release)
+        if: ${{ inputs.build-type == 'production' }}
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          # Requires code signing — see ios/.signing/README.md and ios/.appstore/README.md
+          flutter build ios --release --no-codesign --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive CODE_SIGNING_ALLOWED=NO
+
+      - name: Create IPA archive (Preview)
+        if: ${{ inputs.build-type == 'preview' }}
+        working-directory: ${{ inputs.app-path }}/ios
+        run: |
+          mkdir -p Payload
+          cp -r build/Runner.xcarchive/Products/Applications/Runner.app Payload/
+          zip -r ../portrai-debug.ipa Payload
+
+      - name: Create IPA archive (Production)
+        if: ${{ inputs.build-type == 'production' }}
+        working-directory: ${{ inputs.app-path }}/ios
+        run: |
+          mkdir -p Payload
+          cp -r build/Runner.xcarchive/Products/Applications/Runner.app Payload/
+          zip -r ../portrai-release.ipa Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portrai-ios-${{ inputs.build-type }}-${{ github.sha }}
+          path: ${{ inputs.app-path }}/portrai-${{ inputs.build-type == 'production' && 'release' || 'debug' }}.ipa
+          retention-days: ${{ inputs.build-type == 'production' && 30 || 7 }}
