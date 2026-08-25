@@ -35,6 +35,11 @@ on:
         required: false
         type: boolean
         default: false
+      run-codegen:
+        description: Whether to run build_runner code generation before build
+        required: false
+        type: boolean
+        default: false
     outputs:
       artifact-name:
         description: Name of the build artifact
@@ -69,6 +74,7 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           module-path: ${{ inputs.app-path }}
+          run-codegen: ${{ inputs.run-codegen }}
 
       - name: Build web (Preview — profile)
         if: ${{ inputs.build-type == 'preview' && !inputs.force-release }}

@@ -28,6 +28,7 @@ jobs:
       app-name: storybook
       build-type: preview
       force-release: true
+      run-codegen: true
 
   deploy:
     name: Deploy Review

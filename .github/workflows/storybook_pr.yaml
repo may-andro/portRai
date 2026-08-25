@@ -34,6 +34,7 @@ jobs:
       app-name: storybook
       build-type: preview
       force-release: true
+      run-codegen: true
 
   # Deploy preview after build is complete.
   deploy:
