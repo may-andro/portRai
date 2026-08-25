@@ -62,7 +62,7 @@ runs:
 
     - name: Generate coverage report
       if: inputs.collect-coverage == 'true'
-      uses: zgosalvez/github-actions-report-lcov@v4.1.22
+      uses: zgosalvez/github-actions-report-lcov@v7.2.0
       with:
         coverage-files: ${{ inputs.module-path }}/coverage/lcov.info
         minimum-coverage: 0
