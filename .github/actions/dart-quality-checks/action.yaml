@@ -68,4 +68,5 @@ runs:
         minimum-coverage: 0
         artifact-name: code-coverage-${{ hashFiles(format('{0}/pubspec.yaml', inputs.module-path)) }}
         github-token: ${{ github.token }}
+        title-prefix: '[${{ inputs.module-path }}] '
         update-comment: true
