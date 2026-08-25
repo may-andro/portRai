@@ -21,6 +21,7 @@ jobs:
         uses: ./.github/actions/setup-flutter-module
         with:
           module-path: app/portrai
+          run-codegen: 'true'
       
       - name: Quality Checks
         uses: ./.github/actions/flutter-quality-checks
