@@ -58,7 +58,11 @@ runs:
       working-directory: ${{ inputs.module-path }}
       run: |
         # Fix paths in lcov.info to be relative to module directory
-        sed -i "s|SF:lib/|SF:${{ inputs.module-path }}/lib/|g" coverage/lcov.info
+        if [[ "$RUNNER_OS" == "macOS" ]]; then
+          sed -i '' "s|SF:lib/|SF:${{ inputs.module-path }}/lib/|g" coverage/lcov.info
+        else
+          sed -i "s|SF:lib/|SF:${{ inputs.module-path }}/lib/|g" coverage/lcov.info
+        fi
 
     - name: Generate coverage report
       if: inputs.collect-coverage == 'true'
