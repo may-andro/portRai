@@ -69,12 +69,24 @@ jobs:
             echo "value=Build ${{ github.sha }} - Type: ${{ inputs.build-type }} - By: ${{ github.actor }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Prepare Firebase credentials
+        id: creds
+        run: |
+          # Decode base64-encoded service account to raw JSON
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > ${{ runner.temp }}/firebase-service-account.json
+          # Read the decoded JSON for use in action
+          CREDS_JSON=$(cat ${{ runner.temp }}/firebase-service-account.json)
+          # Set as output (GitHub Actions handles multiline properly)
+          echo "json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$CREDS_JSON" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
       - name: Deploy Android to Firebase App Distribution
         if: ${{ inputs.platform == 'android' }}
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          serviceCredentialsFileContent: ${{ steps.creds.outputs.json }}
           groups: ${{ inputs.build-type == 'preview' && 'testers' || 'production-testers' }}
           file: ${{ inputs.build-type == 'production' && 'build-output/app-release.aab' || 'build-output/app-release.apk' }}
           releaseNotes: ${{ steps.notes.outputs.value }}
@@ -84,7 +96,7 @@ jobs:
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          serviceCredentialsFileContent: ${{ steps.creds.outputs.json }}
           groups: ${{ inputs.build-type == 'preview' && 'testers' || 'production-testers' }}
           file: ${{ inputs.build-type == 'production' && 'build-output/portrai-release.ipa' || 'build-output/portrai-debug.ipa' }}
           releaseNotes: ${{ steps.notes.outputs.value }}
