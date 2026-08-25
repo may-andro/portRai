@@ -100,8 +100,11 @@ jobs:
       app-path: ./app/portrai
       app-name: portrai
       build-type: production
+      use-firebase: true
       version: ${{ needs.extract-version.outputs.version }}
       build-number: ${{ needs.extract-version.outputs.build-number }}
+    secrets:
+      FIREBASE_OPTIONS: ${{ secrets.PORTRAI_FIREBASE_OPTIONS }}
 
   # Deploy after builds complete
   # Firebase App Distribution (for testers)
