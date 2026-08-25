@@ -41,8 +41,12 @@ runs:
       if: inputs.collect-coverage == 'true'
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y lcov
+        if [[ "$RUNNER_OS" == "macOS" ]]; then
+          brew install lcov
+        else
+          sudo apt-get update
+          sudo apt-get install -y lcov
+        fi
 
     - name: Fix coverage paths
       if: inputs.collect-coverage == 'true'
