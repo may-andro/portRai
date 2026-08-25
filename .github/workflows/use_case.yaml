@@ -26,4 +26,3 @@ jobs:
         with:
           module-path: layer/use_case
           collect-coverage: 'true'
-          upload-coverage: 'true'

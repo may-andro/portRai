@@ -27,4 +27,3 @@ jobs:
         with:
           module-path: layer/tracking
           collect-coverage: 'true'
-          upload-coverage: 'true'

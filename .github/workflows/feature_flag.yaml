@@ -27,4 +27,3 @@ jobs:
         with:
           module-path: layer/feature_flag
           collect-coverage: 'true'
-          upload-coverage: 'true'

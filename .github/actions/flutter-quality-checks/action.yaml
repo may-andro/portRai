@@ -13,10 +13,6 @@ inputs:
     description: Whether to collect test coverage
     required: false
     default: 'false'
-  upload-coverage:
-    description: Whether to upload coverage to Codecov
-    required: false
-    default: 'false'
 
 runs:
   using: composite
@@ -41,18 +37,12 @@ runs:
           ${{ inputs.test-command }}
         fi
 
-    - name: Upload coverage to artifact
+    - name: Generate coverage report
       if: inputs.collect-coverage == 'true'
-      uses: actions/upload-artifact@v4
+      uses: zgosalvez/github-actions-report-lcov@v4.1.22
       with:
-        name: coverage-${{ hashFiles(format('{0}/pubspec.yaml', inputs.module-path)) }}
-        path: ${{ inputs.module-path }}/coverage/
-        retention-days: 7
-
-    - name: Upload to Codecov
-      if: inputs.upload-coverage == 'true'
-      uses: codecov/codecov-action@v4
-      with:
-        directory: ${{ inputs.module-path }}/coverage/
-        flags: ${{ inputs.module-path }}
-        fail_ci_if_error: false
+        coverage-files: ${{ inputs.module-path }}/coverage/lcov.info
+        minimum-coverage: 0
+        artifact-name: code-coverage-${{ hashFiles(format('{0}/pubspec.yaml', inputs.module-path)) }}
+        github-token: ${{ github.token }}
+        update-comment: true

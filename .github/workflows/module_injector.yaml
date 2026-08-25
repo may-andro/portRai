@@ -26,4 +26,3 @@ jobs:
         with:
           module-path: layer/module_injector
           collect-coverage: 'true'
-          upload-coverage: 'true'

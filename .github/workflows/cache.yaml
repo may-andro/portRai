@@ -26,4 +26,3 @@ jobs:
         with:
           module-path: layer/cache
           collect-coverage: 'true'
-          upload-coverage: 'true'

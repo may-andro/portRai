@@ -26,4 +26,3 @@ jobs:
         with:
           module-path: tool/firestore_export_import
           collect-coverage: 'true'
-          upload-coverage: 'true'

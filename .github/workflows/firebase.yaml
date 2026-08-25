@@ -26,4 +26,3 @@ jobs:
         with:
           module-path: layer/firebase
           collect-coverage: 'true'
-          upload-coverage: 'true'

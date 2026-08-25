@@ -26,4 +26,3 @@ jobs:
         with:
           module-path: layer/remote
           collect-coverage: 'true'
-          upload-coverage: 'true'

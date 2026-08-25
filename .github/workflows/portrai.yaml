@@ -32,4 +32,3 @@ jobs:
         with:
           module-path: app/portrai
           collect-coverage: 'true'
-          upload-coverage: 'true'
