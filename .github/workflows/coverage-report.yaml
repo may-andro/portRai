@@ -1,6 +1,7 @@
 name: Coverage Report
 
 on:
+  # Triggered after module workflows complete (only works from default branch)
   workflow_run:
     workflows:
       - cache
@@ -20,6 +21,14 @@ on:
       - completed
     branches:
       - '**'
+  
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Workflow run ID to get coverage from'
+        required: false
+        type: string
 
 permissions:
   contents: read

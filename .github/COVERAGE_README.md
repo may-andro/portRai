@@ -4,6 +4,17 @@
 
 The monorepo now has **generic, reusable test coverage collection** enabled for all 13 modules.
 
+## ⚠️ Important: workflow_run Limitation
+
+The coverage report workflow uses `workflow_run` trigger, which **only works from the default branch** (main) due to GitHub Actions security.
+
+**What this means:**
+- ✅ After PR #34 is merged, coverage will work automatically on all future PRs
+- ❌ In feature branches (like this PR), coverage collection won't trigger automatically
+- 🔄 You can manually trigger coverage report using workflow_dispatch after this PR is merged
+
+**For this PR:** Coverage is being collected but not merged. After merge, it will work automatically.
+
 ## ✅ Coverage Enabled For
 
 ### Flutter Layers (11 modules)
