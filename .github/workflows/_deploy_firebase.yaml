@@ -104,6 +104,12 @@ jobs:
           name: ${{ inputs.artifact-name }}
           path: ${{ inputs.app-path }}/build/web
 
+      - name: Prepare Firebase credentials
+        run: |
+          # Decode base64-encoded service account
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > ${{ runner.temp }}/firebase-creds.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${{ runner.temp }}/firebase-creds.json" >> $GITHUB_ENV
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
