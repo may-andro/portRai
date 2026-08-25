@@ -25,4 +25,6 @@ jobs:
         uses: ./.github/actions/flutter-quality-checks
         with:
           module-path: layer/log_reporter
+          collect-coverage: 'true'
+          upload-coverage: 'true'
 

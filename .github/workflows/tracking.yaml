@@ -26,3 +26,5 @@ jobs:
         uses: ./.github/actions/flutter-quality-checks
         with:
           module-path: layer/tracking
+          collect-coverage: 'true'
+          upload-coverage: 'true'

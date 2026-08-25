@@ -25,3 +25,5 @@ jobs:
         uses: ./.github/actions/dart-quality-checks
         with:
           module-path: tool/firestore_export_import
+          collect-coverage: 'true'
+          upload-coverage: 'true'

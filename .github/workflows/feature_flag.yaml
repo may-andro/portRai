@@ -26,3 +26,5 @@ jobs:
         uses: ./.github/actions/flutter-quality-checks
         with:
           module-path: layer/feature_flag
+          collect-coverage: 'true'
+          upload-coverage: 'true'
