@@ -5,34 +5,29 @@ on:
     paths:
       - 'layer/design_system/**'
       - '.github/workflows/design_system.yaml'
+      - '.github/actions/**'
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   analyze_and_test:
     name: Analyze & Test
     runs-on: macos-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      
+      - name: Setup Flutter Module
+        uses: ./.github/actions/setup-flutter-module
         with:
-          channel: stable
-          flutter-version: 3.47.1
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Verify formatting
-        working-directory: layer/design_system
-        run: dart format --set-exit-if-changed .
-
-      - name: Static analysis
-        working-directory: layer/design_system
-        run: dart analyze --fatal-infos .
-
-      - name: Run golden tests (CI mode)
-        working-directory: layer/design_system
-        run: flutter test --dart-define=CI=true
-
+          module-path: layer/design_system
+      
+      - name: Quality Checks
+        uses: ./.github/actions/flutter-quality-checks
+        with:
+          module-path: layer/design_system
+          test-command: flutter test --dart-define=CI=true
+          collect-coverage: 'true'

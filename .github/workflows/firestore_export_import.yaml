@@ -5,33 +5,28 @@ on:
     paths:
       - 'tool/firestore_export_import/**'
       - '.github/workflows/firestore_export_import.yaml'
+      - '.github/actions/**'
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   analyze_and_test:
     name: Analyze & Test
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Dart
-        uses: dart-lang/setup-dart@v1
+      
+      - name: Setup Dart Module
+        uses: ./.github/actions/setup-dart-module
         with:
-          sdk: 3.13.1
-
-      - name: Install dependencies
-        working-directory: tool/firestore_export_import
-        run: dart pub get
-
-      - name: Verify formatting
-        working-directory: tool/firestore_export_import
-        run: dart format --set-exit-if-changed .
-
-      - name: Static analysis
-        working-directory: tool/firestore_export_import
-        run: dart analyze --fatal-infos .
-
-      - name: Run tests
-        working-directory: tool/firestore_export_import
-        run: dart test
+          module-path: tool/firestore_export_import
+      
+      - name: Quality Checks
+        uses: ./.github/actions/dart-quality-checks
+        with:
+          module-path: tool/firestore_export_import
+          collect-coverage: 'true'

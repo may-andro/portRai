@@ -1,0 +1,95 @@
+name: Legal Pages Production Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Trigger on tags like: legal-1.0.0, legal-1.1.0
+on:
+  push:
+    tags:
+      - 'legal-*'
+
+permissions: write-all
+
+jobs:
+  extract-version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+    steps:
+      - name: Extract version from tag
+        id: extract
+        run: |
+          # Tag format: legal-1.0.0  →  version: 1.0.0
+          version="${GITHUB_REF_NAME#legal-}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "Deploying legal pages version: ${version}"
+
+  deploy:
+    name: Deploy to Firebase Hosting
+    needs: [extract-version]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Stamp version into HTML pages
+        run: |
+          VERSION="${{ needs.extract-version.outputs.version }}"
+          find tool/legal/public -name "*.html" -exec \
+            sed -i "s/{{VERSION}}/${VERSION}/g" {} +
+          echo "Stamped version ${VERSION} into HTML pages"
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          entryPoint: tool/legal
+          channelId: live
+          target: legal
+
+  create-release:
+    name: Create GitHub Release
+    needs: [extract-version, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get previous legal tag
+        id: previous-tag
+        run: |
+          prev_tag="$(git tag --sort=-committerdate -l 'legal-*' | grep -v "$GITHUB_REF_NAME" | head -n 1)"
+          echo "tag=${prev_tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog
+        run: |
+          echo "# Legal Pages v${{ needs.extract-version.outputs.version }}" > changelog.md
+          echo "" >> changelog.md
+          echo "Deployed to: https://portrai-legal.web.app" >> changelog.md
+          echo "" >> changelog.md
+          echo "## Pages" >> changelog.md
+          echo "- [Privacy Policy](https://portrai-legal.web.app/privacy-policy)" >> changelog.md
+          echo "- [Terms & Conditions](https://portrai-legal.web.app/terms)" >> changelog.md
+          echo "" >> changelog.md
+          echo "## Changes" >> changelog.md
+          if [ -n "${{ steps.previous-tag.outputs.tag }}" ]; then
+            git log --pretty="format:* %s (%an)" \
+              "${{ steps.previous-tag.outputs.tag }}..$GITHUB_REF_NAME" \
+              -- tool/legal/ >> changelog.md
+          else
+            echo "* Initial release" >> changelog.md
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Legal Pages v${{ needs.extract-version.outputs.version }}
+          body_path: changelog.md
+          tag_name: ${{ github.ref_name }}

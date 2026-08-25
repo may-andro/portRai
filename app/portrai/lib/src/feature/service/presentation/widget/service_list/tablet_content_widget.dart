@@ -9,11 +9,13 @@ class _TabletContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      scrollCacheExtent: ScrollCacheExtent.pixels(
+        _TabletItemWidget.getHeight(context),
+      ),
       itemCount: services.length,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       padding: EdgeInsets.zero,
-      cacheExtent: _TabletItemWidget.getHeight(context),
       separatorBuilder: (_, index) {
         return const DSVerticalSpacerWidget(1);
       },

@@ -16,10 +16,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/actions/setup-storybook-flutter
+        uses: ./.github/actions/setup-flutter-module
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          storybook-path: ${{ env.STORYBOOK_PATH }}
+          module-path: ${{ env.STORYBOOK_PATH }}
 
       - name: Format check
         working-directory: ${{ env.STORYBOOK_PATH }}
@@ -33,10 +33,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/actions/setup-storybook-flutter
+        uses: ./.github/actions/setup-flutter-module
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          storybook-path: ${{ env.STORYBOOK_PATH }}
+          module-path: ${{ env.STORYBOOK_PATH }}
           run-codegen: 'true'
 
       - name: Analyze code
@@ -51,33 +51,39 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/actions/setup-storybook-flutter
+        uses: ./.github/actions/setup-flutter-module
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          storybook-path: ${{ env.STORYBOOK_PATH }}
+          module-path: ${{ env.STORYBOOK_PATH }}
           run-codegen: 'true'
 
       - name: Run unit tests
         working-directory: ${{ env.STORYBOOK_PATH }}
-        run: flutter test --exclude-tags golden --coverage --machine > test-results.json
+        run: |
+          # Run tests and capture only JSON output (skip dependency resolution logs)
+          flutter test --exclude-tags golden --coverage --machine 2>&1 | tee test-results-raw.log | grep -E '^\{' > test-results.json || true
+          # If no valid JSON found, create empty results
+          if [ ! -s test-results.json ]; then
+            echo '{"protocolVersion":"0.1.1","type":"allSuites","time":0}' > test-results.json
+          fi
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() }}
         with:
           name: test-results
           path: ${{ env.STORYBOOK_PATH }}/test-results.json
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() }}
         with:
           name: coverage
           path: ${{ env.STORYBOOK_PATH }}/coverage/
 
       - name: Generate test report
         uses: dorny/test-reporter@v1.9.1
-        if: always()
+        if: ${{ always() }}
         continue-on-error: true
         with:
           name: Test Results

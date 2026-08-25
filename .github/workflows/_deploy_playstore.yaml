@@ -1,0 +1,62 @@
+name: Deploy to Play Store
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Name of the AAB artifact to deploy
+        required: true
+        type: string
+      track:
+        description: Release track (internal, alpha, beta, production)
+        required: false
+        type: string
+        default: internal
+      version:
+        description: Version name from tag
+        required: true
+        type: string
+      build-number:
+        description: Build number from tag
+        required: true
+        type: string
+    secrets:
+      PLAY_STORE_SERVICE_ACCOUNT_JSON:
+        description: Google Play Service Account JSON key
+        required: true
+      PLAY_STORE_PACKAGE_NAME:
+        description: Android package name
+        required: true
+
+jobs:
+  deploy:
+    name: Upload to Play Store
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download AAB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./build-output
+
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
+          releaseFiles: build-output/app-release.aab
+          track: ${{ inputs.track }}
+          status: completed
+          inAppUpdatePriority: 2
+          whatsNewDirectory: distribution/whatsnew
+          mappingFile: build-output/mapping.txt
+
+      - name: Upload release notes
+        run: |
+          echo "✅ Deployed to Play Store (${{ inputs.track }} track)"
+          echo "Version: ${{ inputs.version }} (${{ inputs.build-number }})"
+          echo "Package: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}"

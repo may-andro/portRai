@@ -1,0 +1,102 @@
+name: Build Web
+
+on:
+  workflow_call:
+    inputs:
+      app-path:
+        description: Path to the Flutter app (e.g., ./app/portrai)
+        required: true
+        type: string
+      app-name:
+        description: Short app name used for artifact naming (e.g., portrai, storybook)
+        required: true
+        type: string
+      build-type:
+        description: Build type (preview or production)
+        required: true
+        type: string
+      version:
+        description: Version number (e.g., 1.1.4) — leave empty to skip version dart-define
+        required: false
+        type: string
+        default: ''
+      build-number:
+        description: Build number (e.g., 202530) — leave empty to skip build-number dart-define
+        required: false
+        type: string
+        default: ''
+      force-release:
+        description: Always build with --release regardless of build-type (e.g., for storybook)
+        required: false
+        type: boolean
+        default: false
+      use-firebase:
+        description: Whether this app uses Firebase (creates firebase_options.dart from secret)
+        required: false
+        type: boolean
+        default: false
+      run-codegen:
+        description: Whether to run build_runner code generation before build
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      artifact-name:
+        description: Name of the build artifact
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+    secrets:
+      FIREBASE_OPTIONS:
+        description: Firebase options file content
+        required: false
+
+env:
+  FLUTTER_VERSION: 3.47.1
+
+jobs:
+  build:
+    name: Build Web
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ inputs.app-name }}-web-${{ inputs.build-type }}-${{ github.sha }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Create firebase_options.dart
+        if: inputs.use-firebase
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > ${{ inputs.app-path }}/lib/firebase_options.dart
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-flutter-module
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          module-path: ${{ inputs.app-path }}
+          run-codegen: ${{ inputs.run-codegen }}
+
+      - name: Build web (Preview — profile)
+        if: ${{ inputs.build-type == 'preview' && !inputs.force-release }}
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          flutter build web --profile \
+            --dart-define=ENVIRONMENT=preview \
+            ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
+            ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
+
+      - name: Build web (Production or force-release)
+        if: ${{ inputs.build-type == 'production' || inputs.force-release }}
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          flutter build web --release \
+            --dart-define=ENVIRONMENT=${{ inputs.build-type }} \
+            ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
+            ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app-name }}-web-${{ inputs.build-type }}-${{ github.sha }}
+          path: ${{ inputs.app-path }}/build/web/
+          retention-days: ${{ inputs.build-type == 'production' && 30 || 7 }}

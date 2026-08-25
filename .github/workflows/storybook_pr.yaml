@@ -1,4 +1,4 @@
-name: Storybook Preview Release
+name: Storybook PR Preview
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +13,7 @@ on:
       - 'layer/design_system/**'
       - '.github/workflows/storybook_*.yaml'
       - '.github/workflows/_storybook_*.yaml'
-      - '.github/actions/setup-storybook-flutter/**'
+      - '.github/actions/setup-flutter-module/**'
 
 permissions: write-all
 
@@ -28,16 +28,26 @@ jobs:
   build:
     name: Build
     needs: [quality]
-    uses: ./.github/workflows/_storybook_build.yaml
+    uses: ./.github/workflows/_build_web.yaml
+    with:
+      app-path: ./app/storybook
+      app-name: storybook
+      build-type: preview
+      force-release: true
+      run-codegen: true
 
   # Deploy preview after build is complete.
   deploy:
     name: Deploy Preview
     needs: [build]
-    uses: ./.github/workflows/_storybook_deploy.yaml
+    uses: ./.github/workflows/_deploy_firebase.yaml
     with:
-      channelId: 'preview'
+      app-path: app/storybook
+      platform: web
+      build-type: preview
       artifact-name: ${{ needs.build.outputs.artifact-name }}
+      hosting-target: storybook
+      channel-id: 'preview'
     secrets:
-      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
       FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

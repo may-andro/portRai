@@ -1,0 +1,38 @@
+name: portrai
+
+on:
+  pull_request:
+    paths:
+      - 'app/portrai/**'
+      - '.github/workflows/portrai.yaml'
+      - '.github/actions/**'
+  workflow_call:  # Allow this workflow to be called by other workflows
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  analyze_and_test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Create firebase_options.dart
+        run: |
+          echo "${{ secrets.PORTRAI_FIREBASE_OPTIONS }}" > app/portrai/lib/firebase_options.dart
+      
+      - name: Setup Flutter Module
+        uses: ./.github/actions/setup-flutter-module
+        with:
+          module-path: app/portrai
+          run-codegen: 'true'
+      
+      - name: Quality Checks
+        uses: ./.github/actions/flutter-quality-checks
+        with:
+          module-path: app/portrai
+          collect-coverage: 'true'

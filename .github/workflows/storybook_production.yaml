@@ -7,7 +7,7 @@ concurrency:
 on:
   push:
     tags:
-      - '*-storybook-prod'
+      - '*+*-prod-storybook'
 
 permissions: write-all
 
@@ -22,7 +22,13 @@ jobs:
   build:
     name: Build
     needs: [quality]
-    uses: ./.github/workflows/_storybook_build.yaml
+    uses: ./.github/workflows/_build_web.yaml
+    with:
+      app-path: ./app/storybook
+      app-name: storybook
+      build-type: production
+      force-release: true
+      run-codegen: true
 
   # Release notes run independently, in parallel with build/deploy.
   release-notes:
@@ -36,10 +42,14 @@ jobs:
   deploy:
     name: Deploy to Production
     needs: [build]
-    uses: ./.github/workflows/_storybook_deploy.yaml
+    uses: ./.github/workflows/_deploy_firebase.yaml
     with:
-      channelId: 'live'
+      app-path: app/storybook
+      platform: web
+      build-type: production
       artifact-name: ${{ needs.build.outputs.artifact-name }}
+      hosting-target: storybook
+      channel-id: 'live'
     secrets:
-      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
       FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

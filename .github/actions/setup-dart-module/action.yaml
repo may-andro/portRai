@@ -1,0 +1,39 @@
+name: Setup Dart Module
+description: Setup Dart SDK and install dependencies
+
+inputs:
+  dart-version:
+    description: Dart SDK version to install
+    required: false
+    default: '3.13.1'
+  module-path:
+    description: Path to the Dart module
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.dart-version }}
+
+    - name: Get dependencies cache key
+      id: pubspec-cache
+      shell: bash
+      run: echo "hash=${{ hashFiles('**/pubspec.lock') }}" >> $GITHUB_OUTPUT
+
+    - name: Cache Dart dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pub-cache
+          **/.dart_tool
+        key: dart-pub-${{ runner.os }}-${{ steps.pubspec-cache.outputs.hash }}
+        restore-keys: |
+          dart-pub-${{ runner.os }}-
+
+    - name: Get dependencies
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart pub get

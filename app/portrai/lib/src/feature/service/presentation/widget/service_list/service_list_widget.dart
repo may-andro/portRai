@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 
 part 'mobile_content_widget.dart';

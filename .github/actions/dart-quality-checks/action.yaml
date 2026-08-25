@@ -1,0 +1,81 @@
+name: Dart Quality Checks
+description: Run formatting, analysis, and tests for a Dart module
+
+inputs:
+  module-path:
+    description: Path to the Dart module to check
+    required: true
+  collect-coverage:
+    description: Whether to collect test coverage
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Verify formatting
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart format --set-exit-if-changed .
+
+    - name: Static analysis
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: dart analyze --fatal-infos .
+
+    - name: Run tests
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: |
+        if [ "${{ inputs.collect-coverage }}" = "true" ]; then
+          dart test --coverage=coverage
+        else
+          dart test
+        fi
+
+    - name: Format coverage
+      if: inputs.collect-coverage == 'true'
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: |
+        dart pub global activate coverage
+        dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+
+    - name: Install lcov
+      if: inputs.collect-coverage == 'true'
+      shell: bash
+      run: |
+        if [[ "$RUNNER_OS" == "macOS" ]]; then
+          # Install lcov 1.16 for compatibility (lcov 2.x has stricter function coverage requirements)
+          curl -L https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz | tar xz
+          cd lcov-1.16
+          sudo make install
+          cd ..
+          rm -rf lcov-1.16
+        else
+          sudo apt-get update
+          sudo apt-get install -y lcov
+        fi
+
+    - name: Fix coverage paths
+      if: inputs.collect-coverage == 'true'
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: |
+        # Fix paths in lcov.info to be relative to module directory
+        if [[ "$RUNNER_OS" == "macOS" ]]; then
+          sed -i '' "s|SF:lib/|SF:${{ inputs.module-path }}/lib/|g" coverage/lcov.info
+        else
+          sed -i "s|SF:lib/|SF:${{ inputs.module-path }}/lib/|g" coverage/lcov.info
+        fi
+
+    - name: Generate coverage report
+      if: inputs.collect-coverage == 'true'
+      uses: zgosalvez/github-actions-report-lcov@v7.2.0
+      with:
+        coverage-files: ${{ inputs.module-path }}/coverage/lcov.info
+        minimum-coverage: 0
+        artifact-name: code-coverage-${{ hashFiles(format('{0}/pubspec.yaml', inputs.module-path)) }}
+        github-token: ${{ github.token }}
+        title-prefix: '[${{ inputs.module-path }}] '
+        update-comment: true

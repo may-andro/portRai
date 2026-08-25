@@ -204,7 +204,7 @@ melos:
       description: Deploy and host flutter web page
     deploy_widgetbook:
       run: |
-        cd app/widgetbook
+        cd app/storybook
         echo "Clean existing repository"
         flutter clean
         echo "Getting packages"
@@ -212,20 +212,13 @@ melos:
         echo "Building web with Flutter"
         flutter build web --release
         echo "Deploying to Firebase"
-        firebase deploy --only hosting:wahl-consultancy-storybook-320bf-5669e --project wahl-consultancy-storybook-320bf-5669e
+        firebase deploy --only hosting:storybook
       description: Host flutter web page
-    deploy_privacy_policy:
+    deploy_legal:
       run: |
-        cd tool/privacy_policy
-        echo "Deploying to Firebase"
-        firebase deploy --only hosting:privacy-policy-320bf
-      description: Host static privacy policy web page
-    deploy_terms_and_conditions:
-      run: |
-        cd tool/terms_and_condition
-        echo "Deploying to Firebase"
-        firebase deploy --only hosting:terms-and-condition-320bf
-      description: Host static privacy policy web page
+        cd tool/legal
+        firebase deploy --only hosting:legal
+      description: Deploy privacy policy and terms & conditions to Firebase Hosting (portrai-legal)
     # Firestore Export/Import CLI scripts
     # Import (Firestore -> JSON) all collections in one go
     firestore_import:

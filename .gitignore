@@ -10,7 +10,9 @@
 **/google-services.json
 **/GoogleService-Info.plist
 **/firebase_options.dart
-**/assets/dashboard/
+**/.firebase/
+**/assets/dashboard/*.json
+!**/assets/dashboard/*.template.json
 
 # ==========================================
 # Flutter / Dart / Pub

@@ -1,0 +1,46 @@
+name: Storybook Review Release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - '*+*-review-storybook'
+
+permissions: write-all
+
+jobs:
+  # Format check, static analysis and unit tests run as parallel jobs
+  # inside a single reusable workflow call.
+  quality:
+    name: Quality Checks
+    uses: ./.github/workflows/_storybook_quality.yaml
+
+  # Build starts once all quality checks pass.
+  build:
+    name: Build
+    needs: [quality]
+    uses: ./.github/workflows/_build_web.yaml
+    with:
+      app-path: ./app/storybook
+      app-name: storybook
+      build-type: preview
+      force-release: true
+      run-codegen: true
+
+  deploy:
+    name: Deploy Review
+    needs: [build]
+    uses: ./.github/workflows/_deploy_firebase.yaml
+    with:
+      app-path: app/storybook
+      platform: web
+      build-type: preview
+      artifact-name: ${{ needs.build.outputs.artifact-name }}
+      hosting-target: storybook
+      channel-id: 'review'
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}

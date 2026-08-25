@@ -1,0 +1,137 @@
+name: Deploy to Firebase
+
+on:
+  workflow_call:
+    inputs:
+      app-path:
+        description: Path to the Flutter app (e.g., app/portrai)
+        required: true
+        type: string
+      platform:
+        description: Platform to deploy (android, ios, or web)
+        required: true
+        type: string
+      build-type:
+        description: Build type (preview or production)
+        required: true
+        type: string
+      artifact-name:
+        description: Name of the build artifact to deploy
+        required: true
+        type: string
+      release-notes:
+        description: Release notes to include in deployment
+        required: false
+        type: string
+        default: ''
+      hosting-target:
+        description: Firebase Hosting target name (e.g., portrai, storybook)
+        required: false
+        type: string
+        default: 'portrai'
+      channel-id:
+        description: Firebase Hosting channel override (e.g., live, preview, review). If empty, derived from build-type.
+        required: false
+        type: string
+        default: ''
+    secrets:
+      FIREBASE_APP_ID_ANDROID:
+        required: false
+      FIREBASE_APP_ID_IOS:
+        required: false
+      FIREBASE_SERVICE_ACCOUNT:
+        required: false
+      FIREBASE_PROJECT_ID:
+        required: false
+
+jobs:
+  deploy-mobile:
+    name: Deploy to Firebase App Distribution
+    if: ${{ inputs.platform == 'android' || inputs.platform == 'ios' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./build-output
+
+      - name: Compute release notes
+        id: notes
+        run: |
+          if [ -n "${{ inputs.release-notes }}" ]; then
+            echo "value=${{ inputs.release-notes }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=Build ${{ github.sha }} - Type: ${{ inputs.build-type }} - By: ${{ github.actor }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare Firebase credentials
+        id: creds
+        run: |
+          # Decode base64-encoded service account to raw JSON
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > ${{ runner.temp }}/firebase-service-account.json
+          # Read the decoded JSON for use in action
+          CREDS_JSON=$(cat ${{ runner.temp }}/firebase-service-account.json)
+          # Set as output (GitHub Actions handles multiline properly)
+          echo "json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$CREDS_JSON" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy Android to Firebase App Distribution
+        if: ${{ inputs.platform == 'android' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+          serviceCredentialsFileContent: ${{ steps.creds.outputs.json }}
+          groups: ${{ inputs.build-type == 'preview' && 'testers' || 'production-testers' }}
+          file: ${{ inputs.build-type == 'production' && 'build-output/app-release.aab' || 'build-output/app-release.apk' }}
+          releaseNotes: ${{ steps.notes.outputs.value }}
+
+      - name: Deploy iOS to Firebase App Distribution
+        if: ${{ inputs.platform == 'ios' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
+          serviceCredentialsFileContent: ${{ steps.creds.outputs.json }}
+          groups: ${{ inputs.build-type == 'preview' && 'testers' || 'production-testers' }}
+          file: ${{ inputs.build-type == 'production' && 'build-output/portrai-release.ipa' || 'build-output/portrai-debug.ipa' }}
+          releaseNotes: ${{ steps.notes.outputs.value }}
+
+  deploy-web:
+    name: Deploy to Firebase Hosting
+    if: ${{ inputs.platform == 'web' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.app-path }}/build/web
+
+      - name: Prepare Firebase credentials
+        id: creds
+        run: |
+          # Decode base64-encoded service account to raw JSON
+          DECODED_JSON=$(echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d)
+          # Store as multiline output
+          echo "json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DECODED_JSON" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ steps.creds.outputs.json }}
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          entryPoint: ${{ inputs.app-path }}
+          channelId: ${{ inputs.channel-id != '' && inputs.channel-id || (inputs.build-type == 'preview' && 'preview' || 'live') }}
+          target: ${{ inputs.hosting-target }}
