@@ -48,6 +48,14 @@ runs:
         sudo apt-get update
         sudo apt-get install -y lcov
 
+    - name: Fix coverage paths
+      if: inputs.collect-coverage == 'true'
+      shell: bash
+      working-directory: ${{ inputs.module-path }}
+      run: |
+        # Fix paths in lcov.info to be relative to module directory
+        sed -i "s|SF:lib/|SF:${{ inputs.module-path }}/lib/|g" coverage/lcov.info
+
     - name: Generate coverage report
       if: inputs.collect-coverage == 'true'
       uses: zgosalvez/github-actions-report-lcov@v4.1.22
