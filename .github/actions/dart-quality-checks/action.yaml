@@ -46,7 +46,12 @@ runs:
       shell: bash
       run: |
         if [[ "$RUNNER_OS" == "macOS" ]]; then
-          brew install lcov
+          # Install lcov 1.16 for compatibility (lcov 2.x has stricter function coverage requirements)
+          curl -L https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz | tar xz
+          cd lcov-1.16
+          sudo make install
+          cd ..
+          rm -rf lcov-1.16
         else
           sudo apt-get update
           sudo apt-get install -y lcov
