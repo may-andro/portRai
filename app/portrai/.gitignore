@@ -61,6 +61,3 @@ app.*.map.json
 
 # Web deploy credentials
 /web/.deploy/
-
-# Firebase base64 encoded credentials
-.firebase_distribution/service-account-base64.txt

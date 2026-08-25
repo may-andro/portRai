@@ -1,9 +1,0 @@
-# Add tester email addresses (one per line)
-# Or reference group names created in Firebase Console
-
-# Example group names:
-# internal-testers
-# qa-team
-
-# Or individual emails:
-# mayankrai271993@gmail.com
