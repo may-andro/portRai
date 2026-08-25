@@ -26,12 +26,19 @@ jobs:
           pattern: coverage-*
           path: ./all-coverage
           merge-multiple: false
+        continue-on-error: true
 
       - name: Merge coverage reports
         run: |
           # Install lcov for merging coverage reports
           sudo apt-get update
           sudo apt-get install -y lcov
+          
+          # Check if coverage directory exists
+          if [ ! -d "./all-coverage" ]; then
+            echo "No coverage artifacts found - skipping coverage report"
+            exit 0
+          fi
           
           # Find all lcov.info files
           find ./all-coverage -name "lcov.info" -type f > coverage-files.txt
