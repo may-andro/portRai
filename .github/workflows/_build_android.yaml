@@ -24,6 +24,8 @@ on:
         description: Name of the build artifact
         value: ${{ jobs.build.outputs.artifact-name }}
     secrets:
+      FIREBASE_OPTIONS:
+        required: true
       ANDROID_KEYSTORE_BASE64:
         description: Base64 encoded Android keystore file
         required: true
@@ -53,6 +55,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Create firebase_options.dart
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > ${{ inputs.app-path }}/lib/firebase_options.dart
 
       - name: Setup environment
         uses: ./.github/actions/setup-flutter-module

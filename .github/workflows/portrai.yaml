@@ -17,6 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Create firebase_options.dart
+        run: |
+          echo "${{ secrets.PORTRAI_FIREBASE_OPTIONS }}" > app/portrai/lib/firebase_options.dart
+      
       - name: Setup Flutter Module
         uses: ./.github/actions/setup-flutter-module
         with:

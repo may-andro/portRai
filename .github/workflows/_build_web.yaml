@@ -35,6 +35,11 @@ on:
         description: Name of the build artifact
         value: ${{ jobs.build.outputs.artifact-name }}
 
+    secrets:
+      FIREBASE_OPTIONS:
+        description: Firebase options file content
+        required: false
+
 env:
   FLUTTER_VERSION: 3.47.1
 
@@ -48,6 +53,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Create firebase_options.dart
+        if: secrets.FIREBASE_OPTIONS != ''
+        run: |
+          echo "${{ secrets.FIREBASE_OPTIONS }}" > ${{ inputs.app-path }}/lib/firebase_options.dart
 
       - name: Setup environment
         uses: ./.github/actions/setup-flutter-module
