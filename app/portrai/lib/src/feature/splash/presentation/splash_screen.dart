@@ -27,7 +27,7 @@ class SplashScreen extends StatelessWidget {
           SplashBloc(ModuleInjectorController(), moduleConfigurators)
             ..add(InitEvent()),
       child: Scaffold(
-        backgroundColor: context.backgroundColor,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: LayoutBuilder(
           builder: (context, constraints) {
             return BlocBuilder<SplashBloc, SplashState>(
@@ -91,13 +91,5 @@ class _SplashInfoWidget extends StatelessWidget {
             ? SetupStatusInfoWidget(setUpStatus)
             : SetupProgressWidget(progress),
     };
-  }
-}
-
-extension on BuildContext {
-  Color get backgroundColor {
-    return Theme.of(this).brightness == Brightness.dark
-        ? const Color(0xFF1E1E1E)
-        : const Color(0xFFF6F6F6);
   }
 }

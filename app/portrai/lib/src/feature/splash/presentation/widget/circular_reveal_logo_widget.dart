@@ -34,7 +34,7 @@ class _CircularRevealLogoWidgetState extends State<CircularRevealLogoWidget>
   bool hasCompletedMoveAnimation = false;
   bool hasCompletedScaleAnimation = false;
 
-  double get _logoSizeRatio => context.isDesktop ? 0.15 : 0.3;
+  double get _logoSizeRatio => context.isDesktop ? 0.25 : 0.45;
 
   @override
   void initState() {
@@ -110,8 +110,8 @@ class _CircularRevealLogoWidgetState extends State<CircularRevealLogoWidget>
 
   Color _getAdaptiveBackgroundColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFF6F6F6)
-        : const Color(0xFF1E1E1E);
+        ? const Color(0xFF1E1E1E)
+        : const Color(0xFFF6F6F6);
   }
 
   @override
