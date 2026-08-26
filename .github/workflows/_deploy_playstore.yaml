@@ -43,10 +43,20 @@ jobs:
           name: ${{ inputs.artifact-name }}
           path: ./build-output
 
+      - name: Prepare Play Store credentials
+        id: creds
+        run: |
+          # Decode base64-encoded service account to raw JSON
+          DECODED_JSON=$(echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 -d)
+          # Store as multiline output
+          echo "json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DECODED_JSON" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          serviceAccountJsonPlainText: ${{ steps.creds.outputs.json }}
           packageName: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
           releaseFiles: build-output/app-release.aab
           track: ${{ inputs.track }}
