@@ -1,0 +1,31 @@
+name: Generate Workspace Code
+description: >
+  Runs build_runner code generation for the given package and its
+  transitive workspace dependencies, using melos's dependency-aware `gen`
+  script (see the root pubspec.yaml `melos.scripts.gen`). build_runner only
+  generates code for the package it's invoked in, so a package's own
+  codegen step never produces generated code for the workspace packages it
+  depends on (e.g. layer/tracking's json_serializable part files). Scoping
+  to `package-name` + `--include-dependencies` (rather than generating for
+  every package in the workspace) keeps each workflow's codegen limited to
+  what it actually needs, while still picking up new build_runner
+  consumers automatically - no per-workflow package list to maintain.
+
+inputs:
+  package-name:
+    description: >
+      The melos/pub package name (as declared in its pubspec.yaml `name:`
+      field, not its path) to generate code for, along with its transitive
+      workspace dependencies.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Run melos gen scoped to ${{ inputs.package-name }} and its dependencies
+      shell: bash
+      run: >
+        dart run melos run gen
+        --scope=${{ inputs.package-name }}
+        --include-dependencies
+        --no-select

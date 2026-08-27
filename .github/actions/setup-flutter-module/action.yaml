@@ -1,5 +1,5 @@
 name: Setup Flutter Module
-description: Setup Flutter SDK, install dependencies, and optionally run code generation
+description: Setup Flutter SDK and install dependencies for a workspace module
 
 inputs:
   flutter-version:
@@ -9,10 +9,6 @@ inputs:
   module-path:
     description: Path to the Flutter module
     required: true
-  run-codegen:
-    description: Whether to run build_runner code generation
-    required: false
-    default: 'false'
 
 runs:
   using: composite
@@ -57,11 +53,3 @@ runs:
             fi
           done
         fi
-
-    - name: Run code generators
-      if: inputs.run-codegen == 'true'
-      shell: bash
-      working-directory: ${{ inputs.module-path }}
-      run: |
-        flutter pub run build_runner build --delete-conflicting-outputs
-        dart format .
