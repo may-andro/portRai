@@ -22,10 +22,21 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Ensure melos CLI is globally available
+      shell: bash
+      run: |
+        # melos exec's per-package concurrency model spawns subprocesses
+        # that invoke `melos` directly (not via `dart run`), so it must be
+        # resolvable on PATH, not just available as a workspace dev_dependency.
+        if ! command -v melos &> /dev/null; then
+          dart pub global activate melos
+        fi
+        echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
     - name: Run melos gen scoped to ${{ inputs.package-name }} and its dependencies
       shell: bash
       run: >
-        dart run melos run gen
+        melos run gen
         --scope=${{ inputs.package-name }}
         --include-dependencies
         --no-select
