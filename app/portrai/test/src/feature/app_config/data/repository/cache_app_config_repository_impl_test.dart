@@ -5,7 +5,7 @@ import 'package:portrai/src/feature/app_config/data/repository/cache_app_config_
 import 'package:portrai/src/feature/app_config/domain/exception/app_config_exception.dart';
 
 import '../../../../../mock/feature/app_config/data/cache/mock_app_config_cache.dart';
-import '../../../../../mock/feature/app_config/domain/entity/fake_portrai_app_config.dart';
+import '../../../../../mock/feature/app_config/domain/entity/fake_portrai_app_config_entity.dart';
 
 void main() {
   group('CacheAppConfigRepositoryImpl', () {
@@ -13,7 +13,7 @@ void main() {
     late CacheAppConfigRepositoryImpl repository;
 
     setUpAll(() {
-      registerFallbackValue(FakePortraiAppConfig());
+      registerFallbackValue(FakePortraiAppConfigEntity());
     });
 
     setUp(() {
@@ -23,7 +23,9 @@ void main() {
 
     group('getAppConfig', () {
       test('should return the cached app config when present', () async {
-        const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.0.0');
+        const appConfig = PortraiAppConfigEntity(
+          minimumRequiredAppVersion: '1.0.0',
+        );
         appConfigCache.stubGet(appConfig);
 
         final result = await repository.getAppConfig();
@@ -55,7 +57,9 @@ void main() {
 
     group('cacheAppConfig', () {
       test('should store the app config in the cache', () async {
-        const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.0.0');
+        const appConfig = PortraiAppConfigEntity(
+          minimumRequiredAppVersion: '1.0.0',
+        );
         appConfigCache.stubPut();
 
         await repository.cacheAppConfig(appConfig);
@@ -64,7 +68,9 @@ void main() {
       });
 
       test('should throw AppConfigCacheException when the cache throws', () {
-        const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.0.0');
+        const appConfig = PortraiAppConfigEntity(
+          minimumRequiredAppVersion: '1.0.0',
+        );
         appConfigCache.stubPutThrows(Exception('cache write failed'));
 
         expect(

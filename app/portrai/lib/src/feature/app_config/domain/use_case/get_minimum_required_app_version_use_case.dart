@@ -15,7 +15,7 @@ class GetMinimumRequiredAppVersionUseCase
   @override
   Either<NoFailure, String> execute() {
     final appConfig = _appConfig;
-    if (appConfig is! PortraiAppConfig) {
+    if (appConfig is! PortraiAppConfigEntity) {
       throw StateError(
         'Unexpected AppConfig implementation: ${appConfig.runtimeType}',
       );

@@ -15,9 +15,11 @@ void main() {
     });
 
     test(
-      'should return Right(PortraiAppConfig) when the repository succeeds',
+      'should return Right(PortraiAppConfigEntity) when the repository succeeds',
       () async {
-        const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.0.0');
+        const appConfig = PortraiAppConfigEntity(
+          minimumRequiredAppVersion: '1.0.0',
+        );
         appConfigRepository.stubGetAppConfig(appConfig);
 
         final result = await useCase();

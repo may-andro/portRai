@@ -1,10 +1,10 @@
 import 'package:core/core.dart';
 
-class PortraiAppConfig extends AppConfig {
-  const PortraiAppConfig({required this.minimumRequiredAppVersion});
+class PortraiAppConfigEntity extends AppConfig {
+  const PortraiAppConfigEntity({required this.minimumRequiredAppVersion});
 
-  factory PortraiAppConfig.fromJson(Map<String, dynamic> json) {
-    return PortraiAppConfig(
+  factory PortraiAppConfigEntity.fromJson(Map<String, dynamic> json) {
+    return PortraiAppConfigEntity(
       minimumRequiredAppVersion: json['minimumRequiredAppVersion'] as String,
     );
   }
@@ -18,7 +18,7 @@ class PortraiAppConfig extends AppConfig {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PortraiAppConfig &&
+      other is PortraiAppConfigEntity &&
           runtimeType == other.runtimeType &&
           minimumRequiredAppVersion == other.minimumRequiredAppVersion;
 
@@ -27,5 +27,5 @@ class PortraiAppConfig extends AppConfig {
 
   @override
   String toString() =>
-      'PortraiAppConfig(minimumRequiredAppVersion: $minimumRequiredAppVersion)';
+      'PortraiAppConfigEntity(minimumRequiredAppVersion: $minimumRequiredAppVersion)';
 }

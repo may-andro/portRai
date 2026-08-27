@@ -3,16 +3,16 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/app_config/domain/entity/_entity.dart';
 
 @registerSingleton
-class AppConfigCache extends KeyValueCache<PortraiAppConfig> {
+class AppConfigCache extends KeyValueCache<PortraiAppConfigEntity> {
   AppConfigCache() : super('app_config_cache');
 
   @override
-  PortraiAppConfig deserializeValue(Map<String, dynamic> map) {
-    return PortraiAppConfig.fromJson(map);
+  PortraiAppConfigEntity deserializeValue(Map<String, dynamic> map) {
+    return PortraiAppConfigEntity.fromJson(map);
   }
 
   @override
-  Map<String, dynamic> serializeValue(PortraiAppConfig value) {
+  Map<String, dynamic> serializeValue(PortraiAppConfigEntity value) {
     return value.toJson();
   }
 }

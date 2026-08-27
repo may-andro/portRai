@@ -10,8 +10,10 @@ class _FakeAppConfig extends AppConfig {
 void main() {
   group('GetMinimumRequiredAppVersionUseCase', () {
     test('should return Right(minimumRequiredAppVersion) when AppConfig is a '
-        'PortraiAppConfig', () async {
-      const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.2.3');
+        'PortraiAppConfigEntity', () async {
+      const appConfig = PortraiAppConfigEntity(
+        minimumRequiredAppVersion: '1.2.3',
+      );
       final useCase = GetMinimumRequiredAppVersionUseCase(appConfig);
 
       final result = await useCase();
@@ -21,7 +23,7 @@ void main() {
     });
 
     test('should return Left(NoFailure) when AppConfig is not a '
-        'PortraiAppConfig', () async {
+        'PortraiAppConfigEntity', () async {
       final useCase = GetMinimumRequiredAppVersionUseCase(
         const _FakeAppConfig(),
       );

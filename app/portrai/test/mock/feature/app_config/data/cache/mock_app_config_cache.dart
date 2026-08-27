@@ -6,7 +6,7 @@ class MockAppConfigCache extends Mock implements AppConfigCache {}
 
 extension MockAppConfigCacheStub on MockAppConfigCache {
   /// Stubs `get()` to return [appConfig].
-  void stubGet(PortraiAppConfig? appConfig) {
+  void stubGet(PortraiAppConfigEntity? appConfig) {
     when(get).thenAnswer((_) async => appConfig);
   }
 

@@ -22,7 +22,7 @@ class InitializeAppConfigUnknownFailure extends InitializeAppConfigFailure {
   const InitializeAppConfigUnknownFailure({super.cause});
 }
 
-/// Fetches [PortraiAppConfig] from remote (falling back to cache) so it can
+/// Fetches [PortraiAppConfigEntity] from remote (falling back to cache) so it can
 /// be registered as the app-wide `AppConfig` singleton.
 ///
 /// This is a **startup-only** use case: it is meant to be called exactly
@@ -32,14 +32,15 @@ class InitializeAppConfigUnknownFailure extends InitializeAppConfigFailure {
 /// (or inject `AppConfig` directly) instead.
 @register
 class InitializeAppConfigUseCase
-    extends BaseNoParamUseCase<PortraiAppConfig, InitializeAppConfigFailure> {
+    extends
+        BaseNoParamUseCase<PortraiAppConfigEntity, InitializeAppConfigFailure> {
   InitializeAppConfigUseCase(this._appConfigRepository);
 
   final AppConfigRepository _appConfigRepository;
 
   @protected
   @override
-  FutureOr<Either<InitializeAppConfigFailure, PortraiAppConfig>>
+  FutureOr<Either<InitializeAppConfigFailure, PortraiAppConfigEntity>>
   execute() async {
     final appConfig = await _appConfigRepository.getAppConfig();
     return Right(appConfig);

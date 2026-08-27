@@ -22,12 +22,12 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
   final LogReporter _logReporter;
 
   @override
-  Future<void> cacheAppConfig(PortraiAppConfig appConfig) {
+  Future<void> cacheAppConfig(PortraiAppConfigEntity appConfig) {
     return _cacheDelegateRepository.cacheAppConfig(appConfig);
   }
 
   @override
-  Future<PortraiAppConfig> getAppConfig() async {
+  Future<PortraiAppConfigEntity> getAppConfig() async {
     try {
       final appConfig = await _loadAppConfigFromRemote();
       await _cacheAppConfigSafely(appConfig);
@@ -40,7 +40,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
     }
   }
 
-  Future<PortraiAppConfig> _loadAppConfigFromRemote() async {
+  Future<PortraiAppConfigEntity> _loadAppConfigFromRemote() async {
     try {
       final documentId = _buildConfig.buildEnvironment.name;
       final appConfigJson = await _firestoreController
@@ -53,7 +53,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
       }
 
       try {
-        return PortraiAppConfig.fromJson(appConfigJson);
+        return PortraiAppConfigEntity.fromJson(appConfigJson);
       } catch (e, st) {
         throw AppConfigParsingException(
           cause: 'Failed to parse app config from Firestore: $e',
@@ -83,7 +83,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
   }
 
   /// Caches the app config, but doesn't fail if caching fails.
-  Future<void> _cacheAppConfigSafely(PortraiAppConfig appConfig) async {
+  Future<void> _cacheAppConfigSafely(PortraiAppConfigEntity appConfig) async {
     try {
       await cacheAppConfig(appConfig);
     } catch (_) {

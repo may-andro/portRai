@@ -6,7 +6,7 @@ import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/app_config/data/repository/remote_app_config_repository_impl.dart';
 import 'package:portrai/src/feature/app_config/domain/exception/app_config_exception.dart';
 
-import '../../../../../mock/feature/app_config/domain/entity/fake_portrai_app_config.dart';
+import '../../../../../mock/feature/app_config/domain/entity/fake_portrai_app_config_entity.dart';
 import '../../../../../mock/feature/app_config/domain/repository/mock_app_config_repository.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
@@ -20,7 +20,7 @@ void main() {
     late RemoteAppConfigRepositoryImpl repository;
 
     setUpAll(() {
-      registerFallbackValue(FakePortraiAppConfig());
+      registerFallbackValue(FakePortraiAppConfigEntity());
     });
 
     setUp(() {
@@ -38,7 +38,9 @@ void main() {
 
     group('cacheAppConfig', () {
       test('should delegate caching to the cache repository', () async {
-        const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.0.0');
+        const appConfig = PortraiAppConfigEntity(
+          minimumRequiredAppVersion: '1.0.0',
+        );
         cacheDelegateRepository.stubCacheAppConfig();
 
         await repository.cacheAppConfig(appConfig);
@@ -61,11 +63,11 @@ void main() {
 
         expect(
           result,
-          const PortraiAppConfig(minimumRequiredAppVersion: '1.2.3'),
+          const PortraiAppConfigEntity(minimumRequiredAppVersion: '1.2.3'),
         );
         verify(
           () => cacheDelegateRepository.cacheAppConfig(
-            const PortraiAppConfig(minimumRequiredAppVersion: '1.2.3'),
+            const PortraiAppConfigEntity(minimumRequiredAppVersion: '1.2.3'),
           ),
         ).called(1);
       });
@@ -73,7 +75,7 @@ void main() {
       test('should fall back to cache and log a warning when the remote '
           'document does not exist', () async {
         firestoreController.stubGetDocumentFromCollection(null);
-        const cachedAppConfig = PortraiAppConfig(
+        const cachedAppConfig = PortraiAppConfigEntity(
           minimumRequiredAppVersion: '0.9.0',
         );
         cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
@@ -93,7 +95,7 @@ void main() {
         firestoreController.stubGetDocumentFromCollection({
           'unexpectedField': 'value',
         });
-        const cachedAppConfig = PortraiAppConfig(
+        const cachedAppConfig = PortraiAppConfigEntity(
           minimumRequiredAppVersion: '0.9.0',
         );
         cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
@@ -109,7 +111,7 @@ void main() {
           firestoreController.stubGetDocumentFromCollectionThrows(
             const FirestoreNetworkException('network error', StackTrace.empty),
           );
-          const cachedAppConfig = PortraiAppConfig(
+          const cachedAppConfig = PortraiAppConfigEntity(
             minimumRequiredAppVersion: '0.9.0',
           );
           cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
@@ -133,7 +135,7 @@ void main() {
 
         expect(
           result,
-          const PortraiAppConfig(minimumRequiredAppVersion: '1.2.3'),
+          const PortraiAppConfigEntity(minimumRequiredAppVersion: '1.2.3'),
         );
         verify(
           () => logReporter.error(

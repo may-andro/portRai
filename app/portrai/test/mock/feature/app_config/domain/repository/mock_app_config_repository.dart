@@ -6,7 +6,7 @@ class MockAppConfigRepository extends Mock implements AppConfigRepository {}
 
 extension MockAppConfigRepositoryStub on MockAppConfigRepository {
   /// Stubs `getAppConfig()` to return [appConfig].
-  void stubGetAppConfig(PortraiAppConfig appConfig) {
+  void stubGetAppConfig(PortraiAppConfigEntity appConfig) {
     when(getAppConfig).thenAnswer((_) async => appConfig);
   }
 

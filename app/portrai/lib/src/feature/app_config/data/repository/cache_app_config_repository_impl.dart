@@ -9,7 +9,7 @@ class CacheAppConfigRepositoryImpl implements AppConfigRepository {
   final AppConfigCache _appConfigCache;
 
   @override
-  Future<PortraiAppConfig> getAppConfig() async {
+  Future<PortraiAppConfigEntity> getAppConfig() async {
     try {
       final cachedAppConfig = await _appConfigCache.get();
 
@@ -31,7 +31,7 @@ class CacheAppConfigRepositoryImpl implements AppConfigRepository {
   }
 
   @override
-  Future<void> cacheAppConfig(PortraiAppConfig appConfig) async {
+  Future<void> cacheAppConfig(PortraiAppConfigEntity appConfig) async {
     try {
       await _appConfigCache.put(appConfig);
     } catch (e, stackTrace) {
