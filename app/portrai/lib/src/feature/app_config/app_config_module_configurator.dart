@@ -18,18 +18,15 @@ class AppConfigModuleConfigurator extends SimpleModuleConfigurator {
     final initializeAppConfigUseCase = sl.get<InitializeAppConfigUseCase>();
 
     final appConfigEither = await initializeAppConfigUseCase.call();
-    final appConfig = appConfigEither.fold(
-      (failure) {
-        sl.get<LogReporter>().error(
-          'Failed to load app config from remote and cache: $failure',
-        );
-        throw PostInjectionException(
-          'App config could not be loaded from remote or cache',
-          failure,
-        );
-      },
-      (appConfig) => appConfig,
-    );
+    final appConfig = appConfigEither.fold((failure) {
+      sl.get<LogReporter>().error(
+        'Failed to load app config from remote and cache: $failure',
+      );
+      throw PostInjectionException(
+        'App config could not be loaded from remote or cache',
+        failure,
+      );
+    }, (appConfig) => appConfig);
 
     sl.registerSingleton<AppConfig>(() => appConfig);
   }

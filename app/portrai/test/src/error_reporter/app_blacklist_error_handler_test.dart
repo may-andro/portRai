@@ -17,22 +17,31 @@ void main() {
       expect(handler, isA<BlacklistErrorHandler>());
     });
 
-    test('should return true when isBlacklistError is called with BlacklistException', () {
-      final result = handler.isBlacklistError(BlacklistException());
+    test(
+      'should return true when isBlacklistError is called with BlacklistException',
+      () {
+        final result = handler.isBlacklistError(BlacklistException());
 
-      expect(result, isTrue);
-    });
+        expect(result, isTrue);
+      },
+    );
 
-    test('should return false when isBlacklistError is called with a different exception', () {
-      final result = handler.isBlacklistError(_OtherException());
+    test(
+      'should return false when isBlacklistError is called with a different exception',
+      () {
+        final result = handler.isBlacklistError(_OtherException());
 
-      expect(result, isFalse);
-    });
+        expect(result, isFalse);
+      },
+    );
 
-    test('should return false when isBlacklistError is called with a plain object', () {
-      final result = handler.isBlacklistError(Object());
+    test(
+      'should return false when isBlacklistError is called with a plain object',
+      () {
+        final result = handler.isBlacklistError(Object());
 
-      expect(result, isFalse);
-    });
+        expect(result, isFalse);
+      },
+    );
   });
 }

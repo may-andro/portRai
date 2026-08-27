@@ -120,7 +120,9 @@ melos:
         flutter: false
     # Generative scripts for application
     gen:
-      run: dart run build_runner build
+      run: |
+        dart run build_runner build
+        dart format .
       description: Run `build_runner` in all packages that depend on it.
       exec:
         concurrency: 3

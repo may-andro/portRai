@@ -10,11 +10,14 @@ void main() {
       expect(exception, isA<AppException>());
     });
 
-    test('should create distinct instances when instantiated multiple times', () {
-      final exception1 = BlacklistException();
-      final exception2 = BlacklistException();
+    test(
+      'should create distinct instances when instantiated multiple times',
+      () {
+        final exception1 = BlacklistException();
+        final exception2 = BlacklistException();
 
-      expect(exception1, isNot(same(exception2)));
-    });
+        expect(exception1, isNot(same(exception2)));
+      },
+    );
   });
 }

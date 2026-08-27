@@ -55,43 +55,49 @@ void main() {
         ).called(1);
       });
 
-      test('should log error with null stacktrace when onError is called without stacktrace', () {
-        final error = Exception('no stack');
+      test(
+        'should log error with null stacktrace when onError is called without stacktrace',
+        () {
+          final error = Exception('no stack');
 
-        interceptor.onError('UseCase', error, null);
+          interceptor.onError('UseCase', error, null);
 
-        verify(
-          () => mockLogReporter.error(
-            'Error detected: $error',
-            tag: 'UseCase',
-            error: error,
-          ),
-        ).called(1);
-      });
+          verify(
+            () => mockLogReporter.error(
+              'Error detected: $error',
+              tag: 'UseCase',
+              error: error,
+            ),
+          ).called(1);
+        },
+      );
     });
 
     group('onSuccess', () {
-      test('should log result type and value when onSuccess is called with string', () {
-        interceptor.onSuccess<String>('MyUseCase', 'result_value');
+      test(
+        'should log result type and value when onSuccess is called with string',
+        () {
+          interceptor.onSuccess<String>('MyUseCase', 'result_value');
 
-        verify(
-          () => mockLogReporter.debug(
-            'Success: String result_value',
-            tag: 'MyUseCase',
-          ),
-        ).called(1);
-      });
+          verify(
+            () => mockLogReporter.debug(
+              'Success: String result_value',
+              tag: 'MyUseCase',
+            ),
+          ).called(1);
+        },
+      );
 
-      test('should log int result correctly when onSuccess is called with int', () {
-        interceptor.onSuccess<int>('CountUseCase', 42);
+      test(
+        'should log int result correctly when onSuccess is called with int',
+        () {
+          interceptor.onSuccess<int>('CountUseCase', 42);
 
-        verify(
-          () => mockLogReporter.debug(
-            'Success: int 42',
-            tag: 'CountUseCase',
-          ),
-        ).called(1);
-      });
+          verify(
+            () => mockLogReporter.debug('Success: int 42', tag: 'CountUseCase'),
+          ).called(1);
+        },
+      );
     });
   });
 }
