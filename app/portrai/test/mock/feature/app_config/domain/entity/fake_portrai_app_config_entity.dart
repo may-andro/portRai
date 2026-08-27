@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_implementing_value_types
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/app_config/app_config.dart';
 
