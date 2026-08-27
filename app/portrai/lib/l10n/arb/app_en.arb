@@ -101,6 +101,10 @@
   "@errorExternalUrlLaunch": {
     "description": "Error when external URL fails to open"
   },
+  "errorForceUpdateStoreUrl": "Unable to open the app store. Please try again",
+  "@errorForceUpdateStoreUrl": {
+    "description": "Error when the app store URL for updating the app can't be built"
+  },
   "errorGeneric": "Something went wrong. Please try again",
   "@errorGeneric": {
     "description": "Generic error for unexpected failures"
@@ -248,6 +252,18 @@
   "footerPitch": "Building digital experiences that matter",
   "@footerPitch": {
     "description": "Footer tagline"
+  },
+  "forceUpdateButton": "Update Now",
+  "@forceUpdateButton": {
+    "description": "Button label to open the app store and update the app"
+  },
+  "forceUpdateMessage": "A new version of the app is available and required to continue. Please update to keep using PortRai.",
+  "@forceUpdateMessage": {
+    "description": "Message explaining why the app must be updated"
+  },
+  "forceUpdateTitle": "Update Required",
+  "@forceUpdateTitle": {
+    "description": "Title of the bottom sheet shown when an app update is required"
   },
   "help": "Help",
   "@help": {

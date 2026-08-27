@@ -6,11 +6,13 @@ import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/firebase_options.dart';
+import 'package:portrai/src/feature/app_config/app_config_module_configurator.dart';
 import 'package:portrai/src/feature/developer_mode/developer_mode_module_configurator.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/feature/force_update/force_update_module_configurator.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
@@ -35,6 +37,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   ),
   TrackingModuleConfigurator(buildConfig.buildEnvironment.isFirebaseEnabled),
   LogReporterModuleConfigurator(),
+  AppConfigModuleConfigurator(),
   RouteModuleConfigurator(),
   UtilityModuleConfigurator(),
   UseCaseModuleConfigurator(),
@@ -49,6 +52,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   layer_ff.FeatureFlagModuleConfigurator(),
   AppFeatureFlagModuleConfigurator(),
   ExternalAppHandlerModuleConfigurator(),
+  ForceUpdateModuleConfigurator(),
   LocaleModuleConfigurator(),
   SettingModuleConfigurator(),
   DeveloperModeModuleConfigurator(),

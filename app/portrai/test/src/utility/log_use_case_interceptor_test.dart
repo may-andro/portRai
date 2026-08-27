@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/utility/log_use_case_interceptor.dart';
 
-import '../../mock/mock_log_reporter.dart';
+import '../../mock/utility/mock_log_reporter.dart';
 
 void main() {
   group('LogUseCaseInterceptor', () {

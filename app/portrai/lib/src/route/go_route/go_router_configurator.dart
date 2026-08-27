@@ -44,6 +44,7 @@ class GoRouterConfigurator {
     final allRoutes = _controller.allRoutes.map(_convertModuleRoute).toList();
 
     return GoRouter(
+      navigatorKey: rootNavigatorKey,
       initialLocation: '/',
       routes: allRoutes,
       observers: navigationObservers,

@@ -55,12 +55,8 @@ class GetProfileUseCase {
 Generates:
 
 ```dart
-sl.registerFactory<GetProfileUseCase>
-(
-() => GetProfileUseCase(sl.get<ProfileRepository>(
-)
-)
-,
+sl.registerFactory<GetProfileUseCase>(
+  () => GetProfileUseCase(sl.get<ProfileRepository>()),
 );
 ```
 
@@ -78,14 +74,8 @@ class ProfileCache extends DBCache<ProfileModel> {
 Generates:
 
 ```dart
-sl.registerSingleton<ProfileCache>
-(
-(
-)
-=>
-ProfileCache
-(
-)
+sl.registerSingleton<ProfileCache>(
+  () => ProfileCache(),
 );
 ```
 
@@ -97,35 +87,18 @@ abstract type.
 ```dart
 @Register(as: ExperienceRepository)
 class BuildConfigExperienceRepositoryImpl implements ExperienceRepository {
-  BuildConfigExperienceRepositoryImpl
-
-  (
-
-  this
-
-      .
-
-  _buildConfig
-
-  ,
-
-  ...
-
-  );
+  BuildConfigExperienceRepositoryImpl(this._buildConfig, ...);
 }
 ```
 
 Generates:
 
 ```dart
-sl.registerFactory<ExperienceRepository>
-(
-() => BuildConfigExperienceRepositoryImpl(sl.get<BuildConfig>(
-)
-,
-...
-)
-,
+sl.registerFactory<ExperienceRepository>(
+  () => BuildConfigExperienceRepositoryImpl(
+    sl.get<BuildConfig>(),
+    ...
+  ),
 );
 ```
 
@@ -200,15 +173,14 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
 Generates:
 
 ```dart
-sl.registerFactory<RemoteExperienceRepositoryImpl>
-(
-() => RemoteExperienceRepositoryImpl(
-sl.get<FbFirestoreController>(),
-sl.get<AppLocale>(),
-sl.get<CacheExperienceRepositoryImpl>(), // ← resolved by @Inject
-sl.get<ExperienceMapper>(),
-sl.get<LogReporter>(),
-),
+sl.registerFactory<RemoteExperienceRepositoryImpl>(
+  () => RemoteExperienceRepositoryImpl(
+    sl.get<FbFirestoreController>(),
+    sl.get<AppLocale>(),
+    sl.get<CacheExperienceRepositoryImpl>(), // ← resolved by @Inject
+    sl.get<ExperienceMapper>(),
+    sl.get<LogReporter>(),
+  ),
 );
 ```
 
@@ -296,9 +268,7 @@ Abstraction layer for dependency registration and retrieval:
 
 ```dart
 // Factory — new instance each time
-sl.registerFactory<ApiClient>
-(
-() => ApiClient());
+sl.registerFactory<ApiClient>(() => ApiClient());
 
 // Singleton — single lazily-created instance
 sl.registerSingleton<Database>(
@@ -314,21 +284,14 @@ if (sl.isRegistered<ApiClient>()) { ... }
 
 // Cleanup
 await sl.unregister<ApiClient>();
-await
-sl
-.
-reset
-(
-);
+await sl.reset();
 ```
 
 #### Shorthand Extensions
 
 ```dart
 // Instead of sl.registerFactory<T>(...)
-sl.factory<T>
-(
-() => MyClass());
+sl.factory<T>(() => MyClass());
 
 // Instead of sl.registerSingleton<T>(...)
 sl.singleton<T>(() => MyClass());
@@ -348,7 +311,6 @@ Enum tracking the dependency injection process:
 ### Setting Up the DI Graph
 
 ```dart
-
 final controller = ModuleInjectorController();
 
 final stream = controller.setUpDIGraph(
@@ -360,11 +322,10 @@ final stream = controller.setUpDIGraph(
   ],
 );
 
-await for (
-final status in stream) {
-if (status == InjectionStatus.finished) {
-// All dependencies are ready
-}
+await for (final status in stream) {
+  if (status == InjectionStatus.finished) {
+    // All dependencies are ready
+  }
 }
 ```
 
@@ -393,15 +354,15 @@ manual registration for:
 
 ```dart
 try {
-await for (final status in controller.setUpDIGraph(configurators: modules)) {
-// Handle status updates
-}
+  await for (final status in controller.setUpDIGraph(configurators: modules)) {
+    // Handle status updates
+  }
 } on PreInjectionException catch (e) {
-// Handle pre-setup errors
+  // Handle pre-setup errors
 } on RegisterInjectionException catch (e) {
-// Handle registration errors
+  // Handle registration errors
 } on PostInjectionException catch (e) {
-// Handle post-setup errors
+  // Handle post-setup errors
 }
 ```
 

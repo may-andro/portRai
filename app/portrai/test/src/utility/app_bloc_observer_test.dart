@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/utility/app_bloc_observer.dart';
 
-import '../../mock/mock_log_reporter.dart';
+import '../../mock/utility/mock_log_reporter.dart';
 
 class _MockBloc extends Mock implements BlocBase<int> {
   @override
