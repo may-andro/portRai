@@ -52,7 +52,9 @@ void main() {
       act: (bloc) => bloc.add(const CheckForceUpdateEvent()),
       expect: () => const [ForceUpdateRequiredState()],
       verify: (_) {
-        verify(() => trackingDelegate.trackScreenView()).called(1);
+        // The bottom sheet's actual view/impression is tracked separately
+        // via [BottomSheetVisibleEvent], not eagerly here.
+        verifyNever(() => trackingDelegate.trackScreenView());
       },
     );
 
@@ -85,6 +87,16 @@ void main() {
     );
 
     blocTest<ForceUpdateBloc, ForceUpdateState>(
+      'tracks a screen view when the bottom sheet becomes visible',
+      build: buildBloc,
+      act: (bloc) => bloc.add(const BottomSheetVisibleEvent()),
+      expect: () => const <ForceUpdateState>[],
+      verify: (_) {
+        verify(() => trackingDelegate.trackScreenView()).called(1);
+      },
+    );
+
+    blocTest<ForceUpdateBloc, ForceUpdateState>(
       'emits [ForceUpdateLaunchFailedState] when the store url can not be built',
       setUp: () => getAppStoreUrlUseCase.stubCall(
         const Left<GetAppStoreUrlFailure, Uri>(
@@ -103,7 +115,6 @@ void main() {
       verify: (_) {
         verifyNever(() => openExternalUrlUseCase(any<OpenExternalUrlParam>()));
         verify(() => trackingDelegate.trackUpdateNowClick()).called(1);
-        verify(() => trackingDelegate.trackLaunchFailedView()).called(1);
       },
     );
 
@@ -131,7 +142,6 @@ void main() {
       ],
       verify: (_) {
         verify(() => trackingDelegate.trackUpdateNowClick()).called(1);
-        verify(() => trackingDelegate.trackLaunchFailedView()).called(1);
       },
     );
 
@@ -162,7 +172,6 @@ void main() {
           ),
         ).called(1);
         verify(() => trackingDelegate.trackUpdateNowClick()).called(1);
-        verifyNever(() => trackingDelegate.trackLaunchFailedView());
       },
     );
   });

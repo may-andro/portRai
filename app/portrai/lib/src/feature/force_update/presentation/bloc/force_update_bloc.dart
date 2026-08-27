@@ -20,6 +20,7 @@ class ForceUpdateBloc extends Bloc<ForceUpdateEvent, ForceUpdateState> {
        super(const ForceUpdateInitialState()) {
     on<CheckForceUpdateEvent>(_onCheckForceUpdateEventToState);
     on<UpdateNowClickEvent>(_onUpdateNowClickEventToState);
+    on<BottomSheetVisibleEvent>(_onBottomSheetVisibleEventToState);
   }
 
   final IsAppUpdateRequiredUseCase _isAppUpdateRequiredUseCase;
@@ -40,10 +41,6 @@ class ForceUpdateBloc extends Bloc<ForceUpdateEvent, ForceUpdateState> {
       (isUpdateRequired) => isUpdateRequired,
     );
 
-    if (isUpdateRequired) {
-      _trackingDelegate.trackScreenView();
-    }
-
     emit(
       isUpdateRequired
           ? const ForceUpdateRequiredState()
@@ -60,7 +57,6 @@ class ForceUpdateBloc extends Bloc<ForceUpdateEvent, ForceUpdateState> {
     final storeUrlEither = await _getAppStoreUrlUseCase();
 
     if (storeUrlEither.isLeft) {
-      _trackingDelegate.trackLaunchFailedView();
       emit(ForceUpdateLaunchFailedState(failure: storeUrlEither.left));
       return;
     }
@@ -70,8 +66,14 @@ class ForceUpdateBloc extends Bloc<ForceUpdateEvent, ForceUpdateState> {
     );
 
     if (openResult.isLeft) {
-      _trackingDelegate.trackLaunchFailedView();
       emit(ForceUpdateLaunchFailedState(failure: openResult.left));
     }
+  }
+
+  void _onBottomSheetVisibleEventToState(
+    BottomSheetVisibleEvent event,
+    Emitter<ForceUpdateState> emit,
+  ) {
+    _trackingDelegate.trackScreenView();
   }
 }

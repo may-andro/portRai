@@ -13,8 +13,4 @@ class ForceUpdateTrackingDelegate extends ScreenTrackingDelegate {
   void trackUpdateNowClick() {
     trackEvent(ClickTracking(label: 'update_now'));
   }
-
-  void trackLaunchFailedView() {
-    trackEvent(ViewTracking(label: 'launch_failed_view'));
-  }
 }

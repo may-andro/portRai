@@ -16,3 +16,9 @@ class CheckForceUpdateEvent extends ForceUpdateEvent {
 class UpdateNowClickEvent extends ForceUpdateEvent {
   const UpdateNowClickEvent();
 }
+
+/// Fired when the bottom sheet actually becomes visible to the user (see
+/// [TrackingImpressionDetectorWidget] in [ForceUpdateBottomSheetWidget]).
+class BottomSheetVisibleEvent extends ForceUpdateEvent {
+  const BottomSheetVisibleEvent();
+}
