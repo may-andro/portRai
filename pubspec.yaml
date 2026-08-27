@@ -45,7 +45,7 @@ melos:
         mocktail: ^1.0.4
         test: ^1.24.4
       hooks:
-        post: dart run build_runner build --delete-conflicting-outputs
+        post: melos run gen --no-select
     clean:
       hooks:
         post: melos exec --flutter --concurrency=1 -- "flutter clean"
@@ -120,10 +120,12 @@ melos:
         flutter: false
     # Generative scripts for application
     gen:
-      run: dart run build_runner build --delete-conflicting-outputs
-      description: Run `build_runner` in all packages.
+      run: |
+        dart run build_runner build
+        dart format .
+      description: Run `build_runner` in all packages that depend on it.
       exec:
-        concurrency: 1
+        concurrency: 3
       packageFilters:
         dependsOn: build_runner
     gen_splash:

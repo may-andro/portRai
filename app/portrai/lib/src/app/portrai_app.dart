@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/force_update/force_update.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/route/route.dart';
 
@@ -33,7 +34,9 @@ class PortraiApp extends StatelessWidget {
           brightness: context.platformBrightness,
           designSystem: designSystem,
           child: SystemLocaleObserverWidget(
-            child: child ?? const SizedBox.shrink(),
+            child: ForceUpdateListenerWidget(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },

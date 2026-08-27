@@ -37,7 +37,11 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           module-path: ${{ env.STORYBOOK_PATH }}
-          run-codegen: 'true'
+
+      - name: Generate workspace code
+        uses: ./.github/actions/generate-workspace-code
+        with:
+          package-name: storybook
 
       - name: Analyze code
         working-directory: ${{ env.STORYBOOK_PATH }}
@@ -55,7 +59,11 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           module-path: ${{ env.STORYBOOK_PATH }}
-          run-codegen: 'true'
+
+      - name: Generate workspace code
+        uses: ./.github/actions/generate-workspace-code
+        with:
+          package-name: storybook
 
       - name: Run unit tests
         working-directory: ${{ env.STORYBOOK_PATH }}

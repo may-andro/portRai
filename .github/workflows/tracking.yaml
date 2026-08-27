@@ -24,7 +24,11 @@ jobs:
         uses: ./.github/actions/setup-flutter-module
         with:
           module-path: layer/tracking
-          run-codegen: 'true'
+
+      - name: Generate workspace code
+        uses: ./.github/actions/generate-workspace-code
+        with:
+          package-name: tracking
       
       - name: Quality Checks
         uses: ./.github/actions/flutter-quality-checks
