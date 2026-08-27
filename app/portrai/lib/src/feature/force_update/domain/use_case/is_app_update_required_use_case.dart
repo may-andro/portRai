@@ -32,12 +32,24 @@ class IsAppUpdateRequiredUseCase
   @protected
   @override
   FutureOr<Either<IsAppUpdateRequiredFailure, bool>> execute() async {
-    final minimumRequiredAppVersion = _getMinimumRequiredAppVersionUseCase();
+    final minimumRequiredAppVersionResult =
+        await _getMinimumRequiredAppVersionUseCase();
+
+    if (minimumRequiredAppVersionResult.isLeft) {
+      return Left(
+        IsAppUpdateRequiredUnknownFailure(
+          cause: minimumRequiredAppVersionResult.left,
+        ),
+      );
+    }
+
     final currentAppVersion = await _appVersionRepository
         .getCurrentAppVersion();
 
     return Right(
-      currentAppVersion.isLowerVersionThan(minimumRequiredAppVersion),
+      currentAppVersion.isLowerVersionThan(
+        minimumRequiredAppVersionResult.right,
+      ),
     );
   }
 

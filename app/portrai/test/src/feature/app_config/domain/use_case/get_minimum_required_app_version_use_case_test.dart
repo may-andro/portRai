@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/app_config/app_config.dart';
+import 'package:use_case/use_case.dart';
 
 class _FakeAppConfig extends AppConfig {
   const _FakeAppConfig();
@@ -8,25 +9,27 @@ class _FakeAppConfig extends AppConfig {
 
 void main() {
   group('GetMinimumRequiredAppVersionUseCase', () {
-    test('should return the minimum required app version when AppConfig is a '
-        'PortraiAppConfig', () {
+    test('should return Right(minimumRequiredAppVersion) when AppConfig is a '
+        'PortraiAppConfig', () async {
       const appConfig = PortraiAppConfig(minimumRequiredAppVersion: '1.2.3');
       final useCase = GetMinimumRequiredAppVersionUseCase(appConfig);
 
-      final result = useCase();
+      final result = await useCase();
 
-      expect(result, '1.2.3');
+      expect(result.isRight, true);
+      expect(result.right, '1.2.3');
     });
 
-    test(
-      'should throw StateError when AppConfig is not a PortraiAppConfig',
-      () {
-        final useCase = GetMinimumRequiredAppVersionUseCase(
-          const _FakeAppConfig(),
-        );
+    test('should return Left(NoFailure) when AppConfig is not a '
+        'PortraiAppConfig', () async {
+      final useCase = GetMinimumRequiredAppVersionUseCase(
+        const _FakeAppConfig(),
+      );
 
-        expect(useCase.call, throwsA(isA<StateError>()));
-      },
-    );
+      final result = await useCase();
+
+      expect(result.isLeft, true);
+      expect(result.left, isA<NoFailure>());
+    });
   });
 }
