@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/app_config/domain/entity/_entity.dart';
+import 'package:portrai/src/feature/app_config/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/app_config/domain/repository/app_config_repository.dart';
 import 'package:use_case/use_case.dart';
 
@@ -49,18 +50,19 @@ class InitializeAppConfigUseCase
   @protected
   @override
   InitializeAppConfigFailure mapErrorToFailure(Object e, StackTrace st) {
-    final errorMessage = e.toString().toLowerCase();
-
-    if (errorMessage.contains('network') ||
-        errorMessage.contains('timeout') ||
-        errorMessage.contains('unauthorized')) {
-      return InitializeAppConfigNetworkFailure(cause: e);
-    }
-
-    if (errorMessage.contains('cache')) {
-      return InitializeAppConfigCacheFailure(cause: e);
-    }
-
-    return InitializeAppConfigUnknownFailure(cause: e);
+    return switch (e) {
+      AppConfigNetworkException() => InitializeAppConfigNetworkFailure(
+        cause: e,
+      ),
+      AppConfigUnauthorizedException() => InitializeAppConfigNetworkFailure(
+        cause: e,
+      ),
+      AppConfigCacheException() => InitializeAppConfigCacheFailure(cause: e),
+      AppConfigNotFoundException() => InitializeAppConfigCacheFailure(cause: e),
+      AppConfigParsingException() => InitializeAppConfigUnknownFailure(
+        cause: e,
+      ),
+      _ => InitializeAppConfigUnknownFailure(cause: e),
+    };
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/app_config/app_config.dart';
+import 'package:portrai/src/feature/app_config/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/app_config/domain/use_case/initialize_app_config_use_case.dart';
 
 import '../../../../../mock/feature/app_config/domain/repository/mock_app_config_repository.dart';
@@ -30,8 +31,22 @@ void main() {
     );
 
     test('should return Left(InitializeAppConfigNetworkFailure) when the '
-        'repository throws a network related error', () async {
-      appConfigRepository.stubGetAppConfigThrows(Exception('network timeout'));
+        'repository throws a network exception', () async {
+      appConfigRepository.stubGetAppConfigThrows(
+        const AppConfigNetworkException(),
+      );
+
+      final result = await useCase();
+
+      expect(result.isLeft, true);
+      expect(result.left, isA<InitializeAppConfigNetworkFailure>());
+    });
+
+    test('should return Left(InitializeAppConfigNetworkFailure) when the '
+        'repository throws an unauthorized exception', () async {
+      appConfigRepository.stubGetAppConfigThrows(
+        const AppConfigUnauthorizedException(),
+      );
 
       final result = await useCase();
 
@@ -40,13 +55,39 @@ void main() {
     });
 
     test('should return Left(InitializeAppConfigCacheFailure) when the '
-        'repository throws a cache related error', () async {
-      appConfigRepository.stubGetAppConfigThrows(Exception('cache miss'));
+        'repository throws a cache exception', () async {
+      appConfigRepository.stubGetAppConfigThrows(
+        const AppConfigCacheException(),
+      );
 
       final result = await useCase();
 
       expect(result.isLeft, true);
       expect(result.left, isA<InitializeAppConfigCacheFailure>());
+    });
+
+    test('should return Left(InitializeAppConfigCacheFailure) when the '
+        'repository throws a not found exception', () async {
+      appConfigRepository.stubGetAppConfigThrows(
+        const AppConfigNotFoundException(),
+      );
+
+      final result = await useCase();
+
+      expect(result.isLeft, true);
+      expect(result.left, isA<InitializeAppConfigCacheFailure>());
+    });
+
+    test('should return Left(InitializeAppConfigUnknownFailure) when the '
+        'repository throws a parsing exception', () async {
+      appConfigRepository.stubGetAppConfigThrows(
+        const AppConfigParsingException(),
+      );
+
+      final result = await useCase();
+
+      expect(result.isLeft, true);
+      expect(result.left, isA<InitializeAppConfigUnknownFailure>());
     });
 
     test('should return Left(InitializeAppConfigUnknownFailure) when the '
