@@ -11,6 +11,7 @@ import '../../../../../mock/feature/external_app_handler/domain/use_case/fake_op
 import '../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../mock/feature/force_update/domain/use_case/mock_get_app_store_url_use_case.dart';
 import '../../../../../mock/feature/force_update/domain/use_case/mock_is_app_update_required_use_case.dart';
+import '../../../../../mock/feature/force_update/presentation/tracking/mock_force_update_tracking_delegate.dart';
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -29,21 +30,25 @@ void main() {
       MockIsAppUpdateRequiredUseCase isAppUpdateRequiredUseCase,
       MockGetAppStoreUrlUseCase getAppStoreUrlUseCase,
       MockOpenExternalUrlUseCase openExternalUrlUseCase,
+      MockForceUpdateTrackingDelegate trackingDelegate,
       ForceUpdateBloc bloc,
     })
     buildBloc() {
       final isAppUpdateRequiredUseCase = MockIsAppUpdateRequiredUseCase();
       final getAppStoreUrlUseCase = MockGetAppStoreUrlUseCase();
       final openExternalUrlUseCase = MockOpenExternalUrlUseCase();
+      final trackingDelegate = MockForceUpdateTrackingDelegate();
       final bloc = ForceUpdateBloc(
         isAppUpdateRequiredUseCase: isAppUpdateRequiredUseCase,
         getAppStoreUrlUseCase: getAppStoreUrlUseCase,
         openExternalUrlUseCase: openExternalUrlUseCase,
+        trackingDelegate: trackingDelegate,
       );
       return (
         isAppUpdateRequiredUseCase: isAppUpdateRequiredUseCase,
         getAppStoreUrlUseCase: getAppStoreUrlUseCase,
         openExternalUrlUseCase: openExternalUrlUseCase,
+        trackingDelegate: trackingDelegate,
         bloc: bloc,
       );
     }
@@ -101,6 +106,7 @@ void main() {
 
       verify(() => deps.getAppStoreUrlUseCase()).called(1);
       verify(() => deps.openExternalUrlUseCase(any())).called(1);
+      verify(() => deps.trackingDelegate.trackUpdateNowClick()).called(1);
     });
 
     testWidgets('should show a snackbar when the store url can not be opened', (

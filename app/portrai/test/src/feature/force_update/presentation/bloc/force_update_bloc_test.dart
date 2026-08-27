@@ -10,6 +10,7 @@ import '../../../../../mock/feature/external_app_handler/domain/use_case/fake_op
 import '../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../mock/feature/force_update/domain/use_case/mock_get_app_store_url_use_case.dart';
 import '../../../../../mock/feature/force_update/domain/use_case/mock_is_app_update_required_use_case.dart';
+import '../../../../../mock/feature/force_update/presentation/tracking/mock_force_update_tracking_delegate.dart';
 
 void main() {
   setUpAll(() {
@@ -20,12 +21,14 @@ void main() {
     late MockIsAppUpdateRequiredUseCase isAppUpdateRequiredUseCase;
     late MockGetAppStoreUrlUseCase getAppStoreUrlUseCase;
     late MockOpenExternalUrlUseCase openExternalUrlUseCase;
+    late MockForceUpdateTrackingDelegate trackingDelegate;
 
     ForceUpdateBloc buildBloc() {
       return ForceUpdateBloc(
         isAppUpdateRequiredUseCase: isAppUpdateRequiredUseCase,
         getAppStoreUrlUseCase: getAppStoreUrlUseCase,
         openExternalUrlUseCase: openExternalUrlUseCase,
+        trackingDelegate: trackingDelegate,
       );
     }
 
@@ -33,6 +36,7 @@ void main() {
       isAppUpdateRequiredUseCase = MockIsAppUpdateRequiredUseCase();
       getAppStoreUrlUseCase = MockGetAppStoreUrlUseCase();
       openExternalUrlUseCase = MockOpenExternalUrlUseCase();
+      trackingDelegate = MockForceUpdateTrackingDelegate();
     });
 
     test('initial state is ForceUpdateInitialState', () {
@@ -47,6 +51,9 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(const CheckForceUpdateEvent()),
       expect: () => const [ForceUpdateRequiredState()],
+      verify: (_) {
+        verify(() => trackingDelegate.trackScreenView()).called(1);
+      },
     );
 
     blocTest<ForceUpdateBloc, ForceUpdateState>(
@@ -57,6 +64,9 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(const CheckForceUpdateEvent()),
       expect: () => const [ForceUpdateNotRequiredState()],
+      verify: (_) {
+        verifyNever(() => trackingDelegate.trackScreenView());
+      },
     );
 
     blocTest<ForceUpdateBloc, ForceUpdateState>(
@@ -69,6 +79,9 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(const CheckForceUpdateEvent()),
       expect: () => const [ForceUpdateNotRequiredState()],
+      verify: (_) {
+        verifyNever(() => trackingDelegate.trackScreenView());
+      },
     );
 
     blocTest<ForceUpdateBloc, ForceUpdateState>(
@@ -89,6 +102,8 @@ void main() {
       ],
       verify: (_) {
         verifyNever(() => openExternalUrlUseCase(any<OpenExternalUrlParam>()));
+        verify(() => trackingDelegate.trackUpdateNowClick()).called(1);
+        verify(() => trackingDelegate.trackLaunchFailedView()).called(1);
       },
     );
 
@@ -114,6 +129,10 @@ void main() {
           isA<OpenExternalUrlFailure>(),
         ),
       ],
+      verify: (_) {
+        verify(() => trackingDelegate.trackUpdateNowClick()).called(1);
+        verify(() => trackingDelegate.trackLaunchFailedView()).called(1);
+      },
     );
 
     blocTest<ForceUpdateBloc, ForceUpdateState>(
@@ -142,6 +161,8 @@ void main() {
             ),
           ),
         ).called(1);
+        verify(() => trackingDelegate.trackUpdateNowClick()).called(1);
+        verifyNever(() => trackingDelegate.trackLaunchFailedView());
       },
     );
   });
