@@ -9,6 +9,7 @@ class FeatureFlag extends Equatable {
     required this.key,
     required this.isEnabled,
     this.isOverridden = false,
+    this.hasRemoteSource = false,
     this.remoteValue,
   });
 
@@ -27,9 +28,17 @@ class FeatureFlag extends Equatable {
   @JsonKey(name: 'is_overridden')
   final bool isOverridden;
 
-  /// The original remote value before any override was applied
+  /// Whether this flag's key currently exists in the remote source.
   ///
-  /// This is null if the flag was never overridden or if the remote value is unknown
+  /// `false` means the key wasn't found remotely, so [isEnabled] falls back
+  /// to the [FeatureFlagDefinition.defaultValue] the flag was resolved with
+  /// (persisted locally so it survives across app restarts).
+  @JsonKey(name: 'has_remote_source')
+  final bool hasRemoteSource;
+
+  /// The last known remote value, kept for reverting an override.
+  ///
+  /// Always `null` when [hasRemoteSource] is `false`.
   @JsonKey(name: 'remote_value')
   final bool? remoteValue;
 
@@ -39,16 +48,24 @@ class FeatureFlag extends Equatable {
     String? key,
     bool? isEnabled,
     bool? isOverridden,
+    bool? hasRemoteSource,
     bool? remoteValue,
   }) {
     return FeatureFlag(
       key: key ?? this.key,
       isEnabled: isEnabled ?? this.isEnabled,
       isOverridden: isOverridden ?? this.isOverridden,
+      hasRemoteSource: hasRemoteSource ?? this.hasRemoteSource,
       remoteValue: remoteValue ?? this.remoteValue,
     );
   }
 
   @override
-  List<Object?> get props => [key, isEnabled, isOverridden, remoteValue];
+  List<Object?> get props => [
+    key,
+    isEnabled,
+    isOverridden,
+    hasRemoteSource,
+    remoteValue,
+  ];
 }

@@ -1,10 +1,11 @@
 import 'package:feature_flag/src/data/data_source/cache_feature_flag_data_source.dart';
 import 'package:feature_flag/src/feature_flag.dart';
+import 'package:feature_flag/src/feature_flag_definition.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../mock/mocked_feature_flag_cache.dart';
-import '../../../mock/mocked_feature_flag_data_source.dart';
+import '../../../mock/mock_feature_flag_cache.dart';
+import '../../../mock/mock_feature_flag_data_source.dart';
 
 void main() {
   setUpAll(() {
@@ -14,189 +15,186 @@ void main() {
 
   group('CacheFeatureFlagDataSource', () {
     late CacheFeatureFlagDataSource dataSource;
-    late MockedFeatureFlagDataSource mockDelegateDataSource;
-    late MockedFeatureFlagCache mockCache;
+    late MockFeatureFlagDataSource mockDelegateDataSource;
+    late MockFeatureFlagCache mockCache;
 
     setUp(() {
-      mockDelegateDataSource = MockedFeatureFlagDataSource();
-      mockCache = MockedFeatureFlagCache();
+      mockDelegateDataSource = MockFeatureFlagDataSource();
+      mockCache = MockFeatureFlagCache();
       dataSource = CacheFeatureFlagDataSource(
         mockDelegateDataSource,
         mockCache,
       );
+      when(() => mockCache.put(any())).thenAnswer((_) async {});
     });
 
-    group('initFeatureFlags', () {
-      test(
-        'should fetch from delegate and cache all flags when cache is empty',
-        () async {
-          const remoteFlags = [
-            FeatureFlag(key: 'feature_login', isEnabled: true),
-            FeatureFlag(key: 'feature_dashboard', isEnabled: false),
-            FeatureFlag(key: 'feature_analytics', isEnabled: true),
-          ];
-
-          when(() => mockCache.getAll()).thenAnswer((_) async => []);
-          when(
-            () => mockDelegateDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => remoteFlags);
-          when(() => mockCache.put(any())).thenAnswer((_) async {});
-
-          final result = await dataSource.initFeatureFlags();
-
-          expect(result, equals(remoteFlags));
-          verify(() => mockCache.getAll()).called(1);
-          verify(() => mockDelegateDataSource.initFeatureFlags()).called(1);
-          verify(() => mockCache.put(any())).called(3);
-        },
-      );
+    group('resolveFeatureFlags', () {
+      const definitions = [
+        FeatureFlagDefinition(key: 'feature_login', defaultValue: false),
+      ];
 
       test(
-        'should override remote flags with cached values for matching keys when cache has data',
+        'should cache and return the delegate value when cache is empty',
         () async {
-          const cachedFlags = [
-            FeatureFlag(key: 'feature_login', isEnabled: false),
-            FeatureFlag(key: 'feature_dashboard', isEnabled: true),
-          ];
-          const remoteFlags = [
-            FeatureFlag(key: 'feature_login', isEnabled: true),
-            FeatureFlag(key: 'feature_dashboard', isEnabled: false),
-            FeatureFlag(key: 'feature_analytics', isEnabled: true),
-          ];
-          const expectedFlags = [
+          const delegateFlags = [
             FeatureFlag(
               key: 'feature_login',
-              isEnabled: false,
-            ), // Overridden by cache
-            FeatureFlag(
-              key: 'feature_dashboard',
               isEnabled: true,
-            ), // Overridden by cache
+              hasRemoteSource: true,
+              remoteValue: true,
+            ),
+          ];
+          when(() => mockCache.getAll()).thenAnswer((_) async => []);
+          when(
+            () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+          ).thenAnswer((_) async => delegateFlags);
+
+          final result = await dataSource.resolveFeatureFlags(definitions);
+
+          expect(result, equals(delegateFlags));
+          verify(() => mockCache.put(delegateFlags.single)).called(1);
+        },
+      );
+
+      test('should always use the fresh delegate value when the flag has a '
+          'remote source, even if a stale value is cached', () async {
+        const cachedFlag = FeatureFlag(
+          key: 'feature_login',
+          isEnabled: false,
+          hasRemoteSource: true,
+          remoteValue: false,
+        );
+        const delegateFlag = FeatureFlag(
+          key: 'feature_login',
+          isEnabled: true,
+          hasRemoteSource: true,
+          remoteValue: true,
+        );
+        when(() => mockCache.getAll()).thenAnswer((_) async => [cachedFlag]);
+        when(
+          () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => [delegateFlag]);
+
+        final result = await dataSource.resolveFeatureFlags(definitions);
+
+        expect(result, equals([delegateFlag]));
+      });
+
+      test('should keep the previously cached value when the flag is '
+          'local-only (no remote source)', () async {
+        const cachedFlag = FeatureFlag(key: 'feature_login', isEnabled: true);
+        const delegateFlag = FeatureFlag(
+          key: 'feature_login',
+          isEnabled: false,
+        );
+        when(() => mockCache.getAll()).thenAnswer((_) async => [cachedFlag]);
+        when(
+          () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => [delegateFlag]);
+
+        final result = await dataSource.resolveFeatureFlags(definitions);
+
+        expect(result, equals([cachedFlag]));
+      });
+
+      test('should use the delegate default-based value when a local-only '
+          'flag has never been cached before', () async {
+        const delegateFlag = FeatureFlag(
+          key: 'feature_login',
+          isEnabled: false,
+        );
+        when(() => mockCache.getAll()).thenAnswer((_) async => []);
+        when(
+          () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => [delegateFlag]);
+
+        final result = await dataSource.resolveFeatureFlags(definitions);
+
+        expect(result, equals([delegateFlag]));
+      });
+
+      test('should let a developer override win but refresh its remote '
+          'metadata from the fresh delegate value', () async {
+        const cachedOverride = FeatureFlag(
+          key: 'feature_login',
+          isEnabled: true,
+          isOverridden: true,
+          hasRemoteSource: true,
+          remoteValue: false,
+        );
+        const delegateFlag = FeatureFlag(
+          key: 'feature_login',
+          isEnabled: true,
+          hasRemoteSource: true,
+          remoteValue: true,
+        );
+        when(
+          () => mockCache.getAll(),
+        ).thenAnswer((_) async => [cachedOverride]);
+        when(
+          () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => [delegateFlag]);
+
+        final result = await dataSource.resolveFeatureFlags(definitions);
+
+        expect(
+          result,
+          equals(const [
             FeatureFlag(
-              key: 'feature_analytics',
+              key: 'feature_login',
               isEnabled: true,
-            ), // From remote
-          ];
+              isOverridden: true,
+              hasRemoteSource: true,
+              remoteValue: true, // refreshed from the delegate
+            ),
+          ]),
+        );
+      });
 
-          when(() => mockCache.getAll()).thenAnswer((_) async => cachedFlags);
-          when(
-            () => mockDelegateDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => remoteFlags);
-          when(() => mockCache.put(any())).thenAnswer((_) async {});
+      test('should persist every resolved flag back to the cache', () async {
+        const delegateFlags = [
+          FeatureFlag(key: 'feature_login', isEnabled: true),
+        ];
+        when(() => mockCache.getAll()).thenAnswer((_) async => []);
+        when(
+          () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => delegateFlags);
 
-          final result = await dataSource.initFeatureFlags();
+        await dataSource.resolveFeatureFlags(definitions);
 
-          expect(result, equals(expectedFlags));
-          verify(() => mockCache.getAll()).called(1);
-          verify(() => mockDelegateDataSource.initFeatureFlags()).called(1);
-          // Should cache only the new flag 'feature_analytics'
-          verify(() => mockCache.put(any())).called(1);
-        },
-      );
-
-      test(
-        'should cache only new flags not present in cache when cache has data',
-        () async {
-          // Arrange
-          const cachedFlags = [
-            FeatureFlag(key: 'existing_feature', isEnabled: true),
-          ];
-          const remoteFlags = [
-            FeatureFlag(key: 'existing_feature', isEnabled: false),
-            FeatureFlag(key: 'new_feature', isEnabled: true),
-          ];
-
-          when(() => mockCache.getAll()).thenAnswer((_) async => cachedFlags);
-          when(
-            () => mockDelegateDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => remoteFlags);
-          when(() => mockCache.put(any())).thenAnswer((_) async {});
-
-          // Act
-          await dataSource.initFeatureFlags();
-
-          // Assert
-          final captured = verify(() => mockCache.put(captureAny())).captured;
-          expect(captured, hasLength(1));
-          final newFlag = captured.first as FeatureFlag;
-          expect(newFlag.key, equals('new_feature'));
-          expect(newFlag.isEnabled, equals(true));
-        },
-      );
-
-      test(
-        'should not cache when all remote flags are already cached',
-        () async {
-          // Arrange
-          const cachedFlags = [
-            FeatureFlag(key: 'feature_one', isEnabled: true),
-            FeatureFlag(key: 'feature_two', isEnabled: false),
-          ];
-          const remoteFlags = [
-            FeatureFlag(key: 'feature_one', isEnabled: false),
-            FeatureFlag(key: 'feature_two', isEnabled: true),
-          ];
-
-          when(() => mockCache.getAll()).thenAnswer((_) async => cachedFlags);
-          when(
-            () => mockDelegateDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => remoteFlags);
-
-          // Act
-          await dataSource.initFeatureFlags();
-
-          // Assert
-          verifyNever(() => mockCache.put(any()));
-        },
-      );
-
-      test(
-        'should preserve cached flags that are not in remote when cache has data',
-        () async {
-          // Arrange
-          const cachedFlags = [
-            FeatureFlag(key: 'cached_only', isEnabled: true),
-            FeatureFlag(key: 'shared_flag', isEnabled: false),
-          ];
-          const remoteFlags = [
-            FeatureFlag(key: 'shared_flag', isEnabled: true),
-            FeatureFlag(key: 'remote_only', isEnabled: false),
-          ];
-          const expectedFlags = [
-            FeatureFlag(
-              key: 'shared_flag',
-              isEnabled: false,
-            ), // Overridden by cache
-            FeatureFlag(key: 'remote_only', isEnabled: false), // From remote
-          ];
-
-          when(() => mockCache.getAll()).thenAnswer((_) async => cachedFlags);
-          when(
-            () => mockDelegateDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => remoteFlags);
-          when(() => mockCache.put(any())).thenAnswer((_) async {});
-
-          // Act
-          final result = await dataSource.initFeatureFlags();
-
-          // Assert
-          expect(result, equals(expectedFlags));
-          // Should not include cached_only as it's not in remote
-          expect(result.any((f) => f.key == 'cached_only'), isFalse);
-        },
-      );
+        verify(() => mockCache.put(delegateFlags.single)).called(1);
+      });
     });
 
     group('updateFeatureFlag', () {
-      test('should put feature flag in cache', () async {
-        const featureFlag = FeatureFlag(key: 'test_feature', isEnabled: true);
-        when(() => mockCache.put(any())).thenAnswer((_) async {});
+      test(
+        'should store as a developer override when the flag is overridden',
+        () async {
+          const featureFlag = FeatureFlag(
+            key: 'test_feature',
+            isEnabled: true,
+            isOverridden: true,
+          );
+          when(() => mockCache.putOverride(any())).thenAnswer((_) async {});
 
-        await dataSource.updateFeatureFlag(featureFlag);
+          await dataSource.updateFeatureFlag(featureFlag);
 
-        verify(() => mockCache.put(featureFlag)).called(1);
-        verifyZeroInteractions(mockDelegateDataSource);
-      });
+          verify(() => mockCache.putOverride(featureFlag)).called(1);
+          verifyNever(() => mockCache.put(featureFlag));
+        },
+      );
+
+      test(
+        'should just put the flag in cache when the flag is not overridden',
+        () async {
+          const featureFlag = FeatureFlag(key: 'test_feature', isEnabled: true);
+
+          await dataSource.updateFeatureFlag(featureFlag);
+
+          verify(() => mockCache.put(featureFlag)).called(1);
+          verifyNever(() => mockCache.putOverride(any()));
+        },
+      );
     });
 
     group('reset', () {

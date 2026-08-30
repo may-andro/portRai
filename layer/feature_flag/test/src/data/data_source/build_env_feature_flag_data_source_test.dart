@@ -2,10 +2,11 @@ import 'package:core/core.dart';
 import 'package:feature_flag/src/data/data_source/build_env_feature_flag_data_source.dart';
 import 'package:feature_flag/src/data/data_source/feature_flag_data_source.dart';
 import 'package:feature_flag/src/feature_flag.dart';
+import 'package:feature_flag/src/feature_flag_definition.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../mock/mocked_feature_flag_data_source.dart';
+import '../../../mock/mock_feature_flag_data_source.dart';
 
 void main() {
   setUpAll(() {
@@ -14,12 +15,16 @@ void main() {
   });
 
   group('BuildEnvFeatureFlagDataSource', () {
-    late MockedFeatureFlagDataSource mockCacheDataSource;
-    late MockedFeatureFlagDataSource mockRemoteDataSource;
+    const definitions = [
+      FeatureFlagDefinition(key: 'feature_login', defaultValue: false),
+    ];
+
+    late MockFeatureFlagDataSource mockCacheDataSource;
+    late MockFeatureFlagDataSource mockRemoteDataSource;
 
     setUp(() {
-      mockCacheDataSource = MockedFeatureFlagDataSource();
-      mockRemoteDataSource = MockedFeatureFlagDataSource();
+      mockCacheDataSource = MockFeatureFlagDataSource();
+      mockRemoteDataSource = MockFeatureFlagDataSource();
     });
 
     group('constructor delegation', () {
@@ -57,69 +62,70 @@ void main() {
       );
     });
 
-    group('initFeatureFlags', () {
-      test(
-        'should return flags from cache data source when environment is dev',
-        () async {
-          const expectedFlags = [
-            FeatureFlag(key: 'login_feature', isEnabled: true),
-            FeatureFlag(key: 'dashboard_feature', isEnabled: false),
-            FeatureFlag(key: 'analytics_feature', isEnabled: true),
-          ];
-          final buildConfig = BuildConfig(
-            buildEnvironment: BuildEnvironment.staging,
-          );
-          when(
-            () => mockCacheDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => expectedFlags);
+    group('resolveFeatureFlags', () {
+      test('should return flags from cache data source when environment is '
+          'staging', () async {
+        const expectedFlags = [
+          FeatureFlag(key: 'feature_login', isEnabled: true),
+        ];
+        final buildConfig = BuildConfig(
+          buildEnvironment: BuildEnvironment.staging,
+        );
+        when(
+          () => mockCacheDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => expectedFlags);
 
-          final dataSource = BuildEnvFeatureFlagDataSource(
-            buildConfig,
-            mockCacheDataSource,
-            mockRemoteDataSource,
-          );
+        final dataSource = BuildEnvFeatureFlagDataSource(
+          buildConfig,
+          mockCacheDataSource,
+          mockRemoteDataSource,
+        );
 
-          final result = await dataSource.initFeatureFlags();
+        final result = await dataSource.resolveFeatureFlags(definitions);
 
-          expect(result, equals(expectedFlags));
-          verify(() => mockCacheDataSource.initFeatureFlags()).called(1);
-          verifyZeroInteractions(mockRemoteDataSource);
-        },
-      );
+        expect(result, equals(expectedFlags));
+        verify(
+          () => mockCacheDataSource.resolveFeatureFlags(definitions),
+        ).called(1);
+        verifyZeroInteractions(mockRemoteDataSource);
+      });
 
-      test(
-        'should return flags from remote data source when environment is prod',
-        () async {
-          const expectedFlags = [
-            FeatureFlag(key: 'remote_login', isEnabled: false),
-            FeatureFlag(key: 'remote_dashboard', isEnabled: true),
-            FeatureFlag(key: 'remote_analytics', isEnabled: false),
-          ];
-          final buildConfig = BuildConfig(
-            buildEnvironment: BuildEnvironment.prod,
-          );
-          when(
-            () => mockRemoteDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => expectedFlags);
+      test('should return flags from remote data source when environment is '
+          'prod', () async {
+        const expectedFlags = [
+          FeatureFlag(
+            key: 'feature_login',
+            isEnabled: false,
+            hasRemoteSource: true,
+            remoteValue: false,
+          ),
+        ];
+        final buildConfig = BuildConfig(
+          buildEnvironment: BuildEnvironment.prod,
+        );
+        when(
+          () => mockRemoteDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => expectedFlags);
 
-          final dataSource = BuildEnvFeatureFlagDataSource(
-            buildConfig,
-            mockCacheDataSource,
-            mockRemoteDataSource,
-          );
+        final dataSource = BuildEnvFeatureFlagDataSource(
+          buildConfig,
+          mockCacheDataSource,
+          mockRemoteDataSource,
+        );
 
-          final result = await dataSource.initFeatureFlags();
+        final result = await dataSource.resolveFeatureFlags(definitions);
 
-          expect(result, equals(expectedFlags));
-          verify(() => mockRemoteDataSource.initFeatureFlags()).called(1);
-          verifyZeroInteractions(mockCacheDataSource);
-        },
-      );
+        expect(result, equals(expectedFlags));
+        verify(
+          () => mockRemoteDataSource.resolveFeatureFlags(definitions),
+        ).called(1);
+        verifyZeroInteractions(mockCacheDataSource);
+      });
     });
 
     group('updateFeatureFlag', () {
       test(
-        'should delegate to cache data source when environment is dev',
+        'should delegate to cache data source when environment is staging',
         () async {
           const featureFlag = FeatureFlag(key: 'test_feature', isEnabled: true);
           final buildConfig = BuildConfig(
@@ -176,7 +182,7 @@ void main() {
 
     group('reset', () {
       test(
-        'should delegate to cache data source when environment is dev',
+        'should delegate to cache data source when environment is staging',
         () async {
           final buildConfig = BuildConfig(
             buildEnvironment: BuildEnvironment.staging,

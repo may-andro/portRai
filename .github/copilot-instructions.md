@@ -61,6 +61,49 @@ extension ContextExtension on BuildContext {
 
 Use `context.bloc`/`context.state` in widgets instead of `context.read<XBloc>()`/`context.watch<XBloc>().state`.
 
+### Feature folder structure
+Each feature under `lib/src/feature/<feature>/` follows `data/`, `domain/`, `presentation/`. Inside `presentation/`, screens are nested under `screen/<screen_name>/`, not directly under `presentation/`:
+
+```
+presentation/
+  _presentation.dart          // exports 'route/_route.dart' + 'screen/_screen.dart'
+  route/
+    _route.dart
+    <feature>_module_route.dart
+  screen/
+    _screen.dart               // exports '<screen_name>/_<screen_name>.dart' for each screen
+    <screen_name>/
+      _<screen_name>.dart      // exports bloc/_bloc.dart (or bloc file), <screen_name>_screen.dart, tracking/_tracking.dart
+      <screen_name>_screen.dart
+      bloc/
+      tracking/
+      widget/
+```
+
+Only skip the `screen/` nesting for features with no real screen (e.g. a bottom sheet or other non-screen widget, like `force_update`). A feature with a `*_screen.dart`/`Screen` widget must use `screen/<screen_name>/`.
+
+`test/src/feature/<feature>/...` and `test/mock/feature/<feature>/...` must mirror this exact `lib/src/` path, including the `screen/<screen_name>/` segment.
+
+### Widget file splitting with `part`
+When a screen's `content_widget.dart` has sub-widgets used *only* by that content tree (not shared/exported elsewhere), split them into `part` files rather than separate imported libraries:
+
+```dart
+// content_widget.dart
+part 'section_widget.dart';
+part 'desktop_content_widget.dart';
+
+class ContentWidget extends StatelessWidget { ... }
+```
+
+```dart
+// section_widget.dart
+part of 'content_widget.dart';
+
+class _SectionWidget extends StatelessWidget { ... }
+```
+
+Classes and file names in these `part` files must **not** be prefixed with the feature/module name (e.g. `_SectionWidget`, not `_ProfileSectionWidget`) - the prefix is reserved for public, externally-referenced classes. Widgets used outside the content tree (e.g. a screen's header widget) stay as normal separate files, not `part`s.
+
 ## Testing Conventions
 
 ### Test naming

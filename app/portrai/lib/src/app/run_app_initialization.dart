@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_flag/feature_flag.dart' as layer_ff;
 import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:portrai/src/app/portrai_app.dart';
 import 'package:portrai/src/app/splash_app.dart';
+import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/module_configurator/module_configurators.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
@@ -40,7 +42,9 @@ Future<void> runAppWithInitialization() async {
   );
 }
 
-void runMainApp(DesignSystem designSystem) {
+Future<void> runMainApp(DesignSystem designSystem) async {
+  await _initFeatureFlags();
+
   final appLocale = appServiceLocator.get<AppLocale>();
   _sendAppInitializationFinishedEvent(appLocale);
   Bloc.observer = appServiceLocator.get<AppBlocObserver>();
@@ -56,6 +60,21 @@ void runMainApp(DesignSystem designSystem) {
         );
       },
     ),
+  );
+}
+
+/// Resolves every flag definition registered by any feature (via
+/// [AppFeatureFlagDefinitionRegistry]) against the `layer/feature_flag`
+/// package. Must run after every module configurator's
+/// `postDependenciesSetup` has completed - by this point in
+/// [runAppWithInitialization], [SplashApp] already guarantees that, the
+/// same way [ModuleRouteController]'s routes are only read once every
+/// feature has registered its own.
+Future<void> _initFeatureFlags() async {
+  final registry = appServiceLocator.get<AppFeatureFlagDefinitionRegistry>();
+  final controller = appServiceLocator.get<layer_ff.FeatureFlagController>();
+  await controller.initFeatureFlags(
+    registry.all.map((definition) => definition.layerDefinition).toList(),
   );
 }
 

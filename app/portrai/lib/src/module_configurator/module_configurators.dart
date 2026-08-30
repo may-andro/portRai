@@ -49,7 +49,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
     buildConfig.buildEnvironment.isRemoteLoggingEnabled,
     '',
   ),
-  layer_ff.FeatureFlagModuleConfigurator(),
+  layer_ff.FeatureFlagModuleConfigurator(appId: 'portrai'),
   AppFeatureFlagModuleConfigurator(),
   ExternalAppHandlerModuleConfigurator(),
   ForceUpdateModuleConfigurator(),

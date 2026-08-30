@@ -1,22 +1,20 @@
 import 'package:equatable/equatable.dart';
-import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag.dart';
+import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag_definition.dart';
 
 class AppFeatureFlagEntity extends Equatable {
   const AppFeatureFlagEntity({
     required this.flag,
     required this.isEnabled,
     required this.isOverridden,
+    this.hasRemoteSource = false,
     this.remoteValue,
-    this.displayName,
-    this.description,
   });
 
-  final AppFeatureFlag flag;
+  final AppFeatureFlagDefinition flag;
   final bool isEnabled;
   final bool isOverridden;
+  final bool hasRemoteSource;
   final bool? remoteValue;
-  final String? displayName;
-  final String? description;
 
   String get key => flag.key;
 
@@ -25,48 +23,39 @@ class AppFeatureFlagEntity extends Equatable {
     flag,
     isEnabled,
     isOverridden,
+    hasRemoteSource,
     remoteValue,
-    displayName,
-    description,
   ];
 
-  String get name => displayName ?? _formatKey(flag.name);
+  String get name => flag.displayName;
+
+  String? get description => flag.description;
 
   bool get isModified => isOverridden && remoteValue != null;
 
   String get statusDescription {
-    if (!isOverridden) {
+    if (isOverridden) {
+      return isEnabled ? 'Enabled (Override)' : 'Disabled (Override)';
+    }
+    if (hasRemoteSource) {
       return isEnabled ? 'Enabled (Remote)' : 'Disabled (Remote)';
     }
-    return isEnabled ? 'Enabled (Override)' : 'Disabled (Override)';
-  }
-
-  String _formatKey(String key) {
-    return key
-        .split(RegExp(r'(?=[A-Z])'))
-        .map(
-          (word) => word.isEmpty
-              ? ''
-              : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}',
-        )
-        .join(' ');
+    return isEnabled ? 'Enabled (Local)' : 'Disabled (Local)';
   }
 
   AppFeatureFlagEntity copyWith({
-    AppFeatureFlag? flag,
+    AppFeatureFlagDefinition? flag,
     bool? isEnabled,
     bool? isOverridden,
+    bool? hasRemoteSource,
     bool? remoteValue,
-    String? displayName,
-    String? description,
   }) {
     return AppFeatureFlagEntity(
       flag: flag ?? this.flag,
       isEnabled: isEnabled ?? this.isEnabled,
       isOverridden: isOverridden ?? this.isOverridden,
+      hasRemoteSource: hasRemoteSource ?? this.hasRemoteSource,
       remoteValue: remoteValue ?? this.remoteValue,
-      displayName: displayName ?? this.displayName,
-      description: description ?? this.description,
     );
   }
 }

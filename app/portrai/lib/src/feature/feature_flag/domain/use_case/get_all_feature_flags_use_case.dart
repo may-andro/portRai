@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
-import 'package:portrai/src/feature/feature_flag/domain/entity/_entity.dart';
-import 'package:portrai/src/feature/feature_flag/domain/repository/_repository.dart';
+import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:use_case/use_case.dart';
 
 sealed class GetAllFeatureFlagsFailure extends BasicFailure {
@@ -25,15 +24,16 @@ class GetAllFeatureFlagsUseCase
           List<AppFeatureFlagEntity>,
           GetAllFeatureFlagsFailure
         > {
-  GetAllFeatureFlagsUseCase(this._repository);
+  GetAllFeatureFlagsUseCase(this._repository, this._registry);
 
   final AppFeatureFlagRepository _repository;
+  final AppFeatureFlagDefinitionRegistry _registry;
 
   @protected
   @override
   Future<Either<GetAllFeatureFlagsFailure, List<AppFeatureFlagEntity>>>
   execute() async {
-    final flags = _repository.getAllFeatureFlags();
+    final flags = _registry.all.map(_repository.getFeatureFlag).toList();
     if (flags.isEmpty) {
       return const Left(FeatureFlagsNotFoundFailure());
     }

@@ -20,7 +20,8 @@ class FeatureFlagUnknownFailure extends IsFeatureEnabledFailure {
 
 @register
 class IsFeatureEnabledUseCase
-    extends BaseUseCase<bool, AppFeatureFlag, IsFeatureEnabledFailure> {
+    extends
+        BaseUseCase<bool, AppFeatureFlagDefinition, IsFeatureEnabledFailure> {
   IsFeatureEnabledUseCase(this._repository);
 
   final AppFeatureFlagRepository _repository;
@@ -28,7 +29,7 @@ class IsFeatureEnabledUseCase
   @protected
   @override
   Future<Either<IsFeatureEnabledFailure, bool>> execute(
-    AppFeatureFlag flag,
+    AppFeatureFlagDefinition flag,
   ) async {
     final isEnabled = _repository.isFeatureEnabled(flag);
     return Right(isEnabled);
