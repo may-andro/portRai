@@ -12,16 +12,11 @@ class AppFeatureFlagRepositoryImpl implements AppFeatureFlagRepository {
   final AppFeatureFlagMapper _mapper;
 
   @override
-  List<AppFeatureFlagEntity> getAllFeatureFlags() {
-    return AppFeatureFlag.values.map(getFeatureFlag).toList();
-  }
-
-  @override
-  bool isFeatureEnabled(AppFeatureFlag flag) {
+  bool isFeatureEnabled(AppFeatureFlagDefinition definition) {
     try {
-      return _controller.isFeatureEnabled(flag.key);
+      return _controller.isFeatureEnabled(definition.key);
     } catch (e) {
-      return flag.defaultValue;
+      return definition.defaultValue;
     }
   }
 
@@ -35,15 +30,15 @@ class AppFeatureFlagRepositoryImpl implements AppFeatureFlagRepository {
   Future<void> reset() => _controller.reset();
 
   @override
-  AppFeatureFlagEntity getFeatureFlag(AppFeatureFlag flag) {
+  AppFeatureFlagEntity getFeatureFlag(AppFeatureFlagDefinition definition) {
     try {
       final flags = _controller.getAllFeatureFlags();
-      final layerFlag = flags.firstWhere((f) => f.key == flag.key);
-      return _mapper.to(layerFlag);
+      final layerFlag = flags.firstWhere((f) => f.key == definition.key);
+      return _mapper.to(layerFlag, definition);
     } catch (e) {
       return AppFeatureFlagEntity(
-        flag: flag,
-        isEnabled: flag.defaultValue,
+        flag: definition,
+        isEnabled: definition.defaultValue,
         isOverridden: false,
       );
     }

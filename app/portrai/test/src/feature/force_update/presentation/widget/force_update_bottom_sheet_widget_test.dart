@@ -5,9 +5,7 @@ import 'package:portrai/src/feature/external_app_handler/domain/_domain.dart';
 import 'package:portrai/src/feature/force_update/domain/_domain.dart';
 import 'package:portrai/src/feature/force_update/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/feature/force_update/presentation/widget/force_update_bottom_sheet_widget.dart';
-import 'package:tracking/tracking.dart';
 import 'package:use_case/use_case.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
@@ -15,21 +13,14 @@ import '../../../../../mock/feature/force_update/domain/use_case/mock_get_app_st
 import '../../../../../mock/feature/force_update/domain/use_case/mock_is_app_update_required_use_case.dart';
 import '../../../../../mock/feature/force_update/presentation/tracking/mock_force_update_tracking_delegate.dart';
 import '../../../../../util/test_wrapper_widget.dart';
+import '../../../../../util/tracking_impression_test_util.dart';
 
 void main() {
   setUpAll(() {
     registerFallbackValue(FakeOpenExternalUrlParam());
   });
 
-  setUp(() {
-    // TrackingImpressionDetectorWidget de-dupes by a process-wide set of
-    // impression ids, so tests must reset it to avoid leaking state between
-    // tests that pump the same widget.
-    triggeredImpressions.clear();
-    // VisibilityDetector normally debounces visibility checks on a timer;
-    // force it to report visibility synchronously in tests instead.
-    VisibilityDetectorController.instance.updateInterval = Duration.zero;
-  });
+  setUp(resetTrackingImpressions);
 
   group('ForceUpdateBottomSheetWidget', () {
     // The bloc is intentionally created inside each `testWidgets` body

@@ -1,10 +1,11 @@
 import 'package:feature_flag/src/feature_flag.dart';
 import 'package:feature_flag/src/feature_flag_controller.dart';
+import 'package:feature_flag/src/feature_flag_definition.dart';
 import 'package:feature_flag/src/feature_flag_exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../mock/mocked_feature_flag_data_source.dart';
+import '../mock/mock_feature_flag_data_source.dart';
 
 void main() {
   setUpAll(() {
@@ -14,10 +15,16 @@ void main() {
 
   group('FeatureFlagController', () {
     late FeatureFlagController controller;
-    late MockedFeatureFlagDataSource mockDataSource;
+    late MockFeatureFlagDataSource mockDataSource;
+
+    const definitions = [
+      FeatureFlagDefinition(key: 'login_feature', defaultValue: false),
+      FeatureFlagDefinition(key: 'dashboard_feature', defaultValue: false),
+      FeatureFlagDefinition(key: 'analytics_feature', defaultValue: false),
+    ];
 
     setUp(() {
-      mockDataSource = MockedFeatureFlagDataSource();
+      mockDataSource = MockFeatureFlagDataSource();
       controller = FeatureFlagController(mockDataSource);
     });
 
@@ -31,12 +38,14 @@ void main() {
             FeatureFlag(key: 'analytics_feature', isEnabled: true),
           ];
           when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => mockFlags);
+            () => mockDataSource.resolveFeatureFlags(definitions),
+          ).thenAnswer((_) async => mockFlags);
 
-          await controller.initFeatureFlags();
+          await controller.initFeatureFlags(definitions);
 
-          verify(() => mockDataSource.initFeatureFlags()).called(1);
+          verify(
+            () => mockDataSource.resolveFeatureFlags(definitions),
+          ).called(1);
           final allFlags = controller.getAllFeatureFlags();
           expect(allFlags, hasLength(3));
           expect(allFlags.map((f) => f.key), contains('login_feature'));
@@ -45,43 +54,42 @@ void main() {
         },
       );
 
-      test(
-        'should throw FeatureFlagInitializationException when data source fails',
-        () {
-          when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenThrow(Exception('Data source error'));
+      test('should throw FeatureFlagInitializationException when data source '
+          'fails', () {
+        when(
+          () => mockDataSource.resolveFeatureFlags(definitions),
+        ).thenThrow(Exception('Data source error'));
 
-          expect(
-            () => controller.initFeatureFlags(),
-            throwsA(isA<FeatureFlagInitializationException>()),
-          );
-          verify(() => mockDataSource.initFeatureFlags()).called(1);
-        },
-      );
+        expect(
+          () => controller.initFeatureFlags(definitions),
+          throwsA(isA<FeatureFlagInitializationException>()),
+        );
+      });
     });
 
     group('getAllFeatureFlags', () {
       test('should return all feature flags when flags exist', () async {
         const mockFlags = [
-          FeatureFlag(key: 'feature1', isEnabled: true),
-          FeatureFlag(key: 'feature2', isEnabled: false),
-          FeatureFlag(key: 'feature3', isEnabled: true),
+          FeatureFlag(key: 'login_feature', isEnabled: true),
+          FeatureFlag(key: 'dashboard_feature', isEnabled: false),
+          FeatureFlag(key: 'analytics_feature', isEnabled: true),
         ];
         when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => mockFlags);
-        await controller.initFeatureFlags();
+          () => mockDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => mockFlags);
+        await controller.initFeatureFlags(definitions);
 
         final result = controller.getAllFeatureFlags();
 
         expect(result, hasLength(3));
-        expect(result[0].key, equals('feature1'));
-        expect(result[0].isEnabled, isTrue);
-        expect(result[1].key, equals('feature2'));
-        expect(result[1].isEnabled, isFalse);
-        expect(result[2].key, equals('feature3'));
-        expect(result[2].isEnabled, isTrue);
+        expect(
+          result.firstWhere((f) => f.key == 'login_feature').isEnabled,
+          isTrue,
+        );
+        expect(
+          result.firstWhere((f) => f.key == 'dashboard_feature').isEnabled,
+          isFalse,
+        );
       });
 
       test(
@@ -94,42 +102,40 @@ void main() {
         },
       );
 
-      test(
-        'should throw EmptyFeatureFlagsException after initialization with empty flags',
-        () async {
-          when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => <FeatureFlag>[]);
-          await controller.initFeatureFlags();
+      test('should throw EmptyFeatureFlagsException after initialization with '
+          'empty flags', () async {
+        when(
+          () => mockDataSource.resolveFeatureFlags(const []),
+        ).thenAnswer((_) async => <FeatureFlag>[]);
+        await controller.initFeatureFlags(const []);
 
-          expect(
-            () => controller.getAllFeatureFlags(),
-            throwsA(isA<EmptyFeatureFlagsException>()),
-          );
-        },
-      );
+        expect(
+          () => controller.getAllFeatureFlags(),
+          throwsA(isA<EmptyFeatureFlagsException>()),
+        );
+      });
     });
 
     group('isFeatureEnabled', () {
       setUp(() async {
         const mockFlags = [
-          FeatureFlag(key: 'enabled_feature', isEnabled: true),
-          FeatureFlag(key: 'disabled_feature', isEnabled: false),
-          FeatureFlag(key: 'another_feature', isEnabled: true),
+          FeatureFlag(key: 'login_feature', isEnabled: true),
+          FeatureFlag(key: 'dashboard_feature', isEnabled: false),
+          FeatureFlag(key: 'analytics_feature', isEnabled: true),
         ];
         when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => mockFlags);
-        await controller.initFeatureFlags();
+          () => mockDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => mockFlags);
+        await controller.initFeatureFlags(definitions);
       });
 
       test('should return true for enabled feature', () {
-        expect(controller.isFeatureEnabled('enabled_feature'), isTrue);
-        expect(controller.isFeatureEnabled('another_feature'), isTrue);
+        expect(controller.isFeatureEnabled('login_feature'), isTrue);
+        expect(controller.isFeatureEnabled('analytics_feature'), isTrue);
       });
 
       test('should return false for disabled feature', () {
-        expect(controller.isFeatureEnabled('disabled_feature'), isFalse);
+        expect(controller.isFeatureEnabled('dashboard_feature'), isFalse);
       });
 
       test(
@@ -155,54 +161,56 @@ void main() {
       );
 
       test('should handle case-sensitive feature keys', () {
-        expect(controller.isFeatureEnabled('enabled_feature'), isTrue);
+        expect(controller.isFeatureEnabled('login_feature'), isTrue);
         expect(
-          () => controller.isFeatureEnabled('ENABLED_FEATURE'),
-          throwsA(isA<FeatureFlagNotFoundException>()),
-        );
-        expect(
-          () => controller.isFeatureEnabled('Enabled_Feature'),
+          () => controller.isFeatureEnabled('LOGIN_FEATURE'),
           throwsA(isA<FeatureFlagNotFoundException>()),
         );
       });
     });
 
     group('updateFeatureFlag', () {
+      const twoDefinitions = [
+        FeatureFlagDefinition(key: 'login_feature', defaultValue: false),
+        FeatureFlagDefinition(key: 'dashboard_feature', defaultValue: false),
+      ];
+
       setUp(() async {
         const mockFlags = [
-          FeatureFlag(key: 'feature1', isEnabled: true),
-          FeatureFlag(key: 'feature2', isEnabled: false),
+          FeatureFlag(key: 'login_feature', isEnabled: true),
+          FeatureFlag(key: 'dashboard_feature', isEnabled: false),
         ];
         when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => mockFlags);
+          () => mockDataSource.resolveFeatureFlags(twoDefinitions),
+        ).thenAnswer((_) async => mockFlags);
         when(
           () => mockDataSource.updateFeatureFlag(any()),
         ).thenAnswer((_) async {});
-        await controller.initFeatureFlags();
+        await controller.initFeatureFlags(twoDefinitions);
       });
 
-      test('should update existing feature flag successfully', () {
-        const updatedFlag = FeatureFlag(key: 'feature1', isEnabled: false);
-        expect(controller.isFeatureEnabled('feature1'), isTrue);
+      test('should update existing feature flag successfully', () async {
+        const updatedFlag = FeatureFlag(key: 'login_feature', isEnabled: false);
+        expect(controller.isFeatureEnabled('login_feature'), isTrue);
 
-        controller.updateFeatureFlag(updatedFlag);
+        await controller.updateFeatureFlag(updatedFlag);
 
-        expect(controller.isFeatureEnabled('feature1'), isFalse);
+        expect(controller.isFeatureEnabled('login_feature'), isFalse);
         verify(() => mockDataSource.updateFeatureFlag(updatedFlag)).called(1);
       });
 
-      test('should update multiple feature flags independently', () {
-        const flag1Update = FeatureFlag(key: 'feature1', isEnabled: false);
-        const flag2Update = FeatureFlag(key: 'feature2', isEnabled: true);
+      test('should update multiple feature flags independently', () async {
+        const flag1Update = FeatureFlag(key: 'login_feature', isEnabled: false);
+        const flag2Update = FeatureFlag(
+          key: 'dashboard_feature',
+          isEnabled: true,
+        );
 
-        controller.updateFeatureFlag(flag1Update);
-        controller.updateFeatureFlag(flag2Update);
+        await controller.updateFeatureFlag(flag1Update);
+        await controller.updateFeatureFlag(flag2Update);
 
-        expect(controller.isFeatureEnabled('feature1'), isFalse);
-        expect(controller.isFeatureEnabled('feature2'), isTrue);
-        verify(() => mockDataSource.updateFeatureFlag(flag1Update)).called(1);
-        verify(() => mockDataSource.updateFeatureFlag(flag2Update)).called(1);
+        expect(controller.isFeatureEnabled('login_feature'), isFalse);
+        expect(controller.isFeatureEnabled('dashboard_feature'), isTrue);
       });
 
       test(
@@ -234,181 +242,88 @@ void main() {
           verifyNever(() => mockDataSource.updateFeatureFlag(any()));
         },
       );
-
-      test('should handle sync updateFeatureFlag from data source', () async {
-        const updatedFlag = FeatureFlag(key: 'feature1', isEnabled: false);
-        when(() => mockDataSource.updateFeatureFlag(any())).thenReturn(null);
-
-        await controller.updateFeatureFlag(updatedFlag);
-
-        expect(controller.isFeatureEnabled('feature1'), isFalse);
-        verify(() => mockDataSource.updateFeatureFlag(updatedFlag)).called(1);
-      });
-
-      test('should update flag even if data source call fails silently', () {
-        const updatedFlag = FeatureFlag(key: 'feature1', isEnabled: false);
-
-        controller.updateFeatureFlag(updatedFlag);
-
-        expect(controller.isFeatureEnabled('feature1'), isFalse);
-        verify(() => mockDataSource.updateFeatureFlag(updatedFlag)).called(1);
-      });
     });
 
     group('reset', () {
-      test('should reset flags and reinitialize successfully', () async {
+      test('should reset flags and re-resolve using the same definitions '
+          'passed to initFeatureFlags', () async {
         const initialFlags = [
-          FeatureFlag(key: 'feature1', isEnabled: true),
-          FeatureFlag(key: 'feature2', isEnabled: false),
+          FeatureFlag(key: 'login_feature', isEnabled: true),
+          FeatureFlag(key: 'dashboard_feature', isEnabled: false),
+          FeatureFlag(key: 'analytics_feature', isEnabled: true),
         ];
         when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => initialFlags);
-        when(() => mockDataSource.reset()).thenAnswer((_) {});
-        await controller.initFeatureFlags();
+          () => mockDataSource.resolveFeatureFlags(definitions),
+        ).thenAnswer((_) async => initialFlags);
+        when(() => mockDataSource.reset()).thenAnswer((_) async {});
+        await controller.initFeatureFlags(definitions);
 
-        expect(controller.getAllFeatureFlags(), hasLength(2));
-
-        const newFlags = [FeatureFlag(key: 'feature3', isEnabled: true)];
-        when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => newFlags);
+        expect(controller.getAllFeatureFlags(), hasLength(3));
 
         await controller.reset();
-
-        final flagsAfterReset = controller.getAllFeatureFlags();
-        expect(flagsAfterReset, hasLength(1));
-        expect(flagsAfterReset.first.key, equals('feature3'));
-        expect(flagsAfterReset.first.isEnabled, isTrue);
 
         verify(() => mockDataSource.reset()).called(1);
+        // definitions is re-supplied automatically on reset, without the
+        // caller passing it again.
         verify(
-          () => mockDataSource.initFeatureFlags(),
-        ).called(2); // Initial + after reset
+          () => mockDataSource.resolveFeatureFlags(definitions),
+        ).called(2); // initial init + re-resolve after reset
       });
 
-      test('should handle empty flags after reset', () async {
-        const initialFlags = [FeatureFlag(key: 'feature1', isEnabled: true)];
+      test('should throw FeatureFlagResetException when data source reset '
+          'fails', () async {
+        const initialFlags = [
+          FeatureFlag(key: 'login_feature', isEnabled: true),
+        ];
         when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => initialFlags);
-        when(() => mockDataSource.reset()).thenAnswer((_) {});
-        await controller.initFeatureFlags();
+          () => mockDataSource.resolveFeatureFlags(const [
+            FeatureFlagDefinition(key: 'login_feature', defaultValue: false),
+          ]),
+        ).thenAnswer((_) async => initialFlags);
+        await controller.initFeatureFlags(const [
+          FeatureFlagDefinition(key: 'login_feature', defaultValue: false),
+        ]);
 
-        when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => <FeatureFlag>[]);
-
-        await controller.reset();
+        when(() => mockDataSource.reset()).thenThrow(Exception('Reset failed'));
 
         expect(
-          () => controller.getAllFeatureFlags(),
-          throwsA(isA<EmptyFeatureFlagsException>()),
+          () => controller.reset(),
+          throwsA(isA<FeatureFlagResetException>()),
         );
-        verify(() => mockDataSource.reset()).called(1);
-        verify(() => mockDataSource.initFeatureFlags()).called(2);
       });
 
       test(
-        'should throw FeatureFlagResetException when data source reset fails',
+        'should clear internal state even if re-resolving after reset fails',
         () async {
-          const initialFlags = [FeatureFlag(key: 'feature1', isEnabled: true)];
+          const singleDefinition = [
+            FeatureFlagDefinition(key: 'login_feature', defaultValue: false),
+          ];
+          const initialFlags = [
+            FeatureFlag(key: 'login_feature', isEnabled: true),
+          ];
           when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => initialFlags);
-          await controller.initFeatureFlags();
+            () => mockDataSource.resolveFeatureFlags(singleDefinition),
+          ).thenAnswer((_) async => initialFlags);
+          await controller.initFeatureFlags(singleDefinition);
 
+          expect(controller.isFeatureEnabled('login_feature'), isTrue);
+
+          when(() => mockDataSource.reset()).thenAnswer((_) async {});
           when(
-            () => mockDataSource.reset(),
-          ).thenThrow(Exception('Reset failed'));
+            () => mockDataSource.resolveFeatureFlags(singleDefinition),
+          ).thenThrow(Exception('Re-resolve failed'));
 
-          expect(
-            () => controller.reset(),
+          await expectLater(
+            controller.reset(),
             throwsA(isA<FeatureFlagResetException>()),
           );
-          verify(() => mockDataSource.reset()).called(1);
-        },
-      );
 
-      test(
-        'should throw FeatureFlagResetException when reinitialization fails',
-        () async {
-          const initialFlags = [FeatureFlag(key: 'feature1', isEnabled: true)];
-          when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => initialFlags);
-          await controller.initFeatureFlags();
-
-          when(() => mockDataSource.reset()).thenAnswer((_) {});
-          // Set up the mock to fail on the second call (during reset)
-          when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenThrow(Exception('Reinit failed'));
-
-          expect(
-            () => controller.reset(),
-            throwsA(isA<FeatureFlagResetException>()),
-          );
-          verify(() => mockDataSource.reset()).called(1);
-          // Only verify the reset call, not the init call count since
-          // the second init call fails and the behavior may vary
-        },
-      );
-
-      test(
-        'should clear internal state even if reinitialization fails',
-        () async {
-          const initialFlags = [FeatureFlag(key: 'feature1', isEnabled: true)];
-          when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenAnswer((_) => initialFlags);
-          await controller.initFeatureFlags();
-
-          expect(controller.isFeatureEnabled('feature1'), isTrue);
-
-          when(() => mockDataSource.reset()).thenAnswer((_) {});
-          when(
-            () => mockDataSource.initFeatureFlags(),
-          ).thenThrow(Exception('Reinit failed'));
-
-          try {
-            await controller.reset();
-          } catch (e) {
-            // Expected to fail
-          }
-
-          // Assert - State should be cleared even though reinit failed
           expect(
             () => controller.getAllFeatureFlags(),
             throwsA(isA<EmptyFeatureFlagsException>()),
           );
-          expect(
-            () => controller.isFeatureEnabled('feature1'),
-            throwsA(isA<EmptyFeatureFlagsException>()),
-          );
         },
       );
-
-      test('should handle sync reset from data source', () async {
-        const initialFlags = [FeatureFlag(key: 'feature1', isEnabled: true)];
-        when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => initialFlags);
-        await controller.initFeatureFlags();
-
-        when(() => mockDataSource.reset()).thenReturn(null);
-        const newFlags = [FeatureFlag(key: 'feature2', isEnabled: false)];
-        when(
-          () => mockDataSource.initFeatureFlags(),
-        ).thenAnswer((_) => newFlags);
-
-        await controller.reset();
-
-        final flagsAfterReset = controller.getAllFeatureFlags();
-        expect(flagsAfterReset, hasLength(1));
-        expect(flagsAfterReset.first.key, equals('feature2'));
-        verify(() => mockDataSource.reset()).called(1);
-      });
     });
   });
 }

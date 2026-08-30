@@ -1,4 +1,4 @@
-import 'package:portrai/src/feature/feature_flag/presentation/feature_flag_screen.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/feature_flag_screen.dart';
 import 'package:portrai/src/route/route.dart';
 
 class FeatureFlagModuleRoute extends ModuleRoute {

@@ -1,71 +1,95 @@
 import 'package:feature_flag/src/data/data_source/remote_feature_flag_data_source.dart';
 import 'package:feature_flag/src/feature_flag.dart';
-import 'package:firebase/firebase.dart';
+import 'package:feature_flag/src/feature_flag_definition.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../../mock/mocked_fb_remote_config_controller.dart';
+import '../../../mock/mock_fb_remote_config_controller.dart';
 
 void main() {
-  setUpAll(() {
-    // Register fallback value for FeatureFlag when using any() matchers
-    registerFallbackValue(const FeatureFlag(key: 'fake', isEnabled: false));
-  });
-
   group('RemoteFeatureFlagDataSource', () {
     late RemoteFeatureFlagDataSource dataSource;
-    late MockedFbRemoteConfigController mockController;
+    late MockFbRemoteConfigController mockController;
 
     setUp(() {
-      mockController = MockedFbRemoteConfigController();
+      mockController = MockFbRemoteConfigController();
       dataSource = RemoteFeatureFlagDataSource(mockController);
     });
 
-    group('initFeatureFlags', () {
-      test('should return empty list when no remote configs are available', () {
+    group('resolveFeatureFlags', () {
+      test('should return empty list when definitions is empty', () {
         when(() => mockController.getAllConfigsValue()).thenReturn({});
 
-        final result = dataSource.initFeatureFlags();
+        final result = dataSource.resolveFeatureFlags(const []);
 
-        expect(result, equals(<FeatureFlag>[]));
-        verify(() => mockController.getAllConfigsValue()).called(1);
+        expect(result, isEmpty);
       });
 
-      test(
-        'should return feature flags list when remote configs are available',
-        () {
-          final mockValue1 = MockedRemoteConfigValue();
-          final mockValue2 = MockedRemoteConfigValue();
-          final mockValue3 = MockedRemoteConfigValue();
+      test('should fall back to definition default value when key is not '
+          'found remotely', () {
+        when(() => mockController.getAllConfigsValue()).thenReturn({});
 
-          when(() => mockValue1.asBool()).thenReturn(true);
-          when(() => mockValue2.asBool()).thenReturn(false);
-          when(() => mockValue3.asBool()).thenReturn(true);
+        final result = dataSource.resolveFeatureFlags(const [
+          FeatureFlagDefinition(key: 'local_feature', defaultValue: true),
+        ]);
 
-          final configValues = <String, RemoteConfigValue>{
-            'feature_login': mockValue1,
-            'feature_dashboard': mockValue2,
-            'feature_analytics': mockValue3,
-          };
+        expect(
+          result,
+          equals(const [FeatureFlag(key: 'local_feature', isEnabled: true)]),
+        );
+      });
 
-          when(
-            () => mockController.getAllConfigsValue(),
-          ).thenReturn(configValues);
+      test('should resolve to remote value with hasRemoteSource true when key '
+          'is found remotely', () {
+        final mockValue = MockRemoteConfigValue();
+        when(() => mockValue.asBool()).thenReturn(true);
+        when(
+          () => mockController.getAllConfigsValue(),
+        ).thenReturn({'feature_login': mockValue});
 
-          final result = dataSource.initFeatureFlags();
+        final result = dataSource.resolveFeatureFlags(const [
+          FeatureFlagDefinition(key: 'feature_login', defaultValue: false),
+        ]);
 
-          final expectedList = [
-            const FeatureFlag(key: 'feature_login', isEnabled: true),
-            const FeatureFlag(key: 'feature_dashboard', isEnabled: false),
-            const FeatureFlag(key: 'feature_analytics', isEnabled: true),
-          ];
-          expect(result, equals(expectedList));
-          verify(() => mockController.getAllConfigsValue()).called(1);
-          verify(() => mockValue1.asBool()).called(1);
-          verify(() => mockValue2.asBool()).called(1);
-          verify(() => mockValue3.asBool()).called(1);
-        },
-      );
+        expect(
+          result,
+          equals(const [
+            FeatureFlag(
+              key: 'feature_login',
+              isEnabled: true,
+              hasRemoteSource: true,
+              remoteValue: true,
+            ),
+          ]),
+        );
+      });
+
+      test('should resolve each definition independently when definitions mix '
+          'remote and local-only keys', () {
+        final mockValue = MockRemoteConfigValue();
+        when(() => mockValue.asBool()).thenReturn(false);
+        when(
+          () => mockController.getAllConfigsValue(),
+        ).thenReturn({'feature_remote': mockValue});
+
+        final result = dataSource.resolveFeatureFlags(const [
+          FeatureFlagDefinition(key: 'feature_remote', defaultValue: true),
+          FeatureFlagDefinition(key: 'feature_local', defaultValue: true),
+        ]);
+
+        expect(
+          result,
+          equals(const [
+            FeatureFlag(
+              key: 'feature_remote',
+              isEnabled: false,
+              hasRemoteSource: true,
+              remoteValue: false,
+            ),
+            FeatureFlag(key: 'feature_local', isEnabled: true),
+          ]),
+        );
+      });
     });
 
     group('updateFeatureFlag', () {

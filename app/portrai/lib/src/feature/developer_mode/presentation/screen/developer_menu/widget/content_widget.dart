@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
-import 'package:portrai/src/feature/feature_flag/presentation/feature_flag_screen.dart';
+import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/feature_flag_screen.dart';
 import 'package:tracking/tracking.dart';
 
 class ContentWidget extends StatelessWidget {

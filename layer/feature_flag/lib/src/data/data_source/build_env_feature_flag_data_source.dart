@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:core/core.dart';
 import 'package:feature_flag/src/data/data_source/feature_flag_data_source.dart';
 import 'package:feature_flag/src/feature_flag.dart';
+import 'package:feature_flag/src/feature_flag_definition.dart';
 
 /// Routes to cache or remote data source based on build environment
 class BuildEnvFeatureFlagDataSource implements FeatureFlagDataSource {
@@ -17,8 +18,10 @@ class BuildEnvFeatureFlagDataSource implements FeatureFlagDataSource {
   final FeatureFlagDataSource _dataSourceDelegate;
 
   @override
-  FutureOr<List<FeatureFlag>> initFeatureFlags() {
-    return _dataSourceDelegate.initFeatureFlags();
+  FutureOr<List<FeatureFlag>> resolveFeatureFlags(
+    List<FeatureFlagDefinition> definitions,
+  ) {
+    return _dataSourceDelegate.resolveFeatureFlags(definitions);
   }
 
   @override

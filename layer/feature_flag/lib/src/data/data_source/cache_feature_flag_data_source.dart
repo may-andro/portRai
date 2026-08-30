@@ -3,7 +3,20 @@ import 'dart:async';
 import 'package:feature_flag/src/data/cache/feature_flag_cache.dart';
 import 'package:feature_flag/src/data/data_source/feature_flag_data_source.dart';
 import 'package:feature_flag/src/feature_flag.dart';
+import 'package:feature_flag/src/feature_flag_definition.dart';
 
+/// Wraps a delegate data source with persistent SQLite caching + developer
+/// override support.
+///
+/// For each resolved flag:
+/// - a developer override (in the cache) always wins, but its remote
+///   metadata is refreshed so reverting the override still targets the
+///   *current* remote value;
+/// - otherwise, a flag with a remote source always reflects the delegate's
+///   (fresh) remote value;
+/// - a flag without a remote source (`hasRemoteSource == false`) is
+///   local-only, so its last cached value is kept - falling back to the
+///   definition's default only the first time it's ever resolved.
 class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
   const CacheFeatureFlagDataSource(
     this._delegateDataSource,
@@ -14,26 +27,40 @@ class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
   final FeatureFlagCache _featureFlagCache;
 
   @override
-  FutureOr<List<FeatureFlag>> initFeatureFlags() async {
+  Future<List<FeatureFlag>> resolveFeatureFlags(
+    List<FeatureFlagDefinition> definitions,
+  ) async {
+    final delegateFlags = await _delegateDataSource.resolveFeatureFlags(
+      definitions,
+    );
     final cachedFlags = await _featureFlagCache.getAll();
-    final delegateFlags = await _delegateDataSource.initFeatureFlags();
+    final cachedByKey = {for (final flag in cachedFlags) flag.key: flag};
 
-    if (cachedFlags.isEmpty) {
-      // Cache all delegate flags and return them
-      await _cacheFlags(delegateFlags);
-      return delegateFlags;
+    final resolved = delegateFlags
+        .map(
+          (delegateFlag) =>
+              _resolve(delegateFlag, cachedByKey[delegateFlag.key]),
+        )
+        .toList();
+
+    await _cacheFlags(resolved);
+    return resolved;
+  }
+
+  FeatureFlag _resolve(FeatureFlag delegateFlag, FeatureFlag? cachedFlag) {
+    if (cachedFlag != null && cachedFlag.isOverridden) {
+      return cachedFlag.copyWith(
+        hasRemoteSource: delegateFlag.hasRemoteSource,
+        remoteValue: delegateFlag.remoteValue,
+      );
     }
 
-    // Merge: cached flags override delegate flags, new delegate flags are added
-    final merged = _mergeFlags(delegateFlags, cachedFlags);
-
-    // Cache any new flags from delegate
-    final newFlags = _findNewFlags(delegateFlags, cachedFlags);
-    if (newFlags.isNotEmpty) {
-      await _cacheFlags(newFlags);
+    if (delegateFlag.hasRemoteSource) {
+      return delegateFlag;
     }
 
-    return merged;
+    // Local-only flag: keep the previously cached value, if any.
+    return cachedFlag ?? delegateFlag;
   }
 
   @override
@@ -45,28 +72,6 @@ class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
       return _featureFlagCache.putOverride(featureFlag);
     }
     return _featureFlagCache.put(featureFlag);
-  }
-
-  List<FeatureFlag> _mergeFlags(
-    List<FeatureFlag> delegateFlags,
-    List<FeatureFlag> cachedFlags,
-  ) {
-    final cachedMap = {for (var flag in cachedFlags) flag.key: flag};
-    final result = <FeatureFlag>[];
-
-    for (final delegateFlag in delegateFlags) {
-      result.add(cachedMap[delegateFlag.key] ?? delegateFlag);
-    }
-
-    return result;
-  }
-
-  List<FeatureFlag> _findNewFlags(
-    List<FeatureFlag> delegateFlags,
-    List<FeatureFlag> cachedFlags,
-  ) {
-    final cachedKeys = cachedFlags.map((f) => f.key).toSet();
-    return delegateFlags.where((f) => !cachedKeys.contains(f.key)).toList();
   }
 
   Future<void> _cacheFlags(List<FeatureFlag> flags) async {
