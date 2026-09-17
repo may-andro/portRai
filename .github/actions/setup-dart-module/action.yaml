@@ -13,15 +13,15 @@ inputs:
 runs:
   using: composite
   steps:
+    # dart-lang/setup-dart's bundled problem matcher registers itself using a
+    # path relative to *this* composite action's directory (not its own), so
+    # `dart-analyzer.json` is vendored here (copied verbatim from
+    # https://github.com/dart-lang/setup-dart/blob/v1/dart-analyzer.json) to
+    # keep the problem matcher working instead of disabling it.
     - name: Setup Dart
       uses: dart-lang/setup-dart@v1
       with:
         sdk: ${{ inputs.dart-version }}
-        # Disabled because the problem matcher's relative path is resolved
-        # against this composite action's directory (not dart-lang/setup-dart's
-        # own), which fails with "Could not find file
-        # .github/actions/setup-dart-module/dart-analyzer.json".
-        problem-matcher: false
 
     - name: Get dependencies cache key
       id: pubspec-cache
