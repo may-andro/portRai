@@ -17,6 +17,11 @@ runs:
       uses: dart-lang/setup-dart@v1
       with:
         sdk: ${{ inputs.dart-version }}
+        # Disabled because the problem matcher's relative path is resolved
+        # against this composite action's directory (not dart-lang/setup-dart's
+        # own), which fails with "Could not find file
+        # .github/actions/setup-dart-module/dart-analyzer.json".
+        problem-matcher: false
 
     - name: Get dependencies cache key
       id: pubspec-cache
