@@ -13,13 +13,13 @@ class FbCrashlyticsController {
 
   Future<void> setCrashlyticsEnabled(bool isEnabled) async {
     if (_isFeatureSupported) {
-      return _firebaseCrashlytics.setCrashlyticsCollectionEnabled(isEnabled);
+      return await _firebaseCrashlytics.setCrashlyticsCollectionEnabled(isEnabled);
     }
   }
 
   Future<void> setUser(String userId) async {
     if (_isOperationAllowed) {
-      return _firebaseCrashlytics.setUserIdentifier(userId);
+      return await _firebaseCrashlytics.setUserIdentifier(userId);
     }
   }
 
@@ -31,7 +31,7 @@ class FbCrashlyticsController {
 
   Future<void> logMessage(String message) async {
     if (_isOperationAllowed) {
-      return _firebaseCrashlytics.log(message);
+      return await _firebaseCrashlytics.log(message);
     }
   }
 
@@ -41,7 +41,7 @@ class FbCrashlyticsController {
     bool isFatal = false,
   }) async {
     if (_isOperationAllowed) {
-      return _firebaseCrashlytics.recordError(
+      return await _firebaseCrashlytics.recordError(
         error,
         stackTrace,
         fatal: isFatal,
@@ -51,7 +51,7 @@ class FbCrashlyticsController {
 
   Future<void> reportFlutterError(FlutterErrorDetails error) async {
     if (_isOperationAllowed) {
-      return _firebaseCrashlytics.recordFlutterError(error);
+      return await _firebaseCrashlytics.recordFlutterError(error);
     }
   }
 
