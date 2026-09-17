@@ -45,3 +45,4 @@ analyzer:
     - '**/*.gen.dart'
     - tool/**
     - lib/src/generated/**
+    - '**/build/**'

@@ -36,7 +36,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
       _logReporter.error(
         'Failed to load app config from remote, falling back to cache.',
       );
-      return _cacheDelegateRepository.getAppConfig();
+      return await _cacheDelegateRepository.getAppConfig();
     }
   }
 

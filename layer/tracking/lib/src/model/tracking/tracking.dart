@@ -1,19 +1,10 @@
-// ignore: directives_ordering
 import 'package:tracking/src/area_controller/area_controller.dart';
 import 'package:tracking/src/model/action/action.dart';
 
 export 'app_initialization_tracking.dart';
-
-// ignore: directives_ordering
 export 'app_start_tracking.dart';
-
-// ignore: directives_ordering
 export 'click_tracking.dart';
-
-// ignore: directives_ordering
 export 'screen_view_tracking.dart';
-
-// ignore: directives_ordering
 export 'view_tracking.dart';
 
 class Tracking {
