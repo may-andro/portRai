@@ -13,7 +13,9 @@ class FbCrashlyticsController {
 
   Future<void> setCrashlyticsEnabled(bool isEnabled) async {
     if (_isFeatureSupported) {
-      return await _firebaseCrashlytics.setCrashlyticsCollectionEnabled(isEnabled);
+      return await _firebaseCrashlytics.setCrashlyticsCollectionEnabled(
+        isEnabled,
+      );
     }
   }
 
