@@ -13,11 +13,6 @@ inputs:
 runs:
   using: composite
   steps:
-    # dart-lang/setup-dart's bundled problem matcher registers itself using a
-    # path relative to *this* composite action's directory (not its own), so
-    # `dart-analyzer.json` is vendored here (copied verbatim from
-    # https://github.com/dart-lang/setup-dart/blob/v1/dart-analyzer.json) to
-    # keep the problem matcher working instead of disabling it.
     - name: Setup Dart
       uses: dart-lang/setup-dart@v1
       with:
