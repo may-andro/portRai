@@ -1,4 +1,4 @@
-# Use Case Module
+# Use Case
 
 A Flutter package that provides base classes and utilities for implementing the Use Case pattern in clean architecture applications. This module helps organize business logic into discrete, testable units while providing error handling and interception capabilities.
 
@@ -12,12 +12,27 @@ A Flutter package that provides base classes and utilities for implementing the 
 
 ## Getting Started
 
+### Installation
+
 Add this package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
   use_case:
     path: ../use_case
+```
+
+### Module Configuration
+
+Configure the module in your dependency injection setup:
+
+```dart
+import 'package:use_case/use_case.dart';
+
+// The module automatically registers the UseCaseInterceptorController
+// Register your interceptors:
+final interceptorController = serviceLocator<UseCaseInterceptorController>();
+interceptorController.register(LoggingInterceptor());
 ```
 
 ## Usage
@@ -31,7 +46,7 @@ import 'package:use_case/use_case.dart';
 
 class GetUserUseCase extends BaseUseCase<User, GetUserParams, UserFailure> {
   GetUserUseCase(this._repository);
-  
+
   final UserRepository _repository;
 
   @override
@@ -60,7 +75,7 @@ import 'package:use_case/use_case.dart';
 
 class GetCurrentUserUseCase extends BaseNoParamUseCase<User, UserFailure> {
   GetCurrentUserUseCase(this._repository);
-  
+
   final UserRepository _repository;
 
   @override
@@ -124,26 +139,13 @@ class LoggingInterceptor implements UseCaseInterceptor {
 }
 ```
 
-### Module Configuration
-
-Configure the module in your dependency injection setup:
-
-```dart
-import 'package:use_case/use_case.dart';
-
-// The module automatically registers the UseCaseInterceptorController
-// Register your interceptors:
-final interceptorController = serviceLocator<UseCaseInterceptorController>();
-interceptorController.register(LoggingInterceptor());
-```
-
 ## API Reference
 
 ### Base Classes
 
 - **`BaseUseCase<O, I, F>`**: Abstract base class for use cases that require input parameters
   - `O`: Output type
-  - `I`: Input parameter type  
+  - `I`: Input parameter type
   - `F`: Failure type (must extend `Failure`)
   - `call(I input)`: Execute the use case with input parameters
 
@@ -173,14 +175,6 @@ interceptorController.register(LoggingInterceptor());
 
 - **`UseCaseModuleConfigurator`**: Handles dependency injection setup for the module
 
-## Dependencies
-
-This package depends on:
-- `either_dart`: For functional error handling with Either type
-- `equatable`: For value equality in failure types
-- `meta`: For annotations like `@protected`
-- `module_injector`: For dependency injection integration
-
 ## Best Practices
 
 1. **Single Responsibility**: Each use case should handle one specific business operation
@@ -188,3 +182,20 @@ This package depends on:
 3. **Testability**: Use dependency injection to make use cases easily testable
 4. **Type Safety**: Define specific failure types for different error scenarios
 5. **Interceptors**: Use interceptors for logging, analytics, and other cross-cutting concerns
+
+## Dependencies
+
+This package depends on:
+
+- `either_dart`: For functional error handling with Either type
+- `equatable`: For value equality in failure types
+- `meta`: For annotations like `@protected`
+- `module_injector`: For dependency injection integration
+
+## Testing
+
+Run the package tests with:
+
+```bash
+flutter test
+```

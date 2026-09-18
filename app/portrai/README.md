@@ -1,25 +1,15 @@
 # Port-Rai Portfolio Application
 
-A professional portfolio application built with Flutter, showcasing projects, experience, skills, and expertise. Built with clean architecture, modular design, and comprehensive theming support with 12 custom themes.
+A professional portfolio application built with Flutter, showcasing projects, experience, skills,
+and expertise. Built with clean architecture, modular design, and comprehensive theming support
+with 12 custom themes. Backend powered by Firebase (Firestore, Analytics, Remote Config), with
+feature flags, offline caching, tracking, error reporting, and localization provided by the
+workspace's shared `layer/*` packages (see the [root README](../../README.md) for the full
+architecture).
 
-## 📋 Overview
-
-Port-Rai is the main portfolio application for Mayank Rai, featuring:
-
-- **Multi-theme Design System**: 12 beautifully designed themes with light and dark mode support
-- **Responsive Design**: Optimized layouts for mobile, tablet, and desktop
-- **Clean Architecture**: Modular, testable, and maintainable codebase
-- **Firebase Integration**: Backend powered by Firebase (Firestore, Analytics, Remote Config)
-- **Feature Flags**: Control features remotely without app updates
-- **Offline Support**: Comprehensive caching for offline functionality
-- **Analytics & Tracking**: User behavior insights with Firebase Analytics
-- **Error Reporting**: Automatic error tracking and reporting
-- **Localization**: Multi-language support with Flutter intl
-
-## ✨ Features
+## Features
 
 ### Portfolio Sections
-
 - **Profile**: Professional introduction and contact information
 - **Experience**: Work history and career progression
 - **Projects**: Portfolio of completed projects with details and media
@@ -29,120 +19,115 @@ Port-Rai is the main portfolio application for Mayank Rai, featuring:
 - **Testimonials**: Client feedback and recommendations
 
 ### Technical Features
-
 - **Dynamic Content**: Content fetched from Firebase Firestore
-- **Theming**: 12 custom themes (Beltane, Carnival, Diwali, Halloween, Sakura, Christmas, etc.)
-- **Responsive Layout**: Adaptive UI for all screen sizes
+- **Multi-theme Design System**: 12 custom themes with light and dark mode support (Beltane,
+  Carnival, Chuseok, Diwali, Halloween, Hogeras, Hogmanay, Holi, Obon, Pachamama, Sakura,
+  Christmas)
+- **Responsive Layout**: Adaptive UI for mobile, tablet, and desktop
 - **Smooth Animations**: Polished transitions and micro-interactions
-- **Offline Mode**: Full functionality without internet connection
-- **Performance**: Optimized loading and caching strategies
+- **Offline Mode**: Comprehensive caching for full functionality without internet connection
+- **Feature Flags**: Control features remotely without app updates
+- **Analytics & Tracking**: User behavior insights with Firebase Analytics
+- **Error Reporting**: Automatic error tracking and reporting via Firebase Crashlytics
+- **Localization**: Multi-language support with Flutter intl
 - **Accessibility**: WCAG compliant with screen reader support
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-
 - Flutter SDK ^3.47.0
 - Dart SDK ^3.11.0
 - Firebase project with Firestore enabled
 - Android Studio / VS Code / IntelliJ IDEA
 
 ### Installation
-
-1. **Navigate to the app directory**:
+1. Navigate to the app directory:
    ```bash
    cd app/portrai
    ```
-
-2. **Get dependencies**:
+2. Get dependencies:
    ```bash
    flutter pub get
    ```
-
-3. **Configure Firebase**:
+3. Configure Firebase:
    - Add `google-services.json` to `android/app/`
    - Add `GoogleService-Info.plist` to `ios/Runner/`
    - Update Firebase configuration in `lib/firebase_options.dart`
-
-4. **Generate code**:
+4. Generate code:
    ```bash
    dart run build_runner build --delete-conflicting-outputs
    ```
-
-5. **Run the app**:
+5. Run the app:
    ```bash
    flutter run
    ```
 
-## 🏗️ Architecture
+## Architecture
 
 The application follows clean architecture with clear separation of concerns:
 
-```
+```text
 lib/
-├── core/                    # App-level configuration
-│   ├── app/                # App initialization and routing
-│   ├── config/             # Build configuration
-│   └── route/              # Navigation setup
-├── feature/                # Feature modules
-│   ├── experience/         # Work experience feature
-│   ├── expertise/          # Expertise showcase
-│   ├── home/               # Landing page
-│   ├── profile/            # User profile
-│   ├── project/            # Projects portfolio
-│   ├── service/            # Services offered
-│   └── testimonial/        # Client testimonials
-└── main.dart               # Application entry point
+├── src/
+│   ├── feature/             # Feature modules (data/domain/presentation per feature)
+│   │   ├── experience/      # Work experience feature
+│   │   ├── expertise/       # Expertise showcase
+│   │   ├── profile/         # User profile
+│   │   ├── project/         # Projects portfolio
+│   │   ├── service/         # Services offered
+│   │   └── testimonial/     # Client testimonials
+│   ├── module_configurator/ # App-wide dependency injection wiring
+│   ├── route/               # Navigation setup
+│   └── utility/             # App-level utilities
+└── main.dart                # Application entry point
 ```
 
 ### Dependency Flow
-
-```
-Presentation Layer (BLoC/Cubit)
-    ↓
-Business Logic Layer (Use Cases)
-    ↓
-Data Layer (Repositories)
-    ↓
-Infrastructure (Firebase, Cache, Remote)
+```text
+Presentation Layer (Bloc)
+    -> Business Logic Layer (Use Cases)
+    -> Data Layer (Repositories)
+    -> Infrastructure (Firebase, Cache, Remote)
 ```
 
-## 🎨 Theming
+See the [creating-new-modules skill](../../.github/skills/creating-new-modules/SKILL.md) and
+[architecture-conventions skill](../../.github/skills/flutter-architecture-conventions/SKILL.md)
+for the conventions each feature module follows.
 
-The app supports 12 custom themes, each with unique color palettes and styling:
+## Theming
+
+The app supports 12 custom themes, each with unique color palettes and styling.
 
 ### Available Themes
-
-1. **Beltane** - Celtic spring festival inspired
-2. **Carnival** - Brazilian carnival vibes
-3. **Chuseok** - Korean harvest festival
-4. **Diwali** - Hindu festival of lights
-5. **Halloween** - Gothic and spooky
-6. **Hogeras** - Mediterranean coastal
-7. **Hogmanay** - Scottish New Year
-8. **Holi** - Indian festival of colors
-9. **Obon** - Japanese lantern festival
-10. **Pachamama** - Andean earth festival
-11. **Sakura** - Japanese cherry blossom
-12. **Christmas** - Winter holiday theme
+1. Beltane - Celtic spring festival inspired
+2. Carnival - Brazilian carnival vibes
+3. Chuseok - Korean harvest festival
+4. Diwali - Hindu festival of lights
+5. Halloween - Gothic and spooky
+6. Hogeras - Mediterranean coastal
+7. Hogmanay - Scottish New Year
+8. Holi - Indian festival of colors
+9. Obon - Japanese lantern festival
+10. Pachamama - Andean earth festival
+11. Sakura - Japanese cherry blossom
+12. Christmas - Winter holiday theme
 
 ### Switching Themes
+Themes can be switched at runtime through the app settings or controlled via Firebase Remote
+Config.
 
-Themes can be switched at runtime through the app settings or controlled via Firebase Remote Config.
-
-## 📱 Supported Platforms
+## Supported Platforms
 
 | Platform | Support | Notes |
 |----------|---------|-------|
-| Android  | ✅      | API 21+ |
-| iOS      | ✅      | iOS 12+ |
-| Web      | ✅      | All modern browsers |
-| macOS    | ✅      | macOS 10.14+ |
+| Android  | Yes     | API 21+ |
+| iOS      | Yes     | iOS 12+ |
+| Web      | Yes     | All modern browsers |
+| macOS    | Yes     | macOS 10.14+ |
 
-## 🛠️ Development
+## Development
 
-### Running in Different Modes
-
+### Running the App
 ```bash
 # Development mode
 flutter run --debug
@@ -155,7 +140,6 @@ flutter run --release
 ```
 
 ### Code Generation
-
 ```bash
 # Generate code (routes, JSON serialization, etc.)
 dart run build_runner build --delete-conflicting-outputs
@@ -165,7 +149,6 @@ dart run build_runner watch --delete-conflicting-outputs
 ```
 
 ### Testing
-
 ```bash
 # Run all tests
 flutter test
@@ -178,7 +161,6 @@ flutter test test/feature/profile/profile_test.dart
 ```
 
 ### Localization
-
 ```bash
 # Generate localization files
 flutter gen-l10n
@@ -186,28 +168,23 @@ flutter gen-l10n
 # Supported languages: English (en), [add others]
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Build Variants
-
 The app supports multiple build configurations:
-
 - **Development**: Local testing with debug tools
 - **Staging**: Pre-production testing environment
 - **Production**: Live production environment
 
 ### Environment Variables
-
-Configure environment-specific settings in:
-- `lib/core/config/build_environment.dart`
+Configure environment-specific settings in `lib/core/config/build_environment.dart`.
 
 ### Feature Flags
-
 Feature flags are managed through Firebase Remote Config:
 - Configure in Firebase Console
 - Keys defined in `lib/core/config/feature_flags.dart`
 
-## 📦 Dependencies
+## Dependencies
 
 ### Core Dependencies
 
@@ -231,10 +208,9 @@ Feature flags are managed through Firebase Remote Config:
 | `flutter_gen_runner` | Asset generation |
 | `mocktail` | Testing mocks |
 
-## 🚀 Deployment
+## Deployment
 
 ### Web Deployment
-
 ```bash
 # Build web app
 flutter build web --release
@@ -244,7 +220,6 @@ firebase deploy --only hosting
 ```
 
 ### Android Deployment
-
 ```bash
 # Build APK
 flutter build apk --release
@@ -254,7 +229,6 @@ flutter build appbundle --release
 ```
 
 ### iOS Deployment
-
 ```bash
 # Build iOS app
 flutter build ios --release
@@ -263,10 +237,9 @@ flutter build ios --release
 flutter build ipa --release
 ```
 
-## 📊 Analytics
+## Analytics
 
 The app tracks user interactions using Firebase Analytics:
-
 - **Screen Views**: Automatic tracking of page navigation
 - **User Actions**: Button clicks, form submissions
 - **Content Views**: Project views, service views
@@ -274,43 +247,31 @@ The app tracks user interactions using Firebase Analytics:
 
 View analytics in [Firebase Console](https://console.firebase.google.com).
 
-## 🐛 Error Reporting
+## Error Reporting
 
 Errors are automatically reported to Firebase Crashlytics:
-
 - **Crash Reports**: Unhandled exceptions
 - **Non-Fatal Errors**: Handled errors with context
 - **Custom Logs**: Debug information for investigation
 
-## 🤝 Contributing
+## Contributing
 
-### Development Workflow
+See the root [Contributing](../../README.md#contributing) section for the development workflow,
+code style, and branch/PR conventions (also documented in
+[`.github/skills/pr-and-branch-conventions/SKILL.md`](../../.github/skills/pr-and-branch-conventions/SKILL.md)).
 
-1. Create a feature branch from `main`
-2. Make your changes following the code style
-3. Write/update tests for your changes
-4. Run tests and ensure they pass
-5. Create a pull request with a clear description
-
-### Code Style
-
-- Follow [Effective Dart](https://dart.dev/guides/language/effective-dart)
-- Use the workspace `analysis_options.yaml`
-- Run `dart format .` before committing
-- Ensure `flutter analyze` passes with no issues
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👤 Author
+## Author
 
 **Mayank Rai**
 - Portfolio: [Your Website]
 - GitHub: [@yourusername]
 - LinkedIn: [Your LinkedIn]
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Design inspiration from modern portfolio websites
 - Built with [Flutter](https://flutter.dev)
@@ -319,6 +280,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: August 2026  
+**Version**: 1.0.0
+**Last Updated**: August 2026
 **Flutter Version**: 3.47.0

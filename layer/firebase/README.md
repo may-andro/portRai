@@ -1,6 +1,7 @@
 # Firebase Module
 
-A comprehensive Firebase integration layer for Flutter applications, providing centralized access to all Firebase services with proper initialization and configuration.
+A comprehensive Firebase integration layer for Flutter applications, providing centralized access
+to all Firebase services with proper initialization and configuration.
 
 ## Features
 
@@ -10,35 +11,26 @@ A comprehensive Firebase integration layer for Flutter applications, providing c
 - **Dependency Injection**: Seamless integration with the module injector system
 - **Cross-Platform**: Support for Android, iOS, macOS, and Web platforms
 
-## Services
-
-This module provides access to the following Firebase services:
-
-| Service | Description |
-|---------|-------------|
-| **Firebase Core** | Core Firebase SDK initialization |
-| **Firebase Auth** | User authentication and management |
-| **Cloud Firestore** | NoSQL cloud database |
-| **Cloud Functions** | Serverless cloud functions |
-| **Firebase Analytics** | User behavior analytics and reporting |
-| **Firebase Crashlytics** | Crash reporting and analysis |
-| **Remote Config** | Feature flags and remote configuration |
-| **Firebase Storage** | Cloud file storage |
-| **App Check** | App attestation and security |
-
 ## Getting Started
 
 ### Installation
 
 This module is part of the workspace and can be imported directly:
 
+```yaml
+dependencies:
+  firebase:
+    path: layer/firebase
+```
+
 ```dart
 import 'package:firebase/firebase.dart';
 ```
 
-> **Note**: As a workspace module, `firebase` is automatically available to all other modules without manual dependency configuration.
+> **Note**: As a workspace module, `firebase` is automatically available to all other modules
+> without manual dependency configuration.
 
-### Configuration
+### Module Configuration
 
 1. **Add Firebase configuration files**:
    - **Android**: `android/app/google-services.json`
@@ -49,23 +41,40 @@ import 'package:firebase/firebase.dart';
 2. **Initialize Firebase** in your app's main entry point:
 
 ```dart
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase/firebase.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Configure Firebase module (registers all services with DI)
   final configurator = FirebaseModuleConfigurator();
   await configurator.configure();
-  
+
   runApp(MyApp());
 }
+```
+
+The Firebase module automatically configures all Firebase services for dependency injection:
+
+```dart
+import 'package:firebase/firebase.dart';
+import 'package:module_injector/module_injector.dart';
+
+// In your app initialization
+final configurator = FirebaseModuleConfigurator();
+await configurator.configure();
+
+// All services are now available via service locator
+final auth = serviceLocator<FirebaseAuth>();
+final firestore = serviceLocator<FirebaseFirestore>();
+final analytics = serviceLocator<FirebaseAnalytics>();
+// ... etc
 ```
 
 ## Usage
@@ -78,18 +87,18 @@ import 'package:module_injector/module_injector.dart';
 
 class AuthService {
   final FirebaseAuth _auth = serviceLocator<FirebaseAuth>();
-  
+
   Future<UserCredential> signIn(String email, String password) async {
     return await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
   }
-  
+
   Future<void> signOut() async {
     await _auth.signOut();
   }
-  
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 }
 ```
@@ -102,28 +111,21 @@ import 'package:module_injector/module_injector.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = serviceLocator<FirebaseFirestore>();
-  
+
   Future<List<Project>> getProjects() async {
     final snapshot = await _firestore.collection('projects').get();
-    return snapshot.docs
-        .map((doc) => Project.fromJson(doc.data()))
-        .toList();
+    return snapshot.docs.map((doc) => Project.fromJson(doc.data())).toList();
   }
-  
+
   Future<void> addProject(Project project) async {
-    await _firestore
-        .collection('projects')
-        .doc(project.id)
-        .set(project.toJson());
+    await _firestore.collection('projects').doc(project.id).set(project.toJson());
   }
-  
+
   Stream<List<Project>> projectsStream() {
-    return _firestore
-        .collection('projects')
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Project.fromJson(doc.data()))
-            .toList());
+    return _firestore.collection('projects').snapshots().map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Project.fromJson(doc.data())).toList(),
+        );
   }
 }
 ```
@@ -136,14 +138,14 @@ import 'package:module_injector/module_injector.dart';
 
 class AnalyticsService {
   final FirebaseAnalytics _analytics = serviceLocator<FirebaseAnalytics>();
-  
+
   Future<void> logEvent(String name, Map<String, dynamic> parameters) async {
     await _analytics.logEvent(
       name: name,
       parameters: parameters,
     );
   }
-  
+
   Future<void> setUserProperty(String name, String value) async {
     await _analytics.setUserProperty(
       name: name,
@@ -161,7 +163,7 @@ import 'package:module_injector/module_injector.dart';
 
 class CrashlyticsService {
   final FirebaseCrashlytics _crashlytics = serviceLocator<FirebaseCrashlytics>();
-  
+
   Future<void> recordError(
     dynamic exception,
     StackTrace? stack, {
@@ -175,11 +177,11 @@ class CrashlyticsService {
       fatal: fatal,
     );
   }
-  
+
   Future<void> setUserIdentifier(String userId) async {
     await _crashlytics.setUserIdentifier(userId);
   }
-  
+
   Future<void> log(String message) async {
     await _crashlytics.log(message);
   }
@@ -194,16 +196,18 @@ import 'package:module_injector/module_injector.dart';
 
 class RemoteConfigService {
   final FirebaseRemoteConfig _remoteConfig = serviceLocator<FirebaseRemoteConfig>();
-  
+
   Future<void> initialize() async {
-    await _remoteConfig.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: const Duration(minutes: 1),
-      minimumFetchInterval: const Duration(hours: 1),
-    ));
-    
+    await _remoteConfig.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: const Duration(hours: 1),
+      ),
+    );
+
     await _remoteConfig.fetchAndActivate();
   }
-  
+
   bool getBool(String key) => _remoteConfig.getBool(key);
   int getInt(String key) => _remoteConfig.getInt(key);
   String getString(String key) => _remoteConfig.getString(key);
@@ -218,13 +222,13 @@ import 'package:module_injector/module_injector.dart';
 
 class StorageService {
   final FirebaseStorage _storage = serviceLocator<FirebaseStorage>();
-  
+
   Future<String> uploadFile(File file, String path) async {
     final ref = _storage.ref().child(path);
     await ref.putFile(file);
     return await ref.getDownloadURL();
   }
-  
+
   Future<void> deleteFile(String path) async {
     await _storage.ref().child(path).delete();
   }
@@ -245,49 +249,21 @@ Future<void> initializeAppCheck() async {
 }
 ```
 
-## Module Configuration
+## Services
 
-The Firebase module automatically configures all Firebase services for dependency injection:
+This module provides access to the following Firebase services:
 
-```dart
-import 'package:firebase/firebase.dart';
-import 'package:module_injector/module_injector.dart';
-
-// In your app initialization
-final configurator = FirebaseModuleConfigurator();
-await configurator.configure();
-
-// All services are now available via service locator
-final auth = serviceLocator<FirebaseAuth>();
-final firestore = serviceLocator<FirebaseFirestore>();
-final analytics = serviceLocator<FirebaseAnalytics>();
-// ... etc
-```
-
-## Platform Support
-
-| Platform | Supported |
-|----------|-----------|
-| Android  | ✅ |
-| iOS      | ✅ |
-| macOS    | ✅ |
-| Web      | ✅ |
-
-## Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `firebase_core` | Core Firebase SDK |
-| `firebase_auth` | Authentication |
-| `cloud_firestore` | NoSQL database |
-| `cloud_functions` | Cloud functions |
-| `firebase_analytics` | Analytics |
-| `firebase_crashlytics` | Crash reporting |
-| `firebase_remote_config` | Remote configuration |
-| `firebase_storage` | File storage |
-| `firebase_app_check` | App security |
-| `module_injector` | Dependency injection |
-| `core` | Core utilities |
+| Service | Description |
+|---------|-------------|
+| **Firebase Core** | Core Firebase SDK initialization |
+| **Firebase Auth** | User authentication and management |
+| **Cloud Firestore** | NoSQL cloud database |
+| **Cloud Functions** | Serverless cloud functions |
+| **Firebase Analytics** | User behavior analytics and reporting |
+| **Firebase Crashlytics** | Crash reporting and analysis |
+| **Remote Config** | Feature flags and remote configuration |
+| **Firebase Storage** | Cloud file storage |
+| **App Check** | App attestation and security |
 
 ## Best Practices
 
@@ -306,6 +282,31 @@ final analytics = serviceLocator<FirebaseAnalytics>();
 - Enable App Check for production apps
 - Regularly rotate authentication tokens and API keys
 
+## Platform Support
+
+| Platform | Supported |
+|----------|-----------|
+| Android  | Yes |
+| iOS      | Yes |
+| macOS    | Yes |
+| Web      | Yes |
+
+## Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `firebase_core` | Core Firebase SDK |
+| `firebase_auth` | Authentication |
+| `cloud_firestore` | NoSQL database |
+| `cloud_functions` | Cloud functions |
+| `firebase_analytics` | Analytics |
+| `firebase_crashlytics` | Crash reporting |
+| `firebase_remote_config` | Remote configuration |
+| `firebase_storage` | File storage |
+| `firebase_app_check` | App security |
+| `module_injector` | Dependency injection |
+| `core` | Core utilities |
+
 ## Testing
 
 ```bash
@@ -320,7 +321,5 @@ import 'package:mocktail/mocktail.dart';
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 ```
-
----
 
 Part of the Port-Rai modular architecture.

@@ -1,6 +1,6 @@
 # Log Reporter
 
-A comprehensive logging solution for Flutter applications that provides a unified logging interface with automatic configuration through dependency injection.
+A comprehensive logging solution for Flutter applications that provides a unified logging interface with automatic configuration through dependency injection. It centralizes debug and error reporting across the workspace.
 
 ## Features
 
@@ -15,7 +15,14 @@ A comprehensive logging solution for Flutter applications that provides a unifie
 
 ### Installation
 
-This module is part of the workspace and can be imported directly:
+This module is part of the workspace and can be added as a workspace dependency:
+
+```yaml
+dependencies:
+  log_reporter: any
+```
+
+Then import it where needed:
 
 ```dart
 import 'package:log_reporter/log_reporter.dart';
@@ -133,8 +140,6 @@ abstract class LogReporter {
 - `error`: Optional error object associated with the log entry
 - `stacktrace`: Optional stack trace for debugging (recommended for error logs)
 
-## Key Concepts
-
 ### Automatic Configuration
 
 The module automatically configures logging to multiple destinations through the module configurator. You don't need to manually set up individual loggers - just inject the `LogReporter` and use it.
@@ -142,12 +147,14 @@ The module automatically configures logging to multiple destinations through the
 ### Message Formatting
 
 All log messages are automatically formatted with tags when provided:
+
 - Debug messages: `[tag] message`
 - Error messages: `[tag] message` with error details
 
 ### Tag Hierarchies
 
 Use dot notation for hierarchical tags to organize logs by service and operation:
+
 ```dart
 'ServiceName.operationName'
 'UserService.fetchProfile'
@@ -155,14 +162,40 @@ Use dot notation for hierarchical tags to organize logs by service and operation
 'PaymentService.validate'
 ```
 
+## Best Practices
+
+1. **Use Descriptive Tags**:
+   - Use hierarchical naming (e.g., 'NetworkService.fetchUserProfile')
+   - Avoid generic tags like 'Error' or 'Debug'
+   - Be consistent with tag naming conventions across your app
+
+2. **Include Relevant Context**:
+   - Add user IDs, request IDs, or other contextual information in messages
+   - Include relevant data that helps with debugging
+   - Balance verbosity with usefulness
+
+3. **Handle Error Information**:
+   - Always include stack traces for error logs
+   - Pass error objects when available for detailed error tracking
+   - Use appropriate log levels (debug vs error)
+
+4. **Structure Your Logging**:
+   - Log at service boundaries (start/end of operations)
+   - Log important state changes
+   - Log all error conditions with sufficient context
+
+## Contributing
+
+This module follows the workspace development patterns. Ensure all changes include appropriate tests and maintain backward compatibility.
+
 ## Platform Support
 
 | Platform | LogReporter |
 |----------|-------------|
-| Android  | ✅          |
-| iOS      | ✅          |
-| macOS    | ✅          |
-| Web      | ✅          |
+| Android  | Yes          |
+| iOS      | Yes          |
+| macOS    | Yes          |
+| Web      | Yes          |
 
 ## Dependencies
 
@@ -192,36 +225,10 @@ void main() {
   test('should log user operations', () {
     final mockLogger = MockLogReporter();
     final userService = UserService(mockLogger);
-    
+
     userService.loginUser('123');
-    
+
     verify(mockLogger.debug('User login started for ID: 123', tag: 'UserService')).called(1);
   });
 }
 ```
-
-## Best Practices
-
-1. **Use Descriptive Tags**:
-   - Use hierarchical naming (e.g., 'NetworkService.fetchUserProfile')
-   - Avoid generic tags like 'Error' or 'Debug'
-   - Be consistent with tag naming conventions across your app
-
-2. **Include Relevant Context**:
-   - Add user IDs, request IDs, or other contextual information in messages
-   - Include relevant data that helps with debugging
-   - Balance verbosity with usefulness
-
-3. **Handle Error Information**:
-   - Always include stack traces for error logs
-   - Pass error objects when available for detailed error tracking
-   - Use appropriate log levels (debug vs error)
-
-4. **Structure Your Logging**:
-   - Log at service boundaries (start/end of operations)
-   - Log important state changes
-   - Log all error conditions with sufficient context
-
-## Contributing
-
-This module follows the workspace development patterns. Ensure all changes include appropriate tests and maintain backward compatibility.

@@ -9,7 +9,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:portrai/src/app/portrai_app.dart';
 import 'package:portrai/src/app/splash_app.dart';
-import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/module_configurator/module_configurators.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';

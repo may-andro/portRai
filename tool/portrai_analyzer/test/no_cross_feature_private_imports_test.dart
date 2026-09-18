@@ -5,6 +5,7 @@ import 'package:test_reflective_loader/test_reflective_loader.dart';
 void main() {
   defineReflectiveSuite(() {
     defineReflectiveTests(NoCrossFeaturePrivateImportsTest);
+    defineReflectiveTests(NoCrossFeaturePrivateImportsDifferentRootTest);
   });
 }
 
@@ -90,5 +91,55 @@ import 'package:test/src/utility/_utility.dart';
 
 Utility? f() => null;
 ''');
+  }
+
+}
+
+// Regression test for a real bug: a file mirroring the same feature under a
+// differently-named root (e.g. `test/mock/feature/<name>/...` or
+// `test/src/feature/<name>/...` mirroring `lib/src/feature/<name>/...`, per
+// `flutter-testing-conventions`) was previously always flagged as a
+// cross-feature import, even though it belongs to the same feature. This is
+// because the old `_featureRootOf` compared the *entire* path prefix (which
+// legitimately differs between e.g. `src/feature/...` and
+// `mock/feature/...`) instead of just the feature name segment.
+@reflectiveTest
+class NoCrossFeaturePrivateImportsDifferentRootTest extends AnalysisRuleTest {
+  @override
+  String get testFileName =>
+      'mock/feature/feature_flag/mock_feature_flag_thing.dart';
+
+  @override
+  void setUp() {
+    rule = NoCrossFeaturePrivateImports();
+    super.setUp();
+
+    newFile(
+      '$testPackageLibPath/src/feature/feature_flag/domain/_domain.dart',
+      'class FeatureFlagEntity {}',
+    );
+    newFile(
+      '$testPackageLibPath/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart',
+      'class ExperienceBloc {}',
+    );
+  }
+
+  Future<void> test_sameFeatureDifferentRootPrivateImport_noLint() async {
+    await assertNoDiagnostics(r'''
+import 'package:test/src/feature/feature_flag/domain/_domain.dart';
+
+FeatureFlagEntity? f() => null;
+''');
+  }
+
+  Future<void> test_crossFeatureDifferentRootPrivateImport() async {
+    await assertDiagnostics(
+      r'''
+import 'package:test/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
+
+ExperienceBloc? f() => null;
+''',
+      [lint(0, 92)],
+    );
   }
 }
