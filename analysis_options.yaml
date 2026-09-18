@@ -1,5 +1,9 @@
 include: package:lint/analysis_options.yaml
 
+plugins:
+  portrai_analyzer:
+    path: tool/portrai_analyzer
+
 linter:
   rules:
     prefer_single_quotes: true

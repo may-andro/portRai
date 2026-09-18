@@ -2,7 +2,7 @@
 
 A modular Flutter portfolio application built with clean architecture principles, featuring a comprehensive design system with 12 themes and organized into discrete, testable layers.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Architecture](#architecture)
@@ -305,11 +305,18 @@ port-rai/
 
 ## Contributing
 
+Detailed, actively-maintained conventions (branch naming, PR titles/descriptions, architecture,
+testing, README structure, and module scaffolding) live as agent skills under
+[`.github/skills/`](.github/skills/) — see
+[`pr-and-branch-conventions`](.github/skills/pr-and-branch-conventions/SKILL.md) for the full
+branch/PR rules. Summary below.
+
 ### Development Workflow
 
-1. **Create a feature branch**:
+1. **Create a branch off `develop`**, named `<type>/<kebab-case-description>` (`feature/`,
+   `app/`, `fix/`, `chore/`, or `docs/`):
    ```bash
-   git checkout -b feature/my-feature
+   git checkout -b feature/my-feature develop
    ```
 
 2. **Make changes in appropriate layer(s)**
@@ -337,7 +344,10 @@ port-rai/
    git push origin feature/my-feature
    ```
 
-7. **Create Pull Request** following the [PR template](.github/pull_request_template.md)
+7. **Create a Pull Request** against `develop` with a Conventional Commits title (e.g.
+   `feat(layer): add my feature`) and a `Summary`/`Changes`/`Testing`/`Validation` description —
+   see the [PR template](.github/pull_request_template.md) and the
+   [pr-and-branch-conventions skill](.github/skills/pr-and-branch-conventions/SKILL.md).
 
 ### Code Style
 
@@ -372,7 +382,11 @@ port-rai/
 
 4. Run `melos bootstrap`
 
-5. Create comprehensive README following the layer README pattern
+5. Create comprehensive README following the layer README pattern (see the
+   [readme-conventions skill](.github/skills/readme-conventions/SKILL.md))
+
+For the full app-feature scaffolding steps (as opposed to a shared layer), see the
+[creating-new-modules skill](.github/skills/creating-new-modules/SKILL.md).
 
 ## License
 

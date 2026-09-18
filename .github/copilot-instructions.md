@@ -1,188 +1,107 @@
 # GitHub Copilot Instructions
 
+This repo's detailed conventions live in per-topic skills under `.github/skills/`, which are
+loaded automatically when relevant. Treat the summary below as always-on ground rules; consult
+the linked skill for full detail (code examples, rationale, edge cases) before acting in that
+area.
+
 ## Architecture Conventions
+See [`.github/skills/flutter-architecture-conventions/SKILL.md`](skills/flutter-architecture-conventions/SKILL.md).
 
-### Use cases
-Every domain use case must extend `BaseUseCase`/`BaseNoParamUseCase` (from the `use_case` package) with a sealed `Failure` hierarchy returning `Either`. Never write a plain class with a bare `call()` method - this loses automatic logging/interceptor support and error-mapping consistency.
-
-```dart
-// ✅ Correct
-sealed class GetFooFailure extends BasicFailure {
-  const GetFooFailure({super.cause});
-}
-
-@register
-class GetFooUseCase extends BaseNoParamUseCase<Foo, GetFooFailure> {
-  @protected
-  @override
-  FutureOr<Either<GetFooFailure, Foo>> execute() async { ... }
-
-  @protected
-  @override
-  GetFooFailure mapErrorToFailure(Object e, StackTrace st) => ...;
-}
-
-// ❌ Wrong
-class GetFooUseCase {
-  FutureOr<Foo> call() async { ... }
-}
-```
-
-### Don't duplicate logging
-The globally registered `LogUseCaseInterceptor` already logs every use case's params, success, and error automatically. Don't add manual `LogReporter.error`/`.debug` calls in blocs or presentation code just to report a use case failure/success - it's already logged.
-
-### Widgets dispatch bloc events, not service locator calls
-Presentation widgets must not resolve use cases from `appServiceLocator` directly to perform actions (e.g. button clicks). Dispatch a bloc event instead and let the bloc own and call the use case(s).
-
-```dart
-// ✅ Correct
-onPressed: () => context.bloc.add(const UpdateNowClickEvent()),
-
-// ❌ Wrong
-onPressed: () async {
-  final result = await appServiceLocator.get<SomeUseCase>()();
-  ...
-},
-```
-
-### Bloc event naming
-UI interaction events are named `<Action>ClickEvent` (e.g. `HeaderTabClickEvent`, `DrawerClickEvent`), not `<Action>PressedEvent` or other variants.
-
-### Bloc folder shortcut extension
-Every feature's `bloc/` folder includes a `bloc_extension.dart` defining a `BuildContext` shortcut, exported from that folder's `_bloc.dart` barrel:
-
-```dart
-extension ContextExtension on BuildContext {
-  XBloc get bloc => read<XBloc>();
-
-  XState get state => bloc.state;
-}
-```
-
-Use `context.bloc`/`context.state` in widgets instead of `context.read<XBloc>()`/`context.watch<XBloc>().state`.
-
-### Feature folder structure
-Each feature under `lib/src/feature/<feature>/` follows `data/`, `domain/`, `presentation/`. Inside `presentation/`, screens are nested under `screen/<screen_name>/`, not directly under `presentation/`:
-
-```
-presentation/
-  _presentation.dart          // exports 'route/_route.dart' + 'screen/_screen.dart'
-  route/
-    _route.dart
-    <feature>_module_route.dart
-  screen/
-    _screen.dart               // exports '<screen_name>/_<screen_name>.dart' for each screen
-    <screen_name>/
-      _<screen_name>.dart      // exports bloc/_bloc.dart (or bloc file), <screen_name>_screen.dart, tracking/_tracking.dart
-      <screen_name>_screen.dart
-      bloc/
-      tracking/
-      widget/
-```
-
-Only skip the `screen/` nesting for features with no real screen (e.g. a bottom sheet or other non-screen widget, like `force_update`). A feature with a `*_screen.dart`/`Screen` widget must use `screen/<screen_name>/`.
-
-`test/src/feature/<feature>/...` and `test/mock/feature/<feature>/...` must mirror this exact `lib/src/` path, including the `screen/<screen_name>/` segment.
-
-### Widget file splitting with `part`
-When a screen's `content_widget.dart` has sub-widgets used *only* by that content tree (not shared/exported elsewhere), split them into `part` files rather than separate imported libraries:
-
-```dart
-// content_widget.dart
-part 'section_widget.dart';
-part 'desktop_content_widget.dart';
-
-class ContentWidget extends StatelessWidget { ... }
-```
-
-```dart
-// section_widget.dart
-part of 'content_widget.dart';
-
-class _SectionWidget extends StatelessWidget { ... }
-```
-
-Classes and file names in these `part` files must **not** be prefixed with the feature/module name (e.g. `_SectionWidget`, not `_ProfileSectionWidget`) - the prefix is reserved for public, externally-referenced classes. Widgets used outside the content tree (e.g. a screen's header widget) stay as normal separate files, not `part`s.
+- Use cases extend `BaseUseCase`/`BaseNoParamUseCase` with a sealed `Failure` hierarchy and `Either` — never a plain class with a bare `call()`.
+- Don't manually log use case success/failure — `LogUseCaseInterceptor` already does it.
+- Widgets dispatch bloc events, never call `appServiceLocator` use cases directly.
+- Bloc UI events are named `<Action>ClickEvent`.
+- Every `bloc/` folder has a `bloc_extension.dart` with `context.bloc`/`context.state`.
+- Features follow `lib/src/feature/<feature>/{data,domain,presentation}`, with screens under `presentation/screen/<screen_name>/`.
+- Content-only sub-widgets are split into `part` files, unprefixed with the feature name.
 
 ## Testing Conventions
+See [`.github/skills/flutter-testing-conventions/SKILL.md`](skills/flutter-testing-conventions/SKILL.md).
 
-### Test naming
-All test names **must** follow the `should ... when ...` pattern:
+- Test names follow `should ... when ...`.
+- Mocks live one-per-file under `test/mock/`, mirroring `lib/src/`, with stubbing helpers as extensions.
+- Widget tests needing localizations/design-system context use `TestWidgetWrapper`.
+- Never construct a `Bloc` inside `setUp()` in widget tests — build it inside each `testWidgets` body.
 
-```dart
-// ✅ Correct
-test('should log debug message when onChange is called', () { ... });
-test('should call onError when use case throws', () { ... });
+## Branch & PR Conventions
+See [`.github/skills/pr-and-branch-conventions/SKILL.md`](skills/pr-and-branch-conventions/SKILL.md).
 
-// ❌ Wrong
-test('logs debug message', () { ... });
-test('onChange delegates to logReporter', () { ... });
-```
+- Branch off `develop`; name branches `<type>/<kebab-case>` (`app/`, `feature/`, `fix/`, `chore/`, `docs/`).
+- PR titles use Conventional Commits: `<type>(<optional-scope>): <description>`, e.g. `feat(app): add portfolio dashboard`.
+- PR descriptions use `## Summary` / `## Changes` / `## Testing` / `## Validation`, not the checkbox template, unless asked otherwise.
 
-### Shared mocks
-Each mock class lives in its own file under `test/mock/`, named `mock_<class>.dart`. Never define local `_MockX` classes inside individual test files.
+## Creating New Modules
+See [`.github/skills/creating-new-modules/SKILL.md`](skills/creating-new-modules/SKILL.md).
 
-Mirror the `lib/src/` folder structure inside `test/mock/` so the folder doesn't become a huge flat dump as the app grows:
+- New shared, reusable concerns → `layer/<name>` package (own `pubspec.yaml`, added to root workspace).
+- New product functionality → app feature under `app/portrai/lib/src/feature/<name>` (not a separate package).
+- Both wire a `ModuleConfigurator` (often via `@generateConfigurator`) into `module_configurators.dart`; screens register routes via a `ModuleRoute`.
 
-```
-lib/src/feature/force_update/domain/use_case/get_app_store_url_use_case.dart
-test/mock/feature/force_update/domain/use_case/mock_get_app_store_url_use_case.dart
+## README Conventions
+See [`.github/skills/readme-conventions/SKILL.md`](skills/readme-conventions/SKILL.md).
 
-lib/src/feature/force_update/domain/repository/app_version_repository.dart
-test/mock/feature/force_update/domain/repository/mock_app_version_repository.dart
+- Plain headings, no emoji, single Title Case H1 — most existing layer READMEs already follow this; `feature_flag`/root/`app/portrai` are outliers, don't copy their emoji style for new docs.
+- Layer READMEs: `Features → Getting Started → Usage → API Reference/Key Concepts → Platform Support → Dependencies → Testing`.
+- App READMEs: `Features → Getting Started → Architecture → Development → Configuration → Deployment → Contributing`, linking to the root README instead of duplicating it.
 
-lib/src/utility/log_use_case_interceptor.dart (consumer)
-test/mock/utility/mock_log_reporter.dart
-```
+## Import Boundaries
+See [`.github/skills/import-boundary-conventions/SKILL.md`](skills/import-boundary-conventions/SKILL.md).
 
-Import only the mock files you need:
-```dart
-import '../../../../../mock/feature/force_update/domain/use_case/mock_get_app_store_url_use_case.dart';
-```
+- Never import another package's `lib/src/**` — only its public top-level barrel.
+- Never import another app feature's private underscore-prefixed barrel files (`_bloc.dart`, etc.) — only its public feature barrel.
+- Enforced by the `portrai_analyzer` plugin rules, wired into root `analysis_options.yaml` via `plugins:` (flags violations as `info`-level, non-blocking).
 
-Co-locate reusable stubbing helpers with the mock, as an extension on it, so every test stubs the same way instead of repeating raw `when(...)` calls:
+## CI Workflows
+See [`.github/skills/ci-workflow-conventions/SKILL.md`](skills/ci-workflow-conventions/SKILL.md).
 
-```dart
-class MockGetAppStoreUrlUseCase extends Mock implements GetAppStoreUrlUseCase {}
+- One `.github/workflows/<name>.yaml` per layer/app, triggered on PRs touching that path, using the shared `setup-flutter-module` + `flutter-quality-checks` composite actions.
+- Release pipelines are tag-triggered and chain `extract-version → quality → build-<platform> → deploy-<platform>` via reusable `_build_*`/`_deploy_*` workflows.
 
-extension MockGetAppStoreUrlUseCaseStub on MockGetAppStoreUrlUseCase {
-  /// Stubs `call()` to return [result].
-  void stubCall(Either<GetAppStoreUrlFailure, Uri> result) {
-    when(() => this()).thenAnswer((_) => result);
-  }
-}
-```
+## Dependency Injection Annotations
+See [`.github/skills/module-injector-annotation-conventions/SKILL.md`](skills/module-injector-annotation-conventions/SKILL.md).
 
-`Fake` classes needed only to `registerFallbackValue` for `any()` matching also belong in `test/mock/` (e.g. `fake_open_external_url_param.dart`), not inline in the test file.
+- `@register`/`@registerSingleton` for factory/singleton registration; `@Register(as:)`/`@RegisterSingleton(as:)` to bind a concrete class to an abstract type.
+- `@Inject(ConcreteType)` on a constructor param resolves a specific concrete type instead of the abstract default — required for repository delegation chains.
+- `@generateConfigurator` on a `SimpleModuleConfigurator` subclass generates `$register<Module>Dependencies` from every `@register`/`@registerSingleton` class in that directory.
 
-### Widget tests: shared wrapper
-Use `test/util/test_wrapper_widget.dart`'s `TestWidgetWrapper` to pump any widget that relies on `context.localizations` or the design system's `context.colorPalette`/`context.typography`. It wraps the child in a `MaterialApp` with the app's localization delegates plus `DSThemeBuilderWidget`:
+## Feature Flags
+See [`.github/skills/feature-flag-conventions/SKILL.md`](skills/feature-flag-conventions/SKILL.md).
 
-```dart
-await tester.pumpWidget(
-  TestWidgetWrapper(
-    child: BlocProvider.value(value: bloc, child: const MyWidget()),
-  ),
-);
-```
+- Each feature declares its own `<Feature>FeatureFlags` holder of `AppFeatureFlagDefinition`s (key `feature_<name>`, plus `displayName`/`description`).
+- Register them with `AppFeatureFlagDefinitionRegistry` from the feature's `postDependenciesSetup`, not by calling the layer's `FeatureFlagController` directly.
 
-### Widget tests: never build a `Bloc` inside `setUp()`
-Construct the `Bloc` (and its mocked use cases) **inside each `testWidgets` body**, not in `setUp()`. `setUp()` runs outside the `FakeAsync` zone that wraps an individual `testWidgets` body; a `Bloc` built in `setUp()` captures the wrong zone at construction, so its internal event processing never synchronizes with the test's pumped clock. Symptom: `pumpAndSettle()` returns without the bloc's `on<Event>` handler ever resuming past its first `await`, so mocked use cases appear to never be called even though the tap/event was dispatched.
+## Tracking Events
+See [`.github/skills/tracking-event-conventions/SKILL.md`](skills/tracking-event-conventions/SKILL.md).
 
-```dart
-// ✅ Correct - bloc created per test
-testWidgets('should open the store when tapped', (tester) async {
-  final getAppStoreUrlUseCase = MockGetAppStoreUrlUseCase();
-  final bloc = ForceUpdateBloc(getAppStoreUrlUseCase: getAppStoreUrlUseCase, ...);
-  addTearDown(bloc.close);
-  ...
-});
+- Each screen owns one `@register`ed `<Screen>TrackingDelegate extends ScreenTrackingDelegate`, injected into its bloc.
+- Widgets/blocs never call `EventTracker`/`TrackingReporter` directly — only through the screen's delegate methods.
 
-// ❌ Wrong - bloc created in setUp(), tap silently never completes the handler
-setUp(() {
-  bloc = ForceUpdateBloc(...);
-});
-```
+## Error & Exception Handling
+See [`.github/skills/error-handling-conventions/SKILL.md`](skills/error-handling-conventions/SKILL.md).
 
-If several tests in a `group` need the same bloc, factor construction into a local helper function called from inside each `testWidgets` body - not a `setUp()` callback.
+- Domain failures extend `BasicFailure`; annotate user-facing ones with `@Localizable('<arbKey>')` and render via the generated `FailureTranslator.translate`.
+- `error_reporter`'s `BlacklistErrorHandler`/`FatalErrorHandler` are for reported/global errors, not domain `Failure`s.
 
+## Golden Tests
+See [`.github/skills/golden-test-conventions/SKILL.md`](skills/golden-test-conventions/SKILL.md).
+
+- `design_system` widget tests use `groupGoldenForBrightnessAndDS` from `test/util/alchemist_utils.dart`, covering every design system × brightness.
+- CI skips golden pixel comparison outside macOS; don't add golden tests to app features.
+
+## Localization
+See [`.github/skills/localization-conventions/SKILL.md`](skills/localization-conventions/SKILL.md).
+
+- User-facing strings go in ARB files (`app/portrai/lib/l10n/arb/app_{en,es,nl}.arb`) with a `@key` description block, accessed via `context.localizations`.
+- Never hand-edit generated `app_localizations*.dart`/`FailureTranslator` files.
+
+## Release & Versioning
+See [`.github/skills/release-versioning-conventions/SKILL.md`](skills/release-versioning-conventions/SKILL.md).
+
+- Releases are triggered by pushing a `<version>+<build>-<suffix>` tag (`-review`, `-prod`, `-review-storybook`, `-prod-storybook`) or `legal-<version>`.
+- Keep the tag's version/build in sync with the matching `pubspec.yaml` `version:` field before tagging.
+
+## Adding new conventions
+When you notice a repeated pattern or correction, add it to the relevant skill file (or create a
+new skill under `.github/skills/<topic>/SKILL.md`) and add a one-line summary + link here, rather
+than growing this file into a monolith.

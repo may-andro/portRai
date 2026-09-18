@@ -1,6 +1,8 @@
-# Tracking Module
+# Tracking
 
-A comprehensive analytics and event tracking solution for Flutter applications with automatic screen tracking, custom event logging, and Firebase Analytics integration.
+A comprehensive analytics and event tracking solution for Flutter applications
+with automatic screen tracking, custom event logging, and Firebase Analytics
+integration.
 
 ## Features
 
@@ -8,7 +10,8 @@ A comprehensive analytics and event tracking solution for Flutter applications w
 - **Custom Event Tracking**: Flexible event tracking with custom parameters
 - **Firebase Analytics Integration**: Built-in Firebase Analytics support
 - **Type-Safe Events**: JSON-serializable event models for consistent tracking
-- **Dependency Injection**: Seamless integration with the module injection system
+- **Dependency Injection**: Seamless integration with the module injection
+  system
 - **Automatic Tracking**: Widget-based automatic screen tracking
 - **Cross-Platform**: Works on Android, iOS, macOS, and Web platforms
 
@@ -18,13 +21,17 @@ A comprehensive analytics and event tracking solution for Flutter applications w
 
 This module is part of the workspace and can be imported directly:
 
+```yaml
+dependencies:
+  tracking: any
+```
+
 ```dart
 import 'package:tracking/tracking.dart';
 ```
 
-> **Note**: As a workspace module, `tracking` is automatically available to all other modules without manual dependency configuration.
-
-## Usage
+> **Note**: As a workspace module, `tracking` is automatically available to all
+> other modules without manual dependency configuration.
 
 ### Module Configuration
 
@@ -37,6 +44,8 @@ import 'package:tracking/tracking.dart';
 final configurator = TrackingModuleConfigurator();
 ```
 
+## Usage
+
 ### Basic Event Tracking
 
 ```dart
@@ -45,11 +54,11 @@ import 'package:module_injector/module_injector.dart';
 
 class UserService {
   final EventTracker _tracker = serviceLocator<EventTracker>();
-  
+
   Future<void> login(String userId) async {
     // Perform login
     await performLogin(userId);
-    
+
     // Track login event
     await _tracker.track(
       LoginEvent(
@@ -59,11 +68,11 @@ class UserService {
       ),
     );
   }
-  
+
   Future<void> purchaseItem(String itemId, double price) async {
     // Process purchase
     await processPurchase(itemId);
-    
+
     // Track purchase event
     await _tracker.track(
       PurchaseEvent(
@@ -102,7 +111,8 @@ class ProfileScreen extends StatelessWidget {
 }
 ```
 
-The `ScreenTrackerWidget` uses `VisibilityDetector` to automatically track when the screen becomes visible and logs the screen view event.
+The `ScreenTrackerWidget` uses `VisibilityDetector` to automatically track when
+the screen becomes visible and logs the screen view event.
 
 ### Custom Events
 
@@ -127,7 +137,7 @@ class ButtonTapEvent {
 
   factory ButtonTapEvent.fromJson(Map<String, dynamic> json) =>
       _$ButtonTapEventFromJson(json);
-  
+
   Map<String, dynamic> toJson() => _$ButtonTapEventToJson(this);
 }
 
@@ -145,7 +155,7 @@ class SearchEvent {
 
   factory SearchEvent.fromJson(Map<String, dynamic> json) =>
       _$SearchEventFromJson(json);
-  
+
   Map<String, dynamic> toJson() => _$SearchEventToJson(this);
 }
 ```
@@ -181,7 +191,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 
 class AnalyticsService {
   final FirebaseAnalytics _analytics = serviceLocator<FirebaseAnalytics>();
-  
+
   Future<void> setUserProperties({
     required String userId,
     required String userType,
@@ -202,7 +212,7 @@ class AnalyticsService {
 }
 ```
 
-## Key Components
+## API Reference
 
 ### EventTracker
 
@@ -212,7 +222,7 @@ Abstract interface for event tracking:
 abstract class EventTracker {
   /// Track a custom event
   Future<void> track(dynamic event);
-  
+
   /// Track a screen view
   Future<void> trackScreen(String screenName, {Map<String, dynamic>? params});
 }
@@ -331,24 +341,6 @@ await _tracker.track(PurchaseEvent(
 ));
 ```
 
-## Platform Support
-
-| Platform | Event Tracking | Screen Tracking | Firebase Analytics |
-|----------|----------------|-----------------|-------------------|
-| Android  | ✅             | ✅              | ✅                |
-| iOS      | ✅             | ✅              | ✅                |
-| macOS    | ✅             | ✅              | ✅                |
-| Web      | ✅             | ✅              | ✅                |
-
-## Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `firebase` | Firebase Analytics integration |
-| `visibility_detector` | Automatic screen view tracking |
-| `json_annotation` | JSON serialization for events |
-| `module_injector` | Dependency injection |
-
 ## Best Practices
 
 1. **Event Naming**:
@@ -381,6 +373,57 @@ await _tracker.track(PurchaseEvent(
    - Avoid tracking in performance-critical code paths
    - Use `VisibilityDetector` for automatic tracking to reduce manual calls
 
+## Debugging
+
+### Firebase Analytics DebugView
+
+Enable debug mode to see events in real-time:
+
+**Android:**
+
+```bash
+adb shell setprop debug.firebase.analytics.app <package_name>
+```
+
+**iOS:**
+
+```bash
+# Add to Xcode scheme: -FIRAnalyticsDebugEnabled
+```
+
+**Web:**
+
+```dart
+// Enable analytics debug mode in main.dart
+FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+```
+
+### Logging Events
+
+All tracked events are automatically logged in debug mode for verification.
+
+## Platform Support
+
+| Platform | Event Tracking | Screen Tracking | Firebase Analytics |
+|----------|----------------|-----------------|-------------------|
+| Android  | Yes            | Yes             | Yes               |
+| iOS      | Yes            | Yes             | Yes               |
+| macOS    | Yes            | Yes             | Yes               |
+| Web      | Yes            | Yes             | Yes               |
+
+---
+
+Part of the Port-Rai modular architecture.
+
+## Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `firebase` | Firebase Analytics integration |
+| `visibility_detector` | Automatic screen view tracking |
+| `json_annotation` | JSON serialization for events |
+| `module_injector` | Dependency injection |
+
 ## Testing
 
 ```bash
@@ -406,40 +449,10 @@ void main() {
 
   test('should track login event on successful login', () async {
     when(() => mockTracker.track(any())).thenAnswer((_) async => {});
-    
+
     await service.login('user123');
-    
+
     verify(() => mockTracker.track(any<LoginEvent>())).called(1);
   });
 }
 ```
-
-## Debugging
-
-### Firebase Analytics DebugView
-
-Enable debug mode to see events in real-time:
-
-**Android:**
-```bash
-adb shell setprop debug.firebase.analytics.app <package_name>
-```
-
-**iOS:**
-```bash
-# Add to Xcode scheme: -FIRAnalyticsDebugEnabled
-```
-
-**Web:**
-```dart
-// Enable analytics debug mode in main.dart
-FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
-```
-
-### Logging Events
-
-All tracked events are automatically logged in debug mode for verification.
-
----
-
-Part of the Port-Rai modular architecture.

@@ -1,6 +1,6 @@
-# Cache Module
+# Cache
 
-A comprehensive caching solution for Flutter applications that provides multiple caching strategies with automatic expiration management.
+A comprehensive caching solution for Flutter applications that provides multiple caching strategies with automatic expiration management. It helps consumers choose between in-memory, key-value, and database-backed caches based on persistence and query needs.
 
 ## Features
 
@@ -11,31 +11,32 @@ A comprehensive caching solution for Flutter applications that provides multiple
 - **Flexible Storage**: Choose the appropriate cache type based on your data persistence needs
 - **Serialization Support**: Automatic JSON serialization/deserialization for complex objects
 
-## Cache Types
-
-### 1. MemoryCache
-Fast in-memory caching for temporary data that doesn't need to persist across app restarts.
-
-**Best for**: Session data, computed values, frequently accessed temporary objects
-
-### 2. KeyValueCache
-Persistent key-value storage using SharedPreferences with automatic JSON serialization.
-
-**Best for**: User preferences, settings, small data objects, authentication tokens
-
-### 3. DBCache
-SQLite-based caching for complex data structures and bulk operations.
-
-**Best for**: Large datasets, complex queries, relational data, offline data storage
-
 ## Getting Started
 
 ### Installation
 
-This module is part of the workspace and can be imported directly:
+This module is part of the workspace and can be added as a workspace dependency:
+
+```yaml
+dependencies:
+  cache: any
+```
+
+Then import it where needed:
 
 ```dart
 import 'package:cache/cache.dart';
+```
+
+### Module Configuration
+
+The cache module automatically configures SharedPreferences dependency injection:
+
+```dart
+import 'package:cache/cache.dart';
+
+// Add to your module configurators
+final configurator = CacheModuleConfigurator();
 ```
 
 ## Usage
@@ -146,20 +147,30 @@ final users = await userCache.getAll();
 final user = await userCache.get(conditions: {'id': 1});
 ```
 
-### Module Configuration
+## Cache Types
 
-The cache module automatically configures SharedPreferences dependency injection:
+### 1. MemoryCache
 
-```dart
-import 'package:cache/cache.dart';
+Fast in-memory caching for temporary data that doesn't need to persist across app restarts.
 
-// Add to your module configurators
-final configurator = CacheModuleConfigurator();
-```
+**Best for**: Session data, computed values, frequently accessed temporary objects
+
+### 2. KeyValueCache
+
+Persistent key-value storage using SharedPreferences with automatic JSON serialization.
+
+**Best for**: User preferences, settings, small data objects, authentication tokens
+
+### 3. DBCache
+
+SQLite-based caching for complex data structures and bulk operations.
+
+**Best for**: Large datasets, complex queries, relational data, offline data storage
 
 ## Key Concepts
 
 ### Time-to-Live (TTL)
+
 All cache types support automatic expiration through the `timeToLive` property:
 
 ```dart
@@ -168,39 +179,16 @@ Duration get timeToLive => const Duration(minutes: 30);
 ```
 
 ### Expiration Handling
+
 - Expired data is automatically detected and removed when accessed
 - The `isExpired` property checks if cached data has exceeded its TTL
 - `lastCachedTimestamp` tracks when data was last stored
 
 ### Thread Safety
+
 - MemoryCache: Thread-safe for single-isolate usage
 - KeyValueCache: Thread-safe through the underlying adapter (SharedPreferences by default)
 - DBCache: Thread-safe through SQLite transactions
-
-## Platform Support
-
-| Platform | MemoryCache | KeyValueCache | DBCache |
-|----------|-------------|---------------|---------|
-| Android  | ✅          | ✅            | ✅      |
-| iOS      | ✅          | ✅            | ✅      |
-| macOS    | ✅          | ✅            | ✅      |
-| Web      | ✅          | ✅            | ✅      |
-
-## Dependencies
-
-- `shared_preferences`: Key-value persistent storage
-- `sqflite`: SQLite database for mobile platforms
-- `sqflite_common_ffi_web`: SQLite support for web platform
-- `module_injector`: Dependency injection framework
-- `core`: Core utilities and types
-
-## Testing
-
-The module includes comprehensive test coverage with mocked dependencies:
-
-```bash
-flutter test
-```
 
 ## Best Practices
 
@@ -225,3 +213,28 @@ flutter test
 ## Contributing
 
 This module follows the workspace development patterns. Ensure all changes include appropriate tests and maintain backward compatibility.
+
+## Platform Support
+
+| Platform | MemoryCache | KeyValueCache | DBCache |
+|----------|-------------|---------------|---------|
+| Android  | Yes          | Yes            | Yes      |
+| iOS      | Yes          | Yes            | Yes      |
+| macOS    | Yes          | Yes            | Yes      |
+| Web      | Yes          | Yes            | Yes      |
+
+## Dependencies
+
+- `shared_preferences`: Key-value persistent storage
+- `sqflite`: SQLite database for mobile platforms
+- `sqflite_common_ffi_web`: SQLite support for web platform
+- `module_injector`: Dependency injection framework
+- `core`: Core utilities and types
+
+## Testing
+
+The module includes comprehensive test coverage with mocked dependencies:
+
+```bash
+flutter test
+```
