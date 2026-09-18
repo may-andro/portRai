@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/external_app_handler/domain/_domain.dart';
+import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/force_update/domain/_domain.dart';
 import 'package:portrai/src/feature/force_update/presentation/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
-import 'package:portrai/src/feature/external_app_handler/domain/_domain.dart';
+import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/force_update/domain/_domain.dart';
 import 'package:portrai/src/feature/force_update/presentation/bloc/force_update_event.dart';
 import 'package:portrai/src/feature/force_update/presentation/bloc/force_update_state.dart';

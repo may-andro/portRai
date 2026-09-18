@@ -77,16 +77,17 @@ class _Visitor extends SimpleAstVisitor<void> {
     var fileName = _fileNameOf(referencedUri);
     if (fileName == null || !fileName.startsWith('_')) return;
 
-    var referencedFeatureRoot = _featureRootOf(referencedUri);
+    var referencedFeatureName = _featureNameOf(referencedUri);
     // Not under a `feature/<name>` directory; this rule doesn't apply.
-    if (referencedFeatureRoot == null) return;
+    if (referencedFeatureName == null) return;
 
     var currentUri = context.libraryElement?.uri.toString();
     if (currentUri == null) return;
-    var currentFeatureRoot = _featureRootOf(currentUri);
+    var currentFeatureName = _featureNameOf(currentUri);
 
-    // Allow a feature to import/export its own private barrels.
-    if (currentFeatureRoot == referencedFeatureRoot) return;
+    // Allow a feature to import/export its own private barrels (including
+    // from a test file mirroring that same feature under `test/`).
+    if (currentFeatureName == referencedFeatureName) return;
 
     rule.reportAtNode(node, arguments: [fileName]);
   }
@@ -97,15 +98,24 @@ class _Visitor extends SimpleAstVisitor<void> {
     return uriString.substring(slashIndex + 1);
   }
 
-  /// Returns the feature root of [uriString], e.g.
-  /// `package:portrai/src/feature/experience` for
+  /// Returns the feature name of [uriString], e.g. `experience` for
   /// `package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart`,
   /// or `null` if [uriString] isn't located under a `feature/<name>`
   /// directory.
-  static String? _featureRootOf(String uriString) {
+  ///
+  /// Only the feature *name* segment is returned (not the full path prefix
+  /// leading up to it), so that a file mirroring the same feature under a
+  /// different root - e.g. `test/mock/feature/experience/...` or
+  /// `test/src/feature/experience/...` mirroring
+  /// `lib/src/feature/experience/...` (see `flutter-testing-conventions`) -
+  /// is still recognized as belonging to that same feature. Comparing full
+  /// path prefixes would never match here, since library URIs for files
+  /// under `test/` don't share the `package:portrai/src/...` prefix that
+  /// files under `lib/` do.
+  static String? _featureNameOf(String uriString) {
     var segments = uriString.split('/');
     var featureIndex = segments.indexOf(_featureSegment);
     if (featureIndex == -1 || featureIndex + 1 >= segments.length) return null;
-    return segments.sublist(0, featureIndex + 2).join('/');
+    return segments[featureIndex + 1];
   }
 }

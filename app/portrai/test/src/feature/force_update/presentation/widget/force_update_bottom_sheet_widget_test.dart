@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/external_app_handler/domain/_domain.dart';
+import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/force_update/domain/_domain.dart';
 import 'package:portrai/src/feature/force_update/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/feature/force_update/presentation/widget/force_update_bottom_sheet_widget.dart';
