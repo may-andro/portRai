@@ -62,6 +62,8 @@ jobs:
     name: Quality Checks
     needs: [extract-version]
     uses: ./.github/workflows/portrai.yaml
+    secrets:
+      PORTRAI_FIREBASE_OPTIONS: ${{ secrets.PORTRAI_FIREBASE_OPTIONS }}
 
   # Build all platforms in parallel after quality checks pass
   build-android:
