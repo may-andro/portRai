@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/feature/splash/presentation/widget/_widget.dart';
 
@@ -26,12 +27,18 @@ class SplashScreen extends StatelessWidget {
       create: (_) =>
           SplashBloc(ModuleInjectorController(), moduleConfigurators)
             ..add(InitEvent()),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return BlocBuilder<SplashBloc, SplashState>(
-              builder: (context, state) {
+      child: BlocBuilder<SplashBloc, SplashState>(
+        builder: (context, state) {
+          if (state is SetUpNoInternetState) {
+            return NoInternetScreen(
+              onRetryClick: () =>
+                  context.read<SplashBloc>().add(RetryClickEvent()),
+            );
+          }
+          return Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            body: LayoutBuilder(
+              builder: (context, constraints) {
                 return Stack(
                   children: [
                     CircularRevealLogoWidget(
@@ -43,9 +50,9 @@ class SplashScreen extends StatelessWidget {
                   ],
                 );
               },
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -81,7 +88,7 @@ class _SplashInfoWidget extends StatelessWidget {
     final isDescriptiveMode = buildConfig.buildEnvironment.isSplashDescriptive;
 
     return switch (state) {
-      SetUpCompetedState() => const SizedBox.shrink(),
+      SetUpCompetedState() || SetUpNoInternetState() => const SizedBox.shrink(),
       SetUpErrorState(:final cause) => SetupFailureWidget(
         cause,
         isDescriptiveMode: isDescriptiveMode,

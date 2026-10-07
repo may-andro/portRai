@@ -15,6 +15,10 @@ final class SetUpErrorState extends SplashState {
   final Object? cause;
 }
 
+final class SetUpNoInternetState extends SplashState {
+  const SetUpNoInternetState();
+}
+
 final class SetUpProgressState extends SplashState {
   const SetUpProgressState(this.setUpStatus, this.progress);
 

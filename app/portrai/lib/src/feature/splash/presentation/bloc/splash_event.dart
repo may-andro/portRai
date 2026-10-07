@@ -8,3 +8,5 @@ sealed class SplashEvent extends Equatable {
 }
 
 final class InitEvent extends SplashEvent {}
+
+final class RetryClickEvent extends SplashEvent {}
