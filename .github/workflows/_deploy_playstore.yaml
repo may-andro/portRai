@@ -45,25 +45,25 @@ jobs:
 
       - name: Prepare Play Store credentials
         id: creds
-        run: |
-          # Decode base64-encoded service account to raw JSON
-          DECODED_JSON=$(echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 -d)
-          # Store as multiline output
-          echo "json<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$DECODED_JSON" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/prepare-service-account
+        with:
+          credentials-base64: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
 
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ steps.creds.outputs.json }}
+          serviceAccountJson: ${{ steps.creds.outputs.file }}
           packageName: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
-          releaseFiles: build-output/app-release.aab
+          releaseFiles: build-output/bundle/release/app-release.aab
           track: ${{ inputs.track }}
           status: completed
           inAppUpdatePriority: 2
           whatsNewDirectory: distribution/whatsnew
-          mappingFile: build-output/mapping.txt
+          mappingFile: build-output/mapping/release/mapping.txt
+
+      - name: Remove Play Store credentials
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/deployment-service-account.json"
 
       - name: Upload release notes
         run: |
