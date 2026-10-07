@@ -74,6 +74,7 @@ jobs:
       version: ${{ needs.extract-version.outputs.version }}
       build-number: ${{ needs.extract-version.outputs.build-number }}
     secrets:
+      FIREBASE_OPTIONS: ${{ secrets.PORTRAI_FIREBASE_OPTIONS }}
       ANDROID_KEYSTORE_BASE64: ${{ secrets.PORTRAI_ANDROID_KEYSTORE_BASE64 }}
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PORTRAI_ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.PORTRAI_ANDROID_KEY_ALIAS }}
@@ -90,6 +91,7 @@ jobs:
       version: ${{ needs.extract-version.outputs.version }}
       build-number: ${{ needs.extract-version.outputs.build-number }}
     secrets:
+      FIREBASE_OPTIONS: ${{ secrets.PORTRAI_FIREBASE_OPTIONS }}
       GOOGLE_SERVICES_PLIST: ${{ secrets.PORTRAI_GOOGLE_SERVICES_PLIST }}
 
   build-web:
