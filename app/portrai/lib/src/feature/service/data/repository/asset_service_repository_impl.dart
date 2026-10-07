@@ -18,6 +18,8 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
     this._logReporter,
   );
 
+  static const _logTag = 'AssetServiceRepositoryImpl';
+
   final AppLocale _appLocale;
   final ServiceRepository _cacheDelegateRepository;
   final ServiceMapper _mapper;
@@ -40,6 +42,7 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
     } on ServiceCacheException catch (e, stackTrace) {
       _logReporter.error(
         'Cache error while getting services: ${e.cause}',
+        tag: _logTag,
         stacktrace: stackTrace,
       );
     }
@@ -86,6 +89,7 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache services from assets, continuing without caching.',
+        tag: _logTag,
       );
     }
   }

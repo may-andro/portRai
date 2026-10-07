@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/experience_event.dart';
@@ -10,15 +9,12 @@ import 'package:portrai/src/feature/experience/presentation/screen/experience/tr
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 
-const _logTag = 'ExperienceBloc';
-
 @register
 class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
   ExperienceBloc(
     this._getExperienceUseCase,
     this._getProfileUseCase,
     this._openExternalUrlUseCase,
-    this._logReporter,
     this._trackingDelegate,
   ) : super(const LoadingState()) {
     on<LoadExperienceEvent>(_mapLoadExperienceEventToState);
@@ -32,7 +28,6 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
   final GetExperienceUseCase _getExperienceUseCase;
   final GetProfileUseCase _getProfileUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
-  final LogReporter _logReporter;
   final ExperienceTrackingDelegate _trackingDelegate;
 
   FutureOr<void> _mapLoadExperienceEventToState(
@@ -42,13 +37,10 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     emit(const LoadingState());
 
     final eitherProfileResult = await _getProfileUseCase();
-    final profile = eitherProfileResult.fold((failure) {
-      _logReporter.error(
-        tag: _logTag,
-        'Failed to load profile: ${failure.cause}',
-      );
-      return null;
-    }, (profile) => profile);
+    final profile = eitherProfileResult.fold<ProfileEntity?>(
+      (_) => null,
+      (profile) => profile,
+    );
 
     final eitherExperienceResult = await _getExperienceUseCase(event.id);
     eitherExperienceResult.fold(
@@ -71,18 +63,9 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     final eitherResult = await _openExternalUrlUseCase(
       OpenExternalUrlParam(Uri.parse(event.url)),
     );
-    eitherResult.fold(
-      (failure) {
-        _logReporter.error(
-          'Failed to open external URL: ${event.url}',
-          error: failure.cause,
-          tag: _logTag,
-        );
-      },
-      (success) {
-        _trackingDelegate.trackExternalLinkClick(event.label);
-      },
-    );
+    if (eitherResult.isRight) {
+      _trackingDelegate.trackExternalLinkClick(event.label);
+    }
   }
 
   // Tracking Events

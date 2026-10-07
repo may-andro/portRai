@@ -30,7 +30,7 @@ class LanguageCardWidget extends StatelessWidget {
           textOverflow: TextOverflow.ellipsis,
         ),
         subtitle: DSTextWidget(
-          context.languageCode.languageName,
+          context.languageCode.languageName(context.localizations),
           color: context.colorPalette.neutral.grey3,
           style: context.typography.bodyMedium,
           maxLines: 1,

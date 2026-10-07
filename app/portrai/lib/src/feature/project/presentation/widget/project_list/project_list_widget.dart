@@ -62,7 +62,7 @@ class _ProjectWidget extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(context.space()),
                 child: Hero(
-                  tag: 'project-image-${project.title}',
+                  tag: 'project-image-${project.id}',
                   child: DSNetworkImageWidget(
                     url: project.image,
                     autoSizeImage: true,

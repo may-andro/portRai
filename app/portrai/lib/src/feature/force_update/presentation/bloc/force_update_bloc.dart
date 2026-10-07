@@ -34,12 +34,8 @@ class ForceUpdateBloc extends Bloc<ForceUpdateEvent, ForceUpdateState> {
   ) async {
     final isUpdateRequiredEither = await _isAppUpdateRequiredUseCase();
 
-    // If the check itself fails, don't block the app - the failure is
-    // already logged by LogUseCaseInterceptor.
-    final isUpdateRequired = isUpdateRequiredEither.fold(
-      (_) => false,
-      (isUpdateRequired) => isUpdateRequired,
-    );
+    final isUpdateRequired =
+        isUpdateRequiredEither.isRight && isUpdateRequiredEither.right;
 
     emit(
       isUpdateRequired

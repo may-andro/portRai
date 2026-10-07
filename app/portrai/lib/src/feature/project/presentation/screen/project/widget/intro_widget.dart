@@ -1,6 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
+import 'package:portrai/src/feature/project/presentation/extension/project_date_range_extension.dart';
 
 class IntroWidget extends StatelessWidget {
   const IntroWidget({super.key, required this.project});
@@ -87,7 +89,7 @@ class _ImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: 'project-image-${project.title}',
+      tag: 'project-image-${project.id}',
       child: DSNetworkImageWidget(
         url: project.image,
         autoSizeImage: true,
@@ -113,12 +115,12 @@ class _InfoChipsWidget extends StatelessWidget {
       children: [
         DSInfoChipWidget(label: project.status, icon: project.statusIcon),
         DSInfoChipWidget(
-          label: '${project.teamSize} people',
+          label: context.localizations.projectTeamSize('${project.teamSize}'),
           icon: Icons.group,
         ),
         DSInfoChipWidget(label: project.role, icon: Icons.work),
         DSInfoChipWidget(
-          label: project.formattedDateRange,
+          label: project.formattedDateRange(context),
           icon: Icons.calendar_month,
         ),
       ],

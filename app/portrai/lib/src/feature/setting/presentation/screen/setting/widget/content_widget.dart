@@ -41,7 +41,7 @@ class ContentWidget extends StatelessWidget {
                       ],
                       const DSVerticalSpacerWidget(3),
                       DSButtonWidget(
-                        label: 'Developer Mode',
+                        label: context.localizations.settingDeveloperMode,
                         onPressed: () => DeveloperMenuScreen.navigate(context),
                         variant: DSButtonVariant.text,
                         size: DSButtonSize.small,

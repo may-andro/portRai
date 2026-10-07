@@ -64,9 +64,19 @@
   "forceUpdateButton": "Actualizar Ahora",
   "forceUpdateMessage": "Hay una nueva versión de la app disponible y es necesaria para continuar. Actualiza para seguir usando PortRai.",
   "forceUpdateTitle": "Actualización Requerida",
+  "featureFlagSearchHint": "Buscar Feature Flags",
+  "featureFlagHeaderTitle": "Feature Flags ({count})",
+  "featureFlagEmptySearchTitle": "No se encontraron resultados",
+  "featureFlagEmptySearchMessage": "Ningún feature flag coincide con \"{query}\"",
+  "featureFlagRestartRequiredMessage": "Puede ser necesario reiniciar para aplicar los cambios",
+  "featureFlagRestartButton": "Reiniciar",
   "help": "Ayuda",
   "hireMe": "Trabaja Conmigo",
   "language": "Idioma",
+  "localeLanguageDutch": "🇳🇱 Neerlandés",
+  "localeLanguageEnglish": "🇬🇧 Inglés",
+  "localeLanguageSpanish": "🇪🇸 Español",
+  "localeLanguageUnknown": "Idioma desconocido",
   "localeSelectionTitle": "Elegir Idioma",
   "privacyPolicy": "Política de Privacidad",
   "retry": "Reintentar",
@@ -74,6 +84,7 @@
   "routeNotFoundMessage": "¡Ups! Esta página no existe.",
   "routeNotFoundTitle": "Página No Encontrada",
   "selectedLanguage": "Idioma Actual",
+  "settingDeveloperMode": "Modo Desarrollador",
   "splashContactSupport": "contactar soporte",
   "splashErrorMessage": "Algo salió mal durante el inicio. Reinicia la app o",
   "splashErrorTitle": "Error de Configuración",
@@ -100,5 +111,84 @@
   "errorFeatureFlagUpdateFailed": "Error al actualizar el indicador de funcionalidad",
   "errorFeatureFlagUpdateUnknown": "Error al guardar los cambios. Inténtalo de nuevo",
   "errorFeatureFlagsResetFailed": "Error al restablecer los feature flags. Inténtalo de nuevo",
-  "version": "Hecho con Flutter · {appVersion}"
+  "version": "Hecho con Flutter · {appVersion}",
+  "experiencesTitle": "Experiencias",
+  "seeMore": "Ver más",
+  "achievementsAndResponsibilities": "Logros y responsabilidades",
+  "atCompany": "en",
+  "present": "Actualidad",
+  "profileYearsExperience": "Años de experiencia",
+  "profileProjects": "Proyectos",
+  "profileDownloadResumeButton": "Descargar currículum",
+  "profileConnectWithMe": "Conecta conmigo",
+  "profileLanguages": "Idiomas",
+  "profileAboutMe": "Sobre mí",
+  "profileGetInTouch": "Ponte en contacto",
+  "profileEducation": "Educación",
+  "profileContact": "Contacto",
+  "profileContactInformation": "Información de contacto",
+  "profileEmail": "Correo electrónico",
+  "profileLocation": "Ubicación",
+  "profileTimezone": "Zona horaria",
+  "profileCurrentRole": "Rol actual",
+  "projectOverview": "Resumen",
+  "projectTechnologies": "Tecnologías",
+  "projectAchievements": "Logros",
+  "projectKeyFeatures": "Características Clave",
+  "projectAvailableOn": "Disponible en",
+  "projectGitHub": "GitHub",
+  "projectWebsite": "Sitio web",
+  "projectAppStore": "App Store",
+  "projectPlayStore": "Play Store",
+  "projectTeamSize": "{count} personas",
+  "@projectOverview": {
+    "description": "Title for the project overview section"
+  },
+  "@projectTechnologies": {
+    "description": "Title for the project technologies section"
+  },
+  "@projectAchievements": {
+    "description": "Title for the project achievements section"
+  },
+  "@projectKeyFeatures": {
+    "description": "Title for the project key features section"
+  },
+  "@projectAvailableOn": {
+    "description": "Title for the project availability links section"
+  },
+  "@projectGitHub": {
+    "description": "Label for the GitHub availability button"
+  },
+  "@projectWebsite": {
+    "description": "Label for the project website availability button"
+  },
+  "@projectAppStore": {
+    "description": "Label for the App Store availability button"
+  },
+  "@projectPlayStore": {
+    "description": "Label for the Play Store availability button"
+  },
+  "@projectTeamSize": {
+    "description": "Label showing the size of the project team",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "portfolioSectionSeeAll": "Ver todo",
+  "developerMenuControlsAndTools": "Controles y herramientas",
+  "developerMenuCachePlayground": "Zona de pruebas de caché",
+  "developerMenuCachePlaygroundDescription": "Experimenta con el contenido y el comportamiento de la caché",
+  "developerMenuFeatureFlags": "Feature flags",
+  "developerMenuFeatureFlagsDescription": "Ver y gestionar feature flags en la app",
+  "developerMenuErrorSimulation": "Simulación de errores",
+  "developerMenuForceFatalCrash": "Forzar fallo fatal",
+  "developerMenuForceFatalCrashDescription": "Simula un fallo fatal en la app",
+  "developerMenuForceNonFatalCrash": "Forzar fallo no fatal",
+  "developerMenuForceNonFatalCrashDescription": "Simula un fallo no fatal en la app",
+  "developerMenuForceBlacklistError": "Forzar error en lista negra",
+  "developerMenuForceBlacklistErrorDescription": "Simula un error que debe ser ignorado por el gestor de errores",
+  "splashContactSupportUnavailableMessage": "Esta función aún no está desarrollada"
 }

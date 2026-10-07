@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/_widget.dart';
@@ -57,7 +58,8 @@ class OverviewSectionDTO extends ScrollableProjectSectionDTO {
 
   @override
   @protected
-  String getTitle(BuildContext context) => 'Overview';
+  String getTitle(BuildContext context) =>
+      context.localizations.projectOverview;
 
   @override
   @protected
@@ -82,7 +84,8 @@ class TechnologiesSectionDTO extends ScrollableProjectSectionDTO {
       );
 
   @override
-  String getTitle(BuildContext context) => 'Technologies';
+  String getTitle(BuildContext context) =>
+      context.localizations.projectTechnologies;
 
   @override
   @protected
@@ -109,7 +112,8 @@ class AchievementsSectionDTO extends ScrollableProjectSectionDTO {
       );
 
   @override
-  String getTitle(BuildContext context) => 'Achievements';
+  String getTitle(BuildContext context) =>
+      context.localizations.projectAchievements;
 
   @override
   @protected
@@ -130,7 +134,8 @@ class KeyFeaturesSectionDTO extends ScrollableProjectSectionDTO {
       );
 
   @override
-  String getTitle(BuildContext context) => 'Key Features';
+  String getTitle(BuildContext context) =>
+      context.localizations.projectKeyFeatures;
 
   @override
   @protected
@@ -151,7 +156,8 @@ class AvailabilitiesSectionDTO extends ScrollableProjectSectionDTO {
       );
 
   @override
-  String getTitle(BuildContext context) => 'Available On';
+  String getTitle(BuildContext context) =>
+      context.localizations.projectAvailableOn;
 
   @override
   @protected

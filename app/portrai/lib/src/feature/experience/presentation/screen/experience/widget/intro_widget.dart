@@ -1,6 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
+import 'package:portrai/src/feature/experience/presentation/extension/experience_date_range_extension.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 
 class IntroWidget extends StatelessWidget {
@@ -134,7 +135,7 @@ class _InfoChipsWidget extends StatelessWidget {
           icon: Icons.location_on_outlined,
         ),
         DSInfoChipWidget(
-          label: experience.formattedExperienceDateRange,
+          label: experience.formattedDateRange(context),
           icon: Icons.calendar_today_outlined,
         ),
       ],

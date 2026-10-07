@@ -9,7 +9,7 @@ class _AboutMeSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionWidget(
-      label: 'About Me',
+      label: context.localizations.profileAboutMe,
       isDesktop: isDesktop,
       children: [
         _ElevatorPitchWidget(
@@ -17,7 +17,7 @@ class _AboutMeSectionWidget extends StatelessWidget {
           isDesktop: isDesktop,
         ),
         DSButtonWidget(
-          label: 'Get in Touch',
+          label: context.localizations.profileGetInTouch,
           icon: Icons.download_rounded,
           iconDirection: DSButtonIconDirection.right,
           border: DSButtonBorder.rounded,

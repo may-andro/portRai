@@ -28,8 +28,8 @@ class ExperienceScreen extends StatelessWidget {
         return appServiceLocator.get<ExperienceBloc>()
           ..add(LoadExperienceEvent(id));
       },
-      child: BlocBuilder<ExperienceBloc, ExperienceState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
           return RouteObserverWidget(
             onResume: () => context.bloc.add(const ScreenVisibleEvent()),
             child: Scaffold(

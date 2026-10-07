@@ -15,6 +15,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
   );
 
   static const _collectionPath = 'app_config';
+  static const _tag = 'RemoteAppConfigRepositoryImpl';
 
   final FbFirestoreController _firestoreController;
   final BuildConfig _buildConfig;
@@ -35,6 +36,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
     } on AppConfigException catch (_) {
       _logReporter.error(
         'Failed to load app config from remote, falling back to cache.',
+        tag: _tag,
       );
       return await _cacheDelegateRepository.getAppConfig();
     }
@@ -82,13 +84,13 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
     }
   }
 
-  /// Caches the app config, but doesn't fail if caching fails.
   Future<void> _cacheAppConfigSafely(PortraiAppConfigEntity appConfig) async {
     try {
       await cacheAppConfig(appConfig);
     } catch (_) {
       _logReporter.error(
         'Failed to cache app config from remote, continuing without caching.',
+        tag: _tag,
       );
     }
   }

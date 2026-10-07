@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 
 class SearchWidget extends StatelessWidget {
   const SearchWidget({
@@ -22,8 +23,7 @@ class SearchWidget extends StatelessWidget {
       controller: searchController,
       focusNode: focusNode,
       decoration: InputDecoration(
-        hintText: 'Search Feature Flags',
-        //context.l10n.searchFeatureFlags,
+        hintText: context.localizations.featureFlagSearchHint,
         prefixIcon: const Icon(Icons.search),
         suffixIcon: searchQuery.isNotEmpty
             ? IconButton(

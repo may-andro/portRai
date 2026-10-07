@@ -9,12 +9,14 @@ class _ContactSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionWidget(
-      label: isDesktop ? 'Contact' : 'Contact Information',
+      label: isDesktop
+          ? context.localizations.profileContact
+          : context.localizations.profileContactInformation,
       isDesktop: isDesktop,
       children: [
         DSLabeledInfoRowWidget(
           icon: Icons.email_rounded,
-          label: 'Email',
+          label: context.localizations.profileEmail,
           value: profile.email,
           onTap: () {
             context.bloc.add(
@@ -27,12 +29,12 @@ class _ContactSectionWidget extends StatelessWidget {
         ),
         DSLabeledInfoRowWidget(
           icon: Icons.location_on_rounded,
-          label: 'Location',
+          label: context.localizations.profileLocation,
           value: '${profile.location.city}, ${profile.location.country}',
         ),
         DSLabeledInfoRowWidget(
           icon: Icons.access_time_rounded,
-          label: 'Timezone',
+          label: context.localizations.profileTimezone,
           value: profile.location.timezone,
         ),
       ],

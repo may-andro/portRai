@@ -7,6 +7,8 @@ import 'package:portrai/src/feature/expertise/data/model/_model.dart';
 import 'package:portrai/src/feature/expertise/data/repository/cache_expertise_repository_impl.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
+const String _logTag = 'RemoteExpertiseRepositoryImpl';
+
 @register
 class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
   RemoteExpertiseRepositoryImpl(
@@ -39,6 +41,7 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
       // Cache is empty for current locale - fall through to load from remote
     } on ExpertiseCacheException catch (_) {
       _logReporter.error(
+        tag: _logTag,
         'Cache error while getting expertise, loading from remote instead.',
       );
     }
@@ -110,6 +113,7 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
       }
     } catch (_) {
       _logReporter.error(
+        tag: _logTag,
         'Failed to cache expertise from remote, continuing without caching.',
       );
     }

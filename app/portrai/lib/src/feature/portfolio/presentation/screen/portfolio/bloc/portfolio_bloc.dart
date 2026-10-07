@@ -30,14 +30,11 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     emit(const LoadingState());
     try {
       final result = await _getPortfolioUseCase();
-      result.fold(
-        (failure) {
-          emit(ErrorState(failure));
-        },
-        (portfolio) {
-          emit(LoadedState(portfolio: portfolio));
-        },
-      );
+      if (result.isRight) {
+        emit(LoadedState(portfolio: result.right));
+        return;
+      }
+      emit(ErrorState(result.left));
     } catch (e) {
       emit(const ErrorState(UnknownFailure()));
     }

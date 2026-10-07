@@ -7,6 +7,8 @@ import 'package:portrai/src/feature/experience/data/model/_model.dart';
 import 'package:portrai/src/feature/experience/data/repository/cache_experience_repository_impl.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 
+const String _logTag = 'RemoteExperienceRepositoryImpl';
+
 @register
 class RemoteExperienceRepositoryImpl implements ExperienceRepository {
   RemoteExperienceRepositoryImpl(
@@ -75,6 +77,7 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
       // Cache is empty for current locale - fall through to load from remote
     } on ExperienceCacheException catch (_) {
       _logReporter.error(
+        tag: _logTag,
         'Cache error while getting experiences, loading from remote instead.',
       );
     }
@@ -150,6 +153,7 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
       }
     } catch (_) {
       _logReporter.error(
+        tag: _logTag,
         'Failed to cache experiences from remote, continuing without caching.',
       );
     }

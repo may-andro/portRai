@@ -58,7 +58,7 @@ class _TitlePositionWidget extends StatelessWidget {
         ),
         const DSHorizontalSpacerWidget(0.5),
         DSTextWidget(
-          'at',
+          context.localizations.atCompany,
           style: context.typography.bodyLarge,
           color: context.colorPalette.neutral.grey8,
         ),

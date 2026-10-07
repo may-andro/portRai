@@ -19,7 +19,8 @@ class SettingScreen extends StatelessWidget {
       appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
       body: BlocProvider(
         create: (_) {
-          return appServiceLocator.get<SettingBloc>()..add(LoadSettingsEvent());
+          return appServiceLocator.get<SettingBloc>()
+            ..add(const LoadSettingsEvent());
         },
         child: BlocBuilder<SettingBloc, SettingState>(
           builder: (context, state) {

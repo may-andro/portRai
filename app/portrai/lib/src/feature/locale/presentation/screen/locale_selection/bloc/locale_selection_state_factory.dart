@@ -31,10 +31,12 @@ class LocaleSelectionStateFactory {
     required List<Locale> supportedLocales,
     required AppLocale appLocale,
     required AppLocale targetLocale,
+    ProfileEntity? profile,
   }) {
     return LocaleSelectionUpdatingState(
       supportedLocales: supportedLocales,
       appLocale: appLocale,
+      profile: profile,
       targetLocale: targetLocale,
     );
   }
@@ -44,9 +46,11 @@ class LocaleSelectionStateFactory {
     required AppLocale appLocale,
     required UpdateLocaleFailure failure,
     required AppLocale targetLocale,
+    ProfileEntity? profile,
   }) => LocaleSelectionUpdateFailureState(
     supportedLocales: supportedLocales,
     appLocale: appLocale,
+    profile: profile,
     failure: failure,
     targetLocale: targetLocale,
   );

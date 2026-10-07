@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
@@ -5,8 +6,8 @@ import 'package:portrai/src/feature/project/project.dart';
 import 'package:portrai/src/feature/service/service.dart';
 import 'package:portrai/src/feature/testimonial/testimonial.dart';
 
-class PortfolioEntity {
-  PortfolioEntity({
+class PortfolioEntity extends Equatable {
+  const PortfolioEntity({
     required this.profile,
     required this.expertises,
     required this.projects,
@@ -21,4 +22,14 @@ class PortfolioEntity {
   final List<ServiceEntity> services;
   final List<ExperienceEntity> experiences;
   final List<TestimonialEntity> testimonials;
+
+  @override
+  List<Object?> get props => [
+    profile,
+    expertises,
+    projects,
+    services,
+    experiences,
+    testimonials,
+  ];
 }

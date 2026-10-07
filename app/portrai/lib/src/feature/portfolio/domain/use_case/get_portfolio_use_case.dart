@@ -39,6 +39,8 @@ class GetPortfolioUseCase
     this._logReporter,
   );
 
+  static const _tag = 'GetPortfolioUseCase';
+
   final GetProfileUseCase _getProfileUseCase;
   final GetAllExpertiseUseCase _allExpertiseUseCase;
   final GetProjectsUseCase _getProjectsUseCase;
@@ -67,6 +69,7 @@ class GetPortfolioUseCase
       _logReporter.debug(
         'Failed to fetch expertise for portfolio, using empty list',
         error: failure,
+        tag: _tag,
       );
       return <ExpertiseEntity>[];
     }, (expertises) => expertises);
@@ -77,6 +80,7 @@ class GetPortfolioUseCase
       _logReporter.debug(
         'Failed to fetch projects for portfolio, using empty list',
         error: failure,
+        tag: _tag,
       );
       return <ProjectEntity>[];
     }, (projects) => projects);
@@ -87,6 +91,7 @@ class GetPortfolioUseCase
       _logReporter.debug(
         'Failed to fetch services for portfolio, using empty list',
         error: failure,
+        tag: _tag,
       );
       return <ServiceEntity>[];
     }, (services) => services);
@@ -97,6 +102,7 @@ class GetPortfolioUseCase
       _logReporter.debug(
         'Failed to fetch experiences for portfolio, using empty list',
         error: failure,
+        tag: _tag,
       );
       return <ExperienceEntity>[];
     }, (experiences) => experiences);
@@ -107,6 +113,7 @@ class GetPortfolioUseCase
       _logReporter.debug(
         'Failed to fetch testimonials for portfolio, using empty list',
         error: failure,
+        tag: _tag,
       );
       return <TestimonialEntity>[];
     }, (testimonials) => testimonials);

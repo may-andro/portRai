@@ -54,10 +54,12 @@ class LocaleSelectionLoadedState extends LoadedState {
   LocaleSelectionLoadedState copyWith({
     List<Locale>? supportedLocales,
     AppLocale? appLocale,
+    ProfileEntity? profile,
   }) {
     return LocaleSelectionLoadedState(
       supportedLocales: supportedLocales ?? this.supportedLocales,
       appLocale: appLocale ?? this.appLocale,
+      profile: profile ?? this.profile,
     );
   }
 }
@@ -67,6 +69,7 @@ class LocaleSelectionUpdatingState extends LoadedState {
   const LocaleSelectionUpdatingState({
     required super.supportedLocales,
     required super.appLocale,
+    super.profile,
     required this.targetLocale,
   });
 
@@ -81,6 +84,7 @@ class LocaleSelectionUpdateFailureState extends LoadedState {
   const LocaleSelectionUpdateFailureState({
     required super.supportedLocales,
     required super.appLocale,
+    super.profile,
     required this.targetLocale,
     required this.failure,
   });

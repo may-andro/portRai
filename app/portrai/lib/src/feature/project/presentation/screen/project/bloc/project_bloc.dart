@@ -66,15 +66,9 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     final eitherResult = await _openExternalUrlUseCase(
       OpenExternalUrlParam(Uri.parse(event.url)),
     );
-    eitherResult.fold(
-      (failure) {
-        // Handle failure if needed
-      },
-      (success) {
-        // Handle success if needed
-      },
-    );
-    _trackingDelegate.trackAvailabilityLinkClick(event.label);
+    if (eitherResult.isRight) {
+      _trackingDelegate.trackAvailabilityLinkClick(event.label);
+    }
   }
 
   FutureOr<void> _mapHeaderTabClickEventToState(

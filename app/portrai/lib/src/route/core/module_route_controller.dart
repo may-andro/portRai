@@ -19,12 +19,12 @@ class ModuleRouteController {
         error: _ModuleRouteRegisteredException(),
         tag: 'ModuleRouteController',
       );
+      return;
     }
     _routes.add(moduleRoute);
   }
 
-  /// Returns all routes from all modules (including nested).
-  List<ModuleRoute> get allRoutes => _routes;
+  List<ModuleRoute> get allRoutes => List.unmodifiable(_routes);
 }
 
 class _ModuleRouteRegisteredException implements AppException {

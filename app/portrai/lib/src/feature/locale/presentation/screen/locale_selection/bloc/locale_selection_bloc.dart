@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/locale/domain/_domain.dart';
@@ -13,8 +12,6 @@ import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/tracking/_tracking.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 
-const _logTag = 'LocaleSelectionBloc';
-
 @register
 class LocaleSelectionBloc
     extends Bloc<LocaleSelectionEvent, LocaleSelectionState> {
@@ -22,7 +19,6 @@ class LocaleSelectionBloc
     this._getLocaleUseCase,
     this._updateLocaleUseCase,
     this._getProfileUseCase,
-    this._logReporter,
     this._trackingDelegate,
   ) : super(LocaleSelectionStateFactory.loading()) {
     on<LoadLocaleEvent>(_mapLoadLocaleEventToState);
@@ -34,7 +30,6 @@ class LocaleSelectionBloc
   final GetLocaleUseCase _getLocaleUseCase;
   final UpdateLocaleUseCase _updateLocaleUseCase;
   final GetProfileUseCase _getProfileUseCase;
-  final LogReporter _logReporter;
   final LocaleSelectionTrackingDelegate _trackingDelegate;
 
   Future<void> _mapLoadLocaleEventToState(
@@ -43,29 +38,24 @@ class LocaleSelectionBloc
   ) async {
     emit(LocaleSelectionStateFactory.loading());
 
+    ProfileEntity? profile;
     final eitherProfileResult = await _getProfileUseCase();
-    final profile = eitherProfileResult.fold((failure) {
-      _logReporter.error(
-        tag: _logTag,
-        'Failed to load profile: ${failure.cause}',
-      );
-      return null;
-    }, (profile) => profile);
+    if (eitherProfileResult.isRight) {
+      profile = eitherProfileResult.right;
+    }
 
     final localeEither = await _getLocaleUseCase();
-    localeEither.fold(
-      (failure) {
-        return emit(LocaleSelectionStateFactory.loadError(failure: failure));
-      },
-      (appLocale) {
-        return emit(
-          LocaleSelectionStateFactory.loaded(
-            supportedLocales: AppLocalizations.supportedLocales,
-            appLocale: appLocale,
-            profile: profile,
-          ),
-        );
-      },
+    if (!localeEither.isRight) {
+      emit(LocaleSelectionStateFactory.loadError(failure: localeEither.left));
+      return;
+    }
+
+    emit(
+      LocaleSelectionStateFactory.loaded(
+        supportedLocales: AppLocalizations.supportedLocales,
+        appLocale: localeEither.right,
+        profile: profile,
+      ),
     );
   }
 
@@ -85,34 +75,35 @@ class LocaleSelectionBloc
         supportedLocales: currentState.supportedLocales,
         appLocale: currentState.appLocale,
         targetLocale: targetLocale,
+        profile: currentState.profile,
       ),
     );
 
     final eitherResult = await _updateLocaleUseCase(targetLocale);
 
-    eitherResult.fold(
-      (failure) {
-        emit(
-          LocaleSelectionStateFactory.updateFailure(
-            supportedLocales: currentState.supportedLocales,
-            appLocale: currentState.appLocale,
-            failure: failure,
-            targetLocale: targetLocale,
-          ),
-        );
-      },
-      (_) {
-        _trackingDelegate.trackLanguageUpdate(
-          previousLanguage: currentState.appLocale.languageCode,
-          newLanguage: targetLocale.languageCode,
-        );
-        emit(
-          LocaleSelectionStateFactory.loaded(
-            supportedLocales: currentState.supportedLocales,
-            appLocale: targetLocale,
-          ),
-        );
-      },
+    if (!eitherResult.isRight) {
+      emit(
+        LocaleSelectionStateFactory.updateFailure(
+          supportedLocales: currentState.supportedLocales,
+          appLocale: currentState.appLocale,
+          failure: eitherResult.left,
+          targetLocale: targetLocale,
+          profile: currentState.profile,
+        ),
+      );
+      return;
+    }
+
+    _trackingDelegate.trackLanguageUpdate(
+      previousLanguage: currentState.appLocale.languageCode,
+      newLanguage: targetLocale.languageCode,
+    );
+    emit(
+      LocaleSelectionStateFactory.loaded(
+        supportedLocales: currentState.supportedLocales,
+        appLocale: targetLocale,
+        profile: currentState.profile,
+      ),
     );
   }
 
@@ -121,7 +112,7 @@ class LocaleSelectionBloc
     ScreenVisibleEvent event,
     Emitter<LocaleSelectionState> emit,
   ) {
-    _trackingDelegate.trackScreenView(event.isDialog);
+    _trackingDelegate.trackVisibleScreen(event.isDialog);
   }
 
   FutureOr<void> _mapViewStateVisibleEventToState(

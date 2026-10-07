@@ -13,7 +13,7 @@ class _MobileContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mobileList = allExpertise.sublist(0, _minCoreSkillsCount);
+    final mobileList = allExpertise.take(_minCoreSkillsCount).toList();
     return ListView.separated(
       shrinkWrap: true,
       padding: EdgeInsets.symmetric(horizontal: context.space(factor: 3)),

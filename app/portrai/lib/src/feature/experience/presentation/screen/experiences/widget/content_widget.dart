@@ -4,6 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/widget/_widget.dart';
@@ -11,9 +12,7 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:tracking/tracking.dart';
 
 class ContentWidget extends StatelessWidget {
-  const ContentWidget({super.key, required this.state});
-
-  final ExperiencesState state;
+  const ContentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +59,7 @@ class _ErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TrackingImpressionDetectorWidget(
-      impressionId: 'experiences_loading_content_view',
+      impressionId: 'experiences_error_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
       child: Center(
         child: Padding(
@@ -130,7 +129,7 @@ class _AppBarWidget extends StatelessWidget {
       automaticallyImplyLeading: !kIsWeb,
       centerTitle: true,
       title: DSTextWidget(
-        'Experiences',
+        context.localizations.experiencesTitle,
         color: context.colorPalette.neutral.grey9,
         style: kIsWeb
             ? context.typography.emphasizedTitleLarge

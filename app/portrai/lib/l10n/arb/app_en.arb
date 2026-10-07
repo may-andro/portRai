@@ -265,6 +265,42 @@
   "@forceUpdateTitle": {
     "description": "Title of the bottom sheet shown when an app update is required"
   },
+  "featureFlagSearchHint": "Search Feature Flags",
+  "@featureFlagSearchHint": {
+    "description": "Hint text for the feature flag search field"
+  },
+  "featureFlagHeaderTitle": "Feature Flags ({count})",
+  "@featureFlagHeaderTitle": {
+    "description": "Header title showing the number of visible feature flags",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "featureFlagEmptySearchTitle": "No results found",
+  "@featureFlagEmptySearchTitle": {
+    "description": "Title shown when no feature flags match the current search"
+  },
+  "featureFlagEmptySearchMessage": "No feature flags match \"{query}\"",
+  "@featureFlagEmptySearchMessage": {
+    "description": "Message shown when no feature flags match the current search query",
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "missing"
+      }
+    }
+  },
+  "featureFlagRestartRequiredMessage": "Restart may be required to apply changes",
+  "@featureFlagRestartRequiredMessage": {
+    "description": "Message shown when feature flag changes may require an app restart"
+  },
+  "featureFlagRestartButton": "Restart",
+  "@featureFlagRestartButton": {
+    "description": "Button label used to restart the app after changing feature flags"
+  },
   "help": "Help",
   "@help": {
     "description": "Help label"
@@ -276,6 +312,22 @@
   "language": "Language",
   "@language": {
     "description": "Language settings label"
+  },
+  "localeLanguageDutch": "🇳🇱 Dutch",
+  "@localeLanguageDutch": {
+    "description": "Label for the Dutch language option"
+  },
+  "localeLanguageEnglish": "🇬🇧 English",
+  "@localeLanguageEnglish": {
+    "description": "Label for the English language option"
+  },
+  "localeLanguageSpanish": "🇪🇸 Spanish",
+  "@localeLanguageSpanish": {
+    "description": "Label for the Spanish language option"
+  },
+  "localeLanguageUnknown": "Unknown Language",
+  "@localeLanguageUnknown": {
+    "description": "Fallback label for an unsupported language option"
   },
   "localeSelectionTitle": "Choose Language",
   "@localeSelectionTitle": {
@@ -304,6 +356,10 @@
   "selectedLanguage": "Current Language",
   "@selectedLanguage": {
     "description": "Current language label"
+  },
+  "settingDeveloperMode": "Developer Mode",
+  "@settingDeveloperMode": {
+    "description": "Button label for opening the developer mode menu"
   },
   "splashContactSupport": "contact support",
   "@splashContactSupport": {
@@ -418,6 +474,183 @@
         "example": "v1.0.0"
       }
     }
+  },
+  "experiencesTitle": "Experiences",
+  "@experiencesTitle": {
+    "description": "Title of the experiences screen"
+  },
+  "seeMore": "See More",
+  "@seeMore": {
+    "description": "Button label to open the details of an item"
+  },
+  "achievementsAndResponsibilities": "Achievements & Responsibilities",
+  "@achievementsAndResponsibilities": {
+    "description": "Heading above the achievements and responsibilities of an experience"
+  },
+  "atCompany": "at",
+  "@atCompany": {
+    "description": "Connector between a job position and the company, e.g. \"Engineer at Acme\""
+  },
+  "present": "Present",
+  "@present": {
+    "description": "Label for the end date of an ongoing experience"
+  },
+  "profileYearsExperience": "Years Experience",
+  "@profileYearsExperience": {
+    "description": "Profile stats label for years of experience"
+  },
+  "profileProjects": "Projects",
+  "@profileProjects": {
+    "description": "Profile stats label for projects"
+  },
+  "profileDownloadResumeButton": "Download Resume",
+  "@profileDownloadResumeButton": {
+    "description": "Profile action label for downloading the resume"
+  },
+  "profileConnectWithMe": "Connect With Me",
+  "@profileConnectWithMe": {
+    "description": "Profile social links section title"
+  },
+  "profileLanguages": "Languages",
+  "@profileLanguages": {
+    "description": "Profile languages section title"
+  },
+  "profileAboutMe": "About Me",
+  "@profileAboutMe": {
+    "description": "Profile about me section title"
+  },
+  "profileGetInTouch": "Get in Touch",
+  "@profileGetInTouch": {
+    "description": "Profile call-to-action label for contacting"
+  },
+  "profileEducation": "Education",
+  "@profileEducation": {
+    "description": "Profile education section title"
+  },
+  "profileContact": "Contact",
+  "@profileContact": {
+    "description": "Profile contact section title for desktop"
+  },
+  "profileContactInformation": "Contact Information",
+  "@profileContactInformation": {
+    "description": "Profile contact section title for compact layouts"
+  },
+  "profileEmail": "Email",
+  "@profileEmail": {
+    "description": "Profile contact row label for email"
+  },
+  "profileLocation": "Location",
+  "@profileLocation": {
+    "description": "Profile contact row label for location"
+  },
+  "profileTimezone": "Timezone",
+  "@profileTimezone": {
+    "description": "Profile contact row label for timezone"
+  },
+  "profileCurrentRole": "Current Role",
+  "@profileCurrentRole": {
+    "description": "Profile current role section heading"
+  },
+  "projectOverview": "Overview",
+  "@projectOverview": {
+    "description": "Title for the project overview section"
+  },
+  "projectTechnologies": "Technologies",
+  "@projectTechnologies": {
+    "description": "Title for the project technologies section"
+  },
+  "projectAchievements": "Achievements",
+  "@projectAchievements": {
+    "description": "Title for the project achievements section"
+  },
+  "projectKeyFeatures": "Key Features",
+  "@projectKeyFeatures": {
+    "description": "Title for the project key features section"
+  },
+  "projectAvailableOn": "Available On",
+  "@projectAvailableOn": {
+    "description": "Title for the project availability links section"
+  },
+  "projectGitHub": "GitHub",
+  "@projectGitHub": {
+    "description": "Label for the GitHub availability button"
+  },
+  "projectWebsite": "Website",
+  "@projectWebsite": {
+    "description": "Label for the project website availability button"
+  },
+  "projectAppStore": "App Store",
+  "@projectAppStore": {
+    "description": "Label for the App Store availability button"
+  },
+  "projectPlayStore": "Play Store",
+  "@projectPlayStore": {
+    "description": "Label for the Play Store availability button"
+  },
+  "projectTeamSize": "{count} people",
+  "@projectTeamSize": {
+    "description": "Label showing the size of the project team",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "portfolioSectionSeeAll": "See All",
+  "@portfolioSectionSeeAll": {
+    "description": "Action label for opening the full experience list from the portfolio section"
+  },
+  "developerMenuControlsAndTools": "Controls & Tools",
+  "@developerMenuControlsAndTools": {
+    "description": "Section title for the developer menu navigation tools"
+  },
+  "developerMenuCachePlayground": "Cache Playground",
+  "@developerMenuCachePlayground": {
+    "description": "Label for the cache playground row in the developer menu"
+  },
+  "developerMenuCachePlaygroundDescription": "Play with cache content and behavior",
+  "@developerMenuCachePlaygroundDescription": {
+    "description": "Description for the cache playground row in the developer menu"
+  },
+  "developerMenuFeatureFlags": "Feature Flags",
+  "@developerMenuFeatureFlags": {
+    "description": "Label for the feature flags row in the developer menu"
+  },
+  "developerMenuFeatureFlagsDescription": "View and manage feature flags in the app",
+  "@developerMenuFeatureFlagsDescription": {
+    "description": "Description for the feature flags row in the developer menu"
+  },
+  "developerMenuErrorSimulation": "Error Simulation",
+  "@developerMenuErrorSimulation": {
+    "description": "Section title for developer menu error simulations"
+  },
+  "developerMenuForceFatalCrash": "Force Fatal Crash",
+  "@developerMenuForceFatalCrash": {
+    "description": "Action title for forcing a fatal crash from the developer menu"
+  },
+  "developerMenuForceFatalCrashDescription": "Simulate a fatal crash in the app",
+  "@developerMenuForceFatalCrashDescription": {
+    "description": "Description for forcing a fatal crash from the developer menu"
+  },
+  "developerMenuForceNonFatalCrash": "Force Non-Fatal Crash",
+  "@developerMenuForceNonFatalCrash": {
+    "description": "Action title for forcing a non-fatal crash from the developer menu"
+  },
+  "developerMenuForceNonFatalCrashDescription": "Simulate a non-fatal crash in the app",
+  "@developerMenuForceNonFatalCrashDescription": {
+    "description": "Description for forcing a non-fatal crash from the developer menu"
+  },
+  "developerMenuForceBlacklistError": "Force Blacklist Error",
+  "@developerMenuForceBlacklistError": {
+    "description": "Action title for forcing a blacklisted error from the developer menu"
+  },
+  "developerMenuForceBlacklistErrorDescription": "Simulate an error that should be ignored by the error handler",
+  "@developerMenuForceBlacklistErrorDescription": {
+    "description": "Description for forcing a blacklisted error from the developer menu"
+  },
+  "splashContactSupportUnavailableMessage": "This feature is not yet developed",
+  "@splashContactSupportUnavailableMessage": {
+    "description": "Snack bar message shown when support contact is unavailable on the splash error screen"
   }
 }
-

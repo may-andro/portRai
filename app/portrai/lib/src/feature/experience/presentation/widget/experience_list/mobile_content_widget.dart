@@ -207,7 +207,7 @@ class _MobileExpandedWidget extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     child: FittedBox(
                       child: DSButtonWidget(
-                        label: 'See More',
+                        label: context.localizations.seeMore,
                         variant: DSButtonVariant.secondary,
                         size: DSButtonSize.extraSmall,
                         icon: Icons.chevron_right_rounded,

@@ -26,10 +26,11 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       SettingFeatureFlags.languageSelector,
     );
 
-    final isLanguageSelectorEnabled = languageSelectorResult.fold(
-      (_) => SettingFeatureFlags.languageSelector.defaultValue,
-      (isEnabled) => isEnabled,
-    );
+    var isLanguageSelectorEnabled =
+        SettingFeatureFlags.languageSelector.defaultValue;
+    if (languageSelectorResult.isRight) {
+      isLanguageSelectorEnabled = languageSelectorResult.right;
+    }
 
     emit(
       SettingLoadedState(isLanguageSelectorEnabled: isLanguageSelectorEnabled),

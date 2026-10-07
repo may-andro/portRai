@@ -27,7 +27,7 @@ class _IntroSectionWidget extends StatelessWidget {
                 child: _StatsCard(
                   icon: Icons.work_rounded,
                   value: '${profile.yearsOfExperience}+',
-                  label: 'Years Experience',
+                  label: context.localizations.profileYearsExperience,
                   color: context.colorPalette.brand.primary.color,
                 ),
               ),
@@ -35,7 +35,7 @@ class _IntroSectionWidget extends StatelessWidget {
                 child: _StatsCard(
                   icon: Icons.apps_rounded,
                   value: '${profile.projectsDelivered}+',
-                  label: 'Projects',
+                  label: context.localizations.profileProjects,
                   color: context.colorPalette.brand.secondary.color,
                 ),
               ),
@@ -55,7 +55,7 @@ class _DownloadResumeButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DSButtonWidget(
-      label: 'Download Resume',
+      label: context.localizations.profileDownloadResumeButton,
       icon: Icons.download_rounded,
       border: DSButtonBorder.rounded,
       onPressed: () {

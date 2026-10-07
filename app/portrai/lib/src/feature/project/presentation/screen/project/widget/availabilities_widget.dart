@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 
@@ -14,22 +15,38 @@ class AvailabilitiesWidget extends StatelessWidget {
 
     if (project.github case final String github) {
       buttons.add(
-        _ButtonWidget(label: 'GitHub', icon: Icons.code, url: github),
+        _ButtonWidget(
+          label: context.localizations.projectGitHub,
+          icon: Icons.code,
+          url: github,
+        ),
       );
     }
     if (project.website case final String website) {
       buttons.add(
-        _ButtonWidget(label: 'Website', icon: Icons.language, url: website),
+        _ButtonWidget(
+          label: context.localizations.projectWebsite,
+          icon: Icons.language,
+          url: website,
+        ),
       );
     }
     if (project.appStore case final String appStore) {
       buttons.add(
-        _ButtonWidget(label: 'App Store', icon: Icons.apple, url: appStore),
+        _ButtonWidget(
+          label: context.localizations.projectAppStore,
+          icon: Icons.apple,
+          url: appStore,
+        ),
       );
     }
     if (project.playStore case final String playStore) {
       buttons.add(
-        _ButtonWidget(label: 'Play Store', icon: Icons.shop, url: playStore),
+        _ButtonWidget(
+          label: context.localizations.projectPlayStore,
+          icon: Icons.shop,
+          url: playStore,
+        ),
       );
     }
 

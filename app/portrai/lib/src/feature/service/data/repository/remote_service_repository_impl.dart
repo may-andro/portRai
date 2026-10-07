@@ -17,6 +17,8 @@ class RemoteServiceRepositoryImpl implements ServiceRepository {
     this._logReporter,
   );
 
+  static const _logTag = 'RemoteServiceRepositoryImpl';
+
   final FbFirestoreController _firestoreController;
   final AppLocale _appLocale;
   final ServiceRepository _cacheDelegateRepository;
@@ -40,6 +42,7 @@ class RemoteServiceRepositoryImpl implements ServiceRepository {
     } on ServiceCacheException catch (_) {
       _logReporter.error(
         'Cache error while getting services, loading from remote instead.',
+        tag: _logTag,
       );
     }
 
@@ -112,6 +115,7 @@ class RemoteServiceRepositoryImpl implements ServiceRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache services from remote, continuing without caching.',
+        tag: _logTag,
       );
     }
   }

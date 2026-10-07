@@ -7,18 +7,17 @@ class _TrackingArea extends TrackingArea {
 }
 
 @register
-class LocaleSelectionTrackingDelegate extends TrackingDelegate {
-  LocaleSelectionTrackingDelegate(super.trackingReporter);
+class LocaleSelectionTrackingDelegate extends ScreenTrackingDelegate {
+  LocaleSelectionTrackingDelegate(TrackingReporter trackingReporter)
+    : super(const _TrackingArea(), trackingReporter);
 
-  final TrackingArea _area = const _TrackingArea();
-
-  void trackScreenView(bool isDialog) {
+  void trackVisibleScreen(bool isDialog) {
     if (isDialog) {
       trackEvent(ViewTracking(label: 'locale_selection_popup'));
       return;
     }
 
-    trackEvent(ScreenViewTracking(area: _area));
+    trackEvent(ScreenViewTracking(area: const _TrackingArea()));
   }
 
   void trackViewEvent(String label) {
@@ -26,7 +25,12 @@ class LocaleSelectionTrackingDelegate extends TrackingDelegate {
   }
 
   void trackLocaleSelectionClick(String localeCode) {
-    trackEvent(ClickTracking(label: 'selected_locale', value: localeCode));
+    trackEvent(
+      Tracking(
+        name: 'selected_locale',
+        action: ClickAction(label: localeCode),
+      ),
+    );
   }
 
   void trackLanguageUpdate({

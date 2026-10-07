@@ -2,10 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_event.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_state.dart';
+import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/tracking/_tracking.dart';
 
 @register
 class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
-  DeveloperMenuBloc() : super(const DeveloperMenuInitialState()) {
+  DeveloperMenuBloc(this._trackingDelegate)
+    : super(const DeveloperMenuInitialState()) {
     on<LoadDeveloperMenuEvent>(_onLoad);
     on<ForceFatalCrashEvent>(_onForceFatalCrash);
     on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
@@ -13,6 +15,8 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     on<ScreenVisibleEvent>(_onScreenVisible);
     on<ViewStateVisibleEvent>(_onViewStateVisible);
   }
+
+  final DeveloperMenuTrackingDelegate _trackingDelegate;
 
   void _onLoad(LoadDeveloperMenuEvent event, Emitter<DeveloperMenuState> emit) {
     emit(const DeveloperMenuLoadedState());
@@ -43,13 +47,13 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     ScreenVisibleEvent event,
     Emitter<DeveloperMenuState> emit,
   ) {
-    // Handle screen visible tracking
+    _trackingDelegate.trackScreenView();
   }
 
   void _onViewStateVisible(
     ViewStateVisibleEvent event,
     Emitter<DeveloperMenuState> emit,
   ) {
-    // Handle view state visible tracking
+    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }

@@ -64,9 +64,19 @@
   "forceUpdateButton": "Nu Bijwerken",
   "forceUpdateMessage": "Er is een nieuwe versie van de app beschikbaar en vereist om door te gaan. Werk bij om PortRai te blijven gebruiken.",
   "forceUpdateTitle": "Update Vereist",
+  "featureFlagSearchHint": "Zoek feature flags",
+  "featureFlagHeaderTitle": "Feature Flags ({count})",
+  "featureFlagEmptySearchTitle": "Geen resultaten gevonden",
+  "featureFlagEmptySearchMessage": "Geen feature flags komen overeen met \"{query}\"",
+  "featureFlagRestartRequiredMessage": "Een herstart kan nodig zijn om wijzigingen toe te passen",
+  "featureFlagRestartButton": "Herstarten",
   "help": "Hulp",
   "hireMe": "Werk met Mij",
   "language": "Taal",
+  "localeLanguageDutch": "🇳🇱 Nederlands",
+  "localeLanguageEnglish": "🇬🇧 Engels",
+  "localeLanguageSpanish": "🇪🇸 Spaans",
+  "localeLanguageUnknown": "Onbekende taal",
   "localeSelectionTitle": "Kies Taal",
   "privacyPolicy": "Privacybeleid",
   "retry": "Opnieuw Proberen",
@@ -74,6 +84,7 @@
   "routeNotFoundMessage": "Oeps! Deze pagina bestaat niet.",
   "routeNotFoundTitle": "Pagina Niet Gevonden",
   "selectedLanguage": "Huidige Taal",
+  "settingDeveloperMode": "Ontwikkelaarsmodus",
   "splashContactSupport": "neem contact op met ondersteuning",
   "splashErrorMessage": "Er ging iets mis tijdens het opstarten. Herstart de app of",
   "splashErrorTitle": "Installatie Mislukt",
@@ -100,5 +111,84 @@
   "errorFeatureFlagUpdateFailed": "Kan functievlag niet bijwerken",
   "errorFeatureFlagUpdateUnknown": "Kan wijzigingen niet opslaan. Probeer het opnieuw",
   "errorFeatureFlagsResetFailed": "Kan feature flags niet resetten. Probeer het opnieuw",
-  "version": "Gemaakt met Flutter · {appVersion}"
+  "version": "Gemaakt met Flutter · {appVersion}",
+  "experiencesTitle": "Ervaringen",
+  "seeMore": "Meer bekijken",
+  "achievementsAndResponsibilities": "Prestaties en verantwoordelijkheden",
+  "atCompany": "bij",
+  "present": "Heden",
+  "profileYearsExperience": "Jaren ervaring",
+  "profileProjects": "Projecten",
+  "profileDownloadResumeButton": "CV downloaden",
+  "profileConnectWithMe": "Maak contact met mij",
+  "profileLanguages": "Talen",
+  "profileAboutMe": "Over mij",
+  "profileGetInTouch": "Neem contact op",
+  "profileEducation": "Opleiding",
+  "profileContact": "Contact",
+  "profileContactInformation": "Contactgegevens",
+  "profileEmail": "E-mail",
+  "profileLocation": "Locatie",
+  "profileTimezone": "Tijdzone",
+  "profileCurrentRole": "Huidige rol",
+  "projectOverview": "Overzicht",
+  "projectTechnologies": "Technologieën",
+  "projectAchievements": "Prestaties",
+  "projectKeyFeatures": "Belangrijkste functies",
+  "projectAvailableOn": "Beschikbaar op",
+  "projectGitHub": "GitHub",
+  "projectWebsite": "Website",
+  "projectAppStore": "App Store",
+  "projectPlayStore": "Play Store",
+  "projectTeamSize": "{count} mensen",
+  "@projectOverview": {
+    "description": "Title for the project overview section"
+  },
+  "@projectTechnologies": {
+    "description": "Title for the project technologies section"
+  },
+  "@projectAchievements": {
+    "description": "Title for the project achievements section"
+  },
+  "@projectKeyFeatures": {
+    "description": "Title for the project key features section"
+  },
+  "@projectAvailableOn": {
+    "description": "Title for the project availability links section"
+  },
+  "@projectGitHub": {
+    "description": "Label for the GitHub availability button"
+  },
+  "@projectWebsite": {
+    "description": "Label for the project website availability button"
+  },
+  "@projectAppStore": {
+    "description": "Label for the App Store availability button"
+  },
+  "@projectPlayStore": {
+    "description": "Label for the Play Store availability button"
+  },
+  "@projectTeamSize": {
+    "description": "Label showing the size of the project team",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "3"
+      }
+    }
+  },
+  "portfolioSectionSeeAll": "Alles bekijken",
+  "developerMenuControlsAndTools": "Bediening en tools",
+  "developerMenuCachePlayground": "Cache-speelruimte",
+  "developerMenuCachePlaygroundDescription": "Experimenteer met cache-inhoud en gedrag",
+  "developerMenuFeatureFlags": "Feature flags",
+  "developerMenuFeatureFlagsDescription": "Feature flags in de app bekijken en beheren",
+  "developerMenuErrorSimulation": "Foutsimulatie",
+  "developerMenuForceFatalCrash": "Fatale crash forceren",
+  "developerMenuForceFatalCrashDescription": "Simuleer een fatale crash in de app",
+  "developerMenuForceNonFatalCrash": "Niet-fatale crash forceren",
+  "developerMenuForceNonFatalCrashDescription": "Simuleer een niet-fatale crash in de app",
+  "developerMenuForceBlacklistError": "Blacklist-fout forceren",
+  "developerMenuForceBlacklistErrorDescription": "Simuleer een fout die door de foutafhandeling genegeerd moet worden",
+  "splashContactSupportUnavailableMessage": "Deze functie is nog niet ontwikkeld"
 }

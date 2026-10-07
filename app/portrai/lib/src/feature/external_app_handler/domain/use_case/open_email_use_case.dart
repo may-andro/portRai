@@ -31,36 +31,50 @@ class OpenEmailUseCase extends BaseUseCase<bool, String, OpenEmailFailure> {
 
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
 
-  @protected
-  @override
-  FutureOr<Either<OpenEmailFailure, bool>> execute(String input) async {
-    const emailSubject = 'Virtual Call Opportunity';
-    const emailBody =
-        'Hello,\n\nI would like to arrange a virtual call to get in touch with you regarding an exciting opportunity.\n\nThank you!';
+  @visibleForTesting
+  bool get isWeb => kIsWeb;
 
-    if (kIsWeb) {
-      final String encodedSubject = Uri.encodeComponent(emailSubject);
-      final String encodedBody = Uri.encodeComponent(emailBody);
-      final String mailtoUrl =
-          'mailto:$input?subject=$encodedSubject&body=$encodedBody';
-      final Uri mailUri = Uri.parse(mailtoUrl);
-
-      final eitherResult = await _openExternalUrlUseCase(
-        OpenExternalUrlParam(mailUri),
-      );
-      return eitherResult.mapLeft(
-        (failure) => WebEmailLaunchFailure(cause: failure.cause),
-      );
-    }
-
-    // For mobile platforms only
-    final result = await OpenMail.composeNewEmailInMailApp(
+  @visibleForTesting
+  Future<OpenMailAppResult> composeEmail(String input) {
+    return OpenMail.composeNewEmailInMailApp(
       emailContent: EmailContent(
         to: [input],
         subject: emailSubject,
         body: emailBody,
       ),
     );
+  }
+
+  @visibleForTesting
+  static const emailSubject = 'Virtual Call Opportunity';
+
+  @visibleForTesting
+  static const emailBody =
+      'Hello,\n\nI would like to arrange a virtual call to get in touch with you regarding an exciting opportunity.\n\nThank you!';
+
+  @protected
+  @override
+  FutureOr<Either<OpenEmailFailure, bool>> execute(String input) async {
+    if (isWeb) {
+      final String encodedSubject = Uri.encodeComponent(emailSubject);
+      final String encodedBody = Uri.encodeComponent(emailBody);
+      final String mailtoUrl =
+          'mailto:$input?subject=$encodedSubject&body=$encodedBody';
+      final Uri mailUri = Uri.parse(mailtoUrl);
+
+      final result = await _openExternalUrlUseCase(
+        OpenExternalUrlParam(mailUri),
+      );
+
+      if (result.isRight) {
+        return Right(result.right);
+      }
+
+      return Left(WebEmailLaunchFailure(cause: result.left.cause));
+    }
+
+    // For mobile platforms only
+    final result = await composeEmail(input);
     if (!result.didOpen) {
       return const Left(NoEmailAppFoundFailure());
     }

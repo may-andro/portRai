@@ -32,7 +32,7 @@ class _DateLocationWidget extends StatelessWidget {
         children: [
           _ItemWidget(
             icon: Icons.calendar_month_rounded,
-            label: experience.formattedExperienceDateRange,
+            label: experience.formattedDateRange(context),
           ),
           _ItemWidget(icon: Icons.pin_drop, label: experience.location),
         ],
@@ -45,7 +45,7 @@ class _DateLocationWidget extends StatelessWidget {
         Flexible(
           child: _ItemWidget(
             icon: Icons.calendar_month_rounded,
-            label: experience.formattedExperienceDateRange,
+            label: experience.formattedDateRange(context),
           ),
         ),
         Flexible(

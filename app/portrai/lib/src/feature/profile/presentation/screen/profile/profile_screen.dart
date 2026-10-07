@@ -20,8 +20,8 @@ class ProfileScreen extends StatelessWidget {
         return appServiceLocator.get<ProfileBloc>()
           ..add(const LoadProfileEvent());
       },
-      child: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
           return RouteObserverWidget(
             onResume: () => context.bloc.add(const ScreenVisibleEvent()),
             child: Scaffold(

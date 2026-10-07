@@ -2,40 +2,16 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/widget/_widget.dart';
 
 import '../../../../../../../mock/feature/feature_flag/presentation/screen/feature_flag/bloc/mock_feature_flag_bloc.dart';
+import '../../../../../../../mock/feature/feature_flag/test_data/feature_flag_test_data.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
 
 void main() {
-  const testimonialsDefinition = AppFeatureFlagDefinition(
-    key: 'feature_testimonials_section',
-    defaultValue: false,
-    displayName: 'Testimonials Section',
-    description: 'Enables the testimonials section on portfolio page',
-  );
-  const servicesDefinition = AppFeatureFlagDefinition(
-    key: 'feature_services_section',
-    defaultValue: false,
-    displayName: 'Services Section',
-    description: 'Enables the services section on portfolio page',
-  );
-  const testimonialsFlag = AppFeatureFlagEntity(
-    flag: testimonialsDefinition,
-    isEnabled: false,
-    isOverridden: false,
-  );
-  const servicesFlag = AppFeatureFlagEntity(
-    flag: servicesDefinition,
-    isEnabled: true,
-    isOverridden: true,
-    hasRemoteSource: true,
-    remoteValue: false,
-  );
-
   setUpAll(() {
     registerFallbackValue(testimonialsFlag);
   });
@@ -139,8 +115,17 @@ void main() {
 
         await pumpWidget(tester, bloc);
 
-        expect(find.text('No results found'), findsOneWidget);
-        expect(find.text('No feature flags match "missing"'), findsOneWidget);
+        final context = tester.element(find.byType(ContentWidget));
+        expect(
+          find.text(context.localizations.featureFlagEmptySearchTitle),
+          findsOneWidget,
+        );
+        expect(
+          find.text(
+            context.localizations.featureFlagEmptySearchMessage('missing'),
+          ),
+          findsOneWidget,
+        );
       },
     );
 

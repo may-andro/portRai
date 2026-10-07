@@ -22,6 +22,7 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
   final ProjectRepository _cacheDelegateRepository;
   final ProjectMapper _mapper;
   final LogReporter _logReporter;
+  static const _tag = 'AssetProjectRepositoryImpl';
 
   @override
   Future<void> cacheProject(ProjectEntity project) {
@@ -40,6 +41,7 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
     } on ProjectCacheException catch (e, stackTrace) {
       _logReporter.error(
         'Cache error while getting projects: ${e.cause}',
+        tag: _tag,
         stacktrace: stackTrace,
       );
     }
@@ -57,10 +59,14 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
       return await _cacheDelegateRepository.getProject(id);
     } on ProjectNotFoundException {
       // If not in cache, load all from assets and try again
-      _logReporter.debug('Project $id not found in cache, loading from assets');
+      _logReporter.debug(
+        'Project $id not found in cache, loading from assets',
+        tag: _tag,
+      );
     } on ProjectCacheException catch (e, stackTrace) {
       _logReporter.error(
         'Cache error while getting project: ${e.cause}',
+        tag: _tag,
         stacktrace: stackTrace,
       );
     }
@@ -114,6 +120,7 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache projects from assets, continuing without caching.',
+        tag: _tag,
       );
     }
   }
