@@ -6,6 +6,25 @@ Complete guide for releasing Portrai app and Storybook using Git tags.
 
 ## 📌 Quick Reference
 
+### Prepare the Next Portrai Release
+
+From a clean working tree, run:
+
+```bash
+melos run prepare_portrai_release
+```
+
+This fetches tags from `origin`, switches to `develop`, pulls with
+`--ff-only`, and reads `app/portrai/pubspec.yaml` without modifying it. It keeps the app's
+semantic version and increments the highest build number from the current
+pubspec and Portrai review/production tags, ignoring Storybook and legal tags.
+Build numbers are compared numerically, not by tag creation date.
+
+The command prints the proposed production tag but does not modify files,
+commit, create a tag, or push. CI injects the version and build number from
+the tag using `--build-name` and `--build-number`; the local pubspec build
+number does not need to match.
+
 ### Tag Format
 ```
 VERSION+BUILD_NUMBER-TYPE[-suffix]

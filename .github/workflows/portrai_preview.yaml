@@ -7,7 +7,7 @@ concurrency:
 on:
   push:
     tags:
-      - '*+*-review'
+      - '*\+*-review'
 
 permissions: write-all
 

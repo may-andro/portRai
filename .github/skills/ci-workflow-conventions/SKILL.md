@@ -99,10 +99,15 @@ Release/deploy pipelines are separate, tag-triggered workflows (e.g. `portrai_pr
    `_deploy_firebase.yaml` / `_deploy_appstore.yaml` / `_deploy_playstore.yaml` workflow.
 
 Tag naming conventions per pipeline (each pipeline's `on.push.tags` filter):
-- App preview build: `*+*-review` (e.g. `1.0.0+1-review`)
+- App preview build: `*\+*-review` (e.g. `1.0.0+1-review`)
 - App production build: check the specific `on.push.tags` pattern in `<app>_production.yaml`
   before assuming — patterns differ per pipeline (e.g. storybook uses
-  `*+*-review-storybook`/`*+*-prod-storybook`, legal pages use `legal-*`).
+  `*\+*-review-storybook`/`*\+*-prod-storybook`, legal pages use `legal-*`).
+
+Escape literal `+` in GitHub Actions tag filters using single-quoted YAML
+strings, e.g. `'*\+*-prod'`. An unescaped `+` is a repetition operator and
+`*+*` is invalid.
+Git's `git tag -l '*+*-prod'` uses different glob syntax and needs no escaping.
 
 New reusable build/deploy workflows should be prefixed with `_` and declare `workflow_call:`
 inputs/secrets explicitly (no `pull_request:`/`push:` triggers of their own) — they're building

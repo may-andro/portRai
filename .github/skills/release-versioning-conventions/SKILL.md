@@ -16,11 +16,14 @@ kicks off (`extract-version → quality → build → deploy`).
 
 | Suffix              | Workflow                                | Purpose                          |
 |----------------------|------------------------------------------|-----------------------------------|
-| `*+*-review`         | `portrai_preview.yaml`                   | Preview/staging release of the app |
-| `*+*-prod`           | `portrai_production.yaml`                | Production release of the app     |
-| `*+*-review-storybook` | `storybook_review.yaml`                | Preview release of the storybook app |
-| `*+*-prod-storybook`   | `storybook_production.yaml`            | Production release of the storybook app |
+| `*\+*-review`         | `portrai_preview.yaml`                   | Preview/staging release of the app |
+| `*\+*-prod`           | `portrai_production.yaml`                | Production release of the app     |
+| `*\+*-review-storybook` | `storybook_review.yaml`                | Preview release of the storybook app |
+| `*\+*-prod-storybook`   | `storybook_production.yaml`            | Production release of the storybook app |
 | `legal-*`            | `legal_production.yaml`                  | Legal/static pages release (no version+build, just `legal-<version>`) |
+
+These are GitHub Actions filter patterns: escape the literal `+` in
+single-quoted YAML. Actual tag names contain no backslash (e.g. `1.0.0+1-prod`).
 
 - `version` must be a semver-like string (e.g. `1.1.4`) matching the
   `version:` field's first segment in the corresponding `pubspec.yaml`.
@@ -31,27 +34,30 @@ kicks off (`extract-version → quality → build → deploy`).
 
 ## Before tagging
 
-Update the `version:` field in the relevant `pubspec.yaml`
-(`app/portrai/pubspec.yaml` or `app/storybook/pubspec.yaml`, format
-`<version>+<build_number>`, e.g. `1.0.0+1`) to match the tag you're about
-to push, then tag the commit that contains that change:
+For Portrai, `melos run prepare_portrai_release` automates preparation from a
+clean working tree: fetch tags, switch to `develop`, pull with `--ff-only`,
+and increment the highest build number from the pubspec and app
+review/production tags. It preserves the pubspec's semantic version,
+excludes Storybook/legal tags, and prints the proposed production tag without
+modifying the pubspec. It does not commit, tag, or push.
+
+CI injects the release version/build from the tag using `--build-name` and
+`--build-number`. The local pubspec build number does not need to match the
+release tag. Semantic version changes are still made in the pubspec.
+Create and push the proposed tag on the intended release commit:
 
 ```bash
 git tag 1.1.4+202530-prod
 git push origin 1.1.4+202530-prod
 ```
 
-Tagging with a version/build that doesn't match `pubspec.yaml` will make
-the built artifact's displayed version inconsistent with what CI reports —
-keep them in sync.
-
 ## Don't invent
 
 Don't invent a new tag suffix without adding a matching
 `on: push: tags:` workflow first — an unrecognized suffix simply won't
 trigger anything. Don't assume a `CHANGELOG.md` or automated version-bump
-tool exists — there is none in this repo today; version bumps are a
-manual `pubspec.yaml` edit.
+tool exists beyond the Portrai preparation script above; semantic version
+bumps and Storybook version updates are manual `pubspec.yaml` edits.
 
 ## Related skills
 
