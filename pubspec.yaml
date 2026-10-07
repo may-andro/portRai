@@ -50,6 +50,9 @@ melos:
       hooks:
         post: melos exec --flutter --concurrency=1 -- "flutter clean"
   scripts:
+    prepare_portrai_release:
+      run: bash tool/release/prepare_portrai_release.sh
+      description: Pull develop and tags and print Portrai's next production tag without modifying files, committing, or pushing.
     format_check:
       run: melos exec dart format . --set-exit-if-changed
       description: Run `dart format` checks for all packages.
