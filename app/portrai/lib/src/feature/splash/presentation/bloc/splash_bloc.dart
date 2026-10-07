@@ -3,14 +3,26 @@ import 'dart:async';
 import 'package:design_system/design_system.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/splash/presentation/bloc/splash_event.dart';
 import 'package:portrai/src/feature/splash/presentation/bloc/splash_state.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
-  SplashBloc(this._moduleInjectorController, this._moduleConfigurators)
-    : super(SetUpProgressState.initial()) {
+  /// The dependency graph isn't built yet while the splash runs, so
+  /// [connectivityRepository] is created by hand rather than injected.
+  SplashBloc(
+    this._moduleInjectorController,
+    this._moduleConfigurators, {
+    ConnectivityRepository? connectivityRepository,
+  }) : _connectivityRepository =
+           connectivityRepository ??
+           ConnectivityPlusRepositoryImpl.standalone(),
+       super(SetUpProgressState.initial()) {
     on<InitEvent>(_onInitEventToState);
+    on<RetryClickEvent>(_onInitEventToState);
   }
+
+  final ConnectivityRepository _connectivityRepository;
 
   final ModuleInjectorController _moduleInjectorController;
 
@@ -21,9 +33,15 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   bool _errorDuringDI = false;
 
   FutureOr<void> _onInitEventToState(
-    InitEvent event,
+    SplashEvent event,
     Emitter<SplashState> emit,
   ) async {
+    if (state is SetUpNoInternetState) emit(SetUpProgressState.initial());
+    if (!await _connectivityRepository.isConnected()) {
+      emit(const SetUpNoInternetState());
+      return;
+    }
+
     await emit.onEach<InjectionStatus>(
       _moduleInjectorController.setUpDIGraph(
         configurators: _moduleConfigurators,
