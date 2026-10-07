@@ -105,6 +105,7 @@ jobs:
       app-name: portrai
       build-type: preview
       use-firebase: true
+      run-codegen: true
       version: ${{ needs.extract-version.outputs.version }}
       build-number: ${{ needs.extract-version.outputs.build-number }}
     secrets:
