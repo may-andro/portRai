@@ -55,6 +55,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           module-path: ${{ inputs.app-path }}
 
+      - name: Generate workspace code
+        uses: ./.github/actions/generate-workspace-code
+        with:
+          package-name: portrai
+
       - name: Inject GoogleService-Info.plist
         run: echo "${{ secrets.GOOGLE_SERVICES_PLIST }}" | base64 -d > ${{ inputs.app-path }}/ios/Runner/GoogleService-Info.plist
 
