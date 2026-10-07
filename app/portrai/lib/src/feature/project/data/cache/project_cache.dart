@@ -45,7 +45,7 @@ class ProjectCache extends DBCache<ProjectModel> {
   ];
 
   @override
-  List<String> get primaryKeyColumns => ['title', 'locale'];
+  List<String> get primaryKeyColumns => ['id', 'locale'];
 
   @override
   ProjectModel deserialize(Map<String, dynamic> map) {

@@ -1,10 +1,11 @@
 import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
+import 'package:portrai/src/feature/experience/presentation/extension/experience_date_range_extension.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/_screen.dart';
 
 part 'mobile_content_widget.dart';

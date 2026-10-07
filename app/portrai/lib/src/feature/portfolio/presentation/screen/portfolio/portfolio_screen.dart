@@ -15,8 +15,8 @@ class PortfolioScreen extends StatelessWidget {
         return appServiceLocator.get<PortfolioBloc>()
           ..add(const LoadPortfolioEvent());
       },
-      child: BlocBuilder<PortfolioBloc, PortfolioState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
           return RouteObserverWidget(
             onResume: () => context.bloc.add(const ScreenVisibleEvent()),
             child: Scaffold(

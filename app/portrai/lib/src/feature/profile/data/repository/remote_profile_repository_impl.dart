@@ -7,6 +7,8 @@ import 'package:portrai/src/feature/profile/data/model/_model.dart';
 import 'package:portrai/src/feature/profile/data/repository/cache_profile_repository_impl.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 
+const _logTag = 'RemoteProfileRepositoryImpl';
+
 @register
 class RemoteProfileRepositoryImpl implements ProfileRepository {
   RemoteProfileRepositoryImpl(
@@ -41,6 +43,7 @@ class RemoteProfileRepositoryImpl implements ProfileRepository {
     } on ProfileCacheException catch (_) {
       _logReporter.error(
         'Cache error while getting profile, loading from remote instead.',
+        tag: _logTag,
       );
 
       final profile = await _loadProfileFromRemote();
@@ -108,6 +111,7 @@ class RemoteProfileRepositoryImpl implements ProfileRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache profile from remote, continuing without caching.',
+        tag: _logTag,
       );
     }
   }

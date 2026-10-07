@@ -9,8 +9,8 @@ class _ImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DSNetworkImageWidget(
       url: imageUrl,
-      width: context.expertiesImageSize,
-      height: context.expertiesImageSize,
+      width: context.expertiseImageSize,
+      height: context.expertiseImageSize,
       shape: BoxShape.circle,
       fit: BoxFit.cover,
       //color: context.colorPalette.surface.inverseSurface,

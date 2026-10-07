@@ -7,4 +7,6 @@ abstract class SettingEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadSettingsEvent extends SettingEvent {}
+class LoadSettingsEvent extends SettingEvent {
+  const LoadSettingsEvent();
+}

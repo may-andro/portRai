@@ -60,7 +60,7 @@ class _LocaleItemWidget extends StatelessWidget {
         children: [
           Expanded(
             child: DSTextWidget(
-              locale.languageCode.languageName,
+              locale.languageCode.languageName(context.localizations),
               style: context.typography.titleMedium,
               color: context.colorPalette.neutral.grey7,
             ),

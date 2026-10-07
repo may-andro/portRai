@@ -84,7 +84,7 @@ class _ErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TrackingImpressionDetectorWidget(
-      impressionId: 'language_update_loading_content_view',
+      impressionId: 'language_update_error_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
       child: Center(
         child: Column(

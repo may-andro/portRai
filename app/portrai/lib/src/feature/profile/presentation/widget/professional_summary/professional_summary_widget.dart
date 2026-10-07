@@ -43,8 +43,8 @@ class ProfessionalSummaryWidget extends StatelessWidget {
         return appServiceLocator.get<ProfessionalSummaryBloc>()
           ..add(LoadDataEvent(profile));
       },
-      child: BlocBuilder<ProfessionalSummaryBloc, ProfessionalSummaryState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
           return _SuccessContentWidget(
             profile: profile,
             isVisible: isVisible,

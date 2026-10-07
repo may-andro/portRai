@@ -1,14 +1,16 @@
+import 'package:portrai/l10n/generated/app_localizations.dart';
+
 extension LocaleCodeExtension on String {
-  String get languageName {
+  String languageName(AppLocalizations localizations) {
     switch (this) {
       case 'en':
-        return '🇬🇧 English';
+        return localizations.localeLanguageEnglish;
       case 'nl':
-        return '🇳🇱 Dutch';
+        return localizations.localeLanguageDutch;
       case 'es':
-        return '🇪🇸 Spanish';
+        return localizations.localeLanguageSpanish;
       default:
-        return 'Unknown Language';
+        return localizations.localeLanguageUnknown;
     }
   }
 }

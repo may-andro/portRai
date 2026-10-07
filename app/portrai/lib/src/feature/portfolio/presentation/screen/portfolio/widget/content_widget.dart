@@ -68,7 +68,7 @@ class _SuccessWidgetState extends State<_SuccessWidget>
   @override
   Widget build(BuildContext context) {
     return TrackingImpressionDetectorWidget(
-      impressionId: 'home_content_view',
+      impressionId: 'portfolio_loaded_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
       child: BlocListener<PortfolioBloc, PortfolioState>(
         listenWhen: (previous, current) {

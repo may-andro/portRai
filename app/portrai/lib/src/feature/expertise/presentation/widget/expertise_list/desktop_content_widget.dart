@@ -15,10 +15,11 @@ class _DesktopContentWidget extends StatefulWidget {
 
 class _DesktopContentWidgetState extends State<_DesktopContentWidget>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-  late ScrollController _scrollController;
-  late List<ExpertiseEntity> _infiniteList;
+  AnimationController? _animationController;
+  late final Animation<double> _animation;
+  late final ScrollController _scrollController;
+  late final List<ExpertiseEntity> _infiniteList;
+  Timer? _restartAnimationTimer;
 
   @override
   void initState() {
@@ -37,6 +38,10 @@ class _DesktopContentWidgetState extends State<_DesktopContentWidget>
   }
 
   void _setupSmoothAnimation() {
+    if (widget.allExpertise.isEmpty) {
+      return;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _scrollController.hasClients) {
         final cardWidth = _CoreStrengthCard.getHeight(context);
@@ -55,7 +60,7 @@ class _DesktopContentWidgetState extends State<_DesktopContentWidget>
               end: cardStepWidth, // Move exactly one card width + spacing
             ).animate(
               CurvedAnimation(
-                parent: _animationController,
+                parent: _animationController!,
                 curve: Curves.easeInOut,
               ),
             );
@@ -69,7 +74,7 @@ class _DesktopContentWidgetState extends State<_DesktopContentWidget>
           }
         });
 
-        _animationController.addStatusListener((status) {
+        _animationController!.addStatusListener((status) {
           if (status == AnimationStatus.completed) {
             // Move to next card
             _currentCardIndex++;
@@ -82,16 +87,17 @@ class _DesktopContentWidgetState extends State<_DesktopContentWidget>
             }
 
             // Pause for 3 second before starting next card transition
-            Future.delayed(3.seconds, () {
+            _restartAnimationTimer?.cancel();
+            _restartAnimationTimer = Timer(3.seconds, () {
               if (mounted) {
-                _animationController.reset();
-                _animationController.forward();
+                _animationController?.reset();
+                _animationController?.forward();
               }
             });
           }
         });
 
-        _animationController.forward();
+        _animationController!.forward();
       }
     });
   }
@@ -100,13 +106,18 @@ class _DesktopContentWidgetState extends State<_DesktopContentWidget>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _restartAnimationTimer?.cancel();
+    _animationController?.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.allExpertise.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return SizedBox(
           height: _CoreStrengthCard.getHeight(context),
           child: ListView.separated(
@@ -138,7 +149,7 @@ class _CoreStrengthCard extends StatelessWidget {
 
   static double getHeight(BuildContext context) {
     return context.space(factor: 2) +
-        context.expertiesImageSize +
+        context.expertiseImageSize +
         context.space(factor: 0.5) +
         _TitleWidget.getHeight(context, 1) +
         context.space(factor: 0.5) +

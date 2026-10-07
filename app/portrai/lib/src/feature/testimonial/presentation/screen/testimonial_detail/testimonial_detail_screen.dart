@@ -13,8 +13,8 @@ class TestimonialDetailScreen extends StatelessWidget {
       create: (context) {
         return appServiceLocator.get<TestimonialDetailBloc>();
       },
-      child: BlocBuilder<TestimonialDetailBloc, TestimonialDetailState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
           return RouteObserverWidget(
             onResume: () => context.bloc.add(ScreenVisibleEvent()),
             child: Scaffold(

@@ -312,7 +312,7 @@ class _DesktopExpandedWidget extends StatelessWidget {
           children: [
             const DSVerticalSpacerWidget(1),
             DSTextWidget(
-                  'Achievements & Responsibilities',
+                  context.localizations.achievementsAndResponsibilities,
                   color: color,
                   style: context.typography.emphasizedLabelLarge,
                 )

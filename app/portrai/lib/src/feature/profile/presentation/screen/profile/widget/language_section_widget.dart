@@ -14,7 +14,7 @@ class _LanguageSectionWidget extends StatelessWidget {
     if (profile.languages.isEmpty) return const SizedBox.shrink();
     final items = profile.languages.toLanguageWidgets(context, isDesktop);
     return _SectionWidget(
-      label: 'Languages',
+      label: context.localizations.profileLanguages,
       isDesktop: isDesktop,
       children: [
         Wrap(

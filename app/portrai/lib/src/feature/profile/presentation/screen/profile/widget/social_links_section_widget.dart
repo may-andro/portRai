@@ -12,7 +12,7 @@ class _SocialLinksSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionWidget(
-      label: 'Connect With Me',
+      label: context.localizations.profileConnectWithMe,
       isDesktop: isDesktop,
       children: [
         Wrap(

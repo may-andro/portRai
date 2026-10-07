@@ -86,6 +86,7 @@ void main() {
         verify(
           () => logReporter.error(
             'Failed to load app config from remote, falling back to cache.',
+            tag: 'RemoteAppConfigRepositoryImpl',
           ),
         ).called(1);
       });
@@ -141,6 +142,7 @@ void main() {
           () => logReporter.error(
             'Failed to cache app config from remote, continuing without '
             'caching.',
+            tag: 'RemoteAppConfigRepositoryImpl',
           ),
         ).called(1);
       });

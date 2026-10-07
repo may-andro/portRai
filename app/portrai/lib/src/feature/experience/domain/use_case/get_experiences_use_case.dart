@@ -53,20 +53,13 @@ class GetExperiencesUseCase
   @override
   GetExperiencesFailure mapErrorToFailure(Object e, StackTrace st) {
     return switch (e) {
-      final ExperienceNotFoundException exception => ExperiencesNotFoundFailure(
-        cause: exception,
+      ExperienceNotFoundException() => ExperiencesNotFoundFailure(cause: e),
+      ExperienceNetworkException() => ExperiencesNetworkFailure(cause: e),
+      ExperienceParsingException() => ExperiencesDataFailure(cause: e),
+      ExperienceUnauthorizedException() => ExperiencesUnauthorizedFailure(
+        cause: e,
       ),
-      final ExperienceNetworkException exception => ExperiencesNetworkFailure(
-        cause: exception,
-      ),
-      final ExperienceParsingException exception => ExperiencesDataFailure(
-        cause: exception,
-      ),
-      final ExperienceUnauthorizedException exception =>
-        ExperiencesUnauthorizedFailure(cause: exception),
-      final ExperienceCacheException exception => ExperiencesDataFailure(
-        cause: exception,
-      ),
+      ExperienceCacheException() => ExperiencesDataFailure(cause: e),
       _ => ExperiencesUnknownFailure(cause: e),
     };
   }

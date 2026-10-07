@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 
 class ExperienceEntity extends Equatable {
@@ -54,12 +53,4 @@ class ExperienceEntity extends Equatable {
     url,
     id,
   ];
-
-  String get formattedExperienceDateRange {
-    final start = DateFormat.yMMM().format(startDate).capitalize;
-    final end = endDate != null
-        ? DateFormat.yMMM().format(endDate!).capitalize
-        : 'Present';
-    return '$start - $end';
-  }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/experiences_event.dart';
@@ -9,14 +8,11 @@ import 'package:portrai/src/feature/experience/presentation/screen/experiences/b
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/tracking/_tracking.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 
-const _logTag = 'ExperiencesBloc';
-
 @register
 class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
   ExperiencesBloc(
     this._getExperiencesUseCase,
     this._getProfileUseCase,
-    this._logReporter,
     this._trackingDelegate,
   ) : super(const LoadingState()) {
     on<LoadExperiencesEvent>(_mapLoadExperiencesEventToState);
@@ -26,7 +22,6 @@ class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
 
   final GetExperiencesUseCase _getExperiencesUseCase;
   final GetProfileUseCase _getProfileUseCase;
-  final LogReporter _logReporter;
   final ExperiencesTrackingDelegate _trackingDelegate;
 
   FutureOr<void> _mapLoadExperiencesEventToState(
@@ -36,13 +31,10 @@ class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
     emit(const LoadingState());
 
     final eitherProfileResult = await _getProfileUseCase();
-    final profile = eitherProfileResult.fold((failure) {
-      _logReporter.error(
-        tag: _logTag,
-        'Failed to load profile: ${failure.cause}',
-      );
-      return null;
-    }, (profile) => profile);
+    final profile = eitherProfileResult.fold<ProfileEntity?>(
+      (_) => null,
+      (profile) => profile,
+    );
 
     final eitherExperiencesResult = await _getExperiencesUseCase();
     eitherExperiencesResult.fold(

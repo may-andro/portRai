@@ -2,7 +2,6 @@
 // ignore_for_file: type=lint, unused_import
 
 import 'package:core/src/model/app_locale.dart';
-import 'package:log_reporter/src/log/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/locale/data/cache/app_locale_cache.dart';
 import 'package:portrai/src/feature/locale/data/repository/locale_repository_impl.dart';
@@ -34,7 +33,6 @@ void $registerLocaleDependencies(ServiceLocator sl) {
       sl.get<GetLocaleUseCase>(),
       sl.get<UpdateLocaleUseCase>(),
       sl.get<GetProfileUseCase>(),
-      sl.get<LogReporter>(),
       sl.get<LocaleSelectionTrackingDelegate>(),
     ),
   );

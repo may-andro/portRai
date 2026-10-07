@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/widget/restart_app_tile_widget.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/widget/search_widget.dart';
@@ -29,7 +30,6 @@ class _HeaderWidgetState extends State<HeaderWidget> {
     super.dispose();
   }
 
-  /// Updates search controller text if needed
   void _updateSearchController(String searchQuery) {
     if (_searchController.text != searchQuery) {
       final cursorPosition = _searchController.selection.baseOffset;
@@ -46,17 +46,14 @@ class _HeaderWidgetState extends State<HeaderWidget> {
       listener: (context, state) {
         if (state is FeatureFlagLoadedState) {
           _updateSearchController(state.searchQuery);
-          if (_searchController.text.isNotEmpty) {
-            //FocusScope.of(context).requestFocus(_focusNode);
-          }
         }
       },
       builder: (context, state) {
-        if (state is FeatureFlagLoadedState) {
-          return _buildContent(context, state);
+        if (state is! FeatureFlagLoadedState) {
+          return const SizedBox.shrink();
         }
 
-        return const SizedBox.shrink();
+        return _buildContent(context, state);
       },
     );
   }
@@ -64,9 +61,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
   Widget _buildContent(BuildContext context, FeatureFlagLoadedState state) {
     final searchQuery = state.searchQuery;
     final resultCount = state.filteredFlags.length;
-    final hasManipulatedFlags = state.hasManipulatedFlags;
 
-    // Ensure the controller has the correct text
     _updateSearchController(searchQuery);
 
     return DSCardWidget(
@@ -90,11 +85,13 @@ class _HeaderWidgetState extends State<HeaderWidget> {
             ),
             const DSVerticalSpacerWidget(1),
             DSTextWidget(
-              'Feature Flags ($resultCount)',
+              context.localizations.featureFlagHeaderTitle(resultCount),
               style: context.typography.labelSmall,
               color: context.colorPalette.onBackground,
             ),
-            RestartAppTileWidget(hasManipulatedFlags: hasManipulatedFlags),
+            RestartAppTileWidget(
+              hasManipulatedFlags: state.hasManipulatedFlags,
+            ),
           ],
         ),
       ),

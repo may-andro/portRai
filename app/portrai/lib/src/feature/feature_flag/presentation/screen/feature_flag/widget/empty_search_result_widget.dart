@@ -20,13 +20,13 @@ class _EmptySearchResultWidget extends StatelessWidget {
             ),
             const DSVerticalSpacerWidget(2),
             DSTextWidget(
-              'No results found',
+              context.localizations.featureFlagEmptySearchTitle,
               style: context.typography.titleMedium,
               color: context.colorPalette.onBackground,
             ),
             const DSVerticalSpacerWidget(1),
             DSTextWidget(
-              'No feature flags match "$searchQuery"',
+              context.localizations.featureFlagEmptySearchMessage(searchQuery),
               style: context.typography.bodyMedium,
               color: context.colorPalette.neutral.grey7,
               textAlign: TextAlign.center,

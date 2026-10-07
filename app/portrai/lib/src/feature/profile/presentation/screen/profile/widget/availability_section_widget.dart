@@ -34,7 +34,7 @@ class _AvailabilitySectionWidget extends StatelessWidget {
                   DSHorizontalSpacerWidget(isDesktop ? 0.75 : 1),
                   Expanded(
                     child: DSTextWidget(
-                      'Current Role',
+                      context.localizations.profileCurrentRole,
                       style: context.typography.emphasizedTitleMedium,
                       color: context.colorPalette.neutral.grey10,
                     ),

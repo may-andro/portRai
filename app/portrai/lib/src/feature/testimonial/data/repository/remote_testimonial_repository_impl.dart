@@ -22,6 +22,7 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
   final TestimonialRepository _cacheDelegateRepository;
   final TestimonialMapper _mapper;
   final LogReporter _logReporter;
+  static const _tag = 'RemoteTestimonialRepositoryImpl';
 
   @override
   Future<void> cacheTestimonial(TestimonialEntity testimonial) {
@@ -32,13 +33,16 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
   Future<TestimonialEntity> getTestimonial(String id) async {
     try {
       return await _cacheDelegateRepository.getTestimonial(id);
-    } on TestimonialNotFoundException catch (_) {
+    } on TestimonialNotFoundException {
+      _logReporter.debug(
+        'Testimonial $id not found in cache, loading from remote',
+        tag: _tag,
+      );
+
       final testimonials = await _loadTestimonialsFromRemote();
 
-      // Try to cache them, but don't fail if caching fails
       await _cacheTestimonialsSafely(testimonials);
 
-      // Find the requested testimonial
       final testimonial = testimonials.firstWhereOrNull(
         (test) => test.id == id,
       );
@@ -51,7 +55,11 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
 
       return testimonial;
     } on TestimonialCacheException catch (_) {
-      // Cache has data corruption or DB issues, try loading from remote directly
+      _logReporter.error(
+        'Cache error while getting testimonial, loading from remote instead.',
+        tag: _tag,
+      );
+
       final testimonials = await _loadTestimonialsFromRemote();
 
       final testimonial = testimonials.firstWhereOrNull(
@@ -80,19 +88,17 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
     } on TestimonialCacheException catch (_) {
       _logReporter.error(
         'Cache error while getting testimonials, loading from remote instead.',
+        tag: _tag,
       );
     }
 
-    // Cache is empty, expired, or has issues - fetch from remote
     final testimonials = await _loadTestimonialsFromRemote();
 
-    // Try to cache them, but don't fail if caching fails
     await _cacheTestimonialsSafely(testimonials);
 
     return testimonials;
   }
 
-  /// Loads testimonials from Firestore based on app locale
   Future<List<TestimonialEntity>> _loadTestimonialsFromRemote() async {
     try {
       final locale = _appLocale.languageCode;
@@ -146,7 +152,6 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
     }
   }
 
-  /// Attempts to cache testimonials, but doesn't throw if caching fails
   Future<void> _cacheTestimonialsSafely(
     List<TestimonialEntity> testimonials,
   ) async {
@@ -157,6 +162,7 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache testimonials from remote, continuing without caching.',
+        tag: _tag,
       );
     }
   }

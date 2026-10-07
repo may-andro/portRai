@@ -9,6 +9,8 @@ import 'package:portrai/src/feature/profile/data/model/_model.dart';
 import 'package:portrai/src/feature/profile/data/repository/cache_profile_repository_impl.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 
+const _logTag = 'AssetProfileRepositoryImpl';
+
 @register
 class AssetProfileRepositoryImpl implements ProfileRepository {
   AssetProfileRepositoryImpl(
@@ -42,6 +44,7 @@ class AssetProfileRepositoryImpl implements ProfileRepository {
       _logReporter.error(
         'Cache error while getting profile: ${e.cause}',
         stacktrace: stackTrace,
+        tag: _logTag,
       );
 
       final profile = await _loadProfileFromAssets();
@@ -79,6 +82,7 @@ class AssetProfileRepositoryImpl implements ProfileRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache profile from assets, continuing without caching.',
+        tag: _logTag,
       );
     }
   }

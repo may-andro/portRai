@@ -1,6 +1,5 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:log_reporter/log_reporter.dart';
 import 'package:portrai/src/feature/locale/domain/_domain.dart';
 import 'package:portrai/src/feature/locale/presentation/widget/system_locale_observer/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
@@ -27,7 +26,6 @@ class _SystemLocaleObserverWidgetState extends State<SystemLocaleObserverWidget>
     _bloc = SystemLocaleObserverBloc(
       getLocaleUseCase: appServiceLocator.get<GetLocaleUseCase>(),
       updateLocaleUseCase: appServiceLocator.get<UpdateLocaleUseCase>(),
-      logReporter: appServiceLocator.get<LogReporter>(),
     );
 
     _bloc.add(const LoadLocaleEvent());

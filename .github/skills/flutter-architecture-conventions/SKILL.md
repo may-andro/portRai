@@ -50,6 +50,9 @@ onPressed: () async {
 ## Bloc event naming
 UI interaction events are named `<Action>ClickEvent` (e.g. `HeaderTabClickEvent`, `DrawerClickEvent`), not `<Action>PressedEvent` or other variants.
 
+## Presentation extensions
+Extensions that need `BuildContext`/localization (e.g. formatting an entity for display) live in `presentation/extension/` with an `_extension.dart` barrel, exported from `presentation/_presentation.dart`. Never put them in the domain layer or in `widget/`. Examples: `experience_date_range_extension.dart`, `project_date_range_extension.dart`, `locale_code_extension.dart`. Screen-specific ones sit next to their screen (`screen/<name>/extension/`).
+
 ## Bloc folder shortcut extension
 Every feature's `bloc/` folder includes a `bloc_extension.dart` defining a `BuildContext` shortcut, exported from that folder's `_bloc.dart` barrel:
 

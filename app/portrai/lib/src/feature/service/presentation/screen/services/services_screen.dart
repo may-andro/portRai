@@ -18,8 +18,8 @@ class ServicesScreen extends StatelessWidget {
       create: (context) {
         return appServiceLocator.get<ServicesBloc>();
       },
-      child: BlocBuilder<ServicesBloc, ServicesState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
           return RouteObserverWidget(
             onResume: () => context.bloc.add(ScreenVisibleEvent()),
             child: Scaffold(

@@ -182,7 +182,7 @@ class ExperienceSectionWidget extends SectionWidget {
       action: context.isDesktop
           ? null
           : SectionAction(
-              label: 'See All',
+              label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
                 ExperiencesScreen.navigate(context);
               },

@@ -47,6 +47,7 @@ void main() {
         openExternalUrlUseCase: openExternalUrlUseCase,
         trackingDelegate: trackingDelegate,
       );
+      addTearDown(bloc.close);
       return (
         isAppUpdateRequiredUseCase: isAppUpdateRequiredUseCase,
         getAppStoreUrlUseCase: getAppStoreUrlUseCase,
@@ -71,7 +72,6 @@ void main() {
       tester,
     ) async {
       final deps = buildBloc();
-      addTearDown(deps.bloc.close);
 
       await pumpWidget(tester, deps.bloc);
 
@@ -91,7 +91,6 @@ void main() {
       tester,
     ) async {
       final deps = buildBloc();
-      addTearDown(deps.bloc.close);
 
       await pumpWidget(tester, deps.bloc);
       await tester.pump();
@@ -103,7 +102,6 @@ void main() {
       tester,
     ) async {
       final deps = buildBloc();
-      addTearDown(deps.bloc.close);
 
       final storeUrl = Uri.parse('https://play.google.com/store/apps');
       deps.getAppStoreUrlUseCase.stubCall(
@@ -128,7 +126,6 @@ void main() {
       tester,
     ) async {
       final deps = buildBloc();
-      addTearDown(deps.bloc.close);
 
       deps.getAppStoreUrlUseCase.stubCall(
         const Left<GetAppStoreUrlFailure, Uri>(

@@ -22,6 +22,7 @@ class RemoteProjectRepositoryImpl implements ProjectRepository {
   final ProjectRepository _cacheDelegateRepository;
   final ProjectMapper _mapper;
   final LogReporter _logReporter;
+  static const _tag = 'RemoteProjectRepositoryImpl';
 
   @override
   Future<void> cacheProject(ProjectEntity project) {
@@ -40,6 +41,7 @@ class RemoteProjectRepositoryImpl implements ProjectRepository {
     } on ProjectCacheException catch (_) {
       _logReporter.error(
         'Cache error while getting projects, loading from remote instead.',
+        tag: _tag,
       );
     }
 
@@ -56,10 +58,14 @@ class RemoteProjectRepositoryImpl implements ProjectRepository {
       return await _cacheDelegateRepository.getProject(id);
     } on ProjectNotFoundException {
       // If not in cache, load all from remote and try again
-      _logReporter.debug('Project $id not found in cache, loading from remote');
+      _logReporter.debug(
+        'Project $id not found in cache, loading from remote',
+        tag: _tag,
+      );
     } on ProjectCacheException catch (_) {
       _logReporter.error(
         'Cache error while getting project, loading from remote instead.',
+        tag: _tag,
       );
     }
 
@@ -139,6 +145,7 @@ class RemoteProjectRepositoryImpl implements ProjectRepository {
     } catch (_) {
       _logReporter.error(
         'Failed to cache projects from remote, continuing without caching.',
+        tag: _tag,
       );
     }
   }

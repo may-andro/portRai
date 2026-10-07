@@ -29,8 +29,8 @@ class ProjectScreen extends StatelessWidget {
         return appServiceLocator.get<ProjectBloc>()
           ..add(LoadProjectEvent(project));
       },
-      child: BlocBuilder<ProjectBloc, ProjectState>(
-        builder: (context, _) {
+      child: Builder(
+        builder: (context) {
           return RouteObserverWidget(
             onResume: () => context.bloc.add(ScreenVisibleEvent()),
             child: Scaffold(

@@ -85,3 +85,5 @@ setUp(() {
 ```
 
 If several tests in a `group` need the same bloc, factor construction into a local helper function called from inside each `testWidgets` body - not a `setUp()` callback.
+
+Register `addTearDown(bloc.close)` once inside that helper (right after constructing the bloc) instead of repeating it in every test. `addTearDown` works from any helper called inside a test body. Skip it when the widget under test owns and closes the bloc itself (e.g. it is resolved from the service locator by a `BlocProvider`).

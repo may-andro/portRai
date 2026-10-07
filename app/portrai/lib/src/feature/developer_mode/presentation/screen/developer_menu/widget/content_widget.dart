@@ -2,8 +2,9 @@ import 'dart:math';
 
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
-import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/feature_flag_screen.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:tracking/tracking.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -19,7 +20,7 @@ class ContentWidget extends StatelessWidget {
         return switch (state) {
           DeveloperMenuInitialState() ||
           DeveloperMenuLoadingState() => const _LoadingWidget(),
-          final DeveloperMenuLoadedState state => _SuccessWidget(state: state),
+          DeveloperMenuLoadedState() => const _SuccessWidget(),
           final DeveloperMenuErrorState state => _ErrorWidget(
             message: state.message,
           ),
@@ -65,9 +66,7 @@ class _ErrorWidget extends StatelessWidget {
 }
 
 class _SuccessWidget extends StatelessWidget {
-  const _SuccessWidget({required this.state});
-
-  final DeveloperMenuLoadedState state;
+  const _SuccessWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -75,18 +74,16 @@ class _SuccessWidget extends StatelessWidget {
       impressionId: 'developer_menu_loaded_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
       child: DSResponsiveContainerWidget(
-        mobileBuilder: (_) => _DeveloperMenuContentWidget(state),
-        tabletBuilder: (_) => _DeveloperMenuContentWidget(state),
-        desktopBuilder: (_) => _DeveloperMenuContentWidget(state),
+        mobileBuilder: (_) => const _DeveloperMenuContentWidget(),
+        tabletBuilder: (_) => const _DeveloperMenuContentWidget(),
+        desktopBuilder: (_) => const _DeveloperMenuContentWidget(),
       ),
     );
   }
 }
 
 class _DeveloperMenuContentWidget extends StatelessWidget {
-  const _DeveloperMenuContentWidget(this.state);
-
-  final DeveloperMenuLoadedState state;
+  const _DeveloperMenuContentWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -101,15 +98,18 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Navigation section
-              const _SectionHeader(title: 'Controls & Tools'),
+              _SectionHeader(
+                title: context.localizations.developerMenuControlsAndTools,
+              ),
               DSCardWidget(
                 child: Column(
                   children: [
                     DSLabeledInfoRowWidget(
                       icon: Icons.storage_outlined,
-                      label: 'Cache Playground',
-                      value: 'Play with cache content and behavior',
+                      label: context.localizations.developerMenuCachePlayground,
+                      value: context
+                          .localizations
+                          .developerMenuCachePlaygroundDescription,
                       onTap: () {},
                     ),
                     DSHorizontalDividerWidget(
@@ -118,8 +118,10 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                     ),
                     DSLabeledInfoRowWidget(
                       icon: Icons.flag_outlined,
-                      label: 'Feature Flags',
-                      value: 'View and manage feature flags in the app',
+                      label: context.localizations.developerMenuFeatureFlags,
+                      value: context
+                          .localizations
+                          .developerMenuFeatureFlagsDescription,
                       onTap: () => FeatureFlagScreen.navigate(context),
                     ),
                   ],
@@ -127,14 +129,17 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
               ),
               const DSVerticalSpacerWidget(3),
 
-              // Actions section
-              const _SectionHeader(title: 'Error Simulation'),
+              _SectionHeader(
+                title: context.localizations.developerMenuErrorSimulation,
+              ),
               DSCardWidget(
                 child: Column(
                   children: [
                     _ActionTile(
-                      title: 'Force Fatal Crash',
-                      subTitle: 'Simulate a fatal crash in the app',
+                      title: context.localizations.developerMenuForceFatalCrash,
+                      subTitle: context
+                          .localizations
+                          .developerMenuForceFatalCrashDescription,
                       icon: Icons.warning_amber_outlined,
                       onPressed: () =>
                           context.bloc.add(const ForceFatalCrashEvent()),
@@ -144,8 +149,11 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                       color: context.colorPalette.neutral.grey3,
                     ),
                     _ActionTile(
-                      title: 'Force Non-Fatal Crash',
-                      subTitle: 'Simulate a non-fatal crash in the app',
+                      title:
+                          context.localizations.developerMenuForceNonFatalCrash,
+                      subTitle: context
+                          .localizations
+                          .developerMenuForceNonFatalCrashDescription,
                       icon: Icons.error_outline,
                       onPressed: () =>
                           context.bloc.add(const ForceNonFatalCrashEvent()),
@@ -155,9 +163,12 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                       color: context.colorPalette.neutral.grey3,
                     ),
                     _ActionTile(
-                      title: 'Force Blacklist Error',
-                      subTitle:
-                          'Simulate an error that should be ignored by the error handler',
+                      title: context
+                          .localizations
+                          .developerMenuForceBlacklistError,
+                      subTitle: context
+                          .localizations
+                          .developerMenuForceBlacklistErrorDescription,
                       icon: Icons.block_outlined,
                       onPressed: () =>
                           context.bloc.add(const ForceBlacklistErrorEvent()),

@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 
 class ProjectEntity extends Equatable {
@@ -63,12 +62,4 @@ class ProjectEntity extends Equatable {
     role,
     id,
   ];
-
-  String get formattedDateRange {
-    final start = DateFormat.yMMM().format(startDate).capitalize;
-    final end = endDate != null
-        ? DateFormat.yMMM().format(endDate!).capitalize
-        : 'Present';
-    return '$start - $end';
-  }
 }

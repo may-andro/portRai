@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/app/restart_app.dart';
 
 class RestartAppTileWidget extends StatelessWidget {
@@ -19,7 +20,7 @@ class RestartAppTileWidget extends StatelessWidget {
           const DSHorizontalSpacerWidget(0.5),
           Expanded(
             child: DSTextWidget(
-              'Restart may be required to apply changes',
+              context.localizations.featureFlagRestartRequiredMessage,
               color: context.colorPalette.neutral.grey9,
               style: context.typography.labelMedium,
               maxLines: 2,
@@ -28,7 +29,7 @@ class RestartAppTileWidget extends StatelessWidget {
           ),
           const DSHorizontalSpacerWidget(2),
           DSButtonWidget(
-            label: 'Restart',
+            label: context.localizations.featureFlagRestartButton,
             size: DSButtonSize.small,
             variant: DSButtonVariant.text,
             onPressed: () async {

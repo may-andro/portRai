@@ -32,7 +32,9 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         _receivedSetUpStatus.add(setUpStatus);
         final progress =
             _receivedSetUpStatus.length / InjectionStatus.values.length;
-        emit(SetUpProgressState(_receivedSetUpStatus, progress));
+        emit(
+          SetUpProgressState(List.unmodifiable(_receivedSetUpStatus), progress),
+        );
       },
       onError: (error, stackTrace) {
         _errorDuringDI = true;

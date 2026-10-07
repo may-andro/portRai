@@ -8,6 +8,8 @@ import 'package:portrai/src/feature/expertise/data/model/_model.dart';
 import 'package:portrai/src/feature/expertise/data/repository/cache_expertise_repository_impl.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
+const String _logTag = 'AssetExpertiseRepositoryImpl';
+
 @register
 class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
   AssetExpertiseRepositoryImpl(
@@ -38,6 +40,7 @@ class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
       // Cache is empty for current locale - fall through to load from assets
     } on ExpertiseCacheException catch (e, stackTrace) {
       _logReporter.error(
+        tag: _logTag,
         'Cache error while getting expertise: ${e.cause}',
         stacktrace: stackTrace,
       );
@@ -86,6 +89,7 @@ class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
       }
     } catch (_) {
       _logReporter.error(
+        tag: _logTag,
         'Failed to cache expertise from assets, continuing without caching.',
       );
     }

@@ -14,7 +14,7 @@ class _EducationSectionWidget extends StatelessWidget {
     if (profile.educations.isEmpty) return const SizedBox.shrink();
 
     return _SectionWidget(
-      label: 'Education',
+      label: context.localizations.profileEducation,
       isDesktop: isDesktop,
       children: profile.educations.map((education) {
         return DSCardWidget(

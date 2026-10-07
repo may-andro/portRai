@@ -3,15 +3,35 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 
-class SetupFailureWidget extends StatelessWidget {
+class SetupFailureWidget extends StatefulWidget {
   const SetupFailureWidget(
-    this._cause, {
+    this.cause, {
     this.isDescriptiveMode = false,
     super.key,
   });
 
-  final Object? _cause;
+  final Object? cause;
   final bool isDescriptiveMode;
+
+  @override
+  State<SetupFailureWidget> createState() => _SetupFailureWidgetState();
+}
+
+class _SetupFailureWidgetState extends State<SetupFailureWidget> {
+  late final TapGestureRecognizer _supportTapGestureRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _supportTapGestureRecognizer = TapGestureRecognizer()
+      ..onTap = _showUnavailableMessage;
+  }
+
+  @override
+  void dispose() {
+    _supportTapGestureRecognizer.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +51,7 @@ class SetupFailureWidget extends StatelessWidget {
             ),
             textAlign: TextAlign.start,
           ),
-          if (isDescriptiveMode) ...[
+          if (widget.isDescriptiveMode) ...[
             const SizedBox(height: 16),
             Flexible(
               child: Container(
@@ -42,7 +62,7 @@ class SetupFailureWidget extends StatelessWidget {
                   color: context.color.withValues(alpha: 0.5),
                 ),
                 child: Text(
-                  _cause.toString(),
+                  widget.cause.toString(),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -77,30 +97,31 @@ class SetupFailureWidget extends StatelessWidget {
                     color: Colors.blue,
                     decoration: TextDecoration.underline,
                   ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'This feature is not yer developed',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.15,
-                              height: 20 / 14,
-                              color: context.color,
-                            ),
-                          ),
-                          duration: 300.milliseconds,
-                        ),
-                      );
-                    },
+                  recognizer: _supportTapGestureRecognizer,
                 ),
               ],
             ),
           ),
           const SizedBox(height: 48),
         ],
+      ),
+    );
+  }
+
+  void _showUnavailableMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          context.localizations.splashContactSupportUnavailableMessage,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.15,
+            height: 20 / 14,
+            color: context.color,
+          ),
+        ),
+        duration: 300.milliseconds,
       ),
     );
   }

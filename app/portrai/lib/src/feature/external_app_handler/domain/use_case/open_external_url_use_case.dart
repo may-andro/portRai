@@ -5,9 +5,16 @@ import 'package:module_injector/module_injector.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:use_case/use_case.dart';
 
+sealed class OpenExternalUrlFailure extends BasicFailure {
+  const factory OpenExternalUrlFailure({Object? cause}) =
+      OpenExternalUrlUnknownFailure;
+
+  const OpenExternalUrlFailure._({super.cause});
+}
+
 @Localizable('errorExternalUrlLaunch')
-class OpenExternalUrlFailure extends BasicFailure {
-  const OpenExternalUrlFailure({super.cause});
+final class OpenExternalUrlUnknownFailure extends OpenExternalUrlFailure {
+  const OpenExternalUrlUnknownFailure({super.cause}) : super._();
 }
 
 class OpenExternalUrlParam {
@@ -38,6 +45,6 @@ class OpenExternalUrlUseCase
   @protected
   @override
   OpenExternalUrlFailure mapErrorToFailure(Object e, StackTrace st) {
-    throw OpenExternalUrlFailure(cause: st);
+    return OpenExternalUrlFailure(cause: e);
   }
 }
