@@ -74,6 +74,7 @@ Don't duplicate steps inline — use the existing composite action:
   `package-name` (+ `--include-dependencies`), so a package's own codegen step doesn't need a
   hardcoded list of workspace dependencies to also generate for.
 - **`extract-version-build`**: parses `version+build` out of a release tag.
+- **`prepare-service-account`**: decodes and masks base64 credentials, returning a restricted file path. Use `file-path` under the workspace for Docker actions. Only use `expose-json: 'true'` for Hosting actions that require JSON; never pass unmasked decoded credentials through outputs or plaintext action inputs. Always clean up the file.
 
 If a new workflow needs a step that doesn't map to one of these, prefer adding an input to the
 existing composite action over writing bespoke inline shell steps in multiple workflows.

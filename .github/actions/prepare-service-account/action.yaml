@@ -1,0 +1,65 @@
+name: Prepare Service Account
+description: Decode and mask service-account credentials, preferring a restricted temporary file.
+
+inputs:
+  credentials-base64:
+    description: Base64-encoded service-account JSON
+    required: true
+  expose-json:
+    description: Expose masked JSON for actions that do not accept a file path
+    required: false
+    default: 'false'
+  file-path:
+    description: Optional relative workspace path for Docker actions
+    required: false
+    default: ''
+
+outputs:
+  file:
+    description: Path to the temporary credentials file
+    value: ${{ steps.prepare.outputs.file }}
+  json:
+    description: Masked JSON, only available when expose-json is true
+    value: ${{ steps.prepare.outputs.json }}
+
+runs:
+  using: composite
+  steps:
+    - name: Decode and mask credentials
+      id: prepare
+      uses: actions/github-script@v7
+      env:
+        CREDENTIALS_BASE64: ${{ inputs.credentials-base64 }}
+        EXPOSE_JSON: ${{ inputs.expose-json }}
+        CREDENTIALS_FILE: ${{ inputs.file-path }}
+      with:
+        script: |
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const json = Buffer.from(process.env.CREDENTIALS_BASE64, 'base64').toString('utf8');
+          core.setSecret(json);
+          json.split(/\r?\n/).filter(Boolean).forEach(core.setSecret);
+
+          let credentials;
+          try {
+            credentials = JSON.parse(json);
+          } catch {
+            throw new Error('Service-account credentials must be valid JSON.');
+          }
+          if (credentials?.type !== 'service_account' || !credentials.private_key) {
+            throw new Error('Expected service-account JSON with a private key.');
+          }
+          for (const value of Object.values(credentials).filter(value => typeof value === 'string')) {
+            core.setSecret(value);
+            value.split(/\r?\n/).filter(Boolean).forEach(core.setSecret);
+            core.setSecret(JSON.stringify(value).slice(1, -1));
+          }
+          core.setSecret(JSON.stringify(credentials));
+
+          const file = process.env.CREDENTIALS_FILE ||
+            path.join(process.env.RUNNER_TEMP, 'deployment-service-account.json');
+          fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
+          fs.writeFileSync(file, json, { mode: 0o600 });
+          fs.chmodSync(file, 0o600);
+          core.setOutput('file', file);
+          if (process.env.EXPOSE_JSON === 'true') core.setOutput('json', json);

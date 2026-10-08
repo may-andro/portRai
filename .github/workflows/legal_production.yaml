@@ -44,13 +44,10 @@ jobs:
 
       - name: Prepare Firebase credentials
         id: creds
-        run: |
-          # Decode base64-encoded service account to raw JSON
-          DECODED_JSON=$(echo "${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}" | base64 -d)
-          # Store as multiline output
-          echo "json<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$DECODED_JSON" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/prepare-service-account
+        with:
+          credentials-base64: ${{ secrets.FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT }}
+          expose-json: 'true'
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -61,6 +58,10 @@ jobs:
           entryPoint: tool/legal
           channelId: live
           target: legal
+
+      - name: Remove Firebase credentials
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/deployment-service-account.json"
 
   create-release:
     name: Create GitHub Release

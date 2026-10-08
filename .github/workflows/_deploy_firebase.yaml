@@ -62,33 +62,38 @@ jobs:
 
       - name: Compute release notes
         id: notes
+        env:
+          RELEASE_NOTES: ${{ inputs.release-notes }}
+          BUILD_TYPE: ${{ inputs.build-type }}
         run: |
-          if [ -n "${{ inputs.release-notes }}" ]; then
-            echo "value=${{ inputs.release-notes }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=Build ${{ github.sha }} - Type: ${{ inputs.build-type }} - By: ${{ github.actor }}" >> "$GITHUB_OUTPUT"
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="Build $GITHUB_SHA - Type: $BUILD_TYPE - By: $GITHUB_ACTOR"
           fi
+          delimiter="release_notes_$(openssl rand -hex 16)"
+          while printf '%s\n' "$RELEASE_NOTES" | grep -Fxq "$delimiter"; do
+            delimiter="release_notes_$(openssl rand -hex 16)"
+          done
+          {
+            printf 'value<<%s\n' "$delimiter"
+            printf '%s\n' "$RELEASE_NOTES"
+            printf '%s\n' "$delimiter"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Prepare Firebase credentials
         id: creds
-        run: |
-          # Decode base64-encoded service account to raw JSON
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d > ${{ runner.temp }}/firebase-service-account.json
-          # Read the decoded JSON for use in action
-          CREDS_JSON=$(cat ${{ runner.temp }}/firebase-service-account.json)
-          # Set as output (GitHub Actions handles multiline properly)
-          echo "json<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$CREDS_JSON" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/prepare-service-account
+        with:
+          credentials-base64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          file-path: .deployment-credentials/service-account.json
 
       - name: Deploy Android to Firebase App Distribution
         if: ${{ inputs.platform == 'android' }}
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
-          serviceCredentialsFileContent: ${{ steps.creds.outputs.json }}
+          serviceCredentialsFile: ${{ steps.creds.outputs.file }}
           groups: ${{ inputs.build-type == 'preview' && 'testers' || 'production-testers' }}
-          file: ${{ inputs.build-type == 'production' && 'build-output/app-release.aab' || 'build-output/app-release.apk' }}
+          file: ${{ inputs.build-type == 'production' && 'build-output/bundle/release/app-release.aab' || 'build-output/app-release.apk' }}
           releaseNotes: ${{ steps.notes.outputs.value }}
 
       - name: Deploy iOS to Firebase App Distribution
@@ -96,10 +101,18 @@ jobs:
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID_IOS }}
-          serviceCredentialsFileContent: ${{ steps.creds.outputs.json }}
+          serviceCredentialsFile: ${{ steps.creds.outputs.file }}
           groups: ${{ inputs.build-type == 'preview' && 'testers' || 'production-testers' }}
           file: ${{ inputs.build-type == 'production' && 'build-output/portrai-release.ipa' || 'build-output/portrai-debug.ipa' }}
           releaseNotes: ${{ steps.notes.outputs.value }}
+
+      - name: Remove Firebase credentials
+        if: ${{ always() }}
+        run: |
+          rm -f .deployment-credentials/service-account.json
+          if [ -d .deployment-credentials ]; then
+            rmdir .deployment-credentials
+          fi
 
   deploy-web:
     name: Deploy to Firebase Hosting
@@ -118,13 +131,10 @@ jobs:
 
       - name: Prepare Firebase credentials
         id: creds
-        run: |
-          # Decode base64-encoded service account to raw JSON
-          DECODED_JSON=$(echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 -d)
-          # Store as multiline output
-          echo "json<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$DECODED_JSON" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/prepare-service-account
+        with:
+          credentials-base64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          expose-json: 'true'
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -135,3 +145,7 @@ jobs:
           entryPoint: ${{ inputs.app-path }}
           channelId: ${{ inputs.channel-id != '' && inputs.channel-id || (inputs.build-type == 'preview' && 'preview' || 'live') }}
           target: ${{ inputs.hosting-target }}
+
+      - name: Remove Firebase credentials
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/deployment-service-account.json"
