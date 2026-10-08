@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
@@ -9,12 +10,13 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/set
 
 @register
 class SettingBloc extends Bloc<SettingEvent, SettingState> {
-  SettingBloc(this._isFeatureEnabledUseCase)
+  SettingBloc(this._isFeatureEnabledUseCase, this._buildConfig)
     : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
+  final BuildConfig _buildConfig;
 
   Future<void> _mapLoadSettingsEventToState(
     LoadSettingsEvent event,
@@ -33,7 +35,10 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     }
 
     emit(
-      SettingLoadedState(isLanguageSelectorEnabled: isLanguageSelectorEnabled),
+      SettingLoadedState(
+        isLanguageSelectorEnabled: isLanguageSelectorEnabled,
+        isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
+      ),
     );
   }
 }

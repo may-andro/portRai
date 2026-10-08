@@ -39,13 +39,16 @@ class ContentWidget extends StatelessWidget {
                         ),
                         const LanguageCardWidget(),
                       ],
-                      const DSVerticalSpacerWidget(3),
-                      DSButtonWidget(
-                        label: context.localizations.settingDeveloperMode,
-                        onPressed: () => DeveloperMenuScreen.navigate(context),
-                        variant: DSButtonVariant.text,
-                        size: DSButtonSize.small,
-                      ),
+                      if (state.isDevMenuEnabled) ...[
+                        const DSVerticalSpacerWidget(3),
+                        DSButtonWidget(
+                          label: context.localizations.settingDeveloperMode,
+                          onPressed: () =>
+                              DeveloperMenuScreen.navigate(context),
+                          variant: DSButtonVariant.text,
+                          size: DSButtonSize.small,
+                        ),
+                      ],
                       const Spacer(),
                       const DSVerticalSpacerWidget(3),
                       SafeArea(

@@ -7,12 +7,15 @@ import '../../../../../../../util/test_wrapper_widget.dart';
 void main() {
   group('Setting ContentWidget', () {
     testWidgets(
-      'should render the language section and developer mode button when the selector is enabled',
+      'should render the language section and developer mode button when both are enabled',
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
             child: ContentWidget(
-              state: SettingLoadedState(isLanguageSelectorEnabled: true),
+              state: SettingLoadedState(
+                isLanguageSelectorEnabled: true,
+                isDevMenuEnabled: true,
+              ),
             ),
           ),
         );
@@ -25,20 +28,42 @@ void main() {
     );
 
     testWidgets(
-      'should hide the language section when the selector is disabled',
+      'should hide the language section when the selector is disabled and developer mode is enabled',
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
             child: ContentWidget(
-              state: SettingLoadedState(isLanguageSelectorEnabled: false),
+              state: SettingLoadedState(
+                isLanguageSelectorEnabled: false,
+                isDevMenuEnabled: true,
+              ),
             ),
           ),
         );
+
         await tester.pump();
 
         expect(find.text('Language'), findsNothing);
         expect(find.text('Current Language'), findsNothing);
         expect(find.text('Developer Mode'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'should hide developer mode when disabled while the language selector is enabled',
+      (tester) async {
+        await tester.pumpWidget(
+          const TestWidgetWrapper(
+            child: ContentWidget(
+              state: SettingLoadedState(isLanguageSelectorEnabled: true),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(find.text('Language'), findsOneWidget);
+        expect(find.text('Current Language'), findsOneWidget);
+        expect(find.text('Developer Mode'), findsNothing);
       },
     );
   });
