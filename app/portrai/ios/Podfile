@@ -34,8 +34,6 @@ target 'Runner' do
   target 'RunnerTests' do
     inherit! :search_paths
   end
-
-  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '12.2.0'
 end
 
 post_install do |installer|
