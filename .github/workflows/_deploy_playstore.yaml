@@ -55,10 +55,9 @@ jobs:
           serviceAccountJson: ${{ steps.creds.outputs.file }}
           packageName: ${{ secrets.PLAY_STORE_PACKAGE_NAME }}
           releaseFiles: build-output/bundle/release/app-release.aab
-          track: ${{ inputs.track }}
+          tracks: ${{ inputs.track }}
           status: completed
           inAppUpdatePriority: 2
-          whatsNewDirectory: distribution/whatsnew
           mappingFile: build-output/mapping/release/mapping.txt
 
       - name: Remove Play Store credentials
