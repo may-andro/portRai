@@ -30,6 +30,15 @@ on:
       GOOGLE_SERVICES_PLIST:
         description: Base64 encoded GoogleService-Info.plist for Firebase
         required: true
+      IOS_CERTIFICATE_BASE64:
+        description: Base64 encoded Apple Distribution certificate and private key (.p12)
+        required: true
+      IOS_CERTIFICATE_PASSWORD:
+        description: Password protecting the distribution certificate
+        required: true
+      IOS_PROVISIONING_PROFILE_BASE64:
+        description: Base64 encoded App Store Connect (production) or Ad Hoc (preview) provisioning profile
+        required: true
 
 env:
   FLUTTER_VERSION: 3.47.4
@@ -46,8 +55,12 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Create firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+          APP_PATH: ${{ inputs.app-path }}
         run: |
-          echo "${{ secrets.FIREBASE_OPTIONS }}" > ${{ inputs.app-path }}/lib/firebase_options.dart
+          test -n "$FIREBASE_OPTIONS"
+          printf '%s\n' "$FIREBASE_OPTIONS" > "$APP_PATH/lib/firebase_options.dart"
 
       - name: Setup environment
         uses: ./.github/actions/setup-flutter-module
@@ -61,40 +74,106 @@ jobs:
           package-name: portrai
 
       - name: Inject GoogleService-Info.plist
-        run: echo "${{ secrets.GOOGLE_SERVICES_PLIST }}" | base64 -d > ${{ inputs.app-path }}/ios/Runner/GoogleService-Info.plist
+        env:
+          GOOGLE_SERVICES_PLIST: ${{ secrets.GOOGLE_SERVICES_PLIST }}
+          APP_PATH: ${{ inputs.app-path }}
+        run: |
+          test -n "$GOOGLE_SERVICES_PLIST"
+          printf '%s' "$GOOGLE_SERVICES_PLIST" | base64 --decode > "$APP_PATH/ios/Runner/GoogleService-Info.plist"
 
-      - name: Build iOS (Preview - No Codesign)
-        if: ${{ inputs.build-type == 'preview' }}
+      - name: Prepare iOS signing
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          BUILD_TYPE: ${{ inputs.build-type }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [ "$BUILD_TYPE" != production ] && [ "$BUILD_TYPE" != preview ]; then
+            echo "::error::Build type must be production or preview"
+            exit 1
+          fi
+          if [ -z "$IOS_CERTIFICATE_BASE64" ] || [ -z "$IOS_CERTIFICATE_PASSWORD" ] ||
+             [ -z "$IOS_PROVISIONING_PROFILE_BASE64" ]; then
+            echo "::error::The distribution certificate, password, and provisioning profile are required"
+            exit 1
+          fi
+          signing_dir="$RUNNER_TEMP/portrai-signing"
+          mkdir -p "$signing_dir"
+          printf '%s' "$IOS_CERTIFICATE_BASE64" | base64 --decode > "$signing_dir/certificate.p12"
+          printf '%s' "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$signing_dir/profile.mobileprovision"
+          security cms -D -i "$signing_dir/profile.mobileprovision" > "$signing_dir/profile.plist"
+          profile="$signing_dir/profile.plist"
+          uuid="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$profile")"
+          team_id="$(/usr/libexec/PlistBuddy -c 'Print :TeamIdentifier:0' "$profile")"
+          app_id="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$profile")"
+          bundle_id="${app_id#*.}"
+          if [[ ! "$uuid" =~ ^[0-9A-Fa-f-]{36}$ ]]; then
+            echo "::error::Invalid provisioning profile UUID"
+            exit 1
+          fi
+          if [ "$BUILD_TYPE" = production ]; then
+            export_method=app-store-connect
+          else
+            export_method=release-testing
+          fi
+          export_options="$signing_dir/ExportOptions.plist"
+          /usr/libexec/PlistBuddy \
+            -c "Add :method string $export_method" \
+            -c "Add :teamID string $team_id" \
+            -c 'Add :signingStyle string manual' \
+            -c 'Add :signingCertificate string Apple Distribution' \
+            -c 'Add :manageAppVersionAndBuildNumber bool false' \
+            -c 'Add :provisioningProfiles dict' \
+            -c "Add :provisioningProfiles:$bundle_id string $uuid" \
+            "$export_options"
+          profile_path="$HOME/Library/MobileDevice/Provisioning Profiles/$uuid.mobileprovision"
+          printf '%s\n' "$profile_path" > "$signing_dir/profile-path"
+          keychain="$signing_dir/signing.keychain-db"
+          keychain_password="$(openssl rand -hex 32)"
+          echo "::add-mask::$keychain_password"
+          security list-keychains -d user | sed -E 's/^[[:space:]]*"//; s/"[[:space:]]*$//' > "$signing_dir/original-keychains"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$signing_dir/certificate.p12" -P "$IOS_CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -k "$keychain_password" "$keychain"
+          keychains=("$keychain")
+          while IFS= read -r existing; do
+            keychains+=("$existing")
+          done < "$signing_dir/original-keychains"
+          security list-keychains -d user -s "${keychains[@]}"
+          IFS= read -r profile_path < "$signing_dir/profile-path"
+          mkdir -p "$(dirname "$profile_path")"
+          cp "$signing_dir/profile.mobileprovision" "$profile_path"
+
+      - name: Build signed iOS IPA
         working-directory: ${{ inputs.app-path }}
+        env:
+          VERSION: ${{ inputs.version }}
+          BUILD_NUMBER: ${{ inputs.build-number }}
+          BUILD_TYPE: ${{ inputs.build-type }}
         run: |
-          flutter build ios --debug --no-codesign --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug -archivePath build/Runner.xcarchive archive CODE_SIGNING_ALLOWED=NO
-
-      - name: Build iOS (Production - Release)
-        if: ${{ inputs.build-type == 'production' }}
-        working-directory: ${{ inputs.app-path }}
-        run: |
-          # Requires code signing — see ios/.signing/README.md and ios/.appstore/README.md
-          flutter build ios --release --no-codesign --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive CODE_SIGNING_ALLOWED=NO
-
-      - name: Create IPA archive (Preview)
-        if: ${{ inputs.build-type == 'preview' }}
-        working-directory: ${{ inputs.app-path }}/ios
-        run: |
-          mkdir -p Payload
-          cp -r build/Runner.xcarchive/Products/Applications/Runner.app Payload/
-          zip -r ../portrai-debug.ipa Payload
-
-      - name: Create IPA archive (Production)
-        if: ${{ inputs.build-type == 'production' }}
-        working-directory: ${{ inputs.app-path }}/ios
-        run: |
-          mkdir -p Payload
-          cp -r build/Runner.xcarchive/Products/Applications/Runner.app Payload/
-          zip -r ../portrai-release.ipa Payload
+          # Build the archive first; Xcode signs the app during IPA export.
+          flutter build ipa --release --no-codesign \
+            --build-name="$VERSION" --build-number="$BUILD_NUMBER"
+          xcodebuild -exportArchive \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist "$RUNNER_TEMP/portrai-signing/ExportOptions.plist"
+          shopt -s nullglob
+          ipas=(build/ios/ipa/*.ipa)
+          if [ "${#ipas[@]}" -ne 1 ]; then
+            echo "::error::Expected exactly one exported signed IPA"
+            exit 1
+          fi
+          if [ "$BUILD_TYPE" = production ]; then
+            cp "${ipas[0]}" portrai-release.ipa
+          else
+            cp "${ipas[0]}" portrai-debug.ipa
+          fi
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
@@ -102,3 +181,27 @@ jobs:
           name: portrai-ios-${{ inputs.build-type }}-${{ github.sha }}
           path: ${{ inputs.app-path }}/portrai-${{ inputs.build-type == 'production' && 'release' || 'debug' }}.ipa
           retention-days: ${{ inputs.build-type == 'production' && 30 || 7 }}
+          if-no-files-found: error
+
+      - name: Clean up iOS signing
+        if: ${{ always() }}
+        run: |
+          signing_dir="$RUNNER_TEMP/portrai-signing"
+          if [ -f "$signing_dir/profile-path" ]; then
+            IFS= read -r profile_path < "$signing_dir/profile-path"
+            rm -f "$profile_path"
+          fi
+          if [ -f "$signing_dir/original-keychains" ]; then
+            keychains=()
+            while IFS= read -r keychain; do
+              keychains+=("$keychain")
+            done < "$signing_dir/original-keychains"
+            security list-keychains -d user -s "${keychains[@]}"
+          fi
+          if [ -f "$signing_dir/signing.keychain-db" ]; then
+            security delete-keychain "$signing_dir/signing.keychain-db"
+          fi
+          rm -f "$signing_dir/certificate.p12" "$signing_dir/profile.mobileprovision" \
+            "$signing_dir/profile.plist" \
+            "$signing_dir/ExportOptions.plist" \
+            "$signing_dir/profile-path" "$signing_dir/original-keychains"

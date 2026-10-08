@@ -95,6 +95,9 @@ jobs:
     secrets:
       FIREBASE_OPTIONS: ${{ secrets.PORTRAI_FIREBASE_OPTIONS }}
       GOOGLE_SERVICES_PLIST: ${{ secrets.PORTRAI_GOOGLE_SERVICES_PLIST }}
+      IOS_CERTIFICATE_BASE64: ${{ secrets.PORTRAI_IOS_CERTIFICATE_BASE64 }}
+      IOS_CERTIFICATE_PASSWORD: ${{ secrets.PORTRAI_IOS_CERTIFICATE_PASSWORD }}
+      IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.PORTRAI_IOS_PROVISIONING_PROFILE_BASE64 }}
 
   build-web:
     name: Build Web
@@ -128,21 +131,6 @@ jobs:
       FIREBASE_SERVICE_ACCOUNT: ${{ secrets.PORTRAI_FIREBASE_SERVICE_ACCOUNT }}
       FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
 
-  deploy-ios-firebase:
-    name: Deploy iOS to Firebase
-    needs: [build-ios, extract-version]
-    uses: ./.github/workflows/_deploy_firebase.yaml
-    with:
-      app-path: app/portrai
-      platform: ios
-      build-type: production
-      artifact-name: ${{ needs.build-ios.outputs.artifact-name }}
-      release-notes: ${{ needs.extract-version.outputs.release-notes }}
-    secrets:
-      FIREBASE_APP_ID_IOS: ${{ secrets.PORTRAI_FIREBASE_APP_ID_IOS }}
-      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.PORTRAI_FIREBASE_SERVICE_ACCOUNT }}
-      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-
   # Store deployments (production)
   deploy-playstore:
     name: Deploy to Play Store
@@ -163,7 +151,6 @@ jobs:
     uses: ./.github/workflows/_deploy_appstore.yaml
     with:
       artifact-name: ${{ needs.build-ios.outputs.artifact-name }}
-      submit-for-review: false
       version: ${{ needs.extract-version.outputs.version }}
       build-number: ${{ needs.extract-version.outputs.build-number }}
     secrets:
@@ -188,7 +175,7 @@ jobs:
   # Create GitHub release for production
   create-release:
     name: Create GitHub Release
-    needs: [deploy-android-firebase, deploy-ios-firebase, deploy-web, deploy-playstore, deploy-appstore]
+    needs: [deploy-android-firebase, deploy-web, deploy-playstore, deploy-appstore]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
