@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
@@ -11,11 +12,36 @@ void main() {
   group('SettingBloc', () {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
 
-    SettingBloc buildBloc() => SettingBloc(isFeatureEnabledUseCase);
+    SettingBloc buildBloc() => SettingBloc(
+      isFeatureEnabledUseCase,
+      BuildConfig(buildEnvironment: BuildEnvironment.prod),
+    );
 
     setUp(() {
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase();
     });
+
+    blocTest<SettingBloc, SettingState>(
+      'should enable the developer menu when loading settings in staging',
+      setUp: () {
+        isFeatureEnabledUseCase.stubCall(
+          definition: SettingFeatureFlags.languageSelector,
+          result: const Right<IsFeatureEnabledFailure, bool>(false),
+        );
+      },
+      build: () => SettingBloc(
+        isFeatureEnabledUseCase,
+        BuildConfig(buildEnvironment: BuildEnvironment.staging),
+      ),
+      act: (bloc) => bloc.add(const LoadSettingsEvent()),
+      expect: () => const [
+        SettingLoadingState(),
+        SettingLoadedState(
+          isLanguageSelectorEnabled: false,
+          isDevMenuEnabled: true,
+        ),
+      ],
+    );
 
     blocTest<SettingBloc, SettingState>(
       'should emit a loaded state with the flag value when loading succeeds',

@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/developer_mode/developer_mode_module_configurator.dart';
@@ -17,6 +18,9 @@ void main() {
       serviceLocator = MockServiceLocator();
       routeController = MockModuleRouteController();
       configurator = DeveloperModeModuleConfigurator();
+      when(
+        () => serviceLocator.get<BuildConfig>(),
+      ).thenReturn(BuildConfig(buildEnvironment: BuildEnvironment.staging));
 
       when(
         () => serviceLocator.get<ModuleRouteController>(),
@@ -32,6 +36,18 @@ void main() {
       verify(
         () => routeController.register(DeveloperMenuModuleRoute.developerMenu),
       ).called(1);
+    });
+
+    test('should not register the developer menu route when in production', () {
+      when(
+        () => serviceLocator.get<BuildConfig>(),
+      ).thenReturn(BuildConfig(buildEnvironment: BuildEnvironment.prod));
+
+      configurator.postDependenciesSetup(serviceLocator);
+
+      verifyNever(
+        () => routeController.register(DeveloperMenuModuleRoute.developerMenu),
+      );
     });
   });
 }
