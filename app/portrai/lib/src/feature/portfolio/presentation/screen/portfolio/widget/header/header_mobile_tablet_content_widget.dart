@@ -17,7 +17,7 @@ class _HeaderMobileTabletContentWidget extends StatelessWidget {
             child: DSImage.logo(fit: BoxFit.cover),
           ),
         ),
-        const _SettingButtonWidget(),
+        const SettingButtonWidget(),
       ],
     );
   }
@@ -30,40 +30,12 @@ class _DrawerMenuWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DSIconButtonWidget(
       Icons.menu_rounded,
-      size: context.buttonSize,
+      size: context.portfolioIconButtonSize,
       iconColor: context.colorPalette.surface.onSurface,
       buttonColor: context.colorPalette.neutral.transparent,
       onPressed: () {
         Scaffold.of(context).openDrawer();
       },
     );
-  }
-}
-
-class _SettingButtonWidget extends StatelessWidget {
-  const _SettingButtonWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return DSIconButtonWidget(
-      Icons.settings,
-      size: context.buttonSize,
-      iconColor: context.colorPalette.surface.onSurface,
-      buttonColor: context.colorPalette.neutral.transparent,
-      onPressed: () => SettingScreen.navigate(context),
-    );
-  }
-}
-
-extension on BuildContext {
-  DSIconButtonSize get buttonSize {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return DSIconButtonSize.large;
-      case DSDeviceResolution.tablet:
-        return DSIconButtonSize.small;
-      case DSDeviceResolution.desktop:
-        return DSIconButtonSize.small;
-    }
   }
 }

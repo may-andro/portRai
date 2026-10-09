@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_container_widget.dart';
+import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/project.dart';
 import 'package:portrai/src/feature/service/service.dart';
@@ -62,10 +63,20 @@ class IntroSectionWidget extends SectionWidget {
 
     return SectionContainerWidget(
       builder: (context, isVisible) {
-        return ProfessionalSummaryWidget(
-          profile: portfolio.profile,
-          isVisible: isVisible,
-          height: possibleViewPortHeight,
+        return Stack(
+          children: [
+            ProfessionalSummaryWidget(
+              profile: portfolio.profile,
+              isVisible: isVisible,
+              height: possibleViewPortHeight,
+            ),
+            if (context.isDesktop)
+              Positioned(
+                top: context.space(factor: 2),
+                right: context.space(factor: 2),
+                child: const SettingButtonWidget(),
+              ),
+          ],
         );
       },
       visibilityKey: trackingId,
