@@ -1,5 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/extension/_extension.dart';
 import 'package:portrai/src/feature/setting/setting.dart';
 
 class SettingButtonWidget extends StatelessWidget {
@@ -9,23 +10,10 @@ class SettingButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DSIconButtonWidget(
       Icons.settings,
-      size: context.buttonSize,
+      size: context.portfolioIconButtonSize,
       iconColor: context.colorPalette.surface.onSurface,
       buttonColor: context.colorPalette.neutral.transparent,
       onPressed: () => SettingScreen.navigate(context),
     );
-  }
-}
-
-extension on BuildContext {
-  DSIconButtonSize get buttonSize {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return DSIconButtonSize.large;
-      case DSDeviceResolution.tablet:
-        return DSIconButtonSize.small;
-      case DSDeviceResolution.desktop:
-        return DSIconButtonSize.small;
-    }
   }
 }

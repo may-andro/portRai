@@ -1,8 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
+import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/extension/_extension.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
-import 'package:portrai/src/feature/setting/setting.dart';
+import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
 
 part 'header_desktop_content_widget.dart';
 

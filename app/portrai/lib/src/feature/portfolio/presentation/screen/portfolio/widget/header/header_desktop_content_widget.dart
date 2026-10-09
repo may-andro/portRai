@@ -26,11 +26,17 @@ class _HeaderDesktopContentWidget extends StatelessWidget {
             package: 'design_system',
             fit: BoxFit.cover,
           ),
-          SizedBox(
-            height: DSTabItemWidget.getHeight(context),
-            child: _TabBarWidget(
-              sections: sections,
-              tabController: tabController,
+          const DSHorizontalSpacerWidget(2),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                height: DSTabItemWidget.getHeight(context),
+                child: _TabBarWidget(
+                  sections: sections,
+                  tabController: tabController,
+                ),
+              ),
             ),
           ),
         ],
