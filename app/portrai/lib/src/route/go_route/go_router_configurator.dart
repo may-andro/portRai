@@ -15,14 +15,16 @@ class GoRouterConfigurator {
     return GoRoute(
       name: route.name,
       path: route.path,
-      /*builder: (context, state) {
+      builder: (context, state) {
         return route.builder(context, state.extra, state.pathParameters);
-      },*/
-      pageBuilder: (context, state) {
-        return state.getCustomTransitionPage(
-          route.builder(context, state.extra, state.pathParameters),
-        );
       },
+      pageBuilder: kIsWeb
+          ? (context, state) {
+              return state.getCustomTransitionPage(
+                route.builder(context, state.extra, state.pathParameters),
+              );
+            }
+          : null,
       routes: route.children.map(_convertModuleRoute).toList(),
       redirect: route.requiresAuth
           ? (context, state) {
