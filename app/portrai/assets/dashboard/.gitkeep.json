@@ -2,7 +2,6 @@
   "_comment": "This directory contains mock data for local development.",
   "_comment2": "Files are git-ignored. Copy from .templates/ for local setup.",
   "_files": [
-    "portfolio.json",
     "experiences.json",
     "expertise.json",
     "profile.json",

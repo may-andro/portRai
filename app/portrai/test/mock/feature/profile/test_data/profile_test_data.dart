@@ -1,8 +1,8 @@
 import 'package:portrai/src/feature/profile/data/model/_model.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 
-ProfileEntity createProfileEntity() {
-  return const ProfileEntity(
+ProfileEntity createProfileEntity({List<PublishedAtEntity>? publishedAt}) {
+  return ProfileEntity(
     fullName: 'Mayank Rai',
     title: 'Senior Flutter & Android Developer',
     subtitle: 'Mobile Architecture Specialist',
@@ -14,24 +14,26 @@ ProfileEntity createProfileEntity() {
     detailedBio: 'Builds products that scale with clean architecture.',
     elevatorPitch: 'I craft mobile apps that feel great and scale well.',
     uniqueValueProposition: 'Engineering elegant, scalable mobile solutions',
-    publishedAt: [
-      PublishedAtEntity(
-        name: 'Play Store',
-        url: 'https://example.com/play',
-        image: 'https://example.com/play.png',
-      ),
-      PublishedAtEntity(
-        name: 'App Store',
-        url: 'https://example.com/app-store',
-        image: 'https://example.com/app-store.png',
-      ),
-    ],
-    resume: ResumeEntity(
+    publishedAt:
+        publishedAt ??
+        const [
+          PublishedAtEntity(
+            name: 'Play Store',
+            url: 'https://example.com/play',
+            image: 'https://example.com/play.png',
+          ),
+          PublishedAtEntity(
+            name: 'App Store',
+            url: 'https://example.com/app-store',
+            image: 'https://example.com/app-store.png',
+          ),
+        ],
+    resume: const ResumeEntity(
       url: 'https://example.com/resume.pdf',
       lastUpdated: '2025-10-15',
       image: 'https://example.com/resume.png',
     ),
-    socialLinks: [
+    socialLinks: const [
       SocialLinkEntity(
         name: 'Github',
         url: 'https://github.com/example',
@@ -43,7 +45,7 @@ ProfileEntity createProfileEntity() {
         image: 'https://example.com/portfolio.png',
       ),
     ],
-    availability: AvailabilityEntity(
+    availability: const AvailabilityEntity(
       status: 'Available for consulting',
       workType: 'Remote',
       openToRelocate: false,
@@ -51,7 +53,7 @@ ProfileEntity createProfileEntity() {
       hourlyRate: '€75/hour',
       availability: 'Part-time',
     ),
-    workingHours: WorkingHoursEntity(
+    workingHours: const WorkingHoursEntity(
       timezone: 'Europe/Madrid',
       preferredHours: '09:00 - 18:00',
       weekdays: true,
@@ -61,18 +63,18 @@ ProfileEntity createProfileEntity() {
     currentCompany: 'PortRai',
     yearsOfExperience: 10,
     projectsDelivered: 24,
-    location: LocationEntity(
+    location: const LocationEntity(
       city: 'Alicante',
       state: 'Valencian Community',
       country: 'Spain',
       timezone: 'Madrid, Spain (GMT+1)',
       coordinates: CoordinatesEntity(latitude: 38.3452, longitude: -0.481),
     ),
-    languages: [
+    languages: const [
       LanguageEntity(language: 'English', proficiency: 'Fluent'),
       LanguageEntity(language: 'Spanish', proficiency: 'Intermediate'),
     ],
-    educations: [
+    educations: const [
       EducationEntity(
         institution: 'Army Institute of Technology',
         degree: 'Bachelor in Engineering',

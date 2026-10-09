@@ -4,7 +4,6 @@ This directory contains mock JSON data used for local development and testing.
 
 ## 📁 Files
 
-- `portfolio.json` - Portfolio items data
 - `experiences.json` - Work experience data
 - `expertise.json` - Skills and expertise data
 - `profile.json` - Profile information
@@ -23,7 +22,6 @@ This directory contains mock JSON data used for local development and testing.
 1. Copy the `.template.json` files:
    ```bash
    cd app/portrai/assets/dashboard
-   cp portfolio.template.json portfolio.json
    cp experiences.template.json experiences.json
    cp expertise.template.json expertise.json
    cp profile.template.json profile.json
