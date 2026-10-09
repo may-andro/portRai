@@ -4,8 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
-import 'package:portrai/src/feature/profile/presentation/widget/professional_summary/bloc/_bloc.dart'
-    as summary;
+import 'package:portrai/src/feature/profile/profile.dart' as summary;
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
@@ -32,8 +31,7 @@ void main() {
 
     final bloc = MockPortfolioBloc()..stubState(const LoadingState());
     addTearDown(bloc.close);
-    final summaryBloc = MockProfessionalSummaryBloc()
-      ..stubState(const summary.LoadingState());
+    final summaryBloc = MockProfessionalSummaryBloc()..stubLoadingState();
     appServiceLocator.registerFactory<summary.ProfessionalSummaryBloc>(
       () => summaryBloc,
     );

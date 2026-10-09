@@ -7,6 +7,8 @@ class MockProfessionalSummaryBloc
     implements ProfessionalSummaryBloc {}
 
 extension MockProfessionalSummaryBlocStub on MockProfessionalSummaryBloc {
+  void stubLoadingState() => stubState(const LoadingState());
+
   void stubState(ProfessionalSummaryState state) {
     when(() => this.state).thenReturn(state);
     whenListen(
