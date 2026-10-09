@@ -40,6 +40,11 @@ on:
         required: false
         type: boolean
         default: false
+      setup-sqlite:
+        description: Whether to generate SQLite web worker and WASM assets before build
+        required: false
+        type: boolean
+        default: false
     outputs:
       artifact-name:
         description: Name of the build artifact
@@ -81,6 +86,14 @@ jobs:
         with:
           package-name: ${{ inputs.app-name }}
 
+      - name: Generate SQLite web assets
+        if: inputs.setup-sqlite
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          dart run sqflite_common_ffi_web:setup --force
+          test -s web/sqflite_sw.js
+          test -s web/sqlite3.wasm
+
       - name: Build web (Preview — profile)
         if: ${{ inputs.build-type == 'preview' && !inputs.force-release }}
         working-directory: ${{ inputs.app-path }}
@@ -98,6 +111,13 @@ jobs:
             --dart-define=ENVIRONMENT=${{ inputs.build-type }} \
             ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
             ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
+
+      - name: Verify SQLite assets in build output
+        if: inputs.setup-sqlite
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          test -s build/web/sqflite_sw.js
+          test -s build/web/sqlite3.wasm
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
