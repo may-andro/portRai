@@ -197,15 +197,20 @@ melos:
     # Deploy scripts for web release
     deploy_portrai:
       run: |
-        cd app/partrai
+        set -e
+        cd app/portrai
         echo "Clean existing repository"
         flutter clean
         echo "Getting packages"
         flutter pub get 
+        echo "Generating SQLite web assets"
+        dart run sqflite_common_ffi_web:setup --force
         echo "Building web with Flutter"
         flutter build web --release
+        test -s build/web/sqflite_sw.js
+        test -s build/web/sqlite3.wasm
         echo "Deploying to Firebase"
-        firebase deploy --only hosting
+        firebase deploy --only hosting:portrai
       description: Deploy and host flutter web page
     deploy_widgetbook:
       run: |

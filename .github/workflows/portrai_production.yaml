@@ -109,6 +109,7 @@ jobs:
       build-type: production
       use-firebase: true
       run-codegen: true
+      setup-sqlite: true
       version: ${{ needs.extract-version.outputs.version }}
       build-number: ${{ needs.extract-version.outputs.build-number }}
     secrets:
