@@ -13,6 +13,51 @@ import '../../../mock/utility/mock_module_route_controller.dart';
 
 void main() {
   group('GoRouterConfigurator', () {
+    testWidgets(
+      'should restart navigation with fresh screens when the app rebuilds with a new router',
+      (tester) async {
+        var homeInitCount = 0;
+        final controller = MockModuleRouteController();
+        when(() => controller.allRoutes).thenReturn([
+          ModuleRoute(
+            name: 'home',
+            path: '/',
+            builder: (_, _, _) {
+              return _InitCounterWidget(
+                label: 'Home',
+                onInit: () => homeInitCount++,
+              );
+            },
+          ),
+          ModuleRoute(
+            name: 'details',
+            path: '/details',
+            builder: (_, _, _) => const Scaffold(body: Text('Details')),
+          ),
+        ]);
+        final configurator = GoRouterConfigurator(controller, const []);
+        final firstRouter = configurator.router;
+        addTearDown(firstRouter.dispose);
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: firstRouter));
+        await tester.pumpAndSettle();
+        unawaited(firstRouter.pushNamed<void>('details'));
+        await tester.pumpAndSettle();
+        final firstNavigatorKey = rootNavigatorKey;
+
+        final secondRouter = configurator.router;
+        addTearDown(secondRouter.dispose);
+        await tester.pumpWidget(MaterialApp.router(routerConfig: secondRouter));
+        await tester.pumpAndSettle();
+
+        expect(rootNavigatorKey, isNot(same(firstNavigatorKey)));
+        expect(rootNavigatorKey.currentState, isNotNull);
+        expect(find.text('Home'), findsOneWidget);
+        expect(find.text('Details'), findsNothing);
+        expect(homeInitCount, 2);
+      },
+    );
+
     for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
       testWidgets(
         'should use ${kIsWeb ? 'fade transitions' : 'adaptive pages'} when navigating on $platform',
@@ -149,4 +194,25 @@ void main() {
       },
     );
   });
+}
+
+class _InitCounterWidget extends StatefulWidget {
+  const _InitCounterWidget({required this.label, required this.onInit});
+
+  final String label;
+  final VoidCallback onInit;
+
+  @override
+  State<_InitCounterWidget> createState() => _InitCounterWidgetState();
+}
+
+class _InitCounterWidgetState extends State<_InitCounterWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.onInit();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(body: Text(widget.label));
 }

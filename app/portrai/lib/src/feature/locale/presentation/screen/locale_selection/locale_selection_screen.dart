@@ -35,7 +35,7 @@ class LocaleSelectionScreen extends StatelessWidget {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: DSButtonWidget(
-                    label: context.localizations.close,
+                    label: dialogContext.localizations.close,
                     onPressed: dialogContext.popScreen,
                     variant: DSButtonVariant.secondary,
                     size: DSButtonSize.small,
