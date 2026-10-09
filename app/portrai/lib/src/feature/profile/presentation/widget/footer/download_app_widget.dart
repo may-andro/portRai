@@ -15,11 +15,17 @@ class _DownloadAppWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final storeButtonWidgets = state.profile.publishedAt.map((store) {
-      if (store.name == 'Website') {
-        return const SizedBox.shrink();
-      }
+    final availableStores = state.profile.publishedAt
+        .where(
+          (store) => store.name != 'Website' && store.url.trim().isNotEmpty,
+        )
+        .toList();
 
+    if (availableStores.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final storeButtonWidgets = availableStores.map((store) {
       return _StoreButtonWidget(
         image: store.image,
         store: store.name,

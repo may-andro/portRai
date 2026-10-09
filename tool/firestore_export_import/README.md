@@ -92,8 +92,6 @@ dart run bin/firestore_export_import.dart export \
 
 ## 📝 Common Use Cases
 
-dart run bin/firestore_export_import.dart export --collection portfolio --secrets .data/service_account.json --path .data/portfolio.json
-
 ### Backup Collections
 ```bash
 # Backup all app configuration

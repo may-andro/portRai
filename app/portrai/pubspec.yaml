@@ -54,7 +54,6 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/dashboard/portfolio.json
     - assets/dashboard/experiences.json
     - assets/dashboard/expertise.json
     - assets/dashboard/profile.json
