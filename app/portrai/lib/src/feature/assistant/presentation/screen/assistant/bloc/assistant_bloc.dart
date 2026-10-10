@@ -86,6 +86,11 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     await _refreshDownloaded(emit);
     final result = await _getAssistantEnabledUseCase();
     if (result.isLeft || !result.right) return;
+    // An installed model is only loaded into memory by the first question.
+    if (state.isModelDownloaded) {
+      emit(state.copyWith(status: const AssistantReady()));
+      return;
+    }
     await _prepareModel(emit);
   }
 

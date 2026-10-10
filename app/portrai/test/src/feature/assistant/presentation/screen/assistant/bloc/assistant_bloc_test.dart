@@ -140,6 +140,22 @@ void main() {
   );
 
   blocTest<AssistantBloc, AssistantState>(
+    'should be ready without loading the model when it is already downloaded',
+    build: () {
+      final bloc = createBloc();
+      when(() => getEnabled()).thenAnswer((_) => const Right(true));
+      when(() => isDownloaded()).thenAnswer((_) => const Right(true));
+      return bloc;
+    },
+    act: (bloc) => bloc.add(const AssistantInitializedEvent()),
+    expect: () => [
+      const AssistantState(isModelDownloaded: true),
+      const AssistantState(status: AssistantReady(), isModelDownloaded: true),
+    ],
+    verify: (_) => verifyNever(() => prepare(any())),
+  );
+
+  blocTest<AssistantBloc, AssistantState>(
     'should persist the choice and download when enabled',
     build: createBloc,
     act: (bloc) => bloc.add(const EnableAssistantClickEvent()),

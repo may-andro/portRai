@@ -136,9 +136,11 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
     required String question,
     required String portfolioContext,
   }) async {
+    // The engine is loaded on the first question rather than at startup.
+    await prepareModel(onProgress: (_) {});
     final model = _model;
     if (model == null) {
-      throw StateError('Prepare the on-device model before asking a question.');
+      throw StateError('The on-device model could not be loaded.');
     }
 
     final direct = AssistantDirectAnswerer(portfolioContext).answer(question);
