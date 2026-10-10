@@ -3,7 +3,7 @@ import 'dart:convert';
 /// Selects facts from the complete portfolio without passing the entire
 /// portfolio or an ever-growing conversation to the small on-device model.
 class AssistantContextSelector {
-  static const maxContextBytes = 5500;
+  static const maxContextBytes = 10000;
   static const _header =
       'Portfolio facts (selected for this question). Quote dates and '
       'durations exactly as written; never calculate or invent them.';
@@ -90,6 +90,11 @@ class AssistantContextSelector {
             score: isCareer ? score : 20,
             order: facts.length,
           ));
+        }
+      } else if (section.key == 'digest') {
+        // Every record in one line; sorted after the matching facts.
+        for (final line in section.value as List) {
+          facts.add((text: '$line', score: 15, order: facts.length));
         }
       } else if (section.value is List) {
         final records = section.value as List;

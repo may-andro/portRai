@@ -31,6 +31,26 @@ class GetAssistantContextUseCase
     final hours = profile.workingHours;
     final location = profile.location;
 
+    // One short line per record, so the model always sees every role, project,
+    // skill group and service without relying on keyword retrieval.
+    List<String> digest() {
+      String list(List<String> items, [int max = 10]) =>
+          items.take(max).join(', ');
+      String store(String? url) =>
+          url == null || url.trim().isEmpty ? 'no' : 'yes';
+      final profile = portfolio.profile;
+      return [
+        '${profile.fullName}: ${profile.title}. Email: ${profile.email}. Phone: ${profile.phone}. Based in ${profile.location.city}, ${profile.location.country}.',
+        for (final item in portfolio.experiences)
+          '${_employmentSummary(item, today)} Location: ${item.location}. ${item.employmentType}. Technologies: ${list(item.technologies)}.',
+        for (final item in portfolio.projects)
+          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.playStore)}. On App Store: ${store(item.appStore)}. Website: ${store(item.website)}. GitHub: ${store(item.github)}.',
+        for (final item in portfolio.expertises)
+          'Skills in ${item.title}: ${list(item.skills, 15)}.',
+        for (final item in portfolio.services) 'Service: ${item.title}.',
+      ];
+    }
+
     return Right(
       jsonEncode({
         'asOf': _date(today),
@@ -48,6 +68,7 @@ class GetAssistantContextUseCase
               '${item.language} (${item.proficiency})',
           ]),
         ],
+        'digest': digest(),
         'profile': {
           'name': profile.fullName,
           'title': profile.title,

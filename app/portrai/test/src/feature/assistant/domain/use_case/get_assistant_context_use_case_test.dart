@@ -37,6 +37,17 @@ void main() {
         final hours = profile['workingHours']! as Map<String, Object?>;
         final resume = profile['resume']! as Map<String, Object?>;
         final availability = profile['availability']! as Map<String, Object?>;
+        final digest = (context['digest']! as List).cast<String>();
+        expect(
+          digest.where((line) => line.startsWith('Project ')).length,
+          portfolio.projects.length,
+        );
+        expect(
+          digest.any(
+            (line) => line.contains(portfolio.experiences.first.company),
+          ),
+          isTrue,
+        );
         expect(profile['educations'], isNotEmpty);
         expect(profile['languages'], isNotEmpty);
         expect(

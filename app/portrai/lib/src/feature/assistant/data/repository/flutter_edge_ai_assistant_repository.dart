@@ -157,10 +157,10 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
         : 'none';
     // UTF-8 bytes conservatively bound token count. Reserve room for the
     // answer and chat-template tokens rather than silently truncating input.
+    // English text averages about 3 bytes per token or more.
     final availableBytes =
-        _maxTokens -
-        utf8.encode('$_systemInstruction$question$previousQuestion').length -
-        1024;
+        (_maxTokens - 1024) * 2 -
+        utf8.encode('$_systemInstruction$question$previousQuestion').length;
     if (availableBytes < 512) {
       throw ArgumentError.value(question, 'question', 'Question is too long.');
     }
