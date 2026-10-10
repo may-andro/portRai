@@ -85,11 +85,7 @@ void main() {
   ) async {
     final (bloc, l10n) = await pumpCard(
       tester,
-      const AssistantState(
-        isEnabled: true,
-        isPreparingModel: true,
-        downloadProgress: 42,
-      ),
+      const AssistantState(status: AssistantDownloading(42)),
     );
 
     expect(find.text(l10n.assistantDownloadProgress(42)), findsOneWidget);
@@ -112,7 +108,7 @@ void main() {
   ) async {
     final (bloc, l10n) = await pumpCard(
       tester,
-      const AssistantState(isEnabled: true, isModelReady: true),
+      const AssistantState(status: AssistantReady()),
     );
 
     await tester.tap(find.byType(Switch));
@@ -130,7 +126,7 @@ void main() {
   ) async {
     final (bloc, l10n) = await pumpCard(
       tester,
-      const AssistantState(isEnabled: true, isModelReady: true),
+      const AssistantState(status: AssistantReady()),
     );
 
     await tester.tap(find.byType(Switch));

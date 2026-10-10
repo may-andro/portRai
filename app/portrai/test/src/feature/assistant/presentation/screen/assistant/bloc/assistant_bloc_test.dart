@@ -72,10 +72,7 @@ void main() {
       return bloc;
     },
     act: (bloc) => bloc.add(const AssistantInitializedEvent()),
-    expect: () => [
-      const AssistantState(),
-      const AssistantState(isModelDownloaded: true),
-    ],
+    expect: () => [const AssistantState(isModelDownloaded: true)],
   );
 
   blocTest<AssistantBloc, AssistantState>(
@@ -90,7 +87,7 @@ void main() {
       return bloc;
     },
     act: (bloc) => bloc.add(const AssistantInitializedEvent()),
-    expect: () => [const AssistantState(isFeatureEnabled: false)],
+    expect: () => [const AssistantState(status: AssistantUnavailable())],
     verify: (_) => verifyNever(() => prepare(any())),
   );
 
@@ -114,7 +111,7 @@ void main() {
       bloc.add(const AssistantInitializedEvent());
     },
     expect: () => [
-      const AssistantState(isFeatureEnabled: false),
+      const AssistantState(status: AssistantUnavailable()),
       const AssistantState(),
     ],
   );
@@ -137,9 +134,8 @@ void main() {
     act: (bloc) => bloc.add(const AssistantInitializedEvent()),
     expect: () => [
       const AssistantState(),
-      const AssistantState(isEnabled: true),
-      const AssistantState(isEnabled: true, isPreparingModel: true),
-      const AssistantState(isEnabled: true, isModelReady: true),
+      const AssistantState(status: AssistantDownloading()),
+      const AssistantState(status: AssistantReady()),
     ],
   );
 
@@ -148,23 +144,35 @@ void main() {
     build: createBloc,
     act: (bloc) => bloc.add(const EnableAssistantClickEvent()),
     expect: () => [
-      const AssistantState(isEnabled: true),
-      const AssistantState(isEnabled: true, isPreparingModel: true),
-      const AssistantState(isEnabled: true, isModelReady: true),
+      const AssistantState(status: AssistantDownloading()),
+      const AssistantState(status: AssistantReady()),
     ],
     verify: (_) => verify(() => updateEnabled(true)).called(1),
   );
 
   blocTest<AssistantBloc, AssistantState>(
+    'should fail when enabled and the model cannot be prepared',
+    build: () {
+      final bloc = createBloc();
+      when(
+        () => prepare(any()),
+      ).thenAnswer((_) => const Left(UnknownAssistantFailure()));
+      return bloc;
+    },
+    act: (bloc) => bloc.add(const EnableAssistantClickEvent()),
+    expect: () => [
+      const AssistantState(status: AssistantDownloading()),
+      const AssistantState(status: AssistantFailed()),
+    ],
+  );
+
+  blocTest<AssistantBloc, AssistantState>(
     'should delete the model when disabled with deletion confirmed',
     build: createBloc,
-    seed: () => const AssistantState(isEnabled: true, isModelReady: true),
+    seed: () => const AssistantState(status: AssistantReady()),
     act: (bloc) =>
         bloc.add(const DisableAssistantClickEvent(deleteModel: true)),
-    expect: () => [
-      const AssistantState(isModelReady: true),
-      const AssistantState(),
-    ],
+    expect: () => [const AssistantState()],
     verify: (_) {
       verify(() => updateEnabled(false)).called(1);
       verify(() => delete()).called(1);
@@ -174,7 +182,7 @@ void main() {
   blocTest<AssistantBloc, AssistantState>(
     'should keep the model when disabled without deletion',
     build: createBloc,
-    seed: () => const AssistantState(isEnabled: true, isModelReady: true),
+    seed: () => const AssistantState(status: AssistantReady()),
     act: (bloc) =>
         bloc.add(const DisableAssistantClickEvent(deleteModel: false)),
     verify: (_) {
@@ -193,7 +201,7 @@ void main() {
       when(() => prepare(any())).thenAnswer((_) => download.future);
       bloc.add(const EnableAssistantClickEvent());
       await pumpEventQueue();
-      expect(bloc.state.isPreparingModel, isTrue);
+      expect(bloc.state.isDownloading, isTrue);
 
       bloc.add(const DisableAssistantClickEvent(deleteModel: false));
       await pumpEventQueue();
@@ -203,7 +211,6 @@ void main() {
       verify(() => cancel()).called(1);
       verifyNever(() => delete());
       expect(bloc.state.isEnabled, isFalse);
-      expect(bloc.state.isPreparingModel, isFalse);
       expect(bloc.state.hasError, isFalse);
     },
   );

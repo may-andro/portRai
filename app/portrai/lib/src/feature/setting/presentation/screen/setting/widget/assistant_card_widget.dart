@@ -13,10 +13,11 @@ class AssistantCardWidget extends StatelessWidget {
     final localizations = context.localizations;
     return BlocBuilder<AssistantBloc, AssistantState>(
       builder: (context, state) {
-        final progress = state.downloadProgress.clamp(0, 100);
-        final isDownloading = state.isPreparingModel && progress < 100;
-        final failed =
-            state.isEnabled && !state.isPreparingModel && state.hasError;
+        final progress = switch (state.status) {
+          AssistantDownloading(:final progress) => progress.clamp(0, 100),
+          _ => 0,
+        };
+        final isDownloading = state.isDownloading && progress < 100;
         return DSCardWidget(
           backgroundColor: palette.inverseSurface,
           radius: context.dimen.radiusLevel2,
@@ -56,7 +57,7 @@ class AssistantCardWidget extends StatelessWidget {
                   color: palette.neutral.grey3,
                   style: context.typography.bodyMedium,
                 ),
-                if (state.isPreparingModel) ...[
+                if (state.isDownloading) ...[
                   const DSVerticalSpacerWidget(2),
                   LinearProgressIndicator(
                     color: palette.brand.primary.color,
@@ -87,7 +88,7 @@ class AssistantCardWidget extends StatelessWidget {
                     ],
                   ),
                 ],
-                if (state.isEnabled && state.isModelReady) ...[
+                if (state.isReady) ...[
                   const DSVerticalSpacerWidget(1),
                   DSTextWidget(
                     localizations.assistantSettingsReady,
@@ -95,7 +96,7 @@ class AssistantCardWidget extends StatelessWidget {
                     style: context.typography.labelMedium,
                   ),
                 ],
-                if (failed) ...[
+                if (state.hasFailed) ...[
                   const DSVerticalSpacerWidget(1),
                   DSTextWidget(
                     localizations.assistantModelError,
@@ -144,7 +145,7 @@ class AssistantCardWidget extends StatelessWidget {
     AssistantState state,
   ) async {
     final bloc = context.read<AssistantBloc>();
-    if (!state.isModelReady) {
+    if (!state.isReady) {
       // Cancelling a download, or clearing a failed attempt, leaves no model
       // worth keeping.
       bloc.add(const DisableAssistantClickEvent(deleteModel: true));

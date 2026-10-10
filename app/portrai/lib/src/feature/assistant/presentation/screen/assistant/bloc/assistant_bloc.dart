@@ -74,14 +74,18 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     final isFeatureEnabled = flagResult.isRight
         ? flagResult.right
         : AssistantFeatureFlags.aiAssistant.defaultValue;
-    emit(state.copyWith(isFeatureEnabled: isFeatureEnabled));
-    if (!isFeatureEnabled) return;
+    if (!isFeatureEnabled) {
+      emit(state.copyWith(status: const AssistantUnavailable()));
+      return;
+    }
+    if (state.status is AssistantUnavailable) {
+      emit(state.copyWith(status: const AssistantOff()));
+    }
     if (_hasInitialized) return;
     _hasInitialized = true;
     await _refreshDownloaded(emit);
     final result = await _getAssistantEnabledUseCase();
     if (result.isLeft || !result.right) return;
-    emit(state.copyWith(isEnabled: true));
     await _prepareModel(emit);
   }
 
@@ -89,7 +93,8 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     EnableAssistantClickEvent event,
     Emitter<AssistantState> emit,
   ) async {
-    emit(state.copyWith(isEnabled: true, hasError: false));
+    if (state.isDownloading) return;
+    emit(state.copyWith(status: const AssistantDownloading(), hasError: false));
     await _updateAssistantEnabledUseCase(true);
     await _prepareModel(emit);
   }
@@ -98,22 +103,21 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     DisableAssistantClickEvent event,
     Emitter<AssistantState> emit,
   ) async {
-    final wasPreparing = state.isPreparingModel;
-    emit(state.copyWith(isEnabled: false, hasError: false, messages: const []));
+    final wasDownloading = state.isDownloading;
+    emit(
+      state.copyWith(
+        status: const AssistantOff(),
+        hasError: false,
+        messages: const [],
+      ),
+    );
     await _updateAssistantEnabledUseCase(false);
     // A download that is still running is always discarded.
-    if (wasPreparing) {
+    if (wasDownloading) {
       await _cancelAssistantPreparationUseCase();
     } else if (event.deleteModel) {
       await _deleteAssistantModelUseCase();
     }
-    emit(
-      state.copyWith(
-        isPreparingModel: false,
-        isModelReady: false,
-        downloadProgress: 0,
-      ),
-    );
     await _refreshDownloaded(emit);
   }
 
@@ -123,29 +127,21 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
   }
 
   Future<void> _prepareModel(Emitter<AssistantState> emit) async {
-    if (state.isPreparingModel) return;
-    emit(
-      state.copyWith(
-        isPreparingModel: true,
-        downloadProgress: 0,
-        hasError: false,
-      ),
-    );
+    emit(state.copyWith(status: const AssistantDownloading(), hasError: false));
     final result = await _prepareAssistantModelUseCase((progress) {
-      if (state.isEnabled) emit(state.copyWith(downloadProgress: progress));
+      if (state.isDownloading) {
+        emit(state.copyWith(status: AssistantDownloading(progress)));
+      }
     });
     await _refreshDownloaded(emit);
-    result.fold(
-      // A failure after the user turned the assistant off is a cancellation.
-      (_) => emit(
-        state.copyWith(isPreparingModel: false, hasError: state.isEnabled),
-      ),
-      (_) => emit(
-        state.copyWith(
-          isPreparingModel: false,
-          isModelReady: state.isEnabled,
-          hasError: false,
-        ),
+    // Turning the assistant off meanwhile leaves it off, so a failure then is
+    // a cancellation and a success is discarded.
+    if (!state.isDownloading) return;
+    emit(
+      state.copyWith(
+        status: result.isRight
+            ? const AssistantReady()
+            : const AssistantFailed(),
       ),
     );
   }
@@ -158,7 +154,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     final portfolioContext = state.portfolioContext;
     if (question.isEmpty ||
         portfolioContext == null ||
-        !state.isModelReady ||
+        !state.isReady ||
         state.isSendingQuestion) {
       return;
     }

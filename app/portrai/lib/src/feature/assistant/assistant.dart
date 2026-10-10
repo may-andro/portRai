@@ -11,5 +11,12 @@ export 'presentation/screen/assistant/bloc/assistant_event.dart'
         DisableAssistantClickEvent,
         EnableAssistantClickEvent;
 export 'presentation/screen/assistant/bloc/assistant_state.dart'
-    show AssistantState;
+    show
+        AssistantDownloading,
+        AssistantFailed,
+        AssistantOff,
+        AssistantReady,
+        AssistantState,
+        AssistantStatus,
+        AssistantUnavailable;
 export 'presentation/widget/assistant_button.dart';

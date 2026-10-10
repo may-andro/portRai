@@ -23,10 +23,7 @@ void main() {
   testWidgets('should show the button when enabled and the model is ready', (
     tester,
   ) async {
-    await pumpButton(
-      tester,
-      const AssistantState(isEnabled: true, isModelReady: true),
-    );
+    await pumpButton(tester, const AssistantState(status: AssistantReady()));
 
     expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
   });
@@ -36,11 +33,7 @@ void main() {
   ) async {
     await pumpButton(
       tester,
-      const AssistantState(
-        isEnabled: true,
-        isPreparingModel: true,
-        downloadProgress: 42,
-      ),
+      const AssistantState(status: AssistantDownloading(42)),
     );
 
     expect(find.byType(FloatingActionButton), findsNothing);
@@ -49,16 +42,13 @@ void main() {
   testWidgets('should hide the button when the assistant is disabled', (
     tester,
   ) async {
-    await pumpButton(tester, const AssistantState(isModelReady: true));
+    await pumpButton(tester, const AssistantState());
 
     expect(find.byType(FloatingActionButton), findsNothing);
   });
 
   testWidgets('should hide the button when preparation failed', (tester) async {
-    await pumpButton(
-      tester,
-      const AssistantState(isEnabled: true, hasError: true),
-    );
+    await pumpButton(tester, const AssistantState(status: AssistantFailed()));
 
     expect(find.byType(FloatingActionButton), findsNothing);
   });
@@ -68,11 +58,7 @@ void main() {
   ) async {
     await pumpButton(
       tester,
-      const AssistantState(
-        isFeatureEnabled: false,
-        isEnabled: true,
-        isModelReady: true,
-      ),
+      const AssistantState(status: AssistantUnavailable()),
     );
 
     expect(find.byType(FloatingActionButton), findsNothing);

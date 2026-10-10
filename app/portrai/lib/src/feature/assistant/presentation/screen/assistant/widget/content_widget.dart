@@ -27,7 +27,7 @@ class ContentWidget extends StatelessWidget {
             ),
           );
         }
-        return state.isModelReady
+        return state.isReady
             ? _ChatWidget(state: state)
             : _ModelSetupWidget(state: state);
       },
@@ -71,26 +71,22 @@ class _ModelSetupWidget extends StatelessWidget {
                 style: context.typography.bodyMedium,
                 textAlign: TextAlign.center,
               ),
-              if (state.isPreparingModel) ...[
+              if (state.status case AssistantDownloading(:final progress)) ...[
                 const DSVerticalSpacerWidget(3),
                 LinearProgressIndicator(
                   color: palette.brand.primary.color,
-                  value: state.downloadProgress == 0
-                      ? null
-                      : state.downloadProgress / 100,
+                  value: progress == 0 ? null : progress / 100,
                 ),
                 const DSVerticalSpacerWidget(1),
                 DSTextWidget(
-                  state.downloadProgress == 0
+                  progress == 0
                       ? localizations.assistantPreparingModel
-                      : localizations.assistantDownloadProgress(
-                          state.downloadProgress,
-                        ),
+                      : localizations.assistantDownloadProgress(progress),
                   color: palette.neutral.grey7,
                   style: context.typography.labelMedium,
                 ),
               ],
-              if (state.hasError) ...[
+              if (state.hasFailed) ...[
                 const DSVerticalSpacerWidget(2),
                 DSTextWidget(
                   localizations.assistantModelError,

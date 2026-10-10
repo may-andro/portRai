@@ -44,10 +44,9 @@ class ContentWidget extends StatelessWidget {
                       if (isAssistantSupported)
                         BlocBuilder<AssistantBloc, AssistantState>(
                           buildWhen: (previous, current) =>
-                              previous.isFeatureEnabled !=
-                              current.isFeatureEnabled,
+                              previous.isAvailable != current.isAvailable,
                           builder: (context, assistantState) {
-                            if (!assistantState.isFeatureEnabled) {
+                            if (!assistantState.isAvailable) {
                               return const SizedBox.shrink();
                             }
                             return Column(

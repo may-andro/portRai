@@ -31,7 +31,7 @@ void main() {
       await tester.pumpWidget(
         const TestWidgetWrapper(
           child: AssistantBlocScope(
-            state: AssistantState(isFeatureEnabled: false),
+            state: AssistantState(status: AssistantUnavailable()),
             child: ContentWidget(
               state: SettingLoadedState(isLanguageSelectorEnabled: false),
             ),
