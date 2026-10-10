@@ -685,10 +685,6 @@
   "@assistantOnDeviceDescription": {
     "description": "Explains the model download and local processing to assistant users"
   },
-  "assistantPrepareButton": "Prepare on-device AI",
-  "@assistantPrepareButton": {
-    "description": "Button to download and initialize the local assistant model"
-  },
   "assistantPreparingModel": "Preparing the local model...",
   "@assistantPreparingModel": {
     "description": "Progress text shown while the local assistant model is being prepared"
@@ -714,10 +710,6 @@
   "assistantInputHint": "Ask a question about this portfolio",
   "@assistantInputHint": {
     "description": "Placeholder text for the assistant question input"
-  },
-  "assistantSend": "Send",
-  "@assistantSend": {
-    "description": "Accessible label for the button that sends an assistant question"
   },
   "assistantWelcome": "Ask about projects, skills, experience, or services",
   "@assistantWelcome": {
