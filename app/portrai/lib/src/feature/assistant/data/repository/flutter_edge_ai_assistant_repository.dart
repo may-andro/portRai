@@ -163,47 +163,67 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
     if (availableBytes < 512) {
       throw ArgumentError.value(question, 'question', 'Question is too long.');
     }
-    final selectedContext = AssistantContextSelector().select(
-      portfolioContext,
-      question,
-      previousQuestion: previousQuestion == 'none' ? null : previousQuestion,
-      maxBytes: availableBytes < AssistantContextSelector.maxContextBytes
-          ? availableBytes
-          : AssistantContextSelector.maxContextBytes,
-    );
-    await _chat?.close();
-    _chat = null;
-    _chat = await model.createChat(
-      systemInstruction: _systemInstruction,
-      temperature: 0.2,
-      topK: 40,
-      maxOutputTokens: 512,
-    );
+    final maxBytes = availableBytes < AssistantContextSelector.maxContextBytes
+        ? availableBytes
+        : AssistantContextSelector.maxContextBytes;
 
-    final chat = _chat!;
-    // The facts sit next to the question in the user turn, where the small
-    // model attends to them far better than in a long system prompt.
-    await chat.addQueryChunk(
-      Message(
+    // The small model occasionally collapses into a repeated character on a
+    // long prompt. Retry once with livelier sampling and a shorter context.
+    var answer = '';
+    for (final (temperature, bytes) in [
+      (0.2, maxBytes),
+      (0.7, maxBytes < 6000 ? maxBytes : 6000),
+    ]) {
+      final selectedContext = AssistantContextSelector().select(
+        portfolioContext,
+        question,
+        previousQuestion: previousQuestion == 'none' ? null : previousQuestion,
+        maxBytes: bytes,
+      );
+      answer = await _generate(
+        model,
+        temperature: temperature,
         text:
             'Portfolio information:\n$selectedContext\n\n'
             '${previousQuestion == 'none' ? '' : 'Previous user question: $previousQuestion\n\n'}'
             'Answer only this question, using only the portfolio '
             'information above: $question',
-        isUser: true,
-      ),
-    );
-    final response = await chat.generateChatResponse();
-    final answer = response is TextResponse ? response.token.trim() : '';
-    if (kDebugMode) {
-      debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
+      );
+      if (kDebugMode) {
+        debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
+      }
+      if (!_isDegenerate(answer)) break;
     }
-    if (answer.isEmpty) {
-      throw StateError('The on-device model returned an empty answer.');
+    if (answer.isEmpty || _isDegenerate(answer)) {
+      throw StateError('The on-device model did not return a usable answer.');
     }
     _previousQuestion = question;
     return answer;
   }
+
+  Future<String> _generate(
+    InferenceModel model, {
+    required double temperature,
+    required String text,
+  }) async {
+    await _chat?.close();
+    _chat = null;
+    final chat = _chat = await model.createChat(
+      systemInstruction: _systemInstruction,
+      temperature: temperature,
+      topK: 40,
+      maxOutputTokens: 512,
+    );
+    // The facts sit next to the question in the user turn, where the small
+    // model attends to them far better than in a long system prompt.
+    await chat.addQueryChunk(Message(text: text, isUser: true));
+    final response = await chat.generateChatResponse();
+    return response is TextResponse ? response.token.trim() : '';
+  }
+
+  static final _repeatedRun = RegExp(r'(\S)\1{11,}');
+
+  static bool _isDegenerate(String answer) => _repeatedRun.hasMatch(answer);
 
   static final _followUpPattern = RegExp(
     r'\b(else|also|more|that|those|there|it|them|again|another|other)\b|'
