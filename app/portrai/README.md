@@ -17,6 +17,7 @@ architecture).
 - **Expertise**: Areas of specialization and proficiency
 - **Services**: Professional services offered
 - **Testimonials**: Client feedback and recommendations
+- **On-device AI Assistant**: Ask questions about portfolio content using a local language model
 
 ### Technical Features
 - **Dynamic Content**: Content fetched from Firebase Firestore
@@ -26,6 +27,18 @@ architecture).
 - **Responsive Layout**: Adaptive UI for mobile, tablet, and desktop
 - **Smooth Animations**: Polished transitions and micro-interactions
 - **Offline Mode**: Comprehensive caching for full functionality without internet connection
+- **On-device AI**: An opt-in assistant. Questions and portfolio context are processed locally,
+  without sending them to a hosted AI service. It is off by default; the AI section in Settings
+  explains that it runs on the device, then downloads the model (revision-pinned Gemma 4 E2B
+  LiteRT-LM bundle, approximately 2.4 GiB, Apache-2.0) only after the user agrees, with download
+  progress and a cancel button. Cancelling mid-download deletes the partial model. Turning the
+  assistant off asks whether to delete the downloaded model or keep it for later. The "Ask AI"
+  button appears on the portfolio only when the assistant is enabled and its model is ready. A
+  successful local inference is required before the model counts as ready. Available on Android,
+  iOS, and macOS; disabled on web.
+  All portfolio fields are available to the assistant, including employment dates, responsibilities,
+  achievements, education, testimonials, and project details. Question-focused local context
+  selection keeps prompts bounded; employment entries carry a ready-written date range and duration.
 - **Feature Flags**: Control features remotely without app updates
 - **Analytics & Tracking**: User behavior insights with Firebase Analytics
 - **Error Reporting**: Automatic error tracking and reporting via Firebase Crashlytics
@@ -36,7 +49,7 @@ architecture).
 
 ### Prerequisites
 - Flutter SDK ^3.47.0
-- Dart SDK ^3.11.0
+- Dart SDK ^3.12.0
 - Firebase project with Firestore enabled
 - Android Studio / VS Code / IntelliJ IDEA
 
@@ -72,6 +85,7 @@ lib/
 │   ├── feature/             # Feature modules (data/domain/presentation per feature)
 │   │   ├── experience/      # Work experience feature
 │   │   ├── expertise/       # Expertise showcase
+│   │   ├── assistant/       # On-device portfolio Q&A
 │   │   ├── profile/         # User profile
 │   │   ├── project/         # Projects portfolio
 │   │   ├── service/         # Services offered
@@ -120,10 +134,10 @@ Config.
 
 | Platform | Support | Notes |
 |----------|---------|-------|
-| Android  | Yes     | API 21+ |
-| iOS      | Yes     | iOS 12+ |
-| Web      | Yes     | All modern browsers |
-| macOS    | Yes     | macOS 10.14+ |
+| Android  | Yes     | API 30+ |
+| iOS      | Yes     | iOS 15+ |
+| Web      | Yes     | Modern browsers; on-device AI assistant disabled |
+| macOS    | Yes     | Apple Silicon; macOS 12+ |
 
 ## Development
 

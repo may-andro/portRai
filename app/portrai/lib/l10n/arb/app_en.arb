@@ -668,5 +668,139 @@
   "splashContactSupportUnavailableMessage": "This feature is not yet developed",
   "@splashContactSupportUnavailableMessage": {
     "description": "Snack bar message shown when support contact is unavailable on the splash error screen"
+  },
+  "assistantAskAi": "Ask AI",
+  "@assistantAskAi": {
+    "description": "Portfolio button that opens the on-device AI assistant"
+  },
+  "assistantTitle": "Portfolio AI",
+  "@assistantTitle": {
+    "description": "Title shown in the portfolio assistant screen"
+  },
+  "assistantOnDeviceTitle": "A private assistant, on your device",
+  "@assistantOnDeviceTitle": {
+    "description": "Headline explaining that the assistant runs locally"
+  },
+  "assistantOnDeviceDescription": "The assistant runs on this device. Your questions and portfolio information are processed locally.",
+  "@assistantOnDeviceDescription": {
+    "description": "Explains the model download and local processing to assistant users"
+  },
+  "assistantPrepareButton": "Prepare on-device AI",
+  "@assistantPrepareButton": {
+    "description": "Button to download and initialize the local assistant model"
+  },
+  "assistantPreparingModel": "Preparing the local model...",
+  "@assistantPreparingModel": {
+    "description": "Progress text shown while the local assistant model is being prepared"
+  },
+  "assistantDownloadProgress": "{percent}% downloaded",
+  "@assistantDownloadProgress": {
+    "description": "Download progress shown while preparing the local model",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "assistantModelError": "Could not prepare the model. Check your connection and try again.",
+  "@assistantModelError": {
+    "description": "Error shown when the local assistant model cannot be downloaded or loaded"
+  },
+  "assistantOnDeviceBadge": "On-device AI",
+  "@assistantOnDeviceBadge": {
+    "description": "Badge indicating that assistant responses are generated locally"
+  },
+  "assistantInputHint": "Ask a question about this portfolio",
+  "@assistantInputHint": {
+    "description": "Placeholder text for the assistant question input"
+  },
+  "assistantSend": "Send",
+  "@assistantSend": {
+    "description": "Accessible label for the button that sends an assistant question"
+  },
+  "assistantWelcome": "Ask about projects, skills, experience, or services",
+  "@assistantWelcome": {
+    "description": "Welcome text shown before the first assistant question"
+  },
+  "assistantSuggestionProjects": "Which projects use Flutter?",
+  "@assistantSuggestionProjects": {
+    "description": "Suggested question asking which portfolio projects use Flutter"
+  },
+  "assistantSuggestionExperience": "Summarize the experience",
+  "@assistantSuggestionExperience": {
+    "description": "Suggested question asking for a summary of professional experience"
+  },
+  "assistantSuggestionServices": "Which services are offered?",
+  "@assistantSuggestionServices": {
+    "description": "Suggested question asking which services are offered"
+  },
+  "assistantSuggestionFlutterYears": "How many years of Flutter experience?",
+  "@assistantSuggestionFlutterYears": {
+    "description": "Suggested question asking for total years of Flutter experience"
+  },
+  "assistantSuggestionPlayStore": "Which apps are on the Play Store?",
+  "@assistantSuggestionPlayStore": {
+    "description": "Suggested question asking which apps have a Play Store link"
+  },
+  "assistantSuggestionLeadership": "Has he led a team?",
+  "@assistantSuggestionLeadership": {
+    "description": "Suggested question asking about team leadership experience"
+  },
+  "assistantError": "The assistant could not answer. Please try again.",
+  "@assistantError": {
+    "description": "Generic error shown when the assistant cannot load its context or answer"
+  },
+  "assistantSettingsTitle": "AI assistant",
+  "@assistantSettingsTitle": {
+    "description": "Settings section title for the on-device AI assistant"
+  },
+  "assistantSettingsToggleTitle": "Enable on-device AI",
+  "@assistantSettingsToggleTitle": {
+    "description": "Label of the switch that turns the on-device AI assistant on or off"
+  },
+  "assistantSettingsDescription": "The assistant answers questions about this portfolio with an AI model that runs entirely on your device. Nothing you ask is sent to a server. Enabling it downloads a model of about 2.4 GB, so a Wi-Fi connection is recommended. You can turn it off and delete the model at any time.",
+  "@assistantSettingsDescription": {
+    "description": "Explains that the AI assistant is local, private and requires a large model download"
+  },
+  "assistantSettingsReady": "Ready on this device",
+  "@assistantSettingsReady": {
+    "description": "Status shown in settings when the AI model is downloaded and the assistant is enabled"
+  },
+  "assistantEnableDialogTitle": "Download the AI model?",
+  "@assistantEnableDialogTitle": {
+    "description": "Title of the dialog asking consent to download the AI model"
+  },
+  "assistantEnableDialogMessage": "The assistant needs to download about 2.4 GB and runs only on this device. Do you want to continue?",
+  "@assistantEnableDialogMessage": {
+    "description": "Message of the dialog asking consent to download the AI model"
+  },
+  "assistantEnableDialogConfirm": "Download",
+  "@assistantEnableDialogConfirm": {
+    "description": "Button that confirms downloading the AI model"
+  },
+  "assistantCancel": "Cancel",
+  "@assistantCancel": {
+    "description": "Button that cancels a dialog or an in-progress AI model download"
+  },
+  "assistantDisableDialogTitle": "Delete the downloaded model?",
+  "@assistantDisableDialogTitle": {
+    "description": "Title of the dialog shown when turning the AI assistant off"
+  },
+  "assistantDisableDialogMessage": "The assistant will be turned off. Delete the model to free about 2.4 GB, or keep it to turn the assistant on again without downloading.",
+  "@assistantDisableDialogMessage": {
+    "description": "Message of the dialog asking whether to delete the AI model when turning the assistant off"
+  },
+  "assistantDisableDialogDelete": "Delete",
+  "@assistantDisableDialogDelete": {
+    "description": "Button that deletes the downloaded AI model"
+  },
+  "assistantDisableDialogKeep": "Keep",
+  "@assistantDisableDialogKeep": {
+    "description": "Button that keeps the downloaded AI model when turning the assistant off"
+  },
+  "assistantRetry": "Retry",
+  "@assistantRetry": {
+    "description": "Button that retries the AI model download"
   }
 }
