@@ -72,7 +72,10 @@ void main() {
       return bloc;
     },
     act: (bloc) => bloc.add(const AssistantInitializedEvent()),
-    expect: () => [const AssistantState(isModelDownloaded: true)],
+    expect: () => [
+      const AssistantState(),
+      const AssistantState(isModelDownloaded: true),
+    ],
   );
 
   blocTest<AssistantBloc, AssistantState>(
@@ -89,6 +92,31 @@ void main() {
     act: (bloc) => bloc.add(const AssistantInitializedEvent()),
     expect: () => [const AssistantState(isFeatureEnabled: false)],
     verify: (_) => verifyNever(() => prepare(any())),
+  );
+
+  blocTest<AssistantBloc, AssistantState>(
+    'should pick up the feature flag when initialized again after it was turned on',
+    build: () {
+      final bloc = createBloc();
+      isFeatureEnabled.stubCall(
+        definition: AssistantFeatureFlags.aiAssistant,
+        result: const Right(false),
+      );
+      return bloc;
+    },
+    act: (bloc) async {
+      bloc.add(const AssistantInitializedEvent());
+      await Future<void>.delayed(Duration.zero);
+      isFeatureEnabled.stubCall(
+        definition: AssistantFeatureFlags.aiAssistant,
+        result: const Right(true),
+      );
+      bloc.add(const AssistantInitializedEvent());
+    },
+    expect: () => [
+      const AssistantState(isFeatureEnabled: false),
+      const AssistantState(),
+    ],
   );
 
   blocTest<AssistantBloc, AssistantState>(

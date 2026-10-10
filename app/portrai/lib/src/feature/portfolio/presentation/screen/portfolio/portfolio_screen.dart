@@ -19,7 +19,14 @@ class PortfolioScreen extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return RouteObserverWidget(
-            onResume: () => context.bloc.add(const ScreenVisibleEvent()),
+            onResume: () {
+              context.bloc.add(const ScreenVisibleEvent());
+              if (isAssistantSupported) {
+                context.read<AssistantBloc>().add(
+                  const AssistantInitializedEvent(),
+                );
+              }
+            },
             child: Scaffold(
               backgroundColor: context.colorPalette.background.color,
               drawer: context.isDesktop ? null : const DrawerWidget(),

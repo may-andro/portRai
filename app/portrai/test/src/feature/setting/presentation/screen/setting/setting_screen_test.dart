@@ -53,7 +53,9 @@ void main() {
         appServiceLocator.registerFactory<SettingBloc>(() => bloc);
 
         await tester.pumpWidget(
-          const TestWidgetWrapper(child: SettingScreen()),
+          const TestWidgetWrapper(
+            child: AssistantBlocScope(child: SettingScreen()),
+          ),
         );
         await tester.pump();
 

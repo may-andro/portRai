@@ -9,6 +9,7 @@ import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/observer/route_observer_widget.dart';
 
 import '../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
+import '../../../../../../util/assistant_bloc_scope.dart';
 import '../../../../../../util/tracking_impression_test_util.dart';
 
 void main() {
@@ -36,7 +37,7 @@ void main() {
               child: child!,
             );
           },
-          home: const PortfolioScreen(),
+          home: const AssistantBlocScope(child: PortfolioScreen()),
         ),
       );
       await tester.pump();

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/domain/_domain.dart';
-import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/assistant_event.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/assistant_state.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/tracking/_tracking.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 
 // One shared instance: Settings, the portfolio button and the assistant
 // screen all reflect the same download and enabled state.
@@ -60,6 +60,10 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     );
   }
 
+  var _hasInitialized = false;
+
+  // Dispatched again when screens become visible, so a flag turned on at
+  // runtime (dev menu) is picked up. Setup only ever runs once.
   Future<void> _onInitialized(
     AssistantInitializedEvent event,
     Emitter<AssistantState> emit,
@@ -70,10 +74,10 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     final isFeatureEnabled = flagResult.isRight
         ? flagResult.right
         : AssistantFeatureFlags.aiAssistant.defaultValue;
-    if (!isFeatureEnabled) {
-      emit(state.copyWith(isFeatureEnabled: false));
-      return;
-    }
+    emit(state.copyWith(isFeatureEnabled: isFeatureEnabled));
+    if (!isFeatureEnabled) return;
+    if (_hasInitialized) return;
+    _hasInitialized = true;
     await _refreshDownloaded(emit);
     final result = await _getAssistantEnabledUseCase();
     if (result.isLeft || !result.right) return;
