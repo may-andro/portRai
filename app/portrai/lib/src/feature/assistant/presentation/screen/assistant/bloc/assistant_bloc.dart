@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/domain/_domain.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/assistant_event.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/assistant_state.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/tracking/_tracking.dart';
@@ -21,6 +22,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     this._isAssistantModelDownloadedUseCase,
     this._askPortfolioQuestionUseCase,
     this._trackingDelegate,
+    this._isFeatureEnabledUseCase,
   ) : super(const AssistantState()) {
     on<AssistantStartedEvent>(_onStarted);
     on<AssistantInitializedEvent>(_onInitialized);
@@ -38,6 +40,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
   final IsAssistantModelDownloadedUseCase _isAssistantModelDownloadedUseCase;
   final AskPortfolioQuestionUseCase _askPortfolioQuestionUseCase;
   final AssistantTrackingDelegate _trackingDelegate;
+  final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
 
   Future<void> _onStarted(
     AssistantStartedEvent event,
@@ -61,6 +64,16 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     AssistantInitializedEvent event,
     Emitter<AssistantState> emit,
   ) async {
+    final flagResult = await _isFeatureEnabledUseCase(
+      AssistantFeatureFlags.aiAssistant,
+    );
+    final isFeatureEnabled = flagResult.isRight
+        ? flagResult.right
+        : AssistantFeatureFlags.aiAssistant.defaultValue;
+    if (!isFeatureEnabled) {
+      emit(state.copyWith(isFeatureEnabled: false));
+      return;
+    }
     await _refreshDownloaded(emit);
     final result = await _getAssistantEnabledUseCase();
     if (result.isLeft || !result.right) return;

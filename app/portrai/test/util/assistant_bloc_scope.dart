@@ -7,16 +7,21 @@ import '../mock/feature/assistant/presentation/screen/assistant/bloc/mock_assist
 /// Provides the app-wide [AssistantBloc] that screens hosting the assistant
 /// settings card expect to find above them.
 class AssistantBlocScope extends StatefulWidget {
-  const AssistantBlocScope({super.key, required this.child});
+  const AssistantBlocScope({
+    super.key,
+    required this.child,
+    this.state = const AssistantState(),
+  });
 
   final Widget child;
+  final AssistantState state;
 
   @override
   State<AssistantBlocScope> createState() => _AssistantBlocScopeState();
 }
 
 class _AssistantBlocScopeState extends State<AssistantBlocScope> {
-  late final _bloc = MockAssistantBloc()..stubState(const AssistantState());
+  late final _bloc = MockAssistantBloc()..stubState(widget.state);
 
   @override
   void dispose() {

@@ -13,10 +13,13 @@ class AssistantButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AssistantBloc, AssistantState>(
       buildWhen: (previous, current) =>
+          previous.isFeatureEnabled != current.isFeatureEnabled ||
           previous.isEnabled != current.isEnabled ||
           previous.isModelReady != current.isModelReady,
       builder: (context, state) {
-        if (!state.isEnabled || !state.isModelReady) {
+        if (!state.isFeatureEnabled ||
+            !state.isEnabled ||
+            !state.isModelReady) {
           return const SizedBox.shrink();
         }
         return FloatingActionButton(

@@ -41,12 +41,28 @@ class ContentWidget extends StatelessWidget {
                         ),
                         const LanguageCardWidget(),
                       ],
-                      if (isAssistantSupported) ...[
-                        SectionTitleWidget(
-                          title: context.localizations.assistantSettingsTitle,
+                      if (isAssistantSupported)
+                        BlocBuilder<AssistantBloc, AssistantState>(
+                          buildWhen: (previous, current) =>
+                              previous.isFeatureEnabled !=
+                              current.isFeatureEnabled,
+                          builder: (context, assistantState) {
+                            if (!assistantState.isFeatureEnabled) {
+                              return const SizedBox.shrink();
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SectionTitleWidget(
+                                  title: context
+                                      .localizations
+                                      .assistantSettingsTitle,
+                                ),
+                                const AssistantCardWidget(),
+                              ],
+                            );
+                          },
                         ),
-                        const AssistantCardWidget(),
-                      ],
                       if (state.isDevMenuEnabled) ...[
                         const DSVerticalSpacerWidget(3),
                         DSButtonWidget(

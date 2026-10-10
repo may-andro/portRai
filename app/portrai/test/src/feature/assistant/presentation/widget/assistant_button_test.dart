@@ -62,4 +62,19 @@ void main() {
 
     expect(find.byType(FloatingActionButton), findsNothing);
   });
+
+  testWidgets('should hide the button when the feature flag is off', (
+    tester,
+  ) async {
+    await pumpButton(
+      tester,
+      const AssistantState(
+        isFeatureEnabled: false,
+        isEnabled: true,
+        isModelReady: true,
+      ),
+    );
+
+    expect(find.byType(FloatingActionButton), findsNothing);
+  });
 }

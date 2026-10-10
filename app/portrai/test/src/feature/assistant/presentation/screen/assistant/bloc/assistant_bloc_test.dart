@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
@@ -16,6 +17,7 @@ import '../../../../../../../mock/feature/assistant/domain/use_case/mock_is_assi
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_prepare_assistant_model_use_case.dart';
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_update_assistant_enabled_use_case.dart';
 import '../../../../../../../mock/feature/assistant/presentation/screen/assistant/tracking/mock_assistant_tracking_delegate.dart';
+import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 
 void main() {
   late MockGetAssistantEnabledUseCase getEnabled;
@@ -24,6 +26,7 @@ void main() {
   late MockPrepareAssistantModelUseCase prepare;
   late MockCancelAssistantPreparationUseCase cancel;
   late MockDeleteAssistantModelUseCase delete;
+  late MockIsFeatureEnabledUseCase isFeatureEnabled;
 
   setUpAll(() {
     registerFallbackValue((int _) {});
@@ -42,6 +45,11 @@ void main() {
     when(() => delete()).thenAnswer((_) => const Right(null));
     isDownloaded = MockIsAssistantModelDownloadedUseCase();
     when(() => isDownloaded()).thenAnswer((_) => const Right(false));
+    isFeatureEnabled = MockIsFeatureEnabledUseCase()
+      ..stubCall(
+        definition: AssistantFeatureFlags.aiAssistant,
+        result: const Right(true),
+      );
     return AssistantBloc(
       MockGetAssistantContextUseCase(),
       prepare,
@@ -52,6 +60,7 @@ void main() {
       isDownloaded,
       MockAskPortfolioQuestionUseCase(),
       MockAssistantTrackingDelegate(),
+      isFeatureEnabled,
     );
   }
 
@@ -64,6 +73,22 @@ void main() {
     },
     act: (bloc) => bloc.add(const AssistantInitializedEvent()),
     expect: () => [const AssistantState(isModelDownloaded: true)],
+  );
+
+  blocTest<AssistantBloc, AssistantState>(
+    'should stay off and not download when initialized and the feature flag is off',
+    build: () {
+      final bloc = createBloc();
+      isFeatureEnabled.stubCall(
+        definition: AssistantFeatureFlags.aiAssistant,
+        result: const Right(false),
+      );
+      when(() => getEnabled()).thenAnswer((_) => const Right(true));
+      return bloc;
+    },
+    act: (bloc) => bloc.add(const AssistantInitializedEvent()),
+    expect: () => [const AssistantState(isFeatureEnabled: false)],
+    verify: (_) => verifyNever(() => prepare(any())),
   );
 
   blocTest<AssistantBloc, AssistantState>(

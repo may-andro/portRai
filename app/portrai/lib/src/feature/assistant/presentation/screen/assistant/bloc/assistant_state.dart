@@ -13,6 +13,7 @@ class AssistantMessage extends Equatable {
 class AssistantState extends Equatable {
   const AssistantState({
     this.portfolioContext,
+    this.isFeatureEnabled = true,
     this.isLoadingContext = true,
     this.isEnabled = false,
     this.isPreparingModel = false,
@@ -25,6 +26,7 @@ class AssistantState extends Equatable {
   });
 
   final String? portfolioContext;
+  final bool isFeatureEnabled;
   final bool isLoadingContext;
   final bool isEnabled;
   final bool isPreparingModel;
@@ -37,6 +39,7 @@ class AssistantState extends Equatable {
 
   AssistantState copyWith({
     String? portfolioContext,
+    bool? isFeatureEnabled,
     bool? isLoadingContext,
     bool? isEnabled,
     bool? isPreparingModel,
@@ -49,6 +52,7 @@ class AssistantState extends Equatable {
   }) {
     return AssistantState(
       portfolioContext: portfolioContext ?? this.portfolioContext,
+      isFeatureEnabled: isFeatureEnabled ?? this.isFeatureEnabled,
       isLoadingContext: isLoadingContext ?? this.isLoadingContext,
       isEnabled: isEnabled ?? this.isEnabled,
       isPreparingModel: isPreparingModel ?? this.isPreparingModel,
@@ -64,6 +68,7 @@ class AssistantState extends Equatable {
   @override
   List<Object?> get props => [
     portfolioContext,
+    isFeatureEnabled,
     isLoadingContext,
     isEnabled,
     isPreparingModel,
