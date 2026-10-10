@@ -13,20 +13,25 @@ import '../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart
 
 void main() {
   test('should select Stuart dates when asked about company tenure', () {
-    final context = <String, Object?>{};
-    for (final section in [
-      'profile',
-      'projects',
-      'experiences',
-      'testimonials',
-      'services',
-    ]) {
-      final asset =
-          jsonDecode(File('assets/dashboard/$section.json').readAsStringSync())
-              as Map<String, dynamic>;
-      final english = asset['en'] as Map<String, Object?>;
-      context[section] = english[section];
-    }
+    // Self-contained: the dashboard assets are gitignored and absent in CI.
+    final context = <String, Object?>{
+      'profile': {'name': 'Mayank Rai', 'summary': 'x' * 3000},
+      'projects': [
+        for (var i = 0; i < 20; i++)
+          {'title': 'Project $i', 'description': 'y' * 400},
+      ],
+      'experiences': [
+        {
+          'company': 'Stuart',
+          'position': 'Senior Flutter Developer',
+          'startDate': '2022-07-01',
+          'endDate': '2024-03-31',
+          'description': 'z' * 400,
+        },
+        for (var i = 0; i < 6; i++)
+          {'company': 'Other $i', 'description': 'w' * 400},
+      ],
+    };
     final selected = AssistantContextSelector().select(
       jsonEncode(context),
       'Tell me how long was experience in company Stuart?',
