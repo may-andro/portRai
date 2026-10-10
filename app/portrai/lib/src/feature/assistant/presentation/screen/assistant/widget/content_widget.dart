@@ -215,6 +215,7 @@ class _ChatWidgetState extends State<_ChatWidget> {
                     child: DSTextFieldWidget(
                       controller: _controller,
                       enabled: !state.isSendingQuestion,
+                      enabledBorderColor: palette.neutral.grey4,
                       textInputAction: TextInputAction.send,
                       onFieldSubmitted: _submit,
                       hintText: localizations.assistantInputHint,
@@ -264,7 +265,7 @@ class _SuggestionsWidget extends StatelessWidget {
       localizations.assistantSuggestionLeadership,
     ];
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: EdgeInsets.all(context.space(factor: 3)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
