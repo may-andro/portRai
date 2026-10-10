@@ -7,7 +7,9 @@ import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/assistant_state.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/tracking/_tracking.dart';
 
-@register
+// One shared instance: Settings, the portfolio button and the assistant
+// screen all reflect the same download and enabled state.
+@registerSingleton
 class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
   AssistantBloc(
     this._getAssistantContextUseCase,

@@ -26,14 +26,8 @@ class PortraiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) {
-        final bloc = appServiceLocator.get<AssistantBloc>();
-        if (isAssistantSupported) {
-          bloc.add(const AssistantInitializedEvent());
-        }
-        return bloc;
-      },
+    return BlocProvider.value(
+      value: appServiceLocator.get<AssistantBloc>(),
       child: MaterialApp.router(
         title: 'PortRai',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
