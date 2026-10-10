@@ -3,7 +3,7 @@ import 'dart:convert';
 /// Selects facts from the complete portfolio without passing the entire
 /// portfolio or an ever-growing conversation to the small on-device model.
 class AssistantContextSelector {
-  static const maxContextBytes = 4000;
+  static const maxContextBytes = 5500;
   static const _header =
       'Portfolio facts (selected for this question). Quote dates and '
       'durations exactly as written; never calculate or invent them.';
@@ -78,10 +78,18 @@ class AssistantContextSelector {
                 terms.intersection(_comparisonTerms).isNotEmpty
             ? 1000
             : 20;
-        if (isCareer) {
-          for (final line in section.value as List) {
-            facts.add((text: '$line', score: score, order: facts.length));
-          }
+        // The short summary lines are always offered, so a question phrased
+        // in words nobody anticipated still sees the basics (education,
+        // languages, first and current role). Only the long lists need a
+        // matching question.
+        for (final line in section.value as List) {
+          final isLongList = '$line'.startsWith('All roles');
+          if (isLongList && !isCareer) continue;
+          facts.add((
+            text: '$line',
+            score: isCareer ? score : 20,
+            order: facts.length,
+          ));
         }
       } else if (section.value is List) {
         final records = section.value as List;

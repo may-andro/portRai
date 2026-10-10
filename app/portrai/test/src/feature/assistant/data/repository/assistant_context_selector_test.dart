@@ -176,7 +176,7 @@ void main() {
       );
       expect(
         selector.select(context, 'What is his email?'),
-        isNot(contains('Shortest role')),
+        isNot(contains('All roles in chronological order')),
       );
     },
   );
