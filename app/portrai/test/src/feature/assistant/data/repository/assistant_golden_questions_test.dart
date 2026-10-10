@@ -103,6 +103,8 @@ void main() {
     'has he led a team?': 'Leadership roles: Tech Lead - Flutter Developer',
     'how many languages can he speak?':
         'Spoken languages (2): English (Fluent), Spanish (Intermediate)',
+    'how many companies worked in hyderabad':
+        'Companies worked for per city: Hyderabad: 1 company',
     'tell me his career summary': 'Career overview: 4 roles at 4 different',
   };
 

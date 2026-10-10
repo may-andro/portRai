@@ -301,6 +301,7 @@ class GetAssistantContextUseCase
       'First role (earliest start): ${describe(firstRole)}.',
       ?currentRole,
       ?countries,
+      ?_companiesByCity(experiences),
       ?_workModes(experiences),
       ?_technologyTotals(experiences, today),
       ?_careerGaps(experiences, today),
@@ -446,6 +447,25 @@ class GetAssistantContextUseCase
         .map((part) => part.trim())
         .where((part) => part.isNotEmpty);
     return parts.isEmpty ? null : parts.last;
+  }
+
+  // "Hyderabad, India [Remote]" -> "Hyderabad".
+  static String? _companiesByCity(List<ExperienceEntity> experiences) {
+    final companiesByCity = <String, Set<String>>{};
+    for (final item in experiences) {
+      final parts = item.location.replaceAll(RegExp(r'\[.*?\]'), '').split(',');
+      final city = parts.first.trim();
+      if (parts.length < 2 || city.isEmpty) continue;
+      companiesByCity.putIfAbsent(city, () => {}).add(item.company);
+    }
+    if (companiesByCity.isEmpty) return null;
+    final entries = companiesByCity.entries.map(
+      (entry) =>
+          '${entry.key}: ${entry.value.length} '
+          '${entry.value.length == 1 ? 'company' : 'companies'} '
+          '(${entry.value.join(', ')})',
+    );
+    return 'Companies worked for per city: ${entries.join('; ')}.';
   }
 
   // Overlapping roles in one country count each calendar month once.

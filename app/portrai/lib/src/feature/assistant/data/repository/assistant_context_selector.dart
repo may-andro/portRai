@@ -132,18 +132,13 @@ class AssistantContextSelector {
     return selected.join('\n');
   }
 
-  // Words of every country that appears in an experience location.
+  // Words of every city and country that appears in an experience location.
   static Set<String> _countryTerms(Map<String, dynamic> portfolio) {
     final experiences = portfolio['experiences'];
     if (experiences is! List) return const {};
     return {
       for (final item in experiences.whereType<Map<String, dynamic>>())
-        ..._terms(
-          '${item['location']}'
-              .replaceAll(RegExp(r'\[.*?\]'), '')
-              .split(',')
-              .last,
-        ),
+        ..._terms('${item['location']}'.replaceAll(RegExp(r'\[.*?\]'), '')),
       'country',
       'countries',
     };
