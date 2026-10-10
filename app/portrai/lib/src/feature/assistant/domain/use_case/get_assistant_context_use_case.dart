@@ -34,7 +34,13 @@ class GetAssistantContextUseCase
     return Right(
       jsonEncode({
         'asOf': _date(today),
-        'overview': _careerOverview(portfolio.experiences, today),
+        'overview': [
+          ..._careerOverview(portfolio.experiences, today),
+          ?_languages([
+            for (final item in profile.languages)
+              '${item.language} (${item.proficiency})',
+          ]),
+        ],
         'profile': {
           'name': profile.fullName,
           'title': profile.title,
@@ -291,6 +297,14 @@ class GetAssistantContextUseCase
       'All roles in chronological order, to answer questions about a year or period: $timeline.',
       'All roles from shortest to longest: $ranking.',
     ];
+  }
+
+  // Country names in project titles are markets, not spoken languages, so
+  // the spoken languages are stated outright.
+  static String? _languages(List<String> languages) {
+    if (languages.isEmpty) return null;
+    return 'Spoken languages (${languages.length}): ${languages.join(', ')}. '
+        'No other spoken languages are listed.';
   }
 
   // "Barcelona, Spain [Remote]" -> a count per bracketed tag such as Remote.

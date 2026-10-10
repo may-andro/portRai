@@ -114,10 +114,31 @@ class _ChatWidget extends StatefulWidget {
 
 class _ChatWidgetState extends State<_ChatWidget> {
   final _controller = TextEditingController();
+  final _scrollController = ScrollController();
+
+  @override
+  void didUpdateWidget(covariant _ChatWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final changed =
+        oldWidget.state.messages.length != widget.state.messages.length ||
+        oldWidget.state.isSendingQuestion != widget.state.isSendingQuestion;
+    if (changed) {
+      // Keep the end of a long answer in view once it has been laid out.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_scrollController.hasClients) return;
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      });
+    }
+  }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -159,6 +180,7 @@ class _ChatWidgetState extends State<_ChatWidget> {
                       isBusy: state.isSendingQuestion,
                     )
                   : ListView.builder(
+                      controller: _scrollController,
                       padding: EdgeInsets.all(context.space(factor: 2)),
                       itemCount:
                           state.messages.length +

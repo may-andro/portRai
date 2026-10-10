@@ -97,6 +97,8 @@ void main() {
     'has he got any career gaps?': 'Career gaps between roles: 6 months',
     'does he change jobs often?': 'Job changes: 3',
     'has he led a team?': 'Leadership roles: Tech Lead - Flutter Developer',
+    'how many languages can he speak?':
+        'Spoken languages (2): English (Fluent), Spanish (Intermediate)',
     'tell me his career summary': 'Career overview: 4 roles at 4 different',
   };
 

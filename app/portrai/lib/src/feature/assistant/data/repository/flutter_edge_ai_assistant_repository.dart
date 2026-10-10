@@ -42,8 +42,9 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
       'salary, age, visa or hobbies, say that this is not in the portfolio '
       'and do not guess. For questions about a year, period, order, country, '
       'remote or freelance work, years with a technology, career gaps, '
-      'leadership, longest or shortest, use the overview lines and copy '
-      'their numbers. Answer a follow-up for what it asks, not like the '
+      'leadership, spoken languages, longest or shortest, use the overview '
+      'lines and copy their numbers. Spoken languages come only from the '
+      'spoken languages line, never from country names. Answer a follow-up for what it asks, not like the '
       'previous question. When asked for a link, copy the URL exactly as '
       'written, and if it says "not found" say that no such link was found. '
       'Keep answers direct and concise.';
