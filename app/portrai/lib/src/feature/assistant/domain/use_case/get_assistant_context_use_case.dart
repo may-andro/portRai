@@ -301,7 +301,7 @@ class GetAssistantContextUseCase
       'First role (earliest start): ${describe(firstRole)}.',
       ?currentRole,
       ?countries,
-      ?_companiesByCity(experiences),
+      ?_citySummary(experiences, today),
       ?_workModes(experiences),
       ?_technologyTotals(experiences, today),
       ?_careerGaps(experiences, today),
@@ -449,23 +449,40 @@ class GetAssistantContextUseCase
     return parts.isEmpty ? null : parts.last;
   }
 
-  // "Hyderabad, India [Remote]" -> "Hyderabad".
-  static String? _companiesByCity(List<ExperienceEntity> experiences) {
-    final companiesByCity = <String, Set<String>>{};
+  // "Hyderabad, India [Remote]" -> "Hyderabad". Overlapping roles in one city
+  // count each calendar month once.
+  static String? _citySummary(
+    List<ExperienceEntity> experiences,
+    DateTime today,
+  ) {
+    final months = <String, Set<int>>{};
+    final roles = <String, List<String>>{};
     for (final item in experiences) {
       final parts = item.location.replaceAll(RegExp(r'\[.*?\]'), '').split(',');
       final city = parts.first.trim();
-      if (parts.length < 2 || city.isEmpty) continue;
-      companiesByCity.putIfAbsent(city, () => {}).add(item.company);
+      final end = item.endDate ?? (item.current ? today : null);
+      if (parts.length < 2 || city.isEmpty || end == null) continue;
+      final cityMonths = months.putIfAbsent(city, () => {});
+      for (
+        var month = item.startDate.year * 12 + item.startDate.month;
+        month <= end.year * 12 + end.month;
+        month++
+      ) {
+        cityMonths.add(month);
+      }
+      roles
+          .putIfAbsent(city, () => [])
+          .add('${item.company} (${item.position})');
     }
-    if (companiesByCity.isEmpty) return null;
-    final entries = companiesByCity.entries.map(
-      (entry) =>
-          '${entry.key}: ${entry.value.length} '
-          '${entry.value.length == 1 ? 'company' : 'companies'} '
-          '(${entry.value.join(', ')})',
-    );
-    return 'Companies worked for per city: ${entries.join('; ')}.';
+    if (months.isEmpty) return null;
+    final entries = months.entries.map((entry) {
+      final companies = roles[entry.key]!;
+      return '${entry.key}: ${_formatMonths(entry.value.length)} in '
+          '${companies.length} ${companies.length == 1 ? 'role' : 'roles'} '
+          '(${companies.join(', ')})';
+    });
+    return 'Experience per city, with time worked and roles: '
+        '${entries.join('; ')}.';
   }
 
   // Overlapping roles in one country count each calendar month once.

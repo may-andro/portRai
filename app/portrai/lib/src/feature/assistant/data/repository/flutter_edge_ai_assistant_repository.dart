@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_edge_ai_litertlm/flutter_edge_ai_litertlm.dart';
 import 'package:meta/meta.dart';
@@ -195,6 +196,8 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
     );
     final response = await chat.generateChatResponse();
     final answer = response is TextResponse ? response.token.trim() : '';
+    if (kDebugMode)
+      debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
     if (answer.isEmpty) {
       throw StateError('The on-device model returned an empty answer.');
     }
