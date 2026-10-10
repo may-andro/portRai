@@ -149,7 +149,11 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
       return direct;
     }
 
-    final previousQuestion = _previousQuestion ?? 'none';
+    // A standalone question must not see the previous one: the small model
+    // tends to answer that instead.
+    final previousQuestion = _isFollowUp(question)
+        ? (_previousQuestion ?? 'none')
+        : 'none';
     // UTF-8 bytes conservatively bound token count. Reserve room for the
     // answer and chat-template tokens rather than silently truncating input.
     final availableBytes =
@@ -162,7 +166,7 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
     final selectedContext = AssistantContextSelector().select(
       portfolioContext,
       question,
-      previousQuestion: _previousQuestion,
+      previousQuestion: previousQuestion == 'none' ? null : previousQuestion,
       maxBytes: availableBytes < AssistantContextSelector.maxContextBytes
           ? availableBytes
           : AssistantContextSelector.maxContextBytes,
@@ -183,10 +187,9 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
       Message(
         text:
             'Portfolio information:\n$selectedContext\n\n'
-            'Previous user question: $previousQuestion\n\n'
-            'Answer only this new question, using only the portfolio '
-            'information above. It may be a follow-up to the previous '
-            'question, but never repeat the previous answer: $question',
+            '${previousQuestion == 'none' ? '' : 'Previous user question: $previousQuestion\n\n'}'
+            'Answer only this question, using only the portfolio '
+            'information above: $question',
         isUser: true,
       ),
     );
@@ -198,6 +201,15 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
     _previousQuestion = question;
     return answer;
   }
+
+  static final _followUpPattern = RegExp(
+    r'\b(else|also|more|that|those|there|it|them|again|another|other)\b|'
+    r'^(and|in|for|what about|how about)\b',
+    caseSensitive: false,
+  );
+
+  static bool _isFollowUp(String question) =>
+      _followUpPattern.hasMatch(question.trim());
 
   @override
   Future<void> cancelPreparation() async {
