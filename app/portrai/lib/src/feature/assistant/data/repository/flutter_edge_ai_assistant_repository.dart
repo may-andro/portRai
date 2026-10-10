@@ -170,7 +170,7 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
       systemInstruction: _systemInstruction,
       temperature: 0.2,
       topK: 40,
-      maxOutputTokens: 192,
+      maxOutputTokens: 512,
     );
 
     final chat = _chat!;

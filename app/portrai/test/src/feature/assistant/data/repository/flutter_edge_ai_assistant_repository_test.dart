@@ -121,7 +121,7 @@ void main() {
           systemInstruction: any(named: 'systemInstruction'),
           temperature: 0.2,
           topK: 40,
-          maxOutputTokens: 192,
+          maxOutputTokens: 512,
         ),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
