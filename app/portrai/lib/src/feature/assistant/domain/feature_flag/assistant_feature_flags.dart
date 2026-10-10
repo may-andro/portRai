@@ -4,7 +4,7 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 abstract final class AssistantFeatureFlags {
   static const aiAssistant = AppFeatureFlagDefinition(
     key: 'feature_ai_assistant',
-    defaultValue: true,
+    defaultValue: false,
     displayName: 'AI Assistant',
     description:
         'Shows the on-device AI assistant in settings and on the portfolio',

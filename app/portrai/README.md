@@ -197,7 +197,7 @@ Configure environment-specific settings in `lib/core/config/build_environment.da
 Feature flags are managed through Firebase Remote Config:
 - Configure in Firebase Console
 - Keys defined in `lib/core/config/feature_flags.dart`
-- `feature_ai_assistant` (default on) hides the on-device AI assistant from Settings and the portfolio when turned off
+- `feature_ai_assistant` (default off) shows the on-device AI assistant in Settings and on the portfolio when turned on
 
 ## Dependencies
 
