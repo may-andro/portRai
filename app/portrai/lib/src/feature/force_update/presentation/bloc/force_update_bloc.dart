@@ -9,15 +9,11 @@ import 'package:portrai/src/feature/force_update/presentation/tracking/_tracking
 @register
 class ForceUpdateBloc extends Bloc<ForceUpdateEvent, ForceUpdateState> {
   ForceUpdateBloc({
-    required IsAppUpdateRequiredUseCase isAppUpdateRequiredUseCase,
-    required GetAppStoreUrlUseCase getAppStoreUrlUseCase,
-    required OpenExternalUrlUseCase openExternalUrlUseCase,
-    required ForceUpdateTrackingDelegate trackingDelegate,
-  }) : _isAppUpdateRequiredUseCase = isAppUpdateRequiredUseCase,
-       _getAppStoreUrlUseCase = getAppStoreUrlUseCase,
-       _openExternalUrlUseCase = openExternalUrlUseCase,
-       _trackingDelegate = trackingDelegate,
-       super(const ForceUpdateInitialState()) {
+    required this._isAppUpdateRequiredUseCase,
+    required this._getAppStoreUrlUseCase,
+    required this._openExternalUrlUseCase,
+    required this._trackingDelegate,
+  }) : super(const ForceUpdateInitialState()) {
     on<CheckForceUpdateEvent>(_onCheckForceUpdateEventToState);
     on<UpdateNowClickEvent>(_onUpdateNowClickEventToState);
     on<BottomSheetVisibleEvent>(_onBottomSheetVisibleEventToState);

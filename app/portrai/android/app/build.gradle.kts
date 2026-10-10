@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mayandro.portrai"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName

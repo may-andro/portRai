@@ -6,11 +6,9 @@ import 'package:portrai/src/feature/locale/presentation/widget/system_locale_obs
 class SystemLocaleObserverBloc
     extends Bloc<SystemLocaleObserverEvent, SystemLocaleObserverState> {
   SystemLocaleObserverBloc({
-    required GetLocaleUseCase getLocaleUseCase,
-    required UpdateLocaleUseCase updateLocaleUseCase,
-  }) : _getLocaleUseCase = getLocaleUseCase,
-       _updateLocaleUseCase = updateLocaleUseCase,
-       super(const LoadingState()) {
+    required this._getLocaleUseCase,
+    required this._updateLocaleUseCase,
+  }) : super(const LoadingState()) {
     on<LoadLocaleEvent>(_onLoadLocaleEventToState);
     on<LocaleUpdateEvent>(_onLocaleUpdateEventToState);
   }

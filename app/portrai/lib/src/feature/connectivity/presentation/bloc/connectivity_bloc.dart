@@ -9,11 +9,9 @@ import 'package:portrai/src/feature/connectivity/presentation/bloc/connectivity_
 @register
 class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
   ConnectivityBloc({
-    required CheckInternetConnectionUseCase checkInternetConnectionUseCase,
-    required WatchInternetConnectionUseCase watchInternetConnectionUseCase,
-  }) : _checkInternetConnectionUseCase = checkInternetConnectionUseCase,
-       _watchInternetConnectionUseCase = watchInternetConnectionUseCase,
-       super(const ConnectivityInitialState()) {
+    required this._checkInternetConnectionUseCase,
+    required this._watchInternetConnectionUseCase,
+  }) : super(const ConnectivityInitialState()) {
     on<StartConnectivityMonitoringEvent>(_onStartMonitoringEventToState);
     on<ConnectivityChangedEvent>(_onConnectivityChangedEventToState);
   }

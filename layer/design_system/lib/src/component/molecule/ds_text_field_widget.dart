@@ -32,6 +32,7 @@ class DSTextFieldWidget extends StatefulWidget {
     this.suffixIcon,
     this.textInputAction,
     this.textFieldType = TextFieldType.normal,
+    this.enabledBorderColor,
   });
 
   final TextEditingController? controller;
@@ -57,6 +58,10 @@ class DSTextFieldWidget extends StatefulWidget {
   final IconData? suffixIcon;
   final TextInputAction? textInputAction;
   final TextFieldType textFieldType;
+
+  /// Border shown while the field is enabled but not focused. Defaults to the
+  /// background color, which makes the border invisible.
+  final DSColor? enabledBorderColor;
 
   @override
   State<DSTextFieldWidget> createState() => _DSTextFieldWidgetState();
@@ -201,7 +206,8 @@ class _DSTextFieldWidgetState extends State<DSTextFieldWidget> {
               _textFieldValidationData?.textFieldValidationType ==
                   TextFieldValidationType.success
               ? context.colorPalette.success.color
-              : context.colorPalette.background.color,
+              : (widget.enabledBorderColor ?? context.colorPalette.background)
+                    .color,
         ),
         borderRadius: borderRadius,
       ),
