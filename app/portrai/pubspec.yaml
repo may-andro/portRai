@@ -41,7 +41,6 @@ dependencies:
   url_launcher: ^6.3.1
   use_case: any
 
-  firebase_core: any
 dev_dependencies:
   bloc_test: ^10.0.0
   build_runner: ^2.5.4
