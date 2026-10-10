@@ -26,19 +26,19 @@ class PortraiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: appServiceLocator.get<AssistantBloc>(),
-      child: MaterialApp.router(
-        title: 'PortRai',
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: appLocale.locale,
-        debugShowCheckedModeBanner:
-            buildConfig.buildEnvironment.debugShowCheckedModeBanner,
-        builder: (context, child) {
-          return DSThemeBuilderWidget(
-            brightness: context.platformBrightness,
-            designSystem: designSystem,
+    return MaterialApp.router(
+      title: 'PortRai',
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: appLocale.locale,
+      debugShowCheckedModeBanner:
+          buildConfig.buildEnvironment.debugShowCheckedModeBanner,
+      builder: (context, child) {
+        return DSThemeBuilderWidget(
+          brightness: context.platformBrightness,
+          designSystem: designSystem,
+          child: BlocProvider.value(
+            value: appServiceLocator.get<AssistantBloc>(),
             child: SystemLocaleObserverWidget(
               child: ForceUpdateListenerWidget(
                 child: ConnectivityListenerWidget(
@@ -46,10 +46,10 @@ class PortraiApp extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        },
-        routerConfig: routeConfigurator.router,
-      ),
+          ),
+        );
+      },
+      routerConfig: routeConfigurator.router,
     );
   }
 }
