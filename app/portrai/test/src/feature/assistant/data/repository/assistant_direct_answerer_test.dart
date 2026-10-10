@@ -9,6 +9,15 @@ void main() {
       'profile': {'name': 'Mayank Rai', 'email': 'm@x.com', 'phone': '123'},
       'overview': [
         'Total time worked per country, overlapping roles counted once: Spain: 6 years and 10 months (A, B); India: 4 years (C, D).',
+        'Career overview: 8 roles at 7 different companies.',
+        'Longest role: Initech, 2 years.',
+        'Shortest role: Acme, 2 months.',
+        'First role (earliest start): Acme, July 2015.',
+        'Current role: Lead at Initech since April 2024.',
+        'Time using each technology across all roles, overlapping roles counted once (technologies listed on the roles): Flutter: 5 years and 2 months; Android: 4 years.',
+        'Career gaps: none, there is no month without a role. Job changes: 3.',
+        'Leadership roles: Tech Lead at Initech.',
+        'Spoken languages (2): English (Fluent), Spanish (Proficient). No other spoken languages are listed.',
         'Experience per city, with time worked and roles: Hyderabad: 2 years and 11 months in 2 roles (C (Dev), D (Lead)); Pune: 2 years and 1 month in 1 role (E (Junior)).',
       ],
     }),
@@ -29,7 +38,7 @@ void main() {
   });
 
   test('should return null when the question needs the model', () {
-    expect(answerer.answer('longest experience?'), isNull);
+    expect(answerer.answer('tell me about his projects'), isNull);
     expect(answerer.answer('which company in 2022'), isNull);
   });
 
@@ -54,5 +63,33 @@ void main() {
 
   test('should leave comparisons to the model when a place is mentioned', () {
     expect(answerer.answer('longest experience in India?'), isNull);
+  });
+
+  test(
+    'should state the time using a technology when asked how many years',
+    () {
+      expect(
+        answerer.answer('how many years of flutter experience?'),
+        contains('Flutter for 5 years and 2 months'),
+      );
+    },
+  );
+
+  test('should return the computed line when asked for a career fact', () {
+    expect(answerer.answer('what was his longest job?'), contains('Initech'));
+    expect(answerer.answer('shortest job'), contains('Acme, 2 months'));
+    expect(answerer.answer('what was his first job?'), contains('July 2015'));
+    expect(answerer.answer('what is his current role?'), contains('Lead'));
+    expect(answerer.answer('any career gaps?'), contains('Job changes: 3'));
+    expect(answerer.answer('has he led a team?'), contains('Tech Lead'));
+    expect(answerer.answer('how many companies?'), contains('7 different'));
+    expect(
+      answerer.answer('how many languages can he speak?'),
+      contains('Spoken languages (2)'),
+    );
+  });
+
+  test('should leave the question to the model when it names a place', () {
+    expect(answerer.answer('longest job at Initech'), isNull);
   });
 }
