@@ -207,7 +207,9 @@ class AssistantContextSelector {
     }).isNotEmpty) {
       terms.add('projects');
     }
-    if (terms.contains('education')) terms.add('educations');
+    if (terms.intersection(_educationTerms).isNotEmpty) {
+      terms.addAll({'education', 'educations', 'institution', 'degree'});
+    }
     if (terms.contains('skills')) terms.add('expertises');
     for (final section in {
       'project',
@@ -227,7 +229,24 @@ class AssistantContextSelector {
     return terms;
   }
 
+  static const _educationTerms = {
+    'education',
+    'study',
+    'studied',
+    'studies',
+    'school',
+    'university',
+    'college',
+    'degree',
+    'graduated',
+    'graduate',
+    'qualification',
+    'qualifications',
+  };
+
   static const _comparisonTerms = {
+    ..._educationTerms,
+    'earliest',
     'shortest',
     'longest',
     'short',
@@ -265,6 +284,8 @@ class AssistantContextSelector {
   };
 
   static const _careerTerms = {
+    ..._educationTerms,
+    'earliest',
     'remote',
     'freelance',
     'remoto',

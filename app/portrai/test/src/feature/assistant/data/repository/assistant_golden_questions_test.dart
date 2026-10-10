@@ -91,6 +91,10 @@ void main() {
     'how many freelance roles?': 'Freelance: 1 role (Hooli',
     'which company was he at in 2016?': 'Acme',
     'what was his longest job?': 'Longest role: Initech',
+    'what did he studied':
+        'Education: Bachelor in Engineering in Electronics & Telecommunication at Army Institute of Technology',
+    'where did he studied': 'Army Institute of Technology',
+    'first job': 'First role (earliest start): Acme',
     'what was his shortest job?': 'Shortest role: Acme',
     'how many years of Flutter experience?': 'Flutter: 5 years',
     'how many years of Android experience?': 'Android: 4 years',

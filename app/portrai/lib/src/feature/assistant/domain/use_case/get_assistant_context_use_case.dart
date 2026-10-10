@@ -36,6 +36,13 @@ class GetAssistantContextUseCase
         'asOf': _date(today),
         'overview': [
           ..._careerOverview(portfolio.experiences, today),
+          ?_education([
+            for (final item in profile.educations)
+              '${item.degree}${item.field.isEmpty ? '' : ' in ${item.field}'}'
+                  ' at ${item.institution}'
+                  '${item.location.isEmpty ? '' : ', ${item.location}'}'
+                  ' (${item.startDate} to ${item.endDate})',
+          ]),
           ?_languages([
             for (final item in profile.languages)
               '${item.language} (${item.proficiency})',
@@ -261,6 +268,9 @@ class GetAssistantContextUseCase
         '${entry.$1.company} (${entry.$1.position}), ${_range(entry.$1)}, '
         '${_formatMonths(entry.$2)}';
 
+    final firstRole = dated.reduce(
+      (a, b) => a.$1.startDate.isBefore(b.$1.startDate) ? a : b,
+    );
     final companies = {for (final item in experiences) item.company};
     final current = experiences.where((item) => item.current).toList();
     final counts =
@@ -288,6 +298,7 @@ class GetAssistantContextUseCase
       'Career overview: $counts.',
       'Shortest role: ${describe(dated.first)}.',
       'Longest role: ${describe(dated.last)}.',
+      'First role (earliest start): ${describe(firstRole)}.',
       ?currentRole,
       ?countries,
       ?_workModes(experiences),
@@ -301,6 +312,11 @@ class GetAssistantContextUseCase
 
   // Country names in project titles are markets, not spoken languages, so
   // the spoken languages are stated outright.
+  static String? _education(List<String> educations) {
+    if (educations.isEmpty) return null;
+    return 'Education: ${educations.join('; ')}.';
+  }
+
   static String? _languages(List<String> languages) {
     if (languages.isEmpty) return null;
     return 'Spoken languages (${languages.length}): ${languages.join(', ')}. '
