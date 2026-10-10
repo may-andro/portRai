@@ -82,7 +82,6 @@ class AssistantCardWidget extends StatelessWidget {
                         onPressed: () => context.read<AssistantBloc>().add(
                           const DisableAssistantClickEvent(deleteModel: true),
                         ),
-                        variant: DSButtonVariant.primary,
                         size: DSButtonSize.small,
                       ),
                     ],
@@ -108,7 +107,6 @@ class AssistantCardWidget extends StatelessWidget {
                     onPressed: () => context.read<AssistantBloc>().add(
                       const EnableAssistantClickEvent(),
                     ),
-                    variant: DSButtonVariant.primary,
                     size: DSButtonSize.small,
                   ),
                 ],

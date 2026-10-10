@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/assistant/data/repository/assistant_context_selector.dart';
 import 'package:portrai/src/feature/assistant/domain/use_case/get_assistant_context_use_case.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
-import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
+import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';

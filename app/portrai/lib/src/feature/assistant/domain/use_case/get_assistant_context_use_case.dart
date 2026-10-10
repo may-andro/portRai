@@ -58,10 +58,7 @@ class GetAssistantContextUseCase
           ..._careerOverview(portfolio.experiences, today),
           ?_education([
             for (final item in profile.educations)
-              '${item.degree}${item.field.isEmpty ? '' : ' in ${item.field}'}'
-                  ' at ${item.institution}'
-                  '${item.location.isEmpty ? '' : ', ${item.location}'}'
-                  ' (${item.startDate} to ${item.endDate})',
+              '${item.degree}${item.field.isEmpty ? '' : ' in ${item.field}'} at ${item.institution}${item.location.isEmpty ? '' : ', ${item.location}'} (${item.startDate} to ${item.endDate})',
           ]),
           ?_languages([
             for (final item in profile.languages)

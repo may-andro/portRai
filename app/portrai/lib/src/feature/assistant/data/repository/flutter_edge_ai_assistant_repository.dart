@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_edge_ai_litertlm/flutter_edge_ai_litertlm.dart';
-import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/data/cache/_cache.dart';
 import 'package:portrai/src/feature/assistant/data/repository/assistant_context_selector.dart';
@@ -196,8 +195,9 @@ class FlutterEdgeAiAssistantRepository implements AssistantRepository {
     );
     final response = await chat.generateChatResponse();
     final answer = response is TextResponse ? response.token.trim() : '';
-    if (kDebugMode)
+    if (kDebugMode) {
       debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
+    }
     if (answer.isEmpty) {
       throw StateError('The on-device model returned an empty answer.');
     }
