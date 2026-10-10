@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/assistant/data/repository/assistant_context_selector.dart';
