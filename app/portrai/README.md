@@ -85,7 +85,8 @@ lib/
 │   ├── feature/             # Feature modules (data/domain/presentation per feature)
 │   │   ├── experience/      # Work experience feature
 │   │   ├── expertise/       # Expertise showcase
-│   │   ├── assistant/       # On-device portfolio Q&A
+│   │   ├── assistant/       # Shared portfolio context and conversation UI
+│   │   ├── local_assistant/ # On-device inference, model lifecycle and settings
 │   │   ├── profile/         # User profile
 │   │   ├── project/         # Projects portfolio
 │   │   ├── service/         # Services offered
@@ -107,6 +108,18 @@ Presentation Layer (Bloc)
 See the [creating-new-modules skill](../../.github/skills/creating-new-modules/SKILL.md) and
 [architecture-conventions skill](../../.github/skills/flutter-architecture-conventions/SKILL.md)
 for the conventions each feature module follows.
+
+### Assistant Modules
+
+`assistant` owns provider-neutral message/response entities, portfolio context generation, and
+the callback-driven conversation widget. It has no dependency on the local model or local bloc.
+`local_assistant` consumes that public API and owns on-device inference, model downloads,
+enablement preferences, failures, routes, tracking, and the Settings card. Both configurators
+are registered in the app, with the shared configurator first.
+
+The local refactor retains the `/assistant` route, `feature_ai_assistant` rollout key,
+`assistant_enabled_cache` preference key, model identifiers, and existing analytics names.
+It does not add remote inference or automatic cloud fallback.
 
 ## Theming
 

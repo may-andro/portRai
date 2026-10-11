@@ -1,10 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/developer_menu_screen.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
-import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/assistant_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
 import 'package:portrai/src/widget/app_version_widget.dart';
@@ -42,8 +41,8 @@ class ContentWidget extends StatelessWidget {
                         ),
                         const LanguageCardWidget(),
                       ],
-                      if (isAssistantSupported)
-                        BlocBuilder<AssistantBloc, AssistantState>(
+                      if (isLocalAssistantSupported)
+                        BlocBuilder<LocalAssistantBloc, LocalAssistantState>(
                           buildWhen: (previous, current) =>
                               previous.isAvailable != current.isAvailable,
                           builder: (context, assistantState) {
@@ -58,7 +57,7 @@ class ContentWidget extends StatelessWidget {
                                       .localizations
                                       .assistantSettingsTitle,
                                 ),
-                                const AssistantCardWidget(),
+                                const LocalAssistantCardWidget(),
                               ],
                             );
                           },

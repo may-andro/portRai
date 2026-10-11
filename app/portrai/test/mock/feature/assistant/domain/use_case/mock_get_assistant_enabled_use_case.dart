@@ -1,5 +1,0 @@
-import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/assistant/domain/_domain.dart';
-
-class MockGetAssistantEnabledUseCase extends Mock
-    implements GetAssistantEnabledUseCase {}

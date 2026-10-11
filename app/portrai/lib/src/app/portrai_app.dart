@@ -3,9 +3,9 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/force_update/force_update.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
@@ -38,7 +38,7 @@ class PortraiApp extends StatelessWidget {
           brightness: context.platformBrightness,
           designSystem: designSystem,
           child: BlocProvider.value(
-            value: appServiceLocator.get<AssistantBloc>(),
+            value: appServiceLocator.get<LocalAssistantBloc>(),
             child: SystemLocaleObserverWidget(
               child: ForceUpdateListenerWidget(
                 child: ConnectivityListenerWidget(
