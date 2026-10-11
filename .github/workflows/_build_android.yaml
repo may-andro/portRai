@@ -102,12 +102,12 @@ jobs:
       - name: Build APK (Preview)
         if: ${{ inputs.build-type == 'preview' }}
         working-directory: ${{ inputs.app-path }}
-        run: flutter build apk --release --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
+        run: flutter build apk --release --dart-define=build_env=staging --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
 
       - name: Build AAB (Production)
         if: ${{ inputs.build-type == 'production' }}
         working-directory: ${{ inputs.app-path }}
-        run: flutter build appbundle --release --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
+        run: flutter build appbundle --release --dart-define=build_env=prod --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
 
       - name: Upload APK artifact (Preview)
         if: ${{ inputs.build-type == 'preview' }}

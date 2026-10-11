@@ -108,6 +108,7 @@ jobs:
       app-name: portrai
       build-type: production
       use-firebase: true
+      app-check-site-key: ${{ vars.FIREBASE_APP_CHECK_WEB_SITE_KEY }}
       run-codegen: true
       setup-sqlite: true
       version: ${{ needs.extract-version.outputs.version }}

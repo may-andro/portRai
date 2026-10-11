@@ -3,6 +3,9 @@
 # ==========================================
 **/.data/
 **/service_account.json
+**/.env
+**/.env.*
+!**/.env.example
 # Exception: Test fixture file (dummy credentials)
 !tool/firestore_export_import/test/test_data/service_account.json
 **/*.keystore
@@ -94,4 +97,3 @@ Thumbs.db
 *.pyc
 *.class
 pubspec.lock
-

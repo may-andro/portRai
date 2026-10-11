@@ -158,9 +158,11 @@ jobs:
           VERSION: ${{ inputs.version }}
           BUILD_NUMBER: ${{ inputs.build-number }}
           BUILD_TYPE: ${{ inputs.build-type }}
+          BUILD_ENV: ${{ inputs.build-type == 'production' && 'prod' || 'staging' }}
         run: |
           # Build the archive first; Xcode signs the app during IPA export.
           flutter build ipa --release --no-codesign \
+            --dart-define="build_env=$BUILD_ENV" \
             --build-name="$VERSION" --build-number="$BUILD_NUMBER"
           xcodebuild -exportArchive \
             -archivePath build/ios/archive/Runner.xcarchive \

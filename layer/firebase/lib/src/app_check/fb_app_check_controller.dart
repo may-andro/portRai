@@ -14,20 +14,45 @@ class FbAppCheckController {
 
   final FirebaseAppCheck _firebaseAppCheck;
 
-  Future<void> initialiseAppCheck(String token) async {
+  Future<void> initialiseAppCheck({
+    required String webSiteKey,
+    bool useDebugProviders = kDebugMode,
+    String androidDebugToken = const String.fromEnvironment(
+      'FIREBASE_APP_CHECK_ANDROID_DEBUG_TOKEN',
+    ),
+    String appleDebugToken = const String.fromEnvironment(
+      'FIREBASE_APP_CHECK_APPLE_DEBUG_TOKEN',
+    ),
+    String webDebugToken = const String.fromEnvironment(
+      'FIREBASE_APP_CHECK_WEB_DEBUG_TOKEN',
+    ),
+  }) async {
     try {
+      if (kIsWeb && !useDebugProviders && webSiteKey.trim().isEmpty) {
+        throw StateError(
+          'FIREBASE_APP_CHECK_WEB_SITE_KEY is required for web profile '
+          'and release builds.',
+        );
+      }
       await _firebaseAppCheck.activate(
-        providerWeb: ReCaptchaV3Provider(token),
-        providerAndroid: kDebugMode
-            ? const AndroidDebugProvider()
+        providerWeb: useDebugProviders
+            ? WebDebugProvider(debugToken: _optionalToken(webDebugToken))
+            : ReCaptchaEnterpriseProvider(webSiteKey),
+        providerAndroid: useDebugProviders
+            ? AndroidDebugProvider(
+                debugToken: _optionalToken(androidDebugToken),
+              )
             : const AndroidPlayIntegrityProvider(),
-        providerApple: kDebugMode
-            ? const AppleDebugProvider()
-            : const AppleAppAttestProvider(),
+        providerApple: useDebugProviders
+            ? AppleDebugProvider(debugToken: _optionalToken(appleDebugToken))
+            : const AppleAppAttestWithDeviceCheckFallbackProvider(),
       );
       await _firebaseAppCheck.setTokenAutoRefreshEnabled(true);
     } catch (e, st) {
-      throw AppCheckException(e.toString(), st);
+      Error.throwWithStackTrace(AppCheckException(e, st), st);
     }
   }
+
+  String? _optionalToken(String token) =>
+      token.trim().isEmpty ? null : token.trim();
 }

@@ -34,7 +34,9 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   FirebaseModuleConfigurator(
     isFirebaseEnabled: buildConfig.buildEnvironment.isFirebaseEnabled,
     firebaseOptions: DefaultFirebaseOptions.currentPlatform,
-    appCheckToken: '',
+    appCheckWebSiteKey: const String.fromEnvironment(
+      'FIREBASE_APP_CHECK_WEB_SITE_KEY',
+    ),
     storageBucketUrl: '',
   ),
   TrackingModuleConfigurator(buildConfig.buildEnvironment.isFirebaseEnabled),
