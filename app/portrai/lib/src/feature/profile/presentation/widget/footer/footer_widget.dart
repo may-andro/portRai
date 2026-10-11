@@ -8,6 +8,7 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/widget/app_version_widget.dart';
 
 part 'contact_widget.dart';
 

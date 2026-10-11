@@ -16,12 +16,12 @@ on:
         required: true
         type: string
       version:
-        description: Version number (e.g., 1.1.4) — leave empty to skip version dart-define
+        description: Version number (e.g., 1.1.4) — leave empty to use the pubspec version
         required: false
         type: string
         default: ''
       build-number:
-        description: Build number (e.g., 202530) — leave empty to skip build-number dart-define
+        description: Build number (e.g., 202530) — leave empty to use the pubspec build number
         required: false
         type: string
         default: ''
@@ -118,8 +118,8 @@ jobs:
             --dart-define=ENVIRONMENT=preview \
             --dart-define="build_env=$BUILD_ENV" \
             --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY" \
-            ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
-            ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
+            ${{ inputs.version != '' && format('--build-name={0}', inputs.version) || '' }} \
+            ${{ inputs.build-number != '' && format('--build-number={0}', inputs.build-number) || '' }}
 
       - name: Build web (Production or force-release)
         if: ${{ inputs.build-type == 'production' || inputs.force-release }}
@@ -129,8 +129,8 @@ jobs:
             --dart-define=ENVIRONMENT=${{ inputs.build-type }} \
             --dart-define="build_env=$BUILD_ENV" \
             --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY" \
-            ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
-            ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
+            ${{ inputs.version != '' && format('--build-name={0}', inputs.version) || '' }} \
+            ${{ inputs.build-number != '' && format('--build-number={0}', inputs.build-number) || '' }}
 
       - name: Verify SQLite assets in build output
         if: inputs.setup-sqlite
