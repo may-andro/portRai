@@ -62,6 +62,24 @@ Priority is a simple remote-first check in the portfolio and Settings compositio
 A failed remote flag check hides both providers, rather than falling back to local.
 The shared assistant module remains provider-neutral, and providers do not import siblings.
 
+## API Reference
+
+`ResolveAssistantProjectsUseCase` accepts an ordered `List<String>` of exact project
+source IDs and returns `Either<ResolveAssistantProjectsFailure, List<ProjectEntity>>`.
+It loads authoritative localized projects through the project's public `GetProjectsUseCase`;
+generated titles, links and other facts are not inputs.
+
+- At most `maxProjects` (3) IDs are accepted. Excess, empty/blank IDs and duplicate
+  requested IDs fail before loading projects.
+- An empty list succeeds without loading projects.
+- IDs are case-sensitive and are not trimmed or normalized. Unknown IDs and selected
+  IDs with multiple source records fail; duplicates of unselected source IDs are ignored.
+- Success contains the original source entities in requested order in an unmodifiable
+  list snapshot. There is no partial success.
+- Source failures are wrapped in `AssistantProjectsSourceFailure`, retaining the
+  `GetProjectsFailure` as the cause. Unexpected exceptions map to
+  `ResolveAssistantProjectsUnknownFailure`.
+
 ## Configuration
 
 ### On-device
