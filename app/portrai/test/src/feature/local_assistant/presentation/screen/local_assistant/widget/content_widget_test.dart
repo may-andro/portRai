@@ -40,7 +40,9 @@ void main() {
       );
 
       expect(find.byType(AssistantConversationWidget), findsOneWidget);
-      expect(find.byIcon(Icons.offline_bolt_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.offline_bolt_rounded), findsNothing);
+      expect(find.text('Clear chat'), findsNothing);
+      expect(find.byIcon(Icons.delete_outline), findsNothing);
       await tester.enterText(find.byType(TextField), 'Local question');
       await tester.tap(find.byIcon(Icons.send_rounded));
 

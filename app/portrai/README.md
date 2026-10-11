@@ -149,7 +149,8 @@ unready remote assistant never falls back to local while its rollout flag is on.
 
 Settings exposes only on-device model management during local-only rollout. Remote chat entry
 is available only from the portfolio. Visiting Settings or the portfolio does not initialize remote chat or
-load its portfolio context. Clear-chat controls and cloud disclosure live inside chat.
+load its portfolio context. Both chat toolbars offer a clear-chat control; only the
+on-device chat offers an informational dialog about local processing and in-memory history.
 Each provider's module-internal singleton bloc preserves its own in-memory conversation
 across navigation. Flags are rechecked on screen visibility/return and before each new request
 or enable action, without flag subscriptions or polling. The app does not rewrite rollout flags or the

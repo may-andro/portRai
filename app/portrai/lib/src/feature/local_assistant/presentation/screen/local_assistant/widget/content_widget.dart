@@ -62,26 +62,6 @@ class ContentWidget extends StatelessWidget {
               : null,
           onSubmit: (question) =>
               context.bloc.add(SendLocalAssistantQuestionClickEvent(question)),
-          header: Row(
-            children: [
-              DSIconWidget(
-                Icons.offline_bolt_rounded,
-                color: context.colorPalette.brand.primary,
-                size: DSIconSize.small,
-              ),
-              const DSHorizontalSpacerWidget(1),
-              DSTextWidget(
-                context.localizations.assistantOnDeviceBadge,
-                color: context.colorPalette.neutral.grey7,
-                style: context.typography.labelMedium,
-              ),
-              TextButton(
-                onPressed: () =>
-                    context.bloc.add(const ResetLocalAssistantClickEvent()),
-                child: Text(context.localizations.remoteAssistantReset),
-              ),
-            ],
-          ),
         );
       },
     );

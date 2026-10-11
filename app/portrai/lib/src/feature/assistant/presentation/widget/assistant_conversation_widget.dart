@@ -7,20 +7,20 @@ part 'message_bubble_widget.dart';
 part 'suggestions_widget.dart';
 
 /// Renders a portfolio conversation without owning its provider or lifecycle.
-/// The screen supplies localized provider identity/errors and handles submission.
+/// The screen supplies optional status feedback/errors and handles submission.
 class AssistantConversationWidget extends StatefulWidget {
   const AssistantConversationWidget({
     super.key,
     required this.messages,
     required this.isSendingQuestion,
-    required this.header,
+    this.header,
     required this.onSubmit,
     this.errorText,
   });
 
   final List<AssistantMessageEntity> messages;
   final bool isSendingQuestion;
-  final Widget header;
+  final Widget? header;
   final ValueChanged<String> onSubmit;
   final String? errorText;
 
@@ -69,13 +69,14 @@ class _AssistantConversationWidgetState
         constraints: const BoxConstraints(maxWidth: 760),
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.space(factor: 2),
-                vertical: context.space(),
+            if (widget.header case final header?)
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.space(factor: 2),
+                  vertical: context.space(),
+                ),
+                child: header,
               ),
-              child: widget.header,
-            ),
             Expanded(
               child: widget.messages.isEmpty
                   ? _SuggestionsWidget(

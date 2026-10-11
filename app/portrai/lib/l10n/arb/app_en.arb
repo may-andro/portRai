@@ -673,6 +673,18 @@
   "@assistantAskAi": {
     "description": "Portfolio button that opens the on-device AI assistant"
   },
+  "chatAssistantTitle": "Chat Assistant",
+  "@chatAssistantTitle": {
+    "description": "Shared title of the local and remote chat assistant screens"
+  },
+  "chatAssistantClear": "Clear chat",
+  "@chatAssistantClear": {
+    "description": "Toolbar action clearing the current assistant conversation"
+  },
+  "assistantOnDeviceChatDescription": "The downloaded model runs on your device. Your questions and portfolio data are processed locally. This conversation is held only in app memory, not saved to device storage. Leaving this screen does not clear it: it remains while the app session is alive. Clear chat removes the conversation and discards pending answers, but keeps the downloaded model.",
+  "@assistantOnDeviceChatDescription": {
+    "description": "Local chat information explaining on-device processing, in-memory history retained across navigation, and clear-chat behavior"
+  },
   "assistantTitle": "Portfolio AI",
   "@assistantTitle": {
     "description": "Title shown in the portfolio assistant screen"

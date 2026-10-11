@@ -196,6 +196,18 @@
   "developerMenuForceBlacklistErrorDescription": "Simula un error que debe ser ignorado por el gestor de errores",
   "splashContactSupportUnavailableMessage": "Esta función aún no está desarrollada",
   "assistantAskAi": "Preguntar a la IA",
+  "chatAssistantTitle": "Asistente de chat",
+  "@chatAssistantTitle": {
+    "description": "Shared title of the local and remote chat assistant screens"
+  },
+  "chatAssistantClear": "Borrar chat",
+  "@chatAssistantClear": {
+    "description": "Toolbar action clearing the current assistant conversation"
+  },
+  "assistantOnDeviceChatDescription": "El modelo descargado funciona en tu dispositivo. Tus preguntas y los datos del portafolio se procesan localmente. Esta conversación se mantiene solo en la memoria de la app, no se guarda en el almacenamiento del dispositivo. Salir de esta pantalla no la borra: permanece mientras la sesión de la app siga activa. Borrar chat elimina la conversación y descarta las respuestas pendientes, pero conserva el modelo descargado.",
+  "@assistantOnDeviceChatDescription": {
+    "description": "Local chat information explaining on-device processing, in-memory history retained across navigation, and clear-chat behavior"
+  },
   "assistantTitle": "IA del portafolio",
   "assistantOnDeviceTitle": "Un asistente privado en tu dispositivo",
   "assistantOnDeviceDescription": "El asistente funciona en este dispositivo. Tus preguntas y la información del portafolio se procesan localmente.",

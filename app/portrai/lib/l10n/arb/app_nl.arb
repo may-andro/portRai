@@ -196,6 +196,18 @@
   "developerMenuForceBlacklistErrorDescription": "Simuleer een fout die door de foutafhandeling genegeerd moet worden",
   "splashContactSupportUnavailableMessage": "Deze functie is nog niet ontwikkeld",
   "assistantAskAi": "Vraag AI",
+  "chatAssistantTitle": "Chatassistent",
+  "@chatAssistantTitle": {
+    "description": "Shared title of the local and remote chat assistant screens"
+  },
+  "chatAssistantClear": "Chat wissen",
+  "@chatAssistantClear": {
+    "description": "Toolbar action clearing the current assistant conversation"
+  },
+  "assistantOnDeviceChatDescription": "Het gedownloade model draait op je apparaat. Je vragen en portfoliogegevens worden lokaal verwerkt. Dit gesprek blijft alleen in het geheugen van de app en wordt niet opgeslagen op het apparaat. Deze pagina verlaten wist het gesprek niet: het blijft bewaard zolang de appsessie actief is. Chat wissen verwijdert het gesprek en negeert nog lopende antwoorden, maar behoudt het gedownloade model.",
+  "@assistantOnDeviceChatDescription": {
+    "description": "Local chat information explaining on-device processing, in-memory history retained across navigation, and clear-chat behavior"
+  },
   "assistantTitle": "Portfolio-AI",
   "assistantOnDeviceTitle": "Een privéassistent op je apparaat",
   "assistantOnDeviceDescription": "De assistent draait op dit apparaat. Je vragen en portfolio-informatie worden lokaal verwerkt.",

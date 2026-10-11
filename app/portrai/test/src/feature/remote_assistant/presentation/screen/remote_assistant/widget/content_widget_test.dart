@@ -48,7 +48,10 @@ void main() {
       ),
     );
     expect(find.byType(AssistantConversationWidget), findsOneWidget);
-    expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.cloud_outlined), findsNothing);
+    expect(find.byIcon(Icons.info_outline), findsNothing);
+    expect(find.text('Cloud AI via Firebase and Google'), findsNothing);
+    expect(find.text('Clear chat'), findsNothing);
     expect(find.byIcon(Icons.offline_bolt_rounded), findsNothing);
     await tester.enterText(find.byType(TextField), 'Remote question');
     await tester.tap(find.byIcon(Icons.send_rounded));
@@ -57,8 +60,6 @@ void main() {
         const SendRemoteAssistantQuestionClickEvent('Remote question'),
       ),
     ).called(1);
-    await tester.tap(find.text('Clear chat'));
-    verify(() => bloc.add(const ResetRemoteAssistantClickEvent())).called(1);
     expect(find.byType(Switch), findsNothing);
   });
 

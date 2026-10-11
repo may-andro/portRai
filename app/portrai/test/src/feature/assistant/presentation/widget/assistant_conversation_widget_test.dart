@@ -6,6 +6,30 @@ import 'package:portrai/src/feature/assistant/assistant.dart';
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
+  testWidgets(
+    'should show suggestions without a header when none is supplied',
+    (tester) async {
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: AssistantConversationWidget(
+            messages: const [],
+            isSendingQuestion: false,
+            onSubmit: (_) {},
+          ),
+        ),
+      );
+      expect(find.text('Which projects use Flutter?'), findsOneWidget);
+      expect(
+        tester
+            .widget<AssistantConversationWidget>(
+              find.byType(AssistantConversationWidget),
+            )
+            .header,
+        isNull,
+      );
+    },
+  );
+
   Future<void> pumpConversation(
     WidgetTester tester, {
     List<AssistantMessageEntity> messages = const [],

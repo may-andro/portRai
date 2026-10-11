@@ -41,7 +41,8 @@ rather than hiding its entry or exposing the other chat.
 
 Settings exposes only local model management during local-only rollout. Remote chat entry
 appears only on the portfolio, based on the cloud flag rather than platform support, context
-retrieval or session readiness. Clear-chat controls and cloud disclosure remain inside chat.
+retrieval or session readiness. Both chat toolbars offer a clear-chat control; only the
+on-device chat offers an informational dialog about local processing and in-memory history.
 Conversations remain in independent singleton blocs across navigation. There is no
 chooser, context switch, automatic fallback or transfer of history between features.
 
@@ -83,7 +84,7 @@ The shared assistant module remains provider-neutral, and providers do not impor
 - Route: `/remote-assistant`; its entry is flag-only. Runtime rollout and platform guards show
   unavailability inside chat.
 - Questions, bounded recent completed history and portfolio context are sent to Google
-  through Firebase. The disclosure warns against sensitive input and inaccurate answers.
+  through Firebase. The remote chat has no provider badge or disclosure control.
 - There is no saved remote consent, enablement preference or user activation toggle.
 - Opening the screen loads portfolio context but never calls the model until a question.
 - Clear chat resets only the remote in-memory session.

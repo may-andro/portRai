@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
@@ -28,6 +29,94 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  for (final locale in AppLocalizations.supportedLocales) {
+    testWidgets(
+      'should show the shared localized title and local information when opened in ${locale.languageCode}',
+      (tester) async {
+        final fixture = AssistantTestFixture(localEnabled: true);
+        await appServiceLocator.reset();
+        addTearDown(appServiceLocator.reset);
+        fixture.install();
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: Builder(
+              builder: (context) => Localizations.override(
+                context: context,
+                locale: locale,
+                child: const LocalAssistantScreen(),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final localizations = await AppLocalizations.delegate.load(locale);
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.text(localizations.chatAssistantTitle),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.byTooltip(localizations.chatAssistantClear),
+          findsOneWidget,
+        );
+        expect(find.text(localizations.chatAssistantClear), findsNothing);
+        expect(
+          find.text(localizations.assistantOnDeviceChatDescription),
+          findsNothing,
+        );
+        await tester.tap(find.byTooltip(localizations.assistantOnDeviceBadge));
+        await tester.pumpAndSettle();
+        expect(find.text(localizations.assistantOnDeviceTitle), findsOneWidget);
+        expect(
+          find.text(localizations.assistantOnDeviceChatDescription),
+          findsOneWidget,
+        );
+        await tester.tap(find.text(localizations.close));
+        await tester.pumpAndSettle();
+        expect(
+          find.text(localizations.assistantOnDeviceChatDescription),
+          findsNothing,
+        );
+      },
+    );
+  }
+
+  testWidgets(
+    'should clear retained local chat when the toolbar clear action is clicked',
+    (tester) async {
+      final fixture = AssistantTestFixture(localEnabled: true);
+      await pumpScreen(tester, fixture);
+      await tester.enterText(find.byType(TextField), 'Question');
+      await tester.tap(find.byIcon(Icons.send_rounded));
+      await tester.pumpAndSettle();
+      expect(find.text('Local answer'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(
+        const TestWidgetWrapper(child: LocalAssistantScreen()),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Local answer'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.byTooltip('Clear chat'),
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(find.byTooltip('Clear chat'));
+      await tester.pumpAndSettle();
+      verify(() => fixture.resetLocal()).called(1);
+      expect(fixture.local.state.messages, isEmpty);
+      expect(find.text('Local answer'), findsNothing);
+      expect(find.text('Question'), findsNothing);
+      expect(find.text('Clear chat'), findsNothing);
+      expect(fixture.local.state.isReady, isTrue);
+      expect(fixture.local.state.isModelDownloaded, isTrue);
+    },
+  );
 
   for (final unsupported in [false, true]) {
     testWidgets(

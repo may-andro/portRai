@@ -20,7 +20,15 @@ class RemoteAssistantScreen extends StatelessWidget {
         onResume: () => context.bloc.add(const RemoteAssistantStartedEvent()),
         child: Scaffold(
           appBar: AppBar(
-            title: Text(context.localizations.remoteAssistantTitle),
+            title: Text(context.localizations.chatAssistantTitle),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.delete_outline),
+                tooltip: context.localizations.chatAssistantClear,
+                onPressed: () =>
+                    context.bloc.add(const ResetRemoteAssistantClickEvent()),
+              ),
+            ],
           ),
           body: const SafeArea(child: ContentWidget()),
         ),
