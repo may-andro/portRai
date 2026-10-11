@@ -15,8 +15,8 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
   PortfolioBloc(
     this._getPortfolioUseCase,
     this._trackingDelegate,
-    this._getLocalAvailability,
-    this._getRemoteAvailability,
+    this._getLocalAssistantAvailabilityUseCase,
+    this._getRemoteAssistantAvailabilityUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
@@ -29,8 +29,10 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
 
   final GetPortfolioUseCase _getPortfolioUseCase;
   final PortfolioTrackingDelegate _trackingDelegate;
-  final GetLocalAssistantAvailabilityUseCase _getLocalAvailability;
-  final GetRemoteAssistantAvailabilityUseCase _getRemoteAvailability;
+  final GetLocalAssistantAvailabilityUseCase
+  _getLocalAssistantAvailabilityUseCase;
+  final GetRemoteAssistantAvailabilityUseCase
+  _getRemoteAssistantAvailabilityUseCase;
   int _availabilityRevision = 0;
 
   Future<void> _mapLoadPortfolioEventToState(
@@ -93,8 +95,8 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     Emitter<PortfolioState> emit,
   ) async {
     final revision = ++_availabilityRevision;
-    final remote = await _getRemoteAvailability();
-    final local = await _getLocalAvailability();
+    final remote = await _getRemoteAssistantAvailabilityUseCase();
+    final local = await _getLocalAssistantAvailabilityUseCase();
     if (emit.isDone ||
         revision != _availabilityRevision ||
         state is! LoadedState) {

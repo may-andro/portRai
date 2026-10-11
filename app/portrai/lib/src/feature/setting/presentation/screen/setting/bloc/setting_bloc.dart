@@ -15,16 +15,18 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   SettingBloc(
     this._isFeatureEnabledUseCase,
     this._buildConfig,
-    this._getLocalAvailability,
-    this._getRemoteAvailability,
+    this._getLocalAssistantAvailabilityUseCase,
+    this._getRemoteAssistantAvailabilityUseCase,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final BuildConfig _buildConfig;
-  final GetLocalAssistantAvailabilityUseCase _getLocalAvailability;
-  final GetRemoteAssistantAvailabilityUseCase _getRemoteAvailability;
+  final GetLocalAssistantAvailabilityUseCase
+  _getLocalAssistantAvailabilityUseCase;
+  final GetRemoteAssistantAvailabilityUseCase
+  _getRemoteAssistantAvailabilityUseCase;
   int _loadRevision = 0;
 
   Future<void> _mapLoadSettingsEventToState(
@@ -44,8 +46,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       isLanguageSelectorEnabled = languageSelectorResult.right;
     }
 
-    final remote = await _getRemoteAvailability();
-    final local = await _getLocalAvailability();
+    final remote = await _getRemoteAssistantAvailabilityUseCase();
+    final local = await _getLocalAssistantAvailabilityUseCase();
     if (emit.isDone || revision != _loadRevision) return;
     emit(
       SettingLoadedState(

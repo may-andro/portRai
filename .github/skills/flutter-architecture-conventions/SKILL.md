@@ -7,6 +7,9 @@ description: 'Architecture and code-organization conventions for this Flutter ap
 ## Use cases
 Every domain use case must extend `BaseUseCase`/`BaseNoParamUseCase` (from the `use_case` package) with a sealed `Failure` hierarchy returning `Either`. Never write a plain class with a bare `call()` method - this loses automatic logging/interceptor support and error-mapping consistency.
 Use cases belong to the owning feature's `domain/use_case/`, never the app's `utility/` folder.
+Name injected use case fields after their full type in lower camel case, preserving the
+`UseCase` suffix and subject (for example `_getLocalAssistantAvailabilityUseCase`, not
+`_getLocalAvailability`).
 
 ```dart
 // ✅ Correct
