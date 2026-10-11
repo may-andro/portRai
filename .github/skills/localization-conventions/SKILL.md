@@ -61,6 +61,12 @@ exist in every locale ARB file. See `error-handling-conventions` for the
 full pattern; don't add a raw string message field to a `Failure` instead
 of an ARB key.
 
+The remote assistant's optional `serviceMessage` is a narrow exception for actionable
+backend error-field details, not the localized default. Presentation retains the
+translated failure heading and formats these original-language service details with
+the `remoteAssistantErrorDetails` ARB placeholders. Never display arbitrary exception
+strings or response content this way.
+
 ## Don't invent
 
 Don't hardcode any user-visible string in a widget — every string the user

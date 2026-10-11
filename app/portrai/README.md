@@ -138,6 +138,10 @@ successfully. Failed partial answers are discarded and never become future provi
 Disable/reset invalidate pending output. They stop local consumption and close the owned
 transport; they cannot guarantee that server generation or billing stops.
 Question content and generated text are excluded from remote request/state logging and analytics.
+Actionable Firebase service error messages (such as depleted credits, disabled APIs, or
+unavailable models) appear below the localized error description. These explicit backend
+error-field details are not logged; SDK parsing errors, HTTP client details, arbitrary
+exceptions, and blocked/empty/incomplete response content remain private.
 
 Local and remote chats are independent features. The rollout enabler maintains mutually exclusive
 flags; if both are on, remote takes priority regardless of readiness.

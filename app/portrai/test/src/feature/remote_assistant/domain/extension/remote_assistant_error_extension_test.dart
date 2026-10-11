@@ -39,7 +39,7 @@ void main() {
     ),
     (
       const AiServerException('secret server body', StackTrace.empty),
-      isA<RemoteAssistantNetworkFailure>(),
+      isA<RemoteAssistantUnknownFailure>(),
     ),
     (
       const AiConfigurationException('secret server body', StackTrace.empty),
@@ -162,11 +162,50 @@ void main() {
               throw StateError('Unsupported test operation');
           }
           expect(failure, expected);
-          expect(failure.cause, isNull);
+          expect(failure.cause, error is AiException ? same(error) : isNull);
+          expect(
+            failure.serviceMessage,
+            error is AiException ? error.serviceMessage : null,
+          );
           expect(failure.toString(), isNot(contains('secret')));
         },
       );
     }
+  }
+
+  for (final error in <AiException>[
+    const AiServerException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'Your credits are depleted. Enable billing to continue.',
+    ),
+    const AiQuotaExceededException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'Quota exceeded. Try again later.',
+    ),
+    const AiConfigurationException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'Enable the Gemini API in the console.',
+    ),
+    const AiUnsupportedLocationException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'User location is not supported for the API use.',
+    ),
+  ]) {
+    test(
+      'should preserve service details without logging them when mapping ${error.runtimeType}',
+      () {
+        final failure = error.toRemoteAssistantFailure();
+        expect(failure.cause, same(error));
+        expect(failure.serviceMessage, error.serviceMessage);
+        expect(failure.toString(), isNot(contains(error.serviceMessage)));
+        expect(failure.toString(), isNot(contains('secret')));
+        expect(failure.props, [error]);
+      },
+    );
   }
 
   test(

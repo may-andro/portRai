@@ -255,6 +255,14 @@
   "@errorRemoteAssistantIncomplete": {"description": "Remote output was empty, truncated or ended without a complete response"},
   "errorRemoteAssistantUnknown": "El asistente en la nube no pudo responder. Inténtalo de nuevo.",
   "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
+  "remoteAssistantErrorDetails": "{heading}\n\n{serviceMessage}",
+  "@remoteAssistantErrorDetails": {
+    "description": "Localized remote failure heading followed by actionable backend error details in the service's original language",
+    "placeholders": {
+      "heading": {"type": "String", "example": "El asistente en la nube no pudo responder. Inténtalo de nuevo."},
+      "serviceMessage": {"type": "String", "example": "Your credits are depleted. Enable billing to continue."}
+    }
+  },
   "remoteAssistantSettingsTitle": "IA en la nube",
   "@remoteAssistantSettingsTitle": {"description": "Cloud assistant informational settings card title"},
   "errorLocalAssistantUnavailable": "El asistente en el dispositivo no está disponible en esta plataforma o está desactivado para esta aplicación.",

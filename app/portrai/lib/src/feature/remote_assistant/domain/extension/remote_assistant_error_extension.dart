@@ -12,25 +12,40 @@ extension RemoteAssistantErrorExtension on Object {
     RemoteAssistantClosedException() ||
     RemoteAssistantConcurrentRequestException() =>
       const RemoteAssistantUnavailableFailure(),
-    AiNetworkException() ||
-    AiServerException() => const RemoteAssistantNetworkFailure(),
-    AiTimeoutException() ||
+    AiNetworkException(:final serviceMessage) => RemoteAssistantNetworkFailure(
+      cause: this,
+      serviceMessage: serviceMessage,
+    ),
+    AiServerException(:final serviceMessage) => RemoteAssistantUnknownFailure(
+      cause: this,
+      serviceMessage: serviceMessage,
+    ),
+    AiTimeoutException() => RemoteAssistantTimeoutFailure(cause: this),
     RemoteAssistantTimeoutException() => const RemoteAssistantTimeoutFailure(),
-    AiQuotaExceededException() => const RemoteAssistantQuotaFailure(),
-    AiConfigurationException() ||
-    AiUnsupportedLocationException() ||
+    AiQuotaExceededException(:final serviceMessage) =>
+      RemoteAssistantQuotaFailure(cause: this, serviceMessage: serviceMessage),
+    AiConfigurationException(:final serviceMessage) ||
+    AiUnsupportedLocationException(
+      :final serviceMessage,
+    ) => RemoteAssistantConfigurationFailure(
+      cause: this,
+      serviceMessage: serviceMessage,
+    ),
     RemoteAssistantFlagException() =>
       const RemoteAssistantConfigurationFailure(),
-    AiBlockedResponseException() => const RemoteAssistantBlockedFailure(),
-    AiInvalidInputException() || RemoteAssistantInvalidInputException() =>
+    AiBlockedResponseException() => RemoteAssistantBlockedFailure(cause: this),
+    AiInvalidInputException() => RemoteAssistantInvalidInputFailure(
+      cause: this,
+    ),
+    RemoteAssistantInvalidInputException() =>
       const RemoteAssistantInvalidInputFailure(),
-    AiEmptyResponseException() ||
-    AiIncompleteResponseException() ||
+    AiEmptyResponseException() || AiIncompleteResponseException() =>
+      RemoteAssistantIncompleteFailure(cause: this),
     RemoteAssistantIncompleteException() ||
     RemoteAssistantResponseLimitException() =>
       const RemoteAssistantIncompleteFailure(),
-    RemoteAssistantCallbackException() ||
-    AiSdkException() => const RemoteAssistantUnknownFailure(),
+    RemoteAssistantCallbackException() => const RemoteAssistantUnknownFailure(),
+    AiSdkException() => RemoteAssistantUnknownFailure(cause: this),
     _ => unknownFailure,
   };
 }

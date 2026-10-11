@@ -1,5 +1,7 @@
+import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/utility/log_use_case_interceptor.dart';
 
 import '../../mock/utility/mock_log_reporter.dart';
@@ -39,6 +41,33 @@ void main() {
     });
 
     group('onError', () {
+      test(
+        'should omit backend details and raw causes when logging remote failures',
+        () {
+          const details =
+              'Your credits are depleted. Enable billing to continue.';
+          final exception = AiServerException(
+            StateError('secret prompt and server body'),
+            StackTrace.current,
+            serviceMessage: details,
+          );
+          final failure = exception.toRemoteAssistantFailure();
+          interceptor.onError('RemoteUseCase', failure, null);
+          final message =
+              verify(
+                    () => mockLogReporter.error(
+                      captureAny(),
+                      tag: 'RemoteUseCase',
+                      error: failure,
+                    ),
+                  ).captured.single
+                  as String;
+          expect(message, contains('Firebase AI request failed'));
+          expect(message, isNot(contains(details)));
+          expect(message, isNot(contains('secret')));
+        },
+      );
+
       test('should log error and stacktrace when onError is called', () {
         final error = Exception('something went wrong');
         final stackTrace = StackTrace.current;

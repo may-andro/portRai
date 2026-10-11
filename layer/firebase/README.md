@@ -260,7 +260,13 @@ execute generated actions. `GenerationConfig` supports structured text/JSON
 settings for a later generative UI feature; that feature must validate the result
 and resolve references against authoritative app data.
 
-`AiException` subclasses preserve the cause and stack trace. Concrete SDK
+`AiException` subclasses preserve the cause and stack trace.
+`FirebaseAIException.message` details are also retained in the optional `serviceMessage`
+for request/configuration/quota/location errors, allowing callers to display actionable
+service errors. `toString()` remains generic and sanitized: neither those details nor the
+raw cause are printed. SDK parsing messages, HTTP client URI/body details, arbitrary errors,
+and blocked/empty/incomplete responses never populate `serviceMessage`.
+Concrete SDK
 exceptions map to configuration, quota, location, server, or SDK errors; typed
 HTTP client and timeout exceptions map to network and timeout errors. Generic
 server exceptions remain server errors rather than guessing their meaning from

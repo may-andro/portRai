@@ -1,8 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -13,9 +13,7 @@ class ContentWidget extends StatelessWidget {
       BlocBuilder<RemoteAssistantBloc, RemoteAssistantState>(
         builder: (context, state) {
           final failure = state.failure;
-          final errorText = failure == null
-              ? null
-              : FailureTranslator.translate(context, failure);
+          final errorText = failure?.remoteAssistantErrorText(context);
           if (state.status == RemoteAssistantStatus.loading) {
             return const Center(child: DSLoadingWidget(size: 40));
           }

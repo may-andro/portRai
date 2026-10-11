@@ -821,6 +821,14 @@
   "@errorRemoteAssistantIncomplete": {"description": "Remote output was empty, truncated or ended without a complete response"},
   "errorRemoteAssistantUnknown": "The cloud assistant could not answer. Please try again.",
   "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
+  "remoteAssistantErrorDetails": "{heading}\n\n{serviceMessage}",
+  "@remoteAssistantErrorDetails": {
+    "description": "Localized remote failure heading followed by actionable backend error details in the service's original language",
+    "placeholders": {
+      "heading": {"type": "String", "example": "The cloud assistant could not answer. Please try again."},
+      "serviceMessage": {"type": "String", "example": "Your credits are depleted. Enable billing to continue."}
+    }
+  },
   "remoteAssistantSettingsTitle": "Cloud AI",
   "@remoteAssistantSettingsTitle": {
     "description": "Cloud assistant informational settings card title"
