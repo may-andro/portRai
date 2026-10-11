@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase/src/ai/fb_ai_backend.dart';
+import 'package:firebase/src/ai/fb_ai_controller.dart';
 import 'package:firebase/src/analytics/fb_analytics_controller.dart';
 import 'package:firebase/src/app_check/fb_app_check_controller.dart';
 import 'package:firebase/src/auth/fb_auth_controller.dart';
@@ -10,6 +12,7 @@ import 'package:firebase/src/firestore/fb_firestore_controller.dart';
 import 'package:firebase/src/function/fb_function_controller.dart';
 import 'package:firebase/src/remote_config/fb_remote_config_controller.dart';
 import 'package:firebase/src/storage/fb_storage_controller.dart';
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,12 +28,16 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
     required this.firebaseOptions,
     required this.appCheckWebSiteKey,
     required this.storageBucketUrl,
+    this.aiBackend = FbAiBackend.googleAI,
+    this.aiLocation = 'global',
   });
 
   final bool isFirebaseEnabled;
   final FirebaseOptions firebaseOptions;
   final String appCheckWebSiteKey;
   final String storageBucketUrl;
+  final FbAiBackend aiBackend;
+  final String aiLocation;
 
   @override
   FutureOr<void> preDependenciesSetup(ServiceLocator serviceLocator) async {
@@ -66,12 +73,27 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
     _injectFirestore(serviceLocator);
     _injectStorage(serviceLocator);
     _injectFunctions(serviceLocator);
+    _injectAi(serviceLocator);
   }
 
   void _injectAppCheck(ServiceLocator serviceLocator) {
     serviceLocator.registerSingleton(() => FirebaseAppCheck.instance);
     serviceLocator.registerFactory(
       () => FbAppCheckController(serviceLocator.get<FirebaseAppCheck>()),
+    );
+  }
+
+  void _injectAi(ServiceLocator serviceLocator) {
+    serviceLocator.registerSingleton(
+      () => switch (aiBackend) {
+        FbAiBackend.googleAI => FirebaseAI.googleAI(),
+        FbAiBackend.agentPlatform => FirebaseAI.agentPlatform(
+          location: aiLocation,
+        ),
+      },
+    );
+    serviceLocator.registerFactory(
+      () => FbAiController(serviceLocator.get<FirebaseAI>()),
     );
   }
 
