@@ -20,6 +20,7 @@ import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/project.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/service/service.dart';
 import 'package:portrai/src/feature/setting/setting.dart';
 import 'package:portrai/src/feature/testimonial/testimonial.dart';
@@ -71,4 +72,5 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   PortfolioModuleConfigurator(),
   AssistantModuleConfigurator(),
   LocalAssistantModuleConfigurator(),
+  RemoteAssistantModuleConfigurator(),
 ];

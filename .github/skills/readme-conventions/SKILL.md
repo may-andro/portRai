@@ -11,6 +11,9 @@ toward this shape when you're already editing them for another reason — don't 
 rewrite of an unrelated README.
 
 ## General style rules
+- Describe implemented behavior, configuration, and limitations as factual reference material.
+  Do not include implementation progress, PR sequencing, or promises about future work;
+  keep those in plans and PR descriptions.
 - Plain ATX headings, **no emoji** in headings or bullet points (e.g. `## Features`, not
   `## ✨ Features`). Most existing READMEs (`core`, `cache`, `log_reporter`, `use_case`,
   `tracking`, `error_reporter`, `remote`, `design_system`, `firebase`, `module_injector`) already
