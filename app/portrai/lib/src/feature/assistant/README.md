@@ -11,6 +11,7 @@ It does not import either provider, resolve their blocs, or select an inference 
   and testimonials.
 - Typed text responses and shared suggestions, message bubbles and chat input.
 - Provisional streamed responses supplied by the caller, without provider-specific state.
+- A read-only GenUI catalog for design-system text and card composition.
 
 ## Getting Started
 
@@ -63,6 +64,55 @@ A failed remote flag check hides both providers, rather than falling back to loc
 The shared assistant module remains provider-neutral, and providers do not import siblings.
 
 ## Configuration
+
+### A2UI rendering
+
+The app depends on the published experimental `genui` **0.10.4** package and
+`json_schema_builder` **^0.1.6** (resolved **0.1.7**). The schema dependency starts
+at 0.1.6 because the runtime requires its exported `SchemaRegistry`; the 0.1.3
+lower bound declared upstream does not compile with this release.
+Its runtime uses `a2ui_core` **0.1.1** in the
+resolved workspace and supports A2UI **v0.9**. The installed package source, not
+the repository's evolving main branch, defines the API used here.
+
+`createAssistantCatalog()` exposes only `DSText` and `DSCard` under catalog ID
+`dev.portrai.assistant`. `DSText.text` accepts a literal string or an official
+data-model reference such as `{"path":"/message"}`, resolved reactively by
+`BoundString`. `DSCard.child` is a component ID rendered by the framework's
+`CatalogItemContext.buildChild`. Both render app-owned design-system widgets.
+No basic catalog, client functions, actions, navigation, media or network widgets
+are registered.
+
+Consumers own the controller and render the framework `Surface` directly inside
+the app's design-system theme:
+
+```dart
+import 'package:genui/genui.dart';
+import 'package:portrai/src/feature/assistant/assistant.dart';
+
+final controller = SurfaceController(catalogs: [createAssistantCatalog()]);
+final surfaceContext = controller.contextFor('answer');
+final surface = Surface(surfaceContext: surfaceContext);
+```
+
+In published 0.10.4 the constructor is `Surface(surfaceContext: ...)`, not
+`Surface(host: ..., surfaceId: ...)` shown in its README. `SurfaceController`
+implements the host; `contextFor` supplies the per-surface context. Retain it for
+the mounted surface, observe `surfaceUpdates`/`activeSurfaceIds` for lifecycle,
+unmount surfaces before disposing their owner, and call `controller.dispose()`.
+No session, service locator or DI registration is hidden in the catalog factory.
+
+Feed external text streams through the official `A2uiParserTransformer` and pass
+each `A2uiMessageEvent.message` to `controller.handleMessage`. Stream parse errors
+must be handled by the caller. Controller and component errors use the framework's
+`SurfaceContext.reportError` path and appear on `controller.onSubmit` as
+`UiInteractionPart` error messages; consumers must subscribe and surface those
+errors, not log prompt or generated content. Invalid rendering can also show the
+framework's `FallbackWidget`. Cancel owned subscriptions on disposal.
+
+The catalog is not connected to either chat screen or inference provider. There
+is no transport adapter, conversation session, feature flag or backend activation
+for A2UI rendering.
 
 ### On-device
 
@@ -124,5 +174,8 @@ flutter test test/src/feature/assistant test/src/feature/local_assistant \
 Tests use deterministic fixtures and mocked inference. They cover discovery combinations,
 unsupported platforms, flag-only cloud activation, direct-route guards, pending-request invalidation,
 local download consent, and independent sessions. No model download or live AI generation is needed.
+The catalog widget tests feed real v0.9 messages through `A2uiParserTransformer`
+and `SurfaceController` into `Surface`, covering DS composition, literal text,
+binding updates, surface deletion and unsupported-component error reporting.
 
 Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md).
