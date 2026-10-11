@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
@@ -66,6 +67,25 @@ void main() {
                     !remoteEnabled && localEnabled && localSupported,
               ),
             ],
+            verify: (_) {
+              if (remoteEnabled) {
+                verifyNever(
+                  () => isFeatureEnabledUseCase(
+                    LocalAssistantFeatureFlags.aiAssistant,
+                  ),
+                );
+                verifyNever(() => local());
+              } else if (!localEnabled) {
+                verify(
+                  () => isFeatureEnabledUseCase(
+                    LocalAssistantFeatureFlags.aiAssistant,
+                  ),
+                ).called(1);
+                verifyNever(() => local());
+              } else {
+                verify(() => local()).called(1);
+              }
+            },
           );
         }
       }
@@ -94,6 +114,12 @@ void main() {
         SettingLoadingState(),
         SettingLoadedState(isLanguageSelectorEnabled: false),
       ],
+      verify: (_) {
+        verifyNever(
+          () => isFeatureEnabledUseCase(LocalAssistantFeatureFlags.aiAssistant),
+        );
+        verifyNever(() => local());
+      },
     );
 
     blocTest<SettingBloc, SettingState>(

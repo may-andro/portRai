@@ -26,7 +26,8 @@ class LocalAssistantBloc
     this._trackingDelegate,
     this._isFeatureEnabledUseCase, {
     required this._isLocalAssistantSupportedUseCase,
-    @Inject(ResetLocalAssistantSessionUseCase) this._resetSession,
+    @Inject(ResetLocalAssistantSessionUseCase)
+    required this._resetLocalAssistantSessionUseCase,
   }) : super(const LocalAssistantState()) {
     on<LocalAssistantStartedEvent>(_mapLocalAssistantStartedEventToState);
     on<LocalAssistantInitializedEvent>(
@@ -57,7 +58,7 @@ class LocalAssistantBloc
   final LocalAssistantTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
-  final ResetLocalAssistantSessionUseCase? _resetSession;
+  final ResetLocalAssistantSessionUseCase _resetLocalAssistantSessionUseCase;
   int _controlRevision = 0;
   int _requestRevision = 0;
 
@@ -93,9 +94,9 @@ class LocalAssistantBloc
         clearFailure: result.isRight && support.isRight,
       ),
     );
-    final reset = await _resetSession?.call();
+    final reset = await _resetLocalAssistantSessionUseCase();
     if (emit.isDone || invalidationRevision != _controlRevision) return false;
-    if (reset != null && reset.isLeft) {
+    if (reset.isLeft) {
       emit(state.copyWith(hasError: true, failure: reset.left));
     }
     if (wasDownloading) {
@@ -116,10 +117,7 @@ class LocalAssistantBloc
     _trackingDelegate.trackScreenView();
     if (!await _checkAvailability(emit)) return;
     final revision = _controlRevision;
-    await _mapLocalAssistantInitializedEventToState(
-      const LocalAssistantInitializedEvent(),
-      emit,
-    );
+    await _initialize(emit, revision);
     if (emit.isDone || revision != _controlRevision) return;
     emit(state.copyWith(isLoadingContext: true));
     final result = await _getAssistantContextUseCase();
@@ -153,6 +151,13 @@ class LocalAssistantBloc
   ) async {
     if (!await _checkAvailability(emit)) return;
     final revision = _controlRevision;
+    await _initialize(emit, revision);
+  }
+
+  Future<void> _initialize(
+    Emitter<LocalAssistantState> emit,
+    int revision,
+  ) async {
     if (state.status is LocalAssistantUnavailable) {
       emit(state.copyWith(status: const LocalAssistantOff()));
     }
@@ -371,11 +376,8 @@ class LocalAssistantBloc
         clearFailure: true,
       ),
     );
-    final result = await _resetSession?.call();
-    if (!emit.isDone &&
-        revision == _requestRevision &&
-        result != null &&
-        result.isLeft) {
+    final result = await _resetLocalAssistantSessionUseCase();
+    if (!emit.isDone && revision == _requestRevision && result.isLeft) {
       emit(state.copyWith(hasError: true, failure: result.left));
     }
   }

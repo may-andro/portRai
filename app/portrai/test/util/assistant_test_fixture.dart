@@ -75,7 +75,7 @@ class AssistantTestFixture {
       MockLocalAssistantTrackingDelegate(),
       IsFeatureEnabledUseCase(flagRepository),
       isLocalAssistantSupportedUseCase: isLocalAssistantSupportedUseCase,
-      resetSession: resetLocal,
+      resetLocalAssistantSessionUseCase: resetLocal,
     );
     when(() => resetRemote()).thenAnswer((_) => const Right(null));
     remoteSupport.stubCall(Right(remoteSupported));

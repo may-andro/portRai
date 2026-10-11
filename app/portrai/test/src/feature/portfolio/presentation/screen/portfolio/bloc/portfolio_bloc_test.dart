@@ -76,6 +76,25 @@ void main() {
                   ? <PortfolioState>[]
                   : [expected];
             },
+            verify: (_) {
+              if (remoteEnabled) {
+                verifyNever(
+                  () => isFeatureEnabledUseCase(
+                    LocalAssistantFeatureFlags.aiAssistant,
+                  ),
+                );
+                verifyNever(() => local());
+              } else if (!localEnabled) {
+                verify(
+                  () => isFeatureEnabledUseCase(
+                    LocalAssistantFeatureFlags.aiAssistant,
+                  ),
+                ).called(1);
+                verifyNever(() => local());
+              } else {
+                verify(() => local()).called(1);
+              }
+            },
           );
         }
       }
@@ -99,6 +118,12 @@ void main() {
           LoadedState(portfolio: portfolio, isLocalAssistantAvailable: true),
       act: (bloc) => bloc.add(const ScreenVisibleEvent()),
       expect: () => [LoadedState(portfolio: portfolio)],
+      verify: (_) {
+        verifyNever(
+          () => isFeatureEnabledUseCase(LocalAssistantFeatureFlags.aiAssistant),
+        );
+        verifyNever(() => local());
+      },
     );
 
     blocTest<PortfolioBloc, PortfolioState>(

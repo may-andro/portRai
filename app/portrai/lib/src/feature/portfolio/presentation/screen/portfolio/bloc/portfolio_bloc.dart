@@ -97,10 +97,18 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     final remote = await _isFeatureEnabledUseCase(
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
-    final local = await _isFeatureEnabledUseCase(
-      LocalAssistantFeatureFlags.aiAssistant,
-    );
-    final localSupported = await _isLocalAssistantSupportedUseCase();
+    final isRemoteAssistantAvailable = remote.isRight && remote.right;
+    var isLocalAssistantAvailable = false;
+    if (remote.isRight && !remote.right) {
+      final local = await _isFeatureEnabledUseCase(
+        LocalAssistantFeatureFlags.aiAssistant,
+      );
+      if (local.isRight && local.right) {
+        final localSupported = await _isLocalAssistantSupportedUseCase();
+        isLocalAssistantAvailable =
+            localSupported.isRight && localSupported.right;
+      }
+    }
     if (emit.isDone ||
         revision != _availabilityRevision ||
         state is! LoadedState) {
@@ -108,14 +116,8 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     }
     emit(
       (state as LoadedState).copyWith(
-        isRemoteAssistantAvailable: remote.isRight && remote.right,
-        isLocalAssistantAvailable:
-            remote.isRight &&
-            !remote.right &&
-            local.isRight &&
-            local.right &&
-            localSupported.isRight &&
-            localSupported.right,
+        isRemoteAssistantAvailable: isRemoteAssistantAvailable,
+        isLocalAssistantAvailable: isLocalAssistantAvailable,
       ),
     );
   }

@@ -45,22 +45,23 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     final remote = await _isFeatureEnabledUseCase(
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
-    final local = await _isFeatureEnabledUseCase(
-      LocalAssistantFeatureFlags.aiAssistant,
-    );
-    final localSupported = await _isLocalAssistantSupportedUseCase();
+    var isLocalAssistantAvailable = false;
+    if (remote.isRight && !remote.right) {
+      final local = await _isFeatureEnabledUseCase(
+        LocalAssistantFeatureFlags.aiAssistant,
+      );
+      if (local.isRight && local.right) {
+        final localSupported = await _isLocalAssistantSupportedUseCase();
+        isLocalAssistantAvailable =
+            localSupported.isRight && localSupported.right;
+      }
+    }
     if (emit.isDone || revision != _loadRevision) return;
     emit(
       SettingLoadedState(
         isLanguageSelectorEnabled: isLanguageSelectorEnabled,
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
-        isLocalAssistantAvailable:
-            remote.isRight &&
-            !remote.right &&
-            local.isRight &&
-            local.right &&
-            localSupported.isRight &&
-            localSupported.right,
+        isLocalAssistantAvailable: isLocalAssistantAvailable,
       ),
     );
   }
