@@ -10,6 +10,7 @@ to all Firebase services with proper initialization and configuration.
 - **Type-Safe Access**: Strongly typed service instances
 - **Dependency Injection**: Seamless integration with the module injector system
 - **Cross-Platform**: Support for Android, iOS, macOS, and Web platforms
+- **Firebase AI Logic**: Configurable Gemini text generation and streaming with typed errors
 
 ## Getting Started
 
@@ -61,6 +62,47 @@ Firebase separately in an Apple `AppDelegate`, as this can bypass provider selec
 
 `isFirebaseEnabled` controls Analytics and Crashlytics collection, not Firebase
 initialization or App Check. Both staging and production activate App Check.
+It also does not gate AI requests: the owning app feature must enforce its rollout
+flag, user preference, and cloud-processing consent before calling the AI controller.
+
+### Firebase AI Logic Setup
+
+1. Open **Firebase Console > Firebase AI Logic** in the existing Firebase project
+   and complete the guided setup for the chosen Gemini API provider. Enable the
+   required APIs through that workflow. The default module backend is the
+   **Gemini Developer API** (`FbAiBackend.googleAI`). Alternatively configure
+   `aiBackend: FbAiBackend.agentPlatform` and an appropriate `aiLocation`
+   (default `global`) for the Agent Platform Gemini API, formerly Vertex AI.
+   Changing that location does not relocate other Firebase services.
+2. Choose an available text-capable model for that provider and pass its name
+   when creating a text model. Model availability, supported settings, quotas,
+   pricing, and regional support must be checked in the provider documentation.
+   The layer deliberately does not hardcode a model or portfolio prompt.
+3. Register the app's production attestation providers as described below and
+   verify **App Check > APIs > Firebase AI Logic** is **Enforced** before exposing
+   cloud AI to public clients. New AI Logic setup may enable enforcement automatically;
+   verify existing projects rather than assuming enforcement is on. Activating App
+   Check in Flutter is not the same as enforcing it in the console. Register debug
+   tokens for local development; never distribute those tokens.
+4. Keep the Gemini API key managed by Firebase's proxy, not in client code,
+   assets, Remote Config, or compile-time definitions. The existing Firebase app
+   configuration is still required; its public Firebase API key is not a Gemini
+   service credential.
+5. Review billing for the actual project and selected model. Firebase AI Logic
+   has no separate usage fee, but model calls can be billable. The Gemini
+   Developer API free tier depends on project billing status and model eligibility;
+   do not assume a Blaze project's low-volume requests are free. Configure
+   provider quotas, AI Logic request limits, budget alerts, and available spend
+   caps. Budget alerts alone do not stop spending.
+6. Keep the app's remote feature disabled until consent, request-size limits,
+   timeout handling, and production App Check verification are implemented.
+   Registering `FbAiController` and creating a model issue no generation requests.
+
+See [AI Logic setup](https://firebase.google.com/docs/ai-logic/get-started),
+[App Check enforcement](https://firebase.google.com/docs/ai-logic/app-check),
+[models](https://firebase.google.com/docs/ai-logic/models),
+[quotas](https://firebase.google.com/docs/ai-logic/quotas), and
+[pricing](https://firebase.google.com/docs/ai-logic/pricing).
 
 ### App Check Setup
 
@@ -168,6 +210,62 @@ See the official [Flutter setup](https://firebase.google.com/docs/app-check/flut
 and [enforcement guide](https://firebase.google.com/docs/app-check/enable-enforcement).
 
 ## Usage
+
+### Firebase AI Logic
+
+Inject `FbAiController` from the module's service locator into the app feature's
+repository. Create a text model only after Firebase initialization and App Check
+activation; do not generate from registration or earlier module hooks.
+
+```dart
+import 'package:firebase/firebase.dart';
+
+Future<String> generateAnswer(
+  FbAiController controller, {
+  required String configuredModelName,
+  required String prompt,
+}) async {
+  final model = controller.createTextModel(
+    model: configuredModelName,
+    generationConfig: GenerationConfig(
+      maxOutputTokens: 1024,
+      temperature: 0.2,
+    ),
+    systemInstruction: 'Answer using the facts supplied by the caller.',
+  );
+  try {
+    return await model.generateText([Content.text(prompt)]);
+  } finally {
+    model.close();
+  }
+}
+```
+
+For incremental output, use `model.generateTextStream(contents)`, which emits
+**deltas**, including whitespace, rather than accumulated text. Commit an answer
+only after the stream completes normally. On an error after partial output,
+discard that partial answer and show the owning feature's failure state. The
+wrapper rejects blocked output, empty/whitespace-only answers, token-limit
+truncation, and streams that end without a normal stop reason.
+
+The model owns its HTTP client. Stop active subscriptions and call `close()` when
+the owning feature disposes or replaces it. Closing is idempotent; requests on a
+closed model fail explicitly. Cancelling a subscription stops local consumption;
+neither cancellation nor closing guarantees that backend generation or billing
+stops. There are no automatic retries or local/cloud fallbacks.
+
+The caller supplies history explicitly as `Content` items. The Firebase layer
+does not keep a chat session, read portfolio data, grant consent, render UI, or
+execute generated actions. `GenerationConfig` supports structured text/JSON
+settings for a later generative UI feature; that feature must validate the result
+and resolve references against authoritative app data.
+
+`AiException` subclasses preserve the cause and stack trace. Concrete SDK
+exceptions map to configuration, quota, location, server, or SDK errors; typed
+HTTP client and timeout exceptions map to network and timeout errors. Generic
+server exceptions remain server errors rather than guessing their meaning from
+message text. Unexpected programming errors propagate unchanged. The owning
+app use cases should map these exceptions to their domain `Failure` types.
 
 ### Firebase Auth
 
@@ -354,6 +452,7 @@ This module provides access to the following Firebase services:
 | **Remote Config** | Feature flags and remote configuration |
 | **Firebase Storage** | Cloud file storage |
 | **App Check** | App attestation and security |
+| **Firebase AI Logic** | Gemini text generation and streamed responses |
 
 ## Best Practices
 
@@ -394,6 +493,8 @@ This module provides access to the following Firebase services:
 | `firebase_remote_config` | Remote configuration |
 | `firebase_storage` | File storage |
 | `firebase_app_check` | App security |
+| `firebase_ai` | Firebase AI Logic SDK |
+| `http` | Owned AI transport and typed network failures |
 | `module_injector` | Dependency injection |
 | `core` | Core utilities |
 
@@ -402,6 +503,12 @@ This module provides access to the following Firebase services:
 ```bash
 flutter test
 ```
+
+AI tests use mocked SDK boundaries and a mock HTTP transport with the real SDK
+serializer/parser. They require no live project, API key, App Check debug token,
+or billable request. A separate trusted live smoke test on configured clients is
+required before enabling the remote feature; unit tests do not verify console
+enforcement, model availability, or billing settings.
 
 For testing Firebase functionality, use mocking or Firebase Emulator Suite:
 
