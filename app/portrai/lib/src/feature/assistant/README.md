@@ -10,6 +10,7 @@ It does not import either provider, resolve their blocs, or select an inference 
   career overview, record digests, profile, experiences, projects, expertise, services
   and testimonials.
 - Typed text responses and shared suggestions, message bubbles and chat input.
+- Standalone source-project summary cards with optional typed click callbacks.
 - Provisional streamed responses supplied by the caller, without provider-specific state.
 
 ## Getting Started
@@ -63,6 +64,21 @@ A failed remote flag check hides both providers, rather than falling back to loc
 The shared assistant module remains provider-neutral, and providers do not import siblings.
 
 ## API Reference
+
+`AssistantProjectCardsWidget(projects: resolvedProjects, onProjectClick: onClick)`
+renders source titles and short descriptions using the design system in a
+width-constrained vertical column. Import it through `assistant.dart`.
+Supply the successful result of `ResolveAssistantProjectsUseCase`; the renderer
+does not resolve IDs, generate content, fetch images or open project links.
+The callback receives the original `ProjectEntity`; navigation belongs to the caller.
+Without a callback, cards have no tap handler or navigation indicator.
+
+The widget snapshots its list as unmodifiable, preserves source order and identity,
+and explicitly rejects more than three projects, blank IDs and duplicate IDs with
+`ArgumentError`. Empty lists render no cards. These checks validate shape, not provenance:
+callers remain responsible for resolving authoritative projects. The standalone renderer
+is not a response subtype or an activated provider capability; conversation messages
+and provider history remain text-only.
 
 `ResolveAssistantProjectsUseCase` accepts an ordered `List<String>` of exact project
 source IDs and returns `Either<ResolveAssistantProjectsFailure, List<ProjectEntity>>`.
