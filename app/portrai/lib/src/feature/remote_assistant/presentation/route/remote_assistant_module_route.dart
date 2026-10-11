@@ -1,5 +1,4 @@
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/_screen.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 
 class RemoteAssistantModuleRoute extends ModuleRoute {
@@ -13,9 +12,6 @@ class RemoteAssistantModuleRoute extends ModuleRoute {
       RemoteAssistantModuleRoute._(
         name: 'remote_assistant',
         path: '/remote-assistant',
-        builder: (_, _, _) => BlocProvider.value(
-          value: appServiceLocator.get<RemoteAssistantBloc>(),
-          child: const RemoteAssistantScreen(),
-        ),
+        builder: (_, _, _) => const RemoteAssistantScreen(),
       );
 }

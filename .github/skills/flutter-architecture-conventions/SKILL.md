@@ -59,7 +59,9 @@ constructor callbacks.
 Blocs, states, and events are module-internal presentation details; do not export them from
 public feature barrels or consume them from other features or app composition. Expose domain
 data through feature-owned use cases instead. Public module widgets and routes own their
-internal bloc providers.
+internal bloc providers. Route builders return screens directly; provider setup belongs inside
+the screen, not in the route definition. For retained singleton sessions, use
+`BlocProvider.value` so navigating away does not close the shared session.
 
 ## Presentation extensions
 Extensions that need `BuildContext`/localization (e.g. formatting an entity for display) live in `presentation/extension/` with an `_extension.dart` barrel, exported from `presentation/_presentation.dart`. Never put them in the domain layer or in `widget/`. Examples: `experience_date_range_extension.dart`, `project_date_range_extension.dart`, `locale_code_extension.dart`. Screen-specific ones sit next to their screen (`screen/<name>/extension/`).

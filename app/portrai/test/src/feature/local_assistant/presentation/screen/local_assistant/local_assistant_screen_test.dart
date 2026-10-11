@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../util/assistant_test_fixture.dart';
@@ -20,13 +20,11 @@ void main() {
     WidgetTester tester,
     AssistantTestFixture fixture,
   ) async {
+    await appServiceLocator.reset();
+    addTearDown(appServiceLocator.reset);
+    fixture.install();
     await tester.pumpWidget(
-      TestWidgetWrapper(
-        child: BlocProvider.value(
-          value: fixture.local,
-          child: const LocalAssistantScreen(),
-        ),
-      ),
+      const TestWidgetWrapper(child: LocalAssistantScreen()),
     );
     await tester.pumpAndSettle();
   }

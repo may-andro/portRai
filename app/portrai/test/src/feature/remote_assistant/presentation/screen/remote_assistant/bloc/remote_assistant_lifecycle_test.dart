@@ -76,14 +76,9 @@ void main() {
   testWidgets(
     'should block chat on a direct route when the platform is unsupported',
     (tester) async {
-      final fixture = AssistantTestFixture(remoteSupported: false);
+      final fixture = AssistantTestFixture(remoteSupported: false)..install();
       await tester.pumpWidget(
-        TestWidgetWrapper(
-          child: BlocProvider.value(
-            value: fixture.remote,
-            child: const RemoteAssistantScreen(),
-          ),
-        ),
+        const TestWidgetWrapper(child: RemoteAssistantScreen()),
       );
       await tester.pumpAndSettle();
       verifyNever(() => fixture.askRemote(any()));
