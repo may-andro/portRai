@@ -791,6 +791,56 @@
   "@assistantDisableDialogKeep": {
     "description": "Button that keeps the downloaded AI model when turning the assistant off"
   },
+  "errorRemoteAssistantUnavailable": "The cloud assistant is not available.",
+  "@errorRemoteAssistantUnavailable": {"description": "Remote assistant rollout is disabled"},
+  "errorRemoteAssistantConsentRequired": "Agree to cloud processing and enable the assistant before asking a question.",
+  "@errorRemoteAssistantConsentRequired": {"description": "Remote generation requires saved consent and enablement"},
+  "errorRemoteAssistantNetwork": "The cloud assistant could not connect. Check your connection and try again.",
+  "@errorRemoteAssistantNetwork": {"description": "Remote generation failed due to a network error"},
+  "errorRemoteAssistantTimeout": "The cloud assistant took too long to answer. Please try again.",
+  "@errorRemoteAssistantTimeout": {"description": "Remote generation exceeded its absolute request deadline"},
+  "errorRemoteAssistantQuota": "The cloud assistant has reached its usage limit. Try again later.",
+  "@errorRemoteAssistantQuota": {"description": "Firebase AI model quota was exceeded"},
+  "errorRemoteAssistantConfiguration": "The cloud assistant is not configured correctly. Try again later.",
+  "@errorRemoteAssistantConfiguration": {"description": "Firebase AI model, API or location configuration failed"},
+  "errorRemoteAssistantBlocked": "The cloud assistant could not provide this answer. Try a different question.",
+  "@errorRemoteAssistantBlocked": {"description": "Model safety policy blocked the remote prompt or answer"},
+  "errorRemoteAssistantInvalidInput": "This question or conversation is too large or unsupported. Shorten the question or clear the chat.",
+  "@errorRemoteAssistantInvalidInput": {"description": "Remote request validation or size bounds failed"},
+  "errorRemoteAssistantIncomplete": "The cloud answer was incomplete and has been discarded. Try again.",
+  "@errorRemoteAssistantIncomplete": {"description": "Remote output was empty, truncated or ended without a complete response"},
+  "errorRemoteAssistantUnknown": "The cloud assistant could not answer. Please try again.",
+  "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
+  "errorRemoteAssistantPreference": "The cloud assistant preference could not be saved or loaded. Please try again.",
+  "@errorRemoteAssistantPreference": {"description": "Remote consent or enablement storage failed"},
+  "remoteAssistantTitle": "Cloud portfolio assistant",
+  "@remoteAssistantTitle": {
+    "description": "Title of the independent cloud assistant"
+  },
+  "remoteAssistantBadge": "Cloud AI via Firebase and Google",
+  "@remoteAssistantBadge": {
+    "description": "Provider identity shown above the remote conversation"
+  },
+  "remoteAssistantDisclosure": "Your questions, recent chat history, and portfolio information are sent to Google through Firebase to generate answers. Do not enter sensitive information. Answers may be inaccurate. This chat is kept only in app memory. Turning this assistant off withdraws consent for future requests and clears the local chat; it does not undo requests already sent. The on-device assistant stays separate.",
+  "@remoteAssistantDisclosure": {
+    "description": "Explicit cloud processing, privacy, accuracy and cancellation disclosure before enabling remote AI"
+  },
+  "remoteAssistantAcceptConsent": "Agree and enable cloud AI",
+  "@remoteAssistantAcceptConsent": {
+    "description": "Explicit action accepting the cloud processing disclosure and enabling the remote assistant"
+  },
+  "remoteAssistantDisable": "Turn off and withdraw consent",
+  "@remoteAssistantDisable": {
+    "description": "Action disabling future cloud requests and withdrawing saved consent"
+  },
+  "remoteAssistantReset": "Clear chat",
+  "@remoteAssistantReset": {
+    "description": "Action clearing the remote in-memory conversation and stopping local consumption of pending output"
+  },
+  "remoteAssistantGenerating": "Generating — this answer is not yet complete",
+  "@remoteAssistantGenerating": {
+    "description": "Indicates that streamed text is provisional until generation completes successfully"
+  },
   "assistantRetry": "Retry",
   "@assistantRetry": {
     "description": "Button that retries the AI model download"
