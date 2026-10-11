@@ -10,6 +10,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
+import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/presentation/screen/remote_assistant/tracking/mock_remote_assistant_tracking_delegate.dart';
 
@@ -18,6 +19,7 @@ void main() {
   late MockResetRemoteAssistantSessionUseCase resetSession;
   late MockAskRemotePortfolioQuestionUseCase askQuestion;
   late MockIsFeatureEnabledUseCase flag;
+  late MockIsRemoteAssistantSupportedUseCase platformSupport;
 
   setUpAll(() {
     registerFallbackValue(
@@ -30,7 +32,10 @@ void main() {
     );
   });
 
-  RemoteAssistantBloc createBloc({bool rollout = true}) {
+  RemoteAssistantBloc createBloc({
+    bool rollout = true,
+    bool platformSupported = true,
+  }) {
     getContext = MockGetAssistantContextUseCase();
     when(() => getContext()).thenAnswer((_) => const Right('Portfolio'));
     resetSession = MockResetRemoteAssistantSessionUseCase();
@@ -48,11 +53,14 @@ void main() {
         definition: RemoteAssistantFeatureFlags.remoteAssistant,
         result: Right(rollout),
       );
+    platformSupport = MockIsRemoteAssistantSupportedUseCase()
+      ..stubCall(Right(platformSupported));
     final bloc = RemoteAssistantBloc(
       getContext,
       resetSession,
       askQuestion,
       flag,
+      platformSupport,
       MockRemoteAssistantTrackingDelegate(),
     );
     addTearDown(bloc.close);
@@ -85,6 +93,20 @@ void main() {
     verifyNever(() => getContext());
     verifyNever(() => askQuestion(any()));
   });
+
+  test(
+    'should avoid context and model access when platform support is unavailable',
+    () async {
+      final bloc = createBloc(platformSupported: false);
+      bloc.add(const RemoteAssistantStartedEvent());
+      await waitFor(
+        bloc,
+        (state) => state.status == RemoteAssistantStatus.unavailable,
+      );
+      verifyNever(() => getContext());
+      verifyNever(() => askQuestion(any()));
+    },
+  );
 
   test(
     'should activate without a preference when the rollout flag is on',
@@ -251,6 +273,22 @@ void main() {
       );
       verifyNever(() => askQuestion(any()));
       expect(bloc.state.messages, isEmpty);
+      expect(bloc.state.isSendingQuestion, isFalse);
+    },
+  );
+
+  test(
+    'should reject a question when platform support changes before submission',
+    () async {
+      final bloc = createBloc();
+      await start(bloc);
+      platformSupport.stubCall(const Right(false));
+      bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
+      await waitFor(
+        bloc,
+        (state) => state.status == RemoteAssistantStatus.unavailable,
+      );
+      verifyNever(() => askQuestion(any()));
       expect(bloc.state.isSendingQuestion, isFalse);
     },
   );

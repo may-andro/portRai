@@ -20,6 +20,7 @@ import '../../../../../mock/feature/project/test_data/project_test_data.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_fb_ai_controller.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_fb_ai_text_model.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_is_feature_enabled_use_case.dart';
+import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
 typedef _Harness = ({
   FirebaseRemoteAssistantRepository repository,
@@ -118,7 +119,11 @@ void main() {
         );
         final harness = _buildHarness();
         final result =
-            await AskRemotePortfolioQuestionUseCase(harness.repository)(
+            await AskRemotePortfolioQuestionUseCase(
+              harness.repository,
+              MockIsRemoteAssistantSupportedUseCase()
+                ..stubCall(const Right(true)),
+            )(
               AskRemotePortfolioQuestionParams(
                 question: 'Which projects use Flutter?',
                 portfolioContext: context,

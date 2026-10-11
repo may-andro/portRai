@@ -6,8 +6,17 @@ import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/reset_remote_assistant_session_use_case.dart';
+import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/remote_assistant/domain/repository/mock_remote_assistant_repository.dart';
+import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
+
+AskRemotePortfolioQuestionUseCase _createAskUseCase(
+  MockRemoteAssistantRepository repository,
+) => AskRemotePortfolioQuestionUseCase(
+  repository,
+  MockIsRemoteAssistantSupportedUseCase()..stubCall(const Right(true)),
+);
 
 void main() {
   setUp(() {
@@ -133,15 +142,14 @@ void main() {
           final RemoteAssistantFailure failure;
           switch (operation) {
             case 'ask':
-              final result =
-                  await AskRemotePortfolioQuestionUseCase(repository)(
-                    AskRemotePortfolioQuestionParams(
-                      question: 'secret prompt',
-                      portfolioContext: 'secret context',
-                      history: const [],
-                      onDelta: (_) {},
-                    ),
-                  );
+              final result = await _createAskUseCase(repository)(
+                AskRemotePortfolioQuestionParams(
+                  question: 'secret prompt',
+                  portfolioContext: 'secret context',
+                  history: const [],
+                  onDelta: (_) {},
+                ),
+              );
               expect(result.isLeft, isTrue);
               failure = result.left;
             case 'reset':
@@ -168,7 +176,7 @@ void main() {
       final repository = MockRemoteAssistantRepository()
         ..stubAnswerError(error)
         ..stubResetSessionError(error);
-      final ask = await AskRemotePortfolioQuestionUseCase(repository)(
+      final ask = await _createAskUseCase(repository)(
         AskRemotePortfolioQuestionParams(
           question: 'Question',
           portfolioContext: 'Context',

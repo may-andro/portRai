@@ -5,6 +5,7 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/use_case/is_remote_assistant_supported_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
 
@@ -50,15 +51,23 @@ class AskRemotePortfolioQuestionUseCase
           AskRemotePortfolioQuestionParams,
           RemoteAssistantFailure
         > {
-  AskRemotePortfolioQuestionUseCase(this._repository);
+  AskRemotePortfolioQuestionUseCase(
+    this._repository,
+    this._isRemoteAssistantSupportedUseCase,
+  );
 
   final RemoteAssistantRepository _repository;
+  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
 
   @protected
   @override
   Future<Either<RemoteAssistantFailure, void>> execute(
     AskRemotePortfolioQuestionParams params,
   ) async {
+    final platformSupport = await _isRemoteAssistantSupportedUseCase();
+    if (platformSupport.isLeft || !platformSupport.right) {
+      return const Left(RemoteAssistantUnavailableFailure());
+    }
     if (!_isValid(params)) {
       return const Left(RemoteAssistantInvalidInputFailure());
     }

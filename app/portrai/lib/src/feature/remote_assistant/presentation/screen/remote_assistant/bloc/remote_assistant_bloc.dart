@@ -8,7 +8,6 @@ import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/tracking/_tracking.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant_availability.dart';
 
 @RegisterSingleton(disposeMethodName: 'close')
 class RemoteAssistantBloc
@@ -18,9 +17,9 @@ class RemoteAssistantBloc
     this._resetRemoteAssistantSessionUseCase,
     this._askRemotePortfolioQuestionUseCase,
     this._isFeatureEnabledUseCase,
-    this._trackingDelegate, {
-    this._availability = const RemoteAssistantAvailability(),
-  }) : super(const RemoteAssistantState()) {
+    this._isRemoteAssistantSupportedUseCase,
+    this._trackingDelegate,
+  ) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
     on<RemoteAssistantInitializedEvent>(
       _mapRemoteAssistantInitializedEventToState,
@@ -37,11 +36,10 @@ class RemoteAssistantBloc
   final ResetRemoteAssistantSessionUseCase _resetRemoteAssistantSessionUseCase;
   final AskRemotePortfolioQuestionUseCase _askRemotePortfolioQuestionUseCase;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
+  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   final RemoteAssistantTrackingDelegate _trackingDelegate;
-  final RemoteAssistantAvailability _availability;
   int _controlRevision = 0;
   int _requestRevision = 0;
-  bool get isPlatformSupported => _availability.isSupported;
 
   Future<bool> _checkFlag(
     Emitter<RemoteAssistantState> emit,
@@ -52,7 +50,12 @@ class RemoteAssistantBloc
     );
     if (emit.isDone || controlRevision != _controlRevision) return false;
     emit(state.copyWith(isFeatureEnabled: result.isRight && result.right));
-    if (result.isRight && result.right && _availability.isSupported) {
+    final platformSupport = await _isRemoteAssistantSupportedUseCase();
+    if (emit.isDone || controlRevision != _controlRevision) return false;
+    if (result.isRight &&
+        result.right &&
+        platformSupport.isRight &&
+        platformSupport.right) {
       return true;
     }
     _requestRevision++;

@@ -4,10 +4,20 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
+import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/remote_assistant/domain/repository/mock_remote_assistant_repository.dart';
+import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
 void _ignoreDelta(String _) {}
+
+AskRemotePortfolioQuestionUseCase _createAskUseCase(
+  MockRemoteAssistantRepository repository, {
+  bool platformSupported = true,
+}) => AskRemotePortfolioQuestionUseCase(
+  repository,
+  MockIsRemoteAssistantSupportedUseCase()..stubCall(Right(platformSupported)),
+);
 
 AssistantMessageEntity _message(String text, {required bool isUser}) =>
     AssistantMessageEntity(
@@ -38,9 +48,7 @@ void main() {
         onDelta: received.add,
       );
 
-      final result = await AskRemotePortfolioQuestionUseCase(repository)(
-        params,
-      );
+      final result = await _createAskUseCase(repository)(params);
 
       expect(result.isRight, isTrue);
       expect(received, ['response delta']);
@@ -69,9 +77,7 @@ void main() {
         onDelta: _ignoreDelta,
       );
 
-      final result = await AskRemotePortfolioQuestionUseCase(repository)(
-        params,
-      );
+      final result = await _createAskUseCase(repository)(params);
 
       expect(result.isLeft, isTrue);
       expect(result.left, isA<RemoteAssistantQuotaFailure>());
@@ -80,7 +86,7 @@ void main() {
 
   test('should reject a question over 2000 characters when called', () async {
     final repository = MockRemoteAssistantRepository();
-    final result = await AskRemotePortfolioQuestionUseCase(repository)(
+    final result = await _createAskUseCase(repository)(
       AskRemotePortfolioQuestionParams(
         question: 'q' * 2001,
         portfolioContext: 'Context',
@@ -105,7 +111,7 @@ void main() {
     'should reject portfolio context over 100000 characters when called',
     () async {
       final repository = MockRemoteAssistantRepository();
-      final result = await AskRemotePortfolioQuestionUseCase(repository)(
+      final result = await _createAskUseCase(repository)(
         AskRemotePortfolioQuestionParams(
           question: 'Question',
           portfolioContext:
@@ -123,7 +129,7 @@ void main() {
 
   test('should reject more than 12 history messages when called', () async {
     final repository = MockRemoteAssistantRepository();
-    final result = await AskRemotePortfolioQuestionUseCase(repository)(
+    final result = await _createAskUseCase(repository)(
       AskRemotePortfolioQuestionParams(
         question: 'Question',
         portfolioContext: 'Context',
@@ -141,7 +147,7 @@ void main() {
 
   test('should reject history over 24000 characters when called', () async {
     final repository = MockRemoteAssistantRepository();
-    final result = await AskRemotePortfolioQuestionUseCase(repository)(
+    final result = await _createAskUseCase(repository)(
       AskRemotePortfolioQuestionParams(
         question: 'Question',
         portfolioContext: 'Context',
@@ -158,7 +164,7 @@ void main() {
     'should reject empty history content when a completed message has no text',
     () async {
       final repository = MockRemoteAssistantRepository();
-      final result = await AskRemotePortfolioQuestionUseCase(repository)(
+      final result = await _createAskUseCase(repository)(
         AskRemotePortfolioQuestionParams(
           question: 'Question',
           portfolioContext: 'Context',
@@ -168,6 +174,26 @@ void main() {
       );
       expect(result.isLeft, isTrue);
       expect(result.left, isA<RemoteAssistantInvalidInputFailure>());
+      verifyZeroInteractions(repository);
+    },
+  );
+
+  test(
+    'should reject direct requests when the current platform is unsupported',
+    () async {
+      final repository = MockRemoteAssistantRepository();
+      final result =
+          await _createAskUseCase(repository, platformSupported: false)(
+            const AskRemotePortfolioQuestionParams(
+              question: 'Question',
+              portfolioContext: 'Context',
+              history: [],
+              onDelta: _ignoreDelta,
+            ),
+          );
+
+      expect(result.isLeft, isTrue);
+      expect(result.left, isA<RemoteAssistantUnavailableFailure>());
       verifyZeroInteractions(repository);
     },
   );

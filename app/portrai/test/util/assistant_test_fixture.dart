@@ -8,7 +8,6 @@ import 'package:portrai/src/feature/local_assistant/local_assistant_availability
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant_availability.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
@@ -25,6 +24,7 @@ import '../mock/feature/local_assistant/domain/use_case/mock_reset_local_assista
 import '../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
+import '../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
 import '../mock/feature/remote_assistant/presentation/screen/remote_assistant/tracking/mock_remote_assistant_tracking_delegate.dart';
 
@@ -76,6 +76,7 @@ class AssistantTestFixture {
       resetSession: resetLocal,
     );
     when(() => resetRemote()).thenAnswer((_) => const Right(null));
+    remoteSupport.stubCall(Right(remoteSupported));
     when(() => askRemote(any())).thenAnswer((invocation) {
       final params =
           invocation.positionalArguments.single
@@ -88,8 +89,8 @@ class AssistantTestFixture {
       resetRemote,
       askRemote,
       flag,
+      remoteSupport,
       remoteTracking,
-      availability: RemoteAssistantAvailability.supported(remoteSupported),
     );
     addTearDown(() async {
       await local.close();
@@ -124,6 +125,7 @@ class AssistantTestFixture {
   final resetRemote = MockResetRemoteAssistantSessionUseCase();
   final updateLocal = MockUpdateLocalAssistantEnabledUseCase();
   final remoteTracking = MockRemoteAssistantTrackingDelegate();
+  final remoteSupport = MockIsRemoteAssistantSupportedUseCase();
   late final LocalAssistantBloc local;
   late final RemoteAssistantBloc remote;
   late final IsLocalAssistantSupportedUseCase isLocalAssistantSupportedUseCase;
