@@ -18,34 +18,32 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RouteObserverWidget(
-      onResume: () {
-        context.read<LocalAssistantBloc>().add(
-          const LocalAssistantInitializedEvent(),
-        );
-        context.read<RemoteAssistantBloc>().add(
-          const RemoteAssistantInitializedEvent(),
-        );
-      },
-      child: Scaffold(
-        appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
-        body: BlocProvider(
-          create: (_) {
-            return appServiceLocator.get<SettingBloc>()
-              ..add(const LoadSettingsEvent());
-          },
-          child: BlocBuilder<SettingBloc, SettingState>(
-            builder: (context, state) {
-              switch (state) {
-                case SettingInitialState():
-                case SettingLoadingState():
-                  return const _LoadingStateWidget();
-                case final SettingLoadedState state:
-                  return ContentWidget(state: state);
-                case SettingErrorState(:final message):
-                  return Center(child: Text(message));
-              }
+    return LocalAssistantVisibilityWidget(
+      child: RemoteAssistantVisibilityWidget(
+        child: Scaffold(
+          appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
+          body: BlocProvider(
+            create: (_) {
+              return appServiceLocator.get<SettingBloc>();
             },
+            child: Builder(
+              builder: (context) => RouteObserverWidget(
+                onResume: () => context.bloc.add(const LoadSettingsEvent()),
+                child: BlocBuilder<SettingBloc, SettingState>(
+                  builder: (context, state) {
+                    switch (state) {
+                      case SettingInitialState():
+                      case SettingLoadingState():
+                        return const _LoadingStateWidget();
+                      case final SettingLoadedState state:
+                        return ContentWidget(state: state);
+                      case SettingErrorState(:final message):
+                        return Center(child: Text(message));
+                    }
+                  },
+                ),
+              ),
+            ),
           ),
         ),
       ),

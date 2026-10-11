@@ -13,14 +13,12 @@ import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/repository/_repository.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
-import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
 
 @RegisterSingleton(as: LocalAssistantRepository, disposeMethodName: 'dispose')
 class FlutterEdgeAiLocalAssistantRepository
     implements LocalAssistantRepository {
   FlutterEdgeAiLocalAssistantRepository(
     this._enabledCache, {
-    @Inject(LocalAssistantFeatureAccessUseCase)
     required IsFeatureEnabledUseCase this._isFeatureEnabled,
     this._availability = const LocalAssistantAvailability(),
   });

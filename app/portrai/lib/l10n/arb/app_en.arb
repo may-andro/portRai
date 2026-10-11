@@ -793,8 +793,6 @@
   },
   "errorRemoteAssistantUnavailable": "The cloud assistant is not available.",
   "@errorRemoteAssistantUnavailable": {"description": "Remote assistant rollout is disabled"},
-  "errorRemoteAssistantConsentRequired": "Agree to cloud processing and enable the assistant before asking a question.",
-  "@errorRemoteAssistantConsentRequired": {"description": "Remote generation requires saved consent and enablement"},
   "errorRemoteAssistantNetwork": "The cloud assistant could not connect. Check your connection and try again.",
   "@errorRemoteAssistantNetwork": {"description": "Remote generation failed due to a network error"},
   "errorRemoteAssistantTimeout": "The cloud assistant took too long to answer. Please try again.",
@@ -811,11 +809,9 @@
   "@errorRemoteAssistantIncomplete": {"description": "Remote output was empty, truncated or ended without a complete response"},
   "errorRemoteAssistantUnknown": "The cloud assistant could not answer. Please try again.",
   "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
-  "errorRemoteAssistantPreference": "The cloud assistant preference could not be saved or loaded. Please try again.",
-  "@errorRemoteAssistantPreference": {"description": "Remote consent or enablement storage failed"},
-  "remoteAssistantSettingsTitle": "Enable cloud AI",
+  "remoteAssistantSettingsTitle": "Cloud AI",
   "@remoteAssistantSettingsTitle": {
-    "description": "Cloud assistant settings toggle title"
+    "description": "Cloud assistant informational settings card title"
   },
   "errorLocalAssistantUnavailable": "The on-device assistant is not available on this platform or is turned off for this app.",
   "@errorLocalAssistantUnavailable": {
@@ -833,17 +829,9 @@
   "@remoteAssistantBadge": {
     "description": "Provider identity shown above the remote conversation"
   },
-  "remoteAssistantDisclosure": "Your questions, recent chat history, and portfolio information are sent to Google through Firebase to generate answers. Do not enter sensitive information. Answers may be inaccurate. This chat is kept only in app memory. Turning this assistant off withdraws consent for future requests and clears the local chat; it does not undo requests already sent. The on-device assistant stays separate.",
+  "remoteAssistantDisclosure": "Your questions, recent chat history, and portfolio information are sent to Google through Firebase to generate answers. Do not enter sensitive information. Answers may be inaccurate. This chat is kept only in app memory. Clearing chat stops local consumption of pending output; it cannot undo requests already sent or guarantee server cancellation or stop billing. The on-device assistant stays separate.",
   "@remoteAssistantDisclosure": {
-    "description": "Explicit cloud processing, privacy, accuracy and cancellation disclosure before enabling remote AI"
-  },
-  "remoteAssistantAcceptConsent": "Agree and enable cloud AI",
-  "@remoteAssistantAcceptConsent": {
-    "description": "Explicit action accepting the cloud processing disclosure and enabling the remote assistant"
-  },
-  "remoteAssistantDisable": "Turn off and withdraw consent",
-  "@remoteAssistantDisable": {
-    "description": "Action disabling future cloud requests and withdrawing saved consent"
+    "description": "Informational cloud processing, privacy, accuracy and cancellation notice without an activation gate"
   },
   "remoteAssistantReset": "Clear chat",
   "@remoteAssistantReset": {

@@ -15,31 +15,25 @@ class RemoteAssistantBloc
     extends Bloc<RemoteAssistantEvent, RemoteAssistantState> {
   RemoteAssistantBloc(
     this._getContext,
-    this._getPreference,
-    this._updatePreference,
     this._resetSession,
     this._askQuestion,
     this._isFeatureEnabled,
     this._tracking, {
     this._availability = const RemoteAssistantAvailability(),
   }) : super(const RemoteAssistantState()) {
-    on<RemoteAssistantStartedEvent>(_onStarted);
+    on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
     on<RemoteAssistantInitializedEvent>(
-      (event, emit) => _onStarted(
-        const RemoteAssistantStartedEvent(),
-        emit,
-        trackView: false,
-      ),
+      _mapRemoteAssistantInitializedEventToState,
     );
-    on<AcceptRemoteAssistantConsentClickEvent>(_onAcceptConsent);
-    on<DisableRemoteAssistantClickEvent>(_onDisable);
-    on<ResetRemoteAssistantClickEvent>(_onReset);
-    on<SendRemoteAssistantQuestionClickEvent>(_onSend);
+    on<ResetRemoteAssistantClickEvent>(
+      _mapResetRemoteAssistantClickEventToState,
+    );
+    on<SendRemoteAssistantQuestionClickEvent>(
+      _mapSendRemoteAssistantQuestionClickEventToState,
+    );
   }
 
   final GetAssistantContextUseCase _getContext;
-  final GetRemoteAssistantPreferenceUseCase _getPreference;
-  final UpdateRemoteAssistantPreferenceUseCase _updatePreference;
   final ResetRemoteAssistantSessionUseCase _resetSession;
   final AskRemotePortfolioQuestionUseCase _askQuestion;
   final IsFeatureEnabledUseCase _isFeatureEnabled;
@@ -57,7 +51,7 @@ class RemoteAssistantBloc
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
     if (emit.isDone || controlRevision != _controlRevision) return false;
-    emit(state.copyWith(isFeatureEnabled: result.isLeft || result.right));
+    emit(state.copyWith(isFeatureEnabled: result.isRight && result.right));
     if (result.isRight && result.right && _availability.isSupported) {
       return true;
     }
@@ -81,51 +75,22 @@ class RemoteAssistantBloc
     return false;
   }
 
-  Future<void> _onStarted(
+  Future<void> _mapRemoteAssistantStartedEventToState(
     RemoteAssistantStartedEvent event,
-    Emitter<RemoteAssistantState> emit, {
-    bool trackView = true,
-  }) async {
-    if (state.isUpdatingPreference) return;
+    Emitter<RemoteAssistantState> emit,
+  ) async {
+    _tracking.trackScreenView();
+    await _refresh(emit);
+  }
+
+  Future<void> _mapRemoteAssistantInitializedEventToState(
+    RemoteAssistantInitializedEvent event,
+    Emitter<RemoteAssistantState> emit,
+  ) => _refresh(emit);
+
+  Future<void> _refresh(Emitter<RemoteAssistantState> emit) async {
     final revision = ++_controlRevision;
-    if (trackView) _tracking.trackScreenView();
     if (!await _checkFlag(emit, revision) || revision != _controlRevision) {
-      return;
-    }
-    final preference = await _getPreference();
-    if (emit.isDone || revision != _controlRevision) return;
-    if (preference.isLeft) {
-      _requestRevision++;
-      emit(
-        state.copyWith(
-          status: RemoteAssistantStatus.off,
-          messages: const [],
-          partialAnswer: '',
-          isSendingQuestion: false,
-          isLoadingContext: false,
-          clearContext: true,
-          failure: preference.left,
-        ),
-      );
-      await _resetSession();
-      return;
-    }
-    if (!preference.right.enabled || !preference.right.consentAccepted) {
-      _requestRevision++;
-      emit(
-        state.copyWith(
-          status: RemoteAssistantStatus.off,
-          messages: const [],
-          partialAnswer: '',
-          isSendingQuestion: false,
-          clearContext: true,
-          clearFailure: true,
-        ),
-      );
-      final reset = await _resetSession();
-      if (!emit.isDone && revision == _controlRevision && reset.isLeft) {
-        emit(state.copyWith(failure: reset.left));
-      }
       return;
     }
     emit(state.copyWith(status: RemoteAssistantStatus.ready));
@@ -151,83 +116,7 @@ class RemoteAssistantBloc
     );
   }
 
-  Future<void> _onAcceptConsent(
-    AcceptRemoteAssistantConsentClickEvent event,
-    Emitter<RemoteAssistantState> emit,
-  ) async {
-    if (state.isUpdatingPreference || state.isReady) return;
-    final revision = ++_controlRevision;
-    emit(state.copyWith(isUpdatingPreference: true, clearFailure: true));
-    if (!await _checkFlag(emit, revision) || revision != _controlRevision) {
-      if (!emit.isDone && revision == _controlRevision) {
-        emit(state.copyWith(isUpdatingPreference: false));
-      }
-      return;
-    }
-    final result = await _updatePreference(
-      const RemoteAssistantPreferenceEntity(
-        enabled: true,
-        consentAccepted: true,
-      ),
-    );
-    if (emit.isDone || revision != _controlRevision) return;
-    if (result.isLeft) {
-      emit(
-        state.copyWith(
-          status: RemoteAssistantStatus.off,
-          isUpdatingPreference: false,
-          failure: result.left,
-        ),
-      );
-      return;
-    }
-    _tracking.trackConsentAcceptance();
-    emit(
-      state.copyWith(
-        status: RemoteAssistantStatus.ready,
-        isUpdatingPreference: false,
-        clearFailure: true,
-      ),
-    );
-    await _loadContext(emit, revision);
-  }
-
-  Future<void> _onDisable(
-    DisableRemoteAssistantClickEvent event,
-    Emitter<RemoteAssistantState> emit,
-  ) async {
-    final revision = ++_controlRevision;
-    _requestRevision++;
-    _tracking.trackDisable();
-    emit(
-      state.copyWith(
-        status: RemoteAssistantStatus.off,
-        messages: const [],
-        partialAnswer: '',
-        isSendingQuestion: false,
-        isLoadingContext: false,
-        isUpdatingPreference: true,
-        clearContext: true,
-        clearFailure: true,
-      ),
-    );
-    final result = await _updatePreference(
-      const RemoteAssistantPreferenceEntity(
-        enabled: false,
-        consentAccepted: false,
-      ),
-    );
-    if (emit.isDone || revision != _controlRevision) return;
-    emit(
-      state.copyWith(
-        isUpdatingPreference: false,
-        failure: result.isLeft ? result.left : null,
-        clearFailure: result.isRight,
-      ),
-    );
-  }
-
-  Future<void> _onReset(
+  Future<void> _mapResetRemoteAssistantClickEventToState(
     ResetRemoteAssistantClickEvent event,
     Emitter<RemoteAssistantState> emit,
   ) async {
@@ -247,13 +136,12 @@ class RemoteAssistantBloc
     }
   }
 
-  Future<void> _onSend(
+  Future<void> _mapSendRemoteAssistantQuestionClickEventToState(
     SendRemoteAssistantQuestionClickEvent event,
     Emitter<RemoteAssistantState> emit,
   ) async {
     if (!state.isReady ||
         state.isSendingQuestion ||
-        state.isUpdatingPreference ||
         state.portfolioContext == null) {
       return;
     }

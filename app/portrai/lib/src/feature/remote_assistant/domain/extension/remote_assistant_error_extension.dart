@@ -7,8 +7,6 @@ extension RemoteAssistantErrorExtension on Object {
     RemoteAssistantFailure unknownFailure =
         const RemoteAssistantUnknownFailure(),
   }) => switch (this) {
-    RemoteAssistantConsentRequiredException() =>
-      const RemoteAssistantConsentRequiredFailure(),
     RemoteAssistantUnavailableException() ||
     RemoteAssistantCancelledException() ||
     RemoteAssistantClosedException() ||
@@ -31,8 +29,6 @@ extension RemoteAssistantErrorExtension on Object {
     RemoteAssistantIncompleteException() ||
     RemoteAssistantResponseLimitException() =>
       const RemoteAssistantIncompleteFailure(),
-    RemoteAssistantPreferenceException() =>
-      const RemoteAssistantPreferenceFailure(),
     RemoteAssistantCallbackException() ||
     AiSdkException() => const RemoteAssistantUnknownFailure(),
     _ => unknownFailure,

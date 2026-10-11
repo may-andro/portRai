@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/widget/local_assistant_button.dart';
 
 import '../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/bloc/mock_local_assistant_bloc.dart';
 import '../../../../../util/test_wrapper_widget.dart';

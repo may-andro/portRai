@@ -1,25 +1,16 @@
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/get_remote_assistant_preference_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/reset_remote_assistant_session_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/update_remote_assistant_preference_use_case.dart';
 
 import '../../../../../mock/feature/remote_assistant/domain/repository/mock_remote_assistant_repository.dart';
 
 void main() {
-  const preference = RemoteAssistantPreferenceEntity(
-    enabled: true,
-    consentAccepted: true,
-  );
-
   setUp(() {
-    registerFallbackValue(preference);
     registerFallbackValue(FakeAssistantMessageList());
     registerFallbackValue((String _) {});
   });
@@ -79,10 +70,6 @@ void main() {
       isA<RemoteAssistantUnknownFailure>(),
     ),
     (
-      const RemoteAssistantPreferenceException(),
-      isA<RemoteAssistantPreferenceFailure>(),
-    ),
-    (
       const RemoteAssistantClosedException(),
       isA<RemoteAssistantUnavailableFailure>(),
     ),
@@ -97,10 +84,6 @@ void main() {
     (
       const RemoteAssistantUnavailableException(),
       isA<RemoteAssistantUnavailableFailure>(),
-    ),
-    (
-      const RemoteAssistantConsentRequiredException(),
-      isA<RemoteAssistantConsentRequiredFailure>(),
     ),
     (
       const RemoteAssistantInvalidInputException(),
@@ -139,15 +122,13 @@ void main() {
     },
   );
 
-  for (final operation in ['ask', 'get', 'update', 'reset']) {
+  for (final operation in ['ask', 'reset']) {
     for (final (error, expected) in cases) {
       test(
         'should map ${error.runtimeType} without sensitive causes when $operation fails',
         () async {
           final repository = MockRemoteAssistantRepository()
             ..stubAnswerError(error)
-            ..stubGetPreferenceError(error)
-            ..stubUpdatePreferenceError(error)
             ..stubResetSessionError(error);
           final RemoteAssistantFailure failure;
           switch (operation) {
@@ -161,18 +142,6 @@ void main() {
                       onDelta: (_) {},
                     ),
                   );
-              expect(result.isLeft, isTrue);
-              failure = result.left;
-            case 'get':
-              final result = await GetRemoteAssistantPreferenceUseCase(
-                repository,
-              )();
-              expect(result.isLeft, isTrue);
-              failure = result.left;
-            case 'update':
-              final result = await UpdateRemoteAssistantPreferenceUseCase(
-                repository,
-              )(preference);
               expect(result.isLeft, isTrue);
               failure = result.left;
             case 'reset':
@@ -198,8 +167,6 @@ void main() {
       final error = StateError('secret server body');
       final repository = MockRemoteAssistantRepository()
         ..stubAnswerError(error)
-        ..stubGetPreferenceError(error)
-        ..stubUpdatePreferenceError(error)
         ..stubResetSessionError(error);
       final ask = await AskRemotePortfolioQuestionUseCase(repository)(
         AskRemotePortfolioQuestionParams(
@@ -209,16 +176,10 @@ void main() {
           onDelta: (_) {},
         ),
       );
-      final get = await GetRemoteAssistantPreferenceUseCase(repository)();
-      final update = await UpdateRemoteAssistantPreferenceUseCase(repository)(
-        preference,
-      );
       final reset = await ResetRemoteAssistantSessionUseCase(repository)();
       expect(ask.left, isA<RemoteAssistantUnknownFailure>());
-      expect(get.left, isA<RemoteAssistantPreferenceFailure>());
-      expect(update.left, isA<RemoteAssistantPreferenceFailure>());
       expect(reset.left, isA<RemoteAssistantUnknownFailure>());
-      for (final failure in [ask.left, get.left, update.left, reset.left]) {
+      for (final failure in [ask.left, reset.left]) {
         expect(failure.cause, isNull);
         expect(failure.toString(), isNot(contains('secret')));
       }

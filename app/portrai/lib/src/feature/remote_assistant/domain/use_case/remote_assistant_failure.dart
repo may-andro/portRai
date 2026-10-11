@@ -9,11 +9,6 @@ class RemoteAssistantUnavailableFailure extends RemoteAssistantFailure {
   const RemoteAssistantUnavailableFailure({super.cause});
 }
 
-@Localizable('errorRemoteAssistantConsentRequired')
-class RemoteAssistantConsentRequiredFailure extends RemoteAssistantFailure {
-  const RemoteAssistantConsentRequiredFailure({super.cause});
-}
-
 @Localizable('errorRemoteAssistantNetwork')
 class RemoteAssistantNetworkFailure extends RemoteAssistantFailure {
   const RemoteAssistantNetworkFailure({super.cause});
@@ -52,9 +47,4 @@ class RemoteAssistantIncompleteFailure extends RemoteAssistantFailure {
 @Localizable('errorRemoteAssistantUnknown')
 class RemoteAssistantUnknownFailure extends RemoteAssistantFailure {
   const RemoteAssistantUnknownFailure({super.cause});
-}
-
-@Localizable('errorRemoteAssistantPreference')
-class RemoteAssistantPreferenceFailure extends RemoteAssistantFailure {
-  const RemoteAssistantPreferenceFailure({super.cause});
 }

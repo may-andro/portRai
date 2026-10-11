@@ -1,11 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
-import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
 import '../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
@@ -21,9 +24,7 @@ import '../mock/feature/local_assistant/domain/use_case/mock_reset_local_assista
 import '../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
-import '../mock/feature/remote_assistant/domain/use_case/mock_get_remote_assistant_preference_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
-import '../mock/feature/remote_assistant/domain/use_case/mock_update_remote_assistant_preference_use_case.dart';
 import '../mock/feature/remote_assistant/presentation/screen/remote_assistant/tracking/mock_remote_assistant_tracking_delegate.dart';
 
 /// Creates real independent blocs with deterministic, non-network use cases.
@@ -34,8 +35,15 @@ class AssistantTestFixture {
     bool localSupported = true,
     bool remoteSupported = true,
     bool localEnabled = false,
-    bool remoteEnabled = false,
   }) {
+    localAvailability = GetLocalAssistantAvailabilityUseCase(
+      IsFeatureEnabledUseCase(flagRepository),
+      LocalAssistantAvailability.supported(localSupported),
+    );
+    remoteAvailability = GetRemoteAssistantAvailabilityUseCase(
+      flag,
+      RemoteAssistantAvailability.supported(remoteSupported),
+    );
     setRollout(local: localRollout, remote: remoteRollout);
     when(() => context()).thenAnswer((_) => const Right('Fixture portfolio'));
     final prepare = MockPrepareLocalAssistantModelUseCase()
@@ -67,21 +75,10 @@ class AssistantTestFixture {
       downloaded,
       askLocal,
       MockLocalAssistantTrackingDelegate(),
-      LocalAssistantFeatureAccessUseCase(flagRepository),
+      IsFeatureEnabledUseCase(flagRepository),
       availability: LocalAssistantAvailability.supported(localSupported),
       resetSession: resetLocal,
     );
-    preference = RemoteAssistantPreferenceEntity(
-      enabled: remoteEnabled,
-      consentAccepted: remoteEnabled,
-    );
-    when(() => getRemote()).thenAnswer((_) => Right(preference));
-    when(() => updateRemote(any())).thenAnswer((invocation) {
-      preference =
-          invocation.positionalArguments.single
-              as RemoteAssistantPreferenceEntity;
-      return const Right(null);
-    });
     when(() => resetRemote()).thenAnswer((_) => const Right(null));
     when(() => askRemote(any())).thenAnswer((invocation) {
       final params =
@@ -92,8 +89,6 @@ class AssistantTestFixture {
     });
     remote = RemoteAssistantBloc(
       context,
-      getRemote,
-      updateRemote,
       resetRemote,
       askRemote,
       flag,
@@ -107,12 +102,6 @@ class AssistantTestFixture {
   }
 
   static void registerFallbacks() {
-    registerFallbackValue(
-      const RemoteAssistantPreferenceEntity(
-        enabled: false,
-        consentAccepted: false,
-      ),
-    );
     registerFallbackValue(
       AskRemotePortfolioQuestionParams(
         question: 'Question',
@@ -138,12 +127,17 @@ class AssistantTestFixture {
   final resetLocal = MockResetLocalAssistantSessionUseCase();
   final resetRemote = MockResetRemoteAssistantSessionUseCase();
   final updateLocal = MockUpdateLocalAssistantEnabledUseCase();
-  final getRemote = MockGetRemoteAssistantPreferenceUseCase();
-  final updateRemote = MockUpdateRemoteAssistantPreferenceUseCase();
   final remoteTracking = MockRemoteAssistantTrackingDelegate();
-  late RemoteAssistantPreferenceEntity preference;
   late final LocalAssistantBloc local;
   late final RemoteAssistantBloc remote;
+  late final GetLocalAssistantAvailabilityUseCase localAvailability;
+  late final GetRemoteAssistantAvailabilityUseCase remoteAvailability;
+
+  /// Installs module-owned instances; public cards/routes own their providers.
+  void install() {
+    appServiceLocator.registerSingleton<LocalAssistantBloc>(() => local);
+    appServiceLocator.registerSingleton<RemoteAssistantBloc>(() => remote);
+  }
 
   void setRollout({required bool local, required bool remote}) {
     flagRepository

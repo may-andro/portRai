@@ -30,28 +30,40 @@ final class LoadedState extends PortfolioState {
     required this.portfolio,
     this.selectedSectionIndex = 0,
     this.lastNavigationSource,
+    this.isLocalAssistantAvailable = false,
+    this.isRemoteAssistantAvailable = false,
   });
 
   final PortfolioEntity portfolio;
   final int selectedSectionIndex;
   final NavigationSource? lastNavigationSource;
+  final bool isLocalAssistantAvailable;
+  final bool isRemoteAssistantAvailable;
 
   @override
   List<Object?> get props => [
     portfolio,
     selectedSectionIndex,
     lastNavigationSource,
+    isLocalAssistantAvailable,
+    isRemoteAssistantAvailable,
   ];
 
   LoadedState copyWith({
     PortfolioEntity? portfolio,
     int? selectedSectionIndex,
     NavigationSource? lastNavigationSource,
+    bool? isLocalAssistantAvailable,
+    bool? isRemoteAssistantAvailable,
   }) {
     return LoadedState(
       portfolio: portfolio ?? this.portfolio,
       selectedSectionIndex: selectedSectionIndex ?? this.selectedSectionIndex,
       lastNavigationSource: lastNavigationSource ?? this.lastNavigationSource,
+      isLocalAssistantAvailable:
+          isLocalAssistantAvailable ?? this.isLocalAssistantAvailable,
+      isRemoteAssistantAvailable:
+          isRemoteAssistantAvailable ?? this.isRemoteAssistantAvailable,
     );
   }
 }

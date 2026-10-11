@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 
 import '../../../../../../mock/feature/remote_assistant/presentation/screen/remote_assistant/bloc/mock_remote_assistant_bloc.dart';
@@ -16,7 +17,7 @@ void main() {
       addTearDown(locator.reset);
       final bloc = MockRemoteAssistantBloc()
         ..stubState(
-          const RemoteAssistantState(status: RemoteAssistantStatus.off),
+          const RemoteAssistantState(status: RemoteAssistantStatus.unavailable),
         );
       addTearDown(bloc.close);
       locator.registerSingleton<RemoteAssistantBloc>(() => bloc);
@@ -29,7 +30,7 @@ void main() {
         ),
       );
       verify(() => bloc.add(const RemoteAssistantStartedEvent())).called(1);
-      expect(find.text('Cloud portfolio assistant'), findsNWidgets(2));
+      expect(find.text('Cloud portfolio assistant'), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());
       verifyNever(bloc.close);
     },

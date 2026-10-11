@@ -1,24 +1,35 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
+import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_get_local_assistant_availability_use_case.dart';
+import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_get_remote_assistant_availability_use_case.dart';
 
 void main() {
   group('SettingBloc', () {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
+    late MockGetLocalAssistantAvailabilityUseCase local;
+    late MockGetRemoteAssistantAvailabilityUseCase remote;
 
     SettingBloc buildBloc() => SettingBloc(
       isFeatureEnabledUseCase,
       BuildConfig(buildEnvironment: BuildEnvironment.prod),
+      local,
+      remote,
     );
 
     setUp(() {
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase();
+      local = MockGetLocalAssistantAvailabilityUseCase()
+        ..stubCall(const AssistantAvailabilityEntity.unavailable());
+      remote = MockGetRemoteAssistantAvailabilityUseCase()
+        ..stubCall(const AssistantAvailabilityEntity.unavailable());
     });
 
     blocTest<SettingBloc, SettingState>(
@@ -32,6 +43,8 @@ void main() {
       build: () => SettingBloc(
         isFeatureEnabledUseCase,
         BuildConfig(buildEnvironment: BuildEnvironment.staging),
+        local,
+        remote,
       ),
       act: (bloc) => bloc.add(const LoadSettingsEvent()),
       expect: () => const [

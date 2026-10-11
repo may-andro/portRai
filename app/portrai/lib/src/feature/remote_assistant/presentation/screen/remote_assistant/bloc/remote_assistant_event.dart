@@ -15,14 +15,6 @@ class RemoteAssistantInitializedEvent extends RemoteAssistantEvent {
   const RemoteAssistantInitializedEvent();
 }
 
-class AcceptRemoteAssistantConsentClickEvent extends RemoteAssistantEvent {
-  const AcceptRemoteAssistantConsentClickEvent();
-}
-
-class DisableRemoteAssistantClickEvent extends RemoteAssistantEvent {
-  const DisableRemoteAssistantClickEvent();
-}
-
 class ResetRemoteAssistantClickEvent extends RemoteAssistantEvent {
   const ResetRemoteAssistantClickEvent();
 }

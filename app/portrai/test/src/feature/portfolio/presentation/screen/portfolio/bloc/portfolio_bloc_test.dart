@@ -1,13 +1,16 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_get_local_assistant_availability_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/tracking/mock_portfolio_tracking_delegate.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
+import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_get_remote_assistant_availability_use_case.dart';
 
 void main() {
   final portfolio = createPortfolioEntity();
@@ -15,13 +18,19 @@ void main() {
   group('PortfolioBloc', () {
     late MockGetPortfolioUseCase getPortfolioUseCase;
     late MockPortfolioTrackingDelegate trackingDelegate;
+    late MockGetLocalAssistantAvailabilityUseCase local;
+    late MockGetRemoteAssistantAvailabilityUseCase remote;
 
     PortfolioBloc buildBloc() =>
-        PortfolioBloc(getPortfolioUseCase, trackingDelegate);
+        PortfolioBloc(getPortfolioUseCase, trackingDelegate, local, remote);
 
     setUp(() {
       getPortfolioUseCase = MockGetPortfolioUseCase();
       trackingDelegate = MockPortfolioTrackingDelegate();
+      local = MockGetLocalAssistantAvailabilityUseCase()
+        ..stubCall(const AssistantAvailabilityEntity.unavailable());
+      remote = MockGetRemoteAssistantAvailabilityUseCase()
+        ..stubCall(const AssistantAvailabilityEntity.unavailable());
     });
 
     blocTest<PortfolioBloc, PortfolioState>(

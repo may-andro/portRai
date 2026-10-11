@@ -6,11 +6,10 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/flutter_edge_ai_local_assistant_repository.dart';
 import 'package:portrai/src/feature/local_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/route/route.dart';
-import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
 
 import '../../../mock/feature/feature_flag/domain/registry/mock_app_feature_flag_definition_registry.dart';
-import '../../../mock/feature/feature_flag/domain/repository/mock_app_feature_flag_repository.dart';
 import '../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../mock/feature/local_assistant/presentation/screen/local_assistant/bloc/mock_local_assistant_bloc.dart';
 import '../../../mock/utility/mock_module_route_controller.dart';
@@ -25,10 +24,6 @@ void main() {
       addTearDown(locator.reset);
       locator.registerFactory<IsFeatureEnabledUseCase>(
         () => MockIsFeatureEnabledUseCase(),
-      );
-      locator.registerFactory<LocalAssistantFeatureAccessUseCase>(
-        () =>
-            LocalAssistantFeatureAccessUseCase(MockAppFeatureFlagRepository()),
       );
 
       AssistantModuleConfigurator().registerDependencies(locator);

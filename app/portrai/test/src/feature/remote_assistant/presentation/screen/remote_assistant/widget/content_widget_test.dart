@@ -37,41 +37,6 @@ void main() {
     expect(find.byType(FilledButton), findsNothing);
   });
 
-  testWidgets('should request explicit consent when remote AI is off', (
-    tester,
-  ) async {
-    final bloc = await pumpContent(
-      tester,
-      const RemoteAssistantState(status: RemoteAssistantStatus.off),
-    );
-    expect(find.byType(AssistantConversationWidget), findsNothing);
-    expect(
-      find.textContaining('sent to Google through Firebase'),
-      findsOneWidget,
-    );
-    await tester.tap(find.text('Agree and enable cloud AI'));
-    verify(
-      () => bloc.add(const AcceptRemoteAssistantConsentClickEvent()),
-    ).called(1);
-  });
-
-  testWidgets(
-    'should prevent repeated consent clicks when persistence is pending',
-    (tester) async {
-      await pumpContent(
-        tester,
-        const RemoteAssistantState(
-          status: RemoteAssistantStatus.off,
-          isUpdatingPreference: true,
-        ),
-      );
-      expect(
-        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNull,
-      );
-    },
-  );
-
   testWidgets('should share chat presentation when remote AI is ready', (
     tester,
   ) async {
@@ -94,8 +59,7 @@ void main() {
     ).called(1);
     await tester.tap(find.text('Clear chat'));
     verify(() => bloc.add(const ResetRemoteAssistantClickEvent())).called(1);
-    await tester.tap(find.text('Turn off and withdraw consent'));
-    verify(() => bloc.add(const DisableRemoteAssistantClickEvent())).called(1);
+    expect(find.byType(Switch), findsNothing);
   });
 
   testWidgets('should mark provisional text when an answer is streaming', (

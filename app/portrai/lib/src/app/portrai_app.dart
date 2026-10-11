@@ -1,14 +1,10 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/force_update/force_update.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 
 class PortraiApp extends StatelessWidget {
@@ -38,20 +34,10 @@ class PortraiApp extends StatelessWidget {
         return DSThemeBuilderWidget(
           brightness: context.platformBrightness,
           designSystem: designSystem,
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider.value(
-                value: appServiceLocator.get<LocalAssistantBloc>(),
-              ),
-              BlocProvider.value(
-                value: appServiceLocator.get<RemoteAssistantBloc>(),
-              ),
-            ],
-            child: SystemLocaleObserverWidget(
-              child: ForceUpdateListenerWidget(
-                child: ConnectivityListenerWidget(
-                  child: child ?? const SizedBox.shrink(),
-                ),
+          child: SystemLocaleObserverWidget(
+            child: ForceUpdateListenerWidget(
+              child: ConnectivityListenerWidget(
+                child: child ?? const SizedBox.shrink(),
               ),
             ),
           ),

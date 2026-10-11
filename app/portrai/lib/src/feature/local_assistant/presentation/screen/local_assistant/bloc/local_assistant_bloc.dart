@@ -9,7 +9,6 @@ import 'package:portrai/src/feature/local_assistant/local_assistant_availability
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_state.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/tracking/_tracking.dart';
-import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
 
 // One shared instance: Settings, the portfolio button and the assistant
 // screen all reflect the same download and enabled state.
@@ -26,16 +25,24 @@ class LocalAssistantBloc
     this._isAssistantModelDownloadedUseCase,
     this._askPortfolioQuestionUseCase,
     this._trackingDelegate,
-    @Inject(LocalAssistantFeatureAccessUseCase) this._isFeatureEnabledUseCase, {
+    this._isFeatureEnabledUseCase, {
     this._availability = const LocalAssistantAvailability(),
     @Inject(ResetLocalAssistantSessionUseCase) this._resetSession,
   }) : super(const LocalAssistantState()) {
-    on<LocalAssistantStartedEvent>(_onStarted);
-    on<LocalAssistantInitializedEvent>(_onInitialized);
-    on<EnableLocalAssistantClickEvent>(_onEnable);
-    on<DisableLocalAssistantClickEvent>(_onDisable);
-    on<SendLocalAssistantQuestionClickEvent>(_onSendQuestion);
-    on<ResetLocalAssistantClickEvent>(_onReset);
+    on<LocalAssistantStartedEvent>(_mapLocalAssistantStartedEventToState);
+    on<LocalAssistantInitializedEvent>(
+      _mapLocalAssistantInitializedEventToState,
+    );
+    on<EnableLocalAssistantClickEvent>(
+      _mapEnableLocalAssistantClickEventToState,
+    );
+    on<DisableLocalAssistantClickEvent>(
+      _mapDisableLocalAssistantClickEventToState,
+    );
+    on<SendLocalAssistantQuestionClickEvent>(
+      _mapSendLocalAssistantQuestionClickEventToState,
+    );
+    on<ResetLocalAssistantClickEvent>(_mapResetLocalAssistantClickEventToState);
   }
 
   final GetAssistantContextUseCase _getAssistantContextUseCase;
@@ -98,14 +105,17 @@ class LocalAssistantBloc
     return false;
   }
 
-  Future<void> _onStarted(
+  Future<void> _mapLocalAssistantStartedEventToState(
     LocalAssistantStartedEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
     _trackingDelegate.trackScreenView();
     if (!await _checkAvailability(emit)) return;
     final revision = _controlRevision;
-    await _onInitialized(const LocalAssistantInitializedEvent(), emit);
+    await _mapLocalAssistantInitializedEventToState(
+      const LocalAssistantInitializedEvent(),
+      emit,
+    );
     if (emit.isDone || revision != _controlRevision) return;
     emit(state.copyWith(isLoadingContext: true));
     final result = await _getAssistantContextUseCase();
@@ -133,7 +143,7 @@ class LocalAssistantBloc
 
   // Dispatched again when screens become visible, so a flag turned on at
   // runtime (dev menu) is picked up. Setup only ever runs once.
-  Future<void> _onInitialized(
+  Future<void> _mapLocalAssistantInitializedEventToState(
     LocalAssistantInitializedEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
@@ -163,7 +173,7 @@ class LocalAssistantBloc
     await _prepareModel(emit, revision);
   }
 
-  Future<void> _onEnable(
+  Future<void> _mapEnableLocalAssistantClickEventToState(
     EnableLocalAssistantClickEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
@@ -192,7 +202,7 @@ class LocalAssistantBloc
     await _prepareModel(emit, revision);
   }
 
-  Future<void> _onDisable(
+  Future<void> _mapDisableLocalAssistantClickEventToState(
     DisableLocalAssistantClickEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
@@ -281,7 +291,7 @@ class LocalAssistantBloc
     );
   }
 
-  Future<void> _onSendQuestion(
+  Future<void> _mapSendLocalAssistantQuestionClickEventToState(
     SendLocalAssistantQuestionClickEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
@@ -343,7 +353,7 @@ class LocalAssistantBloc
     );
   }
 
-  Future<void> _onReset(
+  Future<void> _mapResetLocalAssistantClickEventToState(
     ResetLocalAssistantClickEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {

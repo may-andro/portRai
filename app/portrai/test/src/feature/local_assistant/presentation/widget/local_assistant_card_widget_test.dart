@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/bloc/mock_local_assistant_bloc.dart';
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
+  setUp(() => appServiceLocator.reset());
+  tearDown(() => appServiceLocator.reset());
   setUpAll(() {
     registerFallbackValue(const EnableLocalAssistantClickEvent());
   });
@@ -18,13 +21,11 @@ void main() {
     LocalAssistantState state,
   ) async {
     final bloc = MockLocalAssistantBloc()..stubState(state);
+    appServiceLocator.registerSingleton<LocalAssistantBloc>(() => bloc);
     addTearDown(bloc.close);
     await tester.pumpWidget(
-      TestWidgetWrapper(
-        child: BlocProvider<LocalAssistantBloc>.value(
-          value: bloc,
-          child: const SingleChildScrollView(child: LocalAssistantCardWidget()),
-        ),
+      const TestWidgetWrapper(
+        child: SingleChildScrollView(child: LocalAssistantCardWidget()),
       ),
     );
     return (
@@ -41,7 +42,7 @@ void main() {
     await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
     expect(find.text(l10n.assistantEnableDialogTitle), findsOneWidget);
-    verifyNever(() => bloc.add(any<LocalAssistantEvent>()));
+    verifyNever(() => bloc.add(const EnableLocalAssistantClickEvent()));
 
     await tester.tap(find.text(l10n.assistantEnableDialogConfirm));
     await tester.pumpAndSettle();
@@ -74,7 +75,7 @@ void main() {
     await tester.tap(find.text(l10n.assistantCancel));
     await tester.pumpAndSettle();
 
-    verifyNever(() => bloc.add(any<LocalAssistantEvent>()));
+    verifyNever(() => bloc.add(const EnableLocalAssistantClickEvent()));
   });
 
   testWidgets('should show progress and cancel the download when preparing', (

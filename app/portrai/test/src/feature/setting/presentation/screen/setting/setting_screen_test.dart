@@ -7,7 +7,6 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/c
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../mock/feature/setting/presentation/screen/setting/bloc/mock_setting_bloc.dart';
-import '../../../../../../util/local_assistant_bloc_scope.dart';
 import '../../../../../../util/package_info_setup.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
@@ -28,12 +27,10 @@ void main() {
         (tester) async {
           await tester.pumpWidget(
             TestWidgetWrapper(
-              child: LocalAssistantBlocScope(
-                child: ContentWidget(
-                  state: SettingLoadedState(
-                    isLanguageSelectorEnabled: false,
-                    isDevMenuEnabled: isDevMenuEnabled,
-                  ),
+              child: ContentWidget(
+                state: SettingLoadedState(
+                  isLanguageSelectorEnabled: false,
+                  isDevMenuEnabled: isDevMenuEnabled,
                 ),
               ),
             ),
@@ -55,9 +52,7 @@ void main() {
         appServiceLocator.registerFactory<SettingBloc>(() => bloc);
 
         await tester.pumpWidget(
-          const TestWidgetWrapper(
-            child: LocalAssistantBlocScope(child: SettingScreen()),
-          ),
+          const TestWidgetWrapper(child: SettingScreen()),
         );
         await tester.pump();
 

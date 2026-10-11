@@ -4,9 +4,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/route/observer/route_observer_widget.dart';
 
 class LocalAssistantCardWidget extends StatelessWidget {
   const LocalAssistantCardWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) => BlocProvider.value(
+    value: appServiceLocator.get<LocalAssistantBloc>(),
+    child: Builder(
+      builder: (context) => RouteObserverWidget(
+        onResume: () =>
+            context.bloc.add(const LocalAssistantInitializedEvent()),
+        child: const LocalAssistantCardContentWidget(),
+      ),
+    ),
+  );
+}
+
+class LocalAssistantCardContentWidget extends StatelessWidget {
+  const LocalAssistantCardContentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -47,7 +47,7 @@ class ContentWidget extends StatelessWidget {
             child: Column(
               children: [
                 _ModelSetupWidget(state: state),
-                const LocalAssistantCardWidget(),
+                const LocalAssistantCardContentWidget(),
               ],
             ),
           );

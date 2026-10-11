@@ -6,6 +6,7 @@ description: 'Architecture and code-organization conventions for this Flutter ap
 
 ## Use cases
 Every domain use case must extend `BaseUseCase`/`BaseNoParamUseCase` (from the `use_case` package) with a sealed `Failure` hierarchy returning `Either`. Never write a plain class with a bare `call()` method - this loses automatic logging/interceptor support and error-mapping consistency.
+Use cases belong to the owning feature's `domain/use_case/`, never the app's `utility/` folder.
 
 ```dart
 // ✅ Correct
@@ -49,6 +50,16 @@ onPressed: () async {
 
 ## Bloc event naming
 UI interaction events are named `<Action>ClickEvent` (e.g. `HeaderTabClickEvent`, `DrawerClickEvent`), not `<Action>PressedEvent` or other variants.
+
+Register events with private handler methods named `_map<EventName>ToState`, including the
+capital `To` (for example `_mapAssistantLaunchClickEventToState`). Keep handler logic out of
+constructor callbacks.
+
+## Feature presentation boundaries
+Blocs, states, and events are module-internal presentation details; do not export them from
+public feature barrels or consume them from other features or app composition. Expose domain
+data through feature-owned use cases instead. Public module widgets and routes own their
+internal bloc providers.
 
 ## Presentation extensions
 Extensions that need `BuildContext`/localization (e.g. formatting an entity for display) live in `presentation/extension/` with an `_extension.dart` barrel, exported from `presentation/_presentation.dart`. Never put them in the domain layer or in `widget/`. Examples: `experience_date_range_extension.dart`, `project_date_range_extension.dart`, `locale_code_extension.dart`. Screen-specific ones sit next to their screen (`screen/<name>/extension/`).

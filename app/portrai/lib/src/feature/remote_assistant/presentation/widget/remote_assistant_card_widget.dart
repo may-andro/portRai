@@ -4,9 +4,27 @@ import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/remote_assistant_screen.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/route/observer/route_observer_widget.dart';
 
 class RemoteAssistantCardWidget extends StatelessWidget {
   const RemoteAssistantCardWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) => BlocProvider.value(
+    value: appServiceLocator.get<RemoteAssistantBloc>(),
+    child: Builder(
+      builder: (context) => RouteObserverWidget(
+        onResume: () =>
+            context.bloc.add(const RemoteAssistantInitializedEvent()),
+        child: const _CardContentWidget(),
+      ),
+    ),
+  );
+}
+
+class _CardContentWidget extends StatelessWidget {
+  const _CardContentWidget();
 
   @override
   Widget build(BuildContext context) =>
@@ -43,20 +61,6 @@ class RemoteAssistantCardWidget extends StatelessWidget {
                           style: context.typography.titleMedium,
                         ),
                       ),
-                      Switch(
-                        value: state.isReady,
-                        onChanged: state.isUpdatingPreference
-                            ? null
-                            : (enabled) {
-                                if (enabled) {
-                                  RemoteAssistantScreen.navigate(context);
-                                } else {
-                                  context.bloc.add(
-                                    const DisableRemoteAssistantClickEvent(),
-                                  );
-                                }
-                              },
-                      ),
                     ],
                   ),
                   const DSVerticalSpacerWidget(1),
@@ -75,13 +79,15 @@ class RemoteAssistantCardWidget extends StatelessWidget {
                   ],
                   if (state.isReady)
                     TextButton(
-                      onPressed: state.isUpdatingPreference
-                          ? null
-                          : () => context.bloc.add(
-                              const ResetRemoteAssistantClickEvent(),
-                            ),
+                      onPressed: () => context.bloc.add(
+                        const ResetRemoteAssistantClickEvent(),
+                      ),
                       child: Text(localizations.remoteAssistantReset),
                     ),
+                  TextButton(
+                    onPressed: () => RemoteAssistantScreen.navigate(context),
+                    child: Text(localizations.assistantAskAi),
+                  ),
                 ],
               ),
             ),

@@ -23,28 +23,27 @@ class PortfolioScreen extends StatelessWidget {
           return RouteObserverWidget(
             onResume: () {
               context.bloc.add(const ScreenVisibleEvent());
-              context.read<LocalAssistantBloc>().add(
-                const LocalAssistantInitializedEvent(),
-              );
-              context.read<RemoteAssistantBloc>().add(
-                const RemoteAssistantInitializedEvent(),
-              );
             },
-            child: Scaffold(
-              backgroundColor: context.colorPalette.background.color,
-              drawer: context.isDesktop ? null : const DrawerWidget(),
-              drawerEnableOpenDragGesture: false,
-              onDrawerChanged: (isOpened) {
-                context.bloc.add(DrawerClickEvent(isOpened));
-              },
-              floatingActionButton: BlocBuilder<PortfolioBloc, PortfolioState>(
-                builder: (context, state) {
-                  return state is LoadedState
-                      ? const AssistantLauncherWidget()
-                      : const SizedBox.shrink();
-                },
+            child: LocalAssistantVisibilityWidget(
+              child: RemoteAssistantVisibilityWidget(
+                child: Scaffold(
+                  backgroundColor: context.colorPalette.background.color,
+                  drawer: context.isDesktop ? null : const DrawerWidget(),
+                  drawerEnableOpenDragGesture: false,
+                  onDrawerChanged: (isOpened) {
+                    context.bloc.add(DrawerClickEvent(isOpened));
+                  },
+                  floatingActionButton:
+                      BlocBuilder<PortfolioBloc, PortfolioState>(
+                        builder: (context, state) {
+                          return state is LoadedState
+                              ? const AssistantLauncherWidget()
+                              : const SizedBox.shrink();
+                        },
+                      ),
+                  body: const ContentWidget(),
+                ),
               ),
-              body: const ContentWidget(),
             ),
           );
         },

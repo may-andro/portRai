@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../util/assistant_test_fixture.dart';
@@ -145,22 +146,20 @@ void main() {
   );
 
   testWidgets(
-    'should guard hidden local routes and setup when both rollout flags are on',
+    'should retain independent local chat when its route is opened explicitly',
     (tester) async {
       final fixture = AssistantTestFixture(localEnabled: true);
       await pumpScreen(tester, fixture);
-      expect(fixture.local.state.status, isA<LocalAssistantUnavailable>());
-      expect(find.byType(AssistantConversationWidget), findsNothing);
+      expect(fixture.local.state.isReady, isTrue);
+      expect(find.byType(AssistantConversationWidget), findsOneWidget);
       expect(find.byType(Switch), findsNothing);
-      fixture.local.add(const EnableLocalAssistantClickEvent());
-      await tester.pumpAndSettle();
       verifyNever(() => fixture.updateLocal(true));
       verifyNever(() => fixture.askLocal(any()));
     },
   );
 
   test(
-    'should reject new local requests when remote rollout takes priority after startup',
+    'should retain independent local requests when only remote rollout changes',
     () async {
       final fixture = AssistantTestFixture(
         localEnabled: true,
@@ -171,8 +170,8 @@ void main() {
       fixture.setRollout(local: true, remote: true);
       fixture.local.add(const SendLocalAssistantQuestionClickEvent('Question'));
       await pumpEventQueue();
-      verifyNever(() => fixture.askLocal(any()));
-      expect(fixture.local.state.status, isA<LocalAssistantUnavailable>());
+      verify(() => fixture.askLocal(any())).called(1);
+      expect(fixture.local.state.isReady, isTrue);
     },
   );
 }

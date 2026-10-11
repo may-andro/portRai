@@ -8,11 +8,8 @@ import 'package:portrai/src/feature/local_assistant/data/repository/flutter_edge
 import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
-import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../mock/feature/feature_flag/domain/repository/mock_app_feature_flag_repository.dart';
 import '../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../mock/feature/local_assistant/data/cache/mock_local_assistant_enabled_cache.dart';
 import '../../../../../mock/feature/local_assistant/data/repository/mock_inference_chat.dart';
@@ -70,43 +67,6 @@ void main() {
       },
     );
   }
-
-  test(
-    'should reject local enablement and inference without preference changes when remote rollout takes priority',
-    () async {
-      final cache = MockLocalAssistantEnabledCache()..stubGet(true);
-      final flags = MockAppFeatureFlagRepository()
-        ..stubIsFeatureEnabled(
-          definition: LocalAssistantFeatureFlags.aiAssistant,
-          isEnabled: true,
-        )
-        ..stubIsFeatureEnabled(
-          definition: RemoteAssistantFeatureFlags.remoteAssistant,
-          isEnabled: true,
-        );
-      var loads = 0;
-      final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
-        (_) {
-          loads++;
-          throw StateError('Must not load');
-        },
-        enabledCache: cache,
-        isFeatureEnabled: LocalAssistantFeatureAccessUseCase(flags),
-        availability: const LocalAssistantAvailability.supported(true),
-      );
-      addTearDown(repository.dispose);
-      await expectLater(
-        repository.answer(question: 'Question', portfolioContext: 'Fixture'),
-        throwsA(isA<LocalAssistantUnavailableException>()),
-      );
-      await expectLater(
-        repository.setEnabled(enabled: true),
-        throwsA(isA<LocalAssistantUnavailableException>()),
-      );
-      expect(loads, 0);
-      verifyNever(() => cache.put(any()));
-    },
-  );
 
   test(
     'should stay fail-closed when saving the local disable preference fails',
