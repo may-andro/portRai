@@ -15,30 +15,16 @@ class RemoteAssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BlocProvider.value(
     value: appServiceLocator.get<RemoteAssistantBloc>(),
-    child: const _ScreenContent(),
-  );
-}
-
-class _ScreenContent extends StatefulWidget {
-  const _ScreenContent();
-
-  @override
-  State<_ScreenContent> createState() => _RemoteAssistantScreenState();
-}
-
-class _RemoteAssistantScreenState extends State<_ScreenContent> {
-  @override
-  void initState() {
-    super.initState();
-    context.bloc.add(const RemoteAssistantStartedEvent());
-  }
-
-  @override
-  Widget build(BuildContext context) => RouteObserverWidget(
-    onResume: () => context.bloc.add(const RemoteAssistantInitializedEvent()),
-    child: Scaffold(
-      appBar: AppBar(title: Text(context.localizations.remoteAssistantTitle)),
-      body: const SafeArea(child: ContentWidget()),
+    child: Builder(
+      builder: (context) => RouteObserverWidget(
+        onResume: () => context.bloc.add(const RemoteAssistantStartedEvent()),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(context.localizations.remoteAssistantTitle),
+          ),
+          body: const SafeArea(child: ContentWidget()),
+        ),
+      ),
     ),
   );
 }

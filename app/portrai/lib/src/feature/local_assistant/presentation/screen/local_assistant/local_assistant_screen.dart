@@ -18,32 +18,14 @@ class LocalAssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BlocProvider.value(
     value: appServiceLocator.get<LocalAssistantBloc>(),
-    child: const _ScreenContent(),
-  );
-}
-
-class _ScreenContent extends StatefulWidget {
-  const _ScreenContent();
-
-  @override
-  State<_ScreenContent> createState() => _LocalAssistantScreenState();
-}
-
-class _LocalAssistantScreenState extends State<_ScreenContent> {
-  @override
-  void initState() {
-    super.initState();
-    context.bloc.add(const LocalAssistantStartedEvent());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RouteObserverWidget(
-      onResume: () => context.bloc.add(const LocalAssistantInitializedEvent()),
-      child: Scaffold(
-        appBar: AppBar(title: Text(context.localizations.assistantTitle)),
-        body: const SafeArea(child: ContentWidget()),
+    child: Builder(
+      builder: (context) => RouteObserverWidget(
+        onResume: () => context.bloc.add(const LocalAssistantStartedEvent()),
+        child: Scaffold(
+          appBar: AppBar(title: Text(context.localizations.assistantTitle)),
+          body: const SafeArea(child: ContentWidget()),
+        ),
       ),
-    );
-  }
+    ),
+  );
 }
