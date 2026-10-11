@@ -6,10 +6,10 @@ import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/data/cache/_cache.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 
 @RegisterSingleton(as: RemoteAssistantRepository, disposeMethodName: 'close')
 class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
@@ -53,7 +53,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
             consentAccepted: false,
           );
     } on Object {
-      throw const RemoteAssistantPreferenceFailure();
+      throw const RemoteAssistantPreferenceException();
     }
   }
 
@@ -71,25 +71,23 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
 
     try {
       await _serializePreferenceMutation(() async {
-        if (_closed) throw const _AssistantClosedException();
+        if (_closed) throw const RemoteAssistantClosedException();
         final normalized = RemoteAssistantPreferenceEntity(
           enabled: preference.consentAccepted && preference.enabled,
           consentAccepted: preference.consentAccepted,
         );
         final saved = await _preferenceCache.put(normalized);
-        if (!saved) throw const _PreferencePersistenceException();
+        if (!saved) throw const RemoteAssistantPreferenceException();
       });
       if (updateGeneration == _preferenceUpdateGeneration &&
           (!isRevocation || revocationGeneration == _revocationGeneration)) {
         _revocationFailedClosed = false;
       }
-    } on _AssistantClosedException {
-      throw const RemoteAssistantUnavailableFailure();
-    } on RemoteAssistantFailure {
+    } on RemoteAssistantClosedException {
       rethrow;
     } on Object {
       if (isRevocation) _revocationFailedClosed = true;
-      throw const RemoteAssistantPreferenceFailure();
+      throw const RemoteAssistantPreferenceException();
     }
   }
 
@@ -109,12 +107,8 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
 
   @override
   Future<void> resetSession() async {
-    try {
-      await _invalidateActiveRequest();
-      _closeModel();
-    } on Object {
-      throw const RemoteAssistantUnknownFailure();
-    }
+    await _invalidateActiveRequest();
+    _closeModel();
   }
 
   @override
@@ -124,11 +118,10 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required List<AssistantMessageEntity> history,
     required void Function(String delta) onDelta,
   }) async {
-    if (_closed || _requestActive) {
-      throw const RemoteAssistantUnavailableFailure();
-    }
+    if (_closed) throw const RemoteAssistantClosedException();
+    if (_requestActive) throw const RemoteAssistantConcurrentRequestException();
     if (!_isValidRequest(question, portfolioContext, history)) {
-      throw const RemoteAssistantInvalidInputFailure();
+      throw const RemoteAssistantInvalidInputException();
     }
 
     _requestActive = true;
@@ -137,7 +130,9 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     _activeCompletion = deadlineCompletion;
     final deadline = Timer(RemoteAssistantRequestLimits.requestTimeout, () {
       if (!deadlineCompletion.isCompleted) {
-        deadlineCompletion.completeError(const _RequestTimeoutException());
+        deadlineCompletion.completeError(
+          const RemoteAssistantTimeoutException(),
+        );
       }
       _generation++;
       unawaited(_cancelActiveSubscription());
@@ -154,10 +149,6 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
         ),
         deadlineCompletion.future,
       ]);
-    } on RemoteAssistantFailure {
-      rethrow;
-    } on Object catch (error) {
-      throw _failureFor(error);
     } finally {
       deadline.cancel();
       if (identical(_activeCompletion, deadlineCompletion)) {
@@ -176,22 +167,26 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required int generation,
   }) async {
     if (_revocationFailedClosed) {
-      throw const _PreferencePersistenceException();
+      throw const RemoteAssistantPreferenceException();
     }
 
     final flagResult = await _isFeatureEnabled(
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
     if (flagResult.isLeft) {
-      throw const _FeatureFlagResolutionException();
+      throw const RemoteAssistantFlagException();
     }
-    if (!flagResult.right) throw const _UnavailableException();
+    if (!flagResult.right) throw const RemoteAssistantUnavailableException();
     _ensureRequestCurrent(generation);
 
     final preference = await getPreference();
-    if (!preference.consentAccepted) throw const _ConsentRequiredException();
-    if (!preference.enabled) throw const _UnavailableException();
-    if (_revocationFailedClosed) throw const _PreferencePersistenceException();
+    if (!preference.consentAccepted) {
+      throw const RemoteAssistantConsentRequiredException();
+    }
+    if (!preference.enabled) throw const RemoteAssistantUnavailableException();
+    if (_revocationFailedClosed) {
+      throw const RemoteAssistantPreferenceException();
+    }
     _ensureRequestCurrent(generation);
 
     final model = _model ??= _aiController.createTextModel(
@@ -279,14 +274,16 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
           if (responseCharacters >
               RemoteAssistantRequestLimits.maxResponseCharacters) {
             unawaited(_cancelActiveSubscription());
-            completion.completeError(const _ResponseLimitException());
+            completion.completeError(
+              const RemoteAssistantResponseLimitException(),
+            );
             return;
           }
           try {
             onDelta(delta);
           } on Object {
             unawaited(_cancelActiveSubscription());
-            completion.completeError(const _CallbackException());
+            completion.completeError(const RemoteAssistantCallbackException());
           }
         },
         onError: (Object error, StackTrace stackTrace) {
@@ -301,7 +298,9 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
       );
       await Future.any([completion.future, _activeCompletion!.future]);
       _ensureRequestCurrent(generation);
-      if (responseCharacters == 0) throw const _IncompleteResponseException();
+      if (responseCharacters == 0) {
+        throw const RemoteAssistantIncompleteException();
+      }
     } finally {
       await _cancelActiveSubscription();
     }
@@ -310,14 +309,16 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
   bool _isCurrent(int generation) => !_closed && generation == _generation;
 
   void _ensureRequestCurrent(int generation) {
-    if (!_isCurrent(generation)) throw const _RequestCancelledException();
+    if (!_isCurrent(generation)) {
+      throw const RemoteAssistantCancelledException();
+    }
   }
 
   Future<void> _invalidateActiveRequest() async {
     _generation++;
     final completion = _activeCompletion;
     if (completion != null && !completion.isCompleted) {
-      completion.completeError(const _RequestCancelledException());
+      completion.completeError(const RemoteAssistantCancelledException());
     }
     await _cancelActiveSubscription();
   }
@@ -343,150 +344,4 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     _closeModel();
     await _preferenceMutation;
   }
-
-  Never _mapAiError(Object error) {
-    switch (error) {
-      case AiQuotaExceededException():
-        throw const _QuotaException();
-      case AiNetworkException() || AiServerException():
-        throw const _NetworkException();
-      case AiTimeoutException():
-        throw const _TimeoutException();
-      case AiConfigurationException() || AiUnsupportedLocationException():
-        throw const _ConfigurationException();
-      case AiBlockedResponseException():
-        throw const _BlockedException();
-      case AiInvalidInputException():
-        throw const _InvalidRequestException();
-      case AiEmptyResponseException() || AiIncompleteResponseException():
-        throw const _IncompleteResponseException();
-      case AiSdkException():
-        throw const _UnknownException();
-      default:
-        throw const _UnknownException();
-    }
-  }
-
-  RemoteAssistantFailure _failureFor(Object error) => switch (error) {
-    _ConsentRequiredException() =>
-      const RemoteAssistantConsentRequiredFailure(),
-    _UnavailableException() ||
-    _RequestCancelledException() ||
-    _AssistantClosedException() => const RemoteAssistantUnavailableFailure(),
-    _NetworkException() => const RemoteAssistantNetworkFailure(),
-    _RequestTimeoutException() ||
-    _TimeoutException() => const RemoteAssistantTimeoutFailure(),
-    _QuotaException() => const RemoteAssistantQuotaFailure(),
-    _ConfigurationException() || _FeatureFlagResolutionException() =>
-      const RemoteAssistantConfigurationFailure(),
-    _BlockedException() => const RemoteAssistantBlockedFailure(),
-    _InvalidRequestException() => const RemoteAssistantInvalidInputFailure(),
-    _IncompleteResponseException() => const RemoteAssistantIncompleteFailure(),
-    _ResponseLimitException() => const RemoteAssistantIncompleteFailure(),
-    _PreferencePersistenceException() =>
-      const RemoteAssistantPreferenceFailure(),
-    _ConcurrentRequestException() => const RemoteAssistantUnavailableFailure(),
-    _CallbackException() => const RemoteAssistantUnknownFailure(),
-    _UnknownException() => const RemoteAssistantUnknownFailure(),
-    AiException() => _aiFailure(error),
-    _ => const RemoteAssistantUnknownFailure(),
-  };
-
-  RemoteAssistantFailure _aiFailure(AiException error) {
-    try {
-      _mapAiError(error);
-    } on _QuotaException {
-      return const RemoteAssistantQuotaFailure();
-    } on _NetworkException {
-      return const RemoteAssistantNetworkFailure();
-    } on _TimeoutException {
-      return const RemoteAssistantTimeoutFailure();
-    } on _ConfigurationException {
-      return const RemoteAssistantConfigurationFailure();
-    } on _BlockedException {
-      return const RemoteAssistantBlockedFailure();
-    } on _InvalidRequestException {
-      return const RemoteAssistantInvalidInputFailure();
-    } on _IncompleteResponseException {
-      return const RemoteAssistantIncompleteFailure();
-    } on Object {
-      return const RemoteAssistantUnknownFailure();
-    }
-  }
-}
-
-class _AssistantRequestException implements Exception {
-  const _AssistantRequestException();
-}
-
-class _PreferencePersistenceException extends _AssistantRequestException {
-  const _PreferencePersistenceException();
-}
-
-class _AssistantClosedException extends _AssistantRequestException {
-  const _AssistantClosedException();
-}
-
-class _ConcurrentRequestException extends _AssistantRequestException {
-  const _ConcurrentRequestException();
-}
-
-class _FeatureFlagResolutionException extends _AssistantRequestException {
-  const _FeatureFlagResolutionException();
-}
-
-class _UnavailableException extends _AssistantRequestException {
-  const _UnavailableException();
-}
-
-class _ConsentRequiredException extends _AssistantRequestException {
-  const _ConsentRequiredException();
-}
-
-class _InvalidRequestException extends _AssistantRequestException {
-  const _InvalidRequestException();
-}
-
-class _RequestTimeoutException extends _AssistantRequestException {
-  const _RequestTimeoutException();
-}
-
-class _TimeoutException extends _AssistantRequestException {
-  const _TimeoutException();
-}
-
-class _RequestCancelledException extends _AssistantRequestException {
-  const _RequestCancelledException();
-}
-
-class _CallbackException extends _AssistantRequestException {
-  const _CallbackException();
-}
-
-class _NetworkException extends _AssistantRequestException {
-  const _NetworkException();
-}
-
-class _QuotaException extends _AssistantRequestException {
-  const _QuotaException();
-}
-
-class _ConfigurationException extends _AssistantRequestException {
-  const _ConfigurationException();
-}
-
-class _BlockedException extends _AssistantRequestException {
-  const _BlockedException();
-}
-
-class _IncompleteResponseException extends _AssistantRequestException {
-  const _IncompleteResponseException();
-}
-
-class _ResponseLimitException extends _AssistantRequestException {
-  const _ResponseLimitException();
-}
-
-class _UnknownException extends _AssistantRequestException {
-  const _UnknownException();
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/get_remote_assistant_preference_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/reset_remote_assistant_session_use_case.dart';
@@ -39,7 +40,7 @@ void main() {
     'should preserve preference persistence failures when reading',
     () async {
       final repository = MockRemoteAssistantRepository()
-        ..stubGetPreferenceError(const RemoteAssistantPreferenceFailure());
+        ..stubGetPreferenceError(const RemoteAssistantPreferenceException());
 
       final result = await GetRemoteAssistantPreferenceUseCase(repository)();
 
@@ -67,7 +68,7 @@ void main() {
     'should preserve preference failures when updating preferences',
     () async {
       final repository = MockRemoteAssistantRepository()
-        ..stubUpdatePreferenceError(const RemoteAssistantPreferenceFailure());
+        ..stubUpdatePreferenceError(const RemoteAssistantPreferenceException());
 
       final result = await UpdateRemoteAssistantPreferenceUseCase(repository)(
         const RemoteAssistantPreferenceEntity(

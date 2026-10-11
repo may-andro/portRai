@@ -14,8 +14,8 @@ import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/project/project.dart';
 import 'package:portrai/src/feature/remote_assistant/data/repository/firebase_remote_assistant_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
@@ -202,7 +202,7 @@ void main() {
           history: const [],
           onDelta: (_) {},
         ),
-        throwsA(isA<RemoteAssistantInvalidInputFailure>()),
+        throwsA(isA<RemoteAssistantInvalidInputException>()),
       );
       verifyNever(
         () => harness.aiController.createTextModel(
@@ -215,57 +215,24 @@ void main() {
     },
   );
 
-  for (final (error, expected) in <(AiException, Matcher)>[
-    (
-      const AiNetworkException('raw HTTP response', StackTrace.empty),
-      isA<RemoteAssistantNetworkFailure>(),
-    ),
-    (
-      const AiQuotaExceededException('raw HTTP response', StackTrace.empty),
-      isA<RemoteAssistantQuotaFailure>(),
-    ),
-    (
-      const AiTimeoutException('raw HTTP response', StackTrace.empty),
-      isA<RemoteAssistantTimeoutFailure>(),
-    ),
-    (
-      const AiConfigurationException('raw HTTP response', StackTrace.empty),
-      isA<RemoteAssistantConfigurationFailure>(),
-    ),
-    (
-      const AiBlockedResponseException('raw generated text', StackTrace.empty),
-      isA<RemoteAssistantBlockedFailure>(),
-    ),
-    (
-      const AiIncompleteResponseException(
-        'raw generated text',
-        StackTrace.empty,
-      ),
-      isA<RemoteAssistantIncompleteFailure>(),
-    ),
-    (
-      const AiSdkException('raw HTTP response', StackTrace.empty),
-      isA<RemoteAssistantUnknownFailure>(),
-    ),
+  for (final error in <AiException>[
+    const AiNetworkException('raw HTTP response', StackTrace.empty),
+    const AiQuotaExceededException('raw HTTP response', StackTrace.empty),
+    const AiTimeoutException('raw HTTP response', StackTrace.empty),
+    const AiConfigurationException('raw HTTP response', StackTrace.empty),
+    const AiUnsupportedLocationException('raw HTTP response', StackTrace.empty),
+    const AiServerException('raw HTTP response', StackTrace.empty),
+    const AiBlockedResponseException('raw generated text', StackTrace.empty),
+    const AiInvalidInputException('raw prompt', StackTrace.empty),
+    const AiIncompleteResponseException('raw generated text', StackTrace.empty),
+    const AiEmptyResponseException('raw generated text', StackTrace.empty),
+    const AiSdkException('raw HTTP response', StackTrace.empty),
   ]) {
     test(
-      'should sanitize $expected when Firebase exposes sensitive error causes',
+      'should propagate ${error.runtimeType} unchanged when Firebase reports an error',
       () async {
         final harness = _buildHarness(responseStream: Stream.error(error));
-        final result =
-            await AskRemotePortfolioQuestionUseCase(harness.repository)(
-              AskRemotePortfolioQuestionParams(
-                question: 'private prompt',
-                portfolioContext: 'private context',
-                history: const [],
-                onDelta: (_) {},
-              ),
-            );
-        expect(result.isLeft, isTrue);
-        expect(result.left, expected);
-        expect(result.left.cause, isNull);
-        expect(result.left.toString(), isNot(contains('raw')));
-        expect(result.left.toString(), isNot(contains('private')));
+        await expectLater(_answer(harness.repository), throwsA(same(error)));
       },
     );
   }
@@ -283,13 +250,105 @@ void main() {
   );
 
   test(
+    'should throw a preference exception when reading the cache fails',
+    () async {
+      final harness = _buildHarness();
+      when(
+        () => harness.preferenceCache.get(),
+      ).thenThrow(StateError('secret persisted content'));
+      await expectLater(
+        harness.repository.getPreference(),
+        throwsA(isA<RemoteAssistantPreferenceException>()),
+      );
+    },
+  );
+
+  test('should remain fail closed when a revocation write throws', () async {
+    final harness = _buildHarness();
+    when(
+      () => harness.preferenceCache.put(any()),
+    ).thenThrow(StateError('secret persisted content'));
+    await expectLater(
+      harness.repository.updatePreference(
+        const RemoteAssistantPreferenceEntity(
+          enabled: false,
+          consentAccepted: false,
+        ),
+      ),
+      throwsA(isA<RemoteAssistantPreferenceException>()),
+    );
+    await expectLater(
+      _answer(harness.repository),
+      throwsA(isA<RemoteAssistantPreferenceException>()),
+    );
+  });
+
+  test(
+    'should propagate model creation exceptions unchanged when Firebase configuration fails',
+    () async {
+      const error = AiConfigurationException(
+        'secret server body',
+        StackTrace.empty,
+      );
+      final harness = _buildHarness();
+      when(
+        () => harness.aiController.createTextModel(
+          model: any(named: 'model'),
+          generationConfig: any(named: 'generationConfig'),
+          systemInstruction: any(named: 'systemInstruction'),
+          safetySettings: any(named: 'safetySettings'),
+        ),
+      ).thenThrow(error);
+      await expectLater(_answer(harness.repository), throwsA(same(error)));
+    },
+  );
+
+  test(
+    'should reject requests with a closed exception when repository disposal completes',
+    () async {
+      final harness = _buildHarness();
+      await _answer(harness.repository);
+      await harness.repository.close();
+      await harness.repository.close();
+      verify(() => harness.model.close()).called(1);
+      await expectLater(
+        _answer(harness.repository),
+        throwsA(isA<RemoteAssistantClosedException>()),
+      );
+      await expectLater(
+        harness.repository.updatePreference(
+          const RemoteAssistantPreferenceEntity(
+            enabled: true,
+            consentAccepted: true,
+          ),
+        ),
+        throwsA(isA<RemoteAssistantClosedException>()),
+      );
+    },
+  );
+
+  test(
+    'should propagate cleanup errors when resetting the session fails',
+    () async {
+      final harness = _buildHarness();
+      final error = StateError('model cleanup failed');
+      await _answer(harness.repository);
+      when(() => harness.model.close()).thenThrow(error);
+      await expectLater(
+        harness.repository.resetSession(),
+        throwsA(same(error)),
+      );
+    },
+  );
+
+  test(
     'should avoid creating a model when the rollout flag is disabled',
     () async {
       final harness = _buildHarness(flagResult: const Right(false));
 
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantUnavailableFailure>()),
+        throwsA(isA<RemoteAssistantUnavailableException>()),
       );
 
       verifyNever(
@@ -310,7 +369,7 @@ void main() {
 
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantConfigurationFailure>()),
+        throwsA(isA<RemoteAssistantFlagException>()),
       );
 
       verifyNever(
@@ -334,7 +393,7 @@ void main() {
 
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantConsentRequiredFailure>()),
+        throwsA(isA<RemoteAssistantConsentRequiredException>()),
       );
 
       verifyNever(
@@ -358,7 +417,7 @@ void main() {
 
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantUnavailableFailure>()),
+        throwsA(isA<RemoteAssistantUnavailableException>()),
       );
 
       verifyNever(
@@ -471,37 +530,43 @@ void main() {
     },
   );
 
-  test('should map quota errors when the response stream fails', () async {
-    final harness = _buildHarness(
-      responseStream: Stream<String>.error(
-        AiQuotaExceededException(
-          StateError('quota information'),
-          StackTrace.current,
+  test(
+    'should propagate quota errors when the response stream fails',
+    () async {
+      final harness = _buildHarness(
+        responseStream: Stream<String>.error(
+          AiQuotaExceededException(
+            StateError('quota information'),
+            StackTrace.current,
+          ),
         ),
-      ),
-    );
+      );
 
-    await expectLater(
-      _answer(harness.repository),
-      throwsA(isA<RemoteAssistantQuotaFailure>()),
-    );
-  });
+      await expectLater(
+        _answer(harness.repository),
+        throwsA(isA<AiQuotaExceededException>()),
+      );
+    },
+  );
 
-  test('should map network errors when the response stream fails', () async {
-    final harness = _buildHarness(
-      responseStream: Stream<String>.error(
-        AiNetworkException(
-          StateError('network information'),
-          StackTrace.current,
+  test(
+    'should propagate network errors when the response stream fails',
+    () async {
+      final harness = _buildHarness(
+        responseStream: Stream<String>.error(
+          AiNetworkException(
+            StateError('network information'),
+            StackTrace.current,
+          ),
         ),
-      ),
-    );
+      );
 
-    await expectLater(
-      _answer(harness.repository),
-      throwsA(isA<RemoteAssistantNetworkFailure>()),
-    );
-  });
+      await expectLater(
+        _answer(harness.repository),
+        throwsA(isA<AiNetworkException>()),
+      );
+    },
+  );
 
   test(
     'should fail a partial response when the stream later reports an error',
@@ -527,7 +592,7 @@ void main() {
           history: const [],
           onDelta: deltas.add,
         ),
-        throwsA(isA<RemoteAssistantQuotaFailure>()),
+        throwsA(isA<AiQuotaExceededException>()),
       );
 
       expect(deltas, ['partial response']);
@@ -547,7 +612,7 @@ void main() {
           history: const [],
           onDelta: deltas.add,
         ),
-        throwsA(isA<RemoteAssistantIncompleteFailure>()),
+        throwsA(isA<RemoteAssistantResponseLimitException>()),
       );
 
       expect(deltas, isEmpty);
@@ -564,13 +629,13 @@ void main() {
 
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantUnavailableFailure>()),
+        throwsA(isA<RemoteAssistantConcurrentRequestException>()),
       );
 
       await harness.repository.resetSession();
       await expectLater(
         firstRequest,
-        throwsA(isA<RemoteAssistantUnavailableFailure>()),
+        throwsA(isA<RemoteAssistantCancelledException>()),
       );
       await streamController.close();
     },
@@ -597,7 +662,7 @@ void main() {
 
       await expectLater(
         request,
-        throwsA(isA<RemoteAssistantUnavailableFailure>()),
+        throwsA(isA<RemoteAssistantCancelledException>()),
       );
       expect(deltas, ['before reset']);
       verify(() => harness.model.close()).called(1);
@@ -623,7 +688,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       final requestExpectation = expectLater(
         request,
-        throwsA(isA<RemoteAssistantUnavailableFailure>()),
+        throwsA(isA<RemoteAssistantCancelledException>()),
       );
 
       await harness.repository.updatePreference(
@@ -662,11 +727,11 @@ void main() {
             consentAccepted: false,
           ),
         ),
-        throwsA(isA<RemoteAssistantPreferenceFailure>()),
+        throwsA(isA<RemoteAssistantPreferenceException>()),
       );
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantPreferenceFailure>()),
+        throwsA(isA<RemoteAssistantPreferenceException>()),
       );
       verifyNever(
         () => harness.aiController.createTextModel(
@@ -706,7 +771,7 @@ void main() {
 
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantPreferenceFailure>()),
+        throwsA(isA<RemoteAssistantPreferenceException>()),
       );
 
       firstWrite.complete(true);
@@ -741,7 +806,7 @@ void main() {
         async.flushMicrotasks();
       });
 
-      expect(failure, isA<RemoteAssistantTimeoutFailure>());
+      expect(failure, isA<RemoteAssistantTimeoutException>());
       unawaited(streamController.close());
     },
   );
@@ -758,7 +823,7 @@ void main() {
           history: const [],
           onDelta: (_) => throw StateError('callback failed'),
         ),
-        throwsA(isA<RemoteAssistantUnknownFailure>()),
+        throwsA(isA<RemoteAssistantCallbackException>()),
       );
     },
   );

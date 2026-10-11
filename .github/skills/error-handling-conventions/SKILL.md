@@ -29,6 +29,15 @@ class GetAppStoreUrlUnknownFailure extends GetAppStoreUrlFailure {
 `Failure`s are what blocs put into state and what the UI renders — they are
 **not** reported to crash/error reporting on their own.
 
+### Repository exception boundary
+
+Repositories propagate infrastructure exceptions or normalize them into typed exceptions;
+they never throw domain `Failure`s or map exceptions to failures. Use cases own that mapping
+in `mapErrorToFailure`, matching concrete exception types rather than message strings.
+Keep feature exception hierarchies in dedicated `domain/exception/<feature>_exception.dart`
+files with an `_exception.dart` barrel, not inline in repository implementations.
+Exceptions describe what went wrong; localized failures describe what that means to the user.
+
 ### `@Localizable('<arbKey>')`
 
 Annotate any concrete `Failure` subclass that should show a user-facing
@@ -67,9 +76,9 @@ ad hoc at call sites.
 
 ## Don't invent
 
-- Don't create a new exception hierarchy parallel to `Failure`/
-  `BasicFailure` for domain errors — every use case failure extends
-  `BasicFailure`.
+- Don't substitute exceptions for use case result failures — every use case failure extends
+  `BasicFailure`. Typed repository exceptions cross the data boundary and are mapped by the
+  use case before reaching presentation.
 - Don't call `ErrorReporter`/`FatalErrorController` directly from a bloc to
   report a `Failure` — logging/reporting of use case failures is already
   handled by the `LogUseCaseInterceptor` (see `flutter-architecture-conventions`);

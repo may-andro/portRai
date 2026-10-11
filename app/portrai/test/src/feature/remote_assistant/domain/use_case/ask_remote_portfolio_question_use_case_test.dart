@@ -1,3 +1,4 @@
+import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
@@ -55,10 +56,12 @@ void main() {
   );
 
   test(
-    'should preserve failure type when repository rejects a request',
+    'should map a quota exception when repository rejects a request',
     () async {
       final repository = MockRemoteAssistantRepository()
-        ..stubAnswerError(const RemoteAssistantQuotaFailure());
+        ..stubAnswerError(
+          const AiQuotaExceededException('raw response', StackTrace.empty),
+        );
       const params = AskRemotePortfolioQuestionParams(
         question: 'Question',
         portfolioContext: 'Context',
