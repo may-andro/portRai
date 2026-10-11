@@ -165,7 +165,7 @@ controls, including a successful authorized smoke test. See the
 [Firebase AI setup guide](../../layer/firebase/README.md#firebase-ai-logic-setup).
 No live or billable AI request is required by the automated tests.
 
-Generation uses `gemini-2.5-flash`, a 1,024-token output limit and temperature 0.3.
+Generation uses `gemini-3.8-flash`, a 1,024-token output limit and temperature 0.3.
 Requests are bounded to 2,000 question characters, 100,000 portfolio-context characters,
 12 recent history messages / 24,000 history characters, and 12,000 response characters.
 The absolute request deadline is 60 seconds, with no automatic retries. Oversized input is
