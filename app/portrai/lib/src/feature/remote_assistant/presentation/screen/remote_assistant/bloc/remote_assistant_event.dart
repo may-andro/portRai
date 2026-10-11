@@ -11,6 +11,10 @@ class RemoteAssistantStartedEvent extends RemoteAssistantEvent {
   const RemoteAssistantStartedEvent();
 }
 
+class RemoteAssistantInitializedEvent extends RemoteAssistantEvent {
+  const RemoteAssistantInitializedEvent();
+}
+
 class AcceptRemoteAssistantConsentClickEvent extends RemoteAssistantEvent {
   const AcceptRemoteAssistantConsentClickEvent();
 }
@@ -33,4 +37,8 @@ class SendRemoteAssistantQuestionClickEvent extends RemoteAssistantEvent {
 
   @override
   String toString() => 'SendRemoteAssistantQuestionClickEvent';
+}
+
+class RemoteAssistantFlagsChangedEvent extends RemoteAssistantEvent {
+  const RemoteAssistantFlagsChangedEvent();
 }

@@ -9,6 +9,7 @@ import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/route/route.dart';
 
 import '../../../mock/feature/feature_flag/domain/registry/mock_app_feature_flag_definition_registry.dart';
+import '../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../mock/feature/local_assistant/presentation/screen/local_assistant/bloc/mock_local_assistant_bloc.dart';
 import '../../../mock/utility/mock_module_route_controller.dart';
 import '../../../mock/utility/mock_service_locator.dart';
@@ -20,6 +21,9 @@ void main() {
       final locator = ModuleInjectorController().serviceLocator;
       await locator.reset();
       addTearDown(locator.reset);
+      locator.registerFactory<IsFeatureEnabledUseCase>(
+        () => MockIsFeatureEnabledUseCase(),
+      );
 
       AssistantModuleConfigurator().registerDependencies(locator);
 

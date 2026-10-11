@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:use_case/use_case.dart';
 
 /// Where the on-device model is in its lifecycle. Exactly one applies, so
 /// states such as "ready while still downloading" cannot be represented.
@@ -48,6 +49,7 @@ class LocalAssistantState extends Equatable {
     this.isSendingQuestion = false,
     this.messages = const [],
     this.hasError = false,
+    this.failure,
   });
 
   final LocalAssistantStatus status;
@@ -62,6 +64,7 @@ class LocalAssistantState extends Equatable {
 
   /// The context failed to load, or the last answer failed.
   final bool hasError;
+  final Failure? failure;
 
   bool get isAvailable => status is! LocalAssistantUnavailable;
   bool get isReady => status is LocalAssistantReady;
@@ -77,15 +80,21 @@ class LocalAssistantState extends Equatable {
     bool? isSendingQuestion,
     List<AssistantMessageEntity>? messages,
     bool? hasError,
+    Failure? failure,
+    bool clearFailure = false,
+    bool clearContext = false,
   }) {
     return LocalAssistantState(
       status: status ?? this.status,
-      portfolioContext: portfolioContext ?? this.portfolioContext,
+      portfolioContext: clearContext
+          ? null
+          : portfolioContext ?? this.portfolioContext,
       isLoadingContext: isLoadingContext ?? this.isLoadingContext,
       isModelDownloaded: isModelDownloaded ?? this.isModelDownloaded,
       isSendingQuestion: isSendingQuestion ?? this.isSendingQuestion,
       messages: messages ?? this.messages,
       hasError: hasError ?? this.hasError,
+      failure: clearFailure ? null : failure ?? this.failure,
     );
   }
 
@@ -98,5 +107,6 @@ class LocalAssistantState extends Equatable {
     isSendingQuestion,
     messages,
     hasError,
+    failure,
   ];
 }

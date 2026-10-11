@@ -1,6 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 
@@ -110,6 +111,14 @@ class LocalAssistantCardWidget extends StatelessWidget {
                       const EnableLocalAssistantClickEvent(),
                     ),
                     size: DSButtonSize.small,
+                  ),
+                ],
+                if (state.failure != null && !state.hasFailed) ...[
+                  const DSVerticalSpacerWidget(1),
+                  DSTextWidget(
+                    FailureTranslator.translate(context, state.failure!),
+                    color: palette.semantic.error,
+                    style: context.typography.bodyMedium,
                   ),
                 ],
               ],

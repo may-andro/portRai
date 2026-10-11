@@ -69,3 +69,12 @@ final class SectionNavigationEvent extends PortfolioEvent {
 }
 
 enum NavigationSource { drawer, header, scroll }
+
+final class AssistantSelectionClickEvent extends PortfolioEvent {
+  const AssistantSelectionClickEvent({required this.isLocal});
+
+  final bool isLocal;
+
+  @override
+  List<Object> get props => [isLocal];
+}

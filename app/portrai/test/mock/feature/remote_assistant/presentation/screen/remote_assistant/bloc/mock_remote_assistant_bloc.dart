@@ -9,5 +9,10 @@ class MockRemoteAssistantBloc
 extension MockRemoteAssistantBlocStub on MockRemoteAssistantBloc {
   void stubState(RemoteAssistantState state) {
     when(() => this.state).thenReturn(state);
+    stubPlatformSupported(true);
+  }
+
+  void stubPlatformSupported(bool supported) {
+    when(() => isPlatformSupported).thenReturn(supported);
   }
 }

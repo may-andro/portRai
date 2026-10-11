@@ -23,5 +23,5 @@ class UpdateLocalAssistantEnabledUseCase
   @protected
   @override
   LocalAssistantFailure mapErrorToFailure(Object e, StackTrace st) =>
-      UnknownLocalAssistantFailure(cause: e);
+      e.toLocalAssistantFailure;
 }

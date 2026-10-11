@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/_widget.dart';
+import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/assistant_launcher_widget.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/observer/route_observer_widget.dart';
 
@@ -21,11 +23,12 @@ class PortfolioScreen extends StatelessWidget {
           return RouteObserverWidget(
             onResume: () {
               context.bloc.add(const ScreenVisibleEvent());
-              if (isLocalAssistantSupported) {
-                context.read<LocalAssistantBloc>().add(
-                  const LocalAssistantInitializedEvent(),
-                );
-              }
+              context.read<LocalAssistantBloc>().add(
+                const LocalAssistantInitializedEvent(),
+              );
+              context.read<RemoteAssistantBloc>().add(
+                const RemoteAssistantInitializedEvent(),
+              );
             },
             child: Scaffold(
               backgroundColor: context.colorPalette.background.color,
@@ -36,8 +39,8 @@ class PortfolioScreen extends StatelessWidget {
               },
               floatingActionButton: BlocBuilder<PortfolioBloc, PortfolioState>(
                 builder: (context, state) {
-                  return state is LoadedState && isLocalAssistantSupported
-                      ? const LocalAssistantButton()
+                  return state is LoadedState
+                      ? const AssistantLauncherWidget()
                       : const SizedBox.shrink();
                 },
               ),

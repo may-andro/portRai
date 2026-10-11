@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/tracking/_tracking.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant_availability.dart';
 
 @RegisterSingleton(disposeMethodName: 'close')
 class RemoteAssistantBloc
@@ -19,13 +20,50 @@ class RemoteAssistantBloc
     this._resetSession,
     this._askQuestion,
     this._isFeatureEnabled,
-    this._tracking,
-  ) : super(const RemoteAssistantState()) {
+    this._tracking, {
+    this._availability = const RemoteAssistantAvailability(),
+    @Inject(AppFeatureFlagChanges) AppFeatureFlagChanges? flagChanges,
+  }) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_onStarted);
+    on<RemoteAssistantInitializedEvent>(
+      (event, emit) => _onStarted(
+        const RemoteAssistantStartedEvent(),
+        emit,
+        trackView: false,
+      ),
+    );
     on<AcceptRemoteAssistantConsentClickEvent>(_onAcceptConsent);
     on<DisableRemoteAssistantClickEvent>(_onDisable);
     on<ResetRemoteAssistantClickEvent>(_onReset);
     on<SendRemoteAssistantQuestionClickEvent>(_onSend);
+    on<RemoteAssistantFlagsChangedEvent>((event, emit) async {
+      emit(
+        state.copyWith(
+          messages: const [],
+          partialAnswer: '',
+          isSendingQuestion: false,
+          isUpdatingPreference: false,
+        ),
+      );
+      await _onStarted(
+        const RemoteAssistantStartedEvent(),
+        emit,
+        trackView: false,
+      );
+      final reset = await _resetSession();
+      if (!emit.isDone && reset.isLeft) {
+        emit(state.copyWith(failure: reset.left));
+      }
+    });
+    _flagSubscription = flagChanges?.stream.listen((key) {
+      if (key != null &&
+          key != RemoteAssistantFeatureFlags.remoteAssistant.key) {
+        return;
+      }
+      _requestRevision++;
+      _controlRevision++;
+      add(const RemoteAssistantFlagsChangedEvent());
+    });
   }
 
   final GetAssistantContextUseCase _getContext;
@@ -35,8 +73,11 @@ class RemoteAssistantBloc
   final AskRemotePortfolioQuestionUseCase _askQuestion;
   final IsFeatureEnabledUseCase _isFeatureEnabled;
   final RemoteAssistantTrackingDelegate _tracking;
+  final RemoteAssistantAvailability _availability;
+  StreamSubscription<String?>? _flagSubscription;
   int _controlRevision = 0;
   int _requestRevision = 0;
+  bool get isPlatformSupported => _availability.isSupported;
 
   Future<bool> _checkFlag(
     Emitter<RemoteAssistantState> emit,
@@ -46,7 +87,9 @@ class RemoteAssistantBloc
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
     if (emit.isDone || controlRevision != _controlRevision) return false;
-    if (result.isRight && result.right) return true;
+    if (result.isRight && result.right && _availability.isSupported) {
+      return true;
+    }
     _requestRevision++;
     emit(
       state.copyWith(
@@ -69,11 +112,12 @@ class RemoteAssistantBloc
 
   Future<void> _onStarted(
     RemoteAssistantStartedEvent event,
-    Emitter<RemoteAssistantState> emit,
-  ) async {
+    Emitter<RemoteAssistantState> emit, {
+    bool trackView = true,
+  }) async {
     if (state.isUpdatingPreference) return;
     final revision = ++_controlRevision;
-    _tracking.trackScreenView();
+    if (trackView) _tracking.trackScreenView();
     if (!await _checkFlag(emit, revision) || revision != _controlRevision) {
       return;
     }
@@ -316,6 +360,7 @@ class RemoteAssistantBloc
   Future<void> close() async {
     _controlRevision++;
     _requestRevision++;
+    await _flagSubscription?.cancel();
     await _resetSession();
     await super.close();
   }

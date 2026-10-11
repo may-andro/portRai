@@ -120,7 +120,7 @@ void main() {
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
-    'should retain the question and expose an error when answering fails',
+    'should discard the failed turn and expose a failure when answering fails',
     build: () {
       final bloc = createBloc();
       askQuestion.stubCall(
@@ -157,12 +157,7 @@ void main() {
         portfolioContext: 'Context',
         isLoadingContext: false,
         hasError: true,
-        messages: [
-          AssistantMessageEntity(
-            content: AssistantTextResponseEntity(text: 'Question'),
-            isUser: true,
-          ),
-        ],
+        failure: UnknownLocalAssistantFailure(),
       ),
     ],
   );
@@ -191,7 +186,10 @@ void main() {
     },
     act: (bloc) => bloc.add(const LocalAssistantInitializedEvent()),
     expect: () => [
-      const LocalAssistantState(status: LocalAssistantUnavailable()),
+      const LocalAssistantState(
+        status: LocalAssistantUnavailable(),
+        isLoadingContext: false,
+      ),
     ],
     verify: (_) => verifyNever(() => prepare(any())),
   );
@@ -216,8 +214,11 @@ void main() {
       bloc.add(const LocalAssistantInitializedEvent());
     },
     expect: () => [
-      const LocalAssistantState(status: LocalAssistantUnavailable()),
-      const LocalAssistantState(),
+      const LocalAssistantState(
+        status: LocalAssistantUnavailable(),
+        isLoadingContext: false,
+      ),
+      const LocalAssistantState(isLoadingContext: false),
     ],
   );
 
@@ -286,7 +287,10 @@ void main() {
     act: (bloc) => bloc.add(const EnableLocalAssistantClickEvent()),
     expect: () => [
       const LocalAssistantState(status: LocalAssistantDownloading()),
-      const LocalAssistantState(status: LocalAssistantFailed()),
+      const LocalAssistantState(
+        status: LocalAssistantFailed(),
+        failure: UnknownLocalAssistantFailure(),
+      ),
     ],
   );
 

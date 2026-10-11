@@ -18,4 +18,13 @@ class LocalAssistantTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
+
+  void trackReset() {
+    trackEvent(
+      Tracking(
+        name: 'assistant_reset',
+        action: const ClickAction(label: 'reset'),
+      ),
+    );
+  }
 }

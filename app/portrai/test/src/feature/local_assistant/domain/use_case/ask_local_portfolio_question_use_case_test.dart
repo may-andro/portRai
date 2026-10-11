@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 
@@ -53,4 +54,33 @@ void main() {
     expect(result.left, isA<UnknownLocalAssistantFailure>());
     expect(result.left.cause, same(error));
   });
+
+  test(
+    'should map a typed availability exception when the repository blocks access',
+    () async {
+      final repository = MockLocalAssistantRepository()
+        ..stubAnswerError(
+          question: params.question,
+          portfolioContext: params.portfolioContext,
+          error: const LocalAssistantUnavailableException(),
+        );
+
+      final result = await AskLocalPortfolioQuestionUseCase(repository)(params);
+      expect(result.left, isA<UnavailableLocalAssistantFailure>());
+    },
+  );
+
+  test(
+    'should map a busy exception when previous native work is still finishing',
+    () async {
+      final repository = MockLocalAssistantRepository()
+        ..stubAnswerError(
+          question: params.question,
+          portfolioContext: params.portfolioContext,
+          error: const LocalAssistantBusyException(),
+        );
+      final result = await AskLocalPortfolioQuestionUseCase(repository)(params);
+      expect(result.left, isA<BusyLocalAssistantFailure>());
+    },
+  );
 }

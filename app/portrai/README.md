@@ -139,8 +139,19 @@ Disable/reset invalidate pending output. They stop local consumption and close t
 transport; they cannot guarantee that server generation or billing stops.
 Question content and generated text are excluded from remote request/state logging and analytics.
 
-To access the remote assistant, enable its flag in the feature-flag tools, then open
-`/remote-assistant`. The portfolio launcher and Settings do not expose remote assistant controls.
+The portfolio launcher offers providers based on rollout and platform support, before user
+enablement. It is hidden when neither is offered, opens directly when only one is offered, and
+shows a localized on-device/cloud choice when both are offered. The on-device option is hidden
+on web; cloud is supported on the configured Firebase platforms (Android, iOS and web).
+Selecting an unconfigured local assistant opens its existing download/enable controls.
+Selecting cloud without consent opens the explicit consent screen; discovery never grants consent.
+
+Settings has separate on-device model management and cloud consent/chat cards. Enabling cloud
+from Settings opens the consent screen. Turning cloud off withdraws consent and clears its chat;
+clear chat retains consent. Each provider's singleton bloc preserves its own in-memory conversation
+across navigation. Dev flag updates notify both blocs without polling; flag-off clears pending
+output and sessions. Every new request and enable action rechecks availability.
+See the [assistant reference](lib/src/feature/assistant/README.md) for module boundaries.
 Production use requires validated App Check enforcement, model availability, and quota/spending
 controls, including a successful authorized smoke test. See the
 [Firebase AI setup guide](../../layer/firebase/README.md#firebase-ai-logic-setup).

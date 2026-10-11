@@ -10,14 +10,16 @@ import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception
 import 'package:portrai/src/feature/remote_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant_availability.dart';
 
 @RegisterSingleton(as: RemoteAssistantRepository, disposeMethodName: 'close')
 class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
   FirebaseRemoteAssistantRepository(
     this._aiController,
     this._preferenceCache,
-    this._isFeatureEnabled,
-  );
+    this._isFeatureEnabled, {
+    this._availability = const RemoteAssistantAvailability(),
+  });
 
   static const _systemInstruction =
       'You are a portfolio question-answering assistant for Mayank Rai. '
@@ -31,6 +33,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
   final FbAiController _aiController;
   final RemoteAssistantPreferenceCache _preferenceCache;
   final IsFeatureEnabledUseCase _isFeatureEnabled;
+  final RemoteAssistantAvailability _availability;
 
   FbAiTextModel? _model;
   // ignore: cancel_subscriptions
@@ -166,6 +169,9 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required void Function(String delta) onDelta,
     required int generation,
   }) async {
+    if (!_availability.isSupported) {
+      throw const RemoteAssistantUnavailableException();
+    }
     if (_revocationFailedClosed) {
       throw const RemoteAssistantPreferenceException();
     }

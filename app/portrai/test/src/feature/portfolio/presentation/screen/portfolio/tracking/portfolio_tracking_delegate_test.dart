@@ -32,6 +32,24 @@ void main() {
       when(() => trackingReporter.sendTrackingEvent(any())).thenReturn(null);
     });
 
+    for (final isLocal in [true, false]) {
+      test(
+        'should send only provider metadata when ${isLocal ? 'local' : 'cloud'} discovery is selected',
+        () {
+          delegate.trackAssistantSelection(isLocal: isLocal);
+          final tracking =
+              verify(
+                    () => trackingReporter.sendTrackingEvent(captureAny()),
+                  ).captured.single
+                  as Tracking;
+          expect(tracking.name, 'assistant_selection');
+          expect(tracking.parameters['label'], isLocal ? 'local' : 'cloud');
+          expect(tracking.parameters.keys, isNot(contains('prompt')));
+          expect(tracking.parameters.keys, isNot(contains('response')));
+        },
+      );
+    }
+
     test('should send a screen view event when trackScreenView is called', () {
       delegate.trackScreenView();
 

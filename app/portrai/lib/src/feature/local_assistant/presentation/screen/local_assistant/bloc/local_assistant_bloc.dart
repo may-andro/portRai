@@ -5,13 +5,14 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/_domain.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_state.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/tracking/_tracking.dart';
 
 // One shared instance: Settings, the portfolio button and the assistant
 // screen all reflect the same download and enabled state.
-@registerSingleton
+@RegisterSingleton(disposeMethodName: 'close')
 class LocalAssistantBloc
     extends Bloc<LocalAssistantEvent, LocalAssistantState> {
   LocalAssistantBloc(
@@ -24,13 +25,39 @@ class LocalAssistantBloc
     this._isAssistantModelDownloadedUseCase,
     this._askPortfolioQuestionUseCase,
     this._trackingDelegate,
-    this._isFeatureEnabledUseCase,
-  ) : super(const LocalAssistantState()) {
+    this._isFeatureEnabledUseCase, {
+    this._availability = const LocalAssistantAvailability(),
+    @Inject(AppFeatureFlagChanges) AppFeatureFlagChanges? flagChanges,
+    @Inject(ResetLocalAssistantSessionUseCase) this._resetSession,
+  }) : super(const LocalAssistantState()) {
     on<LocalAssistantStartedEvent>(_onStarted);
     on<LocalAssistantInitializedEvent>(_onInitialized);
     on<EnableLocalAssistantClickEvent>(_onEnable);
     on<DisableLocalAssistantClickEvent>(_onDisable);
     on<SendLocalAssistantQuestionClickEvent>(_onSendQuestion);
+    on<ResetLocalAssistantClickEvent>(_onReset);
+    on<LocalAssistantFlagsChangedEvent>((event, emit) async {
+      final revision = _controlRevision;
+      emit(state.copyWith(messages: const [], isSendingQuestion: false));
+      if (!await _checkAvailability(emit) || revision != _controlRevision) {
+        return;
+      }
+      final reset = await _resetSession?.call();
+      if (emit.isDone || revision != _controlRevision) return;
+      if (reset != null && reset.isLeft) {
+        emit(state.copyWith(hasError: true, failure: reset.left));
+      }
+      await _onInitialized(const LocalAssistantInitializedEvent(), emit);
+    });
+    _flagSubscription = flagChanges?.stream.listen((key) {
+      if (key != null && key != LocalAssistantFeatureFlags.aiAssistant.key) {
+        return;
+      }
+      _requestRevision++;
+      _controlRevision++;
+      _hasInitialized = false;
+      add(const LocalAssistantFlagsChangedEvent());
+    });
   }
 
   final GetAssistantContextUseCase _getAssistantContextUseCase;
@@ -45,20 +72,81 @@ class LocalAssistantBloc
   final AskLocalPortfolioQuestionUseCase _askPortfolioQuestionUseCase;
   final LocalAssistantTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
+  final LocalAssistantAvailability _availability;
+  final ResetLocalAssistantSessionUseCase? _resetSession;
+  StreamSubscription<String?>? _flagSubscription;
+  int _controlRevision = 0;
+  int _requestRevision = 0;
+  bool get isPlatformSupported => _availability.isSupported;
+
+  Future<bool> _checkAvailability(Emitter<LocalAssistantState> emit) async {
+    final revision = _controlRevision;
+    final result = await _isFeatureEnabledUseCase(
+      LocalAssistantFeatureFlags.aiAssistant,
+    );
+    if (emit.isDone || revision != _controlRevision) return false;
+    if (result.isRight && result.right && _availability.isSupported) {
+      return true;
+    }
+    _controlRevision++;
+    _requestRevision++;
+    final invalidationRevision = _controlRevision;
+    _hasInitialized = false;
+    final wasDownloading = state.isDownloading;
+    emit(
+      state.copyWith(
+        status: const LocalAssistantUnavailable(),
+        messages: const [],
+        isSendingQuestion: false,
+        isLoadingContext: false,
+        clearContext: true,
+        hasError: result.isLeft,
+        failure: result.isLeft ? result.left : null,
+        clearFailure: result.isRight,
+      ),
+    );
+    final reset = await _resetSession?.call();
+    if (emit.isDone || invalidationRevision != _controlRevision) return false;
+    if (reset != null && reset.isLeft) {
+      emit(state.copyWith(hasError: true, failure: reset.left));
+    }
+    if (wasDownloading) {
+      final result = await _cancelAssistantPreparationUseCase();
+      if (!emit.isDone &&
+          invalidationRevision == _controlRevision &&
+          result.isLeft) {
+        emit(state.copyWith(hasError: true, failure: result.left));
+      }
+    }
+    return false;
+  }
 
   Future<void> _onStarted(
     LocalAssistantStartedEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
     _trackingDelegate.trackScreenView();
+    if (!await _checkAvailability(emit)) return;
+    final revision = _controlRevision;
+    await _onInitialized(const LocalAssistantInitializedEvent(), emit);
+    if (emit.isDone || revision != _controlRevision) return;
+    emit(state.copyWith(isLoadingContext: true));
     final result = await _getAssistantContextUseCase();
+    if (emit.isDone || revision != _controlRevision) return;
     result.fold(
-      (_) => emit(state.copyWith(isLoadingContext: false, hasError: true)),
+      (failure) => emit(
+        state.copyWith(
+          isLoadingContext: false,
+          hasError: true,
+          failure: failure,
+        ),
+      ),
       (context) => emit(
         state.copyWith(
           portfolioContext: context,
           isLoadingContext: false,
           hasError: false,
+          clearFailure: true,
         ),
       ),
     );
@@ -72,30 +160,30 @@ class LocalAssistantBloc
     LocalAssistantInitializedEvent event,
     Emitter<LocalAssistantState> emit,
   ) async {
-    final flagResult = await _isFeatureEnabledUseCase(
-      LocalAssistantFeatureFlags.aiAssistant,
-    );
-    final isFeatureEnabled = flagResult.isRight
-        ? flagResult.right
-        : LocalAssistantFeatureFlags.aiAssistant.defaultValue;
-    if (!isFeatureEnabled) {
-      emit(state.copyWith(status: const LocalAssistantUnavailable()));
-      return;
-    }
+    if (!await _checkAvailability(emit)) return;
+    final revision = _controlRevision;
     if (state.status is LocalAssistantUnavailable) {
       emit(state.copyWith(status: const LocalAssistantOff()));
     }
     if (_hasInitialized) return;
     _hasInitialized = true;
-    await _refreshDownloaded(emit);
+    if (!await _refreshDownloaded(emit, revision)) {
+      _hasInitialized = false;
+      return;
+    }
     final result = await _getAssistantEnabledUseCase();
-    if (result.isLeft || !result.right) return;
+    if (emit.isDone || revision != _controlRevision) return;
+    if (result.isLeft) {
+      emit(state.copyWith(hasError: true, failure: result.left));
+      return;
+    }
+    if (!result.right) return;
     // An installed model is only loaded into memory by the first question.
     if (state.isModelDownloaded) {
       emit(state.copyWith(status: const LocalAssistantReady()));
       return;
     }
-    await _prepareModel(emit);
+    await _prepareModel(emit, revision);
   }
 
   Future<void> _onEnable(
@@ -103,14 +191,28 @@ class LocalAssistantBloc
     Emitter<LocalAssistantState> emit,
   ) async {
     if (state.isDownloading) return;
+    final revision = ++_controlRevision;
     emit(
       state.copyWith(
         status: const LocalAssistantDownloading(),
         hasError: false,
+        clearFailure: true,
       ),
     );
-    await _updateAssistantEnabledUseCase(true);
-    await _prepareModel(emit);
+    if (!await _checkAvailability(emit) || revision != _controlRevision) return;
+    final result = await _updateAssistantEnabledUseCase(true);
+    if (emit.isDone || revision != _controlRevision) return;
+    if (result.isLeft) {
+      emit(
+        state.copyWith(
+          status: const LocalAssistantFailed(),
+          hasError: true,
+          failure: result.left,
+        ),
+      );
+      return;
+    }
+    await _prepareModel(emit, revision);
   }
 
   Future<void> _onDisable(
@@ -118,29 +220,56 @@ class LocalAssistantBloc
     Emitter<LocalAssistantState> emit,
   ) async {
     final wasDownloading = state.isDownloading;
+    final revision = ++_controlRevision;
+    _requestRevision++;
     emit(
       state.copyWith(
         status: const LocalAssistantOff(),
         hasError: false,
         messages: const [],
+        isSendingQuestion: false,
+        clearFailure: true,
       ),
     );
-    await _updateAssistantEnabledUseCase(false);
+    final result = await _updateAssistantEnabledUseCase(false);
+    if (emit.isDone || revision != _controlRevision) return;
+    if (result.isLeft) {
+      emit(state.copyWith(hasError: true, failure: result.left));
+    }
     // A download that is still running is always discarded.
     if (wasDownloading) {
-      await _cancelAssistantPreparationUseCase();
+      final cancelled = await _cancelAssistantPreparationUseCase();
+      if (!emit.isDone && revision == _controlRevision && cancelled.isLeft) {
+        emit(state.copyWith(hasError: true, failure: cancelled.left));
+      }
     } else if (event.deleteModel) {
-      await _deleteAssistantModelUseCase();
+      final deleted = await _deleteAssistantModelUseCase();
+      if (!emit.isDone && revision == _controlRevision && deleted.isLeft) {
+        emit(state.copyWith(hasError: true, failure: deleted.left));
+      }
     }
-    await _refreshDownloaded(emit);
+    await _refreshDownloaded(emit, revision);
   }
 
-  Future<void> _refreshDownloaded(Emitter<LocalAssistantState> emit) async {
+  Future<bool> _refreshDownloaded(
+    Emitter<LocalAssistantState> emit,
+    int revision,
+  ) async {
     final result = await _isAssistantModelDownloadedUseCase();
-    emit(state.copyWith(isModelDownloaded: result.isRight && result.right));
+    if (emit.isDone || revision != _controlRevision) return false;
+    if (result.isLeft) {
+      emit(state.copyWith(hasError: true, failure: result.left));
+      return false;
+    } else {
+      emit(state.copyWith(isModelDownloaded: result.right));
+      return true;
+    }
   }
 
-  Future<void> _prepareModel(Emitter<LocalAssistantState> emit) async {
+  Future<void> _prepareModel(
+    Emitter<LocalAssistantState> emit,
+    int revision,
+  ) async {
     emit(
       state.copyWith(
         status: const LocalAssistantDownloading(),
@@ -148,19 +277,29 @@ class LocalAssistantBloc
       ),
     );
     final result = await _prepareAssistantModelUseCase((progress) {
-      if (state.isDownloading) {
+      if (!emit.isDone && revision == _controlRevision && state.isDownloading) {
         emit(state.copyWith(status: LocalAssistantDownloading(progress)));
       }
     });
-    await _refreshDownloaded(emit);
+    if (emit.isDone || revision != _controlRevision) return;
+    if (!await _refreshDownloaded(emit, revision)) {
+      if (!emit.isDone && revision == _controlRevision) {
+        emit(state.copyWith(status: const LocalAssistantFailed()));
+      }
+      return;
+    }
     // Turning the assistant off meanwhile leaves it off, so a failure then is
     // a cancellation and a success is discarded.
-    if (!state.isDownloading) return;
+    if (emit.isDone || revision != _controlRevision || !state.isDownloading) {
+      return;
+    }
     emit(
       state.copyWith(
         status: result.isRight
             ? const LocalAssistantReady()
             : const LocalAssistantFailed(),
+        failure: result.isLeft ? result.left : null,
+        clearFailure: result.isRight,
       ),
     );
   }
@@ -178,7 +317,8 @@ class LocalAssistantBloc
       return;
     }
 
-    _trackingDelegate.trackQuestionSubmission();
+    final revision = ++_requestRevision;
+    final history = state.messages;
     final messages = [
       ...state.messages,
       AssistantMessageEntity(
@@ -193,6 +333,8 @@ class LocalAssistantBloc
         hasError: false,
       ),
     );
+    if (!await _checkAvailability(emit) || revision != _requestRevision) return;
+    _trackingDelegate.trackQuestionSubmission();
 
     final result = await _askPortfolioQuestionUseCase(
       AskLocalPortfolioQuestionParams(
@@ -200,8 +342,16 @@ class LocalAssistantBloc
         portfolioContext: portfolioContext,
       ),
     );
+    if (emit.isDone || revision != _requestRevision || !state.isReady) return;
     result.fold(
-      (_) => emit(state.copyWith(isSendingQuestion: false, hasError: true)),
+      (failure) => emit(
+        state.copyWith(
+          messages: history,
+          isSendingQuestion: false,
+          hasError: true,
+          failure: failure,
+        ),
+      ),
       (answer) => emit(
         state.copyWith(
           messages: [
@@ -210,8 +360,40 @@ class LocalAssistantBloc
           ],
           isSendingQuestion: false,
           hasError: false,
+          clearFailure: true,
         ),
       ),
     );
+  }
+
+  Future<void> _onReset(
+    ResetLocalAssistantClickEvent event,
+    Emitter<LocalAssistantState> emit,
+  ) async {
+    final revision = ++_requestRevision;
+    _trackingDelegate.trackReset();
+    emit(
+      state.copyWith(
+        messages: const [],
+        isSendingQuestion: false,
+        hasError: false,
+        clearFailure: true,
+      ),
+    );
+    final result = await _resetSession?.call();
+    if (!emit.isDone &&
+        revision == _requestRevision &&
+        result != null &&
+        result.isLeft) {
+      emit(state.copyWith(hasError: true, failure: result.left));
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    _controlRevision++;
+    _requestRevision++;
+    await _flagSubscription?.cancel();
+    await super.close();
   }
 }

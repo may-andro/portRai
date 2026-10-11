@@ -67,7 +67,7 @@ void main() {
       expect(
         tester
             .widget<LinearProgressIndicator>(
-              find.byType(LinearProgressIndicator),
+              find.byType(LinearProgressIndicator).first,
             )
             .value,
         0.42,

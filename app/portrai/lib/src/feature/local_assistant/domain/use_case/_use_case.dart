@@ -5,4 +5,5 @@ export 'get_local_assistant_enabled_use_case.dart';
 export 'is_local_assistant_model_downloaded_use_case.dart';
 export 'local_assistant_failure.dart';
 export 'prepare_local_assistant_model_use_case.dart';
+export 'reset_local_assistant_session_use_case.dart';
 export 'update_local_assistant_enabled_use_case.dart';

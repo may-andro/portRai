@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:feature_flag/feature_flag.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -49,21 +51,57 @@ void main() {
       );
 
       test(
-        'should fall back to the definition default value when the controller throws',
+        'should propagate flag resolution errors when the controller throws',
         () {
           controller.stubIsFeatureEnabledThrows(
             key: testimonialsDefinition.key,
             error: Exception('not initialized'),
           );
 
-          final result = repository.isFeatureEnabled(testimonialsDefinition);
-
-          expect(result, testimonialsDefinition.defaultValue);
+          expect(
+            () => repository.isFeatureEnabled(testimonialsDefinition),
+            throwsException,
+          );
         },
       );
     });
 
     group('updateFeatureFlag', () {
+      test(
+        'should notify observers before persistence completes when an override changes memory',
+        () async {
+          final changes = AppFeatureFlagChanges();
+          addTearDown(changes.close);
+          final notifications = <String?>[];
+          final subscription = changes.stream.listen(notifications.add);
+          addTearDown(subscription.cancel);
+          final pending = Completer<void>();
+          const entity = AppFeatureFlagEntity(
+            flag: servicesDefinition,
+            isEnabled: false,
+            isOverridden: true,
+          );
+          const layerFlag = FeatureFlag(
+            key: 'feature_services_section',
+            isEnabled: false,
+            isOverridden: true,
+          );
+          when(
+            () => controller.updateFeatureFlag(layerFlag),
+          ).thenAnswer((_) => pending.future);
+          final observable = AppFeatureFlagRepositoryImpl(
+            controller,
+            const AppFeatureFlagMapper(),
+            changes: changes,
+          );
+          final update = observable.updateFeatureFlag(entity);
+          expect(notifications, [servicesDefinition.key]);
+          pending.completeError(StateError('Persistence failed'));
+          await expectLater(update, throwsStateError);
+          expect(notifications, [servicesDefinition.key]);
+        },
+      );
+
       test(
         'should map and delegate to the controller when updateFeatureFlag is called',
         () async {
@@ -91,6 +129,29 @@ void main() {
     });
 
     group('reset', () {
+      test(
+        'should notify before and after resolution when flags are reset',
+        () async {
+          final changes = AppFeatureFlagChanges();
+          addTearDown(changes.close);
+          final notifications = <String?>[];
+          final subscription = changes.stream.listen(notifications.add);
+          addTearDown(subscription.cancel);
+          final pending = Completer<void>();
+          when(() => controller.reset()).thenAnswer((_) => pending.future);
+          final observable = AppFeatureFlagRepositoryImpl(
+            controller,
+            const AppFeatureFlagMapper(),
+            changes: changes,
+          );
+          final reset = observable.reset();
+          expect(notifications, [null]);
+          pending.complete();
+          await reset;
+          expect(notifications, [null, null]);
+        },
+      );
+
       test('should delegate to the controller when reset is called', () async {
         controller.stubReset();
 

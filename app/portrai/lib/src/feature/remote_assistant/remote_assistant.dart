@@ -4,4 +4,6 @@ export 'presentation/screen/remote_assistant/bloc/remote_assistant_bloc.dart';
 export 'presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 export 'presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 export 'presentation/screen/remote_assistant/remote_assistant_screen.dart';
+export 'presentation/widget/remote_assistant_card_widget.dart';
+export 'remote_assistant_availability.dart';
 export 'remote_assistant_module_configurator.dart';

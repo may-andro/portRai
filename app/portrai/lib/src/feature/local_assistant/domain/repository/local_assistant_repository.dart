@@ -9,7 +9,8 @@ abstract interface class LocalAssistantRepository {
 
   Future<void> prepareModel({required void Function(int) onProgress});
 
-  /// Stops an in-flight download or load, then deletes everything it wrote.
+  /// Cancels a download or waits for native loading to finish, discards its
+  /// result, then deletes everything it wrote.
   Future<void> cancelPreparation();
 
   /// Unloads the model and deletes its downloaded files.
@@ -19,6 +20,10 @@ abstract interface class LocalAssistantRepository {
     required String question,
     required String portfolioContext,
   });
+
+  /// Invalidates pending results and clears follow-up context. Native generation
+  /// may continue; this does not guarantee cancellation of native work.
+  Future<void> resetSession();
 
   Future<void> dispose();
 }
