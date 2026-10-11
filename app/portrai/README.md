@@ -120,8 +120,8 @@ enablement preferences, failures, routes, tracking, and the Settings card.
 failures and a singleton in-memory chat session. All three configurators are registered in the
 app, with the shared configurator first. Neither provider depends on the other.
 
-The local refactor retains the `/assistant` route, `feature_ai_assistant` rollout key,
-`assistant_enabled_cache` preference key, model identifiers, and existing analytics names.
+The local assistant uses the `/assistant` route, `feature_ai_assistant` rollout key,
+and `assistant_enabled_cache` preference key.
 There is no automatic cloud fallback or transfer of conversation history between providers.
 
 ### Remote Assistant
@@ -139,14 +139,14 @@ Disable/reset invalidate pending output. They stop local consumption and close t
 transport; they cannot guarantee that server generation or billing stops.
 Question content and generated text are excluded from remote request/state logging and analytics.
 
-This step intentionally has no portfolio launcher or Settings integration; those belong to the
-next discovery/rollout PR. For development, enable the flag in the feature-flag tools, then open
-the remote route. Production rollout must wait for a successful authorized smoke test,
-App Check enforcement, model availability, and quota/spending controls. See the
+To access the remote assistant, enable its flag in the feature-flag tools, then open
+`/remote-assistant`. The portfolio launcher and Settings do not expose remote assistant controls.
+Production use requires validated App Check enforcement, model availability, and quota/spending
+controls, including a successful authorized smoke test. See the
 [Firebase AI setup guide](../../layer/firebase/README.md#firebase-ai-logic-setup).
 No live or billable AI request is required by the automated tests.
 
-Generation currently uses `gemini-2.5-flash`, a 1,024-token output limit and temperature 0.3.
+Generation uses `gemini-2.5-flash`, a 1,024-token output limit and temperature 0.3.
 Requests are bounded to 2,000 question characters, 100,000 portfolio-context characters,
 12 recent history messages / 24,000 history characters, and 12,000 response characters.
 The absolute request deadline is 60 seconds, with no automatic retries. Oversized input is
