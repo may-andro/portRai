@@ -102,17 +102,35 @@ the mounted surface, observe `surfaceUpdates`/`activeSurfaceIds` for lifecycle,
 unmount surfaces before disposing their owner, and call `controller.dispose()`.
 No session, service locator or DI registration is hidden in the catalog factory.
 
-Feed external text streams through the official `A2uiParserTransformer` and pass
-each `A2uiMessageEvent.message` to `controller.handleMessage`. Stream parse errors
-must be handled by the caller. Controller and component errors use the framework's
-`SurfaceContext.reportError` path and appear on `controller.onSubmit` as
-`UiInteractionPart` error messages; consumers must subscribe and surface those
-errors, not log prompt or generated content. Invalid rendering can also show the
-framework's `FallbackWidget`. Cancel owned subscriptions on disposal.
+`AssistantGenuiSession` owns a DS-catalog controller and builds `systemPrompt` with
+the official `PromptBuilder.chat`. Its callback-driven `send<T>` connects streamed
+deltas through `A2uiTransportAdapter` to that controller:
 
-The catalog is not connected to either chat screen or inference provider. There
-is no transport adapter, conversation session, feature flag or backend activation
-for A2UI rendering.
+```dart
+final session = AssistantGenuiSession();
+final result = await session.send(
+  ChatMessage.user(question),
+  generate: generate,
+);
+final surface = Surface(surfaceContext: session.controller.contextFor('answer'));
+```
+
+`generate(message, systemPrompt, onDelta)` supplies generation, passes the prompt
+to its model, forwards deltas, and returns its domain result (including `Either`).
+Published 0.10.4 has no `onTurnStart`/`onTurnEnd`; `flush()` closes parser input.
+Each turn gets a fresh adapter; concurrent sends are rejected. A scoped error zone
+propagates internal parser errors and generation exceptions through the returned future.
+Controller/component errors use `UiInteractionPart` on `session.controller.onSubmit`;
+subscribe and surface them without logging content or automatically resending them.
+Framework text fallback is unchanged; the session renders surfaces, not text or history.
+
+Unmount surfaces and cancel caller subscriptions before `reset()` or `dispose()`.
+Reset replaces the controller; both invalidate pending sends and ignore late deltas,
+not backend generation. Callers retain responsibility for handling domain failures.
+
+No chat screen or inference provider is connected to this runtime. The existing
+remote use case does not accept its system prompt; no repository contract, history,
+generation configuration, feature flag or backend activation is changed here.
 
 ### On-device
 
@@ -177,5 +195,7 @@ local download consent, and independent sessions. No model download or live AI g
 The catalog widget tests feed real v0.9 messages through `A2uiParserTransformer`
 and `SurfaceController` into `Surface`, covering DS composition, literal text,
 binding updates, surface deletion and unsupported-component error reporting.
+Session tests exercise the actual adapter/parser/controller/surface pipeline,
+callback results, parser and generation errors, sequential turns and late-delta invalidation.
 
 Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md).
