@@ -38,7 +38,3 @@ class SendRemoteAssistantQuestionClickEvent extends RemoteAssistantEvent {
   @override
   String toString() => 'SendRemoteAssistantQuestionClickEvent';
 }
-
-class RemoteAssistantFlagsChangedEvent extends RemoteAssistantEvent {
-  const RemoteAssistantFlagsChangedEvent();
-}

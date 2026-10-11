@@ -1,3 +1,4 @@
+export 'domain/feature_flag/local_assistant_feature_flags.dart';
 export 'local_assistant_availability.dart';
 export 'local_assistant_module_configurator.dart';
 export 'presentation/route/local_assistant_module_route.dart';

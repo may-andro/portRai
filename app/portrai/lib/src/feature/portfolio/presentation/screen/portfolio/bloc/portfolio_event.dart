@@ -70,8 +70,8 @@ final class SectionNavigationEvent extends PortfolioEvent {
 
 enum NavigationSource { drawer, header, scroll }
 
-final class AssistantSelectionClickEvent extends PortfolioEvent {
-  const AssistantSelectionClickEvent({required this.isLocal});
+final class AssistantLaunchClickEvent extends PortfolioEvent {
+  const AssistantLaunchClickEvent({required this.isLocal});
 
   final bool isLocal;
 

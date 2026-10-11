@@ -23,8 +23,11 @@ class _RemoteAssistantScreenState extends State<RemoteAssistantScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(context.localizations.remoteAssistantTitle)),
-    body: const SafeArea(child: ContentWidget()),
+  Widget build(BuildContext context) => RouteObserverWidget(
+    onResume: () => context.bloc.add(const RemoteAssistantInitializedEvent()),
+    child: Scaffold(
+      appBar: AppBar(title: Text(context.localizations.remoteAssistantTitle)),
+      body: const SafeArea(child: ContentWidget()),
+    ),
   );
 }

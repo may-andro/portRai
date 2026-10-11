@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/assistant_launcher_widget.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
 import '../../../../../../../util/assistant_test_fixture.dart';
@@ -30,8 +33,8 @@ void main() {
           ],
           child: Scaffold(
             floatingActionButton: AssistantLauncherWidget(
-              onLocalSelected: local,
-              onRemoteSelected: remote,
+              onLocalLaunch: local,
+              onRemoteLaunch: remote,
             ),
           ),
         ),
@@ -48,7 +51,11 @@ void main() {
     (true, true),
   ]) {
     testWidgets(
-      'should offer only rolled-out providers when flags are local=$localFlag cloud=$remoteFlag',
+      'should launch ${remoteFlag
+          ? 'remote'
+          : localFlag
+          ? 'local'
+          : 'neither'} directly when flags are local=$localFlag remote=$remoteFlag',
       (tester) async {
         final fixture = AssistantTestFixture(
           localRollout: localFlag,
@@ -71,19 +78,9 @@ void main() {
         expect(fixture.remote.state.isReady, isFalse);
         await tester.tap(find.byType(FloatingActionButton));
         await tester.pumpAndSettle();
-        if (localFlag && remoteFlag) {
-          expect(find.text('Choose an assistant'), findsOneWidget);
-          expect(find.text('On-device assistant'), findsOneWidget);
-          expect(find.text('Cloud assistant'), findsOneWidget);
-          await tester.tap(find.text('Cloud assistant'));
-          await tester.pumpAndSettle();
-          expect(remoteClicks, 1);
-          expect(localClicks, 0);
-        } else {
-          expect(find.text('Choose an assistant'), findsNothing);
-          expect(localClicks, localFlag ? 1 : 0);
-          expect(remoteClicks, remoteFlag ? 1 : 0);
-        }
+        expect(find.byType(BottomSheet), findsNothing);
+        expect(localClicks, localFlag && !remoteFlag ? 1 : 0);
+        expect(remoteClicks, remoteFlag ? 1 : 0);
       },
     );
   }
@@ -101,20 +98,72 @@ void main() {
     },
   );
 
-  testWidgets('should update discovery without polling when dev flags change', (
-    tester,
-  ) async {
-    final fixture = AssistantTestFixture(
-      localRollout: false,
-      remoteRollout: false,
-    );
-    await pumpLauncher(tester, fixture, local: () {}, remote: () {});
-    expect(find.byType(FloatingActionButton), findsNothing);
-    fixture.setRollout(local: true, remote: true, notify: true);
-    await tester.pumpAndSettle();
-    expect(find.byType(FloatingActionButton), findsOneWidget);
-    fixture.setRollout(local: false, remote: false, notify: true);
-    await tester.pumpAndSettle();
-    expect(find.byType(FloatingActionButton), findsNothing);
-  });
+  testWidgets(
+    'should hide entry without local fallback when remote rollout is on an unsupported platform',
+    (tester) async {
+      final fixture = AssistantTestFixture(
+        localEnabled: true,
+        remoteSupported: false,
+      );
+      await pumpLauncher(tester, fixture, local: () {}, remote: () {});
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(fixture.remote.state.isFeatureEnabled, isTrue);
+    },
+  );
+
+  testWidgets(
+    'should offer remote entry when only remote is supported on web',
+    (tester) async {
+      final fixture = AssistantTestFixture(localSupported: false);
+      var remoteClicks = 0;
+      await pumpLauncher(
+        tester,
+        fixture,
+        local: () => fail('Local must not launch'),
+        remote: () => remoteClicks++,
+      );
+      await tester.tap(find.byType(FloatingActionButton));
+      expect(remoteClicks, 1);
+      expect(find.byType(BottomSheet), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'should still open remote consent without local fallback when remote preference loading fails',
+    (tester) async {
+      final fixture = AssistantTestFixture(localEnabled: true);
+      when(
+        () => fixture.getRemote(),
+      ).thenAnswer((_) => const Left(RemoteAssistantPreferenceFailure()));
+      var remoteClicks = 0;
+      await pumpLauncher(
+        tester,
+        fixture,
+        local: () => fail('Local must not launch'),
+        remote: () => remoteClicks++,
+      );
+      expect(fixture.remote.state.isFeatureEnabled, isTrue);
+      expect(fixture.remote.state.isReady, isFalse);
+      await tester.tap(find.byType(FloatingActionButton));
+      expect(remoteClicks, 1);
+      expect(find.byType(BottomSheet), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'should refresh discovery when visibility initialization rechecks changed flags',
+    (tester) async {
+      final fixture = AssistantTestFixture(
+        localRollout: false,
+        remoteRollout: false,
+      );
+      await pumpLauncher(tester, fixture, local: () {}, remote: () {});
+      expect(find.byType(FloatingActionButton), findsNothing);
+      fixture.setRollout(local: true, remote: false);
+      fixture.local.add(const LocalAssistantInitializedEvent());
+      fixture.remote.add(const RemoteAssistantInitializedEvent());
+      await tester.pumpAndSettle();
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+    },
+  );
 }

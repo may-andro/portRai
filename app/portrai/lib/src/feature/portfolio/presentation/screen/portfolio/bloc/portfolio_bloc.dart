@@ -18,8 +18,8 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     on<SectionNavigationEvent>(_mapSectionNavigationEventToState);
     on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
     on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
-    on<AssistantSelectionClickEvent>((event, emit) {
-      _trackingDelegate.trackAssistantSelection(isLocal: event.isLocal);
+    on<AssistantLaunchClickEvent>((event, emit) {
+      _trackingDelegate.trackAssistantLaunch(isLocal: event.isLocal);
     });
   }
 

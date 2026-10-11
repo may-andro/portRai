@@ -813,18 +813,6 @@
   "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
   "errorRemoteAssistantPreference": "The cloud assistant preference could not be saved or loaded. Please try again.",
   "@errorRemoteAssistantPreference": {"description": "Remote consent or enablement storage failed"},
-  "assistantChooseTitle": "Choose an assistant",
-  "@assistantChooseTitle": {
-    "description": "Portfolio assistant provider choice sheet heading"
-  },
-  "assistantChooseLocal": "On-device assistant",
-  "@assistantChooseLocal": {
-    "description": "Local assistant discovery choice and settings section label"
-  },
-  "assistantChooseCloud": "Cloud assistant",
-  "@assistantChooseCloud": {
-    "description": "Cloud assistant discovery choice label"
-  },
   "remoteAssistantSettingsTitle": "Enable cloud AI",
   "@remoteAssistantSettingsTitle": {
     "description": "Cloud assistant settings toggle title"

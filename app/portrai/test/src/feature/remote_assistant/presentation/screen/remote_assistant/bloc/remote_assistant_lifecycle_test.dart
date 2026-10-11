@@ -47,54 +47,65 @@ void main() {
     },
   );
 
+  for (final action in ['disable', 'reset']) {
+    test(
+      'should discard deltas and clear remote state when $action occurs during streaming',
+      () async {
+        final fixture = AssistantTestFixture(remoteEnabled: true);
+        fixture.start();
+        await pumpEventQueue();
+        final completion = Completer<Either<RemoteAssistantFailure, void>>();
+        late AskRemotePortfolioQuestionParams request;
+        when(() => fixture.askRemote(any())).thenAnswer((invocation) {
+          request =
+              invocation.positionalArguments.single
+                  as AskRemotePortfolioQuestionParams;
+          request.onDelta('Partial');
+          return completion.future;
+        });
+        fixture.remote.add(
+          const SendRemoteAssistantQuestionClickEvent('Question'),
+        );
+        await pumpEventQueue();
+        expect(fixture.remote.state.partialAnswer, 'Partial');
+        if (action == 'disable') {
+          fixture.remote.add(const DisableRemoteAssistantClickEvent());
+        } else {
+          fixture.remote.add(const ResetRemoteAssistantClickEvent());
+        }
+        await pumpEventQueue();
+        request.onDelta('Late delta');
+        await pumpEventQueue();
+        completion.complete(const Right(null));
+        await pumpEventQueue();
+        expect(fixture.remote.state.messages, isEmpty);
+        expect(fixture.remote.state.partialAnswer, isEmpty);
+        expect(fixture.remote.state.isSendingQuestion, isFalse);
+        expect(
+          fixture.remote.state.status,
+          action == 'disable'
+              ? RemoteAssistantStatus.off
+              : RemoteAssistantStatus.ready,
+        );
+        if (action == 'reset') {
+          verify(() => fixture.resetRemote()).called(1);
+        } else {
+          expect(fixture.preference.consentAccepted, isFalse);
+        }
+      },
+    );
+  }
+
   test(
-    'should discard deltas and clear cloud state when the rollout changes during streaming',
+    'should reject new remote requests when rollout is off after startup',
     () async {
       final fixture = AssistantTestFixture(remoteEnabled: true);
       fixture.start();
       await pumpEventQueue();
-      final completion = Completer<Either<RemoteAssistantFailure, void>>();
-      late AskRemotePortfolioQuestionParams request;
-      when(() => fixture.askRemote(any())).thenAnswer((invocation) {
-        request =
-            invocation.positionalArguments.single
-                as AskRemotePortfolioQuestionParams;
-        request.onDelta('Partial');
-        return completion.future;
-      });
+      fixture.setRollout(local: true, remote: false);
       fixture.remote.add(
         const SendRemoteAssistantQuestionClickEvent('Question'),
       );
-      await pumpEventQueue();
-      expect(fixture.remote.state.partialAnswer, 'Partial');
-      fixture.setRollout(local: true, remote: false, notify: true);
-      request.onDelta('Late delta');
-      await pumpEventQueue();
-      completion.complete(const Right(null));
-      await pumpEventQueue();
-      expect(fixture.remote.state.messages, isEmpty);
-      expect(fixture.remote.state.partialAnswer, isEmpty);
-      expect(fixture.remote.state.isSendingQuestion, isFalse);
-      expect(fixture.remote.state.status, RemoteAssistantStatus.unavailable);
-      verify(() => fixture.resetRemote()).called(greaterThanOrEqualTo(1));
-    },
-  );
-
-  test(
-    'should remain unavailable when rollout changes during consent persistence',
-    () async {
-      final fixture = AssistantTestFixture();
-      fixture.start();
-      await pumpEventQueue();
-      final completion = Completer<Either<RemoteAssistantFailure, void>>();
-      when(
-        () => fixture.updateRemote(any()),
-      ).thenAnswer((_) => completion.future);
-      fixture.remote.add(const AcceptRemoteAssistantConsentClickEvent());
-      await pumpEventQueue();
-      fixture.setRollout(local: true, remote: false, notify: true);
-      await pumpEventQueue();
-      completion.complete(const Right(null));
       await pumpEventQueue();
       expect(fixture.remote.state.status, RemoteAssistantStatus.unavailable);
       expect(fixture.remote.state.isUpdatingPreference, isFalse);

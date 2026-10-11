@@ -31,7 +31,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('On-device assistant'), findsOneWidget);
+      expect(find.text('Portfolio AI'), findsOneWidget);
     });
 
     testWidgets('should hide the AI section when the feature flag is off', (
@@ -49,7 +49,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('On-device assistant'), findsNothing);
+      expect(find.text('Portfolio AI'), findsNothing);
     });
 
     testWidgets(

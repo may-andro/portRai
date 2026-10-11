@@ -29,15 +29,18 @@ The portfolio's `AssistantLauncherWidget` composes discovery:
 | Off | Off | No launcher |
 | On | Off | On-device setup/chat directly |
 | Off | On | Cloud consent/chat directly |
-| On | On | Localized provider choice |
+| On | On | Cloud consent/chat directly, never local fallback |
 
 Offering a provider does not require user enablement or model readiness. Platform
-availability is applied independently: on-device is hidden on web, and cloud is
-available on the configured Firebase platforms, Android, iOS and web.
+The rollout enabler maintains mutually exclusive flags. If both are on, cloud takes
+priority based on its flag alone, even if disabled, unconsented, unsupported or in error.
+The app never rewrites flags or preferences to enforce exclusivity. On-device is hidden
+on web; cloud is available on the configured Firebase platforms, Android, iOS and web.
+An unsupported active provider hides discovery rather than exposing the other chat.
 
-Settings exposes separate model management and cloud consent/chat controls.
+Settings exposes only the active feature's model management or cloud consent/chat controls.
 Conversations remain in independent singleton blocs across navigation. There is no
-automatic fallback or transfer of history between providers.
+chooser, context switch, automatic fallback or transfer of history between features.
 
 ## Configuration
 
@@ -72,8 +75,10 @@ automatic fallback or transfer of history between providers.
 - Request/state logging and analytics exclude cloud prompts and generated content.
 
 Both routes, enable actions and new requests check rollout and platform availability.
-App-level flag-change notifications invalidate pending output and clear sessions without
-polling. Repository exceptions are mapped to localized domain failures by use cases.
+Flags are rechecked on screen visibility/return and before new requests, without notifications
+or polling. The app-level local access policy also guards direct local routes and requests
+against remote rollout priority. Disable/reset invalidate late output; they do not guarantee
+native or server cancellation. Repository exceptions map to localized failures in use cases.
 
 Production cloud use requires separately validated Firebase App Check enforcement, model
 availability and spending controls, plus an authorized release smoke test. Automated tests
@@ -94,6 +99,6 @@ flutter test test/src/feature/assistant test/src/feature/local_assistant \
 
 Tests use deterministic fixtures and mocked inference. They cover discovery combinations,
 unsupported platforms, explicit consent, direct-route guards, pending-request invalidation
-and independent navigation-retained state. No model download or live AI generation is needed.
+and independent preferences and sessions. No model download or live AI generation is needed.
 
 Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md).

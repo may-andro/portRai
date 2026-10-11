@@ -34,15 +34,15 @@ void main() {
 
     for (final isLocal in [true, false]) {
       test(
-        'should send only provider metadata when ${isLocal ? 'local' : 'cloud'} discovery is selected',
+        'should send only provider metadata when ${isLocal ? 'local' : 'cloud'} assistant is launched',
         () {
-          delegate.trackAssistantSelection(isLocal: isLocal);
+          delegate.trackAssistantLaunch(isLocal: isLocal);
           final tracking =
               verify(
                     () => trackingReporter.sendTrackingEvent(captureAny()),
                   ).captured.single
                   as Tracking;
-          expect(tracking.name, 'assistant_selection');
+          expect(tracking.name, 'assistant_launch');
           expect(tracking.parameters['label'], isLocal ? 'local' : 'cloud');
           expect(tracking.parameters.keys, isNot(contains('prompt')));
           expect(tracking.parameters.keys, isNot(contains('response')));

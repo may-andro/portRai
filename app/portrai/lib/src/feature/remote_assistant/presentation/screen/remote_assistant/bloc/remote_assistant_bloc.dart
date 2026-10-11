@@ -22,7 +22,6 @@ class RemoteAssistantBloc
     this._isFeatureEnabled,
     this._tracking, {
     this._availability = const RemoteAssistantAvailability(),
-    @Inject(AppFeatureFlagChanges) AppFeatureFlagChanges? flagChanges,
   }) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_onStarted);
     on<RemoteAssistantInitializedEvent>(
@@ -36,34 +35,6 @@ class RemoteAssistantBloc
     on<DisableRemoteAssistantClickEvent>(_onDisable);
     on<ResetRemoteAssistantClickEvent>(_onReset);
     on<SendRemoteAssistantQuestionClickEvent>(_onSend);
-    on<RemoteAssistantFlagsChangedEvent>((event, emit) async {
-      emit(
-        state.copyWith(
-          messages: const [],
-          partialAnswer: '',
-          isSendingQuestion: false,
-          isUpdatingPreference: false,
-        ),
-      );
-      await _onStarted(
-        const RemoteAssistantStartedEvent(),
-        emit,
-        trackView: false,
-      );
-      final reset = await _resetSession();
-      if (!emit.isDone && reset.isLeft) {
-        emit(state.copyWith(failure: reset.left));
-      }
-    });
-    _flagSubscription = flagChanges?.stream.listen((key) {
-      if (key != null &&
-          key != RemoteAssistantFeatureFlags.remoteAssistant.key) {
-        return;
-      }
-      _requestRevision++;
-      _controlRevision++;
-      add(const RemoteAssistantFlagsChangedEvent());
-    });
   }
 
   final GetAssistantContextUseCase _getContext;
@@ -74,7 +45,6 @@ class RemoteAssistantBloc
   final IsFeatureEnabledUseCase _isFeatureEnabled;
   final RemoteAssistantTrackingDelegate _tracking;
   final RemoteAssistantAvailability _availability;
-  StreamSubscription<String?>? _flagSubscription;
   int _controlRevision = 0;
   int _requestRevision = 0;
   bool get isPlatformSupported => _availability.isSupported;
@@ -87,6 +57,7 @@ class RemoteAssistantBloc
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
     if (emit.isDone || controlRevision != _controlRevision) return false;
+    emit(state.copyWith(isFeatureEnabled: result.isLeft || result.right));
     if (result.isRight && result.right && _availability.isSupported) {
       return true;
     }
@@ -360,7 +331,6 @@ class RemoteAssistantBloc
   Future<void> close() async {
     _controlRevision++;
     _requestRevision++;
-    await _flagSubscription?.cancel();
     await _resetSession();
     await super.close();
   }

@@ -42,14 +42,17 @@ class ContentWidget extends StatelessWidget {
                         ),
                         const LanguageCardWidget(),
                       ],
-                      if (context
-                          .read<LocalAssistantBloc>()
-                          .isPlatformSupported)
-                        BlocBuilder<LocalAssistantBloc, LocalAssistantState>(
-                          buildWhen: (previous, current) =>
-                              previous.isAvailable != current.isAvailable,
-                          builder: (context, assistantState) {
-                            if (!assistantState.isAvailable) {
+                      BlocBuilder<RemoteAssistantBloc, RemoteAssistantState>(
+                        builder: (context, remote) {
+                          if (remote.status == RemoteAssistantStatus.loading) {
+                            return const SizedBox.shrink();
+                          }
+                          if (remote.isFeatureEnabled) {
+                            if (!context
+                                    .read<RemoteAssistantBloc>()
+                                    .isPlatformSupported ||
+                                remote.status ==
+                                    RemoteAssistantStatus.unavailable) {
                               return const SizedBox.shrink();
                             }
                             return Column(
@@ -58,14 +61,36 @@ class ContentWidget extends StatelessWidget {
                                 SectionTitleWidget(
                                   title: context
                                       .localizations
-                                      .assistantChooseLocal,
+                                      .remoteAssistantTitle,
                                 ),
                                 const RemoteAssistantCardWidget(),
-                                const LocalAssistantCardWidget(),
                               ],
                             );
-                          },
-                        ),
+                          }
+                          return BlocBuilder<
+                            LocalAssistantBloc,
+                            LocalAssistantState
+                          >(
+                            builder: (context, local) {
+                              if (!context
+                                      .read<LocalAssistantBloc>()
+                                      .isPlatformSupported ||
+                                  !local.isAvailable) {
+                                return const SizedBox.shrink();
+                              }
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SectionTitleWidget(
+                                    title: context.localizations.assistantTitle,
+                                  ),
+                                  const LocalAssistantCardWidget(),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
                       if (state.isDevMenuEnabled) ...[
                         const DSVerticalSpacerWidget(3),
                         DSButtonWidget(

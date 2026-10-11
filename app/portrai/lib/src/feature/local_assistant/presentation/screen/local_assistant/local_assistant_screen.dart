@@ -4,6 +4,7 @@ import 'package:portrai/src/feature/local_assistant/presentation/route/local_ass
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/widget/content_widget.dart';
 import 'package:portrai/src/route/go_route/go_route_extension.dart';
+import 'package:portrai/src/route/observer/route_observer_widget.dart';
 
 class LocalAssistantScreen extends StatefulWidget {
   const LocalAssistantScreen({super.key});
@@ -25,9 +26,12 @@ class _LocalAssistantScreenState extends State<LocalAssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.localizations.assistantTitle)),
-      body: const SafeArea(child: ContentWidget()),
+    return RouteObserverWidget(
+      onResume: () => context.bloc.add(const LocalAssistantInitializedEvent()),
+      child: Scaffold(
+        appBar: AppBar(title: Text(context.localizations.assistantTitle)),
+        body: const SafeArea(child: ContentWidget()),
+      ),
     );
   }
 }

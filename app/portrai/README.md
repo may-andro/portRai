@@ -139,18 +139,20 @@ Disable/reset invalidate pending output. They stop local consumption and close t
 transport; they cannot guarantee that server generation or billing stops.
 Question content and generated text are excluded from remote request/state logging and analytics.
 
-The portfolio launcher offers providers based on rollout and platform support, before user
-enablement. It is hidden when neither is offered, opens directly when only one is offered, and
-shows a localized on-device/cloud choice when both are offered. The on-device option is hidden
-on web; cloud is supported on the configured Firebase platforms (Android, iOS and web).
-Selecting an unconfigured local assistant opens its existing download/enable controls.
-Selecting cloud without consent opens the explicit consent screen; discovery never grants consent.
+Local and remote chats are independent features. The rollout enabler maintains mutually exclusive
+flags; if both are on, remote takes priority regardless of consent, preference or readiness.
+The portfolio entry opens the active feature directly, with no chooser or context switching.
+Neither flag on hides the entry and assistant settings. Local-only rollout offers setup/chat on
+native platforms; remote rollout offers consent/chat on Android, iOS and web. An unsupported or
+disabled remote assistant never falls back to local while its rollout flag is on.
+Opening remote without consent shows the explicit consent screen; discovery never grants consent.
 
-Settings has separate on-device model management and cloud consent/chat cards. Enabling cloud
+Settings exposes only the active feature's on-device model management or cloud consent/chat card. Enabling cloud
 from Settings opens the consent screen. Turning cloud off withdraws consent and clears its chat;
 clear chat retains consent. Each provider's singleton bloc preserves its own in-memory conversation
-across navigation. Dev flag updates notify both blocs without polling; flag-off clears pending
-output and sessions. Every new request and enable action rechecks availability.
+across navigation. Flags are rechecked on screen visibility/return and before each new request
+or enable action, without observers or polling. The app does not rewrite rollout flags or the
+other feature's preferences.
 See the [assistant reference](lib/src/feature/assistant/README.md) for module boundaries.
 Production use requires validated App Check enforcement, model availability, and quota/spending
 controls, including a successful authorized smoke test. See the

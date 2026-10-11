@@ -40,7 +40,3 @@ class SendLocalAssistantQuestionClickEvent extends LocalAssistantEvent {
 class ResetLocalAssistantClickEvent extends LocalAssistantEvent {
   const ResetLocalAssistantClickEvent();
 }
-
-class LocalAssistantFlagsChangedEvent extends LocalAssistantEvent {
-  const LocalAssistantFlagsChangedEvent();
-}

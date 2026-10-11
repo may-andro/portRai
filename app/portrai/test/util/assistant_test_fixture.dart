@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
-import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
-import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
 import 'package:use_case/use_case.dart';
 
 import '../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
+import '../mock/feature/feature_flag/domain/repository/mock_app_feature_flag_repository.dart';
 import '../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_ask_local_portfolio_question_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_cancel_local_assistant_preparation_use_case.dart';
@@ -67,9 +67,8 @@ class AssistantTestFixture {
       downloaded,
       askLocal,
       MockLocalAssistantTrackingDelegate(),
-      flag,
+      LocalAssistantFeatureAccessUseCase(flagRepository),
       availability: LocalAssistantAvailability.supported(localSupported),
-      flagChanges: changes,
       resetSession: resetLocal,
     );
     preference = RemoteAssistantPreferenceEntity(
@@ -100,12 +99,10 @@ class AssistantTestFixture {
       flag,
       remoteTracking,
       availability: RemoteAssistantAvailability.supported(remoteSupported),
-      flagChanges: changes,
     );
     addTearDown(() async {
       await local.close();
       await remote.close();
-      await changes.close();
     });
   }
 
@@ -135,7 +132,7 @@ class AssistantTestFixture {
 
   final context = MockGetAssistantContextUseCase();
   final flag = MockIsFeatureEnabledUseCase();
-  final changes = AppFeatureFlagChanges();
+  final flagRepository = MockAppFeatureFlagRepository();
   final askLocal = MockAskLocalPortfolioQuestionUseCase();
   final askRemote = MockAskRemotePortfolioQuestionUseCase();
   final resetLocal = MockResetLocalAssistantSessionUseCase();
@@ -148,21 +145,20 @@ class AssistantTestFixture {
   late final LocalAssistantBloc local;
   late final RemoteAssistantBloc remote;
 
-  void setRollout({
-    required bool local,
-    required bool remote,
-    bool notify = false,
-  }) {
-    flag
-      ..stubCall(
+  void setRollout({required bool local, required bool remote}) {
+    flagRepository
+      ..stubIsFeatureEnabled(
         definition: LocalAssistantFeatureFlags.aiAssistant,
-        result: Right(local),
+        isEnabled: local,
       )
-      ..stubCall(
+      ..stubIsFeatureEnabled(
         definition: RemoteAssistantFeatureFlags.remoteAssistant,
-        result: Right(remote),
+        isEnabled: remote,
       );
-    if (notify) changes.notify();
+    flag.stubCall(
+      definition: RemoteAssistantFeatureFlags.remoteAssistant,
+      result: Right(remote),
+    );
   }
 
   void start() {

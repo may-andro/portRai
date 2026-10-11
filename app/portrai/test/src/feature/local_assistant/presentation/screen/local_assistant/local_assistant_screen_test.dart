@@ -37,6 +37,7 @@ void main() {
         final fixture = AssistantTestFixture(
           localRollout: unsupported,
           localSupported: !unsupported,
+          remoteRollout: false,
         );
         await pumpScreen(tester, fixture);
         expect(find.byType(AssistantConversationWidget), findsNothing);
@@ -52,7 +53,7 @@ void main() {
   testWidgets(
     'should offer setup rather than blank chat when local is not enabled',
     (tester) async {
-      final fixture = AssistantTestFixture();
+      final fixture = AssistantTestFixture(remoteRollout: false);
       await pumpScreen(tester, fixture);
       expect(find.byType(Switch), findsOneWidget);
       expect(find.byType(AssistantConversationWidget), findsNothing);
@@ -63,11 +64,14 @@ void main() {
     },
   );
 
-  for (final action in ['disable', 'reset', 'flag off']) {
+  for (final action in ['disable', 'reset']) {
     test(
       'should discard late local output when $action occurs during a request',
       () async {
-        final fixture = AssistantTestFixture(localEnabled: true);
+        final fixture = AssistantTestFixture(
+          localEnabled: true,
+          remoteRollout: false,
+        );
         fixture.start();
         await pumpEventQueue();
         final completion =
@@ -84,10 +88,8 @@ void main() {
           fixture.local.add(
             const DisableLocalAssistantClickEvent(deleteModel: false),
           );
-        } else if (action == 'reset') {
-          fixture.local.add(const ResetLocalAssistantClickEvent());
         } else {
-          fixture.setRollout(local: false, remote: true, notify: true);
+          fixture.local.add(const ResetLocalAssistantClickEvent());
         }
         await pumpEventQueue();
         completion.complete(
@@ -104,7 +106,10 @@ void main() {
   test(
     'should reserve a local request before gating awaits when repeated clicks arrive',
     () async {
-      final fixture = AssistantTestFixture(localEnabled: true);
+      final fixture = AssistantTestFixture(
+        localEnabled: true,
+        remoteRollout: false,
+      );
       fixture.start();
       await pumpEventQueue();
       final completion =
@@ -125,10 +130,45 @@ void main() {
   test(
     'should reject new local requests when rollout is switched off after startup',
     () async {
-      final fixture = AssistantTestFixture(localEnabled: true);
+      final fixture = AssistantTestFixture(
+        localEnabled: true,
+        remoteRollout: false,
+      );
       fixture.start();
       await pumpEventQueue();
       fixture.setRollout(local: false, remote: true);
+      fixture.local.add(const SendLocalAssistantQuestionClickEvent('Question'));
+      await pumpEventQueue();
+      verifyNever(() => fixture.askLocal(any()));
+      expect(fixture.local.state.status, isA<LocalAssistantUnavailable>());
+    },
+  );
+
+  testWidgets(
+    'should guard hidden local routes and setup when both rollout flags are on',
+    (tester) async {
+      final fixture = AssistantTestFixture(localEnabled: true);
+      await pumpScreen(tester, fixture);
+      expect(fixture.local.state.status, isA<LocalAssistantUnavailable>());
+      expect(find.byType(AssistantConversationWidget), findsNothing);
+      expect(find.byType(Switch), findsNothing);
+      fixture.local.add(const EnableLocalAssistantClickEvent());
+      await tester.pumpAndSettle();
+      verifyNever(() => fixture.updateLocal(true));
+      verifyNever(() => fixture.askLocal(any()));
+    },
+  );
+
+  test(
+    'should reject new local requests when remote rollout takes priority after startup',
+    () async {
+      final fixture = AssistantTestFixture(
+        localEnabled: true,
+        remoteRollout: false,
+      );
+      fixture.start();
+      await pumpEventQueue();
+      fixture.setRollout(local: true, remote: true);
       fixture.local.add(const SendLocalAssistantQuestionClickEvent('Question'));
       await pumpEventQueue();
       verifyNever(() => fixture.askLocal(any()));

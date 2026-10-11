@@ -9,6 +9,7 @@ import 'package:portrai/src/feature/local_assistant/local_assistant_availability
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_state.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/tracking/_tracking.dart';
+import 'package:portrai/src/utility/local_assistant_feature_access_use_case.dart';
 
 // One shared instance: Settings, the portfolio button and the assistant
 // screen all reflect the same download and enabled state.
@@ -25,9 +26,8 @@ class LocalAssistantBloc
     this._isAssistantModelDownloadedUseCase,
     this._askPortfolioQuestionUseCase,
     this._trackingDelegate,
-    this._isFeatureEnabledUseCase, {
+    @Inject(LocalAssistantFeatureAccessUseCase) this._isFeatureEnabledUseCase, {
     this._availability = const LocalAssistantAvailability(),
-    @Inject(AppFeatureFlagChanges) AppFeatureFlagChanges? flagChanges,
     @Inject(ResetLocalAssistantSessionUseCase) this._resetSession,
   }) : super(const LocalAssistantState()) {
     on<LocalAssistantStartedEvent>(_onStarted);
@@ -36,28 +36,6 @@ class LocalAssistantBloc
     on<DisableLocalAssistantClickEvent>(_onDisable);
     on<SendLocalAssistantQuestionClickEvent>(_onSendQuestion);
     on<ResetLocalAssistantClickEvent>(_onReset);
-    on<LocalAssistantFlagsChangedEvent>((event, emit) async {
-      final revision = _controlRevision;
-      emit(state.copyWith(messages: const [], isSendingQuestion: false));
-      if (!await _checkAvailability(emit) || revision != _controlRevision) {
-        return;
-      }
-      final reset = await _resetSession?.call();
-      if (emit.isDone || revision != _controlRevision) return;
-      if (reset != null && reset.isLeft) {
-        emit(state.copyWith(hasError: true, failure: reset.left));
-      }
-      await _onInitialized(const LocalAssistantInitializedEvent(), emit);
-    });
-    _flagSubscription = flagChanges?.stream.listen((key) {
-      if (key != null && key != LocalAssistantFeatureFlags.aiAssistant.key) {
-        return;
-      }
-      _requestRevision++;
-      _controlRevision++;
-      _hasInitialized = false;
-      add(const LocalAssistantFlagsChangedEvent());
-    });
   }
 
   final GetAssistantContextUseCase _getAssistantContextUseCase;
@@ -74,7 +52,6 @@ class LocalAssistantBloc
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final LocalAssistantAvailability _availability;
   final ResetLocalAssistantSessionUseCase? _resetSession;
-  StreamSubscription<String?>? _flagSubscription;
   int _controlRevision = 0;
   int _requestRevision = 0;
   bool get isPlatformSupported => _availability.isSupported;
@@ -393,7 +370,6 @@ class LocalAssistantBloc
   Future<void> close() async {
     _controlRevision++;
     _requestRevision++;
-    await _flagSubscription?.cancel();
     await super.close();
   }
 }

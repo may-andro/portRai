@@ -7,6 +7,7 @@ enum RemoteAssistantStatus { loading, unavailable, off, ready }
 class RemoteAssistantState extends Equatable {
   const RemoteAssistantState({
     this.status = RemoteAssistantStatus.loading,
+    this.isFeatureEnabled = false,
     this.isUpdatingPreference = false,
     this.isLoadingContext = false,
     this.isSendingQuestion = false,
@@ -17,6 +18,7 @@ class RemoteAssistantState extends Equatable {
   });
 
   final RemoteAssistantStatus status;
+  final bool isFeatureEnabled;
   final bool isUpdatingPreference;
   final bool isLoadingContext;
   final bool isSendingQuestion;
@@ -38,6 +40,7 @@ class RemoteAssistantState extends Equatable {
 
   RemoteAssistantState copyWith({
     RemoteAssistantStatus? status,
+    bool? isFeatureEnabled,
     bool? isUpdatingPreference,
     bool? isLoadingContext,
     bool? isSendingQuestion,
@@ -49,6 +52,7 @@ class RemoteAssistantState extends Equatable {
     bool clearFailure = false,
   }) => RemoteAssistantState(
     status: status ?? this.status,
+    isFeatureEnabled: isFeatureEnabled ?? this.isFeatureEnabled,
     isUpdatingPreference: isUpdatingPreference ?? this.isUpdatingPreference,
     isLoadingContext: isLoadingContext ?? this.isLoadingContext,
     isSendingQuestion: isSendingQuestion ?? this.isSendingQuestion,
@@ -63,6 +67,7 @@ class RemoteAssistantState extends Equatable {
   @override
   List<Object?> get props => [
     status,
+    isFeatureEnabled,
     isUpdatingPreference,
     isLoadingContext,
     isSendingQuestion,
