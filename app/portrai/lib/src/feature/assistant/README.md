@@ -45,12 +45,15 @@ chooser, context switch, automatic fallback or transfer of history between featu
 
 Provider blocs, events and states are module-internal. Routes and public cards own
 `BlocProvider.value` for their module's retained singleton; there are no app-wide assistant
-bloc providers. Portfolio and Settings blocs consume public availability snapshot use cases
-returning the provider-neutral `AssistantAvailabilityEntity`, and refresh on visibility/return.
+bloc providers. Portfolio and Settings blocs read rollout flags directly through
+`IsFeatureEnabledUseCase` and use the public feature-owned
+`IsLocalAssistantSupportedUseCase` and `IsRemoteAssistantSupportedUseCase` boolean
+platform checks, refreshing on visibility/return.
 Public provider-owned visibility widgets also invalidate retained sessions on flag-off
 rechecks, without publishing bloc types or providing data to the host.
 Priority is a simple remote-first check in the portfolio and Settings composition.
-Each provider's availability use case reads only its own flag and platform.
+Each provider's support use case checks only its own platform. A failed remote flag
+check hides both providers, rather than falling back to local.
 The shared assistant module remains provider-neutral, and providers do not import siblings.
 
 ## Configuration

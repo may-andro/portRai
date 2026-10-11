@@ -15,18 +15,16 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   SettingBloc(
     this._isFeatureEnabledUseCase,
     this._buildConfig,
-    this._getLocalAssistantAvailabilityUseCase,
-    this._getRemoteAssistantAvailabilityUseCase,
+    this._isLocalAssistantSupportedUseCase,
+    this._isRemoteAssistantSupportedUseCase,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final BuildConfig _buildConfig;
-  final GetLocalAssistantAvailabilityUseCase
-  _getLocalAssistantAvailabilityUseCase;
-  final GetRemoteAssistantAvailabilityUseCase
-  _getRemoteAssistantAvailabilityUseCase;
+  final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
+  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   int _loadRevision = 0;
 
   Future<void> _mapLoadSettingsEventToState(
@@ -46,19 +44,31 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       isLanguageSelectorEnabled = languageSelectorResult.right;
     }
 
-    final remote = await _getRemoteAssistantAvailabilityUseCase();
-    final local = await _getLocalAssistantAvailabilityUseCase();
+    final remote = await _isFeatureEnabledUseCase(
+      RemoteAssistantFeatureFlags.remoteAssistant,
+    );
+    final local = await _isFeatureEnabledUseCase(
+      LocalAssistantFeatureFlags.aiAssistant,
+    );
+    final remoteSupported = await _isRemoteAssistantSupportedUseCase();
+    final localSupported = await _isLocalAssistantSupportedUseCase();
     if (emit.isDone || revision != _loadRevision) return;
     emit(
       SettingLoadedState(
         isLanguageSelectorEnabled: isLanguageSelectorEnabled,
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
-        isRemoteAssistantAvailable: remote.isRight && remote.right.isAvailable,
+        isRemoteAssistantAvailable:
+            remote.isRight &&
+            remote.right &&
+            remoteSupported.isRight &&
+            remoteSupported.right,
         isLocalAssistantAvailable:
             remote.isRight &&
-            !remote.right.isFeatureEnabled &&
+            !remote.right &&
             local.isRight &&
-            local.right.isAvailable,
+            local.right &&
+            localSupported.isRight &&
+            localSupported.right,
       ),
     );
   }

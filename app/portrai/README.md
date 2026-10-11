@@ -150,8 +150,9 @@ with open-chat and clear-chat controls. Each provider's module-internal singleto
 across navigation. Flags are rechecked on screen visibility/return and before each new request
 or enable action, without observers or polling. The app does not rewrite rollout flags or the
 other feature's preferences.
-Public routes/cards own module-scoped providers. Portfolio and Settings consume public availability
-use cases and neutral domain entities, never another feature's bloc/state. Priority is a simple
+Public routes/cards own module-scoped providers. Portfolio and Settings read rollout flags through
+`IsFeatureEnabledUseCase` and platform support through each assistant's boolean support use case,
+never another feature's bloc/state. Priority is a simple
 remote-first check in portfolio and Settings composition; each provider reads only its own flag.
 See the [assistant reference](lib/src/feature/assistant/README.md) for module boundaries.
 Production use requires validated App Check enforcement, model availability, and quota/spending

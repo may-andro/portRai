@@ -31,7 +31,7 @@ void main() {
     AssistantTestFixture fixture,
   ) async {
     fixture.install();
-    final flag = MockIsFeatureEnabledUseCase()
+    final flag = fixture.flag
       ..stubCall(
         definition: SettingFeatureFlags.languageSelector,
         result: const Right(false),
@@ -40,8 +40,8 @@ void main() {
       () => SettingBloc(
         flag,
         BuildConfig(buildEnvironment: BuildEnvironment.prod),
-        fixture.localAvailability,
-        fixture.remoteAvailability,
+        fixture.isLocalAssistantSupportedUseCase,
+        fixture.isRemoteAssistantSupportedUseCase,
       ),
     );
     final router = GoRouter(

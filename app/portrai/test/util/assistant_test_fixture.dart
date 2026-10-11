@@ -4,10 +4,11 @@ import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant_availability.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
@@ -36,12 +37,10 @@ class AssistantTestFixture {
     bool remoteSupported = true,
     bool localEnabled = false,
   }) {
-    localAvailability = GetLocalAssistantAvailabilityUseCase(
-      IsFeatureEnabledUseCase(flagRepository),
+    isLocalAssistantSupportedUseCase = IsLocalAssistantSupportedUseCase(
       LocalAssistantAvailability.supported(localSupported),
     );
-    remoteAvailability = GetRemoteAssistantAvailabilityUseCase(
-      flag,
+    isRemoteAssistantSupportedUseCase = IsRemoteAssistantSupportedUseCase(
       RemoteAssistantAvailability.supported(remoteSupported),
     );
     setRollout(local: localRollout, remote: remoteRollout);
@@ -130,8 +129,9 @@ class AssistantTestFixture {
   final remoteTracking = MockRemoteAssistantTrackingDelegate();
   late final LocalAssistantBloc local;
   late final RemoteAssistantBloc remote;
-  late final GetLocalAssistantAvailabilityUseCase localAvailability;
-  late final GetRemoteAssistantAvailabilityUseCase remoteAvailability;
+  late final IsLocalAssistantSupportedUseCase isLocalAssistantSupportedUseCase;
+  late final IsRemoteAssistantSupportedUseCase
+  isRemoteAssistantSupportedUseCase;
 
   /// Installs module-owned instances; public cards/routes own their providers.
   void install() {
@@ -152,6 +152,10 @@ class AssistantTestFixture {
     flag.stubCall(
       definition: RemoteAssistantFeatureFlags.remoteAssistant,
       result: Right(remote),
+    );
+    flag.stubCall(
+      definition: LocalAssistantFeatureFlags.aiAssistant,
+      result: Right(local),
     );
   }
 

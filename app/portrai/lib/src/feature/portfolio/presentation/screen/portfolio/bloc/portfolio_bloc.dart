@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/portfolio_event.dart';
@@ -15,8 +16,9 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
   PortfolioBloc(
     this._getPortfolioUseCase,
     this._trackingDelegate,
-    this._getLocalAssistantAvailabilityUseCase,
-    this._getRemoteAssistantAvailabilityUseCase,
+    this._isFeatureEnabledUseCase,
+    this._isLocalAssistantSupportedUseCase,
+    this._isRemoteAssistantSupportedUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
@@ -29,10 +31,9 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
 
   final GetPortfolioUseCase _getPortfolioUseCase;
   final PortfolioTrackingDelegate _trackingDelegate;
-  final GetLocalAssistantAvailabilityUseCase
-  _getLocalAssistantAvailabilityUseCase;
-  final GetRemoteAssistantAvailabilityUseCase
-  _getRemoteAssistantAvailabilityUseCase;
+  final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
+  final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
+  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   int _availabilityRevision = 0;
 
   Future<void> _mapLoadPortfolioEventToState(
@@ -95,8 +96,14 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     Emitter<PortfolioState> emit,
   ) async {
     final revision = ++_availabilityRevision;
-    final remote = await _getRemoteAssistantAvailabilityUseCase();
-    final local = await _getLocalAssistantAvailabilityUseCase();
+    final remote = await _isFeatureEnabledUseCase(
+      RemoteAssistantFeatureFlags.remoteAssistant,
+    );
+    final local = await _isFeatureEnabledUseCase(
+      LocalAssistantFeatureFlags.aiAssistant,
+    );
+    final remoteSupported = await _isRemoteAssistantSupportedUseCase();
+    final localSupported = await _isLocalAssistantSupportedUseCase();
     if (emit.isDone ||
         revision != _availabilityRevision ||
         state is! LoadedState) {
@@ -104,12 +111,18 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     }
     emit(
       (state as LoadedState).copyWith(
-        isRemoteAssistantAvailable: remote.isRight && remote.right.isAvailable,
+        isRemoteAssistantAvailable:
+            remote.isRight &&
+            remote.right &&
+            remoteSupported.isRight &&
+            remoteSupported.right,
         isLocalAssistantAvailable:
             remote.isRight &&
-            !remote.right.isFeatureEnabled &&
+            !remote.right &&
             local.isRight &&
-            local.right.isAvailable,
+            local.right &&
+            localSupported.isRight &&
+            localSupported.right,
       ),
     );
   }

@@ -1,16 +1,19 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_get_local_assistant_availability_use_case.dart';
+import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
+import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/tracking/mock_portfolio_tracking_delegate.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
-import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_get_remote_assistant_availability_use_case.dart';
+import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
 void main() {
   final portfolio = createPortfolioEntity();
@@ -18,20 +21,92 @@ void main() {
   group('PortfolioBloc', () {
     late MockGetPortfolioUseCase getPortfolioUseCase;
     late MockPortfolioTrackingDelegate trackingDelegate;
-    late MockGetLocalAssistantAvailabilityUseCase local;
-    late MockGetRemoteAssistantAvailabilityUseCase remote;
+    late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
+    late MockIsLocalAssistantSupportedUseCase local;
+    late MockIsRemoteAssistantSupportedUseCase remote;
 
-    PortfolioBloc buildBloc() =>
-        PortfolioBloc(getPortfolioUseCase, trackingDelegate, local, remote);
+    PortfolioBloc buildBloc() => PortfolioBloc(
+      getPortfolioUseCase,
+      trackingDelegate,
+      isFeatureEnabledUseCase,
+      local,
+      remote,
+    );
 
     setUp(() {
       getPortfolioUseCase = MockGetPortfolioUseCase();
       trackingDelegate = MockPortfolioTrackingDelegate();
-      local = MockGetLocalAssistantAvailabilityUseCase()
-        ..stubCall(const AssistantAvailabilityEntity.unavailable());
-      remote = MockGetRemoteAssistantAvailabilityUseCase()
-        ..stubCall(const AssistantAvailabilityEntity.unavailable());
+      isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase()
+        ..stubCall(
+          definition: LocalAssistantFeatureFlags.aiAssistant,
+          result: const Right(false),
+        )
+        ..stubCall(
+          definition: RemoteAssistantFeatureFlags.remoteAssistant,
+          result: const Right(false),
+        );
+      local = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
+      remote = MockIsRemoteAssistantSupportedUseCase()..stubCall(true);
     });
+
+    for (final localEnabled in [false, true]) {
+      for (final remoteEnabled in [false, true]) {
+        for (final localSupported in [false, true]) {
+          for (final remoteSupported in [false, true]) {
+            blocTest<PortfolioBloc, PortfolioState>(
+              'should select only the active supported assistant when local=$localEnabled remote=$remoteEnabled localSupported=$localSupported remoteSupported=$remoteSupported',
+              setUp: () {
+                isFeatureEnabledUseCase
+                  ..stubCall(
+                    definition: LocalAssistantFeatureFlags.aiAssistant,
+                    result: Right(localEnabled),
+                  )
+                  ..stubCall(
+                    definition: RemoteAssistantFeatureFlags.remoteAssistant,
+                    result: Right(remoteEnabled),
+                  );
+                local.stubCall(localSupported);
+                remote.stubCall(remoteSupported);
+              },
+              build: buildBloc,
+              seed: () => LoadedState(portfolio: portfolio),
+              act: (bloc) => bloc.add(const ScreenVisibleEvent()),
+              expect: () {
+                final expected = LoadedState(
+                  portfolio: portfolio,
+                  isLocalAssistantAvailable:
+                      !remoteEnabled && localEnabled && localSupported,
+                  isRemoteAssistantAvailable: remoteEnabled && remoteSupported,
+                );
+                return expected == LoadedState(portfolio: portfolio)
+                    ? <PortfolioState>[]
+                    : [expected];
+              },
+            );
+          }
+        }
+      }
+    }
+
+    blocTest<PortfolioBloc, PortfolioState>(
+      'should hide both assistants when the remote rollout check fails',
+      setUp: () {
+        isFeatureEnabledUseCase
+          ..stubCall(
+            definition: LocalAssistantFeatureFlags.aiAssistant,
+            result: const Right(true),
+          )
+          ..stubCall(
+            definition: RemoteAssistantFeatureFlags.remoteAssistant,
+            result: const Left(FeatureFlagUnknownFailure()),
+          );
+      },
+      build: buildBloc,
+      seed: () =>
+          LoadedState(portfolio: portfolio, isLocalAssistantAvailable: true),
+      act: (bloc) => bloc.add(const ScreenVisibleEvent()),
+      expect: () => [LoadedState(portfolio: portfolio)],
+    );
 
     blocTest<PortfolioBloc, PortfolioState>(
       'should emit loading and loaded when loading the portfolio succeeds',
