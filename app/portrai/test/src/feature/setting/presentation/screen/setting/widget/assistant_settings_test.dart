@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
-import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';

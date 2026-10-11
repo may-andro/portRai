@@ -4,9 +4,12 @@ import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
-import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
-import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_bloc.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/feature_flag/remote_assistant_feature_flags.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_bloc.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
