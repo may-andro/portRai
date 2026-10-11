@@ -24,6 +24,7 @@ extension MockRemoteAssistantRepositoryStub on MockRemoteAssistantRepository {
         portfolioContext: any(named: 'portfolioContext'),
         history: any(named: 'history'),
         onDelta: any(named: 'onDelta'),
+        systemPrompt: any(named: 'systemPrompt'),
       ),
     ).thenAnswer((invocation) async {
       final callback =
@@ -39,6 +40,7 @@ extension MockRemoteAssistantRepositoryStub on MockRemoteAssistantRepository {
         portfolioContext: any(named: 'portfolioContext'),
         history: any(named: 'history'),
         onDelta: any(named: 'onDelta'),
+        systemPrompt: any(named: 'systemPrompt'),
       ),
     ).thenThrow(error);
   }

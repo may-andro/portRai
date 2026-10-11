@@ -128,9 +128,19 @@ Unmount surfaces and cancel caller subscriptions before `reset()` or `dispose()`
 Reset replaces the controller; both invalidate pending sends and ignore late deltas,
 not backend generation. Callers retain responsibility for handling domain failures.
 
-No chat screen or inference provider is connected to this runtime. The existing
-remote use case does not accept its system prompt; no repository contract, history,
-generation configuration, feature flag or backend activation is changed here.
+The remote presentation `sendPortfolioQuestion` extension connects this session
+to `AskRemotePortfolioQuestionUseCase` using a known text question, authoritative
+portfolio context and typed completed history, not arbitrary framework messages.
+Its optional `systemPrompt` accepts trusted framework instructions up to 50,000
+characters (the current catalog generates 20,417). Oversized prompts are rejected,
+never truncated, as invalid input before model creation. Firebase always preserves
+portfolio grounding instructions and appends the framework prompt unchanged as
+subordinate presentation instructions. Null retains the original text-only model
+configuration; changing prompts closes and recreates the cached model. Reset and
+close clear that cache. Parameters remain metadata-only in diagnostics.
+
+No chat screen activates or renders this runtime. Existing chat history,
+generation limits and rollout flags are unchanged.
 
 ### On-device
 
@@ -197,5 +207,7 @@ and `SurfaceController` into `Surface`, covering DS composition, literal text,
 binding updates, surface deletion and unsupported-component error reporting.
 Session tests exercise the actual adapter/parser/controller/surface pipeline,
 callback results, parser and generation errors, sequential turns and late-delta invalidation.
+Remote repository tests connect mocked Firebase streams through the real portfolio
+use case and session to the official surface controller, with no live requests.
 
 Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md).

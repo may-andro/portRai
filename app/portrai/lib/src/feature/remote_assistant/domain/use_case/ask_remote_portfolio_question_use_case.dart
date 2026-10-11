@@ -15,12 +15,17 @@ class AskRemotePortfolioQuestionParams {
     required this.portfolioContext,
     required this.history,
     required this.onDelta,
+    this.systemPrompt,
   });
 
   final String question;
   final String portfolioContext;
   final List<AssistantMessageEntity> history;
   final void Function(String delta) onDelta;
+
+  /// Trusted presentation-framework instructions, never user-supplied data.
+  /// Supplementary only: repository portfolio grounding remains authoritative.
+  final String? systemPrompt;
 
   @override
   String toString() => 'AskRemotePortfolioQuestionParams(metadata only)';
@@ -31,6 +36,8 @@ abstract final class RemoteAssistantRequestLimits {
   static const maxOutputTokens = 1024;
   static const temperature = 0.3;
   static const maxQuestionCharacters = 2000;
+  // The current official catalog prompt is ~21k; leave bounded schema headroom.
+  static const maxSystemPromptCharacters = 50000;
   // Preserve the complete shared JSON, including overview/digest and details.
   // Bound per-request input cost; overflow is rejected, never sliced.
   static const maxPortfolioContextCharacters = 100000;
@@ -75,12 +82,15 @@ class AskRemotePortfolioQuestionUseCase
       portfolioContext: params.portfolioContext,
       history: List.unmodifiable(params.history),
       onDelta: params.onDelta,
+      systemPrompt: params.systemPrompt,
     );
     return const Right(null);
   }
 
   static bool _isValid(AskRemotePortfolioQuestionParams params) {
-    if (params.question.trim().isEmpty ||
+    if ((params.systemPrompt?.length ?? 0) >
+            RemoteAssistantRequestLimits.maxSystemPromptCharacters ||
+        params.question.trim().isEmpty ||
         params.question.length >
             RemoteAssistantRequestLimits.maxQuestionCharacters ||
         params.portfolioContext.length >

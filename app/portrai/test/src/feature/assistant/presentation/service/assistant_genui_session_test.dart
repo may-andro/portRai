@@ -17,6 +17,12 @@ const _surface = '''
 ''';
 
 void main() {
+  test('should bound catalog instructions when constructing a session', () {
+    final session = AssistantGenuiSession();
+    addTearDown(session.dispose);
+    expect(session.systemPrompt.length, lessThanOrEqualTo(50000));
+  });
+
   testWidgets(
     'should render DS surfaces when the callback streams split A2UI chunks',
     (tester) async {
