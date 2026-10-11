@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 // ignore: depend_on_referenced_packages
 import 'package:fake_async/fake_async.dart';
@@ -11,7 +9,6 @@ import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag_definition.dart';
 import 'package:portrai/src/feature/feature_flag/domain/use_case/is_feature_enabled_use_case.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
-import 'package:portrai/src/feature/project/project.dart';
 import 'package:portrai/src/feature/remote_assistant/data/repository/firebase_remote_assistant_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
@@ -20,6 +17,7 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
+import '../../../../../mock/feature/project/test_data/project_test_data.dart';
 import '../../../../../mock/feature/remote_assistant/data/cache/mock_remote_assistant_preference_cache.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_fb_ai_controller.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_fb_ai_text_model.dart';
@@ -107,43 +105,20 @@ void main() {
 
   for (final locale in ['en', 'es', 'nl']) {
     test(
-      'should send complete shared context unchanged when using shipped $locale projects',
+      'should send complete shared context unchanged when using a large $locale portfolio',
       () async {
-        final projectAssets =
-            jsonDecode(
-                  await File('assets/dashboard/projects.json').readAsString(),
-                )
-                as Map<String, dynamic>;
-        final localeAssets = projectAssets[locale] as Map<String, dynamic>;
-        final projects = (localeAssets['projects'] as List<dynamic>).map((
-          item,
-        ) {
-          final json = item as Map<String, dynamic>;
-          return ProjectEntity(
-            title: json['title'] as String,
-            description: json['description'] as String,
-            longDescription: json['longDescription'] as String,
-            technologies: (json['technologies'] as List<dynamic>)
-                .cast<String>(),
-            category: json['category'] as String,
-            status: json['status'] as String,
-            startDate: DateTime.parse(json['startDate'] as String),
-            endDate: json['endDate'] == null
-                ? null
-                : DateTime.parse(json['endDate'] as String),
-            image: json['image'] as String,
-            appStore: json['appStore'] as String?,
-            playStore: json['playStore'] as String?,
-            website: json['website'] as String?,
-            github: json['github'] as String?,
-            features: (json['features'] as List<dynamic>).cast<String>(),
-            achievements: (json['achievements'] as List<dynamic>)
-                .cast<String>(),
-            teamSize: json['teamSize'] as int,
-            role: json['role'] as String,
-            id: json['id'] as String,
-          );
-        }).toList();
+        final title = switch (locale) {
+          'es' => 'Proyecto de portafolio',
+          'nl' => 'Portfolioproject',
+          _ => 'Portfolio project',
+        };
+        final projects = List.generate(
+          40,
+          (index) => createProjectEntity(
+            id: '$locale-project-$index',
+            title: '$title $index',
+          ),
+        );
         final getPortfolio = MockGetPortfolioUseCase()
           ..stubCall(
             Right<GetPortfolioFailure, PortfolioEntity>(
