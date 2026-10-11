@@ -3,10 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/get_remote_assistant_preference_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure_mapper.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/reset_remote_assistant_session_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/update_remote_assistant_preference_use_case.dart';
 
@@ -132,7 +132,7 @@ void main() {
     'should treat unexpected failure objects as unknown when mapping errors',
     () {
       const error = RemoteAssistantQuotaFailure(cause: 'secret server body');
-      final result = mapRemoteAssistantFailure(error);
+      final result = error.toRemoteAssistantFailure();
       expect(result, isA<RemoteAssistantUnknownFailure>());
       expect(result.cause, isNull);
       expect(result, isNot(same(error)));
