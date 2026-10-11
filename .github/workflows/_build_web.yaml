@@ -35,6 +35,11 @@ on:
         required: false
         type: boolean
         default: false
+      app-check-site-key:
+        description: Public reCAPTCHA Enterprise site key required for Firebase App Check
+        required: false
+        type: string
+        default: ''
       run-codegen:
         description: Whether to run build_runner code generation before build
         required: false
@@ -62,12 +67,23 @@ jobs:
   build:
     name: Build Web
     runs-on: ubuntu-latest
+    env:
+      FIREBASE_APP_CHECK_WEB_SITE_KEY: ${{ inputs.app-check-site-key }}
+      BUILD_ENV: ${{ inputs.build-type == 'production' && 'prod' || 'staging' }}
     outputs:
       artifact-name: ${{ inputs.app-name }}-web-${{ inputs.build-type }}-${{ github.sha }}
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Validate Firebase App Check site key
+        if: inputs.use-firebase
+        run: |
+          if [ -z "$FIREBASE_APP_CHECK_WEB_SITE_KEY" ]; then
+            echo "::error::Firebase web builds require app-check-site-key. Set the FIREBASE_APP_CHECK_WEB_SITE_KEY repository variable to your public reCAPTCHA Enterprise site key."
+            exit 1
+          fi
       
       - name: Create firebase_options.dart
         if: inputs.use-firebase
@@ -100,6 +116,8 @@ jobs:
         run: |
           flutter build web --profile \
             --dart-define=ENVIRONMENT=preview \
+            --dart-define="build_env=$BUILD_ENV" \
+            --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY" \
             ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
             ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
 
@@ -109,6 +127,8 @@ jobs:
         run: |
           flutter build web --release \
             --dart-define=ENVIRONMENT=${{ inputs.build-type }} \
+            --dart-define="build_env=$BUILD_ENV" \
+            --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY" \
             ${{ inputs.version != '' && format('--dart-define=VERSION={0}', inputs.version) || '' }} \
             ${{ inputs.build-number != '' && format('--dart-define=BUILD_NUMBER={0}', inputs.build-number) || '' }}
 

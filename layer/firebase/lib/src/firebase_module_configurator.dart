@@ -23,13 +23,13 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
   FirebaseModuleConfigurator({
     required this.isFirebaseEnabled,
     required this.firebaseOptions,
-    required this.appCheckToken,
+    required this.appCheckWebSiteKey,
     required this.storageBucketUrl,
   });
 
   final bool isFirebaseEnabled;
   final FirebaseOptions firebaseOptions;
-  final String appCheckToken;
+  final String appCheckWebSiteKey;
   final String storageBucketUrl;
 
   @override
@@ -39,9 +39,8 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
 
   @override
   FutureOr<void> postDependenciesSetup(ServiceLocator serviceLocator) async {
-    // set up app check
-    //final appCheckController = serviceLocator.get<FbAppCheckController>();
-    //await appCheckController.initialiseAppCheck(appCheckToken);
+    final appCheckController = serviceLocator.get<FbAppCheckController>();
+    await appCheckController.initialiseAppCheck(webSiteKey: appCheckWebSiteKey);
 
     // set up crashlytics
     final crashlyticsController = serviceLocator.get<FbCrashlyticsController>();

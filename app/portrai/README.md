@@ -191,7 +191,28 @@ The app supports multiple build configurations:
 - **Production**: Live production environment
 
 ### Environment Variables
-Configure environment-specific settings in `lib/core/config/build_environment.dart`.
+Select the build environment using `--dart-define=build_env=staging` or
+`--dart-define=build_env=prod`. The shared
+[`BuildEnvironment`](../../layer/core/lib/src/model/build_config.dart) defines
+the environment-specific behavior. Release workflows select staging for previews
+and prod for production; both currently use the same Firebase project.
+
+### Firebase App Check
+
+App Check activates before Firebase service requests. Debug builds use registered
+debug tokens; public preview and production builds use Play Integrity on Android,
+App Attest with DeviceCheck fallback on iOS, and reCAPTCHA Enterprise on web.
+
+Set the repository Actions variable `FIREBASE_APP_CHECK_WEB_SITE_KEY` to your
+public Enterprise website key before running preview or production web releases.
+For local non-debug web builds, pass the same value through `--dart-define`.
+Native builds do not need this key.
+
+Register all providers in Firebase Console and update iOS provisioning profiles
+for the App Attest entitlement before distributing builds. Leave enforcement
+disabled until valid client traffic is confirmed. See the
+[Firebase setup and rollout guide](../../layer/firebase/README.md#app-check-setup)
+for signing, domains, local debug tokens, and enforcement steps.
 
 ### Feature Flags
 Feature flags are managed through Firebase Remote Config:
@@ -226,13 +247,17 @@ Feature flags are managed through Firebase Remote Config:
 ## Deployment
 
 ### Web Deployment
-```bash
-# Build web app
-flutter build web --release
+Set `FIREBASE_APP_CHECK_WEB_SITE_KEY` in the ignored
+`app/portrai/.env.production` file. Keep debug tokens in `.env` only.
 
-# Deploy to Firebase Hosting
-firebase deploy --only hosting
+```bash
+# Run from the workspace root: build and deploy to Firebase Hosting
+melos run deploy_portrai
 ```
+
+The script loads `.env.production` automatically unless the site key is already
+set in the environment. This trusted local file should contain only shell
+assignments and comments; the debug-token `.env` is never loaded.
 
 ### Android Deployment
 ```bash

@@ -38,44 +38,134 @@ import 'package:firebase/firebase.dart';
    - **macOS**: `macos/Runner/GoogleService-Info.plist`
    - **Web**: Update `web/index.html` with Firebase config
 
-2. **Initialize Firebase** in your app's main entry point:
+2. **Configure the module** in your application's module configurator list:
 
 ```dart
 import 'package:firebase/firebase.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  // Configure Firebase module (registers all services with DI)
-  final configurator = FirebaseModuleConfigurator();
-  await configurator.configure();
-
-  runApp(MyApp());
-}
+final configurator = FirebaseModuleConfigurator(
+  isFirebaseEnabled: buildConfig.buildEnvironment.isFirebaseEnabled,
+  firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+  appCheckWebSiteKey: const String.fromEnvironment(
+    'FIREBASE_APP_CHECK_WEB_SITE_KEY',
+  ),
+  storageBucketUrl: '',
+);
 ```
 
-The Firebase module automatically configures all Firebase services for dependency injection:
+Pass this configurator to `ModuleInjectorController.setUpDIGraph`. Its
+`preDependenciesSetup` initializes Firebase. After dependency registration,
+`postDependenciesSetup` resolves the App Check controller through DI and awaits
+activation before initializing the other Firebase services. Dependency registration
+and earlier module hooks must not issue protected Firebase requests. Do not initialize
+Firebase separately in an Apple `AppDelegate`, as this can bypass provider selection.
 
-```dart
-import 'package:firebase/firebase.dart';
-import 'package:module_injector/module_injector.dart';
+`isFirebaseEnabled` controls Analytics and Crashlytics collection, not Firebase
+initialization or App Check. Both staging and production activate App Check.
 
-// In your app initialization
-final configurator = FirebaseModuleConfigurator();
-await configurator.configure();
+### App Check Setup
 
-// All services are now available via service locator
-final auth = serviceLocator<FirebaseAuth>();
-final firestore = serviceLocator<FirebaseFirestore>();
-final analytics = serviceLocator<FirebaseAnalytics>();
-// ... etc
+Debug builds use the SDK debug providers on Android, Apple platforms, and web.
+Profile and release builds use Play Integrity, App Attest with DeviceCheck fallback,
+and reCAPTCHA Enterprise respectively. Public previews use real attestation.
+
+Before deploying, register all clients under **Firebase Console > Security > App Check > Apps**,
+leaving service enforcement disabled:
+
+1. **Android:** link the Play Integrity API to the existing Firebase project and
+   register the signing certificate SHA-256 fingerprints, including Play App Signing.
+   Configure app recognition, licensing, and device integrity requirements for both
+   Play Store and Firebase App Distribution installations. Defaults requiring
+   `PLAY_RECOGNIZED` do not suit apps distributed exclusively outside Google Play.
+2. **iOS:** register App Attest with the Apple team and bundle ID. Configure DeviceCheck
+   credentials as well for the fallback. Enable the App Attest capability in the Apple
+   developer account and regenerate development and distribution provisioning profiles,
+   including the Ad Hoc profile used by previews. Portrai's Runner entitlement uses
+   the `production` App Attest environment for Firebase.
+3. **Web:** create a reCAPTCHA Enterprise score-based website key in the same Google
+   Cloud project, enable the API, configure permitted production and actual preview
+   hostnames, and register that key for the Firebase web app. Review quotas, billing,
+   and privacy requirements. Do not authorize `localhost` on a production key;
+   use the debug provider for local development.
+
+For Portrai CI, set the repository Actions **variable**
+`FIREBASE_APP_CHECK_WEB_SITE_KEY` to the public Enterprise site key. Both preview
+and production workflows pass it to the reusable web build. Firebase web builds
+fail before compilation if it is missing; the application also rejects missing
+keys during non-debug web startup. No web key is needed by native builds.
+
+For local production configuration, put your public Enterprise site key in
+the ignored `app/portrai/.env.production` file:
+
+```dotenv
+FIREBASE_APP_CHECK_WEB_SITE_KEY=YOUR_PUBLIC_ENTERPRISE_SITE_KEY
 ```
+
+Keep this file separate from the debug-token `.env`. To build and deploy to
+Hosting, run from the workspace root:
+
+```bash
+melos run deploy_portrai
+```
+
+The script loads the trusted local `.env.production` file automatically if
+the site key is not already supplied through the environment. An exported key
+takes precedence. The file is sourced as shell configuration; use only simple
+assignments and comments, and never source configuration from untrusted sources.
+The Melos script requires the public site key before cleaning or building,
+passes it to the production release build, and deploys to `hosting:portrai`.
+It does not load the debug-token `.env` file.
+
+### Local Development
+
+Run `flutter run` normally in debug mode. On first Firebase access, copy the
+SDK-generated App Check debug token from the device log or browser console and
+register it under the matching Firebase app's **Manage debug tokens** menu.
+The web debug provider sets the SDK debug configuration itself; no edit to
+`web/index.html` is required. Restart after registration if requests still fail.
+
+To reuse tokens across reinstalls or devices, copy `app/portrai/.env.example` to
+`app/portrai/.env` and enter each platform's registered debug token. The local
+`.env` is git-ignored and is not bundled as an asset. Empty values let the SDK
+generate a token as usual.
+
+```bash
+cd app/portrai
+flutter run --dart-define-from-file=.env
+```
+
+In Android Studio, add `--dart-define-from-file=.env` to the Flutter run
+configuration's additional arguments (relative to the app working directory).
+After changing tokens, stop and rerun the app; hot reload does not update
+compile-time environment values.
+
+Only use this file for debug runs. Profile/release builds select real providers
+even if debug-token values are supplied, but never pass this file to distributed
+builds: compile-time definitions are not a secret-storage mechanism.
+
+Debug tokens bypass attestation: do not commit them, log them in shared CI output,
+or include them in public artifacts. Give each developer a separate token and
+revoke unused tokens. Mocked unit tests and ordinary builds need no registered
+token. Trusted live-Firebase integration tests require separately managed debug
+tokens; the release workflows do not inject any.
+
+### Enforcement Rollout
+
+Deploy clients with App Check active while enforcement remains off. Verify token
+validity and Firebase reads on real devices, App Distribution builds, and production
+and preview web hostnames. Monitor valid, invalid, and missing-token traffic before
+enforcing **Cloud Firestore**, which serves Portrai's portfolio and app configuration.
+Account for older mobile clients and cached web clients; enforcement rejects their
+unverified requests too.
+
+Inventory other active Firebase clients before enforcing additional supported
+services. Keep Firestore Security Rules and IAM protections: App Check supplements
+them and does not protect Hosting pages. Roll back by disabling the affected
+service's enforcement in Firebase Console. Do not use Remote Config to gate
+activation because it is itself fetched during startup.
+
+See the official [Flutter setup](https://firebase.google.com/docs/app-check/flutter/default-providers),
+[Play Integrity settings](https://firebase.google.com/docs/app-check/android/play-integrity-provider),
+and [enforcement guide](https://firebase.google.com/docs/app-check/enable-enforcement).
 
 ## Usage
 

@@ -198,6 +198,13 @@ melos:
     deploy_portrai:
       run: |
         set -e
+        if [ -z "${FIREBASE_APP_CHECK_WEB_SITE_KEY:-}" ] && [ -f app/portrai/.env.production ]; then
+          . ./app/portrai/.env.production
+        fi
+        if [ -z "${FIREBASE_APP_CHECK_WEB_SITE_KEY:-}" ]; then
+          echo "Set FIREBASE_APP_CHECK_WEB_SITE_KEY in app/portrai/.env.production or export it before deploying." >&2
+          exit 1
+        fi
         cd app/portrai
         echo "Clean existing repository"
         flutter clean
@@ -206,7 +213,9 @@ melos:
         echo "Generating SQLite web assets"
         dart run sqflite_common_ffi_web:setup --force
         echo "Building web with Flutter"
-        flutter build web --release
+        flutter build web --release \
+          --dart-define=build_env=prod \
+          --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY"
         test -s build/web/sqflite_sw.js
         test -s build/web/sqlite3.wasm
         echo "Deploying to Firebase"
