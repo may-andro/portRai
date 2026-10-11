@@ -16,12 +16,7 @@ class _CopytextWidget extends StatelessWidget {
           color: context.colorPalette.onInverseSurface,
           textAlign: TextAlign.center,
         ),
-        DSTextWidget(
-          context.localizations.version('v1.0.0'),
-          style: context.typography.emphasizedLabelSmall,
-          color: context.colorPalette.onInverseSurface,
-          textAlign: TextAlign.center,
-        ),
+        const AppVersionWidget(onInverseSurface: true),
       ],
     );
   }

@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bl
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/assistant_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
+import 'package:portrai/src/widget/app_version_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key, required this.state});
@@ -74,16 +75,7 @@ class ContentWidget extends StatelessWidget {
                       ],
                       const Spacer(),
                       const DSVerticalSpacerWidget(3),
-                      SafeArea(
-                        child: Align(
-                          child: DSTextWidget(
-                            context.localizations.version('v1.0.0'),
-                            style: context.typography.emphasizedLabelSmall,
-                            color: context.colorPalette.onBackground,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
+                      const SafeArea(child: Align(child: AppVersionWidget())),
                       const DSVerticalSpacerWidget(2),
                     ],
                   ),

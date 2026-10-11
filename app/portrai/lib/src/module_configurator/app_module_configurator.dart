@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:error_reporter/error_reporter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:portrai/src/error_reporter/app_blacklist_error_handler.dart';
 import 'package:portrai/src/error_reporter/app_fatal_exception_handler.dart';
 import 'package:portrai/src/utility/log_use_case_interceptor.dart';
@@ -42,7 +43,9 @@ class AppModuleConfigurator implements ModuleConfigurator {
   FutureOr<void> preDependenciesSetup(ServiceLocator serviceLocator) => null;
 
   @override
-  FutureOr<void> registerDependencies(ServiceLocator serviceLocator) {
+  FutureOr<void> registerDependencies(ServiceLocator serviceLocator) async {
     serviceLocator.registerSingleton(() => _buildConfig);
+    final packageInfo = await PackageInfo.fromPlatform();
+    serviceLocator.registerSingleton(() => packageInfo);
   }
 }

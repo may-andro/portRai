@@ -8,12 +8,14 @@ import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../mock/feature/setting/presentation/screen/setting/bloc/mock_setting_bloc.dart';
 import '../../../../../../util/assistant_bloc_scope.dart';
+import '../../../../../../util/package_info_setup.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   group('SettingScreen', () {
     setUp(() async {
       await appServiceLocator.reset();
+      registerTestPackageInfo();
     });
 
     tearDown(() async {

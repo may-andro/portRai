@@ -10,11 +10,13 @@ import '../../../../../../mock/feature/external_app_handler/domain/use_case/mock
 import '../../../../../../mock/feature/profile/domain/use_case/mock_open_email_use_case.dart';
 import '../../../../../../mock/feature/profile/presentation/widget/footer/tracking/mock_footer_tracking_delegate.dart';
 import '../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
+import '../../../../../../util/package_info_setup.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   setUp(() async {
     await appServiceLocator.reset();
+    registerTestPackageInfo();
   });
 
   tearDown(() async {

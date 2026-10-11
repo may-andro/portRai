@@ -246,6 +246,12 @@ Feature flags are managed through Firebase Remote Config:
 
 ## Deployment
 
+The Settings and portfolio footer version labels use installed package metadata.
+Release workflows pass the tag's version and build number through Flutter's
+`--build-name` and `--build-number` options on all platforms, including web's
+generated `version.json`. Local Melos web deployments use the app's `pubspec.yaml`
+version unless build metadata is explicitly overridden.
+
 ### Web Deployment
 Set `FIREBASE_APP_CHECK_WEB_SITE_KEY` in the ignored
 `app/portrai/.env.production` file. Keep debug tokens in `.env` only.
