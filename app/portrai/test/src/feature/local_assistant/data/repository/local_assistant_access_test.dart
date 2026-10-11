@@ -7,7 +7,6 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/flutter_edge_ai_local_assistant_repository.dart';
 import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
@@ -20,12 +19,7 @@ void main() {
     () => registerFallbackValue(const Message(text: 'Ready', isUser: true)),
   );
 
-  for (final reason in [
-    'flag off',
-    'unsupported platform',
-    'disabled',
-    'flag failure',
-  ]) {
+  for (final reason in ['flag off', 'disabled', 'flag failure']) {
     test(
       'should reject inference before loading when $reason blocks local access',
       () async {
@@ -47,9 +41,6 @@ void main() {
               },
               enabledCache: cache,
               isFeatureEnabled: flag,
-              availability: LocalAssistantAvailability.supported(
-                reason != 'unsupported platform',
-              ),
             );
         addTearDown(repository.dispose);
         await expectLater(

@@ -4,7 +4,6 @@ import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
@@ -19,6 +18,7 @@ import '../mock/feature/local_assistant/domain/use_case/mock_cancel_local_assist
 import '../mock/feature/local_assistant/domain/use_case/mock_delete_local_assistant_model_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_get_local_assistant_enabled_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_model_downloaded_use_case.dart';
+import '../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_prepare_local_assistant_model_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_reset_local_assistant_session_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
@@ -37,9 +37,8 @@ class AssistantTestFixture {
     bool remoteSupported = true,
     bool localEnabled = false,
   }) {
-    isLocalAssistantSupportedUseCase = IsLocalAssistantSupportedUseCase(
-      LocalAssistantAvailability.supported(localSupported),
-    );
+    isLocalAssistantSupportedUseCase = MockIsLocalAssistantSupportedUseCase()
+      ..stubCall(localSupported);
     setRollout(local: localRollout, remote: remoteRollout);
     when(() => context()).thenAnswer((_) => const Right('Fixture portfolio'));
     final prepare = MockPrepareLocalAssistantModelUseCase()
@@ -72,7 +71,7 @@ class AssistantTestFixture {
       askLocal,
       MockLocalAssistantTrackingDelegate(),
       IsFeatureEnabledUseCase(flagRepository),
-      availability: LocalAssistantAvailability.supported(localSupported),
+      isLocalAssistantSupportedUseCase: isLocalAssistantSupportedUseCase,
       resetSession: resetLocal,
     );
     when(() => resetRemote()).thenAnswer((_) => const Right(null));
@@ -128,7 +127,8 @@ class AssistantTestFixture {
   final remoteSupport = MockIsRemoteAssistantSupportedUseCase();
   late final LocalAssistantBloc local;
   late final RemoteAssistantBloc remote;
-  late final IsLocalAssistantSupportedUseCase isLocalAssistantSupportedUseCase;
+  late final MockIsLocalAssistantSupportedUseCase
+  isLocalAssistantSupportedUseCase;
 
   /// Installs module-owned instances; public cards/routes own their providers.
   void install() {

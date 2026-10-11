@@ -51,8 +51,11 @@ Provider blocs, events and states are module-internal. Routes and public cards o
 bloc providers. Portfolio and Settings blocs read rollout flags directly through
 `IsFeatureEnabledUseCase` and use the public feature-owned
 `IsLocalAssistantSupportedUseCase` boolean platform check for local discovery, refreshing on
-visibility/return. Visiting Settings or the portfolio does not initialize remote chat or load
-its context. The local provider-owned visibility widget still rechecks its retained session.
+visibility/return. The local route is registered only on supported platforms, and local
+domain operations recheck platform support before native model access. The repository checks
+the local rollout flag and propagates native SDK errors. Visiting Settings or the portfolio
+does not initialize remote chat or load its context. The local provider-owned visibility widget
+still rechecks its retained session.
 Remote chat rechecks rollout and platform support on chat visibility/return and before requests,
 invalidating retained output when unavailable, without exposing its bloc to hosts.
 Priority is a simple remote-first check in the portfolio and Settings composition.

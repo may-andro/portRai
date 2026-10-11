@@ -17,6 +17,7 @@ import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_c
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_delete_local_assistant_model_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_get_local_assistant_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_model_downloaded_use_case.dart';
+import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_prepare_local_assistant_model_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
@@ -29,6 +30,7 @@ void main() {
   late MockCancelLocalAssistantPreparationUseCase cancel;
   late MockDeleteLocalAssistantModelUseCase delete;
   late MockIsFeatureEnabledUseCase isFeatureEnabled;
+  late MockIsLocalAssistantSupportedUseCase isSupported;
   late MockAskLocalPortfolioQuestionUseCase askQuestion;
 
   setUpAll(() {
@@ -54,6 +56,7 @@ void main() {
         definition: LocalAssistantFeatureFlags.aiAssistant,
         result: const Right(true),
       );
+    isSupported = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
     return LocalAssistantBloc(
       MockGetAssistantContextUseCase(),
       prepare,
@@ -65,6 +68,7 @@ void main() {
       askQuestion,
       MockLocalAssistantTrackingDelegate(),
       isFeatureEnabled,
+      isLocalAssistantSupportedUseCase: isSupported,
     );
   }
 

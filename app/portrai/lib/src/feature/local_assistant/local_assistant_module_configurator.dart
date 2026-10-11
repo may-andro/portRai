@@ -1,7 +1,6 @@
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/_domain.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant_module_configurator.di.g.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/route/local_assistant_module_route.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
@@ -20,7 +19,11 @@ class LocalAssistantModuleConfigurator extends SimpleModuleConfigurator {
       registry.register(definition);
     }
 
-    if (isLocalAssistantSupported) {
+    final support = await sl.get<IsLocalAssistantSupportedUseCase>()();
+    if (support.isLeft) {
+      throw StateError('Could not determine local assistant platform support.');
+    }
+    if (support.right) {
       sl.get<ModuleRouteController>().register(
         LocalAssistantModuleRoute.assistant,
       );

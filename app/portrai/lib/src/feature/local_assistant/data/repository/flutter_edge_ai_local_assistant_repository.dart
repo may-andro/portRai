@@ -12,7 +12,6 @@ import 'package:portrai/src/feature/local_assistant/data/repository/local_assist
 import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/repository/_repository.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 
 @RegisterSingleton(as: LocalAssistantRepository, disposeMethodName: 'dispose')
 class FlutterEdgeAiLocalAssistantRepository
@@ -20,7 +19,6 @@ class FlutterEdgeAiLocalAssistantRepository
   FlutterEdgeAiLocalAssistantRepository(
     this._enabledCache, {
     required IsFeatureEnabledUseCase this._isFeatureEnabled,
-    this._availability = const LocalAssistantAvailability(),
   });
 
   @visibleForTesting
@@ -28,22 +26,17 @@ class FlutterEdgeAiLocalAssistantRepository
     this._modelLoader, {
     LocalAssistantEnabledCache? enabledCache,
     this._isFeatureEnabled,
-    this._availability = const LocalAssistantAvailability(),
   }) : _enabledCache = enabledCache ?? LocalAssistantEnabledCache();
 
   final LocalAssistantEnabledCache _enabledCache;
   final IsFeatureEnabledUseCase? _isFeatureEnabled;
-  final LocalAssistantAvailability _availability;
   int _generation = 0;
   bool _requestActive = false;
   bool _disabled = false;
   int _preferenceRevision = 0;
   Future<void> _preferenceMutation = Future.value();
 
-  Future<void> _ensureAvailable() async {
-    if (!_availability.isSupported) {
-      throw const LocalAssistantUnavailableException();
-    }
+  Future<void> _ensureFeatureEnabled() async {
     final flag = await _isFeatureEnabled?.call(
       LocalAssistantFeatureFlags.aiAssistant,
     );
@@ -109,7 +102,7 @@ class FlutterEdgeAiLocalAssistantRepository
     _preferenceMutation = completion.future;
     await previous;
     try {
-      if (enabled) await _ensureAvailable();
+      if (enabled) await _ensureFeatureEnabled();
       final saved = await _enabledCache.put(enabled);
       if (!saved) throw const LocalAssistantPreferenceException();
       if (enabled && revision == _preferenceRevision) _disabled = false;
@@ -127,7 +120,7 @@ class FlutterEdgeAiLocalAssistantRepository
 
   @override
   Future<void> prepareModel({required void Function(int) onProgress}) async {
-    await _ensureAvailable();
+    await _ensureFeatureEnabled();
     if (_model != null) return;
     await (_preparation ??= _prepareModel(onProgress));
   }
@@ -196,7 +189,7 @@ class FlutterEdgeAiLocalAssistantRepository
     _requestActive = true;
     final generation = _generation;
     try {
-      await _ensureAvailable();
+      await _ensureFeatureEnabled();
       if (_isFeatureEnabled != null && !await isEnabled()) {
         throw const LocalAssistantUnavailableException();
       }

@@ -5,7 +5,6 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/_domain.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant_availability.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_state.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/tracking/_tracking.dart';
@@ -26,7 +25,7 @@ class LocalAssistantBloc
     this._askPortfolioQuestionUseCase,
     this._trackingDelegate,
     this._isFeatureEnabledUseCase, {
-    this._availability = const LocalAssistantAvailability(),
+    required this._isLocalAssistantSupportedUseCase,
     @Inject(ResetLocalAssistantSessionUseCase) this._resetSession,
   }) : super(const LocalAssistantState()) {
     on<LocalAssistantStartedEvent>(_mapLocalAssistantStartedEventToState);
@@ -57,11 +56,10 @@ class LocalAssistantBloc
   final AskLocalPortfolioQuestionUseCase _askPortfolioQuestionUseCase;
   final LocalAssistantTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
-  final LocalAssistantAvailability _availability;
+  final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
   final ResetLocalAssistantSessionUseCase? _resetSession;
   int _controlRevision = 0;
   int _requestRevision = 0;
-  bool get isPlatformSupported => _availability.isSupported;
 
   Future<bool> _checkAvailability(Emitter<LocalAssistantState> emit) async {
     final revision = _controlRevision;
@@ -69,7 +67,9 @@ class LocalAssistantBloc
       LocalAssistantFeatureFlags.aiAssistant,
     );
     if (emit.isDone || revision != _controlRevision) return false;
-    if (result.isRight && result.right && _availability.isSupported) {
+    final support = await _isLocalAssistantSupportedUseCase();
+    if (emit.isDone || revision != _controlRevision) return false;
+    if (result.isRight && result.right && support.isRight && support.right) {
       return true;
     }
     _controlRevision++;
@@ -84,9 +84,13 @@ class LocalAssistantBloc
         isSendingQuestion: false,
         isLoadingContext: false,
         clearContext: true,
-        hasError: result.isLeft,
-        failure: result.isLeft ? result.left : null,
-        clearFailure: result.isRight,
+        hasError: result.isLeft || support.isLeft,
+        failure: result.isLeft
+            ? result.left
+            : support.isLeft
+            ? support.left
+            : null,
+        clearFailure: result.isRight && support.isRight,
       ),
     );
     final reset = await _resetSession?.call();

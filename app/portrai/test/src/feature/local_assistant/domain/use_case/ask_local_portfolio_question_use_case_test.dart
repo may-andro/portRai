@@ -6,12 +6,16 @@ import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_po
 import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 
 import '../../../../../mock/feature/local_assistant/domain/repository/mock_local_assistant_repository.dart';
+import '../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 
 void main() {
   const params = AskLocalPortfolioQuestionParams(
     question: 'Which projects use Flutter?',
     portfolioContext: 'Verified portfolio context',
   );
+
+  MockIsLocalAssistantSupportedUseCase supportedCase() =>
+      MockIsLocalAssistantSupportedUseCase()..stubCall(true);
 
   test(
     'should return a typed text response when the repository answers',
@@ -23,7 +27,10 @@ void main() {
           answer: 'These projects use Flutter.',
         );
 
-      final result = await AskLocalPortfolioQuestionUseCase(repository)(params);
+      final result = await AskLocalPortfolioQuestionUseCase(
+        repository,
+        supportedCase(),
+      )(params);
 
       expect(result.isRight, isTrue);
       expect(
@@ -48,7 +55,10 @@ void main() {
         error: error,
       );
 
-    final result = await AskLocalPortfolioQuestionUseCase(repository)(params);
+    final result = await AskLocalPortfolioQuestionUseCase(
+      repository,
+      supportedCase(),
+    )(params);
 
     expect(result.isLeft, isTrue);
     expect(result.left, isA<UnknownLocalAssistantFailure>());
@@ -65,7 +75,10 @@ void main() {
           error: const LocalAssistantUnavailableException(),
         );
 
-      final result = await AskLocalPortfolioQuestionUseCase(repository)(params);
+      final result = await AskLocalPortfolioQuestionUseCase(
+        repository,
+        supportedCase(),
+      )(params);
       expect(result.left, isA<UnavailableLocalAssistantFailure>());
     },
   );
@@ -79,8 +92,32 @@ void main() {
           portfolioContext: params.portfolioContext,
           error: const LocalAssistantBusyException(),
         );
-      final result = await AskLocalPortfolioQuestionUseCase(repository)(params);
+      final result = await AskLocalPortfolioQuestionUseCase(
+        repository,
+        supportedCase(),
+      )(params);
       expect(result.left, isA<BusyLocalAssistantFailure>());
+    },
+  );
+
+  test(
+    'should reject questions without calling the repository when unsupported',
+    () async {
+      final repository = MockLocalAssistantRepository();
+      final support = MockIsLocalAssistantSupportedUseCase()..stubCall(false);
+
+      final result = await AskLocalPortfolioQuestionUseCase(
+        repository,
+        support,
+      )(params);
+
+      expect(result.left, isA<UnavailableLocalAssistantFailure>());
+      verifyNever(
+        () => repository.answer(
+          question: params.question,
+          portfolioContext: params.portfolioContext,
+        ),
+      );
     },
   );
 }

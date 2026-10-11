@@ -9,10 +9,5 @@ class MockLocalAssistantBloc
 extension MockLocalAssistantBlocStub on MockLocalAssistantBloc {
   void stubState(LocalAssistantState state) {
     when(() => this.state).thenReturn(state);
-    stubPlatformSupported(true);
-  }
-
-  void stubPlatformSupported(bool supported) {
-    when(() => isPlatformSupported).thenReturn(supported);
   }
 }
