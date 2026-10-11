@@ -18,10 +18,12 @@ class ContentWidget extends StatelessWidget {
       builder: (context, state) {
         if (!state.isAvailable) {
           return Center(
-            child: Text(
+            child: DSTextWidget(
               state.failure == null
                   ? context.localizations.errorLocalAssistantUnavailable
                   : FailureTranslator.translate(context, state.failure!),
+              color: context.colorPalette.textPrimary,
+              style: context.typography.bodyLarge,
               textAlign: TextAlign.center,
             ),
           );

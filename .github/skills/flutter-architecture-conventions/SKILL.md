@@ -64,6 +64,11 @@ internal bloc providers. Route builders return screens directly; provider setup 
 the screen, not in the route definition. For retained singleton sessions, use
 `BlocProvider.value` so navigating away does not close the shared session.
 
+Use `design_system` components whenever an equivalent exists. Render user-facing plain text with
+`DSTextWidget`, choosing its style from `context.typography` and color from
+`context.colorPalette`; do not use Flutter `Text` as a shortcut. Prefer DS buttons, icons, app-bar
+components, and spacers where they fit without changing the screen's behavior or required layout.
+
 ## Presentation extensions
 Extensions that need `BuildContext`/localization (e.g. formatting an entity for display) live in `presentation/extension/` with an `_extension.dart` barrel, exported from `presentation/_presentation.dart`. Never put them in the domain layer or in `widget/`. Examples: `experience_date_range_extension.dart`, `project_date_range_extension.dart`, `locale_code_extension.dart`. Screen-specific ones sit next to their screen (`screen/<name>/extension/`).
 

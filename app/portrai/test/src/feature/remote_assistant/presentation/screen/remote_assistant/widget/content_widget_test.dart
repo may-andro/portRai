@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -34,6 +35,7 @@ void main() {
       const RemoteAssistantState(status: RemoteAssistantStatus.unavailable),
     );
     expect(find.byType(AssistantConversationWidget), findsNothing);
+    expect(find.byType(DSTextWidget), findsOneWidget);
     expect(find.byType(FilledButton), findsNothing);
   });
 
@@ -77,6 +79,13 @@ void main() {
     );
     expect(find.text('Partial answer'), findsOneWidget);
     expect(
+      find.ancestor(
+        of: find.text('Generating — this answer is not yet complete'),
+        matching: find.byType(DSTextWidget),
+      ),
+      findsOneWidget,
+    );
+    expect(
       find.text('Generating — this answer is not yet complete'),
       findsOneWidget,
     );
@@ -91,6 +100,7 @@ void main() {
       const RemoteAssistantState(status: RemoteAssistantStatus.ready),
     );
     expect(find.byType(AssistantConversationWidget), findsNothing);
+    expect(find.byType(DSButtonWidget), findsOneWidget);
     await tester.tap(find.text('Retry'));
     verify(() => bloc.add(const RemoteAssistantStartedEvent())).called(1);
   });

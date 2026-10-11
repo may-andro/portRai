@@ -153,6 +153,15 @@ void main() {
       expect(find.text('Question'), findsOneWidget);
       expect(find.text('Answer'), findsOneWidget);
       expect(find.text('Unable to answer'), findsOneWidget);
+      for (final text in ['Question', 'Answer', 'Unable to answer']) {
+        expect(
+          find.ancestor(
+            of: find.text(text),
+            matching: find.byType(DSTextWidget),
+          ),
+          findsOneWidget,
+        );
+      }
       expect(find.text('Which projects use Flutter?'), findsNothing);
     },
   );

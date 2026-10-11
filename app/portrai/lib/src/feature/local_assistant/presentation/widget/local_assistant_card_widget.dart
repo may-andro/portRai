@@ -49,10 +49,12 @@ class LocalAssistantCardContentWidget extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
+                    DSIconWidget(
                       Icons.auto_awesome,
-                      size: context.iconSize,
-                      color: palette.neutral.grey1.color,
+                      size: context.isMobile
+                          ? DSIconSize.large
+                          : DSIconSize.medium,
+                      color: palette.neutral.grey1,
                     ),
                     const DSHorizontalSpacerWidget(2),
                     Expanded(

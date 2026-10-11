@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,6 +89,13 @@ void main() {
       expect(find.byType(AssistantConversationWidget), findsNothing);
       expect(
         find.text('The assistant could not answer. Please try again.'),
+        findsOneWidget,
+      );
+      expect(
+        find.ancestor(
+          of: find.text('The assistant could not answer. Please try again.'),
+          matching: find.byType(DSTextWidget),
+        ),
         findsOneWidget,
       );
     },

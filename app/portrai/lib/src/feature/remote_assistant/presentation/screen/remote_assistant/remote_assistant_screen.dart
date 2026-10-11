@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/route/remote_assistant_module_route.dart';
@@ -20,13 +21,22 @@ class RemoteAssistantScreen extends StatelessWidget {
         onResume: () => context.bloc.add(const RemoteAssistantStartedEvent()),
         child: Scaffold(
           appBar: AppBar(
-            title: Text(context.localizations.chatAssistantTitle),
+            title: DSTextWidget(
+              context.localizations.chatAssistantTitle,
+              color: context.colorPalette.neutral.grey9,
+              style: context.typography.emphasizedTitleMedium,
+            ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                tooltip: context.localizations.chatAssistantClear,
-                onPressed: () =>
-                    context.bloc.add(const ResetRemoteAssistantClickEvent()),
+              Tooltip(
+                message: context.localizations.chatAssistantClear,
+                child: DSIconButtonWidget(
+                  Icons.delete_outline,
+                  iconColor: context.colorPalette.neutral.grey9,
+                  buttonColor: context.colorPalette.background,
+                  size: DSIconButtonSize.medium,
+                  onPressed: () =>
+                      context.bloc.add(const ResetRemoteAssistantClickEvent()),
+                ),
               ),
             ],
           ),

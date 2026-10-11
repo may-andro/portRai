@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -43,6 +44,20 @@ void main() {
           find.descendant(
             of: find.byType(AppBar),
             matching: find.text(localizations.chatAssistantTitle),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.ancestor(
+            of: find.text(localizations.chatAssistantTitle),
+            matching: find.byType(DSTextWidget),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.byType(DSIconButtonWidget),
           ),
           findsOneWidget,
         );

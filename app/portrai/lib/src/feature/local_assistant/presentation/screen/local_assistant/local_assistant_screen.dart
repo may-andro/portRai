@@ -24,18 +24,32 @@ class LocalAssistantScreen extends StatelessWidget {
         onResume: () => context.bloc.add(const LocalAssistantStartedEvent()),
         child: Scaffold(
           appBar: AppBar(
-            title: Text(context.localizations.chatAssistantTitle),
+            title: DSTextWidget(
+              context.localizations.chatAssistantTitle,
+              color: context.colorPalette.neutral.grey9,
+              style: context.typography.emphasizedTitleMedium,
+            ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.offline_bolt_rounded),
-                tooltip: context.localizations.assistantOnDeviceBadge,
-                onPressed: () => _showLocalInfo(context),
+              Tooltip(
+                message: context.localizations.assistantOnDeviceBadge,
+                child: DSIconButtonWidget(
+                  Icons.offline_bolt_rounded,
+                  iconColor: context.colorPalette.neutral.grey9,
+                  buttonColor: context.colorPalette.background,
+                  size: DSIconButtonSize.medium,
+                  onPressed: () => _showLocalInfo(context),
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                tooltip: context.localizations.chatAssistantClear,
-                onPressed: () =>
-                    context.bloc.add(const ResetLocalAssistantClickEvent()),
+              Tooltip(
+                message: context.localizations.chatAssistantClear,
+                child: DSIconButtonWidget(
+                  Icons.delete_outline,
+                  iconColor: context.colorPalette.neutral.grey9,
+                  buttonColor: context.colorPalette.background,
+                  size: DSIconButtonSize.medium,
+                  onPressed: () =>
+                      context.bloc.add(const ResetLocalAssistantClickEvent()),
+                ),
               ),
             ],
           ),
@@ -53,13 +67,18 @@ class LocalAssistantScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            DSTextWidget(
               context.localizations.assistantOnDeviceTitle,
-              style: Theme.of(dialogContext).textTheme.titleLarge,
+              color: dialogContext.colorPalette.neutral.grey9,
+              style: dialogContext.typography.emphasizedTitleLarge,
             ),
-            const SizedBox(height: 16),
-            Text(context.localizations.assistantOnDeviceChatDescription),
-            const SizedBox(height: 16),
+            const DSVerticalSpacerWidget(2),
+            DSTextWidget(
+              context.localizations.assistantOnDeviceChatDescription,
+              color: dialogContext.colorPalette.surface.onSurface,
+              style: dialogContext.typography.bodyMedium,
+            ),
+            const DSVerticalSpacerWidget(2),
             Align(
               alignment: Alignment.centerRight,
               child: DSButtonWidget(

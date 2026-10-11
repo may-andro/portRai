@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -59,6 +60,20 @@ void main() {
           findsOneWidget,
         );
         expect(
+          find.ancestor(
+            of: find.text(localizations.chatAssistantTitle),
+            matching: find.byType(DSTextWidget),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.byType(DSIconButtonWidget),
+          ),
+          findsNWidgets(2),
+        );
+        expect(
           find.byTooltip(localizations.chatAssistantClear),
           findsOneWidget,
         );
@@ -71,7 +86,21 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text(localizations.assistantOnDeviceTitle), findsOneWidget);
         expect(
+          find.ancestor(
+            of: find.text(localizations.assistantOnDeviceTitle),
+            matching: find.byType(DSTextWidget),
+          ),
+          findsOneWidget,
+        );
+        expect(
           find.text(localizations.assistantOnDeviceChatDescription),
+          findsOneWidget,
+        );
+        expect(
+          find.ancestor(
+            of: find.text(localizations.assistantOnDeviceChatDescription),
+            matching: find.byType(DSTextWidget),
+          ),
           findsOneWidget,
         );
         await tester.tap(find.text(localizations.close));

@@ -23,9 +23,11 @@ class ContentWidget extends StatelessWidget {
             return Center(
               child: Padding(
                 padding: EdgeInsets.all(context.space(factor: 3)),
-                child: Text(
+                child: DSTextWidget(
                   errorText ??
                       context.localizations.errorRemoteAssistantUnavailable,
+                  color: context.colorPalette.textPrimary,
+                  style: context.typography.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -43,15 +45,19 @@ class ContentWidget extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
+                          DSTextWidget(
                             errorText ?? context.localizations.assistantError,
+                            color: context.colorPalette.textPrimary,
+                            style: context.typography.bodyLarge,
                             textAlign: TextAlign.center,
                           ),
-                          TextButton(
+                          DSButtonWidget(
+                            label: context.localizations.assistantRetry,
                             onPressed: () => context.bloc.add(
                               const RemoteAssistantStartedEvent(),
                             ),
-                            child: Text(context.localizations.assistantRetry),
+                            variant: DSButtonVariant.text,
+                            size: DSButtonSize.small,
                           ),
                         ],
                       ),
@@ -68,8 +74,10 @@ class ContentWidget extends StatelessWidget {
                       SendRemoteAssistantQuestionClickEvent(question),
                     ),
                     header: state.isSendingQuestion
-                        ? Text(
+                        ? DSTextWidget(
                             context.localizations.remoteAssistantGenerating,
+                            color: context.colorPalette.textSecondary,
+                            style: context.typography.labelMedium,
                             textAlign: TextAlign.center,
                           )
                         : null,
