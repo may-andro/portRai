@@ -24,6 +24,11 @@ void main() {
       RemoteAssistantModuleConfigurator().registerDependencies(locator);
       expect(locator.isRegistered<RemoteAssistantRepository>(), isTrue);
       expect(locator.isRegistered<RemoteAssistantBloc>(), isTrue);
+      expect(
+        locator.isRegistered<ParseRemoteAssistantResponseUseCase>(),
+        isTrue,
+      );
+      expect(locator.isRegistered<ResolveAssistantProjectsUseCase>(), isTrue);
       expect(locator.isRegistered<GetAssistantContextUseCase>(), isTrue);
     },
   );

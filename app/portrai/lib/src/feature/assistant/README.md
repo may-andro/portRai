@@ -98,6 +98,22 @@ generated titles, links and other facts are not inputs.
 
 ## Configuration
 
+The remote domain's `ParseRemoteAssistantResponseUseCase` accepts a completed JSON
+payload through metadata-only `ParseRemoteAssistantResponseParams`. Its exact wire
+shape is `{"version":1,"text":"...","projectIds":["source-id"]}`: no extra or missing
+fields, coercion, Markdown extraction or partial success. Version must be integer
+`1`; text must be nonblank and is preserved unchanged. Payload and text are bounded
+by `RemoteAssistantRequestLimits.maxResponseCharacters` (12,000 characters).
+References use the shared resolver's exact-ID, three-project limit and typed failures;
+empty references succeed without loading source data.
+
+`RemoteAssistantResponseEntity` holds text and an immutable snapshot of original
+source projects in requested order, not generated project facts. Parser failures
+distinguish invalid shape/JSON, size, version and typed resolution failure. Malformed
+JSON failures omit the raw exception source, and params/response logging omits generated
+text. This domain DTO and parser are separate from the text-only chat/history contract;
+remote requests and conversation rendering do not invoke the parser.
+
 ### On-device
 
 - Default-off rollout key: `feature_ai_assistant`.

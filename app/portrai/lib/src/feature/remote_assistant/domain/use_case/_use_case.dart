@@ -1,4 +1,5 @@
 export 'ask_remote_portfolio_question_use_case.dart';
 export 'is_remote_assistant_supported_use_case.dart';
+export 'parse_remote_assistant_response_use_case.dart';
 export 'remote_assistant_failure.dart';
 export 'reset_remote_assistant_session_use_case.dart';
