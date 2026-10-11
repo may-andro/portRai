@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
-import '../../../../../../../util/assistant_bloc_scope.dart';
+import '../../../../../../../util/local_assistant_bloc_scope.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
@@ -22,7 +22,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         const TestWidgetWrapper(
-          child: AssistantBlocScope(
+          child: LocalAssistantBlocScope(
             child: ContentWidget(
               state: SettingLoadedState(isLanguageSelectorEnabled: false),
             ),
@@ -39,8 +39,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         const TestWidgetWrapper(
-          child: AssistantBlocScope(
-            state: AssistantState(status: AssistantUnavailable()),
+          child: LocalAssistantBlocScope(
+            state: LocalAssistantState(status: LocalAssistantUnavailable()),
             child: ContentWidget(
               state: SettingLoadedState(isLanguageSelectorEnabled: false),
             ),
@@ -57,7 +57,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
-            child: AssistantBlocScope(
+            child: LocalAssistantBlocScope(
               child: ContentWidget(
                 state: SettingLoadedState(
                   isLanguageSelectorEnabled: true,
@@ -80,7 +80,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
-            child: AssistantBlocScope(
+            child: LocalAssistantBlocScope(
               child: ContentWidget(
                 state: SettingLoadedState(
                   isLanguageSelectorEnabled: false,
@@ -104,7 +104,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
-            child: AssistantBlocScope(
+            child: LocalAssistantBlocScope(
               child: ContentWidget(
                 state: SettingLoadedState(isLanguageSelectorEnabled: true),
               ),

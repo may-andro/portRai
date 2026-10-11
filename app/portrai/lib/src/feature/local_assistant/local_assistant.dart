@@ -1,0 +1,10 @@
+export 'local_assistant_availability.dart';
+export 'local_assistant_module_configurator.dart';
+export 'presentation/route/local_assistant_module_route.dart';
+export 'presentation/screen/local_assistant/bloc/local_assistant_bloc.dart'
+    show LocalAssistantBloc;
+export 'presentation/screen/local_assistant/bloc/local_assistant_event.dart';
+export 'presentation/screen/local_assistant/bloc/local_assistant_state.dart';
+export 'presentation/screen/local_assistant/local_assistant_screen.dart';
+export 'presentation/widget/local_assistant_button.dart';
+export 'presentation/widget/local_assistant_card_widget.dart';

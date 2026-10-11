@@ -15,6 +15,7 @@ import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/force_update/force_update_module_configurator.dart';
+import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
@@ -69,4 +70,5 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   ExpertiseModuleConfigurator(),
   PortfolioModuleConfigurator(),
   AssistantModuleConfigurator(),
+  LocalAssistantModuleConfigurator(),
 ];
