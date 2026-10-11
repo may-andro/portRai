@@ -7,10 +7,6 @@ sealed class RemoteAssistantException implements AppException {
   String toString() => 'RemoteAssistantException: operation failed';
 }
 
-class RemoteAssistantPreferenceException extends RemoteAssistantException {
-  const RemoteAssistantPreferenceException();
-}
-
 class RemoteAssistantClosedException extends RemoteAssistantException {
   const RemoteAssistantClosedException();
 }
@@ -26,10 +22,6 @@ class RemoteAssistantFlagException extends RemoteAssistantException {
 
 class RemoteAssistantUnavailableException extends RemoteAssistantException {
   const RemoteAssistantUnavailableException();
-}
-
-class RemoteAssistantConsentRequiredException extends RemoteAssistantException {
-  const RemoteAssistantConsentRequiredException();
 }
 
 class RemoteAssistantInvalidInputException extends RemoteAssistantException {

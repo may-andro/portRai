@@ -1,10 +1,8 @@
-export 'local_assistant_availability.dart';
+export 'domain/feature_flag/local_assistant_feature_flags.dart';
+export 'domain/use_case/is_local_assistant_supported_use_case.dart';
 export 'local_assistant_module_configurator.dart';
 export 'presentation/route/local_assistant_module_route.dart';
-export 'presentation/screen/local_assistant/bloc/local_assistant_bloc.dart'
-    show LocalAssistantBloc;
-export 'presentation/screen/local_assistant/bloc/local_assistant_event.dart';
-export 'presentation/screen/local_assistant/bloc/local_assistant_state.dart';
 export 'presentation/screen/local_assistant/local_assistant_screen.dart';
-export 'presentation/widget/local_assistant_button.dart';
-export 'presentation/widget/local_assistant_card_widget.dart';
+export 'presentation/widget/local_assistant_card_widget.dart'
+    show LocalAssistantCardWidget;
+export 'presentation/widget/local_assistant_visibility_widget.dart';

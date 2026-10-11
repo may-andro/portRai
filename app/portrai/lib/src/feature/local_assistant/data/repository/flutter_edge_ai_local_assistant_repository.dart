@@ -5,23 +5,52 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_edge_ai_litertlm/flutter_edge_ai_litertlm.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/data/cache/_cache.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_context_selector.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_direct_answerer.dart';
+import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
+import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/repository/_repository.dart';
 
 @RegisterSingleton(as: LocalAssistantRepository, disposeMethodName: 'dispose')
 class FlutterEdgeAiLocalAssistantRepository
     implements LocalAssistantRepository {
-  FlutterEdgeAiLocalAssistantRepository(this._enabledCache);
+  FlutterEdgeAiLocalAssistantRepository(
+    this._enabledCache, {
+    required IsFeatureEnabledUseCase this._isFeatureEnabled,
+  });
 
   @visibleForTesting
   FlutterEdgeAiLocalAssistantRepository.withModelLoader(
     this._modelLoader, {
     LocalAssistantEnabledCache? enabledCache,
+    this._isFeatureEnabled,
   }) : _enabledCache = enabledCache ?? LocalAssistantEnabledCache();
 
   final LocalAssistantEnabledCache _enabledCache;
+  final IsFeatureEnabledUseCase? _isFeatureEnabled;
+  int _generation = 0;
+  bool _requestActive = false;
+  bool _disabled = false;
+  int _preferenceRevision = 0;
+  Future<void> _preferenceMutation = Future.value();
+
+  Future<void> _ensureFeatureEnabled() async {
+    final flag = await _isFeatureEnabled?.call(
+      LocalAssistantFeatureFlags.aiAssistant,
+    );
+    if (flag != null && flag.isLeft) throw const LocalAssistantFlagException();
+    if (flag != null && !flag.right) {
+      throw const LocalAssistantUnavailableException();
+    }
+  }
+
+  void _ensureCurrent(int generation) {
+    if (generation != _generation || _disabled) {
+      throw const LocalAssistantCancelledException();
+    }
+  }
 
   // Gemma 4's chat template accepts the structured message content that
   // flutter_edge_ai sends. The Qwen3 1.7B/4B exports only accept plain string
@@ -63,8 +92,24 @@ class FlutterEdgeAiLocalAssistantRepository
 
   @override
   Future<void> setEnabled({required bool enabled}) async {
-    await _enabledCache.put(enabled);
-    if (!enabled) await _unloadModel();
+    final revision = ++_preferenceRevision;
+    if (!enabled) {
+      _disabled = true;
+      _generation++;
+    }
+    final previous = _preferenceMutation;
+    final completion = Completer<void>();
+    _preferenceMutation = completion.future;
+    await previous;
+    try {
+      if (enabled) await _ensureFeatureEnabled();
+      final saved = await _enabledCache.put(enabled);
+      if (!saved) throw const LocalAssistantPreferenceException();
+      if (enabled && revision == _preferenceRevision) _disabled = false;
+    } finally {
+      completion.complete();
+      if (!enabled) await _unloadModel();
+    }
   }
 
   @override
@@ -74,9 +119,10 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   @override
-  Future<void> prepareModel({required void Function(int) onProgress}) {
-    if (_model != null) return Future.value();
-    return _preparation ??= _prepareModel(onProgress);
+  Future<void> prepareModel({required void Function(int) onProgress}) async {
+    await _ensureFeatureEnabled();
+    if (_model != null) return;
+    await (_preparation ??= _prepareModel(onProgress));
   }
 
   Future<InferenceModel> _loadModel(void Function(int) onProgress) async {
@@ -103,6 +149,7 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   Future<void> _prepareModel(void Function(int) onProgress) async {
+    final generation = _generation;
     InferenceModel? candidate;
     InferenceChat? probe;
     try {
@@ -119,6 +166,7 @@ class FlutterEdgeAiLocalAssistantRepository
       }
       await probe.close();
       probe = null;
+      _ensureCurrent(generation);
       _model = candidate;
     } finally {
       try {
@@ -137,8 +185,36 @@ class FlutterEdgeAiLocalAssistantRepository
     required String question,
     required String portfolioContext,
   }) async {
+    if (_requestActive) throw const LocalAssistantBusyException();
+    _requestActive = true;
+    final generation = _generation;
+    try {
+      await _ensureFeatureEnabled();
+      if (_isFeatureEnabled != null && !await isEnabled()) {
+        throw const LocalAssistantUnavailableException();
+      }
+      _ensureCurrent(generation);
+      final answer = await _answer(
+        question: question,
+        portfolioContext: portfolioContext,
+        generation: generation,
+      );
+      _ensureCurrent(generation);
+      _previousQuestion = question;
+      return answer;
+    } finally {
+      _requestActive = false;
+    }
+  }
+
+  Future<String> _answer({
+    required String question,
+    required String portfolioContext,
+    required int generation,
+  }) async {
     // The engine is loaded on the first question rather than at startup.
     await prepareModel(onProgress: (_) {});
+    _ensureCurrent(generation);
     final model = _model;
     if (model == null) {
       throw StateError('The on-device model could not be loaded.');
@@ -148,7 +224,6 @@ class FlutterEdgeAiLocalAssistantRepository
       portfolioContext,
     ).answer(question);
     if (direct != null) {
-      _previousQuestion = question;
       return direct;
     }
 
@@ -186,6 +261,7 @@ class FlutterEdgeAiLocalAssistantRepository
       );
       answer = await _generate(
         model,
+        generation: generation,
         temperature: temperature,
         text:
             'Portfolio information:\n$selectedContext\n\n'
@@ -201,27 +277,35 @@ class FlutterEdgeAiLocalAssistantRepository
     if (answer.isEmpty || _isDegenerate(answer)) {
       throw StateError('The on-device model did not return a usable answer.');
     }
-    _previousQuestion = question;
     return answer;
   }
 
   Future<String> _generate(
     InferenceModel model, {
+    required int generation,
     required double temperature,
     required String text,
   }) async {
     await _chat?.close();
     _chat = null;
-    final chat = _chat = await model.createChat(
+    _ensureCurrent(generation);
+    final chat = await model.createChat(
       systemInstruction: _systemInstruction,
       temperature: temperature,
       topK: 40,
       maxOutputTokens: 512,
     );
+    if (generation != _generation || _disabled) {
+      await chat.close();
+      throw const LocalAssistantCancelledException();
+    }
+    _chat = chat;
     // The facts sit next to the question in the user turn, where the small
     // model attends to them far better than in a long system prompt.
     await chat.addQueryChunk(Message(text: text, isUser: true));
+    _ensureCurrent(generation);
     final response = await chat.generateChatResponse();
+    _ensureCurrent(generation);
     return response is TextResponse ? response.token.trim() : '';
   }
 
@@ -260,6 +344,7 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   Future<void> _unloadModel() async {
+    _generation++;
     final chat = _chat;
     final model = _model;
     _chat = null;
@@ -270,7 +355,17 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   @override
+  Future<void> resetSession() async {
+    _generation++;
+    _previousQuestion = null;
+    final chat = _chat;
+    _chat = null;
+    await chat?.close();
+  }
+
+  @override
   Future<void> dispose() async {
+    _generation++;
     await _chat?.close();
     await _model?.close();
   }

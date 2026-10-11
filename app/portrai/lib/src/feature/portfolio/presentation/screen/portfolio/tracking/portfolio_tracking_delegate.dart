@@ -14,6 +14,15 @@ class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
     trackEvent(ViewTracking(label: label));
   }
 
+  void trackAssistantLaunch({required bool isLocal}) {
+    trackEvent(
+      Tracking(
+        name: 'assistant_launch',
+        action: ClickAction(label: isLocal ? 'local' : 'cloud'),
+      ),
+    );
+  }
+
   void trackDrawerOpen() {
     trackEvent(
       Tracking(

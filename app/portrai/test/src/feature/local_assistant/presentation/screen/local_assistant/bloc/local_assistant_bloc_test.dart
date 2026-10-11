@@ -17,11 +17,14 @@ import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_c
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_delete_local_assistant_model_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_get_local_assistant_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_model_downloaded_use_case.dart';
+import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_prepare_local_assistant_model_use_case.dart';
+import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_reset_local_assistant_session_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
 
 void main() {
+  late MockGetAssistantContextUseCase getContext;
   late MockGetLocalAssistantEnabledUseCase getEnabled;
   late MockIsLocalAssistantModelDownloadedUseCase isDownloaded;
   late MockUpdateLocalAssistantEnabledUseCase updateEnabled;
@@ -29,13 +32,17 @@ void main() {
   late MockCancelLocalAssistantPreparationUseCase cancel;
   late MockDeleteLocalAssistantModelUseCase delete;
   late MockIsFeatureEnabledUseCase isFeatureEnabled;
+  late MockIsLocalAssistantSupportedUseCase isSupported;
   late MockAskLocalPortfolioQuestionUseCase askQuestion;
+  late MockResetLocalAssistantSessionUseCase resetSession;
 
   setUpAll(() {
     registerFallbackValue((int _) {});
   });
 
   LocalAssistantBloc createBloc() {
+    getContext = MockGetAssistantContextUseCase();
+    when(() => getContext()).thenAnswer((_) => const Right('Context'));
     askQuestion = MockAskLocalPortfolioQuestionUseCase();
     getEnabled = MockGetLocalAssistantEnabledUseCase();
     updateEnabled = MockUpdateLocalAssistantEnabledUseCase();
@@ -54,8 +61,11 @@ void main() {
         definition: LocalAssistantFeatureFlags.aiAssistant,
         result: const Right(true),
       );
+    isSupported = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
+    resetSession = MockResetLocalAssistantSessionUseCase()
+      ..stubCall(const Right(null));
     return LocalAssistantBloc(
-      MockGetAssistantContextUseCase(),
+      getContext,
       prepare,
       getEnabled,
       updateEnabled,
@@ -65,6 +75,8 @@ void main() {
       askQuestion,
       MockLocalAssistantTrackingDelegate(),
       isFeatureEnabled,
+      isLocalAssistantSupportedUseCase: isSupported,
+      resetLocalAssistantSessionUseCase: resetSession,
     );
   }
 
@@ -120,7 +132,7 @@ void main() {
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
-    'should retain the question and expose an error when answering fails',
+    'should discard the failed turn and expose a failure when answering fails',
     build: () {
       final bloc = createBloc();
       askQuestion.stubCall(
@@ -157,14 +169,30 @@ void main() {
         portfolioContext: 'Context',
         isLoadingContext: false,
         hasError: true,
-        messages: [
-          AssistantMessageEntity(
-            content: AssistantTextResponseEntity(text: 'Question'),
-            isUser: true,
-          ),
-        ],
+        failure: UnknownLocalAssistantFailure(),
       ),
     ],
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should check availability once and load context when started',
+    build: createBloc,
+    act: (bloc) => bloc.add(const LocalAssistantStartedEvent()),
+    expect: () => [
+      const LocalAssistantState(),
+      const LocalAssistantState(
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+      ),
+    ],
+    verify: (_) {
+      verify(
+        () => isFeatureEnabled(LocalAssistantFeatureFlags.aiAssistant),
+      ).called(1);
+      verify(() => isSupported()).called(1);
+      verify(() => getContext()).called(1);
+      verifyNever(() => resetSession());
+    },
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
@@ -176,6 +204,78 @@ void main() {
     },
     act: (bloc) => bloc.add(const LocalAssistantInitializedEvent()),
     expect: () => [const LocalAssistantState(isModelDownloaded: true)],
+    verify: (_) {
+      verify(
+        () => isFeatureEnabled(LocalAssistantFeatureFlags.aiAssistant),
+      ).called(1);
+      verify(() => isSupported()).called(1);
+    },
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should expose a reset failure when clearing the conversation fails',
+    build: () {
+      final bloc = createBloc();
+      resetSession.stubCall(const Left(UnknownLocalAssistantFailure()));
+      return bloc;
+    },
+    seed: () => const LocalAssistantState(
+      status: LocalAssistantReady(),
+      portfolioContext: 'Context',
+      isLoadingContext: false,
+      messages: [
+        AssistantMessageEntity(
+          content: AssistantTextResponseEntity(text: 'Old message'),
+          isUser: false,
+        ),
+      ],
+    ),
+    act: (bloc) => bloc.add(const ResetLocalAssistantClickEvent()),
+    expect: () => [
+      const LocalAssistantState(
+        status: LocalAssistantReady(),
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+      ),
+      const LocalAssistantState(
+        status: LocalAssistantReady(),
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+        hasError: true,
+        failure: UnknownLocalAssistantFailure(),
+      ),
+    ],
+    verify: (_) => verify(() => resetSession()).called(1),
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should report reset failure when availability cleanup fails',
+    build: () {
+      final bloc = createBloc();
+      isFeatureEnabled.stubCall(
+        definition: LocalAssistantFeatureFlags.aiAssistant,
+        result: const Right(false),
+      );
+      resetSession.stubCall(const Left(UnknownLocalAssistantFailure()));
+      return bloc;
+    },
+    act: (bloc) => bloc.add(const LocalAssistantInitializedEvent()),
+    expect: () => [
+      const LocalAssistantState(
+        status: LocalAssistantUnavailable(),
+        isLoadingContext: false,
+      ),
+      const LocalAssistantState(
+        status: LocalAssistantUnavailable(),
+        isLoadingContext: false,
+        hasError: true,
+        failure: UnknownLocalAssistantFailure(),
+      ),
+    ],
+    verify: (_) {
+      verify(() => resetSession()).called(1);
+      verifyNever(() => cancel());
+    },
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
@@ -191,7 +291,10 @@ void main() {
     },
     act: (bloc) => bloc.add(const LocalAssistantInitializedEvent()),
     expect: () => [
-      const LocalAssistantState(status: LocalAssistantUnavailable()),
+      const LocalAssistantState(
+        status: LocalAssistantUnavailable(),
+        isLoadingContext: false,
+      ),
     ],
     verify: (_) => verifyNever(() => prepare(any())),
   );
@@ -216,8 +319,11 @@ void main() {
       bloc.add(const LocalAssistantInitializedEvent());
     },
     expect: () => [
-      const LocalAssistantState(status: LocalAssistantUnavailable()),
-      const LocalAssistantState(),
+      const LocalAssistantState(
+        status: LocalAssistantUnavailable(),
+        isLoadingContext: false,
+      ),
+      const LocalAssistantState(isLoadingContext: false),
     ],
   );
 
@@ -286,7 +392,10 @@ void main() {
     act: (bloc) => bloc.add(const EnableLocalAssistantClickEvent()),
     expect: () => [
       const LocalAssistantState(status: LocalAssistantDownloading()),
-      const LocalAssistantState(status: LocalAssistantFailed()),
+      const LocalAssistantState(
+        status: LocalAssistantFailed(),
+        failure: UnknownLocalAssistantFailure(),
+      ),
     ],
   );
 

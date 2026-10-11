@@ -10,30 +10,18 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
-import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_get_remote_assistant_preference_use_case.dart';
+import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
-import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_update_remote_assistant_preference_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/presentation/screen/remote_assistant/tracking/mock_remote_assistant_tracking_delegate.dart';
 
 void main() {
   late MockGetAssistantContextUseCase getContext;
-  late MockGetRemoteAssistantPreferenceUseCase getPreference;
-  late MockUpdateRemoteAssistantPreferenceUseCase updatePreference;
   late MockResetRemoteAssistantSessionUseCase resetSession;
   late MockAskRemotePortfolioQuestionUseCase askQuestion;
   late MockIsFeatureEnabledUseCase flag;
-
-  const enabled = RemoteAssistantPreferenceEntity(
-    enabled: true,
-    consentAccepted: true,
-  );
-  const disabled = RemoteAssistantPreferenceEntity(
-    enabled: false,
-    consentAccepted: false,
-  );
+  late MockIsRemoteAssistantSupportedUseCase platformSupport;
 
   setUpAll(() {
-    registerFallbackValue(disabled);
     registerFallbackValue(
       AskRemotePortfolioQuestionParams(
         question: 'Question',
@@ -46,14 +34,10 @@ void main() {
 
   RemoteAssistantBloc createBloc({
     bool rollout = true,
-    RemoteAssistantPreferenceEntity preference = enabled,
+    bool platformSupported = true,
   }) {
     getContext = MockGetAssistantContextUseCase();
     when(() => getContext()).thenAnswer((_) => const Right('Portfolio'));
-    getPreference = MockGetRemoteAssistantPreferenceUseCase();
-    when(() => getPreference()).thenAnswer((_) => Right(preference));
-    updatePreference = MockUpdateRemoteAssistantPreferenceUseCase();
-    when(() => updatePreference(any())).thenAnswer((_) => const Right(null));
     resetSession = MockResetRemoteAssistantSessionUseCase();
     when(() => resetSession()).thenAnswer((_) => const Right(null));
     askQuestion = MockAskRemotePortfolioQuestionUseCase();
@@ -69,13 +53,14 @@ void main() {
         definition: RemoteAssistantFeatureFlags.remoteAssistant,
         result: Right(rollout),
       );
+    platformSupport = MockIsRemoteAssistantSupportedUseCase()
+      ..stubCall(Right(platformSupported));
     final bloc = RemoteAssistantBloc(
       getContext,
-      getPreference,
-      updatePreference,
       resetSession,
       askQuestion,
       flag,
+      platformSupport,
       MockRemoteAssistantTrackingDelegate(),
     );
     addTearDown(bloc.close);
@@ -98,34 +83,41 @@ void main() {
     );
   }
 
+  test('should avoid context and model access when rollout is off', () async {
+    final bloc = createBloc(rollout: false);
+    bloc.add(const RemoteAssistantStartedEvent());
+    await waitFor(
+      bloc,
+      (state) => state.status == RemoteAssistantStatus.unavailable,
+    );
+    verifyNever(() => getContext());
+    verifyNever(() => askQuestion(any()));
+  });
+
   test(
-    'should avoid preference and context access when rollout is off',
+    'should avoid context and model access when platform support is unavailable',
     () async {
-      final bloc = createBloc(rollout: false);
+      final bloc = createBloc(platformSupported: false);
       bloc.add(const RemoteAssistantStartedEvent());
       await waitFor(
         bloc,
         (state) => state.status == RemoteAssistantStatus.unavailable,
       );
-      verifyNever(() => getPreference());
       verifyNever(() => getContext());
       verifyNever(() => askQuestion(any()));
     },
   );
 
   test(
-    'should require consent when the saved preference is disabled',
+    'should activate without a preference when the rollout flag is on',
     () async {
-      final bloc = createBloc(preference: disabled);
+      final bloc = createBloc();
       bloc.add(const RemoteAssistantStartedEvent());
-      await waitFor(bloc, (state) => state.status == RemoteAssistantStatus.off);
-      verifyNever(() => getContext());
-      bloc.add(const AcceptRemoteAssistantConsentClickEvent());
       await waitFor(
         bloc,
         (state) => state.isReady && state.portfolioContext != null,
       );
-      verify(() => updatePreference(enabled)).called(1);
+      verify(() => getContext()).called(1);
       verifyNever(() => askQuestion(any()));
     },
   );
@@ -174,9 +166,9 @@ void main() {
     },
   );
 
-  for (final disable in [false, true]) {
+  for (final flagOff in [false, true]) {
     test(
-      'should discard late output when ${disable ? 'disable' : 'reset'} occurs during generation',
+      'should discard late output when ${flagOff ? 'flag off' : 'reset'} occurs during generation',
       () async {
         final bloc = createBloc();
         await start(bloc);
@@ -191,11 +183,15 @@ void main() {
         });
         bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
         await waitFor(bloc, (state) => state.partialAnswer == 'Partial');
-        bloc.add(
-          disable
-              ? const DisableRemoteAssistantClickEvent()
-              : const ResetRemoteAssistantClickEvent(),
-        );
+        if (flagOff) {
+          flag.stubCall(
+            definition: RemoteAssistantFeatureFlags.remoteAssistant,
+            result: const Right(false),
+          );
+          bloc.add(const RemoteAssistantInitializedEvent());
+        } else {
+          bloc.add(const ResetRemoteAssistantClickEvent());
+        }
         await waitFor(
           bloc,
           (state) => !state.isSendingQuestion && state.messages.isEmpty,
@@ -205,14 +201,8 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         expect(bloc.state.messages, isEmpty);
         expect(bloc.state.partialAnswer, isEmpty);
-        expect(bloc.state.isReady, !disable);
-        if (disable) {
-          await waitFor(bloc, (state) => !state.isUpdatingPreference);
-          verify(() => updatePreference(disabled)).called(1);
-        } else {
-          verify(() => resetSession()).called(1);
-          verifyNever(() => updatePreference(any()));
-        }
+        expect(bloc.state.isReady, !flagOff);
+        verify(() => resetSession()).called(1);
       },
     );
   }
@@ -228,14 +218,8 @@ void main() {
         (state) => state.messages.length == 2 && !state.isSendingQuestion,
       );
       final messages = bloc.state.messages;
-      final reopened = Completer<void>();
-      when(() => getPreference()).thenAnswer((_) {
-        reopened.complete();
-        return const Right(enabled);
-      });
       bloc.add(const RemoteAssistantStartedEvent());
-      await reopened.future;
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
       expect(bloc.state.messages, messages);
       verify(() => getContext()).called(1);
     },
@@ -293,6 +277,22 @@ void main() {
     },
   );
 
+  test(
+    'should reject a question when platform support changes before submission',
+    () async {
+      final bloc = createBloc();
+      await start(bloc);
+      platformSupport.stubCall(const Right(false));
+      bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
+      await waitFor(
+        bloc,
+        (state) => state.status == RemoteAssistantStatus.unavailable,
+      );
+      verifyNever(() => askQuestion(any()));
+      expect(bloc.state.isSendingQuestion, isFalse);
+    },
+  );
+
   test('should discard provisional text when generation fails', () async {
     final bloc = createBloc();
     await start(bloc);
@@ -311,27 +311,4 @@ void main() {
     expect(bloc.state.messages, isEmpty);
     expect(bloc.state.isSendingQuestion, isFalse);
   });
-
-  test(
-    'should remain off when consent persistence completes after disabling',
-    () async {
-      final bloc = createBloc(preference: disabled);
-      bloc.add(const RemoteAssistantStartedEvent());
-      await waitFor(bloc, (state) => state.status == RemoteAssistantStatus.off);
-      final enablePending = Completer<Either<RemoteAssistantFailure, void>>();
-      when(
-        () => updatePreference(enabled),
-      ).thenAnswer((_) => enablePending.future);
-      bloc.add(const AcceptRemoteAssistantConsentClickEvent());
-      await waitFor(bloc, (state) => state.isUpdatingPreference);
-      await Future<void>.delayed(Duration.zero);
-      bloc.add(const DisableRemoteAssistantClickEvent());
-      await waitFor(bloc, (state) => !state.isUpdatingPreference);
-      enablePending.complete(const Right(null));
-      await Future<void>.delayed(Duration.zero);
-      expect(bloc.state.status, RemoteAssistantStatus.off);
-      expect(bloc.state.portfolioContext, isNull);
-      verifyNever(() => getContext());
-    },
-  );
 }

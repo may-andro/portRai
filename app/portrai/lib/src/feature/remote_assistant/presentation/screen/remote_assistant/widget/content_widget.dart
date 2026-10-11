@@ -1,11 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
-
-part 'consent_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
@@ -15,9 +13,7 @@ class ContentWidget extends StatelessWidget {
       BlocBuilder<RemoteAssistantBloc, RemoteAssistantState>(
         builder: (context, state) {
           final failure = state.failure;
-          final errorText = failure == null
-              ? null
-              : FailureTranslator.translate(context, failure);
+          final errorText = failure?.remoteAssistantErrorText(context);
           if (state.status == RemoteAssistantStatus.loading) {
             return const Center(child: DSLoadingWidget(size: 40));
           }
@@ -25,47 +21,18 @@ class ContentWidget extends StatelessWidget {
             return Center(
               child: Padding(
                 padding: EdgeInsets.all(context.space(factor: 3)),
-                child: Text(
+                child: DSTextWidget(
                   errorText ??
                       context.localizations.errorRemoteAssistantUnavailable,
+                  color: context.colorPalette.textPrimary,
+                  style: context.typography.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
               ),
             );
           }
-          if (!state.isReady) {
-            return _ConsentWidget(
-              isBusy: state.isUpdatingPreference,
-              errorText: errorText,
-            );
-          }
           return Column(
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.space(factor: 2),
-                ),
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: context.space(),
-                  children: [
-                    TextButton(
-                      onPressed: state.isUpdatingPreference
-                          ? null
-                          : () => context.bloc.add(
-                              const ResetRemoteAssistantClickEvent(),
-                            ),
-                      child: Text(context.localizations.remoteAssistantReset),
-                    ),
-                    TextButton(
-                      onPressed: () => context.bloc.add(
-                        const DisableRemoteAssistantClickEvent(),
-                      ),
-                      child: Text(context.localizations.remoteAssistantDisable),
-                    ),
-                  ],
-                ),
-              ),
               if (state.isLoadingContext)
                 const Expanded(child: Center(child: DSLoadingWidget(size: 40)))
               else if (state.portfolioContext == null)
@@ -76,15 +43,19 @@ class ContentWidget extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
+                          DSTextWidget(
                             errorText ?? context.localizations.assistantError,
+                            color: context.colorPalette.textPrimary,
+                            style: context.typography.bodyLarge,
                             textAlign: TextAlign.center,
                           ),
-                          TextButton(
+                          DSButtonWidget(
+                            label: context.localizations.assistantRetry,
                             onPressed: () => context.bloc.add(
                               const RemoteAssistantStartedEvent(),
                             ),
-                            child: Text(context.localizations.assistantRetry),
+                            variant: DSButtonVariant.text,
+                            size: DSButtonSize.small,
                           ),
                         ],
                       ),
@@ -100,27 +71,14 @@ class ContentWidget extends StatelessWidget {
                     onSubmit: (question) => context.bloc.add(
                       SendRemoteAssistantQuestionClickEvent(question),
                     ),
-                    header: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.cloud_outlined, size: 18),
-                            const DSHorizontalSpacerWidget(1),
-                            Flexible(
-                              child: Text(
-                                context.localizations.remoteAssistantBadge,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (state.isSendingQuestion)
-                          Text(
+                    header: state.isSendingQuestion
+                        ? DSTextWidget(
                             context.localizations.remoteAssistantGenerating,
+                            color: context.colorPalette.textSecondary,
+                            style: context.typography.labelMedium,
                             textAlign: TextAlign.center,
-                          ),
-                      ],
-                    ),
+                          )
+                        : null,
                   ),
                 ),
             ],

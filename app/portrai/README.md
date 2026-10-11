@@ -87,7 +87,7 @@ lib/
 │   │   ├── expertise/       # Expertise showcase
 │   │   ├── assistant/       # Shared portfolio context and conversation UI
 │   │   ├── local_assistant/ # On-device inference, model lifecycle and settings
-│   │   ├── remote_assistant/ # Cloud inference, consent and independent chat session
+│   │   ├── remote_assistant/ # Flag-gated cloud inference and independent chat session
 │   │   ├── profile/         # User profile
 │   │   ├── project/         # Projects portfolio
 │   │   ├── service/         # Services offered
@@ -116,7 +116,7 @@ for the conventions each feature module follows.
 the callback-driven conversation widget. It has no dependency on either inference provider or bloc.
 `local_assistant` consumes that public API and owns on-device inference, model downloads,
 enablement preferences, failures, routes, tracking, and the Settings card.
-`remote_assistant` owns Firebase AI generation, cloud consent, a separate enablement preference,
+`remote_assistant` owns flag-gated Firebase AI generation,
 failures and a singleton in-memory chat session. All three configurators are registered in the
 app, with the shared configurator first. Neither provider depends on the other.
 
@@ -127,26 +127,49 @@ There is no automatic cloud fallback or transfer of conversation history between
 ### Remote Assistant
 
 The remote screen uses `/remote-assistant` and the independent, default-off
-`feature_remote_assistant` flag. Route entry and generation both check rollout; enabling cloud
-AI requires explicit consent to send questions, recent chat history and portfolio information
-to Google through Firebase. Consent and enablement are stored separately from the on-device
-preference. Turning remote AI off withdraws consent and clears its local conversation.
-Clear chat resets only the remote session, retaining consent and enablement.
+`feature_remote_assistant` flag. Discovery depends only on this flag; the chat screen and
+generation check rollout and Firebase platform support and show unavailability inside chat.
+There is no remote consent preference or user enablement toggle. Questions, recent chat history
+and portfolio information are sent to Google through Firebase only when a question is submitted.
+Opening the screen makes no model request. Clear chat resets only the remote in-memory session.
 
 The shared conversation widget renders streamed text as provisional until generation finishes
 successfully. Failed partial answers are discarded and never become future provider history.
 Disable/reset invalidate pending output. They stop local consumption and close the owned
 transport; they cannot guarantee that server generation or billing stops.
 Question content and generated text are excluded from remote request/state logging and analytics.
+Actionable Firebase service error messages (such as depleted credits, disabled APIs, or
+unavailable models) appear below the localized error description. These explicit backend
+error-field details are not logged; SDK parsing errors, HTTP client details, arbitrary
+exceptions, and blocked/empty/incomplete response content remain private.
 
-To access the remote assistant, enable its flag in the feature-flag tools, then open
-`/remote-assistant`. The portfolio launcher and Settings do not expose remote assistant controls.
+Local and remote chats are independent features. The rollout enabler maintains mutually exclusive
+flags; if both are on, remote takes priority regardless of readiness.
+The portfolio entry opens the active feature directly, with no chooser or context switching.
+Neither flag on hides the entry and assistant settings. Local-only rollout offers setup/chat on
+native platforms; remote rollout always offers direct chat entry. Firebase generation supports
+Android, iOS and web; unsupported platforms show an unavailable message inside chat. An unsupported or
+unready remote assistant never falls back to local while its rollout flag is on.
+
+Settings exposes only on-device model management during local-only rollout. Remote chat entry
+is available only from the portfolio. Visiting Settings or the portfolio does not initialize remote chat or
+load its portfolio context. Both chat toolbars offer a clear-chat control; only the
+on-device chat offers an informational dialog about local processing and in-memory history.
+Each provider's module-internal singleton bloc preserves its own in-memory conversation
+across navigation. Flags are rechecked on screen visibility/return and before each new request
+or enable action, without flag subscriptions or polling. The app does not rewrite rollout flags or the
+other feature's preferences.
+Public routes/cards own module-scoped providers. Portfolio and Settings read rollout flags through
+`IsFeatureEnabledUseCase` and local platform support through `IsLocalAssistantSupportedUseCase`,
+never another feature's bloc/state. Priority is a simple
+remote-first check in portfolio and Settings composition; each provider reads only its own flag.
+See the [assistant reference](lib/src/feature/assistant/README.md) for module boundaries.
 Production use requires validated App Check enforcement, model availability, and quota/spending
 controls, including a successful authorized smoke test. See the
 [Firebase AI setup guide](../../layer/firebase/README.md#firebase-ai-logic-setup).
 No live or billable AI request is required by the automated tests.
 
-Generation uses `gemini-2.5-flash`, a 1,024-token output limit and temperature 0.3.
+Generation uses `gemini-3.8-flash`, a 1,024-token output limit and temperature 0.3.
 Requests are bounded to 2,000 question characters, 100,000 portfolio-context characters,
 12 recent history messages / 24,000 history characters, and 12,000 response characters.
 The absolute request deadline is 60 seconds, with no automatic retries. Oversized input is
@@ -264,7 +287,7 @@ Feature flags are managed through Firebase Remote Config:
 - Configure in Firebase Console
 - Keys defined in `lib/core/config/feature_flags.dart`
 - `feature_ai_assistant` (default off) shows the on-device AI assistant in Settings and on the portfolio when turned on
-- `feature_remote_assistant` (default off) permits the independent cloud assistant, subject to saved user consent and enablement
+- `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
 
 ## Dependencies
 

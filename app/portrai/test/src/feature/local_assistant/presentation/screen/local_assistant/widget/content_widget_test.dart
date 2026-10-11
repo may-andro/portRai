@@ -1,9 +1,10 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/widget/content_widget.dart';
 
 import '../../../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/bloc/mock_local_assistant_bloc.dart';
@@ -40,7 +41,9 @@ void main() {
       );
 
       expect(find.byType(AssistantConversationWidget), findsOneWidget);
-      expect(find.byIcon(Icons.offline_bolt_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.offline_bolt_rounded), findsNothing);
+      expect(find.text('Clear chat'), findsNothing);
+      expect(find.byIcon(Icons.delete_outline), findsNothing);
       await tester.enterText(find.byType(TextField), 'Local question');
       await tester.tap(find.byIcon(Icons.send_rounded));
 
@@ -67,7 +70,7 @@ void main() {
       expect(
         tester
             .widget<LinearProgressIndicator>(
-              find.byType(LinearProgressIndicator),
+              find.byType(LinearProgressIndicator).first,
             )
             .value,
         0.42,
@@ -86,6 +89,13 @@ void main() {
       expect(find.byType(AssistantConversationWidget), findsNothing);
       expect(
         find.text('The assistant could not answer. Please try again.'),
+        findsOneWidget,
+      );
+      expect(
+        find.ancestor(
+          of: find.text('The assistant could not answer. Please try again.'),
+          matching: find.byType(DSTextWidget),
+        ),
         findsOneWidget,
       );
     },

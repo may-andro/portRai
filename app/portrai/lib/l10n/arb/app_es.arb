@@ -196,6 +196,18 @@
   "developerMenuForceBlacklistErrorDescription": "Simula un error que debe ser ignorado por el gestor de errores",
   "splashContactSupportUnavailableMessage": "Esta función aún no está desarrollada",
   "assistantAskAi": "Preguntar a la IA",
+  "chatAssistantTitle": "Asistente de chat",
+  "@chatAssistantTitle": {
+    "description": "Shared title of the local and remote chat assistant screens"
+  },
+  "chatAssistantClear": "Borrar chat",
+  "@chatAssistantClear": {
+    "description": "Toolbar action clearing the current assistant conversation"
+  },
+  "assistantOnDeviceChatDescription": "El modelo descargado funciona en tu dispositivo. Tus preguntas y los datos del portafolio se procesan localmente. Esta conversación se mantiene solo en la memoria de la app, no se guarda en el almacenamiento del dispositivo. Salir de esta pantalla no la borra: permanece mientras la sesión de la app siga activa. Borrar chat elimina la conversación y descarta las respuestas pendientes, pero conserva el modelo descargado.",
+  "@assistantOnDeviceChatDescription": {
+    "description": "Local chat information explaining on-device processing, in-memory history retained across navigation, and clear-chat behavior"
+  },
   "assistantTitle": "IA del portafolio",
   "assistantOnDeviceTitle": "Un asistente privado en tu dispositivo",
   "assistantOnDeviceDescription": "El asistente funciona en este dispositivo. Tus preguntas y la información del portafolio se procesan localmente.",
@@ -227,8 +239,6 @@
   "assistantRetry": "Reintentar",
   "errorRemoteAssistantUnavailable": "El asistente en la nube no está disponible.",
   "@errorRemoteAssistantUnavailable": {"description": "Remote assistant rollout is disabled"},
-  "errorRemoteAssistantConsentRequired": "Acepta el procesamiento en la nube y activa el asistente antes de hacer una pregunta.",
-  "@errorRemoteAssistantConsentRequired": {"description": "Remote generation requires saved consent and enablement"},
   "errorRemoteAssistantNetwork": "El asistente en la nube no pudo conectarse. Comprueba tu conexión e inténtalo de nuevo.",
   "@errorRemoteAssistantNetwork": {"description": "Remote generation failed due to a network error"},
   "errorRemoteAssistantTimeout": "El asistente en la nube tardó demasiado en responder. Inténtalo de nuevo.",
@@ -245,18 +255,26 @@
   "@errorRemoteAssistantIncomplete": {"description": "Remote output was empty, truncated or ended without a complete response"},
   "errorRemoteAssistantUnknown": "El asistente en la nube no pudo responder. Inténtalo de nuevo.",
   "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
-  "errorRemoteAssistantPreference": "No se pudo guardar o cargar la preferencia del asistente en la nube. Inténtalo de nuevo.",
-  "@errorRemoteAssistantPreference": {"description": "Remote consent or enablement storage failed"},
+  "remoteAssistantErrorDetails": "{heading}\n\n{serviceMessage}",
+  "@remoteAssistantErrorDetails": {
+    "description": "Localized remote failure heading followed by actionable backend error details in the service's original language",
+    "placeholders": {
+      "heading": {"type": "String", "example": "El asistente en la nube no pudo responder. Inténtalo de nuevo."},
+      "serviceMessage": {"type": "String", "example": "Your credits are depleted. Enable billing to continue."}
+    }
+  },
+  "remoteAssistantSettingsTitle": "IA en la nube",
+  "@remoteAssistantSettingsTitle": {"description": "Cloud assistant informational settings card title"},
+  "errorLocalAssistantUnavailable": "El asistente en el dispositivo no está disponible en esta plataforma o está desactivado para esta aplicación.",
+  "@errorLocalAssistantUnavailable": {"description": "Local assistant route and request availability guard message"},
+  "errorLocalAssistantBusy": "La solicitud anterior en el dispositivo aún está terminando. Inténtalo de nuevo en unos momentos.",
+  "@errorLocalAssistantBusy": {"description": "A reset invalidated output but native generation is still busy"},
   "remoteAssistantTitle": "Asistente del portafolio en la nube",
   "@remoteAssistantTitle": {"description": "Title of the independent cloud assistant"},
   "remoteAssistantBadge": "IA en la nube mediante Firebase y Google",
   "@remoteAssistantBadge": {"description": "Provider identity shown above the remote conversation"},
-  "remoteAssistantDisclosure": "Tus preguntas, el historial reciente del chat y la información del portafolio se envían a Google mediante Firebase para generar respuestas. No introduzcas información sensible. Las respuestas pueden ser incorrectas. Este chat se guarda solo en la memoria de la app. Desactivar este asistente retira el consentimiento para futuras solicitudes y borra el chat local; no deshace las solicitudes ya enviadas. El asistente en el dispositivo permanece independiente.",
-  "@remoteAssistantDisclosure": {"description": "Explicit cloud processing, privacy, accuracy and cancellation disclosure before enabling remote AI"},
-  "remoteAssistantAcceptConsent": "Aceptar y activar IA en la nube",
-  "@remoteAssistantAcceptConsent": {"description": "Explicit action accepting the cloud processing disclosure and enabling the remote assistant"},
-  "remoteAssistantDisable": "Desactivar y retirar consentimiento",
-  "@remoteAssistantDisable": {"description": "Action disabling future cloud requests and withdrawing saved consent"},
+  "remoteAssistantDisclosure": "Tus preguntas, el historial reciente del chat y la información del portafolio se envían a Google mediante Firebase para generar respuestas. No introduzcas información sensible. Las respuestas pueden ser incorrectas. Este chat se guarda solo en la memoria de la app. Borrar el chat detiene la recepción local de respuestas pendientes; no deshace las solicitudes ya enviadas ni garantiza su cancelación en el servidor o el fin de la facturación. El asistente en el dispositivo permanece independiente.",
+  "@remoteAssistantDisclosure": {"description": "Informational cloud processing, privacy, accuracy and cancellation notice without an activation gate"},
   "remoteAssistantReset": "Borrar chat",
   "@remoteAssistantReset": {"description": "Action clearing the remote in-memory conversation and stopping local consumption of pending output"},
   "remoteAssistantGenerating": "Generando: esta respuesta aún no está completa",

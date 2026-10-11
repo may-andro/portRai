@@ -9,7 +9,8 @@ import 'package:firebase_ai/firebase_ai.dart'
         FirebaseAISdkException,
         GenerateContentResponse,
         PromptFeedback,
-        QuotaExceeded;
+        QuotaExceeded,
+        ServerException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
@@ -239,7 +240,8 @@ void main() {
         throwsA(
           isA<AiQuotaExceededException>()
               .having((e) => e.cause, 'cause', same(error))
-              .having((e) => e.stackTrace, 'stackTrace', same(stack)),
+              .having((e) => e.stackTrace, 'stackTrace', same(stack))
+              .having((e) => e.serviceMessage, 'serviceMessage', error.message),
         ),
       );
     },
@@ -260,7 +262,13 @@ void main() {
         FbAiTextModel(sdk).generateTextStream([Content.text('Question')]),
         emitsInOrder([
           'Partial',
-          emitsError(isA<AiQuotaExceededException>()),
+          emitsError(
+            isA<AiQuotaExceededException>().having(
+              (e) => e.serviceMessage,
+              'serviceMessage',
+              error.message,
+            ),
+          ),
           emitsDone,
         ]),
       );
@@ -285,4 +293,111 @@ void main() {
       expect(cancelled, isTrue);
     },
   );
+
+  for (final message in [
+    'Your credits are depleted. Enable billing to continue.',
+    'Gemini API is disabled. Enable it in the console.',
+    'Model gemini-unavailable is not found.',
+  ]) {
+    for (final streaming in [false, true]) {
+      test(
+        'should retain server details when generation fails with streaming=$streaming and $message',
+        () async {
+          final error = ServerException(message);
+          final stack = StackTrace.current;
+          final sdk = MockAiModelClient();
+          if (streaming) {
+            sdk.stubGenerateContentStream(
+              Stream<GenerateContentResponse>.error(error, stack),
+            );
+          } else {
+            sdk.stubGenerateContentError(error, stack);
+          }
+          final model = FbAiTextModel(sdk);
+          final operation = streaming
+              ? model.generateTextStream([
+                  Content.text('secret prompt'),
+                ]).toList()
+              : model.generateText([Content.text('secret prompt')]);
+          await expectLater(
+            operation,
+            throwsA(
+              isA<AiServerException>()
+                  .having((e) => e.serviceMessage, 'serviceMessage', message)
+                  .having((e) => e.cause, 'cause', same(error))
+                  .having((e) => e.stackTrace, 'stackTrace', same(stack))
+                  .having(
+                    (e) => e.toString(),
+                    'safe logging',
+                    'AiException: Firebase AI request failed',
+                  ),
+            ),
+          );
+        },
+      );
+    }
+
+    for (final error in <Object>[
+      FirebaseAISdkException('Unhandled format: secret prompt and response'),
+      ClientException(
+        'secret body',
+        Uri.parse('https://example.com/secret-prompt'),
+      ),
+    ]) {
+      test(
+        'should omit non-service diagnostics when streaming fails with ${error.runtimeType}',
+        () async {
+          final sdk = MockAiModelClient()
+            ..stubGenerateContentStream(
+              Stream<GenerateContentResponse>.error(error),
+            );
+          await expectLater(
+            FbAiTextModel(
+              sdk,
+            ).generateTextStream([Content.text('secret prompt')]),
+            emitsError(
+              isA<AiException>()
+                  .having((e) => e.serviceMessage, 'serviceMessage', isNull)
+                  .having(
+                    (e) => e.toString(),
+                    'safe logging',
+                    isNot(contains('secret')),
+                  ),
+            ),
+          );
+        },
+      );
+    }
+
+    for (final response in [
+      GenerateContentResponse(
+        [],
+        PromptFeedback(BlockReason.safety, 'secret prompt', []),
+      ),
+      GenerateContentResponse([], null),
+      response('secret generated text', finishReason: FinishReason.maxTokens),
+    ]) {
+      test(
+        'should omit response diagnostics when streaming output is rejected with feedback=${response.promptFeedback?.blockReason} and finish=${response.candidates.firstOrNull?.finishReason}',
+        () async {
+          final sdk = MockAiModelClient()
+            ..stubGenerateContentStream(Stream.value(response));
+          await expectLater(
+            FbAiTextModel(
+              sdk,
+            ).generateTextStream([Content.text('secret prompt')]),
+            emitsError(
+              isA<AiException>()
+                  .having((e) => e.serviceMessage, 'serviceMessage', isNull)
+                  .having(
+                    (e) => e.toString(),
+                    'safe logging',
+                    isNot(contains('secret')),
+                  ),
+            ),
+          );
+        },
+      );
+    }
+  }
 }

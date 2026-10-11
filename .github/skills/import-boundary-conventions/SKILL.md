@@ -46,6 +46,10 @@ import 'package:portrai/src/feature/experience/presentation/bloc/_bloc.dart';
 Importing (or exporting) a private barrel from **within the same feature** is exactly how that
 feature's own barrels are meant to compose, and is unaffected by this rule.
 
+Keep feature repositories internal: do not export them from a feature's public barrel.
+Other features access domain operations and data through the owning feature's use cases,
+not its repository contracts.
+
 ## Why this matters
 Bypassing the public barrel couples callers to another module's/feature's internal file layout,
 so an internal refactor (renaming/moving/splitting a file under `src/` or a feature's private

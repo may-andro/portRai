@@ -5,6 +5,7 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/use_case/is_remote_assistant_supported_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
 
@@ -26,13 +27,12 @@ class AskRemotePortfolioQuestionParams {
 }
 
 abstract final class RemoteAssistantRequestLimits {
-  static const model = 'gemini-2.5-flash';
+  static const model = 'gemini-3.8-flash';
   static const maxOutputTokens = 1024;
   static const temperature = 0.3;
   static const maxQuestionCharacters = 2000;
   // Preserve the complete shared JSON, including overview/digest and details.
-  // This fixed budget leaves ample room in Gemini 2.5 Flash's context window
-  // while bounding per-request input cost; overflow is rejected, never sliced.
+  // Bound per-request input cost; overflow is rejected, never sliced.
   static const maxPortfolioContextCharacters = 100000;
   static const maxHistoryMessages = 12;
   static const maxHistoryCharacters = 24000;
@@ -50,15 +50,23 @@ class AskRemotePortfolioQuestionUseCase
           AskRemotePortfolioQuestionParams,
           RemoteAssistantFailure
         > {
-  AskRemotePortfolioQuestionUseCase(this._repository);
+  AskRemotePortfolioQuestionUseCase(
+    this._repository,
+    this._isRemoteAssistantSupportedUseCase,
+  );
 
   final RemoteAssistantRepository _repository;
+  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
 
   @protected
   @override
   Future<Either<RemoteAssistantFailure, void>> execute(
     AskRemotePortfolioQuestionParams params,
   ) async {
+    final platformSupport = await _isRemoteAssistantSupportedUseCase();
+    if (platformSupport.isLeft || !platformSupport.right) {
+      return const Left(RemoteAssistantUnavailableFailure());
+    }
     if (!_isValid(params)) {
       return const Left(RemoteAssistantInvalidInputFailure());
     }

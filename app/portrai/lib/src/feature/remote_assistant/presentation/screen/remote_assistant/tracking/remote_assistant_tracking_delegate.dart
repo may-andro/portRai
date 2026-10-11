@@ -10,24 +10,10 @@ class RemoteAssistantTrackingDelegate extends ScreenTrackingDelegate {
   RemoteAssistantTrackingDelegate(TrackingReporter reporter)
     : super(const _TrackingArea(), reporter);
 
-  void trackConsentAcceptance() => trackEvent(
-    Tracking(
-      name: 'consent',
-      action: const ClickAction(label: 'accept'),
-    ),
-  );
-
   void trackQuestionSubmission() => trackEvent(
     Tracking(
       name: 'question',
       action: const ClickAction(label: 'submit'),
-    ),
-  );
-
-  void trackDisable() => trackEvent(
-    Tracking(
-      name: 'disable',
-      action: const ClickAction(label: 'disable'),
     ),
   );
 

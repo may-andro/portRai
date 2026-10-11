@@ -5,34 +5,55 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:http/http.dart';
 
 sealed class AiException implements AppException {
-  const AiException(this.message, this.cause, this.stackTrace);
+  const AiException(
+    this.message,
+    this.cause,
+    this.stackTrace, {
+    this.serviceMessage,
+  });
 
   final String message;
   final Object cause;
   final StackTrace stackTrace;
+
+  /// Backend error-field details for display, never included in logs.
+  /// Only populated from [FirebaseAIException.message], not response bodies.
+  final String? serviceMessage;
 
   @override
   String toString() => 'AiException: $message';
 }
 
 class AiConfigurationException extends AiException {
-  const AiConfigurationException(Object cause, StackTrace stackTrace)
-    : super('Firebase AI configuration is invalid', cause, stackTrace);
+  const AiConfigurationException(
+    Object cause,
+    StackTrace stackTrace, {
+    super.serviceMessage,
+  }) : super('Firebase AI configuration is invalid', cause, stackTrace);
 }
 
 class AiQuotaExceededException extends AiException {
-  const AiQuotaExceededException(Object cause, StackTrace stackTrace)
-    : super('Firebase AI quota exceeded', cause, stackTrace);
+  const AiQuotaExceededException(
+    Object cause,
+    StackTrace stackTrace, {
+    super.serviceMessage,
+  }) : super('Firebase AI quota exceeded', cause, stackTrace);
 }
 
 class AiUnsupportedLocationException extends AiException {
-  const AiUnsupportedLocationException(Object cause, StackTrace stackTrace)
-    : super('Firebase AI is unavailable in this location', cause, stackTrace);
+  const AiUnsupportedLocationException(
+    Object cause,
+    StackTrace stackTrace, {
+    super.serviceMessage,
+  }) : super('Firebase AI is unavailable in this location', cause, stackTrace);
 }
 
 class AiServerException extends AiException {
-  const AiServerException(Object cause, StackTrace stackTrace)
-    : super('Firebase AI request failed', cause, stackTrace);
+  const AiServerException(
+    Object cause,
+    StackTrace stackTrace, {
+    super.serviceMessage,
+  }) : super('Firebase AI request failed', cause, stackTrace);
 }
 
 class AiSdkException extends AiException {
@@ -81,15 +102,25 @@ class AiIncompleteResponseException extends AiException {
 AiException handleAiException(Object error, StackTrace stackTrace) =>
     switch (error) {
       AiException() => error,
-      InvalidApiKey() ||
-      ServiceApiNotEnabled() => AiConfigurationException(error, stackTrace),
-      QuotaExceeded() => AiQuotaExceededException(error, stackTrace),
+      InvalidApiKey(:final message) || ServiceApiNotEnabled(:final message) =>
+        AiConfigurationException(error, stackTrace, serviceMessage: message),
+      QuotaExceeded() => AiQuotaExceededException(
+        error,
+        stackTrace,
+        serviceMessage: error.message,
+      ),
       UnsupportedUserLocation() => AiUnsupportedLocationException(
         error,
         stackTrace,
+        serviceMessage: error.message,
       ),
       FirebaseAISdkException() => AiSdkException(error, stackTrace),
       ClientException() => AiNetworkException(error, stackTrace),
       TimeoutException() => AiTimeoutException(error, stackTrace),
+      FirebaseAIException() => AiServerException(
+        error,
+        stackTrace,
+        serviceMessage: error.message,
+      ),
       _ => AiServerException(error, stackTrace),
     };

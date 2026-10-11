@@ -36,3 +36,7 @@ class SendLocalAssistantQuestionClickEvent extends LocalAssistantEvent {
   @override
   List<Object?> get props => [question];
 }
+
+class ResetLocalAssistantClickEvent extends LocalAssistantEvent {
+  const ResetLocalAssistantClickEvent();
+}

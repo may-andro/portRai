@@ -4,12 +4,10 @@ import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception
 
 void main() {
   for (final exception in const <RemoteAssistantException>[
-    RemoteAssistantPreferenceException(),
     RemoteAssistantClosedException(),
     RemoteAssistantConcurrentRequestException(),
     RemoteAssistantFlagException(),
     RemoteAssistantUnavailableException(),
-    RemoteAssistantConsentRequiredException(),
     RemoteAssistantInvalidInputException(),
     RemoteAssistantTimeoutException(),
     RemoteAssistantCancelledException(),

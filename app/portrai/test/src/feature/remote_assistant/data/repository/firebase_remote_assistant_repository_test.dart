@@ -10,7 +10,6 @@ import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag_
 import 'package:portrai/src/feature/feature_flag/domain/use_case/is_feature_enabled_use_case.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/remote_assistant/data/repository/firebase_remote_assistant_repository.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:use_case/use_case.dart';
@@ -18,34 +17,25 @@ import 'package:use_case/use_case.dart';
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../mock/feature/project/test_data/project_test_data.dart';
-import '../../../../../mock/feature/remote_assistant/data/cache/mock_remote_assistant_preference_cache.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_fb_ai_controller.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_fb_ai_text_model.dart';
 import '../../../../../mock/feature/remote_assistant/data/repository/mock_is_feature_enabled_use_case.dart';
+import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
 typedef _Harness = ({
   FirebaseRemoteAssistantRepository repository,
-  MockRemoteAssistantPreferenceCache preferenceCache,
   MockFbAiController aiController,
   MockFbAiTextModel model,
   MockIsFeatureEnabledUseCase isFeatureEnabled,
 });
 
 _Harness _buildHarness({
-  RemoteAssistantPreferenceEntity? preference =
-      const RemoteAssistantPreferenceEntity(
-        enabled: true,
-        consentAccepted: true,
-      ),
   Either<IsFeatureEnabledFailure, bool>? flagResult,
   Stream<String>? responseStream,
 }) {
-  final preferenceCache = MockRemoteAssistantPreferenceCache();
   final aiController = MockFbAiController();
   final model = MockFbAiTextModel();
   final isFeatureEnabled = MockIsFeatureEnabledUseCase();
-  when(() => preferenceCache.get()).thenAnswer((_) => Future.value(preference));
-  when(() => preferenceCache.put(any())).thenAnswer((_) async => true);
   when(
     () => isFeatureEnabled(any()),
   ).thenAnswer((_) => Future.value(flagResult ?? const Right(true)));
@@ -65,10 +55,8 @@ _Harness _buildHarness({
   return (
     repository: FirebaseRemoteAssistantRepository(
       aiController,
-      preferenceCache,
       isFeatureEnabled,
     ),
-    preferenceCache: preferenceCache,
     aiController: aiController,
     model: model,
     isFeatureEnabled: isFeatureEnabled,
@@ -85,12 +73,6 @@ Future<void> _answer(FirebaseRemoteAssistantRepository repository) =>
 
 void main() {
   setUp(() {
-    registerFallbackValue(
-      const RemoteAssistantPreferenceEntity(
-        enabled: false,
-        consentAccepted: false,
-      ),
-    );
     registerFallbackValue(
       const AppFeatureFlagDefinition(
         key: 'fallback',
@@ -137,7 +119,11 @@ void main() {
         );
         final harness = _buildHarness();
         final result =
-            await AskRemotePortfolioQuestionUseCase(harness.repository)(
+            await AskRemotePortfolioQuestionUseCase(
+              harness.repository,
+              MockIsRemoteAssistantSupportedUseCase()
+                ..stubCall(const Right(true)),
+            )(
               AskRemotePortfolioQuestionParams(
                 question: 'Which projects use Flutter?',
                 portfolioContext: context,
@@ -213,52 +199,6 @@ void main() {
   }
 
   test(
-    'should default to disabled and unconsented when the cache is empty',
-    () async {
-      final harness = _buildHarness(preference: null);
-
-      final preference = await harness.repository.getPreference();
-
-      expect(preference.enabled, isFalse);
-      expect(preference.consentAccepted, isFalse);
-    },
-  );
-
-  test(
-    'should throw a preference exception when reading the cache fails',
-    () async {
-      final harness = _buildHarness();
-      when(
-        () => harness.preferenceCache.get(),
-      ).thenThrow(StateError('secret persisted content'));
-      await expectLater(
-        harness.repository.getPreference(),
-        throwsA(isA<RemoteAssistantPreferenceException>()),
-      );
-    },
-  );
-
-  test('should remain fail closed when a revocation write throws', () async {
-    final harness = _buildHarness();
-    when(
-      () => harness.preferenceCache.put(any()),
-    ).thenThrow(StateError('secret persisted content'));
-    await expectLater(
-      harness.repository.updatePreference(
-        const RemoteAssistantPreferenceEntity(
-          enabled: false,
-          consentAccepted: false,
-        ),
-      ),
-      throwsA(isA<RemoteAssistantPreferenceException>()),
-    );
-    await expectLater(
-      _answer(harness.repository),
-      throwsA(isA<RemoteAssistantPreferenceException>()),
-    );
-  });
-
-  test(
     'should propagate model creation exceptions unchanged when Firebase configuration fails',
     () async {
       const error = AiConfigurationException(
@@ -288,15 +228,6 @@ void main() {
       verify(() => harness.model.close()).called(1);
       await expectLater(
         _answer(harness.repository),
-        throwsA(isA<RemoteAssistantClosedException>()),
-      );
-      await expectLater(
-        harness.repository.updatePreference(
-          const RemoteAssistantPreferenceEntity(
-            enabled: true,
-            consentAccepted: true,
-          ),
-        ),
         throwsA(isA<RemoteAssistantClosedException>()),
       );
     },
@@ -345,54 +276,6 @@ void main() {
       await expectLater(
         _answer(harness.repository),
         throwsA(isA<RemoteAssistantFlagException>()),
-      );
-
-      verifyNever(
-        () => harness.aiController.createTextModel(
-          model: any(named: 'model'),
-          generationConfig: any(named: 'generationConfig'),
-        ),
-      );
-    },
-  );
-
-  test(
-    'should avoid creating a model when consent has not been accepted',
-    () async {
-      final harness = _buildHarness(
-        preference: const RemoteAssistantPreferenceEntity(
-          enabled: false,
-          consentAccepted: false,
-        ),
-      );
-
-      await expectLater(
-        _answer(harness.repository),
-        throwsA(isA<RemoteAssistantConsentRequiredException>()),
-      );
-
-      verifyNever(
-        () => harness.aiController.createTextModel(
-          model: any(named: 'model'),
-          generationConfig: any(named: 'generationConfig'),
-        ),
-      );
-    },
-  );
-
-  test(
-    'should avoid creating a model when the preference is disabled',
-    () async {
-      final harness = _buildHarness(
-        preference: const RemoteAssistantPreferenceEntity(
-          enabled: false,
-          consentAccepted: true,
-        ),
-      );
-
-      await expectLater(
-        _answer(harness.repository),
-        throwsA(isA<RemoteAssistantUnavailableException>()),
       );
 
       verifyNever(
@@ -641,127 +524,7 @@ void main() {
       );
       expect(deltas, ['before reset']);
       verify(() => harness.model.close()).called(1);
-      verifyNever(() => harness.preferenceCache.put(any()));
       await streamController.close();
-    },
-  );
-
-  test(
-    'should cancel pending output before persisting a disable preference',
-    () async {
-      final streamController = StreamController<String>();
-      final harness = _buildHarness(responseStream: streamController.stream);
-      final deltas = <String>[];
-      final request = harness.repository.answer(
-        question: 'Question',
-        portfolioContext: 'Context',
-        history: const [],
-        onDelta: deltas.add,
-      );
-      await Future<void>.delayed(Duration.zero);
-      streamController.add('before disable');
-      await Future<void>.delayed(Duration.zero);
-      final requestExpectation = expectLater(
-        request,
-        throwsA(isA<RemoteAssistantCancelledException>()),
-      );
-
-      await harness.repository.updatePreference(
-        const RemoteAssistantPreferenceEntity(
-          enabled: false,
-          consentAccepted: true,
-        ),
-      );
-      streamController.add('after disable');
-
-      await requestExpectation;
-      expect(deltas, ['before disable']);
-      final stored =
-          verify(
-                () => harness.preferenceCache.put(captureAny()),
-              ).captured.single
-              as RemoteAssistantPreferenceEntity;
-      expect(stored.enabled, isFalse);
-      expect(stored.consentAccepted, isTrue);
-      await streamController.close();
-    },
-  );
-
-  test(
-    'should fail closed when revoking consent cannot be persisted',
-    () async {
-      final harness = _buildHarness();
-      when(
-        () => harness.preferenceCache.put(any()),
-      ).thenAnswer((_) async => false);
-
-      await expectLater(
-        harness.repository.updatePreference(
-          const RemoteAssistantPreferenceEntity(
-            enabled: false,
-            consentAccepted: false,
-          ),
-        ),
-        throwsA(isA<RemoteAssistantPreferenceException>()),
-      );
-      await expectLater(
-        _answer(harness.repository),
-        throwsA(isA<RemoteAssistantPreferenceException>()),
-      );
-      verifyNever(
-        () => harness.aiController.createTextModel(
-          model: any(named: 'model'),
-          generationConfig: any(named: 'generationConfig'),
-        ),
-      );
-    },
-  );
-
-  test(
-    'should not let a queued stale enable undo a concurrent revocation',
-    () async {
-      final firstWrite = Completer<bool>();
-      final revocationWrite = Completer<bool>();
-      var writeCount = 0;
-      final harness = _buildHarness();
-      when(() => harness.preferenceCache.put(any())).thenAnswer((_) {
-        writeCount++;
-        return writeCount == 1 ? firstWrite.future : revocationWrite.future;
-      });
-
-      final enableRequest = harness.repository.updatePreference(
-        const RemoteAssistantPreferenceEntity(
-          enabled: true,
-          consentAccepted: true,
-        ),
-      );
-      await Future<void>.delayed(Duration.zero);
-      final revokeRequest = harness.repository.updatePreference(
-        const RemoteAssistantPreferenceEntity(
-          enabled: false,
-          consentAccepted: false,
-        ),
-      );
-      await Future<void>.delayed(Duration.zero);
-
-      await expectLater(
-        _answer(harness.repository),
-        throwsA(isA<RemoteAssistantPreferenceException>()),
-      );
-
-      firstWrite.complete(true);
-      await enableRequest;
-      await Future<void>.delayed(Duration.zero);
-      revocationWrite.complete(true);
-      await revokeRequest;
-
-      expect(writeCount, 2);
-      final writes = verify(
-        () => harness.preferenceCache.put(captureAny()),
-      ).captured.cast<RemoteAssistantPreferenceEntity>();
-      expect(writes.first.enabled, isTrue);
-      expect(writes.last.enabled, isFalse);
-      expect(writes.last.consentAccepted, isFalse);
     },
   );
 

@@ -1,25 +1,25 @@
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/get_remote_assistant_preference_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/reset_remote_assistant_session_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/update_remote_assistant_preference_use_case.dart';
+import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/remote_assistant/domain/repository/mock_remote_assistant_repository.dart';
+import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
+
+AskRemotePortfolioQuestionUseCase _createAskUseCase(
+  MockRemoteAssistantRepository repository,
+) => AskRemotePortfolioQuestionUseCase(
+  repository,
+  MockIsRemoteAssistantSupportedUseCase()..stubCall(const Right(true)),
+);
 
 void main() {
-  const preference = RemoteAssistantPreferenceEntity(
-    enabled: true,
-    consentAccepted: true,
-  );
-
   setUp(() {
-    registerFallbackValue(preference);
     registerFallbackValue(FakeAssistantMessageList());
     registerFallbackValue((String _) {});
   });
@@ -39,7 +39,7 @@ void main() {
     ),
     (
       const AiServerException('secret server body', StackTrace.empty),
-      isA<RemoteAssistantNetworkFailure>(),
+      isA<RemoteAssistantUnknownFailure>(),
     ),
     (
       const AiConfigurationException('secret server body', StackTrace.empty),
@@ -79,10 +79,6 @@ void main() {
       isA<RemoteAssistantUnknownFailure>(),
     ),
     (
-      const RemoteAssistantPreferenceException(),
-      isA<RemoteAssistantPreferenceFailure>(),
-    ),
-    (
       const RemoteAssistantClosedException(),
       isA<RemoteAssistantUnavailableFailure>(),
     ),
@@ -97,10 +93,6 @@ void main() {
     (
       const RemoteAssistantUnavailableException(),
       isA<RemoteAssistantUnavailableFailure>(),
-    ),
-    (
-      const RemoteAssistantConsentRequiredException(),
-      isA<RemoteAssistantConsentRequiredFailure>(),
     ),
     (
       const RemoteAssistantInvalidInputException(),
@@ -139,40 +131,25 @@ void main() {
     },
   );
 
-  for (final operation in ['ask', 'get', 'update', 'reset']) {
+  for (final operation in ['ask', 'reset']) {
     for (final (error, expected) in cases) {
       test(
         'should map ${error.runtimeType} without sensitive causes when $operation fails',
         () async {
           final repository = MockRemoteAssistantRepository()
             ..stubAnswerError(error)
-            ..stubGetPreferenceError(error)
-            ..stubUpdatePreferenceError(error)
             ..stubResetSessionError(error);
           final RemoteAssistantFailure failure;
           switch (operation) {
             case 'ask':
-              final result =
-                  await AskRemotePortfolioQuestionUseCase(repository)(
-                    AskRemotePortfolioQuestionParams(
-                      question: 'secret prompt',
-                      portfolioContext: 'secret context',
-                      history: const [],
-                      onDelta: (_) {},
-                    ),
-                  );
-              expect(result.isLeft, isTrue);
-              failure = result.left;
-            case 'get':
-              final result = await GetRemoteAssistantPreferenceUseCase(
-                repository,
-              )();
-              expect(result.isLeft, isTrue);
-              failure = result.left;
-            case 'update':
-              final result = await UpdateRemoteAssistantPreferenceUseCase(
-                repository,
-              )(preference);
+              final result = await _createAskUseCase(repository)(
+                AskRemotePortfolioQuestionParams(
+                  question: 'secret prompt',
+                  portfolioContext: 'secret context',
+                  history: const [],
+                  onDelta: (_) {},
+                ),
+              );
               expect(result.isLeft, isTrue);
               failure = result.left;
             case 'reset':
@@ -185,11 +162,50 @@ void main() {
               throw StateError('Unsupported test operation');
           }
           expect(failure, expected);
-          expect(failure.cause, isNull);
+          expect(failure.cause, error is AiException ? same(error) : isNull);
+          expect(
+            failure.serviceMessage,
+            error is AiException ? error.serviceMessage : null,
+          );
           expect(failure.toString(), isNot(contains('secret')));
         },
       );
     }
+  }
+
+  for (final error in <AiException>[
+    const AiServerException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'Your credits are depleted. Enable billing to continue.',
+    ),
+    const AiQuotaExceededException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'Quota exceeded. Try again later.',
+    ),
+    const AiConfigurationException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'Enable the Gemini API in the console.',
+    ),
+    const AiUnsupportedLocationException(
+      'secret raw SDK body',
+      StackTrace.empty,
+      serviceMessage: 'User location is not supported for the API use.',
+    ),
+  ]) {
+    test(
+      'should preserve service details without logging them when mapping ${error.runtimeType}',
+      () {
+        final failure = error.toRemoteAssistantFailure();
+        expect(failure.cause, same(error));
+        expect(failure.serviceMessage, error.serviceMessage);
+        expect(failure.toString(), isNot(contains(error.serviceMessage)));
+        expect(failure.toString(), isNot(contains('secret')));
+        expect(failure.props, [error]);
+      },
+    );
   }
 
   test(
@@ -198,10 +214,8 @@ void main() {
       final error = StateError('secret server body');
       final repository = MockRemoteAssistantRepository()
         ..stubAnswerError(error)
-        ..stubGetPreferenceError(error)
-        ..stubUpdatePreferenceError(error)
         ..stubResetSessionError(error);
-      final ask = await AskRemotePortfolioQuestionUseCase(repository)(
+      final ask = await _createAskUseCase(repository)(
         AskRemotePortfolioQuestionParams(
           question: 'Question',
           portfolioContext: 'Context',
@@ -209,16 +223,10 @@ void main() {
           onDelta: (_) {},
         ),
       );
-      final get = await GetRemoteAssistantPreferenceUseCase(repository)();
-      final update = await UpdateRemoteAssistantPreferenceUseCase(repository)(
-        preference,
-      );
       final reset = await ResetRemoteAssistantSessionUseCase(repository)();
       expect(ask.left, isA<RemoteAssistantUnknownFailure>());
-      expect(get.left, isA<RemoteAssistantPreferenceFailure>());
-      expect(update.left, isA<RemoteAssistantPreferenceFailure>());
       expect(reset.left, isA<RemoteAssistantUnknownFailure>());
-      for (final failure in [ask.left, get.left, update.left, reset.left]) {
+      for (final failure in [ask.left, reset.left]) {
         expect(failure.cause, isNull);
         expect(failure.toString(), isNot(contains('secret')));
       }

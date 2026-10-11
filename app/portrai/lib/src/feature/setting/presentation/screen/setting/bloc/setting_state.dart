@@ -19,13 +19,19 @@ class SettingLoadedState extends SettingState {
   const SettingLoadedState({
     required this.isLanguageSelectorEnabled,
     this.isDevMenuEnabled = false,
+    this.isLocalAssistantAvailable = false,
   });
 
   final bool isLanguageSelectorEnabled;
   final bool isDevMenuEnabled;
+  final bool isLocalAssistantAvailable;
 
   @override
-  List<Object?> get props => [isLanguageSelectorEnabled, isDevMenuEnabled];
+  List<Object?> get props => [
+    isLanguageSelectorEnabled,
+    isDevMenuEnabled,
+    isLocalAssistantAvailable,
+  ];
 }
 
 class SettingErrorState extends SettingState {

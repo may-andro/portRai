@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portrai/l10n/l10n.dart';
@@ -20,7 +21,11 @@ class LocalAssistantButton extends StatelessWidget {
         return FloatingActionButton(
           tooltip: context.localizations.assistantAskAi,
           onPressed: () => LocalAssistantScreen.navigate(context),
-          child: const Icon(Icons.auto_awesome),
+          child: DSIconWidget(
+            Icons.auto_awesome,
+            color: context.colorPalette.brand.onPrimary,
+            size: context.isMobile ? DSIconSize.large : DSIconSize.medium,
+          ),
         );
       },
     );

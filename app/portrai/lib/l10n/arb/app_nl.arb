@@ -196,6 +196,18 @@
   "developerMenuForceBlacklistErrorDescription": "Simuleer een fout die door de foutafhandeling genegeerd moet worden",
   "splashContactSupportUnavailableMessage": "Deze functie is nog niet ontwikkeld",
   "assistantAskAi": "Vraag AI",
+  "chatAssistantTitle": "Chatassistent",
+  "@chatAssistantTitle": {
+    "description": "Shared title of the local and remote chat assistant screens"
+  },
+  "chatAssistantClear": "Chat wissen",
+  "@chatAssistantClear": {
+    "description": "Toolbar action clearing the current assistant conversation"
+  },
+  "assistantOnDeviceChatDescription": "Het gedownloade model draait op je apparaat. Je vragen en portfoliogegevens worden lokaal verwerkt. Dit gesprek blijft alleen in het geheugen van de app en wordt niet opgeslagen op het apparaat. Deze pagina verlaten wist het gesprek niet: het blijft bewaard zolang de appsessie actief is. Chat wissen verwijdert het gesprek en negeert nog lopende antwoorden, maar behoudt het gedownloade model.",
+  "@assistantOnDeviceChatDescription": {
+    "description": "Local chat information explaining on-device processing, in-memory history retained across navigation, and clear-chat behavior"
+  },
   "assistantTitle": "Portfolio-AI",
   "assistantOnDeviceTitle": "Een privéassistent op je apparaat",
   "assistantOnDeviceDescription": "De assistent draait op dit apparaat. Je vragen en portfolio-informatie worden lokaal verwerkt.",
@@ -227,8 +239,6 @@
   "assistantRetry": "Opnieuw proberen",
   "errorRemoteAssistantUnavailable": "De cloud-assistent is niet beschikbaar.",
   "@errorRemoteAssistantUnavailable": {"description": "Remote assistant rollout is disabled"},
-  "errorRemoteAssistantConsentRequired": "Geef toestemming voor verwerking in de cloud en schakel de assistent in voordat je een vraag stelt.",
-  "@errorRemoteAssistantConsentRequired": {"description": "Remote generation requires saved consent and enablement"},
   "errorRemoteAssistantNetwork": "De cloud-assistent kon geen verbinding maken. Controleer je verbinding en probeer het opnieuw.",
   "@errorRemoteAssistantNetwork": {"description": "Remote generation failed due to a network error"},
   "errorRemoteAssistantTimeout": "De cloud-assistent deed te lang over het antwoord. Probeer het opnieuw.",
@@ -245,18 +255,26 @@
   "@errorRemoteAssistantIncomplete": {"description": "Remote output was empty, truncated or ended without a complete response"},
   "errorRemoteAssistantUnknown": "De cloud-assistent kon niet antwoorden. Probeer het opnieuw.",
   "@errorRemoteAssistantUnknown": {"description": "Unexpected remote generation failure"},
-  "errorRemoteAssistantPreference": "De voorkeur voor de cloud-assistent kon niet worden opgeslagen of geladen. Probeer het opnieuw.",
-  "@errorRemoteAssistantPreference": {"description": "Remote consent or enablement storage failed"},
+  "remoteAssistantErrorDetails": "{heading}\n\n{serviceMessage}",
+  "@remoteAssistantErrorDetails": {
+    "description": "Localized remote failure heading followed by actionable backend error details in the service's original language",
+    "placeholders": {
+      "heading": {"type": "String", "example": "De cloud-assistent kon niet antwoorden. Probeer het opnieuw."},
+      "serviceMessage": {"type": "String", "example": "Your credits are depleted. Enable billing to continue."}
+    }
+  },
+  "remoteAssistantSettingsTitle": "Cloud-AI",
+  "@remoteAssistantSettingsTitle": {"description": "Cloud assistant informational settings card title"},
+  "errorLocalAssistantUnavailable": "De assistent op het apparaat is niet beschikbaar op dit platform of is uitgeschakeld voor deze app.",
+  "@errorLocalAssistantUnavailable": {"description": "Local assistant route and request availability guard message"},
+  "errorLocalAssistantBusy": "Het vorige verzoek op het apparaat wordt nog afgerond. Probeer het zo nogmaals.",
+  "@errorLocalAssistantBusy": {"description": "A reset invalidated output but native generation is still busy"},
   "remoteAssistantTitle": "Portfolio-assistent in de cloud",
   "@remoteAssistantTitle": {"description": "Title of the independent cloud assistant"},
   "remoteAssistantBadge": "Cloud-AI via Firebase en Google",
   "@remoteAssistantBadge": {"description": "Provider identity shown above the remote conversation"},
-  "remoteAssistantDisclosure": "Je vragen, recente chatgeschiedenis en portfolio-informatie worden via Firebase naar Google gestuurd om antwoorden te genereren. Voer geen gevoelige informatie in. Antwoorden kunnen onjuist zijn. Deze chat blijft alleen in het geheugen van de app. Uitschakelen trekt je toestemming voor toekomstige verzoeken in en wist de lokale chat; reeds verstuurde verzoeken worden niet ongedaan gemaakt. De assistent op je apparaat blijft apart.",
-  "@remoteAssistantDisclosure": {"description": "Explicit cloud processing, privacy, accuracy and cancellation disclosure before enabling remote AI"},
-  "remoteAssistantAcceptConsent": "Akkoord en cloud-AI inschakelen",
-  "@remoteAssistantAcceptConsent": {"description": "Explicit action accepting the cloud processing disclosure and enabling the remote assistant"},
-  "remoteAssistantDisable": "Uitschakelen en toestemming intrekken",
-  "@remoteAssistantDisable": {"description": "Action disabling future cloud requests and withdrawing saved consent"},
+  "remoteAssistantDisclosure": "Je vragen, recente chatgeschiedenis en portfolio-informatie worden via Firebase naar Google gestuurd om antwoorden te genereren. Voer geen gevoelige informatie in. Antwoorden kunnen onjuist zijn. Deze chat blijft alleen in het geheugen van de app. Chat wissen stopt de lokale ontvangst van lopende antwoorden; het maakt reeds verstuurde verzoeken niet ongedaan en garandeert geen serverannulering of stopzetting van kosten. De assistent op je apparaat blijft apart.",
+  "@remoteAssistantDisclosure": {"description": "Informational cloud processing, privacy, accuracy and cancellation notice without an activation gate"},
   "remoteAssistantReset": "Chat wissen",
   "@remoteAssistantReset": {"description": "Action clearing the remote in-memory conversation and stopping local consumption of pending output"},
   "remoteAssistantGenerating": "Bezig met genereren — dit antwoord is nog niet volledig",

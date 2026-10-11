@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
-import '../../../../../../../util/local_assistant_bloc_scope.dart';
+import '../../../../../../../util/assistant_test_fixture.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
+  setUpAll(AssistantTestFixture.registerFallbacks);
   setUp(() async {
     await appServiceLocator.reset();
     registerTestPackageInfo();
@@ -20,18 +20,20 @@ void main() {
     testWidgets('should show the AI section when the feature flag is on', (
       tester,
     ) async {
+      AssistantTestFixture(remoteRollout: false).install();
       await tester.pumpWidget(
         const TestWidgetWrapper(
-          child: LocalAssistantBlocScope(
-            child: ContentWidget(
-              state: SettingLoadedState(isLanguageSelectorEnabled: false),
+          child: ContentWidget(
+            state: SettingLoadedState(
+              isLanguageSelectorEnabled: false,
+              isLocalAssistantAvailable: true,
             ),
           ),
         ),
       );
       await tester.pump();
 
-      expect(find.text('AI assistant'), findsOneWidget);
+      expect(find.text('Portfolio AI'), findsOneWidget);
     });
 
     testWidgets('should hide the AI section when the feature flag is off', (
@@ -39,17 +41,14 @@ void main() {
     ) async {
       await tester.pumpWidget(
         const TestWidgetWrapper(
-          child: LocalAssistantBlocScope(
-            state: LocalAssistantState(status: LocalAssistantUnavailable()),
-            child: ContentWidget(
-              state: SettingLoadedState(isLanguageSelectorEnabled: false),
-            ),
+          child: ContentWidget(
+            state: SettingLoadedState(isLanguageSelectorEnabled: false),
           ),
         ),
       );
       await tester.pump();
 
-      expect(find.text('AI assistant'), findsNothing);
+      expect(find.text('Portfolio AI'), findsNothing);
     });
 
     testWidgets(
@@ -57,12 +56,10 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
-            child: LocalAssistantBlocScope(
-              child: ContentWidget(
-                state: SettingLoadedState(
-                  isLanguageSelectorEnabled: true,
-                  isDevMenuEnabled: true,
-                ),
+            child: ContentWidget(
+              state: SettingLoadedState(
+                isLanguageSelectorEnabled: true,
+                isDevMenuEnabled: true,
               ),
             ),
           ),
@@ -80,12 +77,10 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
-            child: LocalAssistantBlocScope(
-              child: ContentWidget(
-                state: SettingLoadedState(
-                  isLanguageSelectorEnabled: false,
-                  isDevMenuEnabled: true,
-                ),
+            child: ContentWidget(
+              state: SettingLoadedState(
+                isLanguageSelectorEnabled: false,
+                isDevMenuEnabled: true,
               ),
             ),
           ),
@@ -104,10 +99,8 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           const TestWidgetWrapper(
-            child: LocalAssistantBlocScope(
-              child: ContentWidget(
-                state: SettingLoadedState(isLanguageSelectorEnabled: true),
-              ),
+            child: ContentWidget(
+              state: SettingLoadedState(isLanguageSelectorEnabled: true),
             ),
           ),
         );

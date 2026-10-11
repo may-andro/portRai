@@ -4,8 +4,6 @@ import 'package:firebase/firebase.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
-import 'package:portrai/src/feature/remote_assistant/data/cache/_cache.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/entity/remote_assistant_preference_entity.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
@@ -13,11 +11,7 @@ import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_
 
 @RegisterSingleton(as: RemoteAssistantRepository, disposeMethodName: 'close')
 class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
-  FirebaseRemoteAssistantRepository(
-    this._aiController,
-    this._preferenceCache,
-    this._isFeatureEnabled,
-  );
+  FirebaseRemoteAssistantRepository(this._aiController, this._isFeatureEnabled);
 
   static const _systemInstruction =
       'You are a portfolio question-answering assistant for Mayank Rai. '
@@ -29,81 +23,15 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
       'say so without guessing. Keep answers direct and concise.';
 
   final FbAiController _aiController;
-  final RemoteAssistantPreferenceCache _preferenceCache;
   final IsFeatureEnabledUseCase _isFeatureEnabled;
 
   FbAiTextModel? _model;
   // ignore: cancel_subscriptions
   StreamSubscription<String>? _activeSubscription;
   Completer<void>? _activeCompletion;
-  Future<void> _preferenceMutation = Future.value();
   int _generation = 0;
-  int _revocationGeneration = 0;
-  int _preferenceUpdateGeneration = 0;
   bool _requestActive = false;
   bool _closed = false;
-  bool _revocationFailedClosed = false;
-
-  @override
-  Future<RemoteAssistantPreferenceEntity> getPreference() async {
-    try {
-      return await _preferenceCache.get() ??
-          const RemoteAssistantPreferenceEntity(
-            enabled: false,
-            consentAccepted: false,
-          );
-    } on Object {
-      throw const RemoteAssistantPreferenceException();
-    }
-  }
-
-  @override
-  Future<void> updatePreference(
-    RemoteAssistantPreferenceEntity preference,
-  ) async {
-    final updateGeneration = ++_preferenceUpdateGeneration;
-    final isRevocation = !preference.consentAccepted || !preference.enabled;
-    final revocationGeneration = isRevocation ? ++_revocationGeneration : null;
-    if (isRevocation) {
-      _revocationFailedClosed = true;
-      await _invalidateActiveRequest();
-    }
-
-    try {
-      await _serializePreferenceMutation(() async {
-        if (_closed) throw const RemoteAssistantClosedException();
-        final normalized = RemoteAssistantPreferenceEntity(
-          enabled: preference.consentAccepted && preference.enabled,
-          consentAccepted: preference.consentAccepted,
-        );
-        final saved = await _preferenceCache.put(normalized);
-        if (!saved) throw const RemoteAssistantPreferenceException();
-      });
-      if (updateGeneration == _preferenceUpdateGeneration &&
-          (!isRevocation || revocationGeneration == _revocationGeneration)) {
-        _revocationFailedClosed = false;
-      }
-    } on RemoteAssistantClosedException {
-      rethrow;
-    } on Object {
-      if (isRevocation) _revocationFailedClosed = true;
-      throw const RemoteAssistantPreferenceException();
-    }
-  }
-
-  Future<void> _serializePreferenceMutation(
-    Future<void> Function() mutation,
-  ) async {
-    final previous = _preferenceMutation;
-    final completer = Completer<void>();
-    _preferenceMutation = completer.future;
-    await previous;
-    try {
-      await mutation();
-    } finally {
-      completer.complete();
-    }
-  }
 
   @override
   Future<void> resetSession() async {
@@ -166,10 +94,6 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required void Function(String delta) onDelta,
     required int generation,
   }) async {
-    if (_revocationFailedClosed) {
-      throw const RemoteAssistantPreferenceException();
-    }
-
     final flagResult = await _isFeatureEnabled(
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
@@ -177,16 +101,6 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
       throw const RemoteAssistantFlagException();
     }
     if (!flagResult.right) throw const RemoteAssistantUnavailableException();
-    _ensureRequestCurrent(generation);
-
-    final preference = await getPreference();
-    if (!preference.consentAccepted) {
-      throw const RemoteAssistantConsentRequiredException();
-    }
-    if (!preference.enabled) throw const RemoteAssistantUnavailableException();
-    if (_revocationFailedClosed) {
-      throw const RemoteAssistantPreferenceException();
-    }
     _ensureRequestCurrent(generation);
 
     final model = _model ??= _aiController.createTextModel(
@@ -342,6 +256,5 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     _generation++;
     await _invalidateActiveRequest();
     _closeModel();
-    await _preferenceMutation;
   }
 }

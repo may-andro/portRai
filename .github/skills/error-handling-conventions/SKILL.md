@@ -15,6 +15,12 @@ for the full use-case pattern). `BasicFailure` (`layer/use_case/lib/src/model/fa
 carries an optional `cause` and auto-implements `toString()`/`Equatable`
 props — don't override `toString()` or `props` yourself.
 
+Remote assistant failures may additionally carry an optional `serviceMessage` copied
+only from the Firebase layer's explicit backend error-field property. This supplements
+the translated failure description in presentation; it does not replace `@Localizable`
+or derive text from arbitrary causes. Keep it out of logging/equality properties and
+attach only the sanitized `AiException` as a cause, never its raw SDK cause.
+
 ```dart
 sealed class GetAppStoreUrlFailure extends BasicFailure {
   const GetAppStoreUrlFailure({super.cause});

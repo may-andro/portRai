@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:use_case/use_case.dart';
 
-enum RemoteAssistantStatus { loading, unavailable, off, ready }
+enum RemoteAssistantStatus { loading, unavailable, ready }
 
 class RemoteAssistantState extends Equatable {
   const RemoteAssistantState({
     this.status = RemoteAssistantStatus.loading,
-    this.isUpdatingPreference = false,
+    this.isFeatureEnabled = false,
     this.isLoadingContext = false,
     this.isSendingQuestion = false,
     this.portfolioContext,
@@ -17,7 +17,7 @@ class RemoteAssistantState extends Equatable {
   });
 
   final RemoteAssistantStatus status;
-  final bool isUpdatingPreference;
+  final bool isFeatureEnabled;
   final bool isLoadingContext;
   final bool isSendingQuestion;
   final String? portfolioContext;
@@ -38,7 +38,7 @@ class RemoteAssistantState extends Equatable {
 
   RemoteAssistantState copyWith({
     RemoteAssistantStatus? status,
-    bool? isUpdatingPreference,
+    bool? isFeatureEnabled,
     bool? isLoadingContext,
     bool? isSendingQuestion,
     String? portfolioContext,
@@ -49,7 +49,7 @@ class RemoteAssistantState extends Equatable {
     bool clearFailure = false,
   }) => RemoteAssistantState(
     status: status ?? this.status,
-    isUpdatingPreference: isUpdatingPreference ?? this.isUpdatingPreference,
+    isFeatureEnabled: isFeatureEnabled ?? this.isFeatureEnabled,
     isLoadingContext: isLoadingContext ?? this.isLoadingContext,
     isSendingQuestion: isSendingQuestion ?? this.isSendingQuestion,
     portfolioContext: clearContext
@@ -63,7 +63,7 @@ class RemoteAssistantState extends Equatable {
   @override
   List<Object?> get props => [
     status,
-    isUpdatingPreference,
+    isFeatureEnabled,
     isLoadingContext,
     isSendingQuestion,
     portfolioContext,
