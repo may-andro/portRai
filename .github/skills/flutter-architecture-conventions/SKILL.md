@@ -54,9 +54,7 @@ onPressed: () async {
 ## Bloc event naming
 UI interaction events are named `<Action>ClickEvent` (e.g. `HeaderTabClickEvent`, `DrawerClickEvent`), not `<Action>PressedEvent` or other variants.
 
-Register events with private handler methods named `_map<EventName>ToState`, including the
-capital `To` (for example `_mapAssistantLaunchClickEventToState`). Keep handler logic out of
-constructor callbacks.
+Register events with private `_map<EventName>ToState` methods rather than inline handlers.
 
 ## Feature presentation boundaries
 Blocs, states, and events are module-internal presentation details; do not export them from
