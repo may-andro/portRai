@@ -167,7 +167,10 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     _trackingDelegate.trackQuestionSubmission();
     final messages = [
       ...state.messages,
-      AssistantMessage(text: question, isUser: true),
+      AssistantMessageEntity(
+        content: AssistantTextResponseEntity(text: question),
+        isUser: true,
+      ),
     ];
     emit(
       state.copyWith(
@@ -189,7 +192,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
         state.copyWith(
           messages: [
             ...messages,
-            AssistantMessage(text: answer, isUser: false),
+            AssistantMessageEntity(content: answer, isUser: false),
           ],
           isSendingQuestion: false,
           hasError: false,

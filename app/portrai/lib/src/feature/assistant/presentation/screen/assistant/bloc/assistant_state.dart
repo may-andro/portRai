@@ -1,14 +1,5 @@
 import 'package:equatable/equatable.dart';
-
-class AssistantMessage extends Equatable {
-  const AssistantMessage({required this.text, required this.isUser});
-
-  final String text;
-  final bool isUser;
-
-  @override
-  List<Object?> get props => [text, isUser];
-}
+import 'package:portrai/src/feature/assistant/domain/entity/_entity.dart';
 
 /// Where the on-device model is in its lifecycle. Exactly one applies, so
 /// states such as "ready while still downloading" cannot be represented.
@@ -67,7 +58,7 @@ class AssistantState extends Equatable {
   /// and the user chose to keep it.
   final bool isModelDownloaded;
   final bool isSendingQuestion;
-  final List<AssistantMessage> messages;
+  final List<AssistantMessageEntity> messages;
 
   /// The context failed to load, or the last answer failed.
   final bool hasError;
@@ -84,7 +75,7 @@ class AssistantState extends Equatable {
     bool? isLoadingContext,
     bool? isModelDownloaded,
     bool? isSendingQuestion,
-    List<AssistantMessage>? messages,
+    List<AssistantMessageEntity>? messages,
     bool? hasError,
   }) {
     return AssistantState(

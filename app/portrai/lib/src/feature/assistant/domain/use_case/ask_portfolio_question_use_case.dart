@@ -22,21 +22,26 @@ class AskPortfolioQuestionParams extends Equatable {
 
 @register
 class AskPortfolioQuestionUseCase
-    extends BaseUseCase<String, AskPortfolioQuestionParams, AssistantFailure> {
+    extends
+        BaseUseCase<
+          AssistantResponseEntity,
+          AskPortfolioQuestionParams,
+          AssistantFailure
+        > {
   AskPortfolioQuestionUseCase(this._repository);
 
   final AssistantRepository _repository;
 
   @protected
   @override
-  FutureOr<Either<AssistantFailure, String>> execute(
+  FutureOr<Either<AssistantFailure, AssistantResponseEntity>> execute(
     AskPortfolioQuestionParams params,
   ) async {
     final answer = await _repository.answer(
       question: params.question,
       portfolioContext: params.portfolioContext,
     );
-    return Right(answer);
+    return Right(AssistantTextResponseEntity(text: answer));
   }
 
   @protected

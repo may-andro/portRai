@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/assistant/domain/entity/_entity.dart';
 import 'package:portrai/src/feature/assistant/domain/feature_flag/_feature_flag.dart';
+import 'package:portrai/src/feature/assistant/domain/use_case/ask_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
 import 'package:portrai/src/feature/assistant/presentation/screen/assistant/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
@@ -27,12 +29,14 @@ void main() {
   late MockCancelAssistantPreparationUseCase cancel;
   late MockDeleteAssistantModelUseCase delete;
   late MockIsFeatureEnabledUseCase isFeatureEnabled;
+  late MockAskPortfolioQuestionUseCase askQuestion;
 
   setUpAll(() {
     registerFallbackValue((int _) {});
   });
 
   AssistantBloc createBloc() {
+    askQuestion = MockAskPortfolioQuestionUseCase();
     getEnabled = MockGetAssistantEnabledUseCase();
     updateEnabled = MockUpdateAssistantEnabledUseCase();
     prepare = MockPrepareAssistantModelUseCase();
@@ -58,11 +62,109 @@ void main() {
       cancel,
       delete,
       isDownloaded,
-      MockAskPortfolioQuestionUseCase(),
+      askQuestion,
       MockAssistantTrackingDelegate(),
       isFeatureEnabled,
     );
   }
+
+  blocTest<AssistantBloc, AssistantState>(
+    'should append typed messages when a portfolio question succeeds',
+    build: () {
+      final bloc = createBloc();
+      askQuestion.stubCall(
+        params: const AskPortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Context',
+        ),
+        result: const Right(AssistantTextResponseEntity(text: 'Answer')),
+      );
+      return bloc;
+    },
+    seed: () => const AssistantState(
+      status: AssistantReady(),
+      portfolioContext: 'Context',
+      isLoadingContext: false,
+    ),
+    act: (bloc) =>
+        bloc.add(const SendAssistantQuestionClickEvent('  Question  ')),
+    expect: () => [
+      const AssistantState(
+        status: AssistantReady(),
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+        isSendingQuestion: true,
+        messages: [
+          AssistantMessageEntity(
+            content: AssistantTextResponseEntity(text: 'Question'),
+            isUser: true,
+          ),
+        ],
+      ),
+      const AssistantState(
+        status: AssistantReady(),
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+        messages: [
+          AssistantMessageEntity(
+            content: AssistantTextResponseEntity(text: 'Question'),
+            isUser: true,
+          ),
+          AssistantMessageEntity(
+            content: AssistantTextResponseEntity(text: 'Answer'),
+            isUser: false,
+          ),
+        ],
+      ),
+    ],
+  );
+
+  blocTest<AssistantBloc, AssistantState>(
+    'should retain the question and expose an error when answering fails',
+    build: () {
+      final bloc = createBloc();
+      askQuestion.stubCall(
+        params: const AskPortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Context',
+        ),
+        result: const Left(UnknownAssistantFailure()),
+      );
+      return bloc;
+    },
+    seed: () => const AssistantState(
+      status: AssistantReady(),
+      portfolioContext: 'Context',
+      isLoadingContext: false,
+    ),
+    act: (bloc) => bloc.add(const SendAssistantQuestionClickEvent('Question')),
+    expect: () => [
+      const AssistantState(
+        status: AssistantReady(),
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+        isSendingQuestion: true,
+        messages: [
+          AssistantMessageEntity(
+            content: AssistantTextResponseEntity(text: 'Question'),
+            isUser: true,
+          ),
+        ],
+      ),
+      const AssistantState(
+        status: AssistantReady(),
+        portfolioContext: 'Context',
+        isLoadingContext: false,
+        hasError: true,
+        messages: [
+          AssistantMessageEntity(
+            content: AssistantTextResponseEntity(text: 'Question'),
+            isUser: true,
+          ),
+        ],
+      ),
+    ],
+  );
 
   blocTest<AssistantBloc, AssistantState>(
     'should expose a kept model when initialized and it is downloaded',
