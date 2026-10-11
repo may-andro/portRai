@@ -5,7 +5,6 @@ import 'package:core/src/model/build_config.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/domain/use_case/is_feature_enabled_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/is_local_assistant_supported_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/is_remote_assistant_supported_use_case.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_bloc.dart';
 
 void $registerSettingDependencies(ServiceLocator sl) {
@@ -14,7 +13,6 @@ void $registerSettingDependencies(ServiceLocator sl) {
       sl.get<IsFeatureEnabledUseCase>(),
       sl.get<BuildConfig>(),
       sl.get<IsLocalAssistantSupportedUseCase>(),
-      sl.get<IsRemoteAssistantSupportedUseCase>(),
     ),
   );
 }

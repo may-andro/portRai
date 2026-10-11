@@ -13,7 +13,6 @@ import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_i
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/tracking/mock_portfolio_tracking_delegate.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
-import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
 void main() {
   final portfolio = createPortfolioEntity();
@@ -23,14 +22,12 @@ void main() {
     late MockPortfolioTrackingDelegate trackingDelegate;
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
-    late MockIsRemoteAssistantSupportedUseCase remote;
 
     PortfolioBloc buildBloc() => PortfolioBloc(
       getPortfolioUseCase,
       trackingDelegate,
       isFeatureEnabledUseCase,
       local,
-      remote,
     );
 
     setUp(() {
@@ -46,44 +43,40 @@ void main() {
           result: const Right(false),
         );
       local = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
-      remote = MockIsRemoteAssistantSupportedUseCase()..stubCall(true);
     });
 
     for (final localEnabled in [false, true]) {
       for (final remoteEnabled in [false, true]) {
         for (final localSupported in [false, true]) {
-          for (final remoteSupported in [false, true]) {
-            blocTest<PortfolioBloc, PortfolioState>(
-              'should select only the active supported assistant when local=$localEnabled remote=$remoteEnabled localSupported=$localSupported remoteSupported=$remoteSupported',
-              setUp: () {
-                isFeatureEnabledUseCase
-                  ..stubCall(
-                    definition: LocalAssistantFeatureFlags.aiAssistant,
-                    result: Right(localEnabled),
-                  )
-                  ..stubCall(
-                    definition: RemoteAssistantFeatureFlags.remoteAssistant,
-                    result: Right(remoteEnabled),
-                  );
-                local.stubCall(localSupported);
-                remote.stubCall(remoteSupported);
-              },
-              build: buildBloc,
-              seed: () => LoadedState(portfolio: portfolio),
-              act: (bloc) => bloc.add(const ScreenVisibleEvent()),
-              expect: () {
-                final expected = LoadedState(
-                  portfolio: portfolio,
-                  isLocalAssistantAvailable:
-                      !remoteEnabled && localEnabled && localSupported,
-                  isRemoteAssistantAvailable: remoteEnabled && remoteSupported,
+          blocTest<PortfolioBloc, PortfolioState>(
+            'should offer remote by flag and local by support when local=$localEnabled remote=$remoteEnabled localSupported=$localSupported',
+            setUp: () {
+              isFeatureEnabledUseCase
+                ..stubCall(
+                  definition: LocalAssistantFeatureFlags.aiAssistant,
+                  result: Right(localEnabled),
+                )
+                ..stubCall(
+                  definition: RemoteAssistantFeatureFlags.remoteAssistant,
+                  result: Right(remoteEnabled),
                 );
-                return expected == LoadedState(portfolio: portfolio)
-                    ? <PortfolioState>[]
-                    : [expected];
-              },
-            );
-          }
+              local.stubCall(localSupported);
+            },
+            build: buildBloc,
+            seed: () => LoadedState(portfolio: portfolio),
+            act: (bloc) => bloc.add(const ScreenVisibleEvent()),
+            expect: () {
+              final expected = LoadedState(
+                portfolio: portfolio,
+                isLocalAssistantAvailable:
+                    !remoteEnabled && localEnabled && localSupported,
+                isRemoteAssistantAvailable: remoteEnabled,
+              );
+              return expected == LoadedState(portfolio: portfolio)
+                  ? <PortfolioState>[]
+                  : [expected];
+            },
+          );
         }
       }
     }

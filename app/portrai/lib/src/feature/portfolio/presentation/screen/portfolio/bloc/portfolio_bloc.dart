@@ -18,7 +18,6 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     this._trackingDelegate,
     this._isFeatureEnabledUseCase,
     this._isLocalAssistantSupportedUseCase,
-    this._isRemoteAssistantSupportedUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
@@ -33,7 +32,6 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
   final PortfolioTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
-  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   int _availabilityRevision = 0;
 
   Future<void> _mapLoadPortfolioEventToState(
@@ -102,7 +100,6 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     final local = await _isFeatureEnabledUseCase(
       LocalAssistantFeatureFlags.aiAssistant,
     );
-    final remoteSupported = await _isRemoteAssistantSupportedUseCase();
     final localSupported = await _isLocalAssistantSupportedUseCase();
     if (emit.isDone ||
         revision != _availabilityRevision ||
@@ -111,11 +108,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     }
     emit(
       (state as LoadedState).copyWith(
-        isRemoteAssistantAvailable:
-            remote.isRight &&
-            remote.right &&
-            remoteSupported.isRight &&
-            remoteSupported.right,
+        isRemoteAssistantAvailable: remote.isRight && remote.right,
         isLocalAssistantAvailable:
             remote.isRight &&
             !remote.right &&

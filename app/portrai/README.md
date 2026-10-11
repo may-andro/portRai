@@ -127,8 +127,9 @@ There is no automatic cloud fallback or transfer of conversation history between
 ### Remote Assistant
 
 The remote screen uses `/remote-assistant` and the independent, default-off
-`feature_remote_assistant` flag. Route entry and generation both check rollout and platform;
-there is no remote consent preference or user enablement toggle. Questions, recent chat history
+`feature_remote_assistant` flag. Discovery depends only on this flag; the chat screen and
+generation check rollout and Firebase platform support and show unavailability inside chat.
+There is no remote consent preference or user enablement toggle. Questions, recent chat history
 and portfolio information are sent to Google through Firebase only when a question is submitted.
 Opening the screen makes no model request. Clear chat resets only the remote in-memory session.
 
@@ -142,16 +143,19 @@ Local and remote chats are independent features. The rollout enabler maintains m
 flags; if both are on, remote takes priority regardless of readiness.
 The portfolio entry opens the active feature directly, with no chooser or context switching.
 Neither flag on hides the entry and assistant settings. Local-only rollout offers setup/chat on
-native platforms; remote rollout offers chat on Android, iOS and web. An unsupported or
+native platforms; remote rollout always offers direct chat entry. Firebase generation supports
+Android, iOS and web; unsupported platforms show an unavailable message inside chat. An unsupported or
 unready remote assistant never falls back to local while its rollout flag is on.
 
-Settings exposes only the active feature's on-device model management or informational cloud card
-with open-chat and clear-chat controls. Each provider's module-internal singleton bloc preserves its own in-memory conversation
+Settings exposes only the active feature's on-device model management or a plain Ask AI button
+that opens cloud chat. Visiting Settings or the portfolio does not initialize remote chat or
+load its portfolio context. Clear-chat controls and cloud disclosure live inside chat.
+Each provider's module-internal singleton bloc preserves its own in-memory conversation
 across navigation. Flags are rechecked on screen visibility/return and before each new request
-or enable action, without observers or polling. The app does not rewrite rollout flags or the
+or enable action, without flag subscriptions or polling. The app does not rewrite rollout flags or the
 other feature's preferences.
 Public routes/cards own module-scoped providers. Portfolio and Settings read rollout flags through
-`IsFeatureEnabledUseCase` and platform support through each assistant's boolean support use case,
+`IsFeatureEnabledUseCase` and local platform support through `IsLocalAssistantSupportedUseCase`,
 never another feature's bloc/state. Priority is a simple
 remote-first check in portfolio and Settings composition; each provider reads only its own flag.
 See the [assistant reference](lib/src/feature/assistant/README.md) for module boundaries.
@@ -278,7 +282,7 @@ Feature flags are managed through Firebase Remote Config:
 - Configure in Firebase Console
 - Keys defined in `lib/core/config/feature_flags.dart`
 - `feature_ai_assistant` (default off) shows the on-device AI assistant in Settings and on the portfolio when turned on
-- `feature_remote_assistant` (default off) activates the independent cloud assistant on supported platforms without a separate user preference
+- `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
 
 ## Dependencies
 

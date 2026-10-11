@@ -1,7 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/route/setting_module_route.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/_widget.dart';
@@ -19,29 +18,27 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LocalAssistantVisibilityWidget(
-      child: RemoteAssistantVisibilityWidget(
-        child: Scaffold(
-          appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
-          body: BlocProvider(
-            create: (_) {
-              return appServiceLocator.get<SettingBloc>();
-            },
-            child: Builder(
-              builder: (context) => RouteObserverWidget(
-                onResume: () => context.bloc.add(const LoadSettingsEvent()),
-                child: BlocBuilder<SettingBloc, SettingState>(
-                  builder: (context, state) {
-                    switch (state) {
-                      case SettingInitialState():
-                      case SettingLoadingState():
-                        return const _LoadingStateWidget();
-                      case final SettingLoadedState state:
-                        return ContentWidget(state: state);
-                      case SettingErrorState(:final message):
-                        return Center(child: Text(message));
-                    }
-                  },
-                ),
+      child: Scaffold(
+        appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
+        body: BlocProvider(
+          create: (_) {
+            return appServiceLocator.get<SettingBloc>();
+          },
+          child: Builder(
+            builder: (context) => RouteObserverWidget(
+              onResume: () => context.bloc.add(const LoadSettingsEvent()),
+              child: BlocBuilder<SettingBloc, SettingState>(
+                builder: (context, state) {
+                  switch (state) {
+                    case SettingInitialState():
+                    case SettingLoadingState():
+                      return const _LoadingStateWidget();
+                    case final SettingLoadedState state:
+                      return ContentWidget(state: state);
+                    case SettingErrorState(:final message):
+                      return Center(child: Text(message));
+                  }
+                },
               ),
             ),
           ),

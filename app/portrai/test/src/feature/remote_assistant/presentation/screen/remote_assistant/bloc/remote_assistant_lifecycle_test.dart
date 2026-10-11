@@ -18,14 +18,12 @@ void main() {
   tearDown(() => appServiceLocator.reset());
 
   testWidgets(
-    'should invalidate pending output without exposing a bloc when the host becomes visible with rollout off',
+    'should invalidate pending output when chat is reopened with rollout off',
     (tester) async {
       final fixture = AssistantTestFixture()..install();
       fixture.remote.add(const RemoteAssistantStartedEvent());
       await tester.pumpWidget(
-        const TestWidgetWrapper(
-          child: RemoteAssistantVisibilityWidget(child: SizedBox.shrink()),
-        ),
+        const TestWidgetWrapper(child: RemoteAssistantScreen()),
       );
       await tester.pumpAndSettle();
       final completion = Completer<Either<RemoteAssistantFailure, void>>();
@@ -45,9 +43,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       fixture.setRollout(local: true, remote: false);
       await tester.pumpWidget(
-        const TestWidgetWrapper(
-          child: RemoteAssistantVisibilityWidget(child: SizedBox.shrink()),
-        ),
+        const TestWidgetWrapper(child: RemoteAssistantScreen()),
       );
       await tester.pumpAndSettle();
       request.onDelta('Late output');
@@ -83,6 +79,10 @@ void main() {
       await tester.pumpAndSettle();
       verifyNever(() => fixture.askRemote(any()));
       expect(fixture.remote.state.status, RemoteAssistantStatus.unavailable);
+      expect(
+        find.text('The cloud assistant is not available.'),
+        findsOneWidget,
+      );
     },
   );
 

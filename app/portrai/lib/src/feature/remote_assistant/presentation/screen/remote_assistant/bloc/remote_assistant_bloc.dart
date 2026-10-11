@@ -14,11 +14,11 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant_availabili
 class RemoteAssistantBloc
     extends Bloc<RemoteAssistantEvent, RemoteAssistantState> {
   RemoteAssistantBloc(
-    this._getContext,
-    this._resetSession,
-    this._askQuestion,
-    this._isFeatureEnabled,
-    this._tracking, {
+    this._getAssistantContextUseCase,
+    this._resetRemoteAssistantSessionUseCase,
+    this._askRemotePortfolioQuestionUseCase,
+    this._isFeatureEnabledUseCase,
+    this._trackingDelegate, {
     this._availability = const RemoteAssistantAvailability(),
   }) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
@@ -33,11 +33,11 @@ class RemoteAssistantBloc
     );
   }
 
-  final GetAssistantContextUseCase _getContext;
-  final ResetRemoteAssistantSessionUseCase _resetSession;
-  final AskRemotePortfolioQuestionUseCase _askQuestion;
-  final IsFeatureEnabledUseCase _isFeatureEnabled;
-  final RemoteAssistantTrackingDelegate _tracking;
+  final GetAssistantContextUseCase _getAssistantContextUseCase;
+  final ResetRemoteAssistantSessionUseCase _resetRemoteAssistantSessionUseCase;
+  final AskRemotePortfolioQuestionUseCase _askRemotePortfolioQuestionUseCase;
+  final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
+  final RemoteAssistantTrackingDelegate _trackingDelegate;
   final RemoteAssistantAvailability _availability;
   int _controlRevision = 0;
   int _requestRevision = 0;
@@ -47,7 +47,7 @@ class RemoteAssistantBloc
     Emitter<RemoteAssistantState> emit,
     int controlRevision,
   ) async {
-    final result = await _isFeatureEnabled(
+    final result = await _isFeatureEnabledUseCase(
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
     if (emit.isDone || controlRevision != _controlRevision) return false;
@@ -68,7 +68,7 @@ class RemoteAssistantBloc
         clearFailure: result.isRight,
       ),
     );
-    final reset = await _resetSession();
+    final reset = await _resetRemoteAssistantSessionUseCase();
     if (!emit.isDone && controlRevision == _controlRevision && reset.isLeft) {
       emit(state.copyWith(failure: reset.left));
     }
@@ -79,7 +79,7 @@ class RemoteAssistantBloc
     RemoteAssistantStartedEvent event,
     Emitter<RemoteAssistantState> emit,
   ) async {
-    _tracking.trackScreenView();
+    _trackingDelegate.trackScreenView();
     await _refresh(emit);
   }
 
@@ -102,7 +102,7 @@ class RemoteAssistantBloc
     int revision,
   ) async {
     emit(state.copyWith(isLoadingContext: true, clearFailure: true));
-    final result = await _getContext();
+    final result = await _getAssistantContextUseCase();
     if (emit.isDone || revision != _controlRevision || !state.isReady) return;
     emit(
       result.fold(
@@ -121,7 +121,7 @@ class RemoteAssistantBloc
     Emitter<RemoteAssistantState> emit,
   ) async {
     final revision = ++_requestRevision;
-    _tracking.trackReset();
+    _trackingDelegate.trackReset();
     emit(
       state.copyWith(
         messages: const [],
@@ -130,7 +130,7 @@ class RemoteAssistantBloc
         clearFailure: true,
       ),
     );
-    final result = await _resetSession();
+    final result = await _resetRemoteAssistantSessionUseCase();
     if (!emit.isDone && revision == _requestRevision && result.isLeft) {
       emit(state.copyWith(failure: result.left));
     }
@@ -160,7 +160,7 @@ class RemoteAssistantBloc
       }
       return;
     }
-    _tracking.trackQuestionSubmission();
+    _trackingDelegate.trackQuestionSubmission();
     final messages = [
       ...history,
       AssistantMessageEntity(
@@ -169,7 +169,7 @@ class RemoteAssistantBloc
       ),
     ];
     emit(state.copyWith(messages: messages, partialAnswer: ''));
-    final result = await _askQuestion(
+    final result = await _askRemotePortfolioQuestionUseCase(
       AskRemotePortfolioQuestionParams(
         question: question,
         portfolioContext: state.portfolioContext!,
@@ -219,7 +219,7 @@ class RemoteAssistantBloc
   Future<void> close() async {
     _controlRevision++;
     _requestRevision++;
-    await _resetSession();
+    await _resetRemoteAssistantSessionUseCase();
     await super.close();
   }
 }

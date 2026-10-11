@@ -24,7 +24,7 @@ Both consume this API; neither provider imports the other.
 
 The portfolio's `AssistantLauncherWidget` composes discovery:
 
-| Local rollout | Cloud rollout | Offered on a supported platform |
+| Local rollout | Cloud rollout | Offered |
 |---------------|---------------|----------------------------------|
 | Off | Off | No launcher |
 | On | Off | On-device setup/chat directly |
@@ -35,11 +35,13 @@ Offering a provider does not require local user enablement or model readiness.
 The rollout enabler maintains mutually exclusive flags. If both are on, cloud takes
 priority based on its flag alone, even if unsupported or in error.
 The app never rewrites flags or preferences to enforce exclusivity. On-device is hidden
-on web; cloud is available on the configured Firebase platforms, Android, iOS and web.
-An unsupported active provider hides discovery rather than exposing the other chat.
+on web; cloud discovery depends only on its flag. Firebase generation supports configured
+Android, iOS and web apps; unsupported platforms show an unavailable message inside cloud chat
+rather than hiding its entry or exposing the other chat.
 
-Settings exposes only the active feature's model management or informational cloud card
-with open-chat and clear-chat controls. Cloud activation requires only its flag and platform.
+Settings exposes only the active feature's model management or a plain Ask AI button that opens
+cloud chat. The button depends only on the cloud flag, not platform support, context retrieval
+or session readiness. Clear-chat controls and cloud disclosure remain inside chat.
 Conversations remain in independent singleton blocs across navigation. There is no
 chooser, context switch, automatic fallback or transfer of history between features.
 
@@ -47,13 +49,13 @@ Provider blocs, events and states are module-internal. Routes and public cards o
 `BlocProvider.value` for their module's retained singleton; there are no app-wide assistant
 bloc providers. Portfolio and Settings blocs read rollout flags directly through
 `IsFeatureEnabledUseCase` and use the public feature-owned
-`IsLocalAssistantSupportedUseCase` and `IsRemoteAssistantSupportedUseCase` boolean
-platform checks, refreshing on visibility/return.
-Public provider-owned visibility widgets also invalidate retained sessions on flag-off
-rechecks, without publishing bloc types or providing data to the host.
+`IsLocalAssistantSupportedUseCase` boolean platform check for local discovery, refreshing on
+visibility/return. Visiting Settings or the portfolio does not initialize remote chat or load
+its context. The local provider-owned visibility widget still rechecks its retained session.
+Remote chat rechecks rollout and platform support on chat visibility/return and before requests,
+invalidating retained output when unavailable, without exposing its bloc to hosts.
 Priority is a simple remote-first check in the portfolio and Settings composition.
-Each provider's support use case checks only its own platform. A failed remote flag
-check hides both providers, rather than falling back to local.
+A failed remote flag check hides both providers, rather than falling back to local.
 The shared assistant module remains provider-neutral, and providers do not import siblings.
 
 ## Configuration
@@ -78,7 +80,8 @@ The shared assistant module remains provider-neutral, and providers do not impor
 ### Cloud
 
 - Independent default-off rollout key: `feature_remote_assistant`.
-- Route: `/remote-assistant`; rollout and platform alone determine access.
+- Route: `/remote-assistant`; its entry is flag-only. Runtime rollout and platform guards show
+  unavailability inside chat.
 - Questions, bounded recent completed history and portfolio context are sent to Google
   through Firebase. The disclosure warns against sensitive input and inaccurate answers.
 - There is no saved remote consent, enablement preference or user activation toggle.

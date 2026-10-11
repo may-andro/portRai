@@ -46,7 +46,11 @@ class ContentWidget extends StatelessWidget {
                         SectionTitleWidget(
                           title: context.localizations.remoteAssistantTitle,
                         ),
-                        const RemoteAssistantCardWidget(),
+                        DSButtonWidget(
+                          label: context.localizations.assistantAskAi,
+                          onPressed: () =>
+                              RemoteAssistantScreen.navigate(context),
+                        ),
                       ] else if (state.isLocalAssistantAvailable) ...[
                         SectionTitleWidget(
                           title: context.localizations.assistantTitle,

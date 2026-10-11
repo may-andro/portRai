@@ -16,7 +16,6 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     this._isFeatureEnabledUseCase,
     this._buildConfig,
     this._isLocalAssistantSupportedUseCase,
-    this._isRemoteAssistantSupportedUseCase,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
@@ -24,7 +23,6 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final BuildConfig _buildConfig;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
-  final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   int _loadRevision = 0;
 
   Future<void> _mapLoadSettingsEventToState(
@@ -50,18 +48,13 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     final local = await _isFeatureEnabledUseCase(
       LocalAssistantFeatureFlags.aiAssistant,
     );
-    final remoteSupported = await _isRemoteAssistantSupportedUseCase();
     final localSupported = await _isLocalAssistantSupportedUseCase();
     if (emit.isDone || revision != _loadRevision) return;
     emit(
       SettingLoadedState(
         isLanguageSelectorEnabled: isLanguageSelectorEnabled,
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
-        isRemoteAssistantAvailable:
-            remote.isRight &&
-            remote.right &&
-            remoteSupported.isRight &&
-            remoteSupported.right,
+        isRemoteAssistantAvailable: remote.isRight && remote.right,
         isLocalAssistantAvailable:
             remote.isRight &&
             !remote.right &&

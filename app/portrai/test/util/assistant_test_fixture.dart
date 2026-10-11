@@ -40,9 +40,6 @@ class AssistantTestFixture {
     isLocalAssistantSupportedUseCase = IsLocalAssistantSupportedUseCase(
       LocalAssistantAvailability.supported(localSupported),
     );
-    isRemoteAssistantSupportedUseCase = IsRemoteAssistantSupportedUseCase(
-      RemoteAssistantAvailability.supported(remoteSupported),
-    );
     setRollout(local: localRollout, remote: remoteRollout);
     when(() => context()).thenAnswer((_) => const Right('Fixture portfolio'));
     final prepare = MockPrepareLocalAssistantModelUseCase()
@@ -130,8 +127,6 @@ class AssistantTestFixture {
   late final LocalAssistantBloc local;
   late final RemoteAssistantBloc remote;
   late final IsLocalAssistantSupportedUseCase isLocalAssistantSupportedUseCase;
-  late final IsRemoteAssistantSupportedUseCase
-  isRemoteAssistantSupportedUseCase;
 
   /// Installs module-owned instances; public cards/routes own their providers.
   void install() {
