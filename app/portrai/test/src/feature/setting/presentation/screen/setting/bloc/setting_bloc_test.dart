@@ -39,7 +39,7 @@ void main() {
       for (final remoteEnabled in [false, true]) {
         for (final localSupported in [false, true]) {
           blocTest<SettingBloc, SettingState>(
-            'should offer remote by flag and local by support when local=$localEnabled remote=$remoteEnabled localSupported=$localSupported',
+            'should offer only local model management when local=$localEnabled remote=$remoteEnabled localSupported=$localSupported',
             setUp: () {
               isFeatureEnabledUseCase
                 ..stubCall(
@@ -64,7 +64,6 @@ void main() {
                 isLanguageSelectorEnabled: false,
                 isLocalAssistantAvailable:
                     !remoteEnabled && localEnabled && localSupported,
-                isRemoteAssistantAvailable: remoteEnabled,
               ),
             ],
           );

@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
@@ -75,7 +73,7 @@ void main() {
     (true, true),
   ]) {
     testWidgets(
-      'should show only the active provider when flags are local=$localFlag remote=$remoteFlag',
+      'should show only local model management when flags are local=$localFlag remote=$remoteFlag',
       (tester) async {
         final fixture = AssistantTestFixture(
           localRollout: localFlag,
@@ -86,7 +84,10 @@ void main() {
           find.byType(LocalAssistantCardWidget),
           localFlag && !remoteFlag ? findsOneWidget : findsNothing,
         );
-        expect(find.text('Ask AI'), remoteFlag ? findsOneWidget : findsNothing);
+        if (remoteFlag) {
+          expect(find.text('Ask AI'), findsNothing);
+          expect(find.text('Cloud AI assistant'), findsNothing);
+        }
         expect(fixture.remote.state.status, RemoteAssistantStatus.loading);
         verifyNever(() => fixture.context());
         verifyNever(() => fixture.askRemote(any()));
@@ -98,31 +99,24 @@ void main() {
   }
 
   testWidgets(
-    'should offer chat without local fallback when remote is unsupported',
+    'should hide local management and remote entry when remote is enabled on an unsupported platform',
     (tester) async {
       await pumpSettings(
         tester,
         AssistantTestFixture(remoteSupported: false, localEnabled: true),
       );
       expect(find.byType(LocalAssistantCardWidget), findsNothing);
-      expect(find.text('Ask AI'), findsOneWidget);
-      await tester.ensureVisible(find.text('Ask AI'));
-      await tester.tap(find.text('Ask AI'));
-      await tester.pumpAndSettle();
-      expect(
-        find.text('The cloud assistant is not available.'),
-        findsOneWidget,
-      );
+      expect(find.text('Ask AI'), findsNothing);
       expect(find.byType(TextField), findsNothing);
     },
   );
 
-  testWidgets('should offer remote settings when local is unsupported', (
+  testWidgets('should hide assistant settings when local is unsupported', (
     tester,
   ) async {
     await pumpSettings(tester, AssistantTestFixture(localSupported: false));
     expect(find.byType(LocalAssistantCardWidget), findsNothing);
-    expect(find.text('Ask AI'), findsOneWidget);
+    expect(find.text('Ask AI'), findsNothing);
   });
 
   testWidgets(
@@ -140,9 +134,9 @@ void main() {
   testWidgets('should refresh availability when returning from another route', (
     tester,
   ) async {
-    final fixture = AssistantTestFixture();
+    final fixture = AssistantTestFixture(remoteRollout: false);
     final router = await pumpSettings(tester, fixture);
-    expect(find.text('Ask AI'), findsOneWidget);
+    expect(find.byType(LocalAssistantCardWidget), findsOneWidget);
     unawaited(router.push('/remote-assistant'));
     await tester.pumpAndSettle();
     fixture.setRollout(local: false, remote: false);
@@ -151,52 +145,6 @@ void main() {
     expect(find.byType(LocalAssistantCardWidget), findsNothing);
     expect(find.text('Ask AI'), findsNothing);
   });
-
-  testWidgets(
-    'should answer with the given context when the remote button opens chat',
-    (tester) async {
-      final fixture = AssistantTestFixture();
-      await pumpSettings(tester, fixture);
-      verifyNever(() => fixture.context());
-      await tester.ensureVisible(find.text('Ask AI'));
-      await tester.tap(find.text('Ask AI'));
-      await tester.pumpAndSettle();
-      expect(find.byType(TextField), findsOneWidget);
-      expect(find.byType(Switch), findsNothing);
-      expect(find.text('Agree and enable cloud AI'), findsNothing);
-      verify(() => fixture.context()).called(1);
-      await tester.enterText(find.byType(TextField), 'Question');
-      await tester.testTextInput.receiveAction(TextInputAction.send);
-      await tester.pumpAndSettle();
-      expect(find.text('Cloud answer'), findsOneWidget);
-      final request =
-          verify(() => fixture.askRemote(captureAny())).captured.single
-              as AskRemotePortfolioQuestionParams;
-      expect(request.portfolioContext, 'Fixture portfolio');
-    },
-  );
-
-  testWidgets(
-    'should offer the button without fetching context when context retrieval would fail',
-    (tester) async {
-      final fixture = AssistantTestFixture();
-      when(
-        () => fixture.context(),
-      ).thenAnswer((_) => const Left(UnknownAssistantFailure()));
-      await pumpSettings(tester, fixture);
-      expect(find.text('Ask AI'), findsOneWidget);
-      expect(fixture.remote.state.status, RemoteAssistantStatus.loading);
-      verifyNever(() => fixture.context());
-      verifyNever(() => fixture.resetRemote());
-      await tester.ensureVisible(find.text('Ask AI'));
-      await tester.tap(find.text('Ask AI'));
-      await tester.pumpAndSettle();
-      verify(() => fixture.context()).called(1);
-      expect(find.byType(TextField), findsNothing);
-      expect(find.text('Retry'), findsOneWidget);
-      verifyNever(() => fixture.askRemote(any()));
-    },
-  );
 
   testWidgets('should hide both entries when the remote flag check fails', (
     tester,

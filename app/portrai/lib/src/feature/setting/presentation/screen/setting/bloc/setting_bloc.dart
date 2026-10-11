@@ -54,7 +54,6 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       SettingLoadedState(
         isLanguageSelectorEnabled: isLanguageSelectorEnabled,
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
-        isRemoteAssistantAvailable: remote.isRight && remote.right,
         isLocalAssistantAvailable:
             remote.isRight &&
             !remote.right &&

@@ -39,9 +39,9 @@ on web; cloud discovery depends only on its flag. Firebase generation supports c
 Android, iOS and web apps; unsupported platforms show an unavailable message inside cloud chat
 rather than hiding its entry or exposing the other chat.
 
-Settings exposes only the active feature's model management or a plain Ask AI button that opens
-cloud chat. The button depends only on the cloud flag, not platform support, context retrieval
-or session readiness. Clear-chat controls and cloud disclosure remain inside chat.
+Settings exposes only local model management during local-only rollout. Remote chat entry
+appears only on the portfolio, based on the cloud flag rather than platform support, context
+retrieval or session readiness. Clear-chat controls and cloud disclosure remain inside chat.
 Conversations remain in independent singleton blocs across navigation. There is no
 chooser, context switch, automatic fallback or transfer of history between features.
 

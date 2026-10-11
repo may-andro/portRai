@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/developer_menu_screen.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
-import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
@@ -42,16 +41,7 @@ class ContentWidget extends StatelessWidget {
                         ),
                         const LanguageCardWidget(),
                       ],
-                      if (state.isRemoteAssistantAvailable) ...[
-                        SectionTitleWidget(
-                          title: context.localizations.remoteAssistantTitle,
-                        ),
-                        DSButtonWidget(
-                          label: context.localizations.assistantAskAi,
-                          onPressed: () =>
-                              RemoteAssistantScreen.navigate(context),
-                        ),
-                      ] else if (state.isLocalAssistantAvailable) ...[
+                      if (state.isLocalAssistantAvailable) ...[
                         SectionTitleWidget(
                           title: context.localizations.assistantTitle,
                         ),
