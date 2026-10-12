@@ -85,6 +85,16 @@ extension ContextExtension on BuildContext {
 
 Use `context.bloc`/`context.state` in widgets instead of `context.read<XBloc>()`/`context.watch<XBloc>().state`.
 
+## Mappers implement `Mapper`/`BiMapper`
+Every model↔entity mapper in `data/mapper/` implements `BiMapper<Model, Entity>` (or `Mapper<From, To>` when only one direction exists) from the `core` layer, is `@register`ed and `const` where possible. Use `to`/`from` (or `map`) for the interface methods.
+
+```dart
+@register
+class LanguageMapper implements BiMapper<LanguageModel, LanguageEntity> { ... }
+```
+
+If a direction needs extra input the interface can't carry (e.g. a cache key or a definition), implement `Mapper` for the direction that fits and add a separate method for the other, with a doc comment saying why it isn't a `BiMapper` (see `AiImageMapper`, `AppFeatureFlagMapper`). Classes that transform data without mapping a model to an entity (e.g. `AiImageBackgroundRemover`) are not mappers.
+
 ## Feature folder structure
 Each feature under `lib/src/feature/<feature>/` follows `data/`, `domain/`, `presentation/`. Inside `presentation/`, screens are nested under `screen/<screen_name>/`, not directly under `presentation/`:
 

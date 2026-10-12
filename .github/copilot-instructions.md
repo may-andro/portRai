@@ -13,6 +13,7 @@ See [`.github/skills/flutter-architecture-conventions/SKILL.md`](skills/flutter-
 - Widgets dispatch bloc events, never call `appServiceLocator` use cases directly.
 - Bloc UI events are named `<Action>ClickEvent`.
 - Every `bloc/` folder has a `bloc_extension.dart` with `context.bloc`/`context.state`.
+- Data mappers implement `BiMapper`/`Mapper` from `core`; if extra input prevents it, document why in the class doc.
 - Features follow `lib/src/feature/<feature>/{data,domain,presentation}`, with screens under `presentation/screen/<screen_name>/`.
 - Content-only sub-widgets are split into `part` files, unprefixed with the feature name.
 
