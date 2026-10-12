@@ -19,6 +19,18 @@ class ResetRemoteAssistantClickEvent extends RemoteAssistantEvent {
   const ResetRemoteAssistantClickEvent();
 }
 
+class OpenRemoteAssistantLinkClickEvent extends RemoteAssistantEvent {
+  const OpenRemoteAssistantLinkClickEvent(this.url);
+
+  final String url;
+
+  @override
+  List<Object?> get props => [url];
+
+  @override
+  String toString() => 'OpenRemoteAssistantLinkClickEvent';
+}
+
 class SendRemoteAssistantQuestionClickEvent extends RemoteAssistantEvent {
   const SendRemoteAssistantQuestionClickEvent(this.question);
 

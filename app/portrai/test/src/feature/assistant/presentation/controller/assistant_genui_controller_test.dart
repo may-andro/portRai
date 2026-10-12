@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../util/test_wrapper_widget.dart';
@@ -27,9 +28,19 @@ void main() {
   });
 
   test('should bound catalog instructions when constructing a session', () {
-    final genuiController = AssistantGenuiController();
+    final genuiController = AssistantGenuiController(
+      allowedUrls: {'https://a.test'},
+      allowedContactLinks: {'mailto:a@b.test'},
+      allowedLocations: [(latitude: 1.0, longitude: 2.0)],
+      onOpenLink: (_) {},
+      onAskQuestion: (_) {},
+    );
     addTearDown(genuiController.dispose);
-    expect(genuiController.systemPrompt.length, lessThanOrEqualTo(50000));
+    // Leaves room for the response-style instructions added per request.
+    expect(
+      genuiController.systemPrompt.length + 5000,
+      lessThanOrEqualTo(RemoteAssistantRequestLimits.maxSystemPromptCharacters),
+    );
   });
 
   testWidgets(

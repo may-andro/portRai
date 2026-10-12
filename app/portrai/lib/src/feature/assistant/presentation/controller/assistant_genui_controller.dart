@@ -28,13 +28,23 @@ class AssistantGenuiTurnCancelledException implements Exception {
 /// Presentation runtime only: the caller owns generation and domain results.
 class AssistantGenuiController {
   AssistantGenuiController({
-    Iterable<String> allowedImageUrls = const [],
+    Iterable<String> allowedUrls = const [],
+    Iterable<String> allowedContactLinks = const [],
     List<AssistantLocation> allowedLocations = const [],
-  }) : supportsImages = allowedImageUrls.isNotEmpty,
+    void Function(String url)? onOpenLink,
+    void Function(String question)? onAskQuestion,
+  }) : supportsImages = allowedUrls.isNotEmpty,
+       supportsLinks =
+           (allowedUrls.isNotEmpty || allowedContactLinks.isNotEmpty) &&
+           onOpenLink != null,
+       supportsSuggestions = onAskQuestion != null,
        supportsMaps = allowedLocations.isNotEmpty,
        _catalog = createAssistantCatalog(
-         allowedImageUrls: allowedImageUrls.toSet(),
+         allowedUrls: allowedUrls.toSet(),
+         allowedContactLinks: allowedContactLinks.toSet(),
          allowedLocations: allowedLocations,
+         onOpenLink: onOpenLink,
+         onAskQuestion: onAskQuestion,
        ) {
     _controller = SurfaceController(catalogs: [_catalog]);
     systemPrompt = PromptBuilder.chat(catalog: _catalog).systemPromptJoined();
@@ -44,6 +54,8 @@ class AssistantGenuiController {
   final Catalog _catalog;
   final bool supportsImages;
   final bool supportsMaps;
+  final bool supportsLinks;
+  final bool supportsSuggestions;
   late SurfaceController _controller;
   late final String systemPrompt;
   SurfaceController get surfaceController => _controller;

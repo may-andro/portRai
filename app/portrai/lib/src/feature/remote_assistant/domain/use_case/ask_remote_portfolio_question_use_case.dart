@@ -36,8 +36,9 @@ abstract final class RemoteAssistantRequestLimits {
   static const maxOutputTokens = 4096;
   static const temperature = 0.3;
   static const maxQuestionCharacters = 2000;
-  // The current official catalog prompt is ~21k; leave bounded schema headroom.
-  static const maxSystemPromptCharacters = 50000;
+  // The official catalog prompt with every item registered is ~50k; leave
+  // headroom for response-style instructions and future items.
+  static const maxSystemPromptCharacters = 80000;
   // Preserve the complete shared JSON, including overview/digest and details.
   // Bound per-request input cost; overflow is rejected, never sliced.
   static const maxPortfolioContextCharacters = 100000;

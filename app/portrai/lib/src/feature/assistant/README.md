@@ -109,7 +109,22 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
 | `DSImage` | A portfolio image (`avatar`, `logo`, `banner`). Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context |
 | `DSMap` | An interactive Google map with one marker per place, framed to fit them all (profile location and experience locations). Registered only when the portfolio context has coordinates, and marks only coordinates present in that context. Android, iOS and web only |
+| `DSTimeline` | A vertical timeline of up to 8 entries (`period`, `title`, `subtitle`), for career or education history |
+| `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
+| `DSQuote` | A quotation such as a testimonial, with optional author and role |
+| `DSStatGrid` | Two to four `DSMetric` components side by side |
+| `DSCarousel` | A horizontally scrolling row of up to ten child cards |
+| `DSTabs` | Up to five titled tabs, each showing one child component |
+| `DSLinkButton` | A button that opens a link. Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context. Taps open through the remote assistant bloc and `OpenExternalUrlUseCase` |
 | `DSDivider` | A horizontal divider |
+| `DSCallout` | A highlighted note with an `info`, `success` or `warning` style, for example availability |
+| `DSProgressRing` | A circular gauge for one value from 0 to 100, with an optional caption |
+| `DSCodeBlock` | A short code or command snippet, at most 40 lines, scrolling sideways |
+| `DSComparison` | A table with two to four columns and up to eight rows for side-by-side comparisons |
+| `DSEducationList` | Up to six degrees or certificates with institution, degree and period |
+| `DSProjectCard` | A project card with title, description, up to eight technology tags, an optional banner (only URLs present in the portfolio context) and an optional action such as `DSLinkButton` |
+| `DSContactCard` | Up to five contact buttons (`email`, `phone`, `website`). Registered with `DSLinkButton`, and opens only HTTPS URLs from the portfolio context or the profile `mailto:` and `tel:` links |
+| `DSSuggestionChips` | Up to four tappable follow-up questions. Registered only when the host supplies a question callback; a tap sends the question through the remote assistant bloc |
 
 String properties accept a literal or a data-model reference. Child properties are
 component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed

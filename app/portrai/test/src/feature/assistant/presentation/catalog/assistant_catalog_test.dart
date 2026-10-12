@@ -24,6 +24,18 @@ void main() {
       'DSInfoChip',
       'DSLabeledInfoRow',
       'DSExpandable',
+      'DSTimeline',
+      'DSSkillBars',
+      'DSQuote',
+      'DSStatGrid',
+      'DSCarousel',
+      'DSTabs',
+      'DSCallout',
+      'DSProgressRing',
+      'DSCodeBlock',
+      'DSComparison',
+      'DSEducationList',
+      'DSProjectCard',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -100,14 +112,14 @@ void main() {
 
   test('should add DSImage only when image URLs are allowed', () {
     final catalog = createAssistantCatalog(
-      allowedImageUrls: {'https://cdn.test/a.png'},
+      allowedUrls: {'https://cdn.test/a.png'},
     );
 
     expect(catalog.items.map((item) => item.name), contains('DSImage'));
   });
 
   test('should extract unique https URLs when reading portfolio context', () {
-    final urls = assistantImageUrlsFrom(
+    final urls = assistantUrlsFrom(
       '{"a":"https://cdn.test/a.png","b":"https://cdn.test/a.png",'
       '"c":"http://insecure.test/x.png","d":"https://cdn.test/b.jpg?x=1"}',
     );
@@ -120,7 +132,7 @@ void main() {
     (tester) async {
       final controller = SurfaceController(
         catalogs: [
-          createAssistantCatalog(allowedImageUrls: {'https://cdn.test/a.png'}),
+          createAssistantCatalog(allowedUrls: {'https://cdn.test/a.png'}),
         ],
       );
       addTearDown(controller.dispose);
@@ -145,6 +157,117 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+    },
+  );
+
+  test('should add DSLinkButton only when URLs and a callback are given', () {
+    List<String> names(Catalog c) => c.items.map((i) => i.name).toList();
+
+    expect(
+      names(createAssistantCatalog(allowedUrls: {'https://a.test'})),
+      isNot(contains('DSLinkButton')),
+    );
+    expect(
+      names(createAssistantCatalog(onOpenLink: (_) {})),
+      isNot(contains('DSLinkButton')),
+    );
+    expect(
+      names(
+        createAssistantCatalog(
+          allowedContactLinks: {'mailto:a@b.test'},
+          onOpenLink: (_) {},
+        ),
+      ),
+      containsAll(['DSLinkButton', 'DSContactCard']),
+    );
+    expect(
+      names(
+        createAssistantCatalog(
+          allowedUrls: {'https://a.test'},
+          onOpenLink: (_) {},
+        ),
+      ),
+      contains('DSLinkButton'),
+    );
+  });
+
+  testWidgets('should open only allowed URLs when DSLinkButton is tapped', (
+    tester,
+  ) async {
+    final opened = <String>[];
+    final controller = SurfaceController(
+      catalogs: [
+        createAssistantCatalog(
+          allowedUrls: {'https://a.test/p'},
+          onOpenLink: opened.add,
+        ),
+      ],
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: SingleChildScrollView(
+          child: Surface(surfaceContext: controller.contextFor('link')),
+        ),
+      ),
+    );
+    await _feed(tester, controller, [
+      '''
+{"version":"v0.9","createSurface":{"surfaceId":"link","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"link","components":[
+  {"id":"root","component":"DSColumn","children":["ok","bad"]},
+  {"id":"ok","component":"DSLinkButton","label":"Open project","url":"https://a.test/p"},
+  {"id":"bad","component":"DSLinkButton","label":"Evil","url":"https://evil.test"}
+]}}
+''',
+    ]);
+    await tester.pump();
+
+    expect(find.byType(DSButtonWidget), findsOneWidget);
+    await tester.tap(find.byType(DSButtonWidget));
+    expect(opened, ['https://a.test/p']);
+  });
+
+  testWidgets(
+    'should render timeline, skill bars and quote when A2UI describes them',
+    (tester) async {
+      final controller = SurfaceController(
+        catalogs: [createAssistantCatalog()],
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: SingleChildScrollView(
+            child: Surface(surfaceContext: controller.contextFor('story')),
+          ),
+        ),
+      );
+      await _feed(tester, controller, [
+        '''
+{"version":"v0.9","createSurface":{"surfaceId":"story","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"story","components":[
+  {"id":"root","component":"DSColumn","children":["t","s","q"]},
+  {"id":"t","component":"DSTimeline","entries":[
+    {"period":"2021 - 2024","title":"Lead Engineer","subtitle":"Acme"},
+    {"title":"Engineer"}]},
+  {"id":"s","component":"DSSkillBars","items":[
+    {"label":"Flutter","value":6,"display":"6 yrs"},
+    {"label":"Kotlin","value":3}]},
+  {"id":"q","component":"DSQuote","text":"Great to work with.","author":"Sam","role":"CTO"}
+]}}
+''',
+      ]);
+      await tester.pump();
+
+      expect(find.text('Lead Engineer'), findsOneWidget);
+      expect(find.text('Engineer'), findsOneWidget);
+      expect(find.text('Acme'), findsOneWidget);
+      expect(find.text('Flutter'), findsOneWidget);
+      expect(find.text('6 yrs'), findsOneWidget);
+      expect(find.byType(DSQuoteTextWidget), findsOneWidget);
+      expect(find.text('Sam, CTO'), findsOneWidget);
     },
   );
 
@@ -340,6 +463,207 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('should render metrics side by side when DSStatGrid is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSStatGrid","children":["a","b"]},
+{"id":"a","component":"DSMetric","value":"8+","label":"Years"},
+{"id":"b","component":"DSMetric","value":"20","label":"Projects"}''');
+
+    expect(find.text('8+'), findsOneWidget);
+    expect(find.text('20'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('20')).dx,
+      greaterThan(tester.getTopLeft(find.text('8+')).dx),
+    );
+  });
+
+  testWidgets('should render every child when DSCarousel is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSCarousel","children":["a","b"]},
+{"id":"a","component":"DSText","text":"First card"},
+{"id":"b","component":"DSText","text":"Second card"}''');
+
+    expect(find.text('First card'), findsOneWidget);
+    expect(find.text('Second card'), findsOneWidget);
+  });
+
+  testWidgets('should switch content when a DSTabs tab is tapped', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSTabs","tabs":[
+  {"title":"Frontend","child":"f"},{"title":"Backend","child":"b"}]},
+{"id":"f","component":"DSText","text":"Flutter"},
+{"id":"b","component":"DSText","text":"Kotlin"}''');
+
+    expect(find.text('Flutter'), findsOneWidget);
+    expect(find.text('Kotlin'), findsNothing);
+
+    await tester.tap(find.text('Backend'));
+    await tester.pump();
+
+    expect(find.text('Kotlin'), findsOneWidget);
+    expect(find.text('Flutter'), findsNothing);
+  });
+
+  testWidgets('should render its text when DSCallout is used', (tester) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(),
+      '''
+{"id":"root","component":"DSCallout","text":"Open to work","variant":"success"}''',
+    );
+
+    expect(find.text('Open to work'), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
+  });
+
+  testWidgets('should render a clamped gauge when DSProgressRing is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSProgressRing","value":250,"label":"Flutter"}''');
+
+    final ring = tester.widget<CircularProgressIndicator>(
+      find.byType(CircularProgressIndicator),
+    );
+    expect(ring.value, 1.0);
+    expect(find.text('250%'), findsOneWidget);
+    expect(find.text('Flutter'), findsOneWidget);
+  });
+
+  testWidgets('should keep line breaks when DSCodeBlock is used', (
+    tester,
+  ) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(),
+      '''
+{"id":"root","component":"DSCodeBlock","code":"flutter pub get\\nflutter run"}''',
+    );
+
+    expect(find.text('flutter pub get\nflutter run'), findsOneWidget);
+  });
+
+  testWidgets('should render a table when DSComparison is used', (
+    tester,
+  ) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(),
+      '''
+{"id":"root","component":"DSComparison","columns":["Flutter","Kotlin"],
+ "rows":[{"label":"Years","values":["6","3"]},{"label":"Focus","values":["UI"]}]}''',
+    );
+
+    expect(find.byType(Table), findsOneWidget);
+    expect(find.text('Flutter'), findsOneWidget);
+    expect(find.text('Years'), findsOneWidget);
+    expect(find.text('UI'), findsOneWidget);
+  });
+
+  testWidgets('should render each entry when DSEducationList is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSEducationList","entries":[
+  {"institution":"UPC","degree":"BSc Computer Science","period":"2012 - 2016"},
+  {"institution":"Google"}]}''');
+
+    expect(find.text('UPC'), findsOneWidget);
+    expect(find.text('BSc Computer Science'), findsOneWidget);
+    expect(find.text('2012 - 2016'), findsOneWidget);
+    expect(find.text('Google'), findsOneWidget);
+    expect(find.byIcon(Icons.school_outlined), findsNWidgets(2));
+  });
+
+  testWidgets('should show the banner only when its URL is allowed', (
+    tester,
+  ) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(allowedUrls: {'https://cdn.test/p.png'}),
+      '''
+{"id":"root","component":"DSColumn","children":["ok","bad"]},
+{"id":"ok","component":"DSProjectCard","title":"Alpha","description":"An app",
+ "imageUrl":"https://cdn.test/p.png","tags":["Flutter","Dart"]},
+{"id":"bad","component":"DSProjectCard","title":"Beta",
+ "imageUrl":"https://evil.test/x.png"}''',
+    );
+
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(find.text('Beta'), findsOneWidget);
+    expect(find.text('Flutter'), findsOneWidget);
+    expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+  });
+
+  test('should derive mailto and tel links when reading the profile', () {
+    expect(
+      assistantContactLinksFrom(
+        '{"profile":{"email":"me@x.test","phone":"+34 600 111 222"}}',
+      ),
+      {'mailto:me@x.test', 'tel:+34600111222'},
+    );
+    expect(assistantContactLinksFrom('{"profile":{"email":""}}'), isEmpty);
+    expect(assistantContactLinksFrom('not json'), isEmpty);
+  });
+
+  testWidgets('should open only allowed links when DSContactCard is tapped', (
+    tester,
+  ) async {
+    final opened = <String>[];
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(
+        allowedContactLinks: {'mailto:me@x.test'},
+        onOpenLink: opened.add,
+      ),
+      '''
+{"id":"root","component":"DSContactCard","items":[
+  {"kind":"email","label":"Email me","url":"mailto:me@x.test"},
+  {"kind":"phone","label":"Call","url":"tel:+1999"}]}''',
+    );
+
+    expect(find.byType(DSButtonWidget), findsOneWidget);
+    await tester.tap(find.text('Email me'));
+    expect(opened, ['mailto:me@x.test']);
+  });
+
+  testWidgets(
+    'should ask the question when a DSSuggestionChips chip is tapped',
+    (tester) async {
+      final asked = <String>[];
+      await _pumpSurface(
+        tester,
+        createAssistantCatalog(onAskQuestion: asked.add),
+        '''
+{"id":"root","component":"DSSuggestionChips","suggestions":["What is Alpha?","  ","Where did you work?"]}''',
+      );
+
+      expect(find.byType(DSButtonWidget), findsNWidgets(2));
+      await tester.tap(find.text('Where did you work?'));
+      expect(asked, ['Where did you work?']);
+    },
+  );
+
+  test(
+    'should add DSSuggestionChips only when a question callback is given',
+    () {
+      expect(
+        createAssistantCatalog().items.map((item) => item.name),
+        isNot(contains('DSSuggestionChips')),
+      );
+      expect(
+        createAssistantCatalog(onAskQuestion: (_) {}).items.map((i) => i.name),
+        contains('DSSuggestionChips'),
+      );
+    },
+  );
 }
 
 Future<List<A2uiMessageEvent>> _feed(
@@ -358,4 +682,27 @@ Future<List<A2uiMessageEvent>> _feed(
     }
     return messages;
   }))!;
+}
+
+Future<void> _pumpSurface(
+  WidgetTester tester,
+  Catalog catalog,
+  String components,
+) async {
+  final controller = SurfaceController(catalogs: [catalog]);
+  addTearDown(controller.dispose);
+  await tester.pumpWidget(
+    TestWidgetWrapper(
+      child: SingleChildScrollView(
+        child: Surface(surfaceContext: controller.contextFor('s')),
+      ),
+    ),
+  );
+  await _feed(tester, controller, [
+    '''
+{"version":"v0.9","createSurface":{"surfaceId":"s","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"s","components":[$components]}}
+''',
+  ]);
+  await tester.pump();
 }
