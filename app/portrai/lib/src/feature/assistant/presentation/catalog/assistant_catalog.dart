@@ -11,10 +11,12 @@ import 'package:portrai/src/feature/assistant/presentation/catalog/item/story_it
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/text_items.dart';
 
 /// The assistant's read-only A2UI vocabulary; no built-in catalog or functions.
-/// [allowedUrls] enables `DSImage` and, with [onOpenLink], `DSLinkButton`;
+/// [allowedUrls] enables `DSImage`; with [onOpenLink], `DSLinkButton` and
+/// `DSContactCard` open only [allowedUrls] and [allowedContactLinks];
 /// [allowedLocations] enables `DSMap`. Each is limited to the values given.
 Catalog createAssistantCatalog({
   Set<String> allowedUrls = const {},
+  Set<String> allowedContactLinks = const {},
   List<AssistantLocation> allowedLocations = const [],
   void Function(String url)? onOpenLink,
 }) => Catalog([
@@ -42,7 +44,16 @@ Catalog createAssistantCatalog({
   dsEducationList,
   createDsProjectCard(allowedUrls),
   if (allowedUrls.isNotEmpty) createDsImage(allowedUrls),
-  if (allowedUrls.isNotEmpty && onOpenLink != null)
-    createDsLinkButton(allowedUrls: allowedUrls, onOpenLink: onOpenLink),
+  if ((allowedUrls.isNotEmpty || allowedContactLinks.isNotEmpty) &&
+      onOpenLink != null) ...[
+    createDsLinkButton(
+      allowedLinks: {...allowedUrls, ...allowedContactLinks},
+      onOpenLink: onOpenLink,
+    ),
+    createDsContactCard(
+      allowedLinks: {...allowedUrls, ...allowedContactLinks},
+      onOpenLink: onOpenLink,
+    ),
+  ],
   if (allowedLocations.isNotEmpty) createDsMap(allowedLocations),
 ], catalogId: 'dev.portrai.assistant');

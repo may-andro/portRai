@@ -22,6 +22,7 @@ const _responseStyleInstruction =
     'DSComparison for a side-by-side table, '
     'DSEducationList for degrees and certificates, '
     'DSProjectCard for a project with tags and a DSLinkButton as its action, '
+    'DSContactCard for ways to get in touch, '
     'DSText variants heading, title, body '
     'and caption for prose. Group with a DSColumn root; use a DSCard only '
     'around a distinct group, and never around a one-line answer. For a '
@@ -37,7 +38,8 @@ const _imageInstruction =
 
 const _linkInstruction =
     ' To let the user open a link use DSLinkButton with a url copied exactly '
-    'from the portfolio information. Never invent or alter a URL.';
+    'from the portfolio information, or mailto:<email> and tel:<phone without '
+    'spaces> for the profile contact details. Never invent or alter a link.';
 
 const _mapInstruction =
     ' To show where the person is based or has worked use DSMap with one '

@@ -174,6 +174,15 @@ void main() {
     expect(
       names(
         createAssistantCatalog(
+          allowedContactLinks: {'mailto:a@b.test'},
+          onOpenLink: (_) {},
+        ),
+      ),
+      containsAll(['DSLinkButton', 'DSContactCard']),
+    );
+    expect(
+      names(
+        createAssistantCatalog(
           allowedUrls: {'https://a.test'},
           onOpenLink: (_) {},
         ),
@@ -591,6 +600,38 @@ void main() {
     expect(find.text('Beta'), findsOneWidget);
     expect(find.text('Flutter'), findsOneWidget);
     expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+  });
+
+  test('should derive mailto and tel links when reading the profile', () {
+    expect(
+      assistantContactLinksFrom(
+        '{"profile":{"email":"me@x.test","phone":"+34 600 111 222"}}',
+      ),
+      {'mailto:me@x.test', 'tel:+34600111222'},
+    );
+    expect(assistantContactLinksFrom('{"profile":{"email":""}}'), isEmpty);
+    expect(assistantContactLinksFrom('not json'), isEmpty);
+  });
+
+  testWidgets('should open only allowed links when DSContactCard is tapped', (
+    tester,
+  ) async {
+    final opened = <String>[];
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(
+        allowedContactLinks: {'mailto:me@x.test'},
+        onOpenLink: opened.add,
+      ),
+      '''
+{"id":"root","component":"DSContactCard","items":[
+  {"kind":"email","label":"Email me","url":"mailto:me@x.test"},
+  {"kind":"phone","label":"Call","url":"tel:+1999"}]}''',
+    );
+
+    expect(find.byType(DSButtonWidget), findsOneWidget);
+    await tester.tap(find.text('Email me'));
+    expect(opened, ['mailto:me@x.test']);
   });
 }
 

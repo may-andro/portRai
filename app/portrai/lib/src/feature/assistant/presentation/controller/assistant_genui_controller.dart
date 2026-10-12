@@ -29,13 +29,17 @@ class AssistantGenuiTurnCancelledException implements Exception {
 class AssistantGenuiController {
   AssistantGenuiController({
     Iterable<String> allowedUrls = const [],
+    Iterable<String> allowedContactLinks = const [],
     List<AssistantLocation> allowedLocations = const [],
     void Function(String url)? onOpenLink,
   }) : supportsImages = allowedUrls.isNotEmpty,
-       supportsLinks = allowedUrls.isNotEmpty && onOpenLink != null,
+       supportsLinks =
+           (allowedUrls.isNotEmpty || allowedContactLinks.isNotEmpty) &&
+           onOpenLink != null,
        supportsMaps = allowedLocations.isNotEmpty,
        _catalog = createAssistantCatalog(
          allowedUrls: allowedUrls.toSet(),
+         allowedContactLinks: allowedContactLinks.toSet(),
          allowedLocations: allowedLocations,
          onOpenLink: onOpenLink,
        ) {

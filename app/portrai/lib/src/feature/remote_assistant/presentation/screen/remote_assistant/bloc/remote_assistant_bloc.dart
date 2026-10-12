@@ -285,6 +285,7 @@ class RemoteAssistantBloc
     if (state.isGenerativeUiEnabled) {
       final controller = AssistantGenuiController(
         allowedUrls: assistantUrlsFrom(state.portfolioContext!),
+        allowedContactLinks: assistantContactLinksFrom(state.portfolioContext!),
         allowedLocations: assistantLocationsFrom(state.portfolioContext!),
         onOpenLink: (url) => add(OpenRemoteAssistantLinkClickEvent(url)),
       );
