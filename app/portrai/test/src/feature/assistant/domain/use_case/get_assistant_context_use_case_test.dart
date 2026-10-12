@@ -105,8 +105,14 @@ void main() {
                 projects: [
                   createProjectEntity(
                     title: 'Stuart',
-                    playStore: 'https://play.google.com/stuart',
-                    appStore: null,
+                    markets: const [
+                      ProjectMarketEntity(
+                        country: 'Spain',
+                        latitude: 40,
+                        longitude: -3,
+                        playStore: 'https://play.google.com/stuart',
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -121,7 +127,7 @@ void main() {
         )['summary'];
         expect(
           summary,
-          contains('Play Store link: https://play.google.com/stuart'),
+          contains('Spain: Play Store link: https://play.google.com/stuart'),
         );
         expect(summary, contains('App Store link: not found'));
       },

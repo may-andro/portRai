@@ -22,13 +22,6 @@ class AvailabilitiesWidget extends StatelessWidget {
         ),
       );
     }
-    _addStoreButtons(
-      context,
-      buttons,
-      website: project.website,
-      appStore: project.appStore,
-      playStore: project.playStore,
-    );
     for (final market in project.markets) {
       _addStoreButtons(
         context,

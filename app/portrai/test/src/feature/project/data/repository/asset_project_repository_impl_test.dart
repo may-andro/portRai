@@ -23,7 +23,6 @@ void main() {
     createProjectEntity(
       id: 'portfolio-admin',
       title: 'Portfolio Admin',
-      website: null,
       github: null,
     ),
   ];

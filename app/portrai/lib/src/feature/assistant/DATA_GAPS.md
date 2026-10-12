@@ -41,6 +41,7 @@ year as an estimate. Review all of them.
 
 ### Projects
 - The MediaMarkt country projects are one project with a `markets` list. Saturn and MediaWorld stay separate.
+- Every project has at least one market. Store links (`appStore`, `playStore`, `website`) live only on the market, and are `null` when not found. `github` stays on the project.
 - Several projects have three or fewer achievements, so "most complex project" has little to go on.
 - `metrics` (`{ label, value }`) holds Google Play download counts (MediaMarkt is the sum of the seven
   country apps, as a lower bound) and the Play Store rating (MediaMarkt uses the German app).

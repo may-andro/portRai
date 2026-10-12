@@ -36,17 +36,15 @@ class GetAssistantContextUseCase
     List<String> digest() {
       String list(List<String> items, [int max = 10]) =>
           items.take(max).join(', ');
-      String store(String? url, [Iterable<String?> others = const []]) =>
-          [url, ...others].any((u) => u != null && u.trim().isNotEmpty)
-          ? 'yes'
-          : 'no';
+      String store(Iterable<String?> urls) =>
+          urls.any((u) => u != null && u.trim().isNotEmpty) ? 'yes' : 'no';
       final profile = portfolio.profile;
       return [
         '${profile.fullName}: ${profile.title}. Email: ${profile.email}. Phone: ${profile.phone}. Based in ${profile.location.city}, ${profile.location.country}.',
         for (final item in portfolio.experiences)
           '${_employmentSummary(item, today)} Location: ${item.location}. ${item.employmentType}. Technologies: ${list(item.technologies)}.',
         for (final item in portfolio.projects)
-          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.playStore, item.markets.map((m) => m.playStore))}. On App Store: ${store(item.appStore, item.markets.map((m) => m.appStore))}. Website: ${store(item.website, item.markets.map((m) => m.website))}. GitHub: ${store(item.github)}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
+          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.markets.map((m) => m.playStore))}. On App Store: ${store(item.markets.map((m) => m.appStore))}. Website: ${store(item.markets.map((m) => m.website))}. GitHub: ${store([item.github])}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
         for (final item in portfolio.expertises)
           'Skills in ${item.title}: ${list(item.skillNames, 15)}.',
         for (final item in portfolio.services) 'Service: ${item.title}.',
@@ -193,9 +191,6 @@ class GetAssistantContextUseCase
               'achievements': item.achievements,
               'teamSize': item.teamSize,
               'role': item.role,
-              'appStore': item.appStore,
-              'playStore': item.playStore,
-              'website': item.website,
               'github': item.github,
               'image': item.image,
               'id': item.id,
@@ -538,16 +533,13 @@ class GetAssistantContextUseCase
     String link(String label, String? url) =>
         '$label: ${url == null || url.trim().isEmpty ? 'not found' : url}';
     return 'Links for the ${item.title} project. '
-        '${link('Play Store link', item.playStore)}. '
-        '${link('App Store link', item.appStore)}. '
-        '${link('Website', item.website)}. '
         '${link('GitHub', item.github)}.'
         '${_marketLinks(item)}';
   }
 
   static String _marketLinks(ProjectEntity item) {
     String link(String label, String? url) =>
-        url == null || url.trim().isEmpty ? '' : ' $label: $url.';
+        ' $label: ${url == null || url.trim().isEmpty ? 'not found' : url}.';
     return item.markets
         .map(
           (market) =>

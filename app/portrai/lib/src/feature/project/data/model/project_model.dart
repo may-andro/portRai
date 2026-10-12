@@ -22,9 +22,6 @@ class ProjectModel {
     required this.role,
     required this.locale,
     this.endDate,
-    this.appStore,
-    this.playStore,
-    this.website,
     this.github,
     this.experienceId,
 
@@ -50,9 +47,6 @@ class ProjectModel {
   final String role;
   final String startDate;
   final String? endDate;
-  final String? appStore;
-  final String? playStore;
-  final String? website;
   final String? github;
   final List<ProjectMarketModel> markets;
   final List<ProjectMetricModel> metrics;

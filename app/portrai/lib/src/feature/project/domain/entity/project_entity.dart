@@ -13,9 +13,6 @@ class ProjectEntity extends Equatable {
     required this.startDate,
     required this.endDate,
     required this.image,
-    required this.appStore,
-    required this.playStore,
-    required this.website,
     required this.github,
     required this.features,
     required this.achievements,
@@ -36,9 +33,6 @@ class ProjectEntity extends Equatable {
   final DateTime startDate;
   final DateTime? endDate;
   final String image;
-  final String? appStore;
-  final String? playStore;
-  final String? website;
   final String? github;
   final List<String> features;
   final List<String> achievements;
@@ -64,9 +58,6 @@ class ProjectEntity extends Equatable {
     startDate,
     endDate,
     image,
-    appStore,
-    playStore,
-    website,
     github,
     features,
     achievements,

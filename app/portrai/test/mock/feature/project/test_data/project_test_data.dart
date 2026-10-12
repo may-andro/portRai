@@ -9,9 +9,6 @@ ProjectEntity createProjectEntity({
   String title = 'PortRai 🚀',
   DateTime? endDate,
   bool hasEndDate = true,
-  String? appStore = 'https://example.com/app-store',
-  String? playStore = 'https://example.com/play-store',
-  String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
 }) {
   return ProjectEntity(
@@ -29,9 +26,6 @@ ProjectEntity createProjectEntity({
     status: 'active',
     startDate: DateTime(2024),
     endDate: hasEndDate ? endDate ?? DateTime(2025, 3) : null,
-    appStore: appStore,
-    playStore: playStore,
-    website: website,
     github: github,
     features: const ['Localization', 'Tracking'],
     achievements: const ['Launched to production'],
@@ -45,9 +39,6 @@ ProjectModel createProjectModel({
   String id = 'port-rai',
   String title = 'PortRai 🚀',
   String? endDate = '2025-03-01T00:00:00.000',
-  String? appStore = 'https://example.com/app-store',
-  String? playStore = 'https://example.com/play-store',
-  String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
 }) {
   return ProjectModel(
@@ -62,9 +53,6 @@ ProjectModel createProjectModel({
     status: 'active',
     startDate: '2024-01-01T00:00:00.000',
     endDate: endDate,
-    appStore: appStore,
-    playStore: playStore,
-    website: website,
     github: github,
     features: const ['Localization', 'Tracking'],
     achievements: const ['Launched to production'],
@@ -79,9 +67,6 @@ Map<String, dynamic> createProjectJson({
   String id = 'port-rai',
   String title = 'PortRai 🚀',
   String? endDate = '2025-03-01T00:00:00.000',
-  String? appStore = 'https://example.com/app-store',
-  String? playStore = 'https://example.com/play-store',
-  String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
 }) {
   return createProjectModel(
@@ -89,9 +74,6 @@ Map<String, dynamic> createProjectJson({
     id: id,
     title: title,
     endDate: endDate,
-    appStore: appStore,
-    playStore: playStore,
-    website: website,
     github: github,
   ).toJson();
 }
@@ -114,7 +96,6 @@ List<Map<String, dynamic>> createProjectListJson({String locale = 'en'}) {
       locale: locale,
       id: 'portfolio-admin',
       title: 'Portfolio Admin',
-      website: null,
       github: null,
     ),
   ];
