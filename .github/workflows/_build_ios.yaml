@@ -27,6 +27,9 @@ on:
       FIREBASE_OPTIONS:
         description: Firebase options file content
         required: true
+      MAPS_API_KEY:
+        description: Google Maps API key for the iOS build
+        required: false
       GOOGLE_SERVICES_PLIST:
         description: Base64 encoded GoogleService-Info.plist for Firebase
         required: true
@@ -159,7 +162,9 @@ jobs:
           BUILD_NUMBER: ${{ inputs.build-number }}
           BUILD_TYPE: ${{ inputs.build-type }}
           BUILD_ENV: ${{ inputs.build-type == 'production' && 'prod' || 'staging' }}
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: |
+          printf 'MAPS_API_KEY = %s\n' "$MAPS_API_KEY" > ios/Flutter/Secrets.xcconfig
           # Build the archive first; Xcode signs the app during IPA export.
           flutter build ipa --release --no-codesign \
             --dart-define="build_env=$BUILD_ENV" \

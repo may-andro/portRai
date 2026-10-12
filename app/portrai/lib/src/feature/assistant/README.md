@@ -287,3 +287,5 @@ Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md)
 | Web | Maps JavaScript API | Websites: HTTP referrers such as `https://<domain>/*` and `http://localhost:*/*` for local runs | Replace `MAPS_API_KEY` in the script URL in `web/index.html` at build time |
 
 Get an Android SHA-1 with `keytool -list -v -alias <alias> -keystore <keystore>` or `./gradlew signingReport` in `android`. The debug keystore is `~/.android/debug.keystore` with alias `androiddebugkey` and password `android`.
+
+CI reads the Android and iOS keys from the `MAPS_API_KEY_ANDROID` and `MAPS_API_KEY_IOS` repository secrets and passes them to the build workflows as `MAPS_API_KEY`.

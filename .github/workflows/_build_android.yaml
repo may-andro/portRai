@@ -26,6 +26,9 @@ on:
     secrets:
       FIREBASE_OPTIONS:
         required: true
+      MAPS_API_KEY:
+        description: Google Maps API key for the Android build
+        required: false
       ANDROID_KEYSTORE_BASE64:
         description: Base64 encoded Android keystore file
         required: true
@@ -102,11 +105,15 @@ jobs:
       - name: Build APK (Preview)
         if: ${{ inputs.build-type == 'preview' }}
         working-directory: ${{ inputs.app-path }}
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: flutter build apk --release --dart-define=build_env=staging --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
 
       - name: Build AAB (Production)
         if: ${{ inputs.build-type == 'production' }}
         working-directory: ${{ inputs.app-path }}
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: flutter build appbundle --release --dart-define=build_env=prod --build-name=${{ inputs.version }} --build-number=${{ inputs.build-number }}
 
       - name: Upload APK artifact (Preview)
