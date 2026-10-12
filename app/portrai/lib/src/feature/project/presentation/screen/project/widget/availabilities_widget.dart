@@ -13,15 +13,6 @@ class AvailabilitiesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final buttons = <Widget>[];
 
-    if (project.github case final String github) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectGitHub,
-          icon: Icons.code,
-          url: github,
-        ),
-      );
-    }
     for (final market in project.markets) {
       _addStoreButtons(
         context,
@@ -29,6 +20,7 @@ class AvailabilitiesWidget extends StatelessWidget {
         website: market.website,
         appStore: market.appStore,
         playStore: market.playStore,
+        github: market.github,
         country: market.country,
       );
     }
@@ -47,10 +39,20 @@ void _addStoreButtons(
   required String? website,
   required String? appStore,
   required String? playStore,
+  required String? github,
   String? country,
 }) {
   String label(String text) => country == null ? text : '$text · $country';
 
+  if (github != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectGitHub),
+        icon: Icons.code,
+        url: github,
+      ),
+    );
+  }
   if (website != null) {
     buttons.add(
       _ButtonWidget(

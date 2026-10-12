@@ -22,7 +22,6 @@ class ProjectModel {
     required this.role,
     required this.locale,
     this.endDate,
-    this.github,
     this.experienceId,
 
     this.markets = const [],
@@ -47,7 +46,6 @@ class ProjectModel {
   final String role;
   final String startDate;
   final String? endDate;
-  final String? github;
   final List<ProjectMarketModel> markets;
   final List<ProjectMetricModel> metrics;
   final String locale;

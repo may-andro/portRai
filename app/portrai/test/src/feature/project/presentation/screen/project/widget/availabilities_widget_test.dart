@@ -23,6 +23,7 @@ void main() {
               appStore: 'https://example.com/app-store',
               playStore: 'https://example.com/play-store',
               website: 'https://example.com/website',
+              github: 'https://github.com/example/portrai',
             ),
           ],
         );
@@ -37,19 +38,19 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('GitHub'), findsOneWidget);
+        expect(find.text('GitHub · Spain'), findsOneWidget);
         expect(find.text('Website · Spain'), findsOneWidget);
         expect(find.text('App Store · Spain'), findsOneWidget);
         expect(find.text('Play Store · Spain'), findsOneWidget);
 
-        await tester.tap(find.text('GitHub'));
+        await tester.tap(find.text('GitHub · Spain'));
         await tester.pump();
 
         verify(
           () => bloc.add(
             const OpenExternalUrlEvent(
               url: 'https://github.com/example/portrai',
-              label: 'GitHub',
+              label: 'GitHub · Spain',
             ),
           ),
         ).called(1);
@@ -72,7 +73,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('GitHub'), findsOneWidget);
+      expect(find.textContaining('GitHub'), findsNothing);
       expect(find.textContaining('Website'), findsNothing);
       expect(find.textContaining('App Store'), findsNothing);
       expect(find.textContaining('Play Store'), findsNothing);

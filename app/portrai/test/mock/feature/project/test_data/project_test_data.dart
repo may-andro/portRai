@@ -9,7 +9,6 @@ ProjectEntity createProjectEntity({
   String title = 'PortRai 🚀',
   DateTime? endDate,
   bool hasEndDate = true,
-  String? github = 'https://github.com/example/portrai',
 }) {
   return ProjectEntity(
     id: id,
@@ -26,7 +25,6 @@ ProjectEntity createProjectEntity({
     status: 'active',
     startDate: DateTime(2024),
     endDate: hasEndDate ? endDate ?? DateTime(2025, 3) : null,
-    github: github,
     features: const ['Localization', 'Tracking'],
     achievements: const ['Launched to production'],
     teamSize: 3,
@@ -39,7 +37,6 @@ ProjectModel createProjectModel({
   String id = 'port-rai',
   String title = 'PortRai 🚀',
   String? endDate = '2025-03-01T00:00:00.000',
-  String? github = 'https://github.com/example/portrai',
 }) {
   return ProjectModel(
     id: id,
@@ -53,7 +50,6 @@ ProjectModel createProjectModel({
     status: 'active',
     startDate: '2024-01-01T00:00:00.000',
     endDate: endDate,
-    github: github,
     features: const ['Localization', 'Tracking'],
     achievements: const ['Launched to production'],
     teamSize: 3,
@@ -67,14 +63,12 @@ Map<String, dynamic> createProjectJson({
   String id = 'port-rai',
   String title = 'PortRai 🚀',
   String? endDate = '2025-03-01T00:00:00.000',
-  String? github = 'https://github.com/example/portrai',
 }) {
   return createProjectModel(
     locale: locale,
     id: id,
     title: title,
     endDate: endDate,
-    github: github,
   ).toJson();
 }
 
@@ -96,7 +90,6 @@ List<Map<String, dynamic>> createProjectListJson({String locale = 'en'}) {
       locale: locale,
       id: 'portfolio-admin',
       title: 'Portfolio Admin',
-      github: null,
     ),
   ];
 }

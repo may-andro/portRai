@@ -11,6 +11,7 @@ class ProjectMarketModel {
     this.appStore,
     this.playStore,
     this.website,
+    this.github,
   });
 
   factory ProjectMarketModel.fromJson(Map<String, dynamic> json) =>
@@ -22,6 +23,7 @@ class ProjectMarketModel {
   final String? appStore;
   final String? playStore;
   final String? website;
+  final String? github;
 
   Map<String, dynamic> toJson() => _$ProjectMarketModelToJson(this);
 }

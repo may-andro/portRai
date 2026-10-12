@@ -21,7 +21,6 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       startDate: entity.startDate.toIso8601String(),
       endDate: entity.endDate?.toIso8601String(),
       image: entity.image,
-      github: entity.github,
       features: entity.features,
       achievements: entity.achievements,
       teamSize: entity.teamSize,
@@ -37,6 +36,7 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
             appStore: market.appStore,
             playStore: market.playStore,
             website: market.website,
+            github: market.github,
           ),
       ],
       metrics: [
@@ -59,7 +59,6 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       startDate: DateTime.parse(model.startDate),
       endDate: model.endDate != null ? DateTime.parse(model.endDate!) : null,
       image: model.image,
-      github: model.github,
       features: model.features,
       achievements: model.achievements,
       teamSize: model.teamSize,
@@ -75,6 +74,7 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
             appStore: market.appStore,
             playStore: market.playStore,
             website: market.website,
+            github: market.github,
           ),
       ],
       metrics: [

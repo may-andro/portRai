@@ -15,7 +15,7 @@ class ProjectCache extends DBCache<ProjectModel> {
   String get tableName => 'project_table';
 
   @override
-  int get tableVersion => 3;
+  int get tableVersion => 4;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -28,7 +28,6 @@ class ProjectCache extends DBCache<ProjectModel> {
     const DbColumnDefinition(name: 'startDate', nullable: false),
     const DbColumnDefinition(name: 'endDate'),
     const DbColumnDefinition(name: 'image', nullable: false),
-    const DbColumnDefinition(name: 'github'),
     const DbColumnDefinition(name: 'features', nullable: false),
     const DbColumnDefinition(name: 'achievements', nullable: false),
     const DbColumnDefinition(

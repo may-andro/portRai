@@ -17,11 +17,7 @@ void main() {
   final mapper = ProjectMapper(appLocale: appLocale);
   final projects = [
     createProjectEntity(),
-    createProjectEntity(
-      id: 'portfolio-admin',
-      title: 'Portfolio Admin',
-      github: null,
-    ),
+    createProjectEntity(id: 'portfolio-admin', title: 'Portfolio Admin'),
   ];
   final firestoreDocument = {'projects': createProjectListJson()};
 

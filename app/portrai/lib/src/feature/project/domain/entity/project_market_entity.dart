@@ -9,6 +9,7 @@ class ProjectMarketEntity extends Equatable {
     this.appStore,
     this.playStore,
     this.website,
+    this.github,
   });
 
   final String country;
@@ -17,6 +18,7 @@ class ProjectMarketEntity extends Equatable {
   final String? appStore;
   final String? playStore;
   final String? website;
+  final String? github;
 
   @override
   List<Object?> get props => [
@@ -26,5 +28,6 @@ class ProjectMarketEntity extends Equatable {
     appStore,
     playStore,
     website,
+    github,
   ];
 }

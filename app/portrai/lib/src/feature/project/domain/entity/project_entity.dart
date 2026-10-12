@@ -13,7 +13,6 @@ class ProjectEntity extends Equatable {
     required this.startDate,
     required this.endDate,
     required this.image,
-    required this.github,
     required this.features,
     required this.achievements,
     required this.teamSize,
@@ -33,7 +32,6 @@ class ProjectEntity extends Equatable {
   final DateTime startDate;
   final DateTime? endDate;
   final String image;
-  final String? github;
   final List<String> features;
   final List<String> achievements;
   final int teamSize;
@@ -58,7 +56,6 @@ class ProjectEntity extends Equatable {
     startDate,
     endDate,
     image,
-    github,
     features,
     achievements,
     teamSize,

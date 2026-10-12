@@ -44,7 +44,7 @@ class GetAssistantContextUseCase
         for (final item in portfolio.experiences)
           '${_employmentSummary(item, today)} Location: ${item.location}. ${item.employmentType}. Technologies: ${list(item.technologies)}.',
         for (final item in portfolio.projects)
-          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.markets.map((m) => m.playStore))}. On App Store: ${store(item.markets.map((m) => m.appStore))}. Website: ${store(item.markets.map((m) => m.website))}. GitHub: ${store([item.github])}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
+          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.markets.map((m) => m.playStore))}. On App Store: ${store(item.markets.map((m) => m.appStore))}. Website: ${store(item.markets.map((m) => m.website))}. GitHub: ${store(item.markets.map((m) => m.github))}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
         for (final item in portfolio.expertises)
           'Skills in ${item.title}: ${list(item.skillNames, 15)}.',
         for (final item in portfolio.services) 'Service: ${item.title}.',
@@ -191,7 +191,6 @@ class GetAssistantContextUseCase
               'achievements': item.achievements,
               'teamSize': item.teamSize,
               'role': item.role,
-              'github': item.github,
               'image': item.image,
               'id': item.id,
               'experienceId': item.experienceId,
@@ -206,6 +205,7 @@ class GetAssistantContextUseCase
                       'appStore': market.appStore,
                       'playStore': market.playStore,
                       'website': market.website,
+                      'github': market.github,
                     },
                 ],
               if (item.metrics.isNotEmpty)
@@ -530,11 +530,7 @@ class GetAssistantContextUseCase
   // Links are written out, with an explicit "not found" for missing ones, so
   // the model never has to hunt through null fields or guess a URL.
   static String _projectLinks(ProjectEntity item) {
-    String link(String label, String? url) =>
-        '$label: ${url == null || url.trim().isEmpty ? 'not found' : url}';
-    return 'Links for the ${item.title} project. '
-        '${link('GitHub', item.github)}.'
-        '${_marketLinks(item)}';
+    return 'Links for the ${item.title} project.${_marketLinks(item)}';
   }
 
   static String _marketLinks(ProjectEntity item) {
@@ -546,7 +542,8 @@ class GetAssistantContextUseCase
               ' ${market.country}:'
               '${link('Play Store link', market.playStore)}'
               '${link('App Store link', market.appStore)}'
-              '${link('Website', market.website)}',
+              '${link('Website', market.website)}'
+              '${link('GitHub', market.github)}',
         )
         .join();
   }
