@@ -34,6 +34,7 @@ void main() {
       'DSProgressRing',
       'DSCodeBlock',
       'DSComparison',
+      'DSEducationList',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -554,6 +555,21 @@ void main() {
     expect(find.text('Flutter'), findsOneWidget);
     expect(find.text('Years'), findsOneWidget);
     expect(find.text('UI'), findsOneWidget);
+  });
+
+  testWidgets('should render each entry when DSEducationList is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSEducationList","entries":[
+  {"institution":"UPC","degree":"BSc Computer Science","period":"2012 - 2016"},
+  {"institution":"Google"}]}''');
+
+    expect(find.text('UPC'), findsOneWidget);
+    expect(find.text('BSc Computer Science'), findsOneWidget);
+    expect(find.text('2012 - 2016'), findsOneWidget);
+    expect(find.text('Google'), findsOneWidget);
+    expect(find.byIcon(Icons.school_outlined), findsNWidgets(2));
   });
 }
 

@@ -255,3 +255,70 @@ final dsQuote = CatalogItem(
     );
   },
 );
+
+final dsEducationList = CatalogItem(
+  name: 'DSEducationList',
+  dataSchema: S.object(
+    description: 'A list of degrees or certificates, each with a school icon.',
+    properties: {
+      'entries': S.list(
+        description: 'At most six entries.',
+        items: S.object(
+          properties: {
+            'institution': S.string(description: 'School or issuer.'),
+            'degree': S.string(description: 'Degree, field or certificate.'),
+            'period': S.string(description: 'For example 2012 - 2016.'),
+          },
+          required: ['institution'],
+        ),
+      ),
+    },
+    required: ['entries'],
+  ),
+  widgetBuilder: (itemContext) {
+    final entries = _entries((itemContext.data as JsonMap)['entries'], 6);
+    return Builder(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.space(factor: 1.25),
+        children: [
+          for (final entry in entries)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: context.space(factor: 1.25),
+              children: [
+                Icon(
+                  Icons.school_outlined,
+                  color: context.colorPalette.brand.primary.color,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DSTextWidget(
+                        '${entry['institution'] ?? ''}',
+                        style: context.typography.emphasizedTitleMedium,
+                        color: context.colorPalette.neutral.grey9,
+                      ),
+                      if (entry['degree'] is String)
+                        DSTextWidget(
+                          '${entry['degree']}',
+                          style: context.typography.bodyMedium,
+                          color: context.colorPalette.neutral.grey9,
+                        ),
+                      if (entry['period'] is String)
+                        DSTextWidget(
+                          '${entry['period']}',
+                          style: context.typography.bodySmall,
+                          color: context.colorPalette.neutral.grey7,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  },
+);
