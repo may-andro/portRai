@@ -1,9 +1,12 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:genui/genui.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
+
+part 'assistant_genui_surface_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
@@ -71,6 +74,35 @@ class ContentWidget extends StatelessWidget {
                     onSubmit: (question) => context.bloc.add(
                       SendRemoteAssistantQuestionClickEvent(question),
                     ),
+                    messageContentBuilder: (context, message, index) {
+                      final surfaces = state.genuiSurfaces
+                          .where((surface) => surface.messageIndex == index)
+                          .toList();
+                      if (message.isUser || surfaces.isEmpty) return null;
+                      final text = switch (message.content) {
+                        AssistantTextResponseEntity(:final text) => text.trim(),
+                      };
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (text.isNotEmpty)
+                            DSTextWidget(
+                              text,
+                              color: context.colorPalette.surface.onSurface,
+                              style: context.typography.bodyMedium,
+                            ),
+                          for (final surface in surfaces)
+                            _AssistantGenuiSurfaceWidget(
+                              key: ValueKey((
+                                surface.session,
+                                surface.surfaceId,
+                              )),
+                              session: surface.session,
+                              surfaceId: surface.surfaceId,
+                            ),
+                        ],
+                      );
+                    },
                     header: state.isSendingQuestion
                         ? DSTextWidget(
                             context.localizations.remoteAssistantGenerating,

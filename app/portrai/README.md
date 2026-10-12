@@ -137,6 +137,11 @@ The shared conversation widget renders streamed text as provisional until genera
 successfully. Failed partial answers are discarded and never become future provider history.
 Disable/reset invalidate pending output. They stop local consumption and close the owned
 transport; they cannot guarantee that server generation or billing stops.
+`feature_remote_assistant_generative_ui` independently enables the official GenUI parser and
+the app's read-only `DSText`/`DSCard` catalog. When disabled, remote answers retain the existing
+plain-text conversation path. GenUI text events and parsed surfaces stay in their originating
+turn; A2UI protocol chunks are not rendered as chat text. The mode is limited to the design-system
+catalog and is not a project-card, navigation, or action channel.
 Question content and generated text are excluded from remote request/state logging and analytics.
 Actionable Firebase service error messages (such as depleted credits, disabled APIs, or
 unavailable models) appear below the localized error description. These explicit backend
@@ -288,6 +293,7 @@ Feature flags are managed through Firebase Remote Config:
 - Keys defined in `lib/core/config/feature_flags.dart`
 - `feature_ai_assistant` (default off) shows the on-device AI assistant in Settings and on the portfolio when turned on
 - `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
+- `feature_remote_assistant_generative_ui` (default off) enables parsed, read-only design-system text and card surfaces in remote answers
 
 ## Dependencies
 

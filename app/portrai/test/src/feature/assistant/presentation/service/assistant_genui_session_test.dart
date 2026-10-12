@@ -93,7 +93,7 @@ void main() {
           ChatMessage.user('Question'),
           generate: (_, _, _) async => throw error,
         ),
-        throwsA(same(error)),
+        throwsA(isA<AssistantGenuiResponseException>()),
       );
       await expectLater(
         session.send(
@@ -102,13 +102,13 @@ void main() {
             onDelta('{"version":"v0.9","createSurface":{}}');
           },
         ),
-        throwsA(isA<A2uiValidationException>()),
+        throwsA(isA<AssistantGenuiResponseException>()),
       );
     },
   );
 
   testWidgets(
-    'should expose controller errors without resending when components are invalid',
+    'should surface framework validation errors without exposing generated payloads',
     (tester) async {
       final session = AssistantGenuiSession();
       addTearDown(session.dispose);
@@ -116,22 +116,25 @@ void main() {
       final subscription = session.controller.onSubmit.listen(errors.add);
       addTearDown(subscription.cancel);
       var requests = 0;
-      await tester.runAsync(() async {
-        await session.send(
-          ChatMessage.user('Question'),
-          generate: (_, _, onDelta) async {
-            requests++;
-            onDelta(_surface.replaceFirst('"DSText"', '"Image"'));
-          },
-        );
+      final error = await tester.runAsync<Object?>(() async {
+        try {
+          await session.send(
+            ChatMessage.user('Question'),
+            generate: (_, _, onDelta) async {
+              requests++;
+              onDelta(_surface.replaceFirst('"DSText"', '"Image"'));
+            },
+          );
+          return null;
+        } catch (e) {
+          return e;
+        }
       });
+      expect(error, isA<AssistantGenuiResponseException>());
       await tester.pumpAndSettle();
       expect(requests, 1);
       expect(errors, isNotEmpty);
-      expect(
-        errors.expand((e) => e.parts.uiInteractionParts).first.interaction,
-        contains('VALIDATION_FAILED'),
-      );
+      expect(errors.toString(), isNot(contains('Image')));
     },
   );
 
@@ -157,7 +160,10 @@ void main() {
           session.send(ChatMessage.user('Busy'), generate: (_, _, _) async {}),
           throwsStateError,
         );
-        final expectation = expectLater(pending, throwsStateError);
+        final expectation = expectLater(
+          pending,
+          throwsA(isA<AssistantGenuiTurnCancelledException>()),
+        );
         if (dispose) {
           session.dispose();
         } else {

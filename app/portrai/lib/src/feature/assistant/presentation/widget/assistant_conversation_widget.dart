@@ -16,6 +16,7 @@ class AssistantConversationWidget extends StatefulWidget {
     this.header,
     required this.onSubmit,
     this.errorText,
+    this.messageContentBuilder,
   });
 
   final List<AssistantMessageEntity> messages;
@@ -23,6 +24,12 @@ class AssistantConversationWidget extends StatefulWidget {
   final Widget? header;
   final ValueChanged<String> onSubmit;
   final String? errorText;
+  final Widget? Function(
+    BuildContext context,
+    AssistantMessageEntity message,
+    int index,
+  )?
+  messageContentBuilder;
 
   @override
   State<AssistantConversationWidget> createState() =>
@@ -96,7 +103,15 @@ class _AssistantConversationWidgetState
                             child: DSLoadingWidget(size: 28),
                           );
                         }
-                        return _MessageBubble(message: widget.messages[index]);
+                        final message = widget.messages[index];
+                        return _MessageBubble(
+                          message: message,
+                          content: widget.messageContentBuilder?.call(
+                            context,
+                            message,
+                            index,
+                          ),
+                        );
                       },
                     ),
             ),

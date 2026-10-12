@@ -52,6 +52,9 @@ void main() {
         () => registry.register(RemoteAssistantFeatureFlags.remoteAssistant),
       ).called(1);
       verify(
+        () => registry.register(RemoteAssistantFeatureFlags.generativeUi),
+      ).called(1);
+      verify(
         () => routes.register(RemoteAssistantModuleRoute.assistant),
       ).called(1);
     },

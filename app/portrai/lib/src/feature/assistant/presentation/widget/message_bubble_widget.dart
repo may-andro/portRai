@@ -1,16 +1,17 @@
 part of 'assistant_conversation_widget.dart';
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message});
+  const _MessageBubble({required this.message, this.content});
 
   final AssistantMessageEntity message;
+  final Widget? content;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final isUser = message.isUser;
     final text = switch (message.content) {
-      AssistantTextResponseEntity(:final text) => text,
+      AssistantTextResponseEntity(:final text) => text.trim(),
     };
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -28,13 +29,15 @@ class _MessageBubble extends StatelessWidget {
                 horizontal: context.space(factor: 1.75),
                 vertical: context.space(factor: 1.25),
               ),
-              child: DSTextWidget(
-                text,
-                color: isUser
-                    ? palette.brand.onPrimaryContainer
-                    : palette.surface.onSurface,
-                style: context.typography.bodyMedium,
-              ),
+              child:
+                  content ??
+                  DSTextWidget(
+                    text,
+                    color: isUser
+                        ? palette.brand.onPrimaryContainer
+                        : palette.surface.onSurface,
+                    style: context.typography.bodyMedium,
+                  ),
             ),
           ),
         ),
