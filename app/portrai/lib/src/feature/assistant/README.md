@@ -282,7 +282,7 @@ Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md)
 
 | Platform | API restriction (enable the API first under Library) | Application restriction | Where the key goes |
 |---|---|---|---|
-| Android | Maps SDK for Android | Android apps: package `com.mayandro.portrai` plus one SHA-1 per signing key (debug, release, Play App Signing) | `MAPS_API_KEY` in `~/.gradle/gradle.properties`, or the `MAPS_API_KEY` environment variable |
+| Android | Maps SDK for Android | Android apps: package `com.mayandro.portrai` plus one SHA-1 per signing key (debug, release, Play App Signing) | `portRaiMapKeyAndroid` in `~/.gradle/gradle.properties`, or the `MAPS_API_KEY` environment variable |
 | iOS | Maps SDK for iOS | iOS apps: bundle ID of the Runner target | `MAPS_API_KEY = <key>` in the git-ignored `ios/Flutter/Secrets.xcconfig` |
 | Web | Maps JavaScript API | Websites: HTTP referrers such as `https://<domain>/*` and `http://localhost:*/*` for local runs | Replace `MAPS_API_KEY` in the script URL in `web/index.html` at build time |
 
