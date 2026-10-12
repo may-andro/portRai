@@ -2,7 +2,7 @@
   "en": {
     "experties": [
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=flutter",
+        "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Flutter Development",
         "skills": [
           {
@@ -44,7 +44,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=android",
+        "image": "https://picsum.photos/seed/android/400/400",
         "title": "Native Android Development",
         "skills": [
           {
@@ -74,7 +74,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=diagramsdotnet",
+        "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Architecture & Patterns",
         "skills": [
           {
@@ -110,7 +110,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=speedtest",
+        "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Performance Optimization",
         "skills": [
           {
@@ -134,7 +134,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=firebase",
+        "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Backend Integration",
         "skills": [
           {
@@ -164,7 +164,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=testinglibrary",
+        "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Testing & QA",
         "skills": [
           {
@@ -188,7 +188,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=githubactions",
+        "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Release & Deployment",
         "skills": [
           {
@@ -212,7 +212,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=googlegemini",
+        "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "AI & Generative UI",
         "skills": [
           {
@@ -241,7 +241,7 @@
   "es": {
     "experties": [
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=flutter",
+        "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Desarrollo con Flutter",
         "skills": [
           {
@@ -283,7 +283,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=android",
+        "image": "https://picsum.photos/seed/android/400/400",
         "title": "Desarrollo nativo Android",
         "skills": [
           {
@@ -313,7 +313,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=diagramsdotnet",
+        "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Arquitectura y patrones",
         "skills": [
           {
@@ -349,7 +349,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=speedtest",
+        "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Optimización del rendimiento",
         "skills": [
           {
@@ -373,7 +373,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=firebase",
+        "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Integración con backend",
         "skills": [
           {
@@ -403,7 +403,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=testinglibrary",
+        "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Pruebas y QA",
         "skills": [
           {
@@ -427,7 +427,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=githubactions",
+        "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Lanzamiento y despliegue",
         "skills": [
           {
@@ -451,7 +451,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=googlegemini",
+        "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "IA e interfaces generativas",
         "skills": [
           {
@@ -480,7 +480,7 @@
   "nl": {
     "experties": [
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=flutter",
+        "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Flutter-ontwikkeling",
         "skills": [
           {
@@ -522,7 +522,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=android",
+        "image": "https://picsum.photos/seed/android/400/400",
         "title": "Native Android-ontwikkeling",
         "skills": [
           {
@@ -552,7 +552,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=diagramsdotnet",
+        "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Architectuur & patronen",
         "skills": [
           {
@@ -588,7 +588,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=speedtest",
+        "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Performance-optimalisatie",
         "skills": [
           {
@@ -612,7 +612,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=firebase",
+        "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Backend-integratie",
         "skills": [
           {
@@ -642,7 +642,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=testinglibrary",
+        "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Testen & QA",
         "skills": [
           {
@@ -666,7 +666,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=githubactions",
+        "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Release & deployment",
         "skills": [
           {
@@ -690,7 +690,7 @@
         ]
       },
       {
-        "image": "https://api.dicebear.com/9.x/icons/png?seed=googlegemini",
+        "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "AI & generatieve UI",
         "skills": [
           {

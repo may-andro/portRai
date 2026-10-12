@@ -6,7 +6,7 @@
       "subtitle": "Flutter Architect · On-Device AI Pioneer",
       "email": "nova.lindqvist@example.com",
       "phone": "+31-612345678",
-      "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=nova-lindqvist",
+      "profileImage": "https://picsum.photos/seed/nova-lindqvist/400/400",
       "coverImage": "https://picsum.photos/seed/nova-cover/1600/600",
       "summary": "Principal engineer with 12+ years building delightful, scalable mobile products. I blend Flutter architecture, design systems and on-device AI to ship apps people love.",
       "detailedBio": "I started as a native Android developer, fell in love with Flutter in its early days and never looked back. Today I lead mobile platform teams, design modular architectures and prototype generative-UI experiences that run fully on device. I mentor engineers, speak at community meetups and open-source tooling that makes teams faster.",
@@ -16,17 +16,17 @@
         {
           "name": "Website",
           "url": "https://nova.example.com/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
+          "image": "https://picsum.photos/seed/googlechrome/400/400"
         },
         {
           "name": "Play Store",
           "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googleplay"
+          "image": "https://picsum.photos/seed/googleplay/400/400"
         },
         {
           "name": "App Store",
           "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=appstore"
+          "image": "https://picsum.photos/seed/appstore/400/400"
         }
       ],
       "resume": {
@@ -38,17 +38,17 @@
         {
           "name": "Github",
           "url": "https://github.com/nova-lindqvist",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=github"
+          "image": "https://picsum.photos/seed/github/400/400"
         },
         {
           "name": "LinkedIn",
           "url": "https://www.linkedin.com/in/nova-lindqvist/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=linkedin"
+          "image": "https://picsum.photos/seed/linkedin/400/400"
         },
         {
           "name": "Portfolio",
           "url": "https://nova.example.com/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
+          "image": "https://picsum.photos/seed/googlechrome/400/400"
         }
       ],
       "availability": {
@@ -103,7 +103,7 @@
           "field": "Human-Computer Interaction",
           "startDate": "2011-09-01",
           "endDate": "2013-06-30",
-          "image": "https://api.dicebear.com/9.x/shapes/png?seed=nlit",
+          "image": "https://picsum.photos/seed/nlit/400/400",
           "url": "https://nlit.example.edu/",
           "location": "Stockholm, Sweden"
         }
@@ -119,7 +119,7 @@
       "subtitle": "Arquitecta Flutter · Pionera en IA en el dispositivo",
       "email": "nova.lindqvist@example.com",
       "phone": "+31-612345678",
-      "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=nova-lindqvist",
+      "profileImage": "https://picsum.photos/seed/nova-lindqvist/400/400",
       "coverImage": "https://picsum.photos/seed/nova-cover/1600/600",
       "summary": "Ingeniera principal con más de 12 años creando productos móviles escalables y atractivos. Combino arquitectura Flutter, sistemas de diseño e IA en el dispositivo para lanzar apps que enamoran.",
       "detailedBio": "Empecé como desarrolladora nativa de Android, me enamoré de Flutter en sus primeros días y nunca miré atrás. Hoy lidero equipos de plataforma móvil, diseño arquitecturas modulares y prototipo experiencias de UI generativa que se ejecutan por completo en el dispositivo. Mentorizo ingenieros, doy charlas en comunidades y publico herramientas de código abierto que aceleran a los equipos.",
@@ -129,17 +129,17 @@
         {
           "name": "Website",
           "url": "https://nova.example.com/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
+          "image": "https://picsum.photos/seed/googlechrome/400/400"
         },
         {
           "name": "Play Store",
           "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googleplay"
+          "image": "https://picsum.photos/seed/googleplay/400/400"
         },
         {
           "name": "App Store",
           "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=appstore"
+          "image": "https://picsum.photos/seed/appstore/400/400"
         }
       ],
       "resume": {
@@ -151,17 +151,17 @@
         {
           "name": "Github",
           "url": "https://github.com/nova-lindqvist",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=github"
+          "image": "https://picsum.photos/seed/github/400/400"
         },
         {
           "name": "LinkedIn",
           "url": "https://www.linkedin.com/in/nova-lindqvist/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=linkedin"
+          "image": "https://picsum.photos/seed/linkedin/400/400"
         },
         {
           "name": "Portfolio",
           "url": "https://nova.example.com/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
+          "image": "https://picsum.photos/seed/googlechrome/400/400"
         }
       ],
       "availability": {
@@ -216,7 +216,7 @@
           "field": "Interacción Persona-Ordenador",
           "startDate": "2011-09-01",
           "endDate": "2013-06-30",
-          "image": "https://api.dicebear.com/9.x/shapes/png?seed=nlit",
+          "image": "https://picsum.photos/seed/nlit/400/400",
           "url": "https://nlit.example.edu/",
           "location": "Stockholm, Sweden"
         }
@@ -232,7 +232,7 @@
       "subtitle": "Flutter-architect · Pionier in on-device AI",
       "email": "nova.lindqvist@example.com",
       "phone": "+31-612345678",
-      "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=nova-lindqvist",
+      "profileImage": "https://picsum.photos/seed/nova-lindqvist/400/400",
       "coverImage": "https://picsum.photos/seed/nova-cover/1600/600",
       "summary": "Principal engineer met meer dan 12 jaar ervaring in het bouwen van schaalbare, prettige mobiele producten. Ik combineer Flutter-architectuur, designsystemen en on-device AI om apps te leveren waar mensen van houden.",
       "detailedBio": "Ik begon als native Android-ontwikkelaar, werd vroeg verliefd op Flutter en heb nooit achteromgekeken. Tegenwoordig leid ik mobiele platformteams, ontwerp ik modulaire architecturen en prototyp ik generatieve UI-ervaringen die volledig op het apparaat draaien. Ik coach engineers, spreek op community-meetups en publiceer open-sourcetools waarmee teams sneller werken.",
@@ -242,17 +242,17 @@
         {
           "name": "Website",
           "url": "https://nova.example.com/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
+          "image": "https://picsum.photos/seed/googlechrome/400/400"
         },
         {
           "name": "Play Store",
           "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googleplay"
+          "image": "https://picsum.photos/seed/googleplay/400/400"
         },
         {
           "name": "App Store",
           "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=appstore"
+          "image": "https://picsum.photos/seed/appstore/400/400"
         }
       ],
       "resume": {
@@ -264,17 +264,17 @@
         {
           "name": "Github",
           "url": "https://github.com/nova-lindqvist",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=github"
+          "image": "https://picsum.photos/seed/github/400/400"
         },
         {
           "name": "LinkedIn",
           "url": "https://www.linkedin.com/in/nova-lindqvist/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=linkedin"
+          "image": "https://picsum.photos/seed/linkedin/400/400"
         },
         {
           "name": "Portfolio",
           "url": "https://nova.example.com/",
-          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
+          "image": "https://picsum.photos/seed/googlechrome/400/400"
         }
       ],
       "availability": {
@@ -329,7 +329,7 @@
           "field": "Mens-computerinteractie",
           "startDate": "2011-09-01",
           "endDate": "2013-06-30",
-          "image": "https://api.dicebear.com/9.x/shapes/png?seed=nlit",
+          "image": "https://picsum.photos/seed/nlit/400/400",
           "url": "https://nlit.example.edu/",
           "location": "Stockholm, Sweden"
         }
