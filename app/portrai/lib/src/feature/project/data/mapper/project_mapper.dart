@@ -31,6 +31,9 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       role: entity.role,
       id: entity.id,
       experienceId: entity.experienceId,
+
+      marketLatitude: entity.marketLatitude,
+      marketLongitude: entity.marketLongitude,
       locale: appLocale.languageCode,
     );
   }
@@ -57,6 +60,9 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       role: model.role,
       id: model.id,
       experienceId: model.experienceId,
+
+      marketLatitude: model.marketLatitude,
+      marketLongitude: model.marketLongitude,
     );
   }
 }

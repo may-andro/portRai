@@ -187,6 +187,12 @@ class GetAssistantContextUseCase
               'id': item.id,
               'experienceId': item.experienceId,
               'experience': ?_experienceRef(portfolio, item.experienceId),
+
+              if (item.marketLatitude != null && item.marketLongitude != null)
+                'market': {
+                  'latitude': item.marketLatitude,
+                  'longitude': item.marketLongitude,
+                },
             },
         ],
         'expertises': [

@@ -33,6 +33,7 @@ Portfolio summary.
   late MockResetRemoteAssistantSessionUseCase resetSession;
   late MockAskRemotePortfolioQuestionUseCase askQuestion;
   late MockOpenExternalUrlUseCase openUrl;
+  late MockRemoteAssistantTrackingDelegate tracking;
   late MockIsFeatureEnabledUseCase flag;
   late MockIsRemoteAssistantSupportedUseCase platformSupport;
 
@@ -77,6 +78,7 @@ Portfolio summary.
       );
     platformSupport = MockIsRemoteAssistantSupportedUseCase()
       ..stubCall(Right(platformSupported));
+    tracking = MockRemoteAssistantTrackingDelegate();
     final bloc = RemoteAssistantBloc(
       getContext,
       resetSession,
@@ -84,7 +86,7 @@ Portfolio summary.
       flag,
       platformSupport,
       openUrl,
-      MockRemoteAssistantTrackingDelegate(),
+      tracking,
     );
     addTearDown(bloc.close);
     return bloc;
@@ -118,6 +120,29 @@ Portfolio summary.
           verify(() => openUrl(captureAny())).captured.single
               as OpenExternalUrlParam;
       expect(param.uri, Uri.parse('https://example.com/a'));
+      verify(() => tracking.trackLinkClick()).called(1);
+    },
+  );
+
+  test(
+    'should track a suggestion instead of a submission when a chip is tapped',
+    () async {
+      final bloc = createBloc();
+      await start(bloc);
+
+      bloc.add(
+        const SendRemoteAssistantQuestionClickEvent(
+          'Where did you work?',
+          isSuggestion: true,
+        ),
+      );
+      await waitFor(
+        bloc,
+        (state) => state.messages.length == 2 && !state.isSendingQuestion,
+      );
+
+      verify(() => tracking.trackSuggestionClick()).called(1);
+      verifyNever(() => tracking.trackQuestionSubmission());
     },
   );
 

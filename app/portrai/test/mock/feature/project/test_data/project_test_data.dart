@@ -11,6 +11,8 @@ ProjectEntity createProjectEntity({
   String? playStore = 'https://example.com/play-store',
   String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
+  double? marketLatitude,
+  double? marketLongitude,
 }) {
   return ProjectEntity(
     id: id,
@@ -33,6 +35,8 @@ ProjectEntity createProjectEntity({
     achievements: const ['Launched to production'],
     teamSize: 3,
     role: 'Lead Flutter Developer',
+    marketLatitude: marketLatitude,
+    marketLongitude: marketLongitude,
   );
 }
 
@@ -45,6 +49,8 @@ ProjectModel createProjectModel({
   String? playStore = 'https://example.com/play-store',
   String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
+  double? marketLatitude,
+  double? marketLongitude,
 }) {
   return ProjectModel(
     id: id,
@@ -67,6 +73,8 @@ ProjectModel createProjectModel({
     teamSize: 3,
     role: 'Lead Flutter Developer',
     locale: locale,
+    marketLatitude: marketLatitude,
+    marketLongitude: marketLongitude,
   );
 }
 

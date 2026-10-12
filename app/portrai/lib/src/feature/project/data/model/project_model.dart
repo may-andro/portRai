@@ -25,6 +25,9 @@ class ProjectModel {
     this.website,
     this.github,
     this.experienceId,
+
+    this.marketLatitude,
+    this.marketLongitude,
   });
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) =>
@@ -49,6 +52,8 @@ class ProjectModel {
   final String? playStore;
   final String? website;
   final String? github;
+  final double? marketLatitude;
+  final double? marketLongitude;
   final String locale;
 
   Map<String, dynamic> toJson() => _$ProjectModelToJson(this);
