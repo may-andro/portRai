@@ -27,7 +27,13 @@ void main() {
   });
 
   test('should bound catalog instructions when constructing a session', () {
-    final genuiController = AssistantGenuiController();
+    final genuiController = AssistantGenuiController(
+      allowedUrls: {'https://a.test'},
+      allowedContactLinks: {'mailto:a@b.test'},
+      allowedLocations: [(latitude: 1.0, longitude: 2.0)],
+      onOpenLink: (_) {},
+      onAskQuestion: (_) {},
+    );
     addTearDown(genuiController.dispose);
     expect(genuiController.systemPrompt.length, lessThanOrEqualTo(50000));
   });

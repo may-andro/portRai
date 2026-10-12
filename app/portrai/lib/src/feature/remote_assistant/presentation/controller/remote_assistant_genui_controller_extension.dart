@@ -41,6 +41,10 @@ const _linkInstruction =
     'from the portfolio information, or mailto:<email> and tel:<phone without '
     'spaces> for the profile contact details. Never invent or alter a link.';
 
+const _suggestionInstruction =
+    ' End the answer with DSSuggestionChips holding two or three follow-up '
+    'questions that the portfolio information can answer.';
+
 const _mapInstruction =
     ' To show where the person is based or has worked use DSMap with one '
     'place per location, with latitude and longitude copied exactly from the '
@@ -78,6 +82,7 @@ extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
                     '$systemPrompt\n\n$_responseStyleInstruction'
                     '${supportsImages ? _imageInstruction : ''}'
                     '${supportsLinks ? _linkInstruction : ''}'
+                    '${supportsSuggestions ? _suggestionInstruction : ''}'
                     '${supportsMaps ? _mapInstruction : ''}',
               ),
             ),

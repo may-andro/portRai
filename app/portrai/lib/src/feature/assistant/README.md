@@ -124,6 +124,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSEducationList` | Up to six degrees or certificates with institution, degree and period |
 | `DSProjectCard` | A project card with title, description, up to eight technology tags, an optional banner (only URLs present in the portfolio context) and an optional action such as `DSLinkButton` |
 | `DSContactCard` | Up to five contact buttons (`email`, `phone`, `website`). Registered with `DSLinkButton`, and opens only HTTPS URLs from the portfolio context or the profile `mailto:` and `tel:` links |
+| `DSSuggestionChips` | Up to four tappable follow-up questions. Registered only when the host supplies a question callback; a tap sends the question through the remote assistant bloc |
 
 String properties accept a literal or a data-model reference. Child properties are
 component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed

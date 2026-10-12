@@ -633,6 +633,37 @@ void main() {
     await tester.tap(find.text('Email me'));
     expect(opened, ['mailto:me@x.test']);
   });
+
+  testWidgets(
+    'should ask the question when a DSSuggestionChips chip is tapped',
+    (tester) async {
+      final asked = <String>[];
+      await _pumpSurface(
+        tester,
+        createAssistantCatalog(onAskQuestion: asked.add),
+        '''
+{"id":"root","component":"DSSuggestionChips","suggestions":["What is Alpha?","  ","Where did you work?"]}''',
+      );
+
+      expect(find.byType(DSButtonWidget), findsNWidgets(2));
+      await tester.tap(find.text('Where did you work?'));
+      expect(asked, ['Where did you work?']);
+    },
+  );
+
+  test(
+    'should add DSSuggestionChips only when a question callback is given',
+    () {
+      expect(
+        createAssistantCatalog().items.map((item) => item.name),
+        isNot(contains('DSSuggestionChips')),
+      );
+      expect(
+        createAssistantCatalog(onAskQuestion: (_) {}).items.map((i) => i.name),
+        contains('DSSuggestionChips'),
+      );
+    },
+  );
 }
 
 Future<List<A2uiMessageEvent>> _feed(

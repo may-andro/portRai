@@ -288,6 +288,8 @@ class RemoteAssistantBloc
         allowedContactLinks: assistantContactLinksFrom(state.portfolioContext!),
         allowedLocations: assistantLocationsFrom(state.portfolioContext!),
         onOpenLink: (url) => add(OpenRemoteAssistantLinkClickEvent(url)),
+        onAskQuestion: (question) =>
+            add(SendRemoteAssistantQuestionClickEvent(question)),
       );
       genuiController = controller;
       _genuiControllers.add(controller);

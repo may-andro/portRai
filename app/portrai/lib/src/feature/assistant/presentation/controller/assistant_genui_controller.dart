@@ -32,16 +32,19 @@ class AssistantGenuiController {
     Iterable<String> allowedContactLinks = const [],
     List<AssistantLocation> allowedLocations = const [],
     void Function(String url)? onOpenLink,
+    void Function(String question)? onAskQuestion,
   }) : supportsImages = allowedUrls.isNotEmpty,
        supportsLinks =
            (allowedUrls.isNotEmpty || allowedContactLinks.isNotEmpty) &&
            onOpenLink != null,
+       supportsSuggestions = onAskQuestion != null,
        supportsMaps = allowedLocations.isNotEmpty,
        _catalog = createAssistantCatalog(
          allowedUrls: allowedUrls.toSet(),
          allowedContactLinks: allowedContactLinks.toSet(),
          allowedLocations: allowedLocations,
          onOpenLink: onOpenLink,
+         onAskQuestion: onAskQuestion,
        ) {
     _controller = SurfaceController(catalogs: [_catalog]);
     systemPrompt = PromptBuilder.chat(catalog: _catalog).systemPromptJoined();
@@ -52,6 +55,7 @@ class AssistantGenuiController {
   final bool supportsImages;
   final bool supportsMaps;
   final bool supportsLinks;
+  final bool supportsSuggestions;
   late SurfaceController _controller;
   late final String systemPrompt;
   SurfaceController get surfaceController => _controller;
