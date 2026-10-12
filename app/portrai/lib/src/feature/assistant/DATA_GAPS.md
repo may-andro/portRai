@@ -42,8 +42,9 @@ year as an estimate. Review all of them.
 ### Projects
 - The MediaMarkt country projects are one project with a `markets` list. Saturn and MediaWorld stay separate.
 - Several projects have three or fewer achievements, so "most complex project" has little to go on.
-- `metrics` (`{ label, value }`) exists and is filled for MediaMarkt, Saturn, MediaWorld and Stuart from
-  their achievements. Add downloads, ratings or users for the rest.
+- `metrics` (`{ label, value }`) holds Google Play download counts (MediaMarkt is the sum of the seven
+  country apps, as a lower bound) and the release and load time improvements from the achievements.
+  Wahl Analytics, Seagate Tote and Spornado have no public figures yet.
 
 ### Testimonials
 - Only two testimonials. More would support questions about collaboration and working style.
