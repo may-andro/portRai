@@ -29,6 +29,7 @@ void main() {
       'DSQuote',
       'DSStatGrid',
       'DSCarousel',
+      'DSTabs',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -474,6 +475,25 @@ void main() {
 
     expect(find.text('First card'), findsOneWidget);
     expect(find.text('Second card'), findsOneWidget);
+  });
+
+  testWidgets('should switch content when a DSTabs tab is tapped', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSTabs","tabs":[
+  {"title":"Frontend","child":"f"},{"title":"Backend","child":"b"}]},
+{"id":"f","component":"DSText","text":"Flutter"},
+{"id":"b","component":"DSText","text":"Kotlin"}''');
+
+    expect(find.text('Flutter'), findsOneWidget);
+    expect(find.text('Kotlin'), findsNothing);
+
+    await tester.tap(find.text('Backend'));
+    await tester.pump();
+
+    expect(find.text('Kotlin'), findsOneWidget);
+    expect(find.text('Flutter'), findsNothing);
   });
 }
 
