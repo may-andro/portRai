@@ -31,6 +31,7 @@ void main() {
       'DSCarousel',
       'DSTabs',
       'DSCallout',
+      'DSProgressRing',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -507,6 +508,20 @@ void main() {
 
     expect(find.text('Open to work'), findsOneWidget);
     expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
+  });
+
+  testWidgets('should render a clamped gauge when DSProgressRing is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSProgressRing","value":250,"label":"Flutter"}''');
+
+    final ring = tester.widget<CircularProgressIndicator>(
+      find.byType(CircularProgressIndicator),
+    );
+    expect(ring.value, 1.0);
+    expect(find.text('250%'), findsOneWidget);
+    expect(find.text('Flutter'), findsOneWidget);
   });
 }
 

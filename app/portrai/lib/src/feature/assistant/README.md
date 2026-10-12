@@ -118,6 +118,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSLinkButton` | A button that opens a link. Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context. Taps open through the remote assistant bloc and `OpenExternalUrlUseCase` |
 | `DSDivider` | A horizontal divider |
 | `DSCallout` | A highlighted note with an `info`, `success` or `warning` style, for example availability |
+| `DSProgressRing` | A circular gauge for one value from 0 to 100, with an optional caption |
 
 String properties accept a literal or a data-model reference. Child properties are
 component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed

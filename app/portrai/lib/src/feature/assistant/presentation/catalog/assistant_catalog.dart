@@ -1,5 +1,6 @@
 import 'package:genui/genui.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/assistant_map_locations.dart';
+import 'package:portrai/src/feature/assistant/presentation/catalog/item/data_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/image_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/info_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/layout_items.dart';
@@ -34,6 +35,7 @@ Catalog createAssistantCatalog({
   dsCarousel,
   dsTabs,
   dsCallout,
+  dsProgressRing,
   if (allowedUrls.isNotEmpty) createDsImage(allowedUrls),
   if (allowedUrls.isNotEmpty && onOpenLink != null)
     createDsLinkButton(allowedUrls: allowedUrls, onOpenLink: onOpenLink),
