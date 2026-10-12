@@ -194,25 +194,6 @@ melos:
       packageFilters:
         flutter: true
         dirExists: test
-    # Local web run with the Maps key injected temporarily
-    run_portrai_web:
-      run: |
-        set -e
-        if [ -f app/portrai/.env.production ]; then
-          . ./app/portrai/.env.production
-        fi
-        if [ -z "${MAPS_API_KEY_WEB:-}" ]; then
-          echo "Set MAPS_API_KEY_WEB in app/portrai/.env.production or export it first." >&2
-          exit 1
-        fi
-        cd app/portrai
-        cp web/index.html web/index.html.orig
-        trap 'mv web/index.html.orig web/index.html' EXIT
-        sed -i.bak "s/key=MAPS_API_KEY\"/key=$MAPS_API_KEY_WEB\"/" web/index.html
-        rm web/index.html.bak
-        flutter run -d chrome --web-port 5050 \
-          --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=${FIREBASE_APP_CHECK_WEB_SITE_KEY:-}"
-      description: Run the web app locally with MAPS_API_KEY_WEB injected into index.html (restored on exit)
     # Deploy scripts for web release
     deploy_portrai:
       run: |
