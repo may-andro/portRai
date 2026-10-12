@@ -15,7 +15,7 @@ class ProjectCache extends DBCache<ProjectModel> {
   String get tableName => 'project_table';
 
   @override
-  int get tableVersion => 1;
+  int get tableVersion => 4;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -28,10 +28,6 @@ class ProjectCache extends DBCache<ProjectModel> {
     const DbColumnDefinition(name: 'startDate', nullable: false),
     const DbColumnDefinition(name: 'endDate'),
     const DbColumnDefinition(name: 'image', nullable: false),
-    const DbColumnDefinition(name: 'appStore'),
-    const DbColumnDefinition(name: 'playStore'),
-    const DbColumnDefinition(name: 'website'),
-    const DbColumnDefinition(name: 'github'),
     const DbColumnDefinition(name: 'features', nullable: false),
     const DbColumnDefinition(name: 'achievements', nullable: false),
     const DbColumnDefinition(
@@ -41,6 +37,9 @@ class ProjectCache extends DBCache<ProjectModel> {
     ),
     const DbColumnDefinition(name: 'role', nullable: false),
     const DbColumnDefinition(name: 'id', nullable: false),
+    const DbColumnDefinition(name: 'experienceId'),
+    const DbColumnDefinition(name: 'markets', nullable: false),
+    const DbColumnDefinition(name: 'metrics', nullable: false),
     const DbColumnDefinition(name: 'locale', nullable: false),
   ];
 
@@ -71,6 +70,12 @@ class ProjectCache extends DBCache<ProjectModel> {
       );
     }
 
+    for (final key in ['markets', 'metrics']) {
+      if (modifiedMap[key] is String) {
+        modifiedMap[key] = jsonDecode(modifiedMap[key] as String);
+      }
+    }
+
     return ProjectModel.fromJson(modifiedMap);
   }
 
@@ -89,6 +94,12 @@ class ProjectCache extends DBCache<ProjectModel> {
 
     if (json.containsKey('achievements') && json['achievements'] is List) {
       json['achievements'] = jsonEncode(json['achievements']);
+    }
+
+    for (final key in ['markets', 'metrics']) {
+      if (json[key] is List) {
+        json[key] = jsonEncode(json[key]);
+      }
     }
 
     return json;

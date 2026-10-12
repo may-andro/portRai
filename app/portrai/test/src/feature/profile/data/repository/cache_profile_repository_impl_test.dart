@@ -23,6 +23,7 @@ void main() {
     ),
     languageMapper: const LanguageMapper(),
     educationMapper: const EducationMapper(),
+    certificationMapper: const CertificationMapper(),
     appLocale: AppLocale(localeCode),
   );
   final profile = createProfileEntity();

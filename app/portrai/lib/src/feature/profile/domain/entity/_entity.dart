@@ -1,4 +1,5 @@
 export 'availability_entity.dart';
+export 'certification_entity.dart';
 export 'coordinates_entity.dart';
 export 'education_entity.dart';
 export 'language_entity.dart';

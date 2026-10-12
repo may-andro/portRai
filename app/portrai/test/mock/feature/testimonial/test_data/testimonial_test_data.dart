@@ -12,7 +12,8 @@ TestimonialEntity createTestimonialEntity({
   String companyLogo = 'https://example.com/acme.png',
   String linkedinProfile = 'https://linkedin.com/in/john-doe',
   String projectContext = 'Portfolio App',
-  String? experienceId,
+  String experienceId = 'acme',
+  List<String> projectIds = const [],
 }) {
   return TestimonialEntity(
     id: id,
@@ -26,6 +27,7 @@ TestimonialEntity createTestimonialEntity({
     linkedinProfile: linkedinProfile,
     projectContext: projectContext,
     experienceId: experienceId,
+    projectIds: projectIds,
   );
 }
 
@@ -41,6 +43,8 @@ TestimonialModel createTestimonialModel({
   String companyLogo = 'https://example.com/acme.png',
   String linkedinProfile = 'https://linkedin.com/in/john-doe',
   String projectContext = 'Portfolio App',
+  String experienceId = 'acme',
+  List<String> projectIds = const [],
 }) {
   return TestimonialModel(
     id: id,
@@ -53,6 +57,8 @@ TestimonialModel createTestimonialModel({
     companyLogo: companyLogo,
     linkedinProfile: linkedinProfile,
     projectContext: projectContext,
+    experienceId: experienceId,
+    projectIds: projectIds,
     locale: locale,
   );
 }

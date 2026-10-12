@@ -193,7 +193,7 @@ class _CoreStrengthCard extends StatelessWidget {
                         horizontal: context.space(factor: 0.1),
                       ),
                       child: _SkillsWidget(
-                        skills: coreStrength.skills,
+                        skills: coreStrength.skillNames,
                         alignment: WrapAlignment.center,
                       ),
                     ),

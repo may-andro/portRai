@@ -1,11 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 
 void main() {
   const expertise = ExpertiseEntity(
     image: 'https://example.com/flutter.png',
     title: 'Flutter Development',
-    skills: ['Flutter SDK', 'State Management'],
+    skills: [
+      SkillEntity(name: 'Flutter SDK'),
+      SkillEntity(name: 'State Management'),
+    ],
   );
 
   group('ExpertiseEntity', () {
@@ -16,7 +20,10 @@ void main() {
         const ExpertiseEntity(
           image: 'https://example.com/flutter.png',
           title: 'Flutter Development',
-          skills: ['Flutter SDK', 'State Management'],
+          skills: [
+            SkillEntity(name: 'Flutter SDK'),
+            SkillEntity(name: 'State Management'),
+          ],
         ),
       );
       expect(expertise.hashCode, expertise.hashCode);
@@ -29,7 +36,10 @@ void main() {
           const ExpertiseEntity(
             image: 'https://example.com/android.png',
             title: 'Flutter Development',
-            skills: ['Flutter SDK', 'State Management'],
+            skills: [
+              SkillEntity(name: 'Flutter SDK'),
+              SkillEntity(name: 'State Management'),
+            ],
           ),
         ),
       );

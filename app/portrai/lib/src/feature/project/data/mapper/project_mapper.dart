@@ -21,19 +21,28 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       startDate: entity.startDate.toIso8601String(),
       endDate: entity.endDate?.toIso8601String(),
       image: entity.image,
-      appStore: entity.appStore,
-      playStore: entity.playStore,
-      website: entity.website,
-      github: entity.github,
       features: entity.features,
       achievements: entity.achievements,
       teamSize: entity.teamSize,
       role: entity.role,
       id: entity.id,
       experienceId: entity.experienceId,
-
-      marketLatitude: entity.marketLatitude,
-      marketLongitude: entity.marketLongitude,
+      markets: [
+        for (final market in entity.markets)
+          ProjectMarketModel(
+            country: market.country,
+            latitude: market.latitude,
+            longitude: market.longitude,
+            appStore: market.appStore,
+            playStore: market.playStore,
+            website: market.website,
+            github: market.github,
+          ),
+      ],
+      metrics: [
+        for (final metric in entity.metrics)
+          ProjectMetricModel(label: metric.label, value: metric.value),
+      ],
       locale: appLocale.languageCode,
     );
   }
@@ -50,19 +59,28 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       startDate: DateTime.parse(model.startDate),
       endDate: model.endDate != null ? DateTime.parse(model.endDate!) : null,
       image: model.image,
-      appStore: model.appStore,
-      playStore: model.playStore,
-      website: model.website,
-      github: model.github,
       features: model.features,
       achievements: model.achievements,
       teamSize: model.teamSize,
       role: model.role,
       id: model.id,
       experienceId: model.experienceId,
-
-      marketLatitude: model.marketLatitude,
-      marketLongitude: model.marketLongitude,
+      markets: [
+        for (final market in model.markets)
+          ProjectMarketEntity(
+            country: market.country,
+            latitude: market.latitude,
+            longitude: market.longitude,
+            appStore: market.appStore,
+            playStore: market.playStore,
+            website: market.website,
+            github: market.github,
+          ),
+      ],
+      metrics: [
+        for (final metric in model.metrics)
+          ProjectMetricEntity(label: metric.label, value: metric.value),
+      ],
     );
   }
 }

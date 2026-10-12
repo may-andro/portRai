@@ -36,17 +36,17 @@ class GetAssistantContextUseCase
     List<String> digest() {
       String list(List<String> items, [int max = 10]) =>
           items.take(max).join(', ');
-      String store(String? url) =>
-          url == null || url.trim().isEmpty ? 'no' : 'yes';
+      String store(Iterable<String?> urls) =>
+          urls.any((u) => u != null && u.trim().isNotEmpty) ? 'yes' : 'no';
       final profile = portfolio.profile;
       return [
         '${profile.fullName}: ${profile.title}. Email: ${profile.email}. Phone: ${profile.phone}. Based in ${profile.location.city}, ${profile.location.country}.',
         for (final item in portfolio.experiences)
           '${_employmentSummary(item, today)} Location: ${item.location}. ${item.employmentType}. Technologies: ${list(item.technologies)}.',
         for (final item in portfolio.projects)
-          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.playStore)}. On App Store: ${store(item.appStore)}. Website: ${store(item.website)}. GitHub: ${store(item.github)}.',
+          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.markets.map((m) => m.playStore))}. On App Store: ${store(item.markets.map((m) => m.appStore))}. Website: ${store(item.markets.map((m) => m.website))}. GitHub: ${store(item.markets.map((m) => m.github))}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
         for (final item in portfolio.expertises)
-          'Skills in ${item.title}: ${list(item.skills, 15)}.',
+          'Skills in ${item.title}: ${list(item.skillNames, 15)}.',
         for (final item in portfolio.services) 'Service: ${item.title}.',
       ];
     }
@@ -94,6 +94,9 @@ class GetAssistantContextUseCase
             'preferredProjectDuration': availability.preferredProjectDuration,
             'hourlyRate': availability.hourlyRate,
             'availability': availability.availability,
+            'noticePeriod': ?availability.noticePeriod,
+            'workAuthorization': ?availability.workAuthorization,
+            'note': ?availability.note,
           },
           'workingHours': {
             'timezone': hours.timezone,
@@ -124,6 +127,15 @@ class GetAssistantContextUseCase
                 'location': item.location,
                 'url': item.url,
                 'image': item.image,
+              },
+          ],
+          'certifications': [
+            for (final item in profile.certifications)
+              {
+                'name': item.name,
+                'issuer': item.issuer,
+                'date': item.date,
+                'url': item.url,
               },
           ],
           'socialLinks': [
@@ -179,25 +191,45 @@ class GetAssistantContextUseCase
               'achievements': item.achievements,
               'teamSize': item.teamSize,
               'role': item.role,
-              'appStore': item.appStore,
-              'playStore': item.playStore,
-              'website': item.website,
-              'github': item.github,
               'image': item.image,
               'id': item.id,
               'experienceId': item.experienceId,
               'experience': ?_experienceRef(portfolio, item.experienceId),
-
-              if (item.marketLatitude != null && item.marketLongitude != null)
-                'market': {
-                  'latitude': item.marketLatitude,
-                  'longitude': item.marketLongitude,
-                },
+              if (item.markets.isNotEmpty)
+                'markets': [
+                  for (final market in item.markets)
+                    {
+                      'country': market.country,
+                      'latitude': market.latitude,
+                      'longitude': market.longitude,
+                      'appStore': market.appStore,
+                      'playStore': market.playStore,
+                      'website': market.website,
+                      'github': market.github,
+                    },
+                ],
+              if (item.metrics.isNotEmpty)
+                'metrics': [
+                  for (final metric in item.metrics)
+                    {'label': metric.label, 'value': metric.value},
+                ],
             },
         ],
         'expertises': [
           for (final item in portfolio.expertises)
-            {'title': item.title, 'skills': item.skills, 'image': item.image},
+            {
+              'title': item.title,
+              'skills': [
+                for (final skill in item.skills)
+                  {
+                    'name': skill.name,
+                    'level': ?skill.level,
+                    'years': ?skill.years,
+                    'lastUsed': ?skill.lastUsed,
+                  },
+              ],
+              'image': item.image,
+            },
         ],
         'services': [
           for (final item in portfolio.services)
@@ -206,6 +238,21 @@ class GetAssistantContextUseCase
               'description': item.description,
               'detail': item.detail,
               'image': item.image,
+              'id': item.id,
+              'deliverables': item.deliverables,
+              'technologies': item.technologies,
+              'projects': [
+                for (final project in portfolio.projects)
+                  if (item.projectIds.contains(project.id))
+                    {'id': project.id, 'title': project.title},
+              ],
+              'engagementTypes': item.engagementTypes,
+              'idealFor': item.idealFor,
+              'process': item.process,
+              'faq': [
+                for (final entry in item.faq)
+                  {'question': entry.question, 'answer': entry.answer},
+              ],
             },
         ],
         'testimonials': [
@@ -223,6 +270,12 @@ class GetAssistantContextUseCase
               'id': item.id,
               'experienceId': item.experienceId,
               'experience': ?_experienceRef(portfolio, item.experienceId),
+              'projects': [
+                for (final project in portfolio.projects)
+                  if (item.projectIds.contains(project.id) &&
+                      project.experienceId == item.experienceId)
+                    {'id': project.id, 'title': project.title},
+              ],
             },
         ],
       }),
@@ -477,13 +530,22 @@ class GetAssistantContextUseCase
   // Links are written out, with an explicit "not found" for missing ones, so
   // the model never has to hunt through null fields or guess a URL.
   static String _projectLinks(ProjectEntity item) {
+    return 'Links for the ${item.title} project.${_marketLinks(item)}';
+  }
+
+  static String _marketLinks(ProjectEntity item) {
     String link(String label, String? url) =>
-        '$label: ${url == null || url.trim().isEmpty ? 'not found' : url}';
-    return 'Links for the ${item.title} project. '
-        '${link('Play Store link', item.playStore)}. '
-        '${link('App Store link', item.appStore)}. '
-        '${link('Website', item.website)}. '
-        '${link('GitHub', item.github)}.';
+        ' $label: ${url == null || url.trim().isEmpty ? 'not found' : url}.';
+    return item.markets
+        .map(
+          (market) =>
+              ' ${market.country}:'
+              '${link('Play Store link', market.playStore)}'
+              '${link('App Store link', market.appStore)}'
+              '${link('Website', market.website)}'
+              '${link('GitHub', market.github)}',
+        )
+        .join();
   }
 
   // "Hyderabad, India [Remote]" -> "India".

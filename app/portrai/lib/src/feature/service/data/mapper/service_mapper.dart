@@ -16,6 +16,17 @@ class ServiceMapper implements BiMapper<ServiceModel, ServiceEntity> {
       description: entity.description,
       image: entity.image,
       detail: entity.detail,
+      id: entity.id,
+      deliverables: entity.deliverables,
+      technologies: entity.technologies,
+      projectIds: entity.projectIds,
+      engagementTypes: entity.engagementTypes,
+      idealFor: entity.idealFor,
+      process: entity.process,
+      faq: [
+        for (final item in entity.faq)
+          ServiceFaqModel(question: item.question, answer: item.answer),
+      ],
       locale: appLocale.languageCode,
     );
   }
@@ -27,6 +38,17 @@ class ServiceMapper implements BiMapper<ServiceModel, ServiceEntity> {
       description: model.description,
       image: model.image,
       detail: model.detail,
+      id: model.id,
+      deliverables: model.deliverables,
+      technologies: model.technologies,
+      projectIds: model.projectIds,
+      engagementTypes: model.engagementTypes,
+      idealFor: model.idealFor,
+      process: model.process,
+      faq: [
+        for (final item in model.faq)
+          ServiceFaqEntity(question: item.question, answer: item.answer),
+      ],
     );
   }
 }

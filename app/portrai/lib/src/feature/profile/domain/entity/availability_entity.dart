@@ -8,6 +8,9 @@ class AvailabilityEntity extends Equatable {
     required this.preferredProjectDuration,
     required this.hourlyRate,
     required this.availability,
+    this.noticePeriod,
+    this.workAuthorization,
+    this.note,
   });
 
   final String status;
@@ -16,6 +19,9 @@ class AvailabilityEntity extends Equatable {
   final String preferredProjectDuration;
   final String hourlyRate;
   final String availability;
+  final String? noticePeriod;
+  final String? workAuthorization;
+  final String? note;
 
   @override
   List<Object?> get props => [
@@ -25,5 +31,8 @@ class AvailabilityEntity extends Equatable {
     preferredProjectDuration,
     hourlyRate,
     availability,
+    noticePeriod,
+    workAuthorization,
+    note,
   ];
 }

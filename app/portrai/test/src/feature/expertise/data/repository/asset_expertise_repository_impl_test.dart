@@ -21,12 +21,18 @@ void main() {
     const ExpertiseEntity(
       image: 'https://example.com/flutter.png',
       title: 'Flutter Development',
-      skills: ['Flutter SDK', 'State Management'],
+      skills: [
+        SkillEntity(name: 'Flutter SDK'),
+        SkillEntity(name: 'State Management'),
+      ],
     ),
     const ExpertiseEntity(
       image: 'https://example.com/android.png',
       title: 'Android Development',
-      skills: ['Kotlin', 'Coroutines'],
+      skills: [
+        SkillEntity(name: 'Kotlin'),
+        SkillEntity(name: 'Coroutines'),
+      ],
     ),
   ];
   final assetsJson = jsonEncode({
@@ -35,12 +41,16 @@ void main() {
         {
           'image': expertiseList[0].image,
           'title': expertiseList[0].title,
-          'skills': expertiseList[0].skills,
+          'skills': [
+            for (final s in expertiseList[0].skills) {'name': s.name},
+          ],
         },
         {
           'image': expertiseList[1].image,
           'title': expertiseList[1].title,
-          'skills': expertiseList[1].skills,
+          'skills': [
+            for (final s in expertiseList[1].skills) {'name': s.name},
+          ],
         },
       ],
     },

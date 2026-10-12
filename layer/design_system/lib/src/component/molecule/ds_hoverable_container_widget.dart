@@ -20,6 +20,7 @@ class _DSHoverableContainerWidgetState
   bool _isHovering = false;
 
   void _onMouseEnter(bool hovering) {
+    if (!mounted) return;
     setState(() {
       _isHovering = hovering;
     });

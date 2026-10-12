@@ -91,6 +91,7 @@ class _DSTabItemWidgetState extends State<DSTabItemWidget>
   }
 
   void _setHover(bool hovering) {
+    if (!mounted) return;
     setState(() => _isHovering = hovering);
     if (hovering) {
       _animationController.forward();

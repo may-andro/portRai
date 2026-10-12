@@ -15,7 +15,7 @@ class ExpertiseCache extends DBCache<ExpertiseModel> {
   String get tableName => 'expertise_table';
 
   @override
-  int get tableVersion => 1;
+  int get tableVersion => 2;
 
   @override
   List<DbColumnDefinition> get columns => [

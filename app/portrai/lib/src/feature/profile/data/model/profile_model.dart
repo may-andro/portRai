@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:portrai/src/feature/profile/data/model/availability_model.dart';
+import 'package:portrai/src/feature/profile/data/model/certification_model.dart';
 import 'package:portrai/src/feature/profile/data/model/education_model.dart';
 import 'package:portrai/src/feature/profile/data/model/language_model.dart';
 import 'package:portrai/src/feature/profile/data/model/location_model.dart';
@@ -36,6 +37,7 @@ class ProfileModel {
     required this.location,
     required this.languages,
     required this.educations,
+    this.certifications = const [],
     required this.locale,
   });
 
@@ -65,6 +67,7 @@ class ProfileModel {
   final LocationModel location;
   final List<LanguageModel> languages;
   final List<EducationModel> educations;
+  final List<CertificationModel> certifications;
   final String locale;
 
   Map<String, dynamic> toJson() => _$ProfileModelToJson(this);

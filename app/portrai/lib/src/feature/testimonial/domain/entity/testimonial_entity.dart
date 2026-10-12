@@ -12,7 +12,8 @@ class TestimonialEntity extends Equatable {
     required this.companyLogo,
     required this.linkedinProfile,
     required this.projectContext,
-    this.experienceId,
+    required this.experienceId,
+    this.projectIds = const [],
   });
 
   final String id;
@@ -27,7 +28,10 @@ class TestimonialEntity extends Equatable {
   final String projectContext;
 
   /// The experience (employer) the author worked with the portfolio owner on.
-  final String? experienceId;
+  final String experienceId;
+
+  /// Projects the testimonial refers to; each belongs to [experienceId].
+  final List<String> projectIds;
 
   @override
   List<Object?> get props => [
@@ -42,5 +46,6 @@ class TestimonialEntity extends Equatable {
     linkedinProfile,
     projectContext,
     experienceId,
+    projectIds,
   ];
 }

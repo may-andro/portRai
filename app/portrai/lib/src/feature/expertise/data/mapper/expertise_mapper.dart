@@ -14,7 +14,15 @@ class ExpertiseMapper implements BiMapper<ExpertiseModel, ExpertiseEntity> {
     return ExpertiseModel(
       image: entity.image,
       title: entity.title,
-      skills: entity.skills,
+      skills: [
+        for (final skill in entity.skills)
+          SkillModel(
+            name: skill.name,
+            level: skill.level,
+            years: skill.years,
+            lastUsed: skill.lastUsed,
+          ),
+      ],
       locale: appLocale.languageCode,
     );
   }
@@ -24,7 +32,15 @@ class ExpertiseMapper implements BiMapper<ExpertiseModel, ExpertiseEntity> {
     return ExpertiseEntity(
       image: model.image,
       title: model.title,
-      skills: model.skills,
+      skills: [
+        for (final skill in model.skills)
+          SkillEntity(
+            name: skill.name,
+            level: skill.level,
+            years: skill.years,
+            lastUsed: skill.lastUsed,
+          ),
+      ],
     );
   }
 }

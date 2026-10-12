@@ -16,6 +16,7 @@ void main() {
     'projectContext': 'Portfolio App',
     'locale': 'en',
     'experienceId': 'acme',
+    'projectIds': ['p1'],
   };
 
   group('TestimonialModel', () {
@@ -28,6 +29,7 @@ void main() {
       expect(model.projectContext, 'Portfolio App');
       expect(model.locale, 'en');
       expect(model.experienceId, 'acme');
+      expect(model.projectIds, ['p1']);
     });
 
     test('should preserve all fields when serialized and deserialized', () {

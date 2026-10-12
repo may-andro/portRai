@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/availabilities_widget.dart';
 
@@ -13,7 +14,19 @@ void main() {
       'should render localized availability buttons and dispatch open URL events when tapped',
       (tester) async {
         final bloc = MockProjectBloc()..stubState(const LoadingState());
-        final project = createProjectEntity();
+        final project = createProjectEntity(
+          markets: const [
+            ProjectMarketEntity(
+              country: 'Spain',
+              latitude: 40,
+              longitude: -3,
+              appStore: 'https://example.com/app-store',
+              playStore: 'https://example.com/play-store',
+              website: 'https://example.com/website',
+              github: 'https://github.com/example/portrai',
+            ),
+          ],
+        );
 
         await tester.pumpWidget(
           TestWidgetWrapper(
@@ -25,19 +38,19 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('GitHub'), findsOneWidget);
-        expect(find.text('Website'), findsOneWidget);
-        expect(find.text('App Store'), findsOneWidget);
-        expect(find.text('Play Store'), findsOneWidget);
+        expect(find.text('GitHub · Spain'), findsOneWidget);
+        expect(find.text('Website · Spain'), findsOneWidget);
+        expect(find.text('App Store · Spain'), findsOneWidget);
+        expect(find.text('Play Store · Spain'), findsOneWidget);
 
-        await tester.tap(find.text('GitHub'));
+        await tester.tap(find.text('GitHub · Spain'));
         await tester.pump();
 
         verify(
           () => bloc.add(
             const OpenExternalUrlEvent(
               url: 'https://github.com/example/portrai',
-              label: 'GitHub',
+              label: 'GitHub · Spain',
             ),
           ),
         ).called(1);
@@ -48,11 +61,7 @@ void main() {
       tester,
     ) async {
       final bloc = MockProjectBloc()..stubState(const LoadingState());
-      final project = createProjectEntity(
-        website: null,
-        appStore: null,
-        playStore: null,
-      );
+      final project = createProjectEntity();
 
       await tester.pumpWidget(
         TestWidgetWrapper(
@@ -64,10 +73,10 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('GitHub'), findsOneWidget);
-      expect(find.text('Website'), findsNothing);
-      expect(find.text('App Store'), findsNothing);
-      expect(find.text('Play Store'), findsNothing);
+      expect(find.textContaining('GitHub'), findsNothing);
+      expect(find.textContaining('Website'), findsNothing);
+      expect(find.textContaining('App Store'), findsNothing);
+      expect(find.textContaining('Play Store'), findsNothing);
     });
   });
 }

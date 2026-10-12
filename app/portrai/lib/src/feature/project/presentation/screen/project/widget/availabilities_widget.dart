@@ -13,40 +13,15 @@ class AvailabilitiesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final buttons = <Widget>[];
 
-    if (project.github case final String github) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectGitHub,
-          icon: Icons.code,
-          url: github,
-        ),
-      );
-    }
-    if (project.website case final String website) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectWebsite,
-          icon: Icons.language,
-          url: website,
-        ),
-      );
-    }
-    if (project.appStore case final String appStore) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectAppStore,
-          icon: Icons.apple,
-          url: appStore,
-        ),
-      );
-    }
-    if (project.playStore case final String playStore) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectPlayStore,
-          icon: Icons.shop,
-          url: playStore,
-        ),
+    for (final market in project.markets) {
+      _addStoreButtons(
+        context,
+        buttons,
+        website: market.website,
+        appStore: market.appStore,
+        playStore: market.playStore,
+        github: market.github,
+        country: market.country,
       );
     }
 
@@ -54,6 +29,55 @@ class AvailabilitiesWidget extends StatelessWidget {
       spacing: context.space(),
       runSpacing: context.space(),
       children: buttons,
+    );
+  }
+}
+
+void _addStoreButtons(
+  BuildContext context,
+  List<Widget> buttons, {
+  required String? website,
+  required String? appStore,
+  required String? playStore,
+  required String? github,
+  String? country,
+}) {
+  String label(String text) => country == null ? text : '$text · $country';
+
+  if (github != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectGitHub),
+        icon: Icons.code,
+        url: github,
+      ),
+    );
+  }
+  if (website != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectWebsite),
+        icon: Icons.language,
+        url: website,
+      ),
+    );
+  }
+  if (appStore != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectAppStore),
+        icon: Icons.apple,
+        url: appStore,
+      ),
+    );
+  }
+  if (playStore != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectPlayStore),
+        icon: Icons.shop,
+        url: playStore,
+      ),
     );
   }
 }

@@ -4,7 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
 import 'package:portrai/src/feature/assistant/domain/use_case/get_assistant_context_use_case.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
+import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
+import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
+import 'package:portrai/src/feature/service/domain/entity/service_entity.dart';
+import 'package:portrai/src/feature/service/domain/entity/service_faq_entity.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
@@ -31,7 +36,10 @@ void main() {
         expect(result.right, contains(portfolio.profile.socialLinks.first.url));
         expect(result.right, contains(portfolio.projects.first.title));
         expect(result.right, contains(portfolio.experiences.first.company));
-        expect(result.right, contains(portfolio.expertises.first.skills.first));
+        expect(
+          result.right,
+          contains(portfolio.expertises.first.skills.first.name),
+        );
         expect(result.right, contains(portfolio.services.first.title));
         final context = jsonDecode(result.right) as Map<String, Object?>;
         final profile = context['profile']! as Map<String, Object?>;
@@ -97,8 +105,14 @@ void main() {
                 projects: [
                   createProjectEntity(
                     title: 'Stuart',
-                    playStore: 'https://play.google.com/stuart',
-                    appStore: null,
+                    markets: const [
+                      ProjectMarketEntity(
+                        country: 'Spain',
+                        latitude: 40,
+                        longitude: -3,
+                        playStore: 'https://play.google.com/stuart',
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -113,14 +127,14 @@ void main() {
         )['summary'];
         expect(
           summary,
-          contains('Play Store link: https://play.google.com/stuart'),
+          contains('Spain: Play Store link: https://play.google.com/stuart'),
         );
         expect(summary, contains('App Store link: not found'));
       },
     );
 
     test(
-      'should write the project market coordinates only when both are known',
+      'should write each project market with its coordinates and store links',
       () async {
         final getPortfolio = MockGetPortfolioUseCase()
           ..stubCall(
@@ -128,10 +142,16 @@ void main() {
               createPortfolioEntity(
                 projects: [
                   createProjectEntity(
-                    marketLatitude: 51.1657,
-                    marketLongitude: 10.4515,
+                    markets: const [
+                      ProjectMarketEntity(
+                        country: 'Germany',
+                        latitude: 51.1657,
+                        longitude: 10.4515,
+                        playStore: 'https://play.google.com/de',
+                      ),
+                    ],
                   ),
-                  createProjectEntity(id: 'other', marketLatitude: 1),
+                  createProjectEntity(id: 'other'),
                 ],
               ),
             ),
@@ -142,11 +162,153 @@ void main() {
         final projects =
             (jsonDecode(result.right) as Map<String, Object?>)['projects']!
                 as List<Object?>;
-        expect((projects.first! as Map)['market'], {
-          'latitude': 51.1657,
-          'longitude': 10.4515,
-        });
-        expect((projects.last! as Map).containsKey('market'), isFalse);
+        final first = projects.first! as Map<String, Object?>;
+        final market = (first['markets']! as List).single as Map;
+        expect(market['country'], 'Germany');
+        expect(market['latitude'], 51.1657);
+        expect(first['summary'], contains('Germany: Play Store link'));
+        expect((projects.last! as Map).containsKey('markets'), isFalse);
+      },
+    );
+
+    test(
+      'should link projects and testimonials to their experience when ids match',
+      () async {
+        final experience = ExperienceEntity(
+          company: 'Stuart',
+          position: 'Senior Flutter Developer',
+          location: 'Barcelona',
+          startDate: DateTime(2022, 7),
+          endDate: null,
+          current: true,
+          employmentType: 'Full-time',
+          description: 'Delivery platform',
+          longDescription: 'Built the delivery platform',
+          responsibilities: const [],
+          achievements: const [],
+          technologies: const ['Flutter'],
+          companyLogo: '',
+          url: null,
+          id: 'stuart',
+        );
+        final getPortfolio = MockGetPortfolioUseCase()
+          ..stubCall(
+            Right<GetPortfolioFailure, PortfolioEntity>(
+              createPortfolioEntity(
+                experiences: [experience],
+                projects: [
+                  createProjectEntity(id: 'p1', experienceId: 'stuart'),
+                  createProjectEntity(id: 'p2', experienceId: 'unknown'),
+                ],
+                testimonials: [createTestimonialEntity(experienceId: 'stuart')],
+              ),
+            ),
+          );
+
+        final result = await GetAssistantContextUseCase(getPortfolio)();
+        final context = jsonDecode(result.right) as Map<String, Object?>;
+        final projects = (context['projects']! as List)
+            .cast<Map<String, Object?>>();
+        final reference = {
+          'company': 'Stuart',
+          'position': 'Senior Flutter Developer',
+        };
+
+        expect(projects.first['experienceId'], 'stuart');
+        expect(projects.first['experience'], reference);
+        expect(projects.last.containsKey('experience'), isFalse);
+        expect(_firstRecord(context, 'testimonials')['experience'], reference);
+        expect(_firstRecord(context, 'experiences')['projects'], [
+          {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
+      },
+    );
+
+    test(
+      'should write skill levels and only the same-experience projects of a testimonial',
+      () async {
+        final getPortfolio = MockGetPortfolioUseCase()
+          ..stubCall(
+            Right<GetPortfolioFailure, PortfolioEntity>(
+              createPortfolioEntity(
+                expertises: const [
+                  ExpertiseEntity(
+                    image: 'flutter.png',
+                    title: 'Flutter',
+                    skills: [
+                      SkillEntity(
+                        name: 'Dart',
+                        level: 'expert',
+                        years: 7,
+                        lastUsed: 2026,
+                      ),
+                      SkillEntity(name: 'Bloc'),
+                    ],
+                  ),
+                ],
+                projects: [
+                  createProjectEntity(id: 'p1', experienceId: 'acme'),
+                  createProjectEntity(id: 'p2', experienceId: 'other'),
+                ],
+                testimonials: [
+                  createTestimonialEntity(projectIds: ['p1', 'p2']),
+                ],
+              ),
+            ),
+          );
+
+        final result = await GetAssistantContextUseCase(getPortfolio)();
+        final context = jsonDecode(result.right) as Map<String, Object?>;
+
+        expect(_firstRecord(context, 'expertises')['skills'], [
+          {'name': 'Dart', 'level': 'expert', 'years': 7, 'lastUsed': 2026},
+          {'name': 'Bloc'},
+        ]);
+        expect(_firstRecord(context, 'testimonials')['projects'], [
+          {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
+      },
+    );
+
+    test(
+      'should link a service to its projects and write its details',
+      () async {
+        final getPortfolio = MockGetPortfolioUseCase()
+          ..stubCall(
+            Right<GetPortfolioFailure, PortfolioEntity>(
+              createPortfolioEntity(
+                projects: [createProjectEntity(id: 'p1')],
+                services: const [
+                  ServiceEntity(
+                    image: 'service.png',
+                    title: 'App Development',
+                    description: 'Apps',
+                    detail: 'Detail',
+                    id: 'app_development',
+                    deliverables: ['Store release'],
+                    projectIds: ['p1', 'missing'],
+                    faq: [
+                      ServiceFaqEntity(question: 'How long?', answer: '3-12'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+
+        final result = await GetAssistantContextUseCase(getPortfolio)();
+        final service = _firstRecord(
+          jsonDecode(result.right) as Map<String, Object?>,
+          'services',
+        );
+
+        expect(service['deliverables'], ['Store release']);
+        expect(service['projects'], [
+          {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
+        expect(service['faq'], [
+          {'question': 'How long?', 'answer': '3-12'},
+        ]);
       },
     );
 

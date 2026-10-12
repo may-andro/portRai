@@ -1,8 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:portrai/src/feature/project/data/model/project_market_model.dart';
+import 'package:portrai/src/feature/project/data/model/project_metric_model.dart';
 
 part 'project_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class ProjectModel {
   ProjectModel({
     required this.id,
@@ -20,14 +22,10 @@ class ProjectModel {
     required this.role,
     required this.locale,
     this.endDate,
-    this.appStore,
-    this.playStore,
-    this.website,
-    this.github,
     this.experienceId,
 
-    this.marketLatitude,
-    this.marketLongitude,
+    this.markets = const [],
+    this.metrics = const [],
   });
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) =>
@@ -48,12 +46,8 @@ class ProjectModel {
   final String role;
   final String startDate;
   final String? endDate;
-  final String? appStore;
-  final String? playStore;
-  final String? website;
-  final String? github;
-  final double? marketLatitude;
-  final double? marketLongitude;
+  final List<ProjectMarketModel> markets;
+  final List<ProjectMetricModel> metrics;
   final String locale;
 
   Map<String, dynamic> toJson() => _$ProjectModelToJson(this);

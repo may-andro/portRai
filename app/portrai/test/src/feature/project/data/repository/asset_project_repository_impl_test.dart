@@ -20,12 +20,7 @@ void main() {
   final mapper = ProjectMapper(appLocale: appLocale);
   final projects = [
     createProjectEntity(),
-    createProjectEntity(
-      id: 'portfolio-admin',
-      title: 'Portfolio Admin',
-      website: null,
-      github: null,
-    ),
+    createProjectEntity(id: 'portfolio-admin', title: 'Portfolio Admin'),
   ];
   final assetsJson = jsonEncode(
     createProjectAssetJson(projects: createProjectListJson()),

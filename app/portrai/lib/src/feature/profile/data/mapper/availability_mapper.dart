@@ -17,6 +17,9 @@ class AvailabilityMapper
       preferredProjectDuration: entity.preferredProjectDuration,
       hourlyRate: entity.hourlyRate,
       availability: entity.availability,
+      noticePeriod: entity.noticePeriod,
+      workAuthorization: entity.workAuthorization,
+      note: entity.note,
     );
   }
 
@@ -29,6 +32,9 @@ class AvailabilityMapper
       preferredProjectDuration: model.preferredProjectDuration,
       hourlyRate: model.hourlyRate,
       availability: model.availability,
+      noticePeriod: model.noticePeriod,
+      workAuthorization: model.workAuthorization,
+      note: model.note,
     );
   }
 }

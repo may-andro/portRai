@@ -16,7 +16,7 @@ class ProfileCache extends DBCache<ProfileModel> {
   String get tableName => 'profile_table';
 
   @override
-  int get tableVersion => 1;
+  int get tableVersion => 2;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -51,6 +51,7 @@ class ProfileCache extends DBCache<ProfileModel> {
     const DbColumnDefinition(name: 'location', nullable: false),
     const DbColumnDefinition(name: 'languages', nullable: false),
     const DbColumnDefinition(name: 'educations', nullable: false),
+    const DbColumnDefinition(name: 'certifications', nullable: false),
     const DbColumnDefinition(name: 'locale', nullable: false),
   ];
 
@@ -104,6 +105,12 @@ class ProfileCache extends DBCache<ProfileModel> {
       modifiedMap['languages'] = jsonDecode(modifiedMap['languages'] as String);
     }
 
+    if (modifiedMap['certifications'] is String) {
+      modifiedMap['certifications'] = jsonDecode(
+        modifiedMap['certifications'] as String,
+      );
+    }
+
     if (modifiedMap.containsKey('educations') &&
         modifiedMap['educations'] is String) {
       modifiedMap['educations'] = jsonDecode(
@@ -145,6 +152,10 @@ class ProfileCache extends DBCache<ProfileModel> {
 
     if (json.containsKey('languages') && json['languages'] is List) {
       json['languages'] = jsonEncode(json['languages']);
+    }
+
+    if (json['certifications'] is List) {
+      json['certifications'] = jsonEncode(json['certifications']);
     }
 
     if (json.containsKey('educations') && json['educations'] is List) {
