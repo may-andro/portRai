@@ -19,6 +19,12 @@ const _responseStyleInstruction =
     'every A2UI message in its own separate ```json code block, never two '
     'messages in one block.';
 
+const _imageInstruction =
+    ' To show a picture use DSImage with a url copied exactly from the '
+    'portfolio information (profile image, company logo, project image). Use '
+    'avatar for a person, logo for a company and banner for a project. Never '
+    'invent or alter a URL, and omit the image if none is available.';
+
 extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
   /// Sends a known text question and authoritative context, not raw GenUI
   /// messages or UI interaction parts, through the portfolio use case.
@@ -47,7 +53,9 @@ extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
                 portfolioContext: portfolioContext,
                 history: history,
                 onDelta: onDelta,
-                systemPrompt: '$systemPrompt\n\n$_responseStyleInstruction',
+                systemPrompt:
+                    '$systemPrompt\n\n$_responseStyleInstruction'
+                    '${supportsImages ? _imageInstruction : ''}',
               ),
             ),
       );

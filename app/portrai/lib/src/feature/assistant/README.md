@@ -107,6 +107,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSTag`, `DSInfoChip` | Skill badges and icon and label pills |
 | `DSColumn`, `DSWrap` | Vertical and wrapping layouts of child component IDs |
 | `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
+| `DSImage` | A portfolio image (`avatar`, `logo`, `banner`). Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context |
 | `DSDivider` | A horizontal divider |
 
 String properties accept a literal or a data-model reference. Child properties are

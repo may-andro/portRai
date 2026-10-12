@@ -268,7 +268,9 @@ class RemoteAssistantBloc
     final AssistantGenuiController? genuiController;
     final Either<RemoteAssistantFailure, void> result;
     if (state.isGenerativeUiEnabled) {
-      final controller = AssistantGenuiController();
+      final controller = AssistantGenuiController(
+        allowedImageUrls: assistantImageUrlsFrom(state.portfolioContext!),
+      );
       genuiController = controller;
       _genuiControllers.add(controller);
       _genuiErrorSubscriptions[controller] = controller.frameworkErrors.listen(
@@ -291,7 +293,9 @@ class RemoteAssistantBloc
             return;
           }
           final currentSurfaces = state.genuiSurfaces
-              .where((surface) => !identical(surface.genuiController, controller))
+              .where(
+                (surface) => !identical(surface.genuiController, controller),
+              )
               .toList();
           currentSurfaces.addAll(
             controller.activeSurfaceIds.map(

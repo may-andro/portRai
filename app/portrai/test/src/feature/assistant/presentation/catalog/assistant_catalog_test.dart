@@ -97,6 +97,56 @@ void main() {
     },
   );
 
+  test('should add DSImage only when image URLs are allowed', () {
+    final catalog = createAssistantCatalog(
+      allowedImageUrls: {'https://cdn.test/a.png'},
+    );
+
+    expect(catalog.items.map((item) => item.name), contains('DSImage'));
+  });
+
+  test('should extract unique https URLs when reading portfolio context', () {
+    final urls = assistantImageUrlsFrom(
+      '{"a":"https://cdn.test/a.png","b":"https://cdn.test/a.png",'
+      '"c":"http://insecure.test/x.png","d":"https://cdn.test/b.jpg?x=1"}',
+    );
+
+    expect(urls, {'https://cdn.test/a.png', 'https://cdn.test/b.jpg?x=1'});
+  });
+
+  testWidgets(
+    'should render only allowed URLs when A2UI describes DSImage components',
+    (tester) async {
+      final controller = SurfaceController(
+        catalogs: [
+          createAssistantCatalog(allowedImageUrls: {'https://cdn.test/a.png'}),
+        ],
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: SingleChildScrollView(
+            child: Surface(surfaceContext: controller.contextFor('img')),
+          ),
+        ),
+      );
+      await _feed(tester, controller, [
+        '''
+{"version":"v0.9","createSurface":{"surfaceId":"img","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"img","components":[
+  {"id":"root","component":"DSColumn","children":["ok","bad"]},
+  {"id":"ok","component":"DSImage","url":"https://cdn.test/a.png","variant":"avatar"},
+  {"id":"bad","component":"DSImage","url":"https://evil.test/x.png"}
+]}}
+''',
+      ]);
+      await tester.pump();
+
+      expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+    },
+  );
+
   testWidgets(
     'should render composed DS components when A2UI describes a rich answer',
     (tester) async {
