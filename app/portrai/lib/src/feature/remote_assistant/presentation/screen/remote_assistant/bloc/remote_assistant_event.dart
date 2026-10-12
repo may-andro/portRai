@@ -32,12 +32,16 @@ class OpenRemoteAssistantLinkClickEvent extends RemoteAssistantEvent {
 }
 
 class SendRemoteAssistantQuestionClickEvent extends RemoteAssistantEvent {
-  const SendRemoteAssistantQuestionClickEvent(this.question);
+  const SendRemoteAssistantQuestionClickEvent(
+    this.question, {
+    this.isSuggestion = false,
+  });
 
   final String question;
+  final bool isSuggestion;
 
   @override
-  List<Object?> get props => [question];
+  List<Object?> get props => [question, isSuggestion];
 
   @override
   String toString() => 'SendRemoteAssistantQuestionClickEvent';

@@ -17,6 +17,20 @@ class RemoteAssistantTrackingDelegate extends ScreenTrackingDelegate {
     ),
   );
 
+  void trackSuggestionClick() => trackEvent(
+    Tracking(
+      name: 'question',
+      action: const ClickAction(label: 'suggestion'),
+    ),
+  );
+
+  void trackLinkClick() => trackEvent(
+    Tracking(
+      name: 'external_link',
+      action: const ClickAction(label: 'generated_link'),
+    ),
+  );
+
   void trackReset() => trackEvent(
     Tracking(
       name: 'reset',
