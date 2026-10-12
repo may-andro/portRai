@@ -17,6 +17,15 @@ const _surface = '''
 ''';
 
 void main() {
+  test('should allow remounting a surface when every surface was released', () {
+    final genuiController = AssistantGenuiController();
+    addTearDown(genuiController.dispose);
+
+    genuiController.acquireSurface()();
+
+    expect(genuiController.acquireSurface, returnsNormally);
+  });
+
   test('should bound catalog instructions when constructing a session', () {
     final genuiController = AssistantGenuiController();
     addTearDown(genuiController.dispose);

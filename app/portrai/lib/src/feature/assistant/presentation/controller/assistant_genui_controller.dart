@@ -69,7 +69,8 @@ class AssistantGenuiController {
       if (released) return;
       released = true;
       _surfaceReferences--;
-      _disposeControllerIfUnused();
+      // Lazy lists unmount off-screen surfaces that must remount later.
+      if (_disposed) _disposeControllerIfUnused();
     };
   }
 
