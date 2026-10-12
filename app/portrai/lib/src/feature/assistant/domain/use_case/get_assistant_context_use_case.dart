@@ -260,8 +260,12 @@ class GetAssistantContextUseCase
               'id': item.id,
               'experienceId': item.experienceId,
               'experience': ?_experienceRef(portfolio, item.experienceId),
-              'projectId': item.projectId,
-              'project': ?_projectTitle(portfolio, item.projectId),
+              'projects': [
+                for (final project in portfolio.projects)
+                  if (item.projectIds.contains(project.id) &&
+                      project.experienceId == item.experienceId)
+                    {'id': project.id, 'title': project.title},
+              ],
             },
         ],
       }),
@@ -276,13 +280,6 @@ class GetAssistantContextUseCase
       if (item.id == experienceId) {
         return {'company': item.company, 'position': item.position};
       }
-    }
-    return null;
-  }
-
-  static String? _projectTitle(PortfolioEntity portfolio, String? projectId) {
-    for (final item in portfolio.projects) {
-      if (item.id == projectId) return item.title;
     }
     return null;
   }

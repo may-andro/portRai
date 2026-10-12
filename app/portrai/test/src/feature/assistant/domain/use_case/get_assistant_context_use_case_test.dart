@@ -217,7 +217,7 @@ void main() {
     );
 
     test(
-      'should write skill levels and the project a testimonial refers to',
+      'should write skill levels and only the same-experience projects of a testimonial',
       () async {
         final getPortfolio = MockGetPortfolioUseCase()
           ..stubCall(
@@ -238,8 +238,13 @@ void main() {
                     ],
                   ),
                 ],
-                projects: [createProjectEntity(id: 'p1')],
-                testimonials: [createTestimonialEntity(projectId: 'p1')],
+                projects: [
+                  createProjectEntity(id: 'p1', experienceId: 'acme'),
+                  createProjectEntity(id: 'p2', experienceId: 'other'),
+                ],
+                testimonials: [
+                  createTestimonialEntity(projectIds: ['p1', 'p2']),
+                ],
               ),
             ),
           );
@@ -251,7 +256,9 @@ void main() {
           {'name': 'Dart', 'level': 'expert', 'years': 7, 'lastUsed': 2026},
           {'name': 'Bloc'},
         ]);
-        expect(_firstRecord(context, 'testimonials')['project'], 'PortRai 🚀');
+        expect(_firstRecord(context, 'testimonials')['projects'], [
+          {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
       },
     );
 

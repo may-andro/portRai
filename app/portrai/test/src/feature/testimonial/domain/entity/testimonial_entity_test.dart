@@ -14,6 +14,7 @@ void main() {
       companyLogo: 'https://example.com/acme.png',
       linkedinProfile: 'https://linkedin.com/in/john-doe',
       projectContext: 'Portfolio App',
+      experienceId: 'acme',
     );
   }
 

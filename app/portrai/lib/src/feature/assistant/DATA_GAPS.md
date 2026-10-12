@@ -14,7 +14,7 @@ This document tracks what is missing, what was already fixed, and what each fix 
 | `profile.languages` | Spanish added (Proficient / Competente / Vaardig) next to English. |
 | Technology names | Variants (`Github`, `MVVM Pattern`, `Sqlite` and similar) share one spelling across experiences and projects. |
 | Availability | `availability.note` explains that freelance work runs next to the full-time role. |
-| Testimonials | `projectId` points to the project a testimonial is about. |
+| Testimonials | Each belongs to an experience (`experienceId`) and can list `projectIds` of projects under that same experience. |
 | Projects, testimonials | Each now carries an `experienceId` pointing to its experience (employer). The assistant context resolves it to the company and position, and lists each experience's projects. |
 | Projects | Swapped MediaMarkt Turkey Play Store and App Store links corrected. |
 

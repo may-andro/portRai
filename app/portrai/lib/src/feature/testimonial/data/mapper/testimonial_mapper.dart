@@ -23,7 +23,7 @@ class TestimonialMapper
     linkedinProfile: entity.linkedinProfile,
     projectContext: entity.projectContext,
     experienceId: entity.experienceId,
-    projectId: entity.projectId,
+    projectIds: entity.projectIds,
     locale: appLocale.languageCode,
   );
 
@@ -40,6 +40,6 @@ class TestimonialMapper
     linkedinProfile: model.linkedinProfile,
     projectContext: model.projectContext,
     experienceId: model.experienceId,
-    projectId: model.projectId,
+    projectIds: model.projectIds,
   );
 }

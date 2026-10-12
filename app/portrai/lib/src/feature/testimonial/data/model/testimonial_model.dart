@@ -15,9 +15,9 @@ class TestimonialModel {
     required this.companyLogo,
     required this.linkedinProfile,
     required this.projectContext,
+    required this.experienceId,
     required this.locale,
-    this.experienceId,
-    this.projectId,
+    this.projectIds = const [],
   });
 
   factory TestimonialModel.fromJson(Map<String, dynamic> json) =>
@@ -34,8 +34,8 @@ class TestimonialModel {
   final String linkedinProfile;
   final String projectContext;
   final String locale;
-  final String? experienceId;
-  final String? projectId;
+  final String experienceId;
+  final List<String> projectIds;
 
   Map<String, dynamic> toJson() => _$TestimonialModelToJson(this);
 }

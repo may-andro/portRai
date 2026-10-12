@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cache/cache.dart';
 import 'package:core/core.dart';
 import 'package:module_injector/module_injector.dart';
@@ -14,7 +16,7 @@ class TestimonialCache extends DBCache<TestimonialModel> {
   String get tableName => 'testimonial_table';
 
   @override
-  int get tableVersion => 2;
+  int get tableVersion => 3;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -28,8 +30,8 @@ class TestimonialCache extends DBCache<TestimonialModel> {
     const DbColumnDefinition(name: 'companyLogo', nullable: false),
     const DbColumnDefinition(name: 'linkedinProfile', nullable: false),
     const DbColumnDefinition(name: 'projectContext', nullable: false),
-    const DbColumnDefinition(name: 'experienceId'),
-    const DbColumnDefinition(name: 'projectId'),
+    const DbColumnDefinition(name: 'experienceId', nullable: false),
+    const DbColumnDefinition(name: 'projectIds', nullable: false),
     const DbColumnDefinition(name: 'locale', nullable: false),
   ];
 
@@ -38,12 +40,20 @@ class TestimonialCache extends DBCache<TestimonialModel> {
 
   @override
   TestimonialModel deserialize(Map<String, dynamic> map) {
-    return TestimonialModel.fromJson(map);
+    final modifiedMap = Map<String, dynamic>.from(map);
+    if (modifiedMap['projectIds'] is String) {
+      modifiedMap['projectIds'] = jsonDecode(
+        modifiedMap['projectIds'] as String,
+      );
+    }
+    return TestimonialModel.fromJson(modifiedMap);
   }
 
   @override
   Map<String, dynamic> serialize(TestimonialModel model) {
-    return model.toJson();
+    final json = model.toJson();
+    json['projectIds'] = jsonEncode(json['projectIds']);
+    return json;
   }
 
   @override
