@@ -61,3 +61,41 @@ final dsProgressRing = CatalogItem(
     );
   },
 );
+
+final dsCodeBlock = CatalogItem(
+  name: 'DSCodeBlock',
+  dataSchema: S.object(
+    description:
+        'A short code or command snippet that keeps its line breaks and '
+        'scrolls sideways.',
+    properties: {
+      'code': S.string(description: 'The snippet, at most 40 lines.'),
+    },
+    required: ['code'],
+  ),
+  widgetBuilder: (itemContext) {
+    final code = (itemContext.data as JsonMap)['code'];
+    if (code is! String || code.trim().isEmpty) return const SizedBox.shrink();
+    final lines = code.split('\n');
+    final shown = lines.take(40).join('\n');
+    return Builder(
+      builder: (context) => Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(context.space(factor: 1.25)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.neutral.grey3.color,
+          borderRadius: BorderRadius.circular(context.space()),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DSTextWidget(
+            shown,
+            softWrap: false,
+            style: context.typography.bodySmall,
+            color: context.colorPalette.neutral.grey9,
+          ),
+        ),
+      ),
+    );
+  },
+);

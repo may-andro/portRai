@@ -32,6 +32,7 @@ void main() {
       'DSTabs',
       'DSCallout',
       'DSProgressRing',
+      'DSCodeBlock',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -522,6 +523,19 @@ void main() {
     expect(ring.value, 1.0);
     expect(find.text('250%'), findsOneWidget);
     expect(find.text('Flutter'), findsOneWidget);
+  });
+
+  testWidgets('should keep line breaks when DSCodeBlock is used', (
+    tester,
+  ) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(),
+      '''
+{"id":"root","component":"DSCodeBlock","code":"flutter pub get\\nflutter run"}''',
+    );
+
+    expect(find.text('flutter pub get\nflutter run'), findsOneWidget);
   });
 }
 

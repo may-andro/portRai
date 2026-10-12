@@ -36,6 +36,7 @@ Catalog createAssistantCatalog({
   dsTabs,
   dsCallout,
   dsProgressRing,
+  dsCodeBlock,
   if (allowedUrls.isNotEmpty) createDsImage(allowedUrls),
   if (allowedUrls.isNotEmpty && onOpenLink != null)
     createDsLinkButton(allowedUrls: allowedUrls, onOpenLink: onOpenLink),

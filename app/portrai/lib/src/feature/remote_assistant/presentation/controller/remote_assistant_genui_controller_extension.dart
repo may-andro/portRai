@@ -18,6 +18,7 @@ const _responseStyleInstruction =
     'DSStatGrid for two to four DSMetric side by side, DSCarousel for several cards, DSTabs to switch between groups, '
     'DSCallout for a highlighted note such as availability, '
     'DSProgressRing for one proficiency value, '
+    'DSCodeBlock for a short code or command snippet, '
     'DSText variants heading, title, body '
     'and caption for prose. Group with a DSColumn root; use a DSCard only '
     'around a distinct group, and never around a one-line answer. For a '
