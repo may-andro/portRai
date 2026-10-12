@@ -278,8 +278,12 @@ Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md)
 
 ### Maps API Key
 
-`DSMap` uses `google_maps_flutter`, which needs a Maps API key per platform. The key is not committed:
+`DSMap` uses `google_maps_flutter`, which needs one Google Maps API key per platform. Keys are not committed. Create each key in Google Cloud Console under APIs & Services, Credentials, Create credentials, API key, in a project with billing enabled.
 
-- Android: pass `-PMAPS_API_KEY=<key>` or set the `MAPS_API_KEY` environment variable.
-- iOS: define `MAPS_API_KEY = <key>` in the git-ignored `ios/Flutter/Secrets.xcconfig`.
-- Web: replace `MAPS_API_KEY` in the Maps script URL in `web/index.html` at build time.
+| Platform | API restriction (enable the API first under Library) | Application restriction | Where the key goes |
+|---|---|---|---|
+| Android | Maps SDK for Android | Android apps: package `com.mayandro.portrai` plus one SHA-1 per signing key (debug, release, Play App Signing) | `MAPS_API_KEY` in `~/.gradle/gradle.properties`, or the `MAPS_API_KEY` environment variable |
+| iOS | Maps SDK for iOS | iOS apps: bundle ID of the Runner target | `MAPS_API_KEY = <key>` in the git-ignored `ios/Flutter/Secrets.xcconfig` |
+| Web | Maps JavaScript API | Websites: HTTP referrers such as `https://<domain>/*` and `http://localhost:*/*` for local runs | Replace `MAPS_API_KEY` in the script URL in `web/index.html` at build time |
+
+Get an Android SHA-1 with `keytool -list -v -alias <alias> -keystore <keystore>` or `./gradlew signingReport` in `android`. The debug keystore is `~/.android/debug.keystore` with alias `androiddebugkey` and password `android`.
