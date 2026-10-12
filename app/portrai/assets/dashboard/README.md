@@ -2,6 +2,8 @@
 
 This directory contains mock JSON data used for local development and testing.
 
+The committed `*.template.json` files hold fictional demo data for a sample profile (Nova Lindqvist) in `en`, `es` and `nl`, so the app can run in demos without any personal data.
+
 ## 📁 Files
 
 - `experiences.json` - Work experience data
@@ -30,7 +32,7 @@ This directory contains mock JSON data used for local development and testing.
    cp testimonials.template.json testimonials.json
    ```
 
-2. Edit the `.json` files with your actual data
+2. Keep the demo data, or edit the `.json` files with your actual data
 
 ### For CI/CD
 
@@ -48,13 +50,13 @@ In builds with the developer menu enabled, use the **Use demo data** switch (Dat
 assets/dashboard/
 ├── README.md                     # This file (committed)
 ├── .gitkeep.json                 # Directory marker (committed)
-├── *.template.json               # Empty templates (committed)
+├── *.template.json               # Fictional demo data (committed)
 └── *.json                        # Actual data (git-ignored)
 ```
 
 ## ✅ Best Practices
 
 - Keep actual `.json` files with sensitive/real data
-- Templates remain empty arrays/objects
+- Templates contain fictional demo data only, never real personal data
 - CI uses templates to satisfy asset requirements
 - Prevents analyzer warnings without exposing data

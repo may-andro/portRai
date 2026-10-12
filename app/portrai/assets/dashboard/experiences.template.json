@@ -1,1 +1,410 @@
-[]
+{
+  "en": {
+    "experiences": [
+      {
+        "company": "Aurora Commerce",
+        "position": "Principal Mobile Engineer",
+        "location": "Amsterdam, Netherlands [Hybrid]",
+        "startDate": "2023-03-01",
+        "endDate": null,
+        "current": true,
+        "employmentType": "Full-time",
+        "description": "Leading the mobile platform for a pan-European marketplace used by millions, from architecture to on-device AI shopping assistants.",
+        "longDescription": "As Principal Engineer I own the technical vision of the Flutter apps across five countries. I introduced a modular monorepo, a shared design system and an on-device assistant that answers product questions offline, while mentoring a group of twelve engineers.",
+        "responsibilities": [
+          "Define the mobile architecture and technical roadmap",
+          "Mentor engineers and run the architecture guild",
+          "Prototype and ship on-device AI features",
+          "Partner with product and design on discovery"
+        ],
+        "achievements": [
+          "Cut cold-start time by 40% across all apps",
+          "Launched an offline AI shopping assistant used by 1M+ people",
+          "Raised crash-free sessions to 99.8%"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Clean Architecture",
+          "Design Systems",
+          "On-device AI",
+          "Firebase",
+          "GraphQL",
+          "CI/CD"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=aurora_commerce",
+        "url": "https://aurora_commerce.example.com/",
+        "id": "aurora_commerce",
+        "latitude": 52.3676,
+        "longitude": 4.9041
+      },
+      {
+        "company": "PixelForge Studio",
+        "position": "Lead Flutter Developer",
+        "location": "Stockholm, Sweden [Remote]",
+        "startDate": "2020-02-01",
+        "endDate": "2023-02-28",
+        "current": false,
+        "employmentType": "Full-time",
+        "description": "Led a squad building fintech and mobility apps with Flutter, introducing modularization and automated quality gates.",
+        "longDescription": "Guided a squad of six through the migration from native to Flutter, set up a Storybook-documented design system and built release pipelines that shipped weekly to both stores.",
+        "responsibilities": [
+          "Lead a squad of six developers",
+          "Own CI/CD and release management",
+          "Establish testing strategy and code reviews"
+        ],
+        "achievements": [
+          "Shipped weekly releases with zero downtime",
+          "Reached 85% test coverage on core modules"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Storybook",
+          "Fastlane",
+          "GitHub Actions"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=pixelforge_studio",
+        "url": "https://pixelforge_studio.example.com/",
+        "id": "pixelforge_studio",
+        "latitude": 59.3293,
+        "longitude": 18.0686
+      },
+      {
+        "company": "Lumen Labs",
+        "position": "Senior Mobile Developer",
+        "location": "Berlin, Germany",
+        "startDate": "2016-09-01",
+        "endDate": "2020-01-31",
+        "current": false,
+        "employmentType": "Full-time",
+        "description": "Built consumer health and wellness apps for Android and Flutter, from prototypes to millions of installs.",
+        "longDescription": "Joined as an Android specialist and became the early Flutter champion, building offline-first features, wearable integrations and an accessibility-first component library.",
+        "responsibilities": [
+          "Develop native Android and Flutter features",
+          "Integrate wearables and health APIs"
+        ],
+        "achievements": [
+          "Grew the app to 3M+ installs",
+          "Introduced Flutter to the company"
+        ],
+        "technologies": [
+          "Kotlin",
+          "Android",
+          "Flutter",
+          "Room",
+          "Bluetooth LE",
+          "Accessibility"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=lumen_labs",
+        "url": "https://lumen_labs.example.com/",
+        "id": "lumen_labs",
+        "latitude": 52.52,
+        "longitude": 13.405
+      },
+      {
+        "company": "Nordic Pixels",
+        "position": "Android Developer",
+        "location": "Gothenburg, Sweden",
+        "startDate": "2013-08-01",
+        "endDate": "2016-08-31",
+        "current": false,
+        "employmentType": "Full-time",
+        "description": "Started my career crafting Android games and utilities for a boutique mobile studio.",
+        "longDescription": "Built and maintained a portfolio of Android titles, learning the foundations of performance tuning, animation and user-centred design.",
+        "responsibilities": [
+          "Develop Android apps in Java",
+          "Optimize rendering and memory usage"
+        ],
+        "achievements": [
+          "Shipped 8 titles to Google Play"
+        ],
+        "technologies": [
+          "Java",
+          "Android SDK",
+          "OpenGL",
+          "SQLite"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=nordic_pixels",
+        "url": "https://nordic_pixels.example.com/",
+        "id": "nordic_pixels",
+        "latitude": 57.7089,
+        "longitude": 11.9746
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "es": {
+    "experiences": [
+      {
+        "company": "Aurora Commerce",
+        "position": "Ingeniera Móvil Principal",
+        "location": "Ámsterdam, Países Bajos [Híbrido]",
+        "startDate": "2023-03-01",
+        "endDate": null,
+        "current": true,
+        "employmentType": "Tiempo completo",
+        "description": "Lidero la plataforma móvil de un marketplace paneuropeo usado por millones de personas, desde la arquitectura hasta asistentes de compra con IA en el dispositivo.",
+        "longDescription": "Como ingeniera principal soy responsable de la visión técnica de las apps Flutter en cinco países. Introduje un monorepo modular, un sistema de diseño compartido y un asistente en el dispositivo que responde preguntas sobre productos sin conexión, mentorizando a doce ingenieros.",
+        "responsibilities": [
+          "Definir la arquitectura móvil y la hoja de ruta técnica",
+          "Mentorizar ingenieros y dirigir el gremio de arquitectura",
+          "Prototipar y lanzar funciones de IA en el dispositivo",
+          "Colaborar con producto y diseño en el descubrimiento"
+        ],
+        "achievements": [
+          "Reducción del 40% del tiempo de arranque en todas las apps",
+          "Lanzamiento de un asistente de compras con IA sin conexión usado por más de 1M de personas",
+          "Sesiones sin fallos elevadas al 99,8%"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Clean Architecture",
+          "Design Systems",
+          "On-device AI",
+          "Firebase",
+          "GraphQL",
+          "CI/CD"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=aurora_commerce",
+        "url": "https://aurora_commerce.example.com/",
+        "id": "aurora_commerce",
+        "latitude": 52.3676,
+        "longitude": 4.9041
+      },
+      {
+        "company": "PixelForge Studio",
+        "position": "Desarrolladora Flutter Líder",
+        "location": "Estocolmo, Suecia [Remoto]",
+        "startDate": "2020-02-01",
+        "endDate": "2023-02-28",
+        "current": false,
+        "employmentType": "Tiempo completo",
+        "description": "Lideré un equipo que creó apps de fintech y movilidad con Flutter, introduciendo modularización y controles de calidad automatizados.",
+        "longDescription": "Guié a un equipo de seis en la migración de nativo a Flutter, creé un sistema de diseño documentado en Storybook y construí pipelines de lanzamiento semanales para ambas tiendas.",
+        "responsibilities": [
+          "Liderar un equipo de seis desarrolladores",
+          "Gestionar CI/CD y lanzamientos",
+          "Definir la estrategia de pruebas y revisiones de código"
+        ],
+        "achievements": [
+          "Lanzamientos semanales sin tiempo de inactividad",
+          "85% de cobertura de pruebas en los módulos principales"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Storybook",
+          "Fastlane",
+          "GitHub Actions"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=pixelforge_studio",
+        "url": "https://pixelforge_studio.example.com/",
+        "id": "pixelforge_studio",
+        "latitude": 59.3293,
+        "longitude": 18.0686
+      },
+      {
+        "company": "Lumen Labs",
+        "position": "Desarrolladora Móvil Sénior",
+        "location": "Berlín, Alemania",
+        "startDate": "2016-09-01",
+        "endDate": "2020-01-31",
+        "current": false,
+        "employmentType": "Tiempo completo",
+        "description": "Creé apps de salud y bienestar para Android y Flutter, desde prototipos hasta millones de instalaciones.",
+        "longDescription": "Me uní como especialista en Android y me convertí en la primera defensora de Flutter, creando funciones offline-first, integraciones con wearables y una librería de componentes centrada en accesibilidad.",
+        "responsibilities": [
+          "Desarrollar funciones nativas de Android y Flutter",
+          "Integrar wearables y APIs de salud"
+        ],
+        "achievements": [
+          "Aplicación con más de 3M de instalaciones",
+          "Introducción de Flutter en la empresa"
+        ],
+        "technologies": [
+          "Kotlin",
+          "Android",
+          "Flutter",
+          "Room",
+          "Bluetooth LE",
+          "Accessibility"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=lumen_labs",
+        "url": "https://lumen_labs.example.com/",
+        "id": "lumen_labs",
+        "latitude": 52.52,
+        "longitude": 13.405
+      },
+      {
+        "company": "Nordic Pixels",
+        "position": "Desarrolladora Android",
+        "location": "Gotemburgo, Suecia",
+        "startDate": "2013-08-01",
+        "endDate": "2016-08-31",
+        "current": false,
+        "employmentType": "Tiempo completo",
+        "description": "Comencé mi carrera creando juegos y utilidades Android para un estudio móvil boutique.",
+        "longDescription": "Construí y mantuve un portafolio de títulos Android, aprendiendo los fundamentos de optimización, animación y diseño centrado en el usuario.",
+        "responsibilities": [
+          "Desarrollar apps Android en Java",
+          "Optimizar renderizado y uso de memoria"
+        ],
+        "achievements": [
+          "8 títulos publicados en Google Play"
+        ],
+        "technologies": [
+          "Java",
+          "Android SDK",
+          "OpenGL",
+          "SQLite"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=nordic_pixels",
+        "url": "https://nordic_pixels.example.com/",
+        "id": "nordic_pixels",
+        "latitude": 57.7089,
+        "longitude": 11.9746
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "nl": {
+    "experiences": [
+      {
+        "company": "Aurora Commerce",
+        "position": "Principal Mobile Engineer",
+        "location": "Amsterdam, Nederland [Hybride]",
+        "startDate": "2023-03-01",
+        "endDate": null,
+        "current": true,
+        "employmentType": "Fulltime",
+        "description": "Leidt het mobiele platform van een pan-Europese marktplaats met miljoenen gebruikers, van architectuur tot on-device AI-winkelassistenten.",
+        "longDescription": "Als Principal Engineer ben ik verantwoordelijk voor de technische visie van de Flutter-apps in vijf landen. Ik introduceerde een modulaire monorepo, een gedeeld designsysteem en een on-device assistent die offline productvragen beantwoordt, en coach twaalf engineers.",
+        "responsibilities": [
+          "De mobiele architectuur en technische roadmap bepalen",
+          "Engineers coachen en de architectuurgilde leiden",
+          "On-device AI-functies prototypen en opleveren",
+          "Samenwerken met product en design aan discovery"
+        ],
+        "achievements": [
+          "Koude starttijd met 40% verlaagd in alle apps",
+          "Offline AI-winkelassistent gelanceerd met 1M+ gebruikers",
+          "Crashvrije sessies verhoogd naar 99,8%"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Clean Architecture",
+          "Design Systems",
+          "On-device AI",
+          "Firebase",
+          "GraphQL",
+          "CI/CD"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=aurora_commerce",
+        "url": "https://aurora_commerce.example.com/",
+        "id": "aurora_commerce",
+        "latitude": 52.3676,
+        "longitude": 4.9041
+      },
+      {
+        "company": "PixelForge Studio",
+        "position": "Lead Flutter Developer",
+        "location": "Stockholm, Zweden [Remote]",
+        "startDate": "2020-02-01",
+        "endDate": "2023-02-28",
+        "current": false,
+        "employmentType": "Fulltime",
+        "description": "Leidde een squad die fintech- en mobiliteitsapps bouwde met Flutter, met modularisatie en geautomatiseerde kwaliteitscontroles.",
+        "longDescription": "Begeleidde een squad van zes bij de migratie van native naar Flutter, zette een designsysteem op met Storybook en bouwde releasepipelines die wekelijks naar beide stores leverden.",
+        "responsibilities": [
+          "Een squad van zes developers leiden",
+          "CI/CD en releasemanagement beheren",
+          "Teststrategie en codereviews opzetten"
+        ],
+        "achievements": [
+          "Wekelijkse releases zonder downtime",
+          "85% testdekking op kernmodules"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Storybook",
+          "Fastlane",
+          "GitHub Actions"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=pixelforge_studio",
+        "url": "https://pixelforge_studio.example.com/",
+        "id": "pixelforge_studio",
+        "latitude": 59.3293,
+        "longitude": 18.0686
+      },
+      {
+        "company": "Lumen Labs",
+        "position": "Senior Mobile Developer",
+        "location": "Berlijn, Duitsland",
+        "startDate": "2016-09-01",
+        "endDate": "2020-01-31",
+        "current": false,
+        "employmentType": "Fulltime",
+        "description": "Bouwde consumenten-apps voor gezondheid en welzijn voor Android en Flutter, van prototype tot miljoenen installaties.",
+        "longDescription": "Begon als Android-specialist en werd de eerste Flutter-voorvechter, met offline-first functies, wearable-integraties en een toegankelijkheidsgerichte componentenbibliotheek.",
+        "responsibilities": [
+          "Native Android- en Flutter-functies ontwikkelen",
+          "Wearables en gezondheids-API's integreren"
+        ],
+        "achievements": [
+          "App gegroeid naar 3M+ installaties",
+          "Flutter geïntroduceerd binnen het bedrijf"
+        ],
+        "technologies": [
+          "Kotlin",
+          "Android",
+          "Flutter",
+          "Room",
+          "Bluetooth LE",
+          "Accessibility"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=lumen_labs",
+        "url": "https://lumen_labs.example.com/",
+        "id": "lumen_labs",
+        "latitude": 52.52,
+        "longitude": 13.405
+      },
+      {
+        "company": "Nordic Pixels",
+        "position": "Android Developer",
+        "location": "Göteborg, Zweden",
+        "startDate": "2013-08-01",
+        "endDate": "2016-08-31",
+        "current": false,
+        "employmentType": "Fulltime",
+        "description": "Startte mijn carrière met het maken van Android-games en -tools voor een boutique mobiele studio.",
+        "longDescription": "Bouwde en onderhield een portfolio van Android-titels en leerde de basis van performance-tuning, animatie en gebruikersgericht ontwerp.",
+        "responsibilities": [
+          "Android-apps ontwikkelen in Java",
+          "Rendering en geheugengebruik optimaliseren"
+        ],
+        "achievements": [
+          "8 titels gepubliceerd op Google Play"
+        ],
+        "technologies": [
+          "Java",
+          "Android SDK",
+          "OpenGL",
+          "SQLite"
+        ],
+        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=nordic_pixels",
+        "url": "https://nordic_pixels.example.com/",
+        "id": "nordic_pixels",
+        "latitude": 57.7089,
+        "longitude": 11.9746
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  }
+}

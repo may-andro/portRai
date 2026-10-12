@@ -1,1 +1,719 @@
-[]
+{
+  "en": {
+    "experties": [
+      {
+        "image": "https://cdn.simpleicons.org/flutter",
+        "title": "Flutter Development",
+        "skills": [
+          {
+            "name": "Flutter SDK",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Custom Painters & Animations",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Platform Channels / FFI",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Responsive & Adaptive UI",
+            "level": "expert",
+            "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Web",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/android",
+        "title": "Native Android Development",
+        "skills": [
+          {
+            "name": "Kotlin",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Jetpack Compose",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Android SDK",
+            "level": "expert",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Coroutines & Flow",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/diagramsdotnet",
+        "title": "Architecture & Patterns",
+        "skills": [
+          {
+            "name": "Clean Architecture",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "BLoC",
+            "level": "expert",
+            "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Modularization",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dependency Injection",
+            "level": "advanced",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Domain-Driven Design",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/speedtest",
+        "title": "Performance Optimization",
+        "skills": [
+          {
+            "name": "Profiling with DevTools",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Startup Optimization",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Memory Management",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/firebase",
+        "title": "Backend Integration",
+        "skills": [
+          {
+            "name": "Firebase",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "GraphQL",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "REST APIs",
+            "level": "expert",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "WebSockets",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/testinglibrary",
+        "title": "Testing & QA",
+        "skills": [
+          {
+            "name": "Unit & Widget Testing",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Golden Testing",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Integration Testing",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/githubactions",
+        "title": "Release & Deployment",
+        "skills": [
+          {
+            "name": "GitHub Actions",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Fastlane",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Store Release Management",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/googlegemini",
+        "title": "AI & Generative UI",
+        "skills": [
+          {
+            "name": "On-device LLMs",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Generative UI",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Prompt Engineering",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "es": {
+    "experties": [
+      {
+        "image": "https://cdn.simpleicons.org/flutter",
+        "title": "Desarrollo con Flutter",
+        "skills": [
+          {
+            "name": "Flutter SDK",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Custom Painters & Animations",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Platform Channels / FFI",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Responsive & Adaptive UI",
+            "level": "expert",
+            "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Web",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/android",
+        "title": "Desarrollo nativo Android",
+        "skills": [
+          {
+            "name": "Kotlin",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Jetpack Compose",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Android SDK",
+            "level": "expert",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Coroutines & Flow",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/diagramsdotnet",
+        "title": "Arquitectura y patrones",
+        "skills": [
+          {
+            "name": "Clean Architecture",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "BLoC",
+            "level": "expert",
+            "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Modularization",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dependency Injection",
+            "level": "advanced",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Domain-Driven Design",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/speedtest",
+        "title": "Optimización del rendimiento",
+        "skills": [
+          {
+            "name": "Profiling with DevTools",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Startup Optimization",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Memory Management",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/firebase",
+        "title": "Integración con backend",
+        "skills": [
+          {
+            "name": "Firebase",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "GraphQL",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "REST APIs",
+            "level": "expert",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "WebSockets",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/testinglibrary",
+        "title": "Pruebas y QA",
+        "skills": [
+          {
+            "name": "Unit & Widget Testing",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Golden Testing",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Integration Testing",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/githubactions",
+        "title": "Lanzamiento y despliegue",
+        "skills": [
+          {
+            "name": "GitHub Actions",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Fastlane",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Store Release Management",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/googlegemini",
+        "title": "IA e interfaces generativas",
+        "skills": [
+          {
+            "name": "On-device LLMs",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Generative UI",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Prompt Engineering",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "nl": {
+    "experties": [
+      {
+        "image": "https://cdn.simpleicons.org/flutter",
+        "title": "Flutter-ontwikkeling",
+        "skills": [
+          {
+            "name": "Flutter SDK",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Custom Painters & Animations",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Platform Channels / FFI",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Responsive & Adaptive UI",
+            "level": "expert",
+            "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Web",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/android",
+        "title": "Native Android-ontwikkeling",
+        "skills": [
+          {
+            "name": "Kotlin",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Jetpack Compose",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Android SDK",
+            "level": "expert",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Coroutines & Flow",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/diagramsdotnet",
+        "title": "Architectuur & patronen",
+        "skills": [
+          {
+            "name": "Clean Architecture",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "BLoC",
+            "level": "expert",
+            "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Modularization",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dependency Injection",
+            "level": "advanced",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Domain-Driven Design",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/speedtest",
+        "title": "Performance-optimalisatie",
+        "skills": [
+          {
+            "name": "Profiling with DevTools",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Startup Optimization",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Memory Management",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/firebase",
+        "title": "Backend-integratie",
+        "skills": [
+          {
+            "name": "Firebase",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "GraphQL",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "REST APIs",
+            "level": "expert",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "WebSockets",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/testinglibrary",
+        "title": "Testen & QA",
+        "skills": [
+          {
+            "name": "Unit & Widget Testing",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Golden Testing",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Integration Testing",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/githubactions",
+        "title": "Release & deployment",
+        "skills": [
+          {
+            "name": "GitHub Actions",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Fastlane",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Store Release Management",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://cdn.simpleicons.org/googlegemini",
+        "title": "AI & generatieve UI",
+        "skills": [
+          {
+            "name": "On-device LLMs",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Generative UI",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Prompt Engineering",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  }
+}
