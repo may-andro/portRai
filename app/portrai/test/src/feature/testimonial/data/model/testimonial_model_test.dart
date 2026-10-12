@@ -15,6 +15,7 @@ void main() {
     'linkedinProfile': 'https://linkedin.com/in/john-doe',
     'projectContext': 'Portfolio App',
     'locale': 'en',
+    'experienceId': 'acme',
   };
 
   group('TestimonialModel', () {
@@ -26,6 +27,7 @@ void main() {
       expect(model.company, 'Acme');
       expect(model.projectContext, 'Portfolio App');
       expect(model.locale, 'en');
+      expect(model.experienceId, 'acme');
     });
 
     test('should preserve all fields when serialized and deserialized', () {

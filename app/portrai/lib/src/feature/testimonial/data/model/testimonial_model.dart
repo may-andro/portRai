@@ -16,6 +16,7 @@ class TestimonialModel {
     required this.linkedinProfile,
     required this.projectContext,
     required this.locale,
+    this.experienceId,
   });
 
   factory TestimonialModel.fromJson(Map<String, dynamic> json) =>
@@ -32,6 +33,7 @@ class TestimonialModel {
   final String linkedinProfile;
   final String projectContext;
   final String locale;
+  final String? experienceId;
 
   Map<String, dynamic> toJson() => _$TestimonialModelToJson(this);
 }

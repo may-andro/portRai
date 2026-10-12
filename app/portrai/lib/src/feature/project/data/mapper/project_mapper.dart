@@ -30,6 +30,7 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       teamSize: entity.teamSize,
       role: entity.role,
       id: entity.id,
+      experienceId: entity.experienceId,
       locale: appLocale.languageCode,
     );
   }
@@ -55,6 +56,7 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       teamSize: model.teamSize,
       role: model.role,
       id: model.id,
+      experienceId: model.experienceId,
     );
   }
 }

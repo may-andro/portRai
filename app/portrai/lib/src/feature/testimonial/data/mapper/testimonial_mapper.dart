@@ -22,6 +22,7 @@ class TestimonialMapper
     companyLogo: entity.companyLogo,
     linkedinProfile: entity.linkedinProfile,
     projectContext: entity.projectContext,
+    experienceId: entity.experienceId,
     locale: appLocale.languageCode,
   );
 
@@ -37,5 +38,6 @@ class TestimonialMapper
     companyLogo: model.companyLogo,
     linkedinProfile: model.linkedinProfile,
     projectContext: model.projectContext,
+    experienceId: model.experienceId,
   );
 }

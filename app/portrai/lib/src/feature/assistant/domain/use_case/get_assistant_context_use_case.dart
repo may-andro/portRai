@@ -156,6 +156,11 @@ class GetAssistantContextUseCase
               'companyLogo': item.companyLogo,
               'url': item.url,
               'id': item.id,
+              'projects': [
+                for (final project in portfolio.projects)
+                  if (project.experienceId == item.id)
+                    {'id': project.id, 'title': project.title},
+              ],
             },
         ],
         'projects': [
@@ -180,6 +185,8 @@ class GetAssistantContextUseCase
               'github': item.github,
               'image': item.image,
               'id': item.id,
+              'experienceId': item.experienceId,
+              'experience': ?_experienceRef(portfolio, item.experienceId),
             },
         ],
         'expertises': [
@@ -208,10 +215,24 @@ class GetAssistantContextUseCase
               'profileImage': item.profileImage,
               'companyLogo': item.companyLogo,
               'id': item.id,
+              'experienceId': item.experienceId,
+              'experience': ?_experienceRef(portfolio, item.experienceId),
             },
         ],
       }),
     );
+  }
+
+  static Map<String, String>? _experienceRef(
+    PortfolioEntity portfolio,
+    String? experienceId,
+  ) {
+    for (final item in portfolio.experiences) {
+      if (item.id == experienceId) {
+        return {'company': item.company, 'position': item.position};
+      }
+    }
+    return null;
   }
 
   static String _date(DateTime date) =>

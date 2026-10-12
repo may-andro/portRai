@@ -12,6 +12,7 @@ This document tracks what is missing, what was already fixed, and what each fix 
 | `profile.workingHours.timezone` | Placeholder (`Your/Timezone`) replaced with `Europe/Madrid`. |
 | `profile.location.coordinates` | Set to Alicante (38.3452, -0.4810) instead of 0,0. |
 | `profile.languages` | Spanish added (Proficient / Competente / Vaardig) next to English. |
+| Projects, testimonials | Each now carries an `experienceId` pointing to its experience (employer). The assistant context resolves it to the company and position, and lists each experience's projects. |
 | Projects | Swapped MediaMarkt Turkey Play Store and App Store links corrected. |
 
 ## Open data gaps

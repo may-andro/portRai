@@ -24,12 +24,14 @@ class ProjectModel {
     this.playStore,
     this.website,
     this.github,
+    this.experienceId,
   });
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) =>
       _$ProjectModelFromJson(json);
 
   final String id;
+  final String? experienceId;
   final String title;
   final String description;
   final String longDescription;

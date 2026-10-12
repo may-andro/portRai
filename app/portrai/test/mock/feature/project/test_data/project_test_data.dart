@@ -3,6 +3,7 @@ import 'package:portrai/src/feature/project/domain/_domain.dart';
 
 ProjectEntity createProjectEntity({
   String id = 'port-rai',
+  String? experienceId,
   String title = 'PortRai 🚀',
   DateTime? endDate,
   bool hasEndDate = true,
@@ -13,6 +14,7 @@ ProjectEntity createProjectEntity({
 }) {
   return ProjectEntity(
     id: id,
+    experienceId: experienceId,
     title: title,
     description: 'A polished portfolio app',
     longDescription:
