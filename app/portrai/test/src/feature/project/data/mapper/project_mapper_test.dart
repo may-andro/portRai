@@ -31,5 +31,18 @@ void main() {
         expect(mapper.to(model), entity);
       },
     );
+
+    test('should keep the market coordinates when mapping both ways', () {
+      final withMarket = createProjectEntity(
+        marketLatitude: 51.1657,
+        marketLongitude: 10.4515,
+      );
+
+      final model = mapper.from(withMarket);
+
+      expect(model.marketLatitude, 51.1657);
+      expect(model.marketLongitude, 10.4515);
+      expect(mapper.to(model), withMarket);
+    });
   });
 }

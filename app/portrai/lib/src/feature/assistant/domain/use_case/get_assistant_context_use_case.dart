@@ -180,6 +180,11 @@ class GetAssistantContextUseCase
               'github': item.github,
               'image': item.image,
               'id': item.id,
+              if (item.marketLatitude != null && item.marketLongitude != null)
+                'market': {
+                  'latitude': item.marketLatitude,
+                  'longitude': item.marketLongitude,
+                },
             },
         ],
         'expertises': [
