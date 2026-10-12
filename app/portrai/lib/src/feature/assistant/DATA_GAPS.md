@@ -60,7 +60,7 @@ Questions the assistant cannot answer today because the data does not exist:
 | Relocation reasons | `availability.relocationNotes` |
 | Hobbies and interests | `profile.interests` |
 | Soft skills | `profile.softSkills` |
-| Certifications and courses | `profile.certifications` (sample entry, replace with real certifications) |
+| Certifications and courses | `profile.certifications` (field exists, list empty) |
 
 ## Behaviour for missing data
 The assistant is instructed to say the information is not available in the portfolio instead of
