@@ -227,6 +227,7 @@ class RemoteAssistantBloc
   ) async {
     final uri = Uri.tryParse(event.url);
     if (uri == null) return;
+    _trackingDelegate.trackLinkClick();
     await _openExternalUrlUseCase(OpenExternalUrlParam(uri));
   }
 
@@ -254,7 +255,11 @@ class RemoteAssistantBloc
       }
       return;
     }
-    _trackingDelegate.trackQuestionSubmission();
+    if (event.isSuggestion) {
+      _trackingDelegate.trackSuggestionClick();
+    } else {
+      _trackingDelegate.trackQuestionSubmission();
+    }
     final messages = [
       ...history,
       AssistantMessageEntity(
@@ -288,8 +293,9 @@ class RemoteAssistantBloc
         allowedContactLinks: assistantContactLinksFrom(state.portfolioContext!),
         allowedLocations: assistantLocationsFrom(state.portfolioContext!),
         onOpenLink: (url) => add(OpenRemoteAssistantLinkClickEvent(url)),
-        onAskQuestion: (question) =>
-            add(SendRemoteAssistantQuestionClickEvent(question)),
+        onAskQuestion: (question) => add(
+          SendRemoteAssistantQuestionClickEvent(question, isSuggestion: true),
+        ),
       );
       genuiController = controller;
       _genuiControllers.add(controller);
