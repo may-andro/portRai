@@ -95,7 +95,7 @@ class _DesktopContentWidget extends StatelessWidget {
           height: imageHeight,
           width: imageHeight,
           child: _ProfileImageWidget(
-            url: profile.coverImage,
+            url: profile.profileImage,
             isVisible: isVisible,
             animationDelay: 200.ms,
             fit: BoxFit.contain,
