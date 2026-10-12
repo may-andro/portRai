@@ -18,6 +18,8 @@ void main() {
     'technologies': ['Dart'],
     'companyLogo': 'acme.png',
     'url': null,
+    'latitude': 52.37,
+    'longitude': 4.9,
     'id': 'acme-engineer',
     'locale': 'en',
   };
@@ -34,6 +36,8 @@ void main() {
       expect(model.achievements, ['Shipped']);
       expect(model.technologies, ['Dart']);
       expect(model.url, isNull);
+      expect(model.latitude, 52.37);
+      expect(model.longitude, 4.9);
       expect(model.locale, 'en');
     });
 

@@ -17,6 +17,8 @@ class ExperienceEntity extends Equatable {
     required this.companyLogo,
     required this.url,
     required this.id,
+    this.latitude,
+    this.longitude,
   });
 
   final String company;
@@ -34,6 +36,8 @@ class ExperienceEntity extends Equatable {
   final String companyLogo;
   final String? url;
   final String id;
+  final double? latitude;
+  final double? longitude;
 
   @override
   List<Object?> get props => [
@@ -52,5 +56,7 @@ class ExperienceEntity extends Equatable {
     companyLogo,
     url,
     id,
+    latitude,
+    longitude,
   ];
 }

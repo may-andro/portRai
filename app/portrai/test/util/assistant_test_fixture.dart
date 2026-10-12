@@ -36,13 +36,18 @@ class AssistantTestFixture {
   AssistantTestFixture({
     bool localRollout = true,
     bool remoteRollout = true,
+    bool remoteGenerativeUi = false,
     bool localSupported = true,
     bool remoteSupported = true,
     bool localEnabled = false,
   }) {
     isLocalAssistantSupportedUseCase = MockIsLocalAssistantSupportedUseCase()
       ..stubCall(localSupported);
-    setRollout(local: localRollout, remote: remoteRollout);
+    setRollout(
+      local: localRollout,
+      remote: remoteRollout,
+      remoteGenerativeUi: remoteGenerativeUi,
+    );
     when(() => context()).thenAnswer((_) => const Right('Fixture portfolio'));
     final prepare = MockPrepareLocalAssistantModelUseCase()
       ..stubCall(const Right(null));
@@ -139,7 +144,11 @@ class AssistantTestFixture {
     appServiceLocator.registerSingleton<RemoteAssistantBloc>(() => remote);
   }
 
-  void setRollout({required bool local, required bool remote}) {
+  void setRollout({
+    required bool local,
+    required bool remote,
+    bool remoteGenerativeUi = false,
+  }) {
     flagRepository
       ..stubIsFeatureEnabled(
         definition: LocalAssistantFeatureFlags.aiAssistant,
@@ -152,6 +161,10 @@ class AssistantTestFixture {
     flag.stubCall(
       definition: RemoteAssistantFeatureFlags.remoteAssistant,
       result: Right(remote),
+    );
+    flag.stubCall(
+      definition: RemoteAssistantFeatureFlags.generativeUi,
+      result: Right(remoteGenerativeUi),
     );
     flag.stubCall(
       definition: LocalAssistantFeatureFlags.aiAssistant,

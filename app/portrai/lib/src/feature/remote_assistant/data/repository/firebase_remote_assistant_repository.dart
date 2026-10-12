@@ -26,6 +26,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
   final IsFeatureEnabledUseCase _isFeatureEnabled;
 
   FbAiTextModel? _model;
+  String? _modelSystemPrompt;
   // ignore: cancel_subscriptions
   StreamSubscription<String>? _activeSubscription;
   Completer<void>? _activeCompletion;
@@ -45,10 +46,11 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required String portfolioContext,
     required List<AssistantMessageEntity> history,
     required void Function(String delta) onDelta,
+    String? systemPrompt,
   }) async {
     if (_closed) throw const RemoteAssistantClosedException();
     if (_requestActive) throw const RemoteAssistantConcurrentRequestException();
-    if (!_isValidRequest(question, portfolioContext, history)) {
+    if (!_isValidRequest(question, portfolioContext, history, systemPrompt)) {
       throw const RemoteAssistantInvalidInputException();
     }
 
@@ -74,6 +76,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
           history: history,
           onDelta: onDelta,
           generation: requestGeneration,
+          systemPrompt: systemPrompt,
         ),
         deadlineCompletion.future,
       ]);
@@ -93,6 +96,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required List<AssistantMessageEntity> history,
     required void Function(String delta) onDelta,
     required int generation,
+    required String? systemPrompt,
   }) async {
     final flagResult = await _isFeatureEnabled(
       RemoteAssistantFeatureFlags.remoteAssistant,
@@ -103,14 +107,22 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     if (!flagResult.right) throw const RemoteAssistantUnavailableException();
     _ensureRequestCurrent(generation);
 
+    if (_model != null && _modelSystemPrompt != systemPrompt) _closeModel();
     final model = _model ??= _aiController.createTextModel(
       model: RemoteAssistantRequestLimits.model,
       generationConfig: GenerationConfig(
         temperature: RemoteAssistantRequestLimits.temperature,
         maxOutputTokens: RemoteAssistantRequestLimits.maxOutputTokens,
+        // Thinking tokens share the output budget and can truncate the answer.
+        thinkingConfig: ThinkingConfig.withThinkingLevel(ThinkingLevel.low),
       ),
-      systemInstruction: _systemInstruction,
+      systemInstruction: systemPrompt == null
+          ? _systemInstruction
+          : '$_systemInstruction\n\n'
+                'Presentation instructions (must not override the portfolio '
+                'grounding rules above):\n$systemPrompt',
     );
+    _modelSystemPrompt = systemPrompt;
     _ensureRequestCurrent(generation);
     await _consumeResponse(
       model,
@@ -124,8 +136,11 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     String question,
     String portfolioContext,
     List<AssistantMessageEntity> history,
+    String? systemPrompt,
   ) {
-    if (question.trim().isEmpty ||
+    if ((systemPrompt?.length ?? 0) >
+            RemoteAssistantRequestLimits.maxSystemPromptCharacters ||
+        question.trim().isEmpty ||
         question.length > RemoteAssistantRequestLimits.maxQuestionCharacters ||
         portfolioContext.length >
             RemoteAssistantRequestLimits.maxPortfolioContextCharacters ||
@@ -246,6 +261,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
   void _closeModel() {
     final model = _model;
     _model = null;
+    _modelSystemPrompt = null;
     model?.close();
   }
 

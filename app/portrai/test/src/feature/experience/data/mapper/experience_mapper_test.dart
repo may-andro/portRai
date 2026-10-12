@@ -29,6 +29,33 @@ void main() {
   );
 
   group('ExperienceMapper', () {
+    test('should keep coordinates when mapping an entity with coordinates', () {
+      final withCoordinates = ExperienceEntity(
+        company: entity.company,
+        position: entity.position,
+        location: entity.location,
+        startDate: startDate,
+        endDate: endDate,
+        current: false,
+        employmentType: entity.employmentType,
+        description: entity.description,
+        longDescription: entity.longDescription,
+        responsibilities: entity.responsibilities,
+        achievements: entity.achievements,
+        technologies: entity.technologies,
+        companyLogo: entity.companyLogo,
+        url: entity.url,
+        id: entity.id,
+        latitude: 52.37,
+        longitude: 4.9,
+      );
+
+      final result = mapper.to(mapper.from(withCoordinates));
+
+      expect(result.latitude, 52.37);
+      expect(result.longitude, 4.9);
+    });
+
     test(
       'should map an entity to a model and add the configured locale when mapping from',
       () {

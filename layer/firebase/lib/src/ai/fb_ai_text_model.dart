@@ -72,7 +72,11 @@ class FbAiTextModel {
           case FinishReason.stop:
             completed = true;
           default:
-            throw AiIncompleteResponseException(response, StackTrace.current);
+            throw AiIncompleteResponseException(
+              response,
+              StackTrace.current,
+              finishReason: reason.name,
+            );
         }
         final text = response.text;
         if (text == null || text.isEmpty) continue;

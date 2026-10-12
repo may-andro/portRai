@@ -4,6 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:genui/genui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/l10n/l10n.dart';
@@ -21,6 +22,47 @@ import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   setUpAll(AssistantTestFixture.registerFallbacks);
+
+  testWidgets(
+    'should render parsed read-only GenUI content in the remote conversation',
+    (tester) async {
+      final fixture = AssistantTestFixture(remoteGenerativeUi: true);
+      await appServiceLocator.reset();
+      addTearDown(appServiceLocator.reset);
+      fixture.install();
+      when(() => fixture.askRemote(any())).thenAnswer((invocation) {
+        final params =
+            invocation.positionalArguments.single
+                as AskRemotePortfolioQuestionParams;
+        params.onDelta('Portfolio summary.\n');
+        params.onDelta('''
+{"version":"v0.9","createSurface":{"surfaceId":"answer","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"answer","components":[
+{"id":"root","component":"DSCard","child":"body"},
+{"id":"body","component":"DSText","text":"Generated portfolio card"}]}}
+''');
+        return const Right(null);
+      });
+      await tester.pumpWidget(
+        const TestWidgetWrapper(child: RemoteAssistantScreen()),
+      );
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Question');
+      await tester.tap(find.byIcon(Icons.send_rounded));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 200)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Portfolio summary.'), findsOneWidget);
+      expect(find.text('Generated portfolio card'), findsOneWidget);
+      expect(find.textContaining('createSurface'), findsNothing);
+      expect(find.textContaining('"component"'), findsNothing);
+      expect(find.byType(Surface), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   for (final locale in AppLocalizations.supportedLocales) {
     for (final path in ['unavailable', 'context retry', 'conversation']) {

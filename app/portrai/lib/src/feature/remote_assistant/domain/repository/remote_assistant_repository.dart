@@ -8,6 +8,7 @@ abstract interface class RemoteAssistantRepository {
     required String portfolioContext,
     required List<AssistantMessageEntity> history,
     required void Function(String delta) onDelta,
+    String? systemPrompt,
   });
 
   Future<void> close();

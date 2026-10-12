@@ -205,6 +205,13 @@ melos:
           echo "Set FIREBASE_APP_CHECK_WEB_SITE_KEY in app/portrai/.env.production or export it before deploying." >&2
           exit 1
         fi
+        if [ -z "${MAPS_API_KEY_WEB:-}" ] && [ -f app/portrai/.env.production ]; then
+          . ./app/portrai/.env.production
+        fi
+        if [ -z "${MAPS_API_KEY_WEB:-}" ]; then
+          echo "Set MAPS_API_KEY_WEB in app/portrai/.env.production or export it before deploying." >&2
+          exit 1
+        fi
         cd app/portrai
         echo "Clean existing repository"
         flutter clean
@@ -218,6 +225,13 @@ melos:
           --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY"
         test -s build/web/sqflite_sw.js
         test -s build/web/sqlite3.wasm
+        echo "Injecting Google Maps API key"
+        sed -i.bak "s/key=MAPS_API_KEY\"/key=$MAPS_API_KEY_WEB\"/" build/web/index.html
+        rm build/web/index.html.bak
+        if grep -q "key=MAPS_API_KEY\"" build/web/index.html; then
+          echo "Maps API key placeholder was not replaced" >&2
+          exit 1
+        fi
         echo "Deploying to Firebase"
         firebase deploy --only hosting:portrai
       description: Deploy and host flutter web page

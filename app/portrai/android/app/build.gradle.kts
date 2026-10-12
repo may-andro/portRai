@@ -32,6 +32,10 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["MAPS_API_KEY"] =
+            (project.findProperty("portRaiMapKeyAndroid") as String?)
+                ?: System.getenv("MAPS_API_KEY")
+                ?: ""
     }
 
     signingConfigs {

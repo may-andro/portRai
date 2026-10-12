@@ -15,6 +15,18 @@ import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_
 import '../../../../../../../mock/feature/remote_assistant/presentation/screen/remote_assistant/tracking/mock_remote_assistant_tracking_delegate.dart';
 
 void main() {
+  const genuiResponse = '''
+Portfolio summary.
+```json
+{"version":"v0.9","createSurface":{"surfaceId":"answer","catalogId":"dev.portrai.assistant"}}
+```
+```json
+{"version":"v0.9","updateComponents":{"surfaceId":"answer","components":[
+{"id":"root","component":"DSCard","child":"body"},
+{"id":"body","component":"DSText","text":"Generated answer"}]}}
+```
+''';
+
   late MockGetAssistantContextUseCase getContext;
   late MockResetRemoteAssistantSessionUseCase resetSession;
   late MockAskRemotePortfolioQuestionUseCase askQuestion;
@@ -34,6 +46,7 @@ void main() {
 
   RemoteAssistantBloc createBloc({
     bool rollout = true,
+    bool generativeUi = false,
     bool platformSupported = true,
   }) {
     getContext = MockGetAssistantContextUseCase();
@@ -52,6 +65,10 @@ void main() {
       ..stubCall(
         definition: RemoteAssistantFeatureFlags.remoteAssistant,
         result: Right(rollout),
+      )
+      ..stubCall(
+        definition: RemoteAssistantFeatureFlags.generativeUi,
+        result: Right(generativeUi),
       );
     platformSupport = MockIsRemoteAssistantSupportedUseCase()
       ..stubCall(Right(platformSupported));
@@ -146,6 +163,87 @@ void main() {
       );
       expect(bloc.state.partialAnswer, isEmpty);
       expect(bloc.state.failure, isNull);
+    },
+  );
+
+  test(
+    'should keep parsed prose and per-turn surfaces when GenUI is enabled',
+    () async {
+      final bloc = createBloc(generativeUi: true);
+      await start(bloc);
+      when(() => askQuestion(any())).thenAnswer((invocation) {
+        final params =
+            invocation.positionalArguments.single
+                as AskRemotePortfolioQuestionParams;
+        params.onDelta(genuiResponse);
+        return const Right(null);
+      });
+      bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
+      await waitFor(
+        bloc,
+        (state) => state.messages.length == 2 && !state.isSendingQuestion,
+      );
+
+      expect(
+        bloc.state.messages.last.content,
+        const AssistantTextResponseEntity(text: 'Portfolio summary.'),
+      );
+      expect(bloc.state.genuiSurfaces, hasLength(1));
+      expect(bloc.state.genuiSurfaces.single.surfaceId, 'answer');
+      expect(bloc.state.genuiSurfaces.single.messageIndex, 1);
+      expect(bloc.state.genuiSurfaces.single.genuiController.activeSurfaceIds, [
+        'answer',
+      ]);
+      expect(
+        bloc.state.messages.last.content.toString(),
+        isNot(contains('createSurface')),
+      );
+    },
+  );
+
+  test(
+    'should return a typed incomplete failure for malformed GenUI output',
+    () async {
+      final bloc = createBloc(generativeUi: true);
+      await start(bloc);
+      when(() => askQuestion(any())).thenAnswer((invocation) {
+        final params =
+            invocation.positionalArguments.single
+                as AskRemotePortfolioQuestionParams;
+        params.onDelta('{"version":"v0.9","createSurface":{}}');
+        return const Right(null);
+      });
+      bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
+      await waitFor(bloc, (state) => state.failure != null);
+
+      expect(bloc.state.failure, isA<RemoteAssistantIncompleteFailure>());
+      expect(bloc.state.messages, isEmpty);
+      expect(bloc.state.genuiSurfaces, isEmpty);
+      expect(bloc.state.partialAnswer, isEmpty);
+    },
+  );
+
+  test(
+    'should discard provisional surfaces and text when GenUI generation fails',
+    () async {
+      final bloc = createBloc(generativeUi: true);
+      await start(bloc);
+      when(() => askQuestion(any())).thenAnswer((invocation) {
+        final params =
+            invocation.positionalArguments.single
+                as AskRemotePortfolioQuestionParams;
+        params.onDelta(genuiResponse);
+        return const Left<RemoteAssistantFailure, void>(
+          RemoteAssistantNetworkFailure(),
+        );
+      });
+      bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
+      await waitFor(bloc, (state) => state.failure != null);
+
+      expect(bloc.state.failure, isA<RemoteAssistantNetworkFailure>());
+      expect(bloc.state.messages, isEmpty);
+      expect(bloc.state.genuiSurfaces, isEmpty);
+      expect(bloc.state.partialAnswer, isEmpty);
     },
   );
 
@@ -311,4 +409,40 @@ void main() {
     expect(bloc.state.messages, isEmpty);
     expect(bloc.state.isSendingQuestion, isFalse);
   });
+
+  test(
+    'should clear GenUI surfaces and ignore late output when its flag is disabled',
+    () async {
+      final bloc = createBloc(generativeUi: true);
+      await start(bloc);
+      final pending = Completer<Either<RemoteAssistantFailure, void>>();
+      when(() => askQuestion(any())).thenAnswer((invocation) {
+        final params =
+            invocation.positionalArguments.single
+                as AskRemotePortfolioQuestionParams;
+        params.onDelta(genuiResponse);
+        return pending.future;
+      });
+      bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
+      await waitFor(bloc, (state) => state.genuiSurfaces.isNotEmpty);
+      flag.stubCall(
+        definition: RemoteAssistantFeatureFlags.generativeUi,
+        result: const Right(false),
+      );
+      bloc.add(const RemoteAssistantInitializedEvent());
+      await waitFor(
+        bloc,
+        (state) =>
+            !state.isSendingQuestion &&
+            state.messages.isEmpty &&
+            !state.isGenerativeUiEnabled,
+      );
+      pending.complete(const Right(null));
+      await pumpEventQueue();
+
+      expect(bloc.state.genuiSurfaces, isEmpty);
+      expect(bloc.state.messages, isEmpty);
+      expect(bloc.state.partialAnswer, isEmpty);
+    },
+  );
 }

@@ -198,6 +198,50 @@ void main() {
     },
   );
 
+  test('should forward bounded framework instructions when supplied', () async {
+    final repository = MockRemoteAssistantRepository()..stubAnswer();
+    final prompt = 'p' * RemoteAssistantRequestLimits.maxSystemPromptCharacters;
+    final result = await _createAskUseCase(repository)(
+      AskRemotePortfolioQuestionParams(
+        question: 'Question',
+        portfolioContext: 'Context',
+        history: const [],
+        onDelta: _ignoreDelta,
+        systemPrompt: prompt,
+      ),
+    );
+    expect(result.isRight, isTrue);
+    verify(
+      () => repository.answer(
+        question: 'Question',
+        portfolioContext: 'Context',
+        history: any(named: 'history'),
+        onDelta: _ignoreDelta,
+        systemPrompt: prompt,
+      ),
+    ).called(1);
+  });
+
+  test(
+    'should reject oversized framework instructions when supplied',
+    () async {
+      final repository = MockRemoteAssistantRepository();
+      final result = await _createAskUseCase(repository)(
+        AskRemotePortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Context',
+          history: const [],
+          onDelta: _ignoreDelta,
+          systemPrompt:
+              'p' *
+              (RemoteAssistantRequestLimits.maxSystemPromptCharacters + 1),
+        ),
+      );
+      expect(result.left, isA<RemoteAssistantInvalidInputFailure>());
+      verifyZeroInteractions(repository);
+    },
+  );
+
   test(
     'should keep prompt and response data out of parameter logging when inspected',
     () {
@@ -207,6 +251,7 @@ void main() {
         portfolioContext: privateText,
         history: [_message(privateText, isUser: false)],
         onDelta: (delta) {},
+        systemPrompt: privateText,
       );
 
       expect(params.toString(), isNot(contains(privateText)));

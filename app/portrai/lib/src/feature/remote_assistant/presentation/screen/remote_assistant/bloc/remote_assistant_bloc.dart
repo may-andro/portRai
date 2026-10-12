@@ -5,9 +5,11 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/tracking/_tracking.dart';
+import 'package:use_case/use_case.dart';
 
 @RegisterSingleton(disposeMethodName: 'close')
 class RemoteAssistantBloc
@@ -40,6 +42,12 @@ class RemoteAssistantBloc
   final RemoteAssistantTrackingDelegate _trackingDelegate;
   int _controlRevision = 0;
   int _requestRevision = 0;
+  final Set<AssistantGenuiController> _genuiControllers = {};
+  final Map<
+    AssistantGenuiController,
+    StreamSubscription<AssistantGenuiResponseException>
+  >
+  _genuiErrorSubscriptions = {};
 
   Future<bool> _checkFlag(
     Emitter<RemoteAssistantState> emit,
@@ -56,6 +64,69 @@ class RemoteAssistantBloc
         result.right &&
         platformSupport.isRight &&
         platformSupport.right) {
+      final generativeUi = await _isFeatureEnabledUseCase(
+        RemoteAssistantFeatureFlags.generativeUi,
+      );
+      if (emit.isDone || controlRevision != _controlRevision) return false;
+      if (generativeUi.isLeft) {
+        _requestRevision++;
+        emit(
+          state.copyWith(
+            status: RemoteAssistantStatus.unavailable,
+            messages: const [],
+            isGenerativeUiEnabled: false,
+            clearGenuiSurfaces: true,
+            partialAnswer: '',
+            isSendingQuestion: false,
+            isLoadingContext: false,
+            clearContext: true,
+            failure: generativeUi.left,
+          ),
+        );
+        _disposeGenuiControllers();
+        final reset = await _resetRemoteAssistantSessionUseCase();
+        if (!emit.isDone &&
+            controlRevision == _controlRevision &&
+            reset.isLeft) {
+          emit(state.copyWith(failure: reset.left));
+        }
+        return false;
+      }
+      final isGenerativeUiEnabled = generativeUi.isRight && generativeUi.right;
+      final modeChanged =
+          state.isGenerativeUiEnabled != isGenerativeUiEnabled &&
+          (state.messages.isNotEmpty ||
+              state.genuiSurfaces.isNotEmpty ||
+              state.isSendingQuestion);
+      if (modeChanged) {
+        _requestRevision++;
+        emit(
+          state.copyWith(
+            isGenerativeUiEnabled: isGenerativeUiEnabled,
+            messages: const [],
+            clearGenuiSurfaces: true,
+            partialAnswer: '',
+            isSendingQuestion: false,
+            failure: generativeUi.isLeft ? generativeUi.left : null,
+            clearFailure: generativeUi.isRight,
+          ),
+        );
+        _disposeGenuiControllers();
+        final reset = await _resetRemoteAssistantSessionUseCase();
+        if (!emit.isDone &&
+            controlRevision == _controlRevision &&
+            reset.isLeft) {
+          emit(state.copyWith(failure: reset.left));
+        }
+        return false;
+      }
+      emit(
+        state.copyWith(
+          isGenerativeUiEnabled: isGenerativeUiEnabled,
+          failure: generativeUi.isLeft ? generativeUi.left : null,
+          clearFailure: generativeUi.isRight,
+        ),
+      );
       return true;
     }
     _requestRevision++;
@@ -63,6 +134,8 @@ class RemoteAssistantBloc
       state.copyWith(
         status: RemoteAssistantStatus.unavailable,
         messages: const [],
+        isGenerativeUiEnabled: false,
+        clearGenuiSurfaces: true,
         partialAnswer: '',
         isSendingQuestion: false,
         isLoadingContext: false,
@@ -71,6 +144,7 @@ class RemoteAssistantBloc
         clearFailure: result.isRight,
       ),
     );
+    _disposeGenuiControllers();
     final reset = await _resetRemoteAssistantSessionUseCase();
     if (!emit.isDone && controlRevision == _controlRevision && reset.isLeft) {
       emit(state.copyWith(failure: reset.left));
@@ -128,11 +202,13 @@ class RemoteAssistantBloc
     emit(
       state.copyWith(
         messages: const [],
+        clearGenuiSurfaces: true,
         partialAnswer: '',
         isSendingQuestion: false,
         clearFailure: true,
       ),
     );
+    _disposeGenuiControllers();
     final result = await _resetRemoteAssistantSessionUseCase();
     if (!emit.isDone && revision == _requestRevision && result.isLeft) {
       emit(state.copyWith(failure: result.left));
@@ -172,56 +248,194 @@ class RemoteAssistantBloc
       ),
     ];
     emit(state.copyWith(messages: messages, partialAnswer: ''));
-    final result = await _askRemotePortfolioQuestionUseCase(
-      AskRemotePortfolioQuestionParams(
+    final requestHistory = state.isGenerativeUiEnabled
+        ? history
+              .where(
+                (message) =>
+                    message.content is AssistantTextResponseEntity &&
+                    (message.content as AssistantTextResponseEntity)
+                        .text
+                        .isNotEmpty,
+              )
+              .toList()
+        : history;
+    final boundedHistory =
+        requestHistory.length <= RemoteAssistantLimits.maxHistoryMessages
+        ? requestHistory
+        : requestHistory.sublist(
+            requestHistory.length - RemoteAssistantLimits.maxHistoryMessages,
+          );
+    final AssistantGenuiController? genuiController;
+    final Either<RemoteAssistantFailure, void> result;
+    if (state.isGenerativeUiEnabled) {
+      final controller = AssistantGenuiController(
+        allowedImageUrls: assistantImageUrlsFrom(state.portfolioContext!),
+        allowedLocations: assistantLocationsFrom(state.portfolioContext!),
+      );
+      genuiController = controller;
+      _genuiControllers.add(controller);
+      _genuiErrorSubscriptions[controller] = controller.frameworkErrors.listen(
+        (_) => _handleGenuiFrameworkError(emit, controller),
+      );
+      final surfaceMessageIndex = messages.length;
+      result = await controller.sendPortfolioQuestion(
+        askRemotePortfolioQuestionUseCase: _askRemotePortfolioQuestionUseCase,
         question: question,
         portfolioContext: state.portfolioContext!,
-        history: history.length <= RemoteAssistantLimits.maxHistoryMessages
-            ? history
-            : history.sublist(
-                history.length - RemoteAssistantLimits.maxHistoryMessages,
-              ),
-        onDelta: (delta) {
+        history: boundedHistory,
+        onText: (text) {
           if (emit.isDone || revision != _requestRevision || !state.isReady) {
             return;
           }
-          emit(state.copyWith(partialAnswer: state.partialAnswer + delta));
+          emit(state.copyWith(partialAnswer: state.partialAnswer + text));
         },
-      ),
-    );
+        onSurfaceUpdate: (_) {
+          if (emit.isDone || revision != _requestRevision || !state.isReady) {
+            return;
+          }
+          final currentSurfaces = state.genuiSurfaces
+              .where(
+                (surface) => !identical(surface.genuiController, controller),
+              )
+              .toList();
+          currentSurfaces.addAll(
+            controller.activeSurfaceIds.map(
+              (surfaceId) => RemoteAssistantSurface(
+                messageIndex: surfaceMessageIndex,
+                genuiController: controller,
+                surfaceId: surfaceId,
+              ),
+            ),
+          );
+          emit(state.copyWith(genuiSurfaces: currentSurfaces));
+        },
+      );
+    } else {
+      genuiController = null;
+      result = await _askRemotePortfolioQuestionUseCase(
+        AskRemotePortfolioQuestionParams(
+          question: question,
+          portfolioContext: state.portfolioContext!,
+          history: boundedHistory,
+          onDelta: (delta) {
+            if (emit.isDone || revision != _requestRevision || !state.isReady) {
+              return;
+            }
+            emit(state.copyWith(partialAnswer: state.partialAnswer + delta));
+          },
+        ),
+      );
+    }
     if (emit.isDone || revision != _requestRevision || !state.isReady) return;
     if (result.isLeft) {
       // Failed user turns and partial answers never enter provider history.
       emit(
         state.copyWith(
           messages: history,
+          clearGenuiSurfaces: true,
           partialAnswer: '',
           isSendingQuestion: false,
           failure: result.left,
         ),
       );
+      if (genuiController != null) _retireGenuiController(genuiController);
       return;
+    }
+    var completedMessages = [
+      ...messages,
+      AssistantMessageEntity(
+        content: AssistantTextResponseEntity(text: state.partialAnswer.trim()),
+        isUser: false,
+      ),
+    ];
+    var completedSurfaces = state.genuiSurfaces;
+    if (genuiController != null && genuiController.activeSurfaceIds.isEmpty) {
+      completedSurfaces = completedSurfaces
+          .where(
+            (surface) => !identical(surface.genuiController, genuiController),
+          )
+          .toList();
+      _retireGenuiController(genuiController);
+    }
+    if (state.isGenerativeUiEnabled &&
+        completedMessages.length > RemoteAssistantLimits.maxHistoryMessages) {
+      final removedCount =
+          completedMessages.length - RemoteAssistantLimits.maxHistoryMessages;
+      completedMessages = completedMessages.sublist(removedCount);
+      completedSurfaces = completedSurfaces
+          .where((surface) => surface.messageIndex >= removedCount)
+          .map(
+            (surface) => RemoteAssistantSurface(
+              messageIndex: surface.messageIndex - removedCount,
+              genuiController: surface.genuiController,
+              surfaceId: surface.surfaceId,
+            ),
+          )
+          .toList();
     }
     emit(
       state.copyWith(
-        messages: [
-          ...messages,
-          AssistantMessageEntity(
-            content: AssistantTextResponseEntity(text: state.partialAnswer),
-            isUser: false,
-          ),
-        ],
+        messages: completedMessages,
+        genuiSurfaces: completedSurfaces,
         partialAnswer: '',
         isSendingQuestion: false,
         clearFailure: true,
       ),
     );
+    _retainGenuiControllers(completedSurfaces);
+  }
+
+  void _retainGenuiControllers(Iterable<RemoteAssistantSurface> surfaces) {
+    final retained = surfaces.map((surface) => surface.genuiController).toSet();
+    for (final genuiController in _genuiControllers.toList()) {
+      if (!retained.contains(genuiController)) {
+        _retireGenuiController(genuiController);
+      }
+    }
+  }
+
+  void _retireGenuiController(AssistantGenuiController genuiController) {
+    _genuiErrorSubscriptions.remove(genuiController)?.cancel();
+    if (_genuiControllers.remove(genuiController)) {
+      genuiController.dispose();
+    }
+  }
+
+  void _disposeGenuiControllers() {
+    for (final genuiController in _genuiControllers.toList()) {
+      _retireGenuiController(genuiController);
+    }
+  }
+
+  void _handleGenuiFrameworkError(
+    Emitter<RemoteAssistantState> emit,
+    AssistantGenuiController genuiController,
+  ) {
+    if (emit.isDone || !_genuiControllers.contains(genuiController)) return;
+    _requestRevision++;
+    emit(
+      state.copyWith(
+        messages: const [],
+        clearGenuiSurfaces: true,
+        partialAnswer: '',
+        isSendingQuestion: false,
+        failure: const RemoteAssistantIncompleteFailure(),
+      ),
+    );
+    _disposeGenuiControllers();
+    unawaited(() async {
+      final reset = await _resetRemoteAssistantSessionUseCase();
+      if (!emit.isDone && reset.isLeft) {
+        emit(state.copyWith(failure: reset.left));
+      }
+    }());
   }
 
   @override
   Future<void> close() async {
     _controlRevision++;
     _requestRevision++;
+    _disposeGenuiControllers();
     await _resetRemoteAssistantSessionUseCase();
     await super.close();
   }

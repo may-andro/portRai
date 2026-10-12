@@ -59,6 +59,9 @@ on:
       FIREBASE_OPTIONS:
         description: Firebase options file content
         required: false
+      MAPS_API_KEY:
+        description: Google Maps JavaScript API key injected into index.html when the app uses it
+        required: false
 
 env:
   FLUTTER_VERSION: 3.47.4
@@ -70,6 +73,7 @@ jobs:
     env:
       FIREBASE_APP_CHECK_WEB_SITE_KEY: ${{ inputs.app-check-site-key }}
       BUILD_ENV: ${{ inputs.build-type == 'production' && 'prod' || 'staging' }}
+      MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
     outputs:
       artifact-name: ${{ inputs.app-name }}-web-${{ inputs.build-type }}-${{ github.sha }}
     
@@ -131,6 +135,16 @@ jobs:
             --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=$FIREBASE_APP_CHECK_WEB_SITE_KEY" \
             ${{ inputs.version != '' && format('--build-name={0}', inputs.version) || '' }} \
             ${{ inputs.build-number != '' && format('--build-number={0}', inputs.build-number) || '' }}
+
+      - name: Inject Google Maps API key
+        if: env.MAPS_API_KEY != ''
+        working-directory: ${{ inputs.app-path }}
+        run: |
+          sed -i "s/key=MAPS_API_KEY\"/key=$MAPS_API_KEY\"/" build/web/index.html
+          if grep -q 'key=MAPS_API_KEY"' build/web/index.html; then
+            echo "::error::Maps API key placeholder was not replaced in index.html"
+            exit 1
+          fi
 
       - name: Verify SQLite assets in build output
         if: inputs.setup-sqlite
