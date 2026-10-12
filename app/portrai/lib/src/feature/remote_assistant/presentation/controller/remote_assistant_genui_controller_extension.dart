@@ -12,7 +12,9 @@ const _responseStyleInstruction =
     'number (for example years of experience), DSLabeledInfoRow for facts '
     'such as company, period or location, DSTag or DSInfoChip inside a DSWrap '
     'for skills and technologies, DSBulletList for several short points, '
-    'DSExpandable for optional detail, DSText variants heading, title, body '
+    'DSExpandable for optional detail, DSTimeline for career or education '
+    'history, DSSkillBars to compare skills by years, DSQuote for a '
+    'testimonial copied exactly, DSText variants heading, title, body '
     'and caption for prose. Group with a DSColumn root; use a DSCard only '
     'around a distinct group, and never around a one-line answer. For a '
     'simple factual answer use a single DSText. Keep the answer concise. Put '
@@ -24,6 +26,10 @@ const _imageInstruction =
     'portfolio information (profile image, company logo, project image). Use '
     'avatar for a person, logo for a company and banner for a project. Never '
     'invent or alter a URL, and omit the image if none is available.';
+
+const _linkInstruction =
+    ' To let the user open a link use DSLinkButton with a url copied exactly '
+    'from the portfolio information. Never invent or alter a URL.';
 
 const _mapInstruction =
     ' To show where the person is based or has worked use DSMap with one '
@@ -61,6 +67,7 @@ extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
                 systemPrompt:
                     '$systemPrompt\n\n$_responseStyleInstruction'
                     '${supportsImages ? _imageInstruction : ''}'
+                    '${supportsLinks ? _linkInstruction : ''}'
                     '${supportsMaps ? _mapInstruction : ''}',
               ),
             ),

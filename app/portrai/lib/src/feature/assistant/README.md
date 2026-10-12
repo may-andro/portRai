@@ -109,6 +109,10 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
 | `DSImage` | A portfolio image (`avatar`, `logo`, `banner`). Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context |
 | `DSMap` | An interactive Google map with one marker per place, framed to fit them all (profile location and experience locations). Registered only when the portfolio context has coordinates, and marks only coordinates present in that context. Android, iOS and web only |
+| `DSTimeline` | A vertical timeline of up to 8 entries (`period`, `title`, `subtitle`), for career or education history |
+| `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
+| `DSQuote` | A quotation such as a testimonial, with optional author and role |
+| `DSLinkButton` | A button that opens a link. Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context. Taps open through the remote assistant bloc and `OpenExternalUrlUseCase` |
 | `DSDivider` | A horizontal divider |
 
 String properties accept a literal or a data-model reference. Child properties are

@@ -3,15 +3,18 @@ import 'package:portrai/src/feature/assistant/presentation/catalog/assistant_map
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/image_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/info_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/layout_items.dart';
+import 'package:portrai/src/feature/assistant/presentation/catalog/item/link_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/map_items.dart';
+import 'package:portrai/src/feature/assistant/presentation/catalog/item/story_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/text_items.dart';
 
 /// The assistant's read-only A2UI vocabulary; no built-in catalog or functions.
-/// [allowedImageUrls] enables `DSImage` and [allowedLocations] enables `DSMap`,
-/// each limited to exactly the values given.
+/// [allowedUrls] enables `DSImage` and, with [onOpenLink], `DSLinkButton`;
+/// [allowedLocations] enables `DSMap`. Each is limited to the values given.
 Catalog createAssistantCatalog({
-  Set<String> allowedImageUrls = const {},
+  Set<String> allowedUrls = const {},
   List<AssistantLocation> allowedLocations = const [],
+  void Function(String url)? onOpenLink,
 }) => Catalog([
   dsText,
   dsMetric,
@@ -24,6 +27,11 @@ Catalog createAssistantCatalog({
   dsInfoChip,
   dsLabeledInfoRow,
   dsExpandable,
-  if (allowedImageUrls.isNotEmpty) createDsImage(allowedImageUrls),
+  dsTimeline,
+  dsSkillBars,
+  dsQuote,
+  if (allowedUrls.isNotEmpty) createDsImage(allowedUrls),
+  if (allowedUrls.isNotEmpty && onOpenLink != null)
+    createDsLinkButton(allowedUrls: allowedUrls, onOpenLink: onOpenLink),
   if (allowedLocations.isNotEmpty) createDsMap(allowedLocations),
 ], catalogId: 'dev.portrai.assistant');

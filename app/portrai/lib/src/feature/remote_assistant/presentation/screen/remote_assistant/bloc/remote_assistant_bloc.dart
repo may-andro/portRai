@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
@@ -20,6 +21,7 @@ class RemoteAssistantBloc
     this._askRemotePortfolioQuestionUseCase,
     this._isFeatureEnabledUseCase,
     this._isRemoteAssistantSupportedUseCase,
+    this._openExternalUrlUseCase,
     this._trackingDelegate,
   ) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
@@ -29,6 +31,9 @@ class RemoteAssistantBloc
     on<ResetRemoteAssistantClickEvent>(
       _mapResetRemoteAssistantClickEventToState,
     );
+    on<OpenRemoteAssistantLinkClickEvent>(
+      _mapOpenRemoteAssistantLinkClickEventToState,
+    );
     on<SendRemoteAssistantQuestionClickEvent>(
       _mapSendRemoteAssistantQuestionClickEventToState,
     );
@@ -37,6 +42,7 @@ class RemoteAssistantBloc
   final GetAssistantContextUseCase _getAssistantContextUseCase;
   final ResetRemoteAssistantSessionUseCase _resetRemoteAssistantSessionUseCase;
   final AskRemotePortfolioQuestionUseCase _askRemotePortfolioQuestionUseCase;
+  final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   final RemoteAssistantTrackingDelegate _trackingDelegate;
@@ -215,6 +221,15 @@ class RemoteAssistantBloc
     }
   }
 
+  Future<void> _mapOpenRemoteAssistantLinkClickEventToState(
+    OpenRemoteAssistantLinkClickEvent event,
+    Emitter<RemoteAssistantState> emit,
+  ) async {
+    final uri = Uri.tryParse(event.url);
+    if (uri == null) return;
+    await _openExternalUrlUseCase(OpenExternalUrlParam(uri));
+  }
+
   Future<void> _mapSendRemoteAssistantQuestionClickEventToState(
     SendRemoteAssistantQuestionClickEvent event,
     Emitter<RemoteAssistantState> emit,
@@ -269,8 +284,9 @@ class RemoteAssistantBloc
     final Either<RemoteAssistantFailure, void> result;
     if (state.isGenerativeUiEnabled) {
       final controller = AssistantGenuiController(
-        allowedImageUrls: assistantImageUrlsFrom(state.portfolioContext!),
+        allowedUrls: assistantUrlsFrom(state.portfolioContext!),
         allowedLocations: assistantLocationsFrom(state.portfolioContext!),
+        onOpenLink: (url) => add(OpenRemoteAssistantLinkClickEvent(url)),
       );
       genuiController = controller;
       _genuiControllers.add(controller);

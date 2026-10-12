@@ -14,6 +14,7 @@ import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
 import '../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
+import '../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../mock/feature/feature_flag/domain/repository/mock_app_feature_flag_repository.dart';
 import '../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_ask_local_portfolio_question_use_case.dart';
@@ -97,6 +98,7 @@ class AssistantTestFixture {
       askRemote,
       flag,
       remoteSupport,
+      MockOpenExternalUrlUseCase(),
       remoteTracking,
     );
     addTearDown(() async {

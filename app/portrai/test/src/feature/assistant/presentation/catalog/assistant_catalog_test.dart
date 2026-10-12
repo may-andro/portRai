@@ -24,6 +24,9 @@ void main() {
       'DSInfoChip',
       'DSLabeledInfoRow',
       'DSExpandable',
+      'DSTimeline',
+      'DSSkillBars',
+      'DSQuote',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -100,14 +103,14 @@ void main() {
 
   test('should add DSImage only when image URLs are allowed', () {
     final catalog = createAssistantCatalog(
-      allowedImageUrls: {'https://cdn.test/a.png'},
+      allowedUrls: {'https://cdn.test/a.png'},
     );
 
     expect(catalog.items.map((item) => item.name), contains('DSImage'));
   });
 
   test('should extract unique https URLs when reading portfolio context', () {
-    final urls = assistantImageUrlsFrom(
+    final urls = assistantUrlsFrom(
       '{"a":"https://cdn.test/a.png","b":"https://cdn.test/a.png",'
       '"c":"http://insecure.test/x.png","d":"https://cdn.test/b.jpg?x=1"}',
     );
@@ -120,7 +123,7 @@ void main() {
     (tester) async {
       final controller = SurfaceController(
         catalogs: [
-          createAssistantCatalog(allowedImageUrls: {'https://cdn.test/a.png'}),
+          createAssistantCatalog(allowedUrls: {'https://cdn.test/a.png'}),
         ],
       );
       addTearDown(controller.dispose);
@@ -145,6 +148,108 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+    },
+  );
+
+  test('should add DSLinkButton only when URLs and a callback are given', () {
+    List<String> names(Catalog c) => c.items.map((i) => i.name).toList();
+
+    expect(
+      names(createAssistantCatalog(allowedUrls: {'https://a.test'})),
+      isNot(contains('DSLinkButton')),
+    );
+    expect(
+      names(createAssistantCatalog(onOpenLink: (_) {})),
+      isNot(contains('DSLinkButton')),
+    );
+    expect(
+      names(
+        createAssistantCatalog(
+          allowedUrls: {'https://a.test'},
+          onOpenLink: (_) {},
+        ),
+      ),
+      contains('DSLinkButton'),
+    );
+  });
+
+  testWidgets('should open only allowed URLs when DSLinkButton is tapped', (
+    tester,
+  ) async {
+    final opened = <String>[];
+    final controller = SurfaceController(
+      catalogs: [
+        createAssistantCatalog(
+          allowedUrls: {'https://a.test/p'},
+          onOpenLink: opened.add,
+        ),
+      ],
+    );
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: SingleChildScrollView(
+          child: Surface(surfaceContext: controller.contextFor('link')),
+        ),
+      ),
+    );
+    await _feed(tester, controller, [
+      '''
+{"version":"v0.9","createSurface":{"surfaceId":"link","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"link","components":[
+  {"id":"root","component":"DSColumn","children":["ok","bad"]},
+  {"id":"ok","component":"DSLinkButton","label":"Open project","url":"https://a.test/p"},
+  {"id":"bad","component":"DSLinkButton","label":"Evil","url":"https://evil.test"}
+]}}
+''',
+    ]);
+    await tester.pump();
+
+    expect(find.byType(DSButtonWidget), findsOneWidget);
+    await tester.tap(find.byType(DSButtonWidget));
+    expect(opened, ['https://a.test/p']);
+  });
+
+  testWidgets(
+    'should render timeline, skill bars and quote when A2UI describes them',
+    (tester) async {
+      final controller = SurfaceController(
+        catalogs: [createAssistantCatalog()],
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: SingleChildScrollView(
+            child: Surface(surfaceContext: controller.contextFor('story')),
+          ),
+        ),
+      );
+      await _feed(tester, controller, [
+        '''
+{"version":"v0.9","createSurface":{"surfaceId":"story","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"story","components":[
+  {"id":"root","component":"DSColumn","children":["t","s","q"]},
+  {"id":"t","component":"DSTimeline","entries":[
+    {"period":"2021 - 2024","title":"Lead Engineer","subtitle":"Acme"},
+    {"title":"Engineer"}]},
+  {"id":"s","component":"DSSkillBars","items":[
+    {"label":"Flutter","value":6,"display":"6 yrs"},
+    {"label":"Kotlin","value":3}]},
+  {"id":"q","component":"DSQuote","text":"Great to work with.","author":"Sam","role":"CTO"}
+]}}
+''',
+      ]);
+      await tester.pump();
+
+      expect(find.text('Lead Engineer'), findsOneWidget);
+      expect(find.text('Engineer'), findsOneWidget);
+      expect(find.text('Acme'), findsOneWidget);
+      expect(find.text('Flutter'), findsOneWidget);
+      expect(find.text('6 yrs'), findsOneWidget);
+      expect(find.byType(DSQuoteTextWidget), findsOneWidget);
+      expect(find.text('Sam, CTO'), findsOneWidget);
     },
   );
 
