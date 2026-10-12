@@ -210,7 +210,7 @@ melos:
         trap 'mv web/index.html.orig web/index.html' EXIT
         sed -i.bak "s/key=MAPS_API_KEY\"/key=$MAPS_API_KEY_WEB\"/" web/index.html
         rm web/index.html.bak
-        flutter run -d chrome --web-port 5000 \
+        flutter run -d chrome --web-port 5050 \
           --dart-define="FIREBASE_APP_CHECK_WEB_SITE_KEY=${FIREBASE_APP_CHECK_WEB_SITE_KEY:-}"
       description: Run the web app locally with MAPS_API_KEY_WEB injected into index.html (restored on exit)
     # Deploy scripts for web release
