@@ -21,7 +21,7 @@ void main() {
     });
 
     test('should map model to entity when mapping a cached image', () {
-      final entity = mapper.toEntity(
+      final entity = mapper.map(
         mapper.toModel(
           AiImageEntity(bytes: bytes, mimeType: 'image/webp'),
           key: 'key',

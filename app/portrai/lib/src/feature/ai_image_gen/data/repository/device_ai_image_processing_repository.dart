@@ -52,7 +52,7 @@ class DeviceAiImageProcessingRepository implements AiImageProcessingRepository {
   Future<AiImageEntity?> _readCache(String key) async {
     try {
       final model = await _cache.get(conditions: {'key': key});
-      return model == null ? null : _mapper.toEntity(model);
+      return model == null ? null : _mapper.map(model);
     } on Object catch (_) {
       return null;
     }
