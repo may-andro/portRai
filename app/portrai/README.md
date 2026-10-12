@@ -138,7 +138,7 @@ successfully. Failed partial answers are discarded and never become future provi
 Disable/reset invalidate pending output. They stop local consumption and close the owned
 transport; they cannot guarantee that server generation or billing stops.
 `feature_remote_assistant_generative_ui` independently enables the official GenUI parser and
-the app's read-only `DSText`/`DSCard` catalog. When disabled, remote answers retain the existing
+the app's read-only design-system component catalog. When disabled, remote answers retain the existing
 plain-text conversation path. GenUI text events and parsed surfaces stay in their originating
 turn; A2UI protocol chunks are not rendered as chat text. The mode is limited to the design-system
 catalog and is not a project-card, navigation, or action channel.

@@ -75,13 +75,26 @@ Its runtime uses `a2ui_core` **0.1.1** in the
 resolved workspace and supports A2UI **v0.9**. The installed package source, not
 the repository's evolving main branch, defines the API used here.
 
-`createAssistantCatalog()` exposes only `DSText` and `DSCard` under catalog ID
-`dev.portrai.assistant`. `DSText.text` accepts a literal string or an official
-data-model reference such as `{"path":"/message"}`, resolved reactively by
-`BoundString`. `DSCard.child` is a component ID rendered by the framework's
-`CatalogItemContext.buildChild`. Both render app-owned design-system widgets.
-No basic catalog, client functions, actions, navigation, media or network widgets
-are registered.
+`createAssistantCatalog()` exposes read-only design-system components under catalog ID
+`dev.portrai.assistant`:
+
+| Component | Renders |
+| --- | --- |
+| `DSText` | Text with `variant` `heading`, `title`, `body` or `caption` |
+| `DSMetric` | A highlighted value with a label |
+| `DSBulletList` | A bulleted list of literal strings |
+| `DSLabeledInfoRow` | An icon with a label and value |
+| `DSTag`, `DSInfoChip` | Skill badges and icon/label pills |
+| `DSColumn`, `DSWrap` | Vertical and wrapping layouts of child component IDs |
+| `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
+| `DSDivider` | A horizontal divider |
+
+String properties accept a literal or an official data-model reference such as
+`{"path":"/message"}`, resolved reactively by `BoundString`. Child properties are
+component IDs rendered by the framework's `CatalogItemContext.buildChild`. Icons are
+chosen from a fixed name list; unknown names fall back to an info icon. No basic
+catalog, client functions, actions, navigation, media or network widgets are
+registered.
 
 Consumers own the controller and render the framework `Surface` directly inside
 the app's design-system theme:
@@ -132,7 +145,7 @@ The remote presentation `sendPortfolioQuestion` extension connects this session
 to `AskRemotePortfolioQuestionUseCase` using a known text question, authoritative
 portfolio context and typed completed history, not arbitrary framework messages.
 Its optional `systemPrompt` accepts trusted framework instructions up to 50,000
-characters (the current catalog generates 20,417). Oversized prompts are rejected,
+characters (the catalog prompt must stay below this). Oversized prompts are rejected,
 never truncated, as invalid input before model creation. Firebase always preserves
 portfolio grounding instructions and appends the framework prompt unchanged as
 subordinate presentation instructions. Null retains the original text-only model

@@ -5,12 +5,19 @@ import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assi
 import 'package:use_case/use_case.dart';
 
 const _responseStyleInstruction =
-    'Response style: answer in a single surface that contains the entire '
-    'answer, and do not write any text outside the surface. Use only plain '
-    'text: no markdown, no asterisks, no numbered or bulleted syntax; use '
-    'one DSText per item or fact inside a DSCard instead. Never repeat the '
-    'surface content as text. Put every A2UI message in its own separate '
-    '```json code block, never two messages in one block.';
+    'Response style: answer in one surface that holds the entire answer, and '
+    'write no text outside it. Never repeat surface content as text. Use plain '
+    'text only: no markdown, asterisks or bullet characters. Pick the '
+    'component that fits the data instead of plain text: DSMetric for a key '
+    'number (for example years of experience), DSLabeledInfoRow for facts '
+    'such as company, period or location, DSTag or DSInfoChip inside a DSWrap '
+    'for skills and technologies, DSBulletList for several short points, '
+    'DSExpandable for optional detail, DSText variants heading, title, body '
+    'and caption for prose. Group with a DSColumn root; use a DSCard only '
+    'around a distinct group, and never around a one-line answer. For a '
+    'simple factual answer use a single DSText. Keep the answer concise. Put '
+    'every A2UI message in its own separate ```json code block, never two '
+    'messages in one block.';
 
 extension RemoteAssistantGenuiSessionExtension on AssistantGenuiSession {
   /// Sends a known text question and authoritative context, not raw GenUI
