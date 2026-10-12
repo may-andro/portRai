@@ -103,10 +103,7 @@ class _MobileHeaderWidget extends StatelessWidget {
             child: SizedBox(
               width: profileImagenHeight,
               height: profileImagenHeight,
-              child: _ProfileImageWidget(
-                url: profile.coverImage,
-                //url: profile.profileImage,
-              ),
+              child: _ProfileImageWidget(url: profile.profileImage),
             ),
           ),
         ),

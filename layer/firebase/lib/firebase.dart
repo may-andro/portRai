@@ -6,8 +6,10 @@ export 'package:firebase_ai/firebase_ai.dart'
         HarmBlockMethod,
         HarmBlockThreshold,
         HarmCategory,
+        InlineDataPart,
         SafetySetting,
         Schema,
+        TextPart,
         ThinkingConfig,
         ThinkingLevel;
 export 'package:firebase_analytics/firebase_analytics.dart';
@@ -17,6 +19,7 @@ export 'package:firebase_remote_config/firebase_remote_config.dart';
 export 'src/ai/ai_exception.dart';
 export 'src/ai/fb_ai_backend.dart';
 export 'src/ai/fb_ai_controller.dart';
+export 'src/ai/fb_ai_image_model.dart';
 export 'src/ai/fb_ai_text_model.dart';
 export 'src/analytics/fb_analytics_controller.dart';
 export 'src/auth/auth_exception.dart';

@@ -22,7 +22,7 @@ class AppFeatureFlagRepositoryImpl implements AppFeatureFlagRepository {
 
   @override
   Future<void> updateFeatureFlag(AppFeatureFlagEntity flag) async {
-    final layerFlag = _mapper.from(flag);
+    final layerFlag = _mapper.map(flag);
     await _controller.updateFeatureFlag(layerFlag);
   }
 
@@ -34,7 +34,7 @@ class AppFeatureFlagRepositoryImpl implements AppFeatureFlagRepository {
     try {
       final flags = _controller.getAllFeatureFlags();
       final layerFlag = flags.firstWhere((f) => f.key == definition.key);
-      return _mapper.to(layerFlag, definition);
+      return _mapper.toEntity(layerFlag, definition);
     } catch (e) {
       return AppFeatureFlagEntity(
         flag: definition,

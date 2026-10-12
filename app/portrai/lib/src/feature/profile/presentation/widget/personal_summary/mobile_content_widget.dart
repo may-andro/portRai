@@ -75,7 +75,7 @@ class _MobileContentWidget extends StatelessWidget {
               ),
               Expanded(
                 child: _ProfileImageWidget(
-                  url: profile.coverImage,
+                  url: profile.profileImage,
                   isVisible: isVisible,
                   animationDelay: 900.ms,
                 ),

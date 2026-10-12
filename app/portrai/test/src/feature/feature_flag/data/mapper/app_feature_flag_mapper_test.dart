@@ -26,7 +26,7 @@ void main() {
             remoteValue: false,
           );
 
-          final result = mapper.from(entity);
+          final result = mapper.map(entity);
 
           expect(
             result,
@@ -50,7 +50,7 @@ void main() {
             isOverridden: false,
           );
 
-          final result = mapper.from(entity);
+          final result = mapper.map(entity);
 
           expect(
             result,
@@ -75,7 +75,7 @@ void main() {
             remoteValue: false,
           );
 
-          final result = mapper.to(model, definition);
+          final result = mapper.toEntity(model, definition);
 
           expect(
             result,
@@ -98,7 +98,7 @@ void main() {
             isEnabled: false,
           );
 
-          final result = mapper.to(model, definition);
+          final result = mapper.toEntity(model, definition);
 
           expect(result.key, definition.key);
           expect(result.name, definition.displayName);

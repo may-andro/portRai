@@ -95,7 +95,7 @@ class _TabletContentWidget extends StatelessWidget {
           height: imageHeight,
           width: imageHeight,
           child: _ProfileImageWidget(
-            url: profile.coverImage,
+            url: profile.profileImage,
             isVisible: isVisible,
             animationDelay: 100.ms,
           ),

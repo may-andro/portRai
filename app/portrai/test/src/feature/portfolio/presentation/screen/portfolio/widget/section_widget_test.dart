@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widg
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import '../../../../../../../mock/feature/ai_image_gen/presentation/bloc/mock_ai_image_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../../../mock/feature/profile/presentation/widget/professional_summary/bloc/mock_professional_summary_bloc.dart';
@@ -31,6 +32,9 @@ void main() {
     final bloc = MockPortfolioBloc()..stubState(const LoadingState());
     addTearDown(bloc.close);
     MockProfessionalSummaryBloc()
+      ..stubLoadingState()
+      ..registerFactory();
+    MockAiImageBloc()
       ..stubLoadingState()
       ..registerFactory();
 

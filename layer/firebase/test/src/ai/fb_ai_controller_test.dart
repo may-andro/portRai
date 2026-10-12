@@ -1,5 +1,6 @@
 import 'package:firebase/firebase.dart';
-import 'package:firebase_ai/firebase_ai.dart' show InvalidApiKey;
+import 'package:firebase_ai/firebase_ai.dart'
+    show InvalidApiKey, ResponseModalities;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/testing.dart';
 import 'package:mocktail/mocktail.dart';
@@ -150,4 +151,42 @@ void main() {
       );
     },
   );
+
+  test('should request image modalities when an image model is created', () {
+    final sdk = MockFirebaseAI();
+    final model = createAiTestModel();
+    when(
+      () => sdk.generativeModel(
+        model: 'image-model',
+        generationConfig: any(named: 'generationConfig'),
+        httpClient: any(named: 'httpClient'),
+      ),
+    ).thenReturn(model);
+
+    final result = FbAiController(sdk).createImageModel(model: ' image-model ');
+    addTearDown(result.close);
+
+    final config =
+        verify(
+              () => sdk.generativeModel(
+                model: 'image-model',
+                generationConfig: captureAny(named: 'generationConfig'),
+                httpClient: any(named: 'httpClient'),
+              ),
+            ).captured.single
+            as GenerationConfig;
+    expect(config.candidateCount, 1);
+    expect(config.responseModalities, [
+      ResponseModalities.text,
+      ResponseModalities.image,
+    ]);
+    expect(result, isA<FbAiImageModel>());
+  });
+
+  test('should throw invalid input when image model name is blank', () {
+    expect(
+      () => FbAiController(MockFirebaseAI()).createImageModel(model: ' '),
+      throwsA(isA<AiInvalidInputException>()),
+    );
+  });
 }

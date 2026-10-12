@@ -44,7 +44,10 @@ class _MobileContentWidget extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: context.space()),
-              child: _ProfileImageWidget(isVisible: isVisible),
+              child: _ProfileImageWidget(
+                profile: profile,
+                isVisible: isVisible,
+              ),
             ),
           ),
         ],
