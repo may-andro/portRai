@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:genui/genui.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/assistant_catalog.dart';
+import 'package:portrai/src/feature/assistant/presentation/catalog/assistant_map_locations.dart';
 
 typedef AssistantGenuiGenerate<T> =
     Future<T> Function(
@@ -26,11 +27,15 @@ class AssistantGenuiTurnCancelledException implements Exception {
 
 /// Presentation runtime only: the caller owns generation and domain results.
 class AssistantGenuiController {
-  AssistantGenuiController({Iterable<String> allowedImageUrls = const []})
-    : supportsImages = allowedImageUrls.isNotEmpty,
-      _catalog = createAssistantCatalog(
-        allowedImageUrls: allowedImageUrls.toSet(),
-      ) {
+  AssistantGenuiController({
+    Iterable<String> allowedImageUrls = const [],
+    List<AssistantLocation> allowedLocations = const [],
+  }) : supportsImages = allowedImageUrls.isNotEmpty,
+       supportsMaps = allowedLocations.isNotEmpty,
+       _catalog = createAssistantCatalog(
+         allowedImageUrls: allowedImageUrls.toSet(),
+         allowedLocations: allowedLocations,
+       ) {
     _controller = SurfaceController(catalogs: [_catalog]);
     systemPrompt = PromptBuilder.chat(catalog: _catalog).systemPromptJoined();
     _listenForFrameworkErrors();
@@ -38,6 +43,7 @@ class AssistantGenuiController {
 
   final Catalog _catalog;
   final bool supportsImages;
+  final bool supportsMaps;
   late SurfaceController _controller;
   late final String systemPrompt;
   SurfaceController get surfaceController => _controller;

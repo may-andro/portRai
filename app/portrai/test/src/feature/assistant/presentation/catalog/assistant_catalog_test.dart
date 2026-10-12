@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:genui/genui.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 
 import '../../../../../util/test_wrapper_widget.dart';
@@ -144,6 +145,57 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+    },
+  );
+
+  test('should add DSMap only when locations are allowed', () {
+    final catalog = createAssistantCatalog(
+      allowedLocations: [(latitude: 1.0, longitude: 2.0)],
+    );
+
+    expect(catalog.items.map((item) => item.name), contains('DSMap'));
+  });
+
+  test('should extract nested coordinates when reading portfolio context', () {
+    expect(
+      assistantLocationsFrom(
+        '{"location":{"city":"Oslo","latitude":59.9,"longitude":10.7}}',
+      ),
+      [(latitude: 59.9, longitude: 10.7)],
+    );
+    expect(assistantLocationsFrom('not json'), isEmpty);
+  });
+
+  testWidgets(
+    'should render nothing when A2UI describes DSMap with coordinates outside the portfolio',
+    (tester) async {
+      final controller = SurfaceController(
+        catalogs: [
+          createAssistantCatalog(
+            allowedLocations: [(latitude: 59.9, longitude: 10.7)],
+          ),
+        ],
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: SingleChildScrollView(
+            child: Surface(surfaceContext: controller.contextFor('map')),
+          ),
+        ),
+      );
+      await _feed(tester, controller, [
+        '''
+{"version":"v0.9","createSurface":{"surfaceId":"map","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"map","components":[
+  {"id":"root","component":"DSMap","latitude":10.0,"longitude":20.0}
+]}}
+''',
+      ]);
+      await tester.pump();
+
+      expect(find.byType(GoogleMap), findsNothing);
     },
   );
 

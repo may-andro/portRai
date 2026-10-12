@@ -97,3 +97,4 @@ Thumbs.db
 *.pyc
 *.class
 pubspec.lock
+**/ios/Flutter/Secrets.xcconfig

@@ -270,6 +270,7 @@ class RemoteAssistantBloc
     if (state.isGenerativeUiEnabled) {
       final controller = AssistantGenuiController(
         allowedImageUrls: assistantImageUrlsFrom(state.portfolioContext!),
+        allowedLocations: assistantLocationsFrom(state.portfolioContext!),
       );
       genuiController = controller;
       _genuiControllers.add(controller);

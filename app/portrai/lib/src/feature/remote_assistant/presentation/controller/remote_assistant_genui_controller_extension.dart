@@ -25,6 +25,11 @@ const _imageInstruction =
     'avatar for a person, logo for a company and banner for a project. Never '
     'invent or alter a URL, and omit the image if none is available.';
 
+const _mapInstruction =
+    ' To show where the person is based use DSMap with the latitude and '
+    'longitude copied exactly from the location in the portfolio '
+    'information. Never invent coordinates.';
+
 extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
   /// Sends a known text question and authoritative context, not raw GenUI
   /// messages or UI interaction parts, through the portfolio use case.
@@ -55,7 +60,8 @@ extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
                 onDelta: onDelta,
                 systemPrompt:
                     '$systemPrompt\n\n$_responseStyleInstruction'
-                    '${supportsImages ? _imageInstruction : ''}',
+                    '${supportsImages ? _imageInstruction : ''}'
+                    '${supportsMaps ? _mapInstruction : ''}',
               ),
             ),
       );
