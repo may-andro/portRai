@@ -1,1 +1,491 @@
-[]
+{
+  "en": {
+    "services": [
+      {
+        "title": "App Development",
+        "description": "Beautiful, fast and reliable mobile apps.",
+        "image": "https://picsum.photos/seed/app_development/800/600",
+        "detail": "I build production-grade Flutter apps from concept to store release, with clean architecture, tests and CI/CD included.",
+        "id": "app_development",
+        "deliverables": [
+          "Production-ready Flutter app",
+          "Automated test suite",
+          "CI/CD pipeline"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "GraphQL",
+          "BLoC"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "pulsefit",
+          "moveit_mobility"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consulting"
+        ],
+        "idealFor": [
+          "Startups validating an MVP",
+          "Teams modernising a legacy app"
+        ],
+        "process": [
+          "Discovery and scoping",
+          "Architecture and prototype",
+          "Iterative delivery",
+          "Launch and handover"
+        ],
+        "faq": [
+          {
+            "question": "How long does an engagement take?",
+            "answer": "Typically 3-9 months, depending on scope."
+          }
+        ]
+      },
+      {
+        "title": "Architecture Consulting",
+        "description": "Make your codebase scale with your team.",
+        "image": "https://picsum.photos/seed/architecture_consulting/800/600",
+        "detail": "Audits, modularization plans and hands-on guidance to turn tangled apps into maintainable platforms.",
+        "id": "architecture_consulting",
+        "deliverables": [
+          "Architecture audit report",
+          "Modularization roadmap"
+        ],
+        "technologies": [
+          "Clean Architecture",
+          "Modularization",
+          "Dependency Injection"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "moveit_mobility"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consulting"
+        ],
+        "idealFor": [
+          "Growing teams with a monolithic app"
+        ],
+        "process": [
+          "Code and architecture review",
+          "Target architecture",
+          "Guided migration"
+        ],
+        "faq": [
+          {
+            "question": "Can you work with our team?",
+            "answer": "Yes, I pair with your engineers and run workshops."
+          }
+        ]
+      },
+      {
+        "title": "Design Systems",
+        "description": "One consistent UI across every screen.",
+        "image": "https://picsum.photos/seed/design_systems/800/600",
+        "detail": "I design and build Flutter design systems with tokens, themes, golden tests and living documentation.",
+        "id": "design_systems",
+        "deliverables": [
+          "Component library",
+          "Storybook documentation"
+        ],
+        "technologies": [
+          "Flutter",
+          "Design Tokens",
+          "Storybook",
+          "Golden Testing"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "pulsefit"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consulting"
+        ],
+        "idealFor": [
+          "Product teams with multiple apps"
+        ],
+        "process": [
+          "UI audit",
+          "Token and theme design",
+          "Component build-out"
+        ],
+        "faq": [
+          {
+            "question": "Do you work with our designers?",
+            "answer": "Absolutely, design-to-code collaboration is key."
+          }
+        ]
+      },
+      {
+        "title": "On-device AI & Generative UI",
+        "description": "Private, instant intelligence inside your app.",
+        "image": "https://picsum.photos/seed/on_device_ai/800/600",
+        "detail": "Prototype and ship assistants and generative interfaces that run fully on device, keeping user data private.",
+        "id": "on_device_ai",
+        "deliverables": [
+          "Working AI prototype",
+          "Integration into your app"
+        ],
+        "technologies": [
+          "Flutter",
+          "On-device LLMs",
+          "Generative UI"
+        ],
+        "projectIds": [
+          "aurora_marketplace"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consulting"
+        ],
+        "idealFor": [
+          "Teams exploring AI features"
+        ],
+        "process": [
+          "Use-case workshop",
+          "Prototype",
+          "Production hardening"
+        ],
+        "faq": [
+          {
+            "question": "Does it need internet?",
+            "answer": "No, models run locally on the device."
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "es": {
+    "services": [
+      {
+        "title": "Desarrollo de apps",
+        "description": "Apps móviles bonitas, rápidas y fiables.",
+        "image": "https://picsum.photos/seed/app_development/800/600",
+        "detail": "Creo apps Flutter de calidad de producción desde el concepto hasta la publicación, con arquitectura limpia, pruebas y CI/CD incluidos.",
+        "id": "app_development",
+        "deliverables": [
+          "App Flutter lista para producción",
+          "Suite de pruebas automatizadas",
+          "Pipeline de CI/CD"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "GraphQL",
+          "BLoC"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "pulsefit",
+          "moveit_mobility"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consultoría"
+        ],
+        "idealFor": [
+          "Startups que validan un MVP",
+          "Equipos que modernizan una app heredada"
+        ],
+        "process": [
+          "Descubrimiento y alcance",
+          "Arquitectura y prototipo",
+          "Entrega iterativa",
+          "Lanzamiento y traspaso"
+        ],
+        "faq": [
+          {
+            "question": "¿Cuánto dura una colaboración?",
+            "answer": "Normalmente de 3 a 9 meses, según el alcance."
+          }
+        ]
+      },
+      {
+        "title": "Consultoría de arquitectura",
+        "description": "Haz que tu código escale con tu equipo.",
+        "image": "https://picsum.photos/seed/architecture_consulting/800/600",
+        "detail": "Auditorías, planes de modularización y guía práctica para convertir apps enredadas en plataformas mantenibles.",
+        "id": "architecture_consulting",
+        "deliverables": [
+          "Informe de auditoría de arquitectura",
+          "Hoja de ruta de modularización"
+        ],
+        "technologies": [
+          "Clean Architecture",
+          "Modularization",
+          "Dependency Injection"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "moveit_mobility"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consultoría"
+        ],
+        "idealFor": [
+          "Equipos en crecimiento con una app monolítica"
+        ],
+        "process": [
+          "Revisión de código y arquitectura",
+          "Arquitectura objetivo",
+          "Migración guiada"
+        ],
+        "faq": [
+          {
+            "question": "¿Puedes trabajar con nuestro equipo?",
+            "answer": "Sí, trabajo en pareja con tus ingenieros y organizo talleres."
+          }
+        ]
+      },
+      {
+        "title": "Sistemas de diseño",
+        "description": "Una UI coherente en cada pantalla.",
+        "image": "https://picsum.photos/seed/design_systems/800/600",
+        "detail": "Diseño y construyo sistemas de diseño en Flutter con tokens, temas, pruebas golden y documentación viva.",
+        "id": "design_systems",
+        "deliverables": [
+          "Librería de componentes",
+          "Documentación en Storybook"
+        ],
+        "technologies": [
+          "Flutter",
+          "Design Tokens",
+          "Storybook",
+          "Golden Testing"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "pulsefit"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consultoría"
+        ],
+        "idealFor": [
+          "Equipos de producto con varias apps"
+        ],
+        "process": [
+          "Auditoría de UI",
+          "Diseño de tokens y temas",
+          "Construcción de componentes"
+        ],
+        "faq": [
+          {
+            "question": "¿Trabajas con nuestros diseñadores?",
+            "answer": "Por supuesto, la colaboración diseño-código es clave."
+          }
+        ]
+      },
+      {
+        "title": "IA en el dispositivo e interfaces generativas",
+        "description": "Inteligencia privada e instantánea dentro de tu app.",
+        "image": "https://picsum.photos/seed/on_device_ai/800/600",
+        "detail": "Prototipo y lanzo asistentes e interfaces generativas que se ejecutan por completo en el dispositivo, protegiendo los datos del usuario.",
+        "id": "on_device_ai",
+        "deliverables": [
+          "Prototipo de IA funcional",
+          "Integración en tu app"
+        ],
+        "technologies": [
+          "Flutter",
+          "On-device LLMs",
+          "Generative UI"
+        ],
+        "projectIds": [
+          "aurora_marketplace"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consultoría"
+        ],
+        "idealFor": [
+          "Equipos que exploran funciones de IA"
+        ],
+        "process": [
+          "Taller de casos de uso",
+          "Prototipo",
+          "Preparación para producción"
+        ],
+        "faq": [
+          {
+            "question": "¿Necesita internet?",
+            "answer": "No, los modelos se ejecutan localmente en el dispositivo."
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "nl": {
+    "services": [
+      {
+        "title": "App-ontwikkeling",
+        "description": "Mooie, snelle en betrouwbare mobiele apps.",
+        "image": "https://picsum.photos/seed/app_development/800/600",
+        "detail": "Ik bouw Flutter-apps van productiekwaliteit van concept tot storerelease, inclusief clean architecture, tests en CI/CD.",
+        "id": "app_development",
+        "deliverables": [
+          "Productieklare Flutter-app",
+          "Geautomatiseerde testsuite",
+          "CI/CD-pipeline"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "GraphQL",
+          "BLoC"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "pulsefit",
+          "moveit_mobility"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Advies"
+        ],
+        "idealFor": [
+          "Startups die een MVP valideren",
+          "Teams die een legacy-app moderniseren"
+        ],
+        "process": [
+          "Discovery en scope",
+          "Architectuur en prototype",
+          "Iteratieve oplevering",
+          "Lancering en overdracht"
+        ],
+        "faq": [
+          {
+            "question": "Hoe lang duurt een samenwerking?",
+            "answer": "Meestal 3-9 maanden, afhankelijk van de scope."
+          }
+        ]
+      },
+      {
+        "title": "Architectuuradvies",
+        "description": "Laat je codebase meegroeien met je team.",
+        "image": "https://picsum.photos/seed/architecture_consulting/800/600",
+        "detail": "Audits, modularisatieplannen en praktische begeleiding om verwarde apps om te vormen tot onderhoudbare platformen.",
+        "id": "architecture_consulting",
+        "deliverables": [
+          "Architectuur-auditrapport",
+          "Modularisatie-roadmap"
+        ],
+        "technologies": [
+          "Clean Architecture",
+          "Modularization",
+          "Dependency Injection"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "moveit_mobility"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Advies"
+        ],
+        "idealFor": [
+          "Groeiende teams met een monolithische app"
+        ],
+        "process": [
+          "Code- en architectuurreview",
+          "Doelarchitectuur",
+          "Begeleide migratie"
+        ],
+        "faq": [
+          {
+            "question": "Kun je met ons team samenwerken?",
+            "answer": "Ja, ik werk samen met je engineers en geef workshops."
+          }
+        ]
+      },
+      {
+        "title": "Designsystemen",
+        "description": "Eén consistente UI op elk scherm.",
+        "image": "https://picsum.photos/seed/design_systems/800/600",
+        "detail": "Ik ontwerp en bouw Flutter-designsystemen met tokens, thema's, golden tests en levende documentatie.",
+        "id": "design_systems",
+        "deliverables": [
+          "Componentenbibliotheek",
+          "Storybook-documentatie"
+        ],
+        "technologies": [
+          "Flutter",
+          "Design Tokens",
+          "Storybook",
+          "Golden Testing"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "pulsefit"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Advies"
+        ],
+        "idealFor": [
+          "Productteams met meerdere apps"
+        ],
+        "process": [
+          "UI-audit",
+          "Token- en themadesign",
+          "Componenten bouwen"
+        ],
+        "faq": [
+          {
+            "question": "Werk je samen met onze ontwerpers?",
+            "answer": "Absoluut, samenwerking tussen design en code is essentieel."
+          }
+        ]
+      },
+      {
+        "title": "On-device AI & generatieve UI",
+        "description": "Privé, directe intelligentie in je app.",
+        "image": "https://picsum.photos/seed/on_device_ai/800/600",
+        "detail": "Prototypen en opleveren van assistenten en generatieve interfaces die volledig op het apparaat draaien en gebruikersdata privé houden.",
+        "id": "on_device_ai",
+        "deliverables": [
+          "Werkend AI-prototype",
+          "Integratie in je app"
+        ],
+        "technologies": [
+          "Flutter",
+          "On-device LLMs",
+          "Generative UI"
+        ],
+        "projectIds": [
+          "aurora_marketplace"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Advies"
+        ],
+        "idealFor": [
+          "Teams die AI-functies onderzoeken"
+        ],
+        "process": [
+          "Use-case workshop",
+          "Prototype",
+          "Productieklaar maken"
+        ],
+        "faq": [
+          {
+            "question": "Is internet nodig?",
+            "answer": "Nee, modellen draaien lokaal op het apparaat."
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  }
+}
