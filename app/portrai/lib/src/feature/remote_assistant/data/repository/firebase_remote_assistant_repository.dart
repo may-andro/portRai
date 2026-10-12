@@ -113,6 +113,8 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
       generationConfig: GenerationConfig(
         temperature: RemoteAssistantRequestLimits.temperature,
         maxOutputTokens: RemoteAssistantRequestLimits.maxOutputTokens,
+        // Thinking tokens share the output budget and can truncate the answer.
+        thinkingConfig: ThinkingConfig.withThinkingLevel(ThinkingLevel.low),
       ),
       systemInstruction: systemPrompt == null
           ? _systemInstruction
