@@ -21,6 +21,8 @@ class ExperienceModel {
     required this.url,
     required this.id,
     required this.locale,
+    this.latitude,
+    this.longitude,
   });
 
   factory ExperienceModel.fromJson(Map<String, dynamic> json) =>
@@ -42,6 +44,8 @@ class ExperienceModel {
   final String? url;
   final String id;
   final String locale;
+  final double? latitude;
+  final double? longitude;
 
   Map<String, dynamic> toJson() => _$ExperienceModelToJson(this);
 }

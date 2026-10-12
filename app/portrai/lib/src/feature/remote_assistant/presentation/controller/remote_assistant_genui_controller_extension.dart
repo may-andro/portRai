@@ -26,9 +26,9 @@ const _imageInstruction =
     'invent or alter a URL, and omit the image if none is available.';
 
 const _mapInstruction =
-    ' To show where the person is based use DSMap with the latitude and '
-    'longitude copied exactly from the location in the portfolio '
-    'information. Never invent coordinates.';
+    ' To show where the person is based or has worked use DSMap with one '
+    'place per location, with latitude and longitude copied exactly from the '
+    'profile location or from experiences. Never invent coordinates.';
 
 extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
   /// Sends a known text question and authoritative context, not raw GenUI

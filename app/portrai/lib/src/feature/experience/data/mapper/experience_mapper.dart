@@ -27,6 +27,8 @@ class ExperienceMapper implements BiMapper<ExperienceModel, ExperienceEntity> {
     id: entity.id,
     url: entity.url,
     locale: appLocale.languageCode,
+    latitude: entity.latitude,
+    longitude: entity.longitude,
   );
 
   @override
@@ -46,5 +48,7 @@ class ExperienceMapper implements BiMapper<ExperienceModel, ExperienceEntity> {
     companyLogo: model.companyLogo,
     id: model.id,
     url: model.url,
+    latitude: model.latitude,
+    longitude: model.longitude,
   );
 }

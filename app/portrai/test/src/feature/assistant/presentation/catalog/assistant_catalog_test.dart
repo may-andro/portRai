@@ -164,6 +164,14 @@ void main() {
       [(latitude: 59.9, longitude: 10.7)],
     );
     expect(assistantLocationsFrom('not json'), isEmpty);
+    expect(
+      assistantLocationsFrom(
+        '{"location":{"latitude":1,"longitude":2},'
+        '"experiences":[{"latitude":3.5,"longitude":4.5},'
+        '{"latitude":null,"longitude":null}]}',
+      ),
+      [(latitude: 1.0, longitude: 2.0), (latitude: 3.5, longitude: 4.5)],
+    );
   });
 
   testWidgets(
@@ -189,7 +197,7 @@ void main() {
         '''
 {"version":"v0.9","createSurface":{"surfaceId":"map","catalogId":"dev.portrai.assistant"}}
 {"version":"v0.9","updateComponents":{"surfaceId":"map","components":[
-  {"id":"root","component":"DSMap","latitude":10.0,"longitude":20.0}
+  {"id":"root","component":"DSMap","places":[{"latitude":10.0,"longitude":20.0}]}
 ]}}
 ''',
       ]);

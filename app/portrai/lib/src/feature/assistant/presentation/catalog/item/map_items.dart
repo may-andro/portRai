@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,9 @@ bool get _isMapSupported =>
     defaultTargetPlatform == TargetPlatform.android ||
     defaultTargetPlatform == TargetPlatform.iOS;
 
-/// Shows only [allowedLocations]; any other coordinates render nothing, so the
+const _maxPlaces = 12;
+
+/// Shows only [allowedLocations]; places outside them are dropped, so the
 /// model cannot invent places.
 CatalogItem createDsMap(
   List<AssistantLocation> allowedLocations,
@@ -21,46 +25,61 @@ CatalogItem createDsMap(
   name: 'DSMap',
   dataSchema: S.object(
     description:
-        'An interactive map. Coordinates must be copied exactly from the '
-        'portfolio information (the location latitude and longitude); never '
-        'invent them.',
+        'An interactive map with one marker per place. Coordinates must be '
+        'copied exactly from the portfolio information (profile location or '
+        'experience latitude and longitude); never invent them.',
     properties: {
-      'latitude': S.number(description: 'Exact latitude from the portfolio.'),
-      'longitude': S.number(description: 'Exact longitude from the portfolio.'),
-      'label': S.string(description: 'Name of the marked place.'),
-      'zoom': S.number(
-        description: 'Zoom level from 3 (country) to 15 (street).',
+      'places': S.list(
+        description: 'Places to mark, at most $_maxPlaces.',
+        items: S.object(
+          properties: {
+            'latitude': S.number(description: 'Exact latitude.'),
+            'longitude': S.number(description: 'Exact longitude.'),
+            'label': S.string(description: 'Name of the place.'),
+          },
+          required: ['latitude', 'longitude'],
+        ),
       ),
     },
-    required: ['latitude', 'longitude'],
+    required: ['places'],
   ),
   widgetBuilder: (itemContext) {
     final data = itemContext.data as JsonMap;
-    final latitude = data['latitude'];
-    final longitude = data['longitude'];
-    if (latitude is! num || longitude is! num) return const SizedBox.shrink();
-    final isAllowed = allowedLocations.any(
-      (location) =>
-          (location.latitude - latitude).abs() < _tolerance &&
-          (location.longitude - longitude).abs() < _tolerance,
-    );
-    if (!isAllowed || !_isMapSupported) return const SizedBox.shrink();
+    final places = <({LatLng position, String? label})>[];
+    for (final place in (data['places'] as List?) ?? const []) {
+      if (place is! Map) continue;
+      final latitude = place['latitude'];
+      final longitude = place['longitude'];
+      if (latitude is! num || longitude is! num) continue;
+      final isAllowed = allowedLocations.any(
+        (location) =>
+            (location.latitude - latitude).abs() < _tolerance &&
+            (location.longitude - longitude).abs() < _tolerance,
+      );
+      if (!isAllowed) continue;
+      places.add((
+        position: LatLng(latitude.toDouble(), longitude.toDouble()),
+        label: place['label'] as String?,
+      ));
+      if (places.length == _maxPlaces) break;
+    }
+    if (places.isEmpty || !_isMapSupported) return const SizedBox.shrink();
 
-    final position = LatLng(latitude.toDouble(), longitude.toDouble());
-    final zoom = ((data['zoom'] as num?)?.toDouble() ?? 10).clamp(3.0, 15.0);
-    final label = data['label'] as String?;
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: GoogleMap(
-          initialCameraPosition: CameraPosition(target: position, zoom: zoom),
+          initialCameraPosition: _cameraFor([
+            for (final place in places) place.position,
+          ]),
           markers: {
-            Marker(
-              markerId: const MarkerId('place'),
-              position: position,
-              infoWindow: InfoWindow(title: label),
-            ),
+            for (final (index, place) in places.indexed)
+              Marker(
+                markerId: MarkerId('place_$index'),
+                position: place.position,
+                infoWindow: InfoWindow(title: place.label),
+              ),
           },
           zoomControlsEnabled: false,
           mapToolbarEnabled: false,
@@ -73,3 +92,21 @@ CatalogItem createDsMap(
     );
   },
 );
+
+/// Centers on the markers and picks the zoom that fits their span in 16:9.
+CameraPosition _cameraFor(List<LatLng> positions) {
+  final latitudes = positions.map((position) => position.latitude);
+  final longitudes = positions.map((position) => position.longitude);
+  final minLat = latitudes.reduce(math.min);
+  final maxLat = latitudes.reduce(math.max);
+  final minLng = longitudes.reduce(math.min);
+  final maxLng = longitudes.reduce(math.max);
+  final span = math.max(maxLng - minLng, (maxLat - minLat) * 16 / 9);
+  final zoom = span < 0.01
+      ? 10.0
+      : (math.log(506 / span) / math.ln2 - 0.4).clamp(2.0, 10.0);
+  return CameraPosition(
+    target: LatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2),
+    zoom: zoom,
+  );
+}

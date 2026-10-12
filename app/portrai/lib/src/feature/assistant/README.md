@@ -108,7 +108,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSColumn`, `DSWrap` | Vertical and wrapping layouts of child component IDs |
 | `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
 | `DSImage` | A portfolio image (`avatar`, `logo`, `banner`). Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context |
-| `DSMap` | An interactive Google map with one marker. Registered only when the portfolio context has coordinates, and renders only coordinates present in that context. Android, iOS and web only |
+| `DSMap` | An interactive Google map with one marker per place, framed to fit them all (profile location and experience locations). Registered only when the portfolio context has coordinates, and marks only coordinates present in that context. Android, iOS and web only |
 | `DSDivider` | A horizontal divider |
 
 String properties accept a literal or a data-model reference. Child properties are

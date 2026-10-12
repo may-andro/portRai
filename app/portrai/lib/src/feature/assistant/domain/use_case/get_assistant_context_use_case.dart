@@ -145,6 +145,8 @@ class GetAssistantContextUseCase
               'endDate': item.endDate == null ? null : _date(item.endDate!),
               'current': item.current,
               'location': item.location,
+              'latitude': item.latitude,
+              'longitude': item.longitude,
               'employmentType': item.employmentType,
               'description': item.description,
               'longDescription': item.longDescription,
