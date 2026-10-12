@@ -119,6 +119,37 @@ void main() {
     );
 
     test(
+      'should write the project market coordinates only when both are known',
+      () async {
+        final getPortfolio = MockGetPortfolioUseCase()
+          ..stubCall(
+            Right<GetPortfolioFailure, PortfolioEntity>(
+              createPortfolioEntity(
+                projects: [
+                  createProjectEntity(
+                    marketLatitude: 51.1657,
+                    marketLongitude: 10.4515,
+                  ),
+                  createProjectEntity(id: 'other', marketLatitude: 1),
+                ],
+              ),
+            ),
+          );
+
+        final result = await GetAssistantContextUseCase(getPortfolio)();
+
+        final projects =
+            (jsonDecode(result.right) as Map<String, Object?>)['projects']!
+                as List<Object?>;
+        expect((projects.first! as Map)['market'], {
+          'latitude': 51.1657,
+          'longitude': 10.4515,
+        });
+        expect((projects.last! as Map).containsKey('market'), isFalse);
+      },
+    );
+
+    test(
       'should include dates and duration when employment has ended',
       () async {
         final experience = ExperienceEntity(

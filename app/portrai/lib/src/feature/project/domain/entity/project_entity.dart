@@ -20,6 +20,8 @@ class ProjectEntity extends Equatable {
     required this.teamSize,
     required this.role,
     required this.id,
+    this.marketLatitude,
+    this.marketLongitude,
   });
 
   final String title;
@@ -41,6 +43,10 @@ class ProjectEntity extends Equatable {
   final String role;
   final String id;
 
+  /// Where the product is offered, not where the work was done.
+  final double? marketLatitude;
+  final double? marketLongitude;
+
   @override
   List<Object?> get props => [
     title,
@@ -61,5 +67,7 @@ class ProjectEntity extends Equatable {
     teamSize,
     role,
     id,
+    marketLatitude,
+    marketLongitude,
   ];
 }
