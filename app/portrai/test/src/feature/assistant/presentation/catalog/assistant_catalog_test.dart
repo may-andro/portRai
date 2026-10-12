@@ -30,6 +30,7 @@ void main() {
       'DSStatGrid',
       'DSCarousel',
       'DSTabs',
+      'DSCallout',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -494,6 +495,18 @@ void main() {
 
     expect(find.text('Kotlin'), findsOneWidget);
     expect(find.text('Flutter'), findsNothing);
+  });
+
+  testWidgets('should render its text when DSCallout is used', (tester) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(),
+      '''
+{"id":"root","component":"DSCallout","text":"Open to work","variant":"success"}''',
+    );
+
+    expect(find.text('Open to work'), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
   });
 }
 

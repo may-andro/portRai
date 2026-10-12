@@ -16,6 +16,7 @@ const _responseStyleInstruction =
     'history, DSSkillBars to compare skills by years, DSQuote for a '
     'testimonial copied exactly, '
     'DSStatGrid for two to four DSMetric side by side, DSCarousel for several cards, DSTabs to switch between groups, '
+    'DSCallout for a highlighted note such as availability, '
     'DSText variants heading, title, body '
     'and caption for prose. Group with a DSColumn root; use a DSCard only '
     'around a distinct group, and never around a one-line answer. For a '
