@@ -9,6 +9,7 @@ This document tracks what is missing, what was already fixed, and what each fix 
 
 | Area | Change |
 |------|--------|
+| `services` | Each service has an `id`, `deliverables`, `technologies`, linked `projectIds`, `engagementTypes`, `idealFor`, `process` steps and `faq`. |
 | `profile.workingHours.timezone` | Placeholder (`Your/Timezone`) replaced with `Europe/Madrid`. |
 | `profile.location.coordinates` | Set to Alicante (38.3452, -0.4810) instead of 0,0. |
 | `profile.languages` | Spanish added (Proficient / Competente / Vaardig) next to English. |

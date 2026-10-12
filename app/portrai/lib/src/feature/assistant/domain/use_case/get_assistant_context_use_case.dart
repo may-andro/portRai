@@ -243,6 +243,21 @@ class GetAssistantContextUseCase
               'description': item.description,
               'detail': item.detail,
               'image': item.image,
+              'id': item.id,
+              'deliverables': item.deliverables,
+              'technologies': item.technologies,
+              'projects': [
+                for (final project in portfolio.projects)
+                  if (item.projectIds.contains(project.id))
+                    {'id': project.id, 'title': project.title},
+              ],
+              'engagementTypes': item.engagementTypes,
+              'idealFor': item.idealFor,
+              'process': item.process,
+              'faq': [
+                for (final entry in item.faq)
+                  {'question': entry.question, 'answer': entry.answer},
+              ],
             },
         ],
         'testimonials': [

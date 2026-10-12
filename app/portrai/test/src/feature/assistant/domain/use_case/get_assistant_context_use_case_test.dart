@@ -8,6 +8,8 @@ import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
+import 'package:portrai/src/feature/service/domain/entity/service_entity.dart';
+import 'package:portrai/src/feature/service/domain/entity/service_faq_entity.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
@@ -258,6 +260,48 @@ void main() {
         ]);
         expect(_firstRecord(context, 'testimonials')['projects'], [
           {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
+      },
+    );
+
+    test(
+      'should link a service to its projects and write its details',
+      () async {
+        final getPortfolio = MockGetPortfolioUseCase()
+          ..stubCall(
+            Right<GetPortfolioFailure, PortfolioEntity>(
+              createPortfolioEntity(
+                projects: [createProjectEntity(id: 'p1')],
+                services: const [
+                  ServiceEntity(
+                    image: 'service.png',
+                    title: 'App Development',
+                    description: 'Apps',
+                    detail: 'Detail',
+                    id: 'app_development',
+                    deliverables: ['Store release'],
+                    projectIds: ['p1', 'missing'],
+                    faq: [
+                      ServiceFaqEntity(question: 'How long?', answer: '3-12'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+
+        final result = await GetAssistantContextUseCase(getPortfolio)();
+        final service = _firstRecord(
+          jsonDecode(result.right) as Map<String, Object?>,
+          'services',
+        );
+
+        expect(service['deliverables'], ['Store release']);
+        expect(service['projects'], [
+          {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
+        expect(service['faq'], [
+          {'question': 'How long?', 'answer': '3-12'},
         ]);
       },
     );

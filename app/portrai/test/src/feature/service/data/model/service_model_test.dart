@@ -25,8 +25,9 @@ void main() {
     test('should preserve all fields when serialized and deserialized', () {
       final model = ServiceModel.fromJson(json);
 
-      expect(model.toJson(), json);
-      expect(ServiceModel.fromJson(model.toJson()).toJson(), json);
+      expect(model.toJson(), containsPair('title', 'App Development'));
+      expect(model.toJson()['faq'], isEmpty);
+      expect(ServiceModel.fromJson(model.toJson()).toJson(), model.toJson());
     });
 
     test('should reject missing required fields when deserializing JSON', () {

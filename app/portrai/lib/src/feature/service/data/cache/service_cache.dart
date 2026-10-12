@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cache/cache.dart';
 import 'package:core/core.dart';
 import 'package:module_injector/module_injector.dart';
@@ -14,7 +16,7 @@ class ServiceCache extends DBCache<ServiceModel> {
   String get tableName => 'service_table';
 
   @override
-  int get tableVersion => 1;
+  int get tableVersion => 2;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -23,6 +25,14 @@ class ServiceCache extends DBCache<ServiceModel> {
     const DbColumnDefinition(name: 'image', nullable: false),
     const DbColumnDefinition(name: 'detail', nullable: false),
     const DbColumnDefinition(name: 'locale', nullable: false),
+    const DbColumnDefinition(name: 'id'),
+    const DbColumnDefinition(name: 'deliverables', nullable: false),
+    const DbColumnDefinition(name: 'technologies', nullable: false),
+    const DbColumnDefinition(name: 'projectIds', nullable: false),
+    const DbColumnDefinition(name: 'engagementTypes', nullable: false),
+    const DbColumnDefinition(name: 'idealFor', nullable: false),
+    const DbColumnDefinition(name: 'process', nullable: false),
+    const DbColumnDefinition(name: 'faq', nullable: false),
   ];
 
   @override
@@ -30,11 +40,33 @@ class ServiceCache extends DBCache<ServiceModel> {
 
   @override
   ServiceModel deserialize(Map<String, dynamic> map) {
-    return ServiceModel.fromJson(map);
+    final modifiedMap = Map<String, dynamic>.from(map);
+    for (final key in _listColumns) {
+      if (modifiedMap[key] is String) {
+        modifiedMap[key] = jsonDecode(modifiedMap[key] as String);
+      }
+    }
+    return ServiceModel.fromJson(modifiedMap);
   }
 
   @override
-  Map<String, dynamic> serialize(ServiceModel model) => model.toJson();
+  Map<String, dynamic> serialize(ServiceModel model) {
+    final json = model.toJson();
+    for (final key in _listColumns) {
+      json[key] = jsonEncode(json[key]);
+    }
+    return json;
+  }
+
+  static const _listColumns = [
+    'deliverables',
+    'technologies',
+    'projectIds',
+    'engagementTypes',
+    'idealFor',
+    'process',
+    'faq',
+  ];
 
   @override
   Duration get timeToLive => 7.days;
