@@ -98,38 +98,57 @@ flags, limits and errors stay in the app's own bloc and use case.
 `createAssistantCatalog()` exposes read-only design-system components under catalog
 ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 
+Always registered:
+
 | Component | Renders |
 | --- | --- |
 | `DSText` | Text with `variant` `heading`, `title`, `body` or `caption` |
 | `DSMetric` | A highlighted value with a label |
+| `DSStatGrid` | Two to four `DSMetric` components side by side |
 | `DSBulletList` | A bulleted list of literal strings |
 | `DSLabeledInfoRow` | An icon with a label and value |
 | `DSTag`, `DSInfoChip` | Skill badges and icon and label pills |
+| `DSTimeline` | A vertical timeline of up to 8 entries (`period`, `title`, `subtitle`), for career or education history |
+| `DSEducationList` | Up to six degrees or certificates with institution, degree and period |
+| `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
+| `DSProgressRing` | A circular gauge for one value from 0 to 100, with an optional caption |
+| `DSComparison` | A table with two to four columns and up to eight rows for side-by-side comparisons |
+| `DSQuote` | A quotation such as a testimonial, with optional author and role |
+| `DSCallout` | A highlighted note with an `info`, `success` or `warning` style, for example availability |
+| `DSCodeBlock` | A short code or command snippet, at most 40 lines, scrolling sideways |
+| `DSProjectCard` | A project card with title, description, up to eight technology tags, an optional banner and an optional action such as `DSLinkButton`. The banner renders only when its URL is in the portfolio context |
+
+Layout:
+
+| Component | Renders |
+| --- | --- |
 | `DSColumn`, `DSWrap` | Vertical and wrapping layouts of child component IDs |
 | `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
-| `DSImage` | A portfolio image (`avatar`, `logo`, `banner`). Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context |
-| `DSMap` | An interactive Google map with one marker per place, framed to fit them all (profile location and experience locations). Registered only when the portfolio context has coordinates, and marks only coordinates present in that context. Android, iOS and web only |
-| `DSTimeline` | A vertical timeline of up to 8 entries (`period`, `title`, `subtitle`), for career or education history |
-| `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
-| `DSQuote` | A quotation such as a testimonial, with optional author and role |
-| `DSStatGrid` | Two to four `DSMetric` components side by side |
 | `DSCarousel` | A horizontally scrolling row of up to ten child cards |
 | `DSTabs` | Up to five titled tabs, each showing one child component |
-| `DSLinkButton` | A button that opens a link. Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context. Taps open through the remote assistant bloc and `OpenExternalUrlUseCase` |
 | `DSDivider` | A horizontal divider |
-| `DSCallout` | A highlighted note with an `info`, `success` or `warning` style, for example availability |
-| `DSProgressRing` | A circular gauge for one value from 0 to 100, with an optional caption |
-| `DSCodeBlock` | A short code or command snippet, at most 40 lines, scrolling sideways |
-| `DSComparison` | A table with two to four columns and up to eight rows for side-by-side comparisons |
-| `DSEducationList` | Up to six degrees or certificates with institution, degree and period |
-| `DSProjectCard` | A project card with title, description, up to eight technology tags, an optional banner (only URLs present in the portfolio context) and an optional action such as `DSLinkButton` |
-| `DSContactCard` | Up to five contact buttons (`email`, `phone`, `website`). Registered with `DSLinkButton`, and opens only HTTPS URLs from the portfolio context or the profile `mailto:` and `tel:` links |
-| `DSSuggestionChips` | Up to four tappable follow-up questions. Registered only when the host supplies a question callback; a tap sends the question through the remote assistant bloc |
+
+Registered only when the host supplies the data or callback they need:
+
+| Component | Registered when | Renders |
+| --- | --- | --- |
+| `DSImage` | The portfolio context has HTTPS URLs | A portfolio image (`avatar`, `logo`, `banner`), only for URLs present in that context |
+| `DSMap` | The portfolio context has coordinates | An interactive Google map with one marker per place, framed to fit them all (profile and experience locations), only for coordinates present in that context. Android, iOS and web only |
+| `DSLinkButton` | There are allowed links and an `onOpenLink` callback | A button that opens one allowed link |
+| `DSContactCard` | Same as `DSLinkButton` | Up to five contact buttons (`email`, `phone`, `website`) for allowed links |
+| `DSSuggestionChips` | An `onAskQuestion` callback is supplied | Up to four tappable follow-up questions |
+
+Allowed links are the HTTPS URLs in the portfolio context plus the profile
+`mailto:` and `tel:` links (`assistantUrlsFrom`, `assistantContactLinksFrom`).
+Any other URL renders nothing. Taps never reach a use case from the widget:
+`RemoteAssistantBloc` handles `OpenRemoteAssistantLinkClickEvent` with
+`OpenExternalUrlUseCase`, and `SendRemoteAssistantQuestionClickEvent` for
+suggestion chips.
 
 String properties accept a literal or a data-model reference. Child properties are
 component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed
 name list, and unknown names fall back to an info icon. No basic catalog, client
-functions, actions, navigation, media or network widgets are registered.
+functions, navigation or genui user actions are registered.
 
 #### Flow
 
@@ -213,7 +232,9 @@ portfolio context and typed history, not arbitrary framework messages.
 #### Firebase request
 
 The use case's optional `systemPrompt` accepts trusted framework instructions up to
-50,000 characters. Oversized prompts are rejected, never truncated. Firebase keeps
+80,000 characters. The genui base prompt is about 19,000 characters and each catalog
+item adds roughly 1,000 to 1,600, so the full catalog is about 50,000 before the
+response-style instructions. Oversized prompts are rejected, never truncated. Firebase keeps
 its portfolio grounding instructions and appends the framework prompt as
 subordinate presentation instructions. A null prompt keeps the text-only model
 configuration, and a changed prompt closes and recreates the cached model. The
