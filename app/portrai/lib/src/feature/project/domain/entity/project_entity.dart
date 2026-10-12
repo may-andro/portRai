@@ -20,6 +20,8 @@ class ProjectEntity extends Equatable {
     required this.teamSize,
     required this.role,
     required this.id,
+    this.experienceId,
+
     this.marketLatitude,
     this.marketLongitude,
   });
@@ -42,6 +44,9 @@ class ProjectEntity extends Equatable {
   final int teamSize;
   final String role;
   final String id;
+
+  /// The experience (employer) this project was delivered under.
+  final String? experienceId;
 
   /// Where the product is offered, not where the work was done.
   final double? marketLatitude;
@@ -67,6 +72,8 @@ class ProjectEntity extends Equatable {
     teamSize,
     role,
     id,
+    experienceId,
+
     marketLatitude,
     marketLongitude,
   ];

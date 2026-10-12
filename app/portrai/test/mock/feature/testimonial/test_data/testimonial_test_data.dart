@@ -12,6 +12,7 @@ TestimonialEntity createTestimonialEntity({
   String companyLogo = 'https://example.com/acme.png',
   String linkedinProfile = 'https://linkedin.com/in/john-doe',
   String projectContext = 'Portfolio App',
+  String? experienceId,
 }) {
   return TestimonialEntity(
     id: id,
@@ -24,6 +25,7 @@ TestimonialEntity createTestimonialEntity({
     companyLogo: companyLogo,
     linkedinProfile: linkedinProfile,
     projectContext: projectContext,
+    experienceId: experienceId,
   );
 }
 

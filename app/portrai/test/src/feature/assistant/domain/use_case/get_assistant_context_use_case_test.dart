@@ -10,6 +10,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../mock/feature/project/test_data/project_test_data.dart';
+import '../../../../../mock/feature/testimonial/test_data/testimonial_test_data.dart';
 
 void main() {
   group('GetAssistantContextUseCase', () {
@@ -146,6 +147,59 @@ void main() {
           'longitude': 10.4515,
         });
         expect((projects.last! as Map).containsKey('market'), isFalse);
+      },
+    );
+
+    test(
+      'should link projects and testimonials to their experience when ids match',
+      () async {
+        final experience = ExperienceEntity(
+          company: 'Stuart',
+          position: 'Senior Flutter Developer',
+          location: 'Barcelona',
+          startDate: DateTime(2022, 7),
+          endDate: null,
+          current: true,
+          employmentType: 'Full-time',
+          description: 'Delivery platform',
+          longDescription: 'Built the delivery platform',
+          responsibilities: const [],
+          achievements: const [],
+          technologies: const ['Flutter'],
+          companyLogo: '',
+          url: null,
+          id: 'stuart',
+        );
+        final getPortfolio = MockGetPortfolioUseCase()
+          ..stubCall(
+            Right<GetPortfolioFailure, PortfolioEntity>(
+              createPortfolioEntity(
+                experiences: [experience],
+                projects: [
+                  createProjectEntity(id: 'p1', experienceId: 'stuart'),
+                  createProjectEntity(id: 'p2', experienceId: 'unknown'),
+                ],
+                testimonials: [createTestimonialEntity(experienceId: 'stuart')],
+              ),
+            ),
+          );
+
+        final result = await GetAssistantContextUseCase(getPortfolio)();
+        final context = jsonDecode(result.right) as Map<String, Object?>;
+        final projects = (context['projects']! as List)
+            .cast<Map<String, Object?>>();
+        final reference = {
+          'company': 'Stuart',
+          'position': 'Senior Flutter Developer',
+        };
+
+        expect(projects.first['experienceId'], 'stuart');
+        expect(projects.first['experience'], reference);
+        expect(projects.last.containsKey('experience'), isFalse);
+        expect(_firstRecord(context, 'testimonials')['experience'], reference);
+        expect(_firstRecord(context, 'experiences')['projects'], [
+          {'id': 'p1', 'title': 'PortRai 🚀'},
+        ]);
       },
     );
 
