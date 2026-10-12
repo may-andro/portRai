@@ -25,6 +25,7 @@ void main() {
     ),
     languageMapper: const LanguageMapper(),
     educationMapper: const EducationMapper(),
+    certificationMapper: const CertificationMapper(),
     appLocale: appLocale,
   );
   final profile = createProfileEntity();

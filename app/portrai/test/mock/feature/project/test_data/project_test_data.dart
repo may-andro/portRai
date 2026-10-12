@@ -4,6 +4,8 @@ import 'package:portrai/src/feature/project/domain/_domain.dart';
 ProjectEntity createProjectEntity({
   String id = 'port-rai',
   String? experienceId,
+  List<ProjectMarketEntity> markets = const [],
+  List<ProjectMetricEntity> metrics = const [],
   String title = 'PortRai 🚀',
   DateTime? endDate,
   bool hasEndDate = true,
@@ -11,12 +13,12 @@ ProjectEntity createProjectEntity({
   String? playStore = 'https://example.com/play-store',
   String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
-  double? marketLatitude,
-  double? marketLongitude,
 }) {
   return ProjectEntity(
     id: id,
     experienceId: experienceId,
+    markets: markets,
+    metrics: metrics,
     title: title,
     description: 'A polished portfolio app',
     longDescription:
@@ -35,8 +37,6 @@ ProjectEntity createProjectEntity({
     achievements: const ['Launched to production'],
     teamSize: 3,
     role: 'Lead Flutter Developer',
-    marketLatitude: marketLatitude,
-    marketLongitude: marketLongitude,
   );
 }
 
@@ -49,8 +49,6 @@ ProjectModel createProjectModel({
   String? playStore = 'https://example.com/play-store',
   String? website = 'https://example.com/website',
   String? github = 'https://github.com/example/portrai',
-  double? marketLatitude,
-  double? marketLongitude,
 }) {
   return ProjectModel(
     id: id,
@@ -73,8 +71,6 @@ ProjectModel createProjectModel({
     teamSize: 3,
     role: 'Lead Flutter Developer',
     locale: locale,
-    marketLatitude: marketLatitude,
-    marketLongitude: marketLongitude,
   );
 }
 

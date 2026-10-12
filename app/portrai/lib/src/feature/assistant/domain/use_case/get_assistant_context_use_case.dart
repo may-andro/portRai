@@ -36,17 +36,19 @@ class GetAssistantContextUseCase
     List<String> digest() {
       String list(List<String> items, [int max = 10]) =>
           items.take(max).join(', ');
-      String store(String? url) =>
-          url == null || url.trim().isEmpty ? 'no' : 'yes';
+      String store(String? url, [Iterable<String?> others = const []]) =>
+          [url, ...others].any((u) => u != null && u.trim().isNotEmpty)
+          ? 'yes'
+          : 'no';
       final profile = portfolio.profile;
       return [
         '${profile.fullName}: ${profile.title}. Email: ${profile.email}. Phone: ${profile.phone}. Based in ${profile.location.city}, ${profile.location.country}.',
         for (final item in portfolio.experiences)
           '${_employmentSummary(item, today)} Location: ${item.location}. ${item.employmentType}. Technologies: ${list(item.technologies)}.',
         for (final item in portfolio.projects)
-          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.playStore)}. On App Store: ${store(item.appStore)}. Website: ${store(item.website)}. GitHub: ${store(item.github)}.',
+          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.playStore, item.markets.map((m) => m.playStore))}. On App Store: ${store(item.appStore, item.markets.map((m) => m.appStore))}. Website: ${store(item.website, item.markets.map((m) => m.website))}. GitHub: ${store(item.github)}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
         for (final item in portfolio.expertises)
-          'Skills in ${item.title}: ${list(item.skills, 15)}.',
+          'Skills in ${item.title}: ${list(item.skillNames, 15)}.',
         for (final item in portfolio.services) 'Service: ${item.title}.',
       ];
     }
@@ -94,6 +96,9 @@ class GetAssistantContextUseCase
             'preferredProjectDuration': availability.preferredProjectDuration,
             'hourlyRate': availability.hourlyRate,
             'availability': availability.availability,
+            'noticePeriod': ?availability.noticePeriod,
+            'workAuthorization': ?availability.workAuthorization,
+            'note': ?availability.note,
           },
           'workingHours': {
             'timezone': hours.timezone,
@@ -124,6 +129,15 @@ class GetAssistantContextUseCase
                 'location': item.location,
                 'url': item.url,
                 'image': item.image,
+              },
+          ],
+          'certifications': [
+            for (final item in profile.certifications)
+              {
+                'name': item.name,
+                'issuer': item.issuer,
+                'date': item.date,
+                'url': item.url,
               },
           ],
           'socialLinks': [
@@ -187,17 +201,40 @@ class GetAssistantContextUseCase
               'id': item.id,
               'experienceId': item.experienceId,
               'experience': ?_experienceRef(portfolio, item.experienceId),
-
-              if (item.marketLatitude != null && item.marketLongitude != null)
-                'market': {
-                  'latitude': item.marketLatitude,
-                  'longitude': item.marketLongitude,
-                },
+              if (item.markets.isNotEmpty)
+                'markets': [
+                  for (final market in item.markets)
+                    {
+                      'country': market.country,
+                      'latitude': market.latitude,
+                      'longitude': market.longitude,
+                      'appStore': market.appStore,
+                      'playStore': market.playStore,
+                      'website': market.website,
+                    },
+                ],
+              if (item.metrics.isNotEmpty)
+                'metrics': [
+                  for (final metric in item.metrics)
+                    {'label': metric.label, 'value': metric.value},
+                ],
             },
         ],
         'expertises': [
           for (final item in portfolio.expertises)
-            {'title': item.title, 'skills': item.skills, 'image': item.image},
+            {
+              'title': item.title,
+              'skills': [
+                for (final skill in item.skills)
+                  {
+                    'name': skill.name,
+                    'level': ?skill.level,
+                    'years': ?skill.years,
+                    'lastUsed': ?skill.lastUsed,
+                  },
+              ],
+              'image': item.image,
+            },
         ],
         'services': [
           for (final item in portfolio.services)
@@ -223,6 +260,8 @@ class GetAssistantContextUseCase
               'id': item.id,
               'experienceId': item.experienceId,
               'experience': ?_experienceRef(portfolio, item.experienceId),
+              'projectId': item.projectId,
+              'project': ?_projectTitle(portfolio, item.projectId),
             },
         ],
       }),
@@ -237,6 +276,13 @@ class GetAssistantContextUseCase
       if (item.id == experienceId) {
         return {'company': item.company, 'position': item.position};
       }
+    }
+    return null;
+  }
+
+  static String? _projectTitle(PortfolioEntity portfolio, String? projectId) {
+    for (final item in portfolio.projects) {
+      if (item.id == projectId) return item.title;
     }
     return null;
   }
@@ -483,7 +529,22 @@ class GetAssistantContextUseCase
         '${link('Play Store link', item.playStore)}. '
         '${link('App Store link', item.appStore)}. '
         '${link('Website', item.website)}. '
-        '${link('GitHub', item.github)}.';
+        '${link('GitHub', item.github)}.'
+        '${_marketLinks(item)}';
+  }
+
+  static String _marketLinks(ProjectEntity item) {
+    String link(String label, String? url) =>
+        url == null || url.trim().isEmpty ? '' : ' $label: $url.';
+    return item.markets
+        .map(
+          (market) =>
+              ' ${market.country}:'
+              '${link('Play Store link', market.playStore)}'
+              '${link('App Store link', market.appStore)}'
+              '${link('Website', market.website)}',
+        )
+        .join();
   }
 
   // "Hyderabad, India [Remote]" -> "India".

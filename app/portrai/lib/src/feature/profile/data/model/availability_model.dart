@@ -11,6 +11,9 @@ class AvailabilityModel {
     required this.preferredProjectDuration,
     required this.hourlyRate,
     required this.availability,
+    this.noticePeriod,
+    this.workAuthorization,
+    this.note,
   });
 
   factory AvailabilityModel.fromJson(Map<String, dynamic> json) =>
@@ -22,6 +25,9 @@ class AvailabilityModel {
   final String preferredProjectDuration;
   final String hourlyRate;
   final String availability;
+  final String? noticePeriod;
+  final String? workAuthorization;
+  final String? note;
 
   Map<String, dynamic> toJson() => _$AvailabilityModelToJson(this);
 }

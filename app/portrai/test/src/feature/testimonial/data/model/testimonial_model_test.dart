@@ -16,6 +16,7 @@ void main() {
     'projectContext': 'Portfolio App',
     'locale': 'en',
     'experienceId': 'acme',
+    'projectId': null,
   };
 
   group('TestimonialModel', () {

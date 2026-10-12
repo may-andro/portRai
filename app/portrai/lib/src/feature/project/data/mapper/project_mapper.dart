@@ -31,9 +31,21 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       role: entity.role,
       id: entity.id,
       experienceId: entity.experienceId,
-
-      marketLatitude: entity.marketLatitude,
-      marketLongitude: entity.marketLongitude,
+      markets: [
+        for (final market in entity.markets)
+          ProjectMarketModel(
+            country: market.country,
+            latitude: market.latitude,
+            longitude: market.longitude,
+            appStore: market.appStore,
+            playStore: market.playStore,
+            website: market.website,
+          ),
+      ],
+      metrics: [
+        for (final metric in entity.metrics)
+          ProjectMetricModel(label: metric.label, value: metric.value),
+      ],
       locale: appLocale.languageCode,
     );
   }
@@ -60,9 +72,21 @@ class ProjectMapper implements BiMapper<ProjectModel, ProjectEntity> {
       role: model.role,
       id: model.id,
       experienceId: model.experienceId,
-
-      marketLatitude: model.marketLatitude,
-      marketLongitude: model.marketLongitude,
+      markets: [
+        for (final market in model.markets)
+          ProjectMarketEntity(
+            country: market.country,
+            latitude: market.latitude,
+            longitude: market.longitude,
+            appStore: market.appStore,
+            playStore: market.playStore,
+            website: market.website,
+          ),
+      ],
+      metrics: [
+        for (final metric in model.metrics)
+          ProjectMetricEntity(label: metric.label, value: metric.value),
+      ],
     );
   }
 }

@@ -6,7 +6,15 @@ void main() {
   final json = <String, dynamic>{
     'image': 'https://example.com/flutter.png',
     'title': 'Flutter Development',
-    'skills': ['Flutter SDK', 'State Management'],
+    'skills': [
+      {'name': 'Flutter SDK', 'level': null, 'years': null, 'lastUsed': null},
+      {
+        'name': 'State Management',
+        'level': null,
+        'years': null,
+        'lastUsed': null,
+      },
+    ],
     'locale': 'en',
   };
 
@@ -16,7 +24,10 @@ void main() {
 
       expect(model.image, 'https://example.com/flutter.png');
       expect(model.title, 'Flutter Development');
-      expect(model.skills, ['Flutter SDK', 'State Management']);
+      expect(model.skills.map((s) => s.name), [
+        'Flutter SDK',
+        'State Management',
+      ]);
       expect(model.locale, 'en');
     });
 

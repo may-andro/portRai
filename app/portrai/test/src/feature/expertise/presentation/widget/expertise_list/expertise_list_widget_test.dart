@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/expertise_entity.dart';
+import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
 import 'package:portrai/src/feature/expertise/presentation/widget/expertise_list/expertise_list_widget.dart';
 
 import '../../../../../../util/test_wrapper_widget.dart';
@@ -13,7 +14,7 @@ void main() {
       (index) => ExpertiseEntity(
         image: 'https://example.com/$index.png',
         title: 'Expertise $index',
-        skills: ['Skill $index'],
+        skills: [SkillEntity(name: 'Skill $index')],
       ),
     );
   }

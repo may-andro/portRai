@@ -12,6 +12,9 @@ This document tracks what is missing, what was already fixed, and what each fix 
 | `profile.workingHours.timezone` | Placeholder (`Your/Timezone`) replaced with `Europe/Madrid`. |
 | `profile.location.coordinates` | Set to Alicante (38.3452, -0.4810) instead of 0,0. |
 | `profile.languages` | Spanish added (Proficient / Competente / Vaardig) next to English. |
+| Technology names | Variants (`Github`, `MVVM Pattern`, `Sqlite` and similar) share one spelling across experiences and projects. |
+| Availability | `availability.note` explains that freelance work runs next to the full-time role. |
+| Testimonials | `projectId` points to the project a testimonial is about. |
 | Projects, testimonials | Each now carries an `experienceId` pointing to its experience (employer). The assistant context resolves it to the company and position, and lists each experience's projects. |
 | Projects | Swapped MediaMarkt Turkey Play Store and App Store links corrected. |
 
@@ -30,35 +33,16 @@ This document tracks what is missing, what was already fixed, and what each fix 
   the assistant does not read it as contradicting the current full-time role.
 
 ### Skills (expertise)
-Today a skill is only a string inside an expertise group:
-
-```json
-{ "title": "Flutter Development", "skills": ["Flutter SDK", "State Management"] }
-```
-
-The assistant cannot answer "how good is he at X", "how many years of X" for non-listed technologies,
-or "what is his strongest skill". Years per technology are currently derived from the
-`technologies` of each experience, which only works when those are kept accurate.
-
-Proposed structure (needs a data model, parser, mapper and assistant context change):
-
-```json
-{
-  "title": "Flutter Development",
-  "skills": [
-    { "name": "Flutter SDK", "level": "expert", "years": 6, "lastUsed": "2026" }
-  ]
-}
-```
-
-Code changes: expertise entity and DTO, the mapper, the Firestore import/export templates, and a new
-"Skill levels" overview line in `GetAssistantContextUseCase`.
+Each skill is now `{ name, level, years, lastUsed }`. `level` is one of `expert`, `advanced`,
+`intermediate` or `familiar`. Only skills that map to technologies listed on experiences and projects have
+values; they were derived from those date ranges, so review them. The remaining skills (for example
+profiling or TDD) have only a name and need real values.
 
 ### Projects
-- The seven MediaMarkt country projects have identical descriptions and achievements; differentiate them
-  (country, release date, specific features) or merge them into one project with a list of markets.
+- The MediaMarkt country projects are one project with a `markets` list. Saturn and MediaWorld stay separate.
 - Several projects have three or fewer achievements, so "most complex project" has little to go on.
-- No impact metrics (downloads, ratings, users, revenue). Add a `metrics` field.
+- `metrics` (`{ label, value }`) exists and is filled for MediaMarkt, Saturn, MediaWorld and Stuart from
+  their achievements. Add downloads, ratings or users for the rest.
 
 ### Testimonials
 - Only two testimonials. More would support questions about collaboration and working style.
@@ -70,12 +54,12 @@ Questions the assistant cannot answer today because the data does not exist:
 |-------|-----------------|
 | Salary expectations | `availability.salaryExpectation` (or state that it is private) |
 | Age / date of birth | Decide whether to expose it at all |
-| Visa / work authorization | `availability.workAuthorization` |
-| Notice period | `availability.noticePeriod` |
+| Visa / work authorization | `availability.workAuthorization` (field exists, value empty) |
+| Notice period | `availability.noticePeriod` (field exists, value empty) |
 | Relocation reasons | `availability.relocationNotes` |
 | Hobbies and interests | `profile.interests` |
 | Soft skills | `profile.softSkills` |
-| Certifications and courses | `profile.certifications` |
+| Certifications and courses | `profile.certifications` (field exists, list empty) |
 
 ## Behaviour for missing data
 The assistant is instructed to say the information is not available in the portfolio instead of

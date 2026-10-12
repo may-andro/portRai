@@ -48,8 +48,8 @@ const _suggestionInstruction =
 const _mapInstruction =
     ' To show where the person is based or has worked use DSMap with one '
     'place per location, with latitude and longitude copied exactly from the '
-    'profile location, experiences or a project market (where the product is '
-    'offered, not where the work was done). Never invent coordinates.';
+    'profile location, experiences or a project market (a country where the '
+    'product is offered, not where the work was done). Never invent coordinates.';
 
 extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
   /// Sends a known text question and authoritative context, not raw GenUI

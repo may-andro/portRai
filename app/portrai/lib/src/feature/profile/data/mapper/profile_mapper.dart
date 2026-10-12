@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/profile/data/mapper/availability_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/certification_mapper.dart';
 import 'package:portrai/src/feature/profile/data/mapper/education_mapper.dart';
 import 'package:portrai/src/feature/profile/data/mapper/language_mapper.dart';
 import 'package:portrai/src/feature/profile/data/mapper/location_mapper.dart';
@@ -22,6 +23,7 @@ class ProfileMapper implements BiMapper<ProfileModel, ProfileEntity> {
     required this.locationMapper,
     required this.languageMapper,
     required this.educationMapper,
+    required this.certificationMapper,
     required this.appLocale,
   });
 
@@ -33,6 +35,7 @@ class ProfileMapper implements BiMapper<ProfileModel, ProfileEntity> {
   final LocationMapper locationMapper;
   final LanguageMapper languageMapper;
   final EducationMapper educationMapper;
+  final CertificationMapper certificationMapper;
   final AppLocale appLocale;
 
   @override
@@ -66,6 +69,9 @@ class ProfileMapper implements BiMapper<ProfileModel, ProfileEntity> {
       languages: entity.languages.map((e) => languageMapper.from(e)).toList(),
       educations: entity.educations
           .map((e) => educationMapper.from(e))
+          .toList(),
+      certifications: entity.certifications
+          .map((e) => certificationMapper.from(e))
           .toList(),
       locale: appLocale.languageCode,
     );
@@ -101,6 +107,9 @@ class ProfileMapper implements BiMapper<ProfileModel, ProfileEntity> {
       location: locationMapper.to(model.location),
       languages: model.languages.map((e) => languageMapper.to(e)).toList(),
       educations: model.educations.map((e) => educationMapper.to(e)).toList(),
+      certifications: model.certifications
+          .map((e) => certificationMapper.to(e))
+          .toList(),
     );
   }
 }

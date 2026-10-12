@@ -7,7 +7,10 @@ void main() {
   const expertise = ExpertiseEntity(
     image: 'https://example.com/flutter.png',
     title: 'Flutter Development',
-    skills: ['Flutter SDK', 'State Management'],
+    skills: [
+      SkillEntity(name: 'Flutter SDK'),
+      SkillEntity(name: 'State Management'),
+    ],
   );
 
   group('GetAllExpertiseUseCase', () {

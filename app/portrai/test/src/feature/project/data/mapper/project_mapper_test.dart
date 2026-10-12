@@ -1,6 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/project/data/mapper/project_mapper.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_metric_entity.dart';
 
 import '../../../../../mock/feature/project/test_data/project_test_data.dart';
 
@@ -32,17 +34,27 @@ void main() {
       },
     );
 
-    test('should keep the market coordinates when mapping both ways', () {
-      final withMarket = createProjectEntity(
-        marketLatitude: 51.1657,
-        marketLongitude: 10.4515,
+    test('should keep markets and metrics when mapping both ways', () {
+      final withMarkets = createProjectEntity(
+        experienceId: 'mediamarkt',
+        markets: const [
+          ProjectMarketEntity(
+            country: 'Germany',
+            latitude: 51.1657,
+            longitude: 10.4515,
+            appStore: 'https://example.com/app',
+          ),
+        ],
+        metrics: const [ProjectMetricEntity(label: 'Downloads', value: '1M+')],
       );
 
-      final model = mapper.from(withMarket);
+      final model = mapper.from(withMarkets);
 
-      expect(model.marketLatitude, 51.1657);
-      expect(model.marketLongitude, 10.4515);
-      expect(mapper.to(model), withMarket);
+      expect(model.experienceId, 'mediamarkt');
+      expect(model.markets.single.country, 'Germany');
+      expect(model.markets.single.latitude, 51.1657);
+      expect(model.metrics.single.value, '1M+');
+      expect(mapper.to(model), withMarkets);
     });
   });
 }

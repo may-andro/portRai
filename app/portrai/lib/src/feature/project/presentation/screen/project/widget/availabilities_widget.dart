@@ -22,31 +22,21 @@ class AvailabilitiesWidget extends StatelessWidget {
         ),
       );
     }
-    if (project.website case final String website) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectWebsite,
-          icon: Icons.language,
-          url: website,
-        ),
-      );
-    }
-    if (project.appStore case final String appStore) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectAppStore,
-          icon: Icons.apple,
-          url: appStore,
-        ),
-      );
-    }
-    if (project.playStore case final String playStore) {
-      buttons.add(
-        _ButtonWidget(
-          label: context.localizations.projectPlayStore,
-          icon: Icons.shop,
-          url: playStore,
-        ),
+    _addStoreButtons(
+      context,
+      buttons,
+      website: project.website,
+      appStore: project.appStore,
+      playStore: project.playStore,
+    );
+    for (final market in project.markets) {
+      _addStoreButtons(
+        context,
+        buttons,
+        website: market.website,
+        appStore: market.appStore,
+        playStore: market.playStore,
+        country: market.country,
       );
     }
 
@@ -54,6 +44,45 @@ class AvailabilitiesWidget extends StatelessWidget {
       spacing: context.space(),
       runSpacing: context.space(),
       children: buttons,
+    );
+  }
+}
+
+void _addStoreButtons(
+  BuildContext context,
+  List<Widget> buttons, {
+  required String? website,
+  required String? appStore,
+  required String? playStore,
+  String? country,
+}) {
+  String label(String text) => country == null ? text : '$text · $country';
+
+  if (website != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectWebsite),
+        icon: Icons.language,
+        url: website,
+      ),
+    );
+  }
+  if (appStore != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectAppStore),
+        icon: Icons.apple,
+        url: appStore,
+      ),
+    );
+  }
+  if (playStore != null) {
+    buttons.add(
+      _ButtonWidget(
+        label: label(context.localizations.projectPlayStore),
+        icon: Icons.shop,
+        url: playStore,
+      ),
     );
   }
 }

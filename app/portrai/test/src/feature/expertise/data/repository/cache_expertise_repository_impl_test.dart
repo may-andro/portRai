@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/expertise/data/mapper/expertise_mapper.dart';
 import 'package:portrai/src/feature/expertise/data/model/expertise_model.dart';
+import 'package:portrai/src/feature/expertise/data/model/skill_model.dart';
 import 'package:portrai/src/feature/expertise/data/repository/cache_expertise_repository_impl.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
@@ -17,7 +18,10 @@ void main() {
   const expertise = ExpertiseEntity(
     image: 'https://example.com/flutter.png',
     title: 'Flutter Development',
-    skills: ['Flutter SDK', 'State Management'],
+    skills: [
+      SkillEntity(name: 'Flutter SDK'),
+      SkillEntity(name: 'State Management'),
+    ],
   );
 
   group('CacheExpertiseRepositoryImpl', () {
@@ -49,7 +53,7 @@ void main() {
                 as ExpertiseModel;
         expect(capturedModel.image, expertise.image);
         expect(capturedModel.title, expertise.title);
-        expect(capturedModel.skills, expertise.skills);
+        expect(capturedModel.skills.map((s) => s.name), expertise.skillNames);
         expect(capturedModel.locale, localeCode);
       },
     );
@@ -80,7 +84,9 @@ void main() {
           ExpertiseModel(
             image: expertise.image,
             title: expertise.title,
-            skills: expertise.skills,
+            skills: [
+              for (final s in expertise.skills) SkillModel(name: s.name),
+            ],
             locale: localeCode,
           ),
         ],

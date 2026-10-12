@@ -9,6 +9,7 @@ void main() {
   const availabilityMapper = AvailabilityMapper();
   const coordinatesMapper = CoordinatesMapper();
   const educationMapper = EducationMapper();
+  const certificationMapper = CertificationMapper();
   const languageMapper = LanguageMapper();
   const locationMapper = LocationMapper(coordinatesMapper: CoordinatesMapper());
   const publishedAtMapper = PublishedAtMapper();
@@ -24,6 +25,7 @@ void main() {
     locationMapper: locationMapper,
     languageMapper: languageMapper,
     educationMapper: educationMapper,
+    certificationMapper: certificationMapper,
     appLocale: locale,
   );
 

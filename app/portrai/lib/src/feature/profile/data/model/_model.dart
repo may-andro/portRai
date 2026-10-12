@@ -1,4 +1,5 @@
 export 'availability_model.dart';
+export 'certification_model.dart';
 export 'coordinates_model.dart';
 export 'education_model.dart';
 export 'language_model.dart';

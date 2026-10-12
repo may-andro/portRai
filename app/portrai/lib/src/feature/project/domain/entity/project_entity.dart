@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_metric_entity.dart';
 
 class ProjectEntity extends Equatable {
   const ProjectEntity({
@@ -21,9 +23,8 @@ class ProjectEntity extends Equatable {
     required this.role,
     required this.id,
     this.experienceId,
-
-    this.marketLatitude,
-    this.marketLongitude,
+    this.markets = const [],
+    this.metrics = const [],
   });
 
   final String title;
@@ -48,9 +49,9 @@ class ProjectEntity extends Equatable {
   /// The experience (employer) this project was delivered under.
   final String? experienceId;
 
-  /// Where the product is offered, not where the work was done.
-  final double? marketLatitude;
-  final double? marketLongitude;
+  /// Countries where the product is offered; one project can span several.
+  final List<ProjectMarketEntity> markets;
+  final List<ProjectMetricEntity> metrics;
 
   @override
   List<Object?> get props => [
@@ -73,8 +74,7 @@ class ProjectEntity extends Equatable {
     role,
     id,
     experienceId,
-
-    marketLatitude,
-    marketLongitude,
+    markets,
+    metrics,
   ];
 }

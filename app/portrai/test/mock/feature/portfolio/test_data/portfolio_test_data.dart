@@ -1,4 +1,5 @@
 import 'package:portrai/src/feature/experience/experience.dart';
+import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/portfolio/domain/entity/portfolio_entity.dart';
 import 'package:portrai/src/feature/project/project.dart';
@@ -24,7 +25,10 @@ PortfolioEntity createPortfolioEntity({
           ExpertiseEntity(
             image: 'flutter.png',
             title: 'Flutter',
-            skills: ['Dart', 'Bloc'],
+            skills: [
+              SkillEntity(name: 'Dart'),
+              SkillEntity(name: 'Bloc'),
+            ],
           ),
         ],
     projects: projects ?? [createProjectEntity()],

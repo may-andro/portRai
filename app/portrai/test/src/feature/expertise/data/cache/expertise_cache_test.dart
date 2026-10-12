@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/expertise/data/cache/expertise_cache.dart';
 import 'package:portrai/src/feature/expertise/data/model/expertise_model.dart';
+import 'package:portrai/src/feature/expertise/data/model/skill_model.dart';
 
 void main() {
   group('ExpertiseCache', () {
@@ -8,7 +11,10 @@ void main() {
     final model = ExpertiseModel(
       image: 'https://example.com/flutter.png',
       title: 'Flutter Development',
-      skills: const ['Flutter SDK', 'State Management'],
+      skills: [
+        SkillModel(name: 'Flutter SDK'),
+        SkillModel(name: 'State Management'),
+      ],
       locale: 'en',
     );
 
@@ -17,7 +23,15 @@ void main() {
 
       expect(result['image'], model.image);
       expect(result['title'], model.title);
-      expect(result['skills'], '["Flutter SDK","State Management"]');
+      expect(jsonDecode(result['skills'] as String), [
+        {'name': 'Flutter SDK', 'level': null, 'years': null, 'lastUsed': null},
+        {
+          'name': 'State Management',
+          'level': null,
+          'years': null,
+          'lastUsed': null,
+        },
+      ]);
       expect(result['locale'], model.locale);
     });
 

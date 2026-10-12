@@ -14,7 +14,7 @@ class TestimonialCache extends DBCache<TestimonialModel> {
   String get tableName => 'testimonial_table';
 
   @override
-  int get tableVersion => 1;
+  int get tableVersion => 2;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -28,6 +28,8 @@ class TestimonialCache extends DBCache<TestimonialModel> {
     const DbColumnDefinition(name: 'companyLogo', nullable: false),
     const DbColumnDefinition(name: 'linkedinProfile', nullable: false),
     const DbColumnDefinition(name: 'projectContext', nullable: false),
+    const DbColumnDefinition(name: 'experienceId'),
+    const DbColumnDefinition(name: 'projectId'),
     const DbColumnDefinition(name: 'locale', nullable: false),
   ];
 

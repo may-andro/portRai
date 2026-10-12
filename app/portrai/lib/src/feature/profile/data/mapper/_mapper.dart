@@ -1,4 +1,5 @@
 export 'availability_mapper.dart';
+export 'certification_mapper.dart';
 export 'coordinates_mapper.dart';
 export 'education_mapper.dart';
 export 'language_mapper.dart';

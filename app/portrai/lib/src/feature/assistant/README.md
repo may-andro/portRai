@@ -133,7 +133,7 @@ Registered only when the host supplies the data or callback they need:
 | Component | Registered when | Renders |
 | --- | --- | --- |
 | `DSImage` | The portfolio context has HTTPS URLs | A portfolio image (`avatar`, `logo`, `banner`), only for URLs present in that context |
-| `DSMap` | The portfolio context has coordinates | An interactive Google map with one marker per place, framed to fit them all (profile and experience locations, plus the optional project market, where a product is offered), only for coordinates present in that context. Android, iOS and web only |
+| `DSMap` | The portfolio context has coordinates | An interactive Google map with one marker per place, framed to fit them all (profile and experience locations, plus the project markets, the countries where a product is offered), only for coordinates present in that context. Android, iOS and web only |
 | `DSLinkButton` | There are allowed links and an `onOpenLink` callback | A button that opens one allowed link |
 | `DSContactCard` | Same as `DSLinkButton` | Up to five contact buttons (`email`, `phone`, `website`) for allowed links |
 | `DSSuggestionChips` | An `onAskQuestion` callback is supplied | Up to four tappable follow-up questions |

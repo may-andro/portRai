@@ -71,7 +71,7 @@ class _MobileExpandedWidget extends StatelessWidget {
           thickness: 1,
           color: context.colorPalette.border,
         ),
-        _SkillsWidget(skills: expertise.skills),
+        _SkillsWidget(skills: expertise.skillNames),
       ],
     );
   }

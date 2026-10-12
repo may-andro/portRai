@@ -1,8 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:portrai/src/feature/expertise/data/model/skill_model.dart';
 
 part 'expertise_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class ExpertiseModel {
   ExpertiseModel({
     required this.image,
@@ -16,7 +17,7 @@ class ExpertiseModel {
 
   final String image;
   final String title;
-  final List<String> skills;
+  final List<SkillModel> skills;
   final String locale;
 
   Map<String, dynamic> toJson() => _$ExpertiseModelToJson(this);

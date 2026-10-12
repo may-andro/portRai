@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/profile/domain/entity/availability_entity.dart';
+import 'package:portrai/src/feature/profile/domain/entity/certification_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/education_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/language_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/location_entity.dart';
@@ -33,6 +34,7 @@ class ProfileEntity extends Equatable {
     required this.location,
     required this.languages,
     required this.educations,
+    this.certifications = const [],
   });
 
   final String fullName;
@@ -58,6 +60,7 @@ class ProfileEntity extends Equatable {
   final LocationEntity location;
   final List<LanguageEntity> languages;
   final List<EducationEntity> educations;
+  final List<CertificationEntity> certifications;
 
   @override
   List<Object?> get props => [
@@ -84,5 +87,6 @@ class ProfileEntity extends Equatable {
     location,
     languages,
     educations,
+    certifications,
   ];
 }
