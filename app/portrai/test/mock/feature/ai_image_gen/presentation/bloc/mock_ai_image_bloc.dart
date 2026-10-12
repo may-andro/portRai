@@ -11,6 +11,8 @@ extension MockAiImageBlocStub on MockAiImageBloc {
     appServiceLocator.registerFactory<AiImageBloc>(() => this);
   }
 
+  void stubLoadingState() => stubState(const LoadingState());
+
   void stubState(AiImageState state) {
     when(() => this.state).thenReturn(state);
     whenListen(this, const Stream<AiImageState>.empty(), initialState: state);

@@ -1,8 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portrai/src/feature/ai_image_gen/presentation/bloc/_bloc.dart'
-    as ai_image;
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
@@ -37,7 +35,7 @@ void main() {
       ..stubLoadingState()
       ..registerFactory();
     MockAiImageBloc()
-      ..stubState(const ai_image.LoadingState())
+      ..stubLoadingState()
       ..registerFactory();
 
     await tester.pumpWidget(

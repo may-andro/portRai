@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/ai_image_gen/domain/_domain.dart';
-import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
+import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/ai_image_gen/domain/repository/mock_ai_image_repository.dart';
