@@ -1,1 +1,341 @@
-{}
+{
+  "en": {
+    "profile": {
+      "fullName": "Nova Lindqvist",
+      "title": "Principal Mobile & AI Engineer",
+      "subtitle": "Flutter Architect · On-Device AI Pioneer",
+      "email": "nova.lindqvist@example.com",
+      "phone": "+31-612345678",
+      "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=nova-lindqvist",
+      "coverImage": "https://picsum.photos/seed/nova-cover/1600/600",
+      "summary": "Principal engineer with 12+ years building delightful, scalable mobile products. I blend Flutter architecture, design systems and on-device AI to ship apps people love.",
+      "detailedBio": "I started as a native Android developer, fell in love with Flutter in its early days and never looked back. Today I lead mobile platform teams, design modular architectures and prototype generative-UI experiences that run fully on device. I mentor engineers, speak at community meetups and open-source tooling that makes teams faster.",
+      "elevatorPitch": "I turn ambitious product ideas into fast, beautiful and maintainable mobile apps — with a little AI magic on top.",
+      "uniqueValueProposition": "Architecture that scales, interfaces that delight, intelligence that runs on device.",
+      "publishedAt": [
+        {
+          "name": "Website",
+          "url": "https://nova.example.com/",
+          "image": "https://cdn.simpleicons.org/googlechrome"
+        },
+        {
+          "name": "Play Store",
+          "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
+          "image": "https://cdn.simpleicons.org/googleplay"
+        },
+        {
+          "name": "App Store",
+          "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
+          "image": "https://cdn.simpleicons.org/appstore"
+        }
+      ],
+      "resume": {
+        "url": "https://example.com/resume/nova-lindqvist.pdf",
+        "lastUpdated": "2026-01-10",
+        "image": "https://picsum.photos/seed/nova-resume/600/800"
+      },
+      "socialLinks": [
+        {
+          "name": "Github",
+          "url": "https://github.com/nova-lindqvist",
+          "image": "https://cdn.simpleicons.org/github"
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/nova-lindqvist/",
+          "image": "https://cdn.simpleicons.org/linkedin"
+        },
+        {
+          "name": "Portfolio",
+          "url": "https://nova.example.com/",
+          "image": "https://cdn.simpleicons.org/googlechrome"
+        }
+      ],
+      "availability": {
+        "status": "Open to select freelance and consulting projects",
+        "workType": "Remote/Hybrid",
+        "openToRelocate": true,
+        "preferredProjectDuration": "3-9 months",
+        "hourlyRate": "$90-130/hour",
+        "availability": "Part-time (16 hrs/week)",
+        "note": "Consulting happens alongside my current role, mostly in evenings and on Fridays.",
+        "noticePeriod": "2 months",
+        "workAuthorization": "EU citizen, authorized to work across the EU"
+      },
+      "workingHours": {
+        "timezone": "Europe/Amsterdam",
+        "preferredHours": "9:00 AM - 5:30 PM",
+        "weekdays": true,
+        "weekends": "Occasionally available"
+      },
+      "currentRole": "Principal Mobile Engineer",
+      "currentCompany": "Aurora Commerce",
+      "yearsOfExperience": 12,
+      "projectsDelivered": 18,
+      "location": {
+        "city": "Amsterdam",
+        "state": "North Holland",
+        "country": "Netherlands",
+        "timezone": "Amsterdam, Netherlands (GMT+1)",
+        "coordinates": {
+          "latitude": 52.3676,
+          "longitude": 4.9041
+        }
+      },
+      "languages": [
+        {
+          "language": "English",
+          "proficiency": "Native"
+        },
+        {
+          "language": "Dutch",
+          "proficiency": "Fluent"
+        },
+        {
+          "language": "Swedish",
+          "proficiency": "Proficient"
+        }
+      ],
+      "educations": [
+        {
+          "institution": "Northern Lights Institute of Technology",
+          "degree": "Master's in Computer Science",
+          "field": "Human-Computer Interaction",
+          "startDate": "2011-09-01",
+          "endDate": "2013-06-30",
+          "image": "https://api.dicebear.com/9.x/shapes/png?seed=nlit",
+          "url": "https://nlit.example.edu/",
+          "location": "Stockholm, Sweden"
+        }
+      ],
+      "certifications": []
+    },
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "es": {
+    "profile": {
+      "fullName": "Nova Lindqvist",
+      "title": "Ingeniera Principal de Móvil e IA",
+      "subtitle": "Arquitecta Flutter · Pionera en IA en el dispositivo",
+      "email": "nova.lindqvist@example.com",
+      "phone": "+31-612345678",
+      "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=nova-lindqvist",
+      "coverImage": "https://picsum.photos/seed/nova-cover/1600/600",
+      "summary": "Ingeniera principal con más de 12 años creando productos móviles escalables y atractivos. Combino arquitectura Flutter, sistemas de diseño e IA en el dispositivo para lanzar apps que enamoran.",
+      "detailedBio": "Empecé como desarrolladora nativa de Android, me enamoré de Flutter en sus primeros días y nunca miré atrás. Hoy lidero equipos de plataforma móvil, diseño arquitecturas modulares y prototipo experiencias de UI generativa que se ejecutan por completo en el dispositivo. Mentorizo ingenieros, doy charlas en comunidades y publico herramientas de código abierto que aceleran a los equipos.",
+      "elevatorPitch": "Convierto ideas de producto ambiciosas en apps móviles rápidas, bonitas y mantenibles, con un toque de magia de IA.",
+      "uniqueValueProposition": "Arquitectura que escala, interfaces que encantan, inteligencia que se ejecuta en el dispositivo.",
+      "publishedAt": [
+        {
+          "name": "Website",
+          "url": "https://nova.example.com/",
+          "image": "https://cdn.simpleicons.org/googlechrome"
+        },
+        {
+          "name": "Play Store",
+          "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
+          "image": "https://cdn.simpleicons.org/googleplay"
+        },
+        {
+          "name": "App Store",
+          "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
+          "image": "https://cdn.simpleicons.org/appstore"
+        }
+      ],
+      "resume": {
+        "url": "https://example.com/resume/nova-lindqvist.pdf",
+        "lastUpdated": "2026-01-10",
+        "image": "https://picsum.photos/seed/nova-resume/600/800"
+      },
+      "socialLinks": [
+        {
+          "name": "Github",
+          "url": "https://github.com/nova-lindqvist",
+          "image": "https://cdn.simpleicons.org/github"
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/nova-lindqvist/",
+          "image": "https://cdn.simpleicons.org/linkedin"
+        },
+        {
+          "name": "Portfolio",
+          "url": "https://nova.example.com/",
+          "image": "https://cdn.simpleicons.org/googlechrome"
+        }
+      ],
+      "availability": {
+        "status": "Abierta a proyectos freelance y de consultoría selectos",
+        "workType": "Remoto / Híbrido",
+        "openToRelocate": true,
+        "preferredProjectDuration": "3-9 meses",
+        "hourlyRate": "$90-130/hora",
+        "availability": "Tiempo parcial (16 h/semana)",
+        "note": "La consultoría se realiza junto a mi puesto actual, sobre todo por las tardes y los viernes.",
+        "noticePeriod": "2 meses",
+        "workAuthorization": "Ciudadana de la UE, autorizada para trabajar en toda la UE"
+      },
+      "workingHours": {
+        "timezone": "Europe/Amsterdam",
+        "preferredHours": "9:00 AM - 5:30 PM",
+        "weekdays": true,
+        "weekends": "Disponible ocasionalmente"
+      },
+      "currentRole": "Ingeniera Móvil Principal",
+      "currentCompany": "Aurora Commerce",
+      "yearsOfExperience": 12,
+      "projectsDelivered": 18,
+      "location": {
+        "city": "Amsterdam",
+        "state": "Holanda Septentrional",
+        "country": "Países Bajos",
+        "timezone": "Ámsterdam, Países Bajos (GMT+1)",
+        "coordinates": {
+          "latitude": 52.3676,
+          "longitude": 4.9041
+        }
+      },
+      "languages": [
+        {
+          "language": "Inglés",
+          "proficiency": "Nativa"
+        },
+        {
+          "language": "Neerlandés",
+          "proficiency": "Fluido"
+        },
+        {
+          "language": "Sueco",
+          "proficiency": "Competente"
+        }
+      ],
+      "educations": [
+        {
+          "institution": "Northern Lights Institute of Technology",
+          "degree": "Máster en Informática",
+          "field": "Interacción Persona-Ordenador",
+          "startDate": "2011-09-01",
+          "endDate": "2013-06-30",
+          "image": "https://api.dicebear.com/9.x/shapes/png?seed=nlit",
+          "url": "https://nlit.example.edu/",
+          "location": "Stockholm, Sweden"
+        }
+      ],
+      "certifications": []
+    },
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "nl": {
+    "profile": {
+      "fullName": "Nova Lindqvist",
+      "title": "Principal Mobile & AI Engineer",
+      "subtitle": "Flutter-architect · Pionier in on-device AI",
+      "email": "nova.lindqvist@example.com",
+      "phone": "+31-612345678",
+      "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=nova-lindqvist",
+      "coverImage": "https://picsum.photos/seed/nova-cover/1600/600",
+      "summary": "Principal engineer met meer dan 12 jaar ervaring in het bouwen van schaalbare, prettige mobiele producten. Ik combineer Flutter-architectuur, designsystemen en on-device AI om apps te leveren waar mensen van houden.",
+      "detailedBio": "Ik begon als native Android-ontwikkelaar, werd vroeg verliefd op Flutter en heb nooit achteromgekeken. Tegenwoordig leid ik mobiele platformteams, ontwerp ik modulaire architecturen en prototyp ik generatieve UI-ervaringen die volledig op het apparaat draaien. Ik coach engineers, spreek op community-meetups en publiceer open-sourcetools waarmee teams sneller werken.",
+      "elevatorPitch": "Ik maak van ambitieuze productideeën snelle, mooie en onderhoudbare mobiele apps, met een vleugje AI-magie.",
+      "uniqueValueProposition": "Architectuur die schaalt, interfaces die verrassen, intelligentie die op het apparaat draait.",
+      "publishedAt": [
+        {
+          "name": "Website",
+          "url": "https://nova.example.com/",
+          "image": "https://cdn.simpleicons.org/googlechrome"
+        },
+        {
+          "name": "Play Store",
+          "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
+          "image": "https://cdn.simpleicons.org/googleplay"
+        },
+        {
+          "name": "App Store",
+          "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
+          "image": "https://cdn.simpleicons.org/appstore"
+        }
+      ],
+      "resume": {
+        "url": "https://example.com/resume/nova-lindqvist.pdf",
+        "lastUpdated": "2026-01-10",
+        "image": "https://picsum.photos/seed/nova-resume/600/800"
+      },
+      "socialLinks": [
+        {
+          "name": "Github",
+          "url": "https://github.com/nova-lindqvist",
+          "image": "https://cdn.simpleicons.org/github"
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/nova-lindqvist/",
+          "image": "https://cdn.simpleicons.org/linkedin"
+        },
+        {
+          "name": "Portfolio",
+          "url": "https://nova.example.com/",
+          "image": "https://cdn.simpleicons.org/googlechrome"
+        }
+      ],
+      "availability": {
+        "status": "Beschikbaar voor selecte freelance- en adviesprojecten",
+        "workType": "Remote/Hybride",
+        "openToRelocate": true,
+        "preferredProjectDuration": "3-9 maanden",
+        "hourlyRate": "$90-130/uur",
+        "availability": "Deeltijd (16 uur/week)",
+        "note": "Advieswerk gebeurt naast mijn huidige rol, vooral in de avonden en op vrijdag.",
+        "noticePeriod": "2 maanden",
+        "workAuthorization": "EU-burger, gerechtigd om in de hele EU te werken"
+      },
+      "workingHours": {
+        "timezone": "Europe/Amsterdam",
+        "preferredHours": "9:00 AM - 5:30 PM",
+        "weekdays": true,
+        "weekends": "Af en toe beschikbaar"
+      },
+      "currentRole": "Principal Mobile Engineer",
+      "currentCompany": "Aurora Commerce",
+      "yearsOfExperience": 12,
+      "projectsDelivered": 18,
+      "location": {
+        "city": "Amsterdam",
+        "state": "Noord-Holland",
+        "country": "Nederland",
+        "timezone": "Amsterdam, Nederland (GMT+1)",
+        "coordinates": {
+          "latitude": 52.3676,
+          "longitude": 4.9041
+        }
+      },
+      "languages": [
+        {
+          "language": "Engels",
+          "proficiency": "Moedertaal"
+        },
+        {
+          "language": "Nederlands",
+          "proficiency": "Vloeiend"
+        },
+        {
+          "language": "Zweeds",
+          "proficiency": "Vaardig"
+        }
+      ],
+      "educations": [
+        {
+          "institution": "Northern Lights Institute of Technology",
+          "degree": "Master Informatica",
+          "field": "Mens-computerinteractie",
+          "startDate": "2011-09-01",
+          "endDate": "2013-06-30",
+          "image": "https://api.dicebear.com/9.x/shapes/png?seed=nlit",
+          "url": "https://nlit.example.edu/",
+          "location": "Stockholm, Sweden"
+        }
+      ],
+      "certifications": []
+    },
+    "updatedAt": "2026-01-15T10:00:00Z"
+  }
+}

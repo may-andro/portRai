@@ -1,1 +1,617 @@
-[]
+{
+  "en": {
+    "projects": [
+      {
+        "title": "Aurora Marketplace",
+        "description": "Pan-European shopping marketplace app with personalised discovery and an offline AI shopping assistant.",
+        "longDescription": "Architected the Flutter platform behind the marketplace: a modular monorepo, a shared design system, remote-config driven home experiences and an on-device assistant powered by a small language model.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Clean Architecture",
+          "BLoC",
+          "Design Systems",
+          "GraphQL",
+          "Firebase",
+          "On-device AI",
+          "CI/CD"
+        ],
+        "category": "E-Commerce",
+        "status": "Ongoing",
+        "startDate": "2023-03-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_marketplace/1200/800",
+        "features": [
+          "Personalised home with remote-config driven layouts",
+          "Offline AI shopping assistant",
+          "Shared design system with golden tests",
+          "Multi-country and multi-language support"
+        ],
+        "achievements": [
+          "Reduced cold start by 40%",
+          "Scaled to five countries with one codebase"
+        ],
+        "teamSize": 12,
+        "role": "Lead Developer",
+        "id": "aurora_marketplace",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "5M+"
+          },
+          {
+            "label": "Store rating",
+            "value": "4.6/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "PulseFit",
+        "description": "Fitness companion with adaptive training plans and live heart-rate tracking.",
+        "longDescription": "Built the cross-platform fitness app with wearable sync, offline workouts and beautiful animated charts, delivering weekly releases through automated pipelines.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Bluetooth LE",
+          "Firebase",
+          "Fastlane",
+          "Storybook"
+        ],
+        "category": "Health & Fitness",
+        "status": "Completed",
+        "startDate": "2020-02-01",
+        "endDate": "2022-05-31",
+        "image": "https://picsum.photos/seed/pulsefit/1200/800",
+        "features": [
+          "Adaptive training plans",
+          "Wearable and heart-rate sync",
+          "Offline-first workouts"
+        ],
+        "achievements": [
+          "Reached 1M installs in the first year"
+        ],
+        "teamSize": 6,
+        "role": "Lead Developer",
+        "id": "pulsefit",
+        "experienceId": "pixelforge_studio",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "1M+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/pulsefit/id0000000002",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
+            "website": "https://pulsefit.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "MoveIt",
+        "description": "Urban mobility app combining e-scooters, bikes and public transport in one journey planner.",
+        "longDescription": "Delivered live maps, route planning and in-app payments, with a modular architecture that allowed three squads to work in parallel.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Maps",
+          "WebSockets",
+          "Payments",
+          "Modularization"
+        ],
+        "category": "Mobility",
+        "status": "Completed",
+        "startDate": "2022-06-01",
+        "endDate": "2023-02-28",
+        "image": "https://picsum.photos/seed/moveit_mobility/1200/800",
+        "features": [
+          "Real-time vehicle map",
+          "Multi-modal route planning",
+          "In-app payments"
+        ],
+        "achievements": [
+          "Enabled three squads to ship in parallel"
+        ],
+        "teamSize": 8,
+        "role": "Lead Developer",
+        "id": "moveit_mobility",
+        "experienceId": "pixelforge_studio",
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/pulsefit/id0000000002",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
+            "website": "https://pulsefit.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Lumen Sleep",
+        "description": "Sleep and mindfulness app with smart alarms and soothing soundscapes.",
+        "longDescription": "Built the Android client and later the Flutter rewrite, featuring background audio, sleep analysis and a fully accessible interface.",
+        "technologies": [
+          "Kotlin",
+          "Flutter",
+          "Room",
+          "Bluetooth LE",
+          "Accessibility"
+        ],
+        "category": "Health & Wellness",
+        "status": "Deprecated",
+        "startDate": "2016-09-01",
+        "endDate": "2020-01-31",
+        "image": "https://picsum.photos/seed/lumen_sleep/1200/800",
+        "features": [
+          "Smart alarm",
+          "Background audio",
+          "Accessibility-first UI"
+        ],
+        "achievements": [
+          "3M+ installs"
+        ],
+        "teamSize": 5,
+        "role": "Senior Developer",
+        "id": "lumen_sleep",
+        "experienceId": "lumen_labs",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "3M+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/lumen-sleep/id0000000003",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.lumensleep",
+            "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "es": {
+    "projects": [
+      {
+        "title": "Aurora Marketplace",
+        "description": "App de marketplace paneuropeo con descubrimiento personalizado y un asistente de compras con IA sin conexión.",
+        "longDescription": "Diseñé la plataforma Flutter del marketplace: un monorepo modular, un sistema de diseño compartido, experiencias de inicio dirigidas por configuración remota y un asistente en el dispositivo con un modelo de lenguaje pequeño.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Clean Architecture",
+          "BLoC",
+          "Design Systems",
+          "GraphQL",
+          "Firebase",
+          "On-device AI",
+          "CI/CD"
+        ],
+        "category": "Comercio electrónico",
+        "status": "Ongoing",
+        "startDate": "2023-03-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_marketplace/1200/800",
+        "features": [
+          "Inicio personalizado con diseños por configuración remota",
+          "Asistente de compras con IA sin conexión",
+          "Sistema de diseño compartido con pruebas golden",
+          "Soporte multipaís y multi-idioma"
+        ],
+        "achievements": [
+          "Redujo el arranque en frío un 40%",
+          "Escalado a cinco países con una única base de código"
+        ],
+        "teamSize": 12,
+        "role": "Desarrolladora Principal",
+        "id": "aurora_marketplace",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "5M+"
+          },
+          {
+            "label": "Valoración en tiendas",
+            "value": "4.6/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "PulseFit",
+        "description": "Compañero de fitness con planes de entrenamiento adaptativos y seguimiento de frecuencia cardíaca en vivo.",
+        "longDescription": "Creé la app de fitness multiplataforma con sincronización de wearables, entrenamientos sin conexión y gráficos animados, con lanzamientos semanales automatizados.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Bluetooth LE",
+          "Firebase",
+          "Fastlane",
+          "Storybook"
+        ],
+        "category": "Salud y fitness",
+        "status": "Completed",
+        "startDate": "2020-02-01",
+        "endDate": "2022-05-31",
+        "image": "https://picsum.photos/seed/pulsefit/1200/800",
+        "features": [
+          "Planes de entrenamiento adaptativos",
+          "Sincronización con wearables y frecuencia cardíaca",
+          "Entrenamientos offline-first"
+        ],
+        "achievements": [
+          "1M de instalaciones en el primer año"
+        ],
+        "teamSize": 6,
+        "role": "Desarrolladora Principal",
+        "id": "pulsefit",
+        "experienceId": "pixelforge_studio",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "1M+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/pulsefit/id0000000002",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
+            "website": "https://pulsefit.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "MoveIt",
+        "description": "App de movilidad urbana que combina patinetes, bicicletas y transporte público en un planificador de viajes.",
+        "longDescription": "Entregué mapas en vivo, planificación de rutas y pagos dentro de la app, con una arquitectura modular que permitió a tres equipos trabajar en paralelo.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Maps",
+          "WebSockets",
+          "Payments",
+          "Modularization"
+        ],
+        "category": "Movilidad",
+        "status": "Completed",
+        "startDate": "2022-06-01",
+        "endDate": "2023-02-28",
+        "image": "https://picsum.photos/seed/moveit_mobility/1200/800",
+        "features": [
+          "Mapa de vehículos en tiempo real",
+          "Planificación de rutas multimodal",
+          "Pagos en la app"
+        ],
+        "achievements": [
+          "Permitió a tres equipos lanzar en paralelo"
+        ],
+        "teamSize": 8,
+        "role": "Desarrolladora Principal",
+        "id": "moveit_mobility",
+        "experienceId": "pixelforge_studio",
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/pulsefit/id0000000002",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
+            "website": "https://pulsefit.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Lumen Sleep",
+        "description": "App de sueño y mindfulness con alarmas inteligentes y paisajes sonoros relajantes.",
+        "longDescription": "Construí el cliente Android y después la reescritura en Flutter, con audio en segundo plano, análisis del sueño y una interfaz totalmente accesible.",
+        "technologies": [
+          "Kotlin",
+          "Flutter",
+          "Room",
+          "Bluetooth LE",
+          "Accessibility"
+        ],
+        "category": "Salud y bienestar",
+        "status": "Deprecated",
+        "startDate": "2016-09-01",
+        "endDate": "2020-01-31",
+        "image": "https://picsum.photos/seed/lumen_sleep/1200/800",
+        "features": [
+          "Alarma inteligente",
+          "Audio en segundo plano",
+          "Interfaz centrada en accesibilidad"
+        ],
+        "achievements": [
+          "Más de 3M de instalaciones"
+        ],
+        "teamSize": 5,
+        "role": "Desarrolladora Sénior",
+        "id": "lumen_sleep",
+        "experienceId": "lumen_labs",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "3M+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/lumen-sleep/id0000000003",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.lumensleep",
+            "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  "nl": {
+    "projects": [
+      {
+        "title": "Aurora Marketplace",
+        "description": "Pan-Europese marktplaats-app met gepersonaliseerde ontdekking en een offline AI-winkelassistent.",
+        "longDescription": "Ontwierp het Flutter-platform achter de marktplaats: een modulaire monorepo, een gedeeld designsysteem, home-ervaringen via remote config en een on-device assistent met een klein taalmodel.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Clean Architecture",
+          "BLoC",
+          "Design Systems",
+          "GraphQL",
+          "Firebase",
+          "On-device AI",
+          "CI/CD"
+        ],
+        "category": "E-commerce",
+        "status": "Ongoing",
+        "startDate": "2023-03-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_marketplace/1200/800",
+        "features": [
+          "Gepersonaliseerde homepage met layouts via remote config",
+          "Offline AI-winkelassistent",
+          "Gedeeld designsysteem met golden tests",
+          "Ondersteuning voor meerdere landen en talen"
+        ],
+        "achievements": [
+          "Koude start met 40% verminderd",
+          "Opgeschaald naar vijf landen met één codebase"
+        ],
+        "teamSize": 12,
+        "role": "Lead Developer",
+        "id": "aurora_marketplace",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "5M+"
+          },
+          {
+            "label": "Winkelbeoordeling",
+            "value": "4.6/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "PulseFit",
+        "description": "Fitnesscompanion met adaptieve trainingsschema's en live hartslagmeting.",
+        "longDescription": "Bouwde de cross-platform fitness-app met wearable-sync, offline workouts en mooie geanimeerde grafieken, met wekelijkse releases via geautomatiseerde pipelines.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "BLoC",
+          "Bluetooth LE",
+          "Firebase",
+          "Fastlane",
+          "Storybook"
+        ],
+        "category": "Gezondheid & fitness",
+        "status": "Completed",
+        "startDate": "2020-02-01",
+        "endDate": "2022-05-31",
+        "image": "https://picsum.photos/seed/pulsefit/1200/800",
+        "features": [
+          "Adaptieve trainingsschema's",
+          "Wearable- en hartslagsync",
+          "Offline-first workouts"
+        ],
+        "achievements": [
+          "1M installaties in het eerste jaar"
+        ],
+        "teamSize": 6,
+        "role": "Lead Developer",
+        "id": "pulsefit",
+        "experienceId": "pixelforge_studio",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "1M+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/pulsefit/id0000000002",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
+            "website": "https://pulsefit.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "MoveIt",
+        "description": "Stedelijke mobiliteits-app die e-steps, fietsen en openbaar vervoer combineert in één reisplanner.",
+        "longDescription": "Leverde live kaarten, routeplanning en in-app betalingen op met een modulaire architectuur waarin drie squads parallel konden werken.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Maps",
+          "WebSockets",
+          "Payments",
+          "Modularization"
+        ],
+        "category": "Mobiliteit",
+        "status": "Completed",
+        "startDate": "2022-06-01",
+        "endDate": "2023-02-28",
+        "image": "https://picsum.photos/seed/moveit_mobility/1200/800",
+        "features": [
+          "Realtime voertuigenkaart",
+          "Multimodale routeplanning",
+          "In-app betalingen"
+        ],
+        "achievements": [
+          "Drie squads in staat gesteld parallel te leveren"
+        ],
+        "teamSize": 8,
+        "role": "Lead Developer",
+        "id": "moveit_mobility",
+        "experienceId": "pixelforge_studio",
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/pulsefit/id0000000002",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
+            "website": "https://pulsefit.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Lumen Sleep",
+        "description": "Slaap- en mindfulness-app met slimme wekkers en rustgevende geluidslandschappen.",
+        "longDescription": "Bouwde de Android-client en later de Flutter-herschrijving, met achtergrondaudio, slaapanalyse en een volledig toegankelijke interface.",
+        "technologies": [
+          "Kotlin",
+          "Flutter",
+          "Room",
+          "Bluetooth LE",
+          "Accessibility"
+        ],
+        "category": "Gezondheid & welzijn",
+        "status": "Deprecated",
+        "startDate": "2016-09-01",
+        "endDate": "2020-01-31",
+        "image": "https://picsum.photos/seed/lumen_sleep/1200/800",
+        "features": [
+          "Slimme wekker",
+          "Achtergrondaudio",
+          "Toegankelijkheidsgerichte UI"
+        ],
+        "achievements": [
+          "3M+ installaties"
+        ],
+        "teamSize": 5,
+        "role": "Senior Developer",
+        "id": "lumen_sleep",
+        "experienceId": "lumen_labs",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "3M+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/lumen-sleep/id0000000003",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.lumensleep",
+            "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      }
+    ],
+    "updatedAt": "2026-01-15T10:00:00Z"
+  }
+}
