@@ -33,7 +33,7 @@ class AskRemotePortfolioQuestionParams {
 
 abstract final class RemoteAssistantRequestLimits {
   static const model = 'gemini-3.8-flash';
-  static const maxOutputTokens = 1024;
+  static const maxOutputTokens = 4096;
   static const temperature = 0.3;
   static const maxQuestionCharacters = 2000;
   // The current official catalog prompt is ~21k; leave bounded schema headroom.
