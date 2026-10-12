@@ -3,11 +3,11 @@ part of 'content_widget.dart';
 class _AssistantGenuiSurfaceWidget extends StatefulWidget {
   const _AssistantGenuiSurfaceWidget({
     super.key,
-    required this.session,
+    required this.genuiController,
     required this.surfaceId,
   });
 
-  final AssistantGenuiSession session;
+  final AssistantGenuiController genuiController;
   final String surfaceId;
 
   @override
@@ -22,15 +22,15 @@ class _AssistantGenuiSurfaceWidgetState
   @override
   void initState() {
     super.initState();
-    _releaseSurface = widget.session.acquireSurface();
+    _releaseSurface = widget.genuiController.acquireSurface();
   }
 
   @override
   void didUpdateWidget(covariant _AssistantGenuiSurfaceWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.session, widget.session)) {
+    if (!identical(oldWidget.genuiController, widget.genuiController)) {
       _releaseSurface();
-      _releaseSurface = widget.session.acquireSurface();
+      _releaseSurface = widget.genuiController.acquireSurface();
     }
   }
 
@@ -44,7 +44,9 @@ class _AssistantGenuiSurfaceWidgetState
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.only(top: context.space()),
     child: Surface(
-      surfaceContext: widget.session.controller.contextFor(widget.surfaceId),
+      surfaceContext: widget.genuiController.surfaceController.contextFor(
+        widget.surfaceId,
+      ),
     ),
   );
 }

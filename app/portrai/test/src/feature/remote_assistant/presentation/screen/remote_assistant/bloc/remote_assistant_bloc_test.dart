@@ -191,7 +191,7 @@ Portfolio summary.
       expect(bloc.state.genuiSurfaces, hasLength(1));
       expect(bloc.state.genuiSurfaces.single.surfaceId, 'answer');
       expect(bloc.state.genuiSurfaces.single.messageIndex, 1);
-      expect(bloc.state.genuiSurfaces.single.session.activeSurfaceIds, [
+      expect(bloc.state.genuiSurfaces.single.genuiController.activeSurfaceIds, [
         'answer',
       ]);
       expect(

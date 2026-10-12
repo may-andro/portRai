@@ -19,7 +19,7 @@ const _responseStyleInstruction =
     'every A2UI message in its own separate ```json code block, never two '
     'messages in one block.';
 
-extension RemoteAssistantGenuiSessionExtension on AssistantGenuiSession {
+extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
   /// Sends a known text question and authoritative context, not raw GenUI
   /// messages or UI interaction parts, through the portfolio use case.
   Future<Either<RemoteAssistantFailure, void>> sendPortfolioQuestion({

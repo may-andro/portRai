@@ -25,8 +25,8 @@ class AssistantGenuiTurnCancelledException implements Exception {
 }
 
 /// Presentation runtime only: the caller owns generation and domain results.
-class AssistantGenuiSession {
-  AssistantGenuiSession() {
+class AssistantGenuiController {
+  AssistantGenuiController() {
     _controller = SurfaceController(catalogs: [_catalog]);
     systemPrompt = PromptBuilder.chat(catalog: _catalog).systemPromptJoined();
     _listenForFrameworkErrors();
@@ -35,7 +35,7 @@ class AssistantGenuiSession {
   final Catalog _catalog = createAssistantCatalog();
   late SurfaceController _controller;
   late final String systemPrompt;
-  SurfaceController get controller => _controller;
+  SurfaceController get surfaceController => _controller;
   final _frameworkErrors =
       StreamController<AssistantGenuiResponseException>.broadcast();
   void Function()? _closeTurn;

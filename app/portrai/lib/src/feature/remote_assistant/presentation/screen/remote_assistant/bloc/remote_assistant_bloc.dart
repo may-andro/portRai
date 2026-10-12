@@ -5,10 +5,10 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
+import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/tracking/_tracking.dart';
-import 'package:portrai/src/feature/remote_assistant/presentation/service/remote_assistant_genui_session_extension.dart';
 import 'package:use_case/use_case.dart';
 
 @RegisterSingleton(disposeMethodName: 'close')
@@ -42,9 +42,9 @@ class RemoteAssistantBloc
   final RemoteAssistantTrackingDelegate _trackingDelegate;
   int _controlRevision = 0;
   int _requestRevision = 0;
-  final Set<AssistantGenuiSession> _genuiSessions = {};
+  final Set<AssistantGenuiController> _genuiControllers = {};
   final Map<
-    AssistantGenuiSession,
+    AssistantGenuiController,
     StreamSubscription<AssistantGenuiResponseException>
   >
   _genuiErrorSubscriptions = {};
@@ -83,7 +83,7 @@ class RemoteAssistantBloc
             failure: generativeUi.left,
           ),
         );
-        _disposeGenuiSessions();
+        _disposeGenuiControllers();
         final reset = await _resetRemoteAssistantSessionUseCase();
         if (!emit.isDone &&
             controlRevision == _controlRevision &&
@@ -111,7 +111,7 @@ class RemoteAssistantBloc
             clearFailure: generativeUi.isRight,
           ),
         );
-        _disposeGenuiSessions();
+        _disposeGenuiControllers();
         final reset = await _resetRemoteAssistantSessionUseCase();
         if (!emit.isDone &&
             controlRevision == _controlRevision &&
@@ -144,7 +144,7 @@ class RemoteAssistantBloc
         clearFailure: result.isRight,
       ),
     );
-    _disposeGenuiSessions();
+    _disposeGenuiControllers();
     final reset = await _resetRemoteAssistantSessionUseCase();
     if (!emit.isDone && controlRevision == _controlRevision && reset.isLeft) {
       emit(state.copyWith(failure: reset.left));
@@ -208,7 +208,7 @@ class RemoteAssistantBloc
         clearFailure: true,
       ),
     );
-    _disposeGenuiSessions();
+    _disposeGenuiControllers();
     final result = await _resetRemoteAssistantSessionUseCase();
     if (!emit.isDone && revision == _requestRevision && result.isLeft) {
       emit(state.copyWith(failure: result.left));
@@ -265,17 +265,17 @@ class RemoteAssistantBloc
         : requestHistory.sublist(
             requestHistory.length - RemoteAssistantLimits.maxHistoryMessages,
           );
-    final AssistantGenuiSession? genuiSession;
+    final AssistantGenuiController? genuiController;
     final Either<RemoteAssistantFailure, void> result;
     if (state.isGenerativeUiEnabled) {
-      final session = AssistantGenuiSession();
-      genuiSession = session;
-      _genuiSessions.add(session);
-      _genuiErrorSubscriptions[session] = session.frameworkErrors.listen(
-        (_) => _handleGenuiFrameworkError(emit, session),
+      final controller = AssistantGenuiController();
+      genuiController = controller;
+      _genuiControllers.add(controller);
+      _genuiErrorSubscriptions[controller] = controller.frameworkErrors.listen(
+        (_) => _handleGenuiFrameworkError(emit, controller),
       );
       final surfaceMessageIndex = messages.length;
-      result = await session.sendPortfolioQuestion(
+      result = await controller.sendPortfolioQuestion(
         askRemotePortfolioQuestionUseCase: _askRemotePortfolioQuestionUseCase,
         question: question,
         portfolioContext: state.portfolioContext!,
@@ -291,13 +291,13 @@ class RemoteAssistantBloc
             return;
           }
           final currentSurfaces = state.genuiSurfaces
-              .where((surface) => !identical(surface.session, session))
+              .where((surface) => !identical(surface.genuiController, controller))
               .toList();
           currentSurfaces.addAll(
-            session.activeSurfaceIds.map(
+            controller.activeSurfaceIds.map(
               (surfaceId) => RemoteAssistantSurface(
                 messageIndex: surfaceMessageIndex,
-                session: session,
+                genuiController: controller,
                 surfaceId: surfaceId,
               ),
             ),
@@ -306,7 +306,7 @@ class RemoteAssistantBloc
         },
       );
     } else {
-      genuiSession = null;
+      genuiController = null;
       result = await _askRemotePortfolioQuestionUseCase(
         AskRemotePortfolioQuestionParams(
           question: question,
@@ -333,7 +333,7 @@ class RemoteAssistantBloc
           failure: result.left,
         ),
       );
-      if (genuiSession != null) _retireGenuiSession(genuiSession);
+      if (genuiController != null) _retireGenuiController(genuiController);
       return;
     }
     var completedMessages = [
@@ -344,11 +344,13 @@ class RemoteAssistantBloc
       ),
     ];
     var completedSurfaces = state.genuiSurfaces;
-    if (genuiSession != null && genuiSession.activeSurfaceIds.isEmpty) {
+    if (genuiController != null && genuiController.activeSurfaceIds.isEmpty) {
       completedSurfaces = completedSurfaces
-          .where((surface) => !identical(surface.session, genuiSession))
+          .where(
+            (surface) => !identical(surface.genuiController, genuiController),
+          )
           .toList();
-      _retireGenuiSession(genuiSession);
+      _retireGenuiController(genuiController);
     }
     if (state.isGenerativeUiEnabled &&
         completedMessages.length > RemoteAssistantLimits.maxHistoryMessages) {
@@ -360,7 +362,7 @@ class RemoteAssistantBloc
           .map(
             (surface) => RemoteAssistantSurface(
               messageIndex: surface.messageIndex - removedCount,
-              session: surface.session,
+              genuiController: surface.genuiController,
               surfaceId: surface.surfaceId,
             ),
           )
@@ -375,32 +377,36 @@ class RemoteAssistantBloc
         clearFailure: true,
       ),
     );
-    _retainGenuiSessions(completedSurfaces);
+    _retainGenuiControllers(completedSurfaces);
   }
 
-  void _retainGenuiSessions(Iterable<RemoteAssistantSurface> surfaces) {
-    final retained = surfaces.map((surface) => surface.session).toSet();
-    for (final session in _genuiSessions.toList()) {
-      if (!retained.contains(session)) _retireGenuiSession(session);
+  void _retainGenuiControllers(Iterable<RemoteAssistantSurface> surfaces) {
+    final retained = surfaces.map((surface) => surface.genuiController).toSet();
+    for (final genuiController in _genuiControllers.toList()) {
+      if (!retained.contains(genuiController)) {
+        _retireGenuiController(genuiController);
+      }
     }
   }
 
-  void _retireGenuiSession(AssistantGenuiSession session) {
-    _genuiErrorSubscriptions.remove(session)?.cancel();
-    if (_genuiSessions.remove(session)) session.dispose();
+  void _retireGenuiController(AssistantGenuiController genuiController) {
+    _genuiErrorSubscriptions.remove(genuiController)?.cancel();
+    if (_genuiControllers.remove(genuiController)) {
+      genuiController.dispose();
+    }
   }
 
-  void _disposeGenuiSessions() {
-    for (final session in _genuiSessions.toList()) {
-      _retireGenuiSession(session);
+  void _disposeGenuiControllers() {
+    for (final genuiController in _genuiControllers.toList()) {
+      _retireGenuiController(genuiController);
     }
   }
 
   void _handleGenuiFrameworkError(
     Emitter<RemoteAssistantState> emit,
-    AssistantGenuiSession session,
+    AssistantGenuiController genuiController,
   ) {
-    if (emit.isDone || !_genuiSessions.contains(session)) return;
+    if (emit.isDone || !_genuiControllers.contains(genuiController)) return;
     _requestRevision++;
     emit(
       state.copyWith(
@@ -411,7 +417,7 @@ class RemoteAssistantBloc
         failure: const RemoteAssistantIncompleteFailure(),
       ),
     );
-    _disposeGenuiSessions();
+    _disposeGenuiControllers();
     unawaited(() async {
       final reset = await _resetRemoteAssistantSessionUseCase();
       if (!emit.isDone && reset.isLeft) {
@@ -424,7 +430,7 @@ class RemoteAssistantBloc
   Future<void> close() async {
     _controlRevision++;
     _requestRevision++;
-    _disposeGenuiSessions();
+    _disposeGenuiControllers();
     await _resetRemoteAssistantSessionUseCase();
     await super.close();
   }

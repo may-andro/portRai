@@ -18,27 +18,29 @@ const _surface = '''
 
 void main() {
   test('should bound catalog instructions when constructing a session', () {
-    final session = AssistantGenuiSession();
-    addTearDown(session.dispose);
-    expect(session.systemPrompt.length, lessThanOrEqualTo(50000));
+    final genuiController = AssistantGenuiController();
+    addTearDown(genuiController.dispose);
+    expect(genuiController.systemPrompt.length, lessThanOrEqualTo(50000));
   });
 
   testWidgets(
     'should render DS surfaces when the callback streams split A2UI chunks',
     (tester) async {
-      final session = AssistantGenuiSession();
-      addTearDown(session.dispose);
+      final genuiController = AssistantGenuiController();
+      addTearDown(genuiController.dispose);
       await tester.pumpWidget(
         TestWidgetWrapper(
           child: Surface(
-            surfaceContext: session.controller.contextFor('answer'),
+            surfaceContext: genuiController.surfaceController.contextFor(
+              'answer',
+            ),
           ),
         ),
       );
       final message = ChatMessage.user('Question');
       await tester.runAsync(() async {
         for (var turn = 0; turn < 2; turn++) {
-          final result = await session.send(
+          final result = await genuiController.send(
             message,
             generate: (request, prompt, onDelta) async {
               expect(request, same(message));
@@ -61,7 +63,10 @@ void main() {
       expect(find.byType(DSCardWidget), findsOneWidget);
       expect(find.byType(DSTextWidget), findsOneWidget);
       expect(find.text('Streamed answer'), findsOneWidget);
-      expect(session.controller.activeSurfaceIds, ['answer', 'followup']);
+      expect(genuiController.surfaceController.activeSurfaceIds, [
+        'answer',
+        'followup',
+      ]);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
@@ -69,11 +74,11 @@ void main() {
   test(
     'should preserve domain results when the callback returns a failure',
     () async {
-      final session = AssistantGenuiSession();
-      addTearDown(session.dispose);
+      final genuiController = AssistantGenuiController();
+      addTearDown(genuiController.dispose);
       const failure = Left<String, void>('domain failure');
       expect(
-        await session.send(
+        await genuiController.send(
           ChatMessage.user('Question'),
           generate: (_, _, _) async => failure,
         ),
@@ -85,18 +90,18 @@ void main() {
   test(
     'should propagate errors when generation or official parsing fails',
     () async {
-      final session = AssistantGenuiSession();
-      addTearDown(session.dispose);
+      final genuiController = AssistantGenuiController();
+      addTearDown(genuiController.dispose);
       final error = StateError('Generation failed');
       await expectLater(
-        session.send(
+        genuiController.send(
           ChatMessage.user('Question'),
           generate: (_, _, _) async => throw error,
         ),
         throwsA(isA<AssistantGenuiResponseException>()),
       );
       await expectLater(
-        session.send(
+        genuiController.send(
           ChatMessage.user('Question'),
           generate: (_, _, onDelta) async {
             onDelta('{"version":"v0.9","createSurface":{}}');
@@ -110,15 +115,17 @@ void main() {
   testWidgets(
     'should surface framework validation errors without exposing generated payloads',
     (tester) async {
-      final session = AssistantGenuiSession();
-      addTearDown(session.dispose);
+      final genuiController = AssistantGenuiController();
+      addTearDown(genuiController.dispose);
       final errors = <ChatMessage>[];
-      final subscription = session.controller.onSubmit.listen(errors.add);
+      final subscription = genuiController.surfaceController.onSubmit.listen(
+        errors.add,
+      );
       addTearDown(subscription.cancel);
       var requests = 0;
       final error = await tester.runAsync<Object?>(() async {
         try {
-          await session.send(
+          await genuiController.send(
             ChatMessage.user('Question'),
             generate: (_, _, onDelta) async {
               requests++;
@@ -141,12 +148,12 @@ void main() {
   test(
     'should invalidate pending output when reset or disposal occurs',
     () async {
-      final session = AssistantGenuiSession();
-      addTearDown(session.dispose);
+      final genuiController = AssistantGenuiController();
+      addTearDown(genuiController.dispose);
       for (final dispose in [false, true]) {
         final gate = Completer<void>();
         late void Function(String) delta;
-        final pending = session.send(
+        final pending = genuiController.send(
           ChatMessage.user('Question'),
           generate: (_, _, onDelta) async {
             delta = onDelta;
@@ -155,9 +162,12 @@ void main() {
         );
         delta(_surface);
         await Future<void>.delayed(Duration.zero);
-        expect(session.controller.activeSurfaceIds, ['answer']);
+        expect(genuiController.surfaceController.activeSurfaceIds, ['answer']);
         await expectLater(
-          session.send(ChatMessage.user('Busy'), generate: (_, _, _) async {}),
+          genuiController.send(
+            ChatMessage.user('Busy'),
+            generate: (_, _, _) async {},
+          ),
           throwsStateError,
         );
         final expectation = expectLater(
@@ -165,18 +175,21 @@ void main() {
           throwsA(isA<AssistantGenuiTurnCancelledException>()),
         );
         if (dispose) {
-          session.dispose();
+          genuiController.dispose();
         } else {
-          session.reset();
+          genuiController.reset();
         }
         await expectation;
         delta(_surface);
         gate.complete();
         await Future<void>.delayed(Duration.zero);
-        expect(session.controller.activeSurfaceIds, isEmpty);
+        expect(genuiController.surfaceController.activeSurfaceIds, isEmpty);
       }
       await expectLater(
-        session.send(ChatMessage.user('Closed'), generate: (_, _, _) async {}),
+        genuiController.send(
+          ChatMessage.user('Closed'),
+          generate: (_, _, _) async {},
+        ),
         throwsStateError,
       );
     },

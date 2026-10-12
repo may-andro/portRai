@@ -94,10 +94,10 @@ class ContentWidget extends StatelessWidget {
                           for (final surface in surfaces)
                             _AssistantGenuiSurfaceWidget(
                               key: ValueKey((
-                                surface.session,
+                                surface.genuiController,
                                 surface.surfaceId,
                               )),
-                              session: surface.session,
+                              genuiController: surface.genuiController,
                               surfaceId: surface.surfaceId,
                             ),
                         ],

@@ -4,5 +4,5 @@ export 'domain/use_case/assistant_failure.dart' show AssistantFailure;
 export 'domain/use_case/get_assistant_context_use_case.dart';
 export 'presentation/catalog/assistant_catalog.dart'
     show createAssistantCatalog;
-export 'presentation/service/assistant_genui_session.dart';
+export 'presentation/controller/assistant_genui_controller.dart';
 export 'presentation/widget/assistant_conversation_widget.dart';

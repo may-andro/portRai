@@ -11,7 +11,7 @@ It does not import either provider, resolve their blocs, or select an inference 
   and testimonials.
 - Typed text responses and shared suggestions, message bubbles and chat input.
 - Provisional streamed responses supplied by the caller, without provider-specific state.
-- A read-only GenUI catalog for design-system text and card composition.
+- A read-only GenUI catalog of design-system components for structured answers.
 
 ## Getting Started
 
@@ -65,18 +65,38 @@ The shared assistant module remains provider-neutral, and providers do not impor
 
 ## Configuration
 
-### A2UI rendering
+### Generative UI
 
-The app depends on the published experimental `genui` **0.10.4** package and
-`json_schema_builder` **^0.1.6** (resolved **0.1.7**). The schema dependency starts
-at 0.1.6 because the runtime requires its exported `SchemaRegistry`; the 0.1.3
-lower bound declared upstream does not compile with this release.
-Its runtime uses `a2ui_core` **0.1.1** in the
-resolved workspace and supports A2UI **v0.9**. The installed package source, not
-the repository's evolving main branch, defines the API used here.
+The remote chat can render structured answers (metrics, tags, info rows, cards)
+instead of plain text. It uses the published experimental `genui` **0.10.4**
+package, which implements A2UI **v0.9**, with `json_schema_builder` **^0.1.6**
+(0.1.3 lacks the `SchemaRegistry` the runtime needs). The feature is behind the
+default-off flag `feature_remote_assistant_generative_ui`. With the flag off, remote
+answers are plain text and none of the code below runs. The local assistant never
+uses it.
 
-`createAssistantCatalog()` exposes read-only design-system components under catalog ID
-`dev.portrai.assistant`:
+The model does not return widgets. It returns text and A2UI JSON messages that
+describe a UI. The app builds widgets only from components its catalog allows.
+
+#### Concepts
+
+| Concept | Package type | Role |
+| --- | --- | --- |
+| Catalog | `Catalog`, `CatalogItem` | The components the model may use. Each item has a name, a JSON schema and a widget builder. The schemas become the model prompt, and anything outside the catalog is rejected. |
+| Transport adapter | `A2uiTransportAdapter` | Splits streamed model output into prose (`incomingText`) and parsed A2UI messages (`incomingMessages`). It copes with chunks that split a JSON message. Single use: it cannot take input after `flush()`. |
+| Surface controller | `SurfaceController` | Holds the state of every surface: components and data. Applies `createSurface`, `updateComponents`, `updateDataModel` and `deleteSurface`. |
+| Surface | `Surface` widget | Renders one surface from `controller.contextFor(surfaceId)` and rebuilds when the controller changes. |
+| Data model | `DataModel`, `BoundString` | A JSON store per surface. A string property such as `{"path": "/message"}` binds to it and updates when `updateDataModel` changes the value. |
+| Prompt builder | `PromptBuilder.chat` | Turns the catalog into the system prompt that explains the A2UI format. |
+
+The package also provides a `Conversation` facade that bundles controller,
+transport and chat history. The app does not use it: chat history, Firebase calls,
+flags, limits and errors stay in the app's own bloc and use case.
+
+#### Catalog
+
+`createAssistantCatalog()` exposes read-only design-system components under catalog
+ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 
 | Component | Renders |
 | --- | --- |
@@ -84,76 +104,105 @@ the repository's evolving main branch, defines the API used here.
 | `DSMetric` | A highlighted value with a label |
 | `DSBulletList` | A bulleted list of literal strings |
 | `DSLabeledInfoRow` | An icon with a label and value |
-| `DSTag`, `DSInfoChip` | Skill badges and icon/label pills |
+| `DSTag`, `DSInfoChip` | Skill badges and icon and label pills |
 | `DSColumn`, `DSWrap` | Vertical and wrapping layouts of child component IDs |
 | `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
 | `DSDivider` | A horizontal divider |
 
-String properties accept a literal or an official data-model reference such as
-`{"path":"/message"}`, resolved reactively by `BoundString`. Child properties are
-component IDs rendered by the framework's `CatalogItemContext.buildChild`. Icons are
-chosen from a fixed name list; unknown names fall back to an info icon. No basic
-catalog, client functions, actions, navigation, media or network widgets are
-registered.
+String properties accept a literal or a data-model reference. Child properties are
+component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed
+name list, and unknown names fall back to an info icon. No basic catalog, client
+functions, actions, navigation, media or network widgets are registered.
 
-Consumers own the controller and render the framework `Surface` directly inside
-the app's design-system theme:
+#### Flow
 
-```dart
-import 'package:genui/genui.dart';
-import 'package:portrai/src/feature/assistant/assistant.dart';
-
-final controller = SurfaceController(catalogs: [createAssistantCatalog()]);
-final surfaceContext = controller.contextFor('answer');
-final surface = Surface(surfaceContext: surfaceContext);
+```mermaid
+flowchart LR
+  User[User question] --> Bloc[RemoteAssistantBloc]
+  Bloc --> GC[AssistantGenuiController]
+  GC -->|catalog prompt| UC[AskRemotePortfolioQuestionUseCase]
+  UC -->|question, portfolio, history, prompt| Gemini[Gemini via Firebase AI]
+  Gemini -->|streamed deltas| UC
+  UC -->|onDelta| TA[A2uiTransportAdapter]
+  TA -->|prose| Bubble[Answer text]
+  TA -->|A2UI messages| SC[SurfaceController]
+  SC --> Surface[Surface widgets]
+  Bubble --> Chat[Chat bubble]
+  Surface --> Chat
 ```
 
-In published 0.10.4 the constructor is `Surface(surfaceContext: ...)`, not
-`Surface(host: ..., surfaceId: ...)` shown in its README. `SurfaceController`
-implements the host; `contextFor` supplies the per-surface context. Retain it for
-the mounted surface, observe `surfaceUpdates`/`activeSurfaceIds` for lifecycle,
-unmount surfaces before disposing their owner, and call `controller.dispose()`.
-No session, service locator or DI registration is hidden in the catalog factory.
-
-`AssistantGenuiSession` owns a DS-catalog controller and builds `systemPrompt` with
-the official `PromptBuilder.chat`. Its callback-driven `send<T>` connects streamed
-deltas through `A2uiTransportAdapter` to that controller:
-
-```dart
-final session = AssistantGenuiSession();
-final result = await session.send(
-  ChatMessage.user(question),
-  generate: generate,
-);
-final surface = Surface(surfaceContext: session.controller.contextFor('answer'));
+```mermaid
+sequenceDiagram
+  participant B as RemoteAssistantBloc
+  participant G as AssistantGenuiController
+  participant U as Use case and Firebase
+  participant T as A2uiTransportAdapter
+  participant S as SurfaceController
+  participant W as Surface widget
+  B->>G: new controller for the turn
+  B->>G: sendPortfolioQuestion
+  G->>T: create adapter for this turn
+  G->>U: generate(question, systemPrompt)
+  loop streamed deltas
+    U-->>T: addChunk(delta)
+    T-->>B: incomingText as prose
+    T-->>S: incomingMessages as A2UI
+    S-->>W: surface updates
+  end
+  G->>T: flush
+  G-->>B: result or typed failure
+  B->>B: store trimmed text and surface IDs
 ```
 
-`generate(message, systemPrompt, onDelta)` supplies generation, passes the prompt
-to its model, forwards deltas, and returns its domain result (including `Either`).
-Published 0.10.4 has no `onTurnStart`/`onTurnEnd`; `flush()` closes parser input.
-Each turn gets a fresh adapter; concurrent sends are rejected. A scoped error zone
-propagates internal parser errors and generation exceptions through the returned future.
-Controller/component errors use `UiInteractionPart` on `session.controller.onSubmit`;
-subscribe and surface them without logging content or automatically resending them.
-Framework text fallback is unchanged; the session renders surfaces, not text or history.
+Each A2UI message must sit in its own ```` ```json ```` block. The response-style
+instruction appended by `sendPortfolioQuestion` tells the model to answer inside
+one surface, avoid markdown, choose the component that fits the data and never
+repeat surface content as text.
 
-Unmount surfaces and cancel caller subscriptions before `reset()` or `dispose()`.
-Reset replaces the controller; both invalidate pending sends and ignore late deltas,
-not backend generation. Callers retain responsibility for handling domain failures.
+#### Classes
 
-The remote presentation `sendPortfolioQuestion` extension connects this session
-to `AskRemotePortfolioQuestionUseCase` using a known text question, authoritative
-portfolio context and typed completed history, not arbitrary framework messages.
-Its optional `systemPrompt` accepts trusted framework instructions up to 50,000
-characters (the catalog prompt must stay below this). Oversized prompts are rejected,
-never truncated, as invalid input before model creation. Firebase always preserves
-portfolio grounding instructions and appends the framework prompt unchanged as
-subordinate presentation instructions. Null retains the original text-only model
-configuration; changing prompts closes and recreates the cached model. Reset and
-close clear that cache. Parameters remain metadata-only in diagnostics.
+`AssistantGenuiController` (`presentation/controller/`) is a per-turn lifecycle
+object, like Flutter's `ScrollController`: a widget or bloc creates and disposes it.
+It owns a `SurfaceController`, exposed as `surfaceController`, builds `systemPrompt`
+with `PromptBuilder.chat`, and offers `send<T>(message, generate:, onText:,
+onSurfaceUpdate:)`. `generate(message, systemPrompt, onDelta)` is supplied by the
+caller, forwards deltas and returns its domain result, including `Either`.
 
-No chat screen activates or renders this runtime. Existing chat history,
-generation limits and rollout flags are unchanged.
+- Each turn gets a fresh adapter, and concurrent sends are rejected.
+- A scoped error zone turns internal parser errors and generation exceptions into
+  `AssistantGenuiResponseException`, without logging generated payloads.
+- Framework validation errors (for example an unknown component) arrive on
+  `surfaceController.onSubmit` and are reported through `frameworkErrors`.
+- `acquireSurface()` counts mounted `Surface` widgets so the controller is not
+  disposed while one is on screen. Unmount surfaces before `reset()` or `dispose()`.
+- `reset()` replaces the surface controller. Both invalidate pending sends and
+  ignore late deltas. Backend generation itself is not cancelled.
+
+`RemoteAssistantGenuiControllerExtension.sendPortfolioQuestion`
+(`remote_assistant/presentation/controller/`) connects the controller to
+`AskRemotePortfolioQuestionUseCase` with a known text question, authoritative
+portfolio context and typed history, not arbitrary framework messages.
+
+#### Remote chat integration
+
+- `RemoteAssistantBloc` creates a controller per question when the flag is on,
+  records `RemoteAssistantSurface(messageIndex, genuiController, surfaceId)` in
+  state, and disposes controllers on clear chat, failure, flag change and close.
+- Completed history sent to the model contains only text, never surfaces.
+- The chat shows each answer's trimmed text followed by its `Surface` widgets.
+- On a failure the partial text and surfaces are discarded and a typed remote
+  failure is shown.
+
+#### Firebase request
+
+The use case's optional `systemPrompt` accepts trusted framework instructions up to
+50,000 characters. Oversized prompts are rejected, never truncated. Firebase keeps
+its portfolio grounding instructions and appends the framework prompt as
+subordinate presentation instructions. A null prompt keeps the text-only model
+configuration, and a changed prompt closes and recreates the cached model. The
+model uses `ThinkingLevel.low` and a 4096 token output limit, because thinking
+tokens share that budget and can end a response with `maxTokens`. Request
+parameters stay metadata-only in diagnostics.
 
 ### On-device
 
@@ -218,9 +267,9 @@ local download consent, and independent sessions. No model download or live AI g
 The catalog widget tests feed real v0.9 messages through `A2uiParserTransformer`
 and `SurfaceController` into `Surface`, covering DS composition, literal text,
 binding updates, surface deletion and unsupported-component error reporting.
-Session tests exercise the actual adapter/parser/controller/surface pipeline,
+Controller tests exercise the actual adapter/parser/controller/surface pipeline,
 callback results, parser and generation errors, sequential turns and late-delta invalidation.
 Remote repository tests connect mocked Firebase streams through the real portfolio
-use case and session to the official surface controller, with no live requests.
+use case and controller to the official surface controller, with no live requests.
 
 Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md).

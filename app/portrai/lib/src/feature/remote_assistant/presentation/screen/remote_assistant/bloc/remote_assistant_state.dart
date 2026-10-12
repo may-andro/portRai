@@ -7,16 +7,16 @@ enum RemoteAssistantStatus { loading, unavailable, ready }
 class RemoteAssistantSurface extends Equatable {
   const RemoteAssistantSurface({
     required this.messageIndex,
-    required this.session,
+    required this.genuiController,
     required this.surfaceId,
   });
 
   final int messageIndex;
-  final AssistantGenuiSession session;
+  final AssistantGenuiController genuiController;
   final String surfaceId;
 
   @override
-  List<Object?> get props => [messageIndex, session, surfaceId];
+  List<Object?> get props => [messageIndex, genuiController, surfaceId];
 }
 
 class RemoteAssistantState extends Equatable {
