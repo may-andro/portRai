@@ -91,3 +91,32 @@ final dsDivider = CatalogItem(
     ),
   ),
 );
+
+final dsStatGrid = CatalogItem(
+  name: 'DSStatGrid',
+  dataSchema: S.object(
+    description:
+        'Shows two to four DSMetric components side by side, for example '
+        'years of experience, projects and companies.',
+    properties: {
+      'children': S.list(
+        description: 'DSMetric component IDs, at most four.',
+        items: A2uiSchemas.componentReference(),
+      ),
+    },
+    required: ['children'],
+  ),
+  widgetBuilder: (itemContext) {
+    final data = itemContext.data as JsonMap;
+    final children = buildCatalogChildren(itemContext, data['children']);
+    return Builder(
+      builder: (context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.space(factor: 1.5),
+        children: [
+          for (final child in children.take(4)) Expanded(child: child),
+        ],
+      ),
+    );
+  },
+);

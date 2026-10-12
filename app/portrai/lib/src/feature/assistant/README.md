@@ -112,6 +112,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSTimeline` | A vertical timeline of up to 8 entries (`period`, `title`, `subtitle`), for career or education history |
 | `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
 | `DSQuote` | A quotation such as a testimonial, with optional author and role |
+| `DSStatGrid` | Two to four `DSMetric` components side by side |
 | `DSLinkButton` | A button that opens a link. Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context. Taps open through the remote assistant bloc and `OpenExternalUrlUseCase` |
 | `DSDivider` | A horizontal divider |
 

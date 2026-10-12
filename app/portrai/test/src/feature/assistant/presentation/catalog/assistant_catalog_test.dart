@@ -27,6 +27,7 @@ void main() {
       'DSTimeline',
       'DSSkillBars',
       'DSQuote',
+      'DSStatGrid',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -445,6 +446,22 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('should render metrics side by side when DSStatGrid is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSStatGrid","children":["a","b"]},
+{"id":"a","component":"DSMetric","value":"8+","label":"Years"},
+{"id":"b","component":"DSMetric","value":"20","label":"Projects"}''');
+
+    expect(find.text('8+'), findsOneWidget);
+    expect(find.text('20'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('20')).dx,
+      greaterThan(tester.getTopLeft(find.text('8+')).dx),
+    );
+  });
 }
 
 Future<List<A2uiMessageEvent>> _feed(
@@ -463,4 +480,27 @@ Future<List<A2uiMessageEvent>> _feed(
     }
     return messages;
   }))!;
+}
+
+Future<void> _pumpSurface(
+  WidgetTester tester,
+  Catalog catalog,
+  String components,
+) async {
+  final controller = SurfaceController(catalogs: [catalog]);
+  addTearDown(controller.dispose);
+  await tester.pumpWidget(
+    TestWidgetWrapper(
+      child: SingleChildScrollView(
+        child: Surface(surfaceContext: controller.contextFor('s')),
+      ),
+    ),
+  );
+  await _feed(tester, controller, [
+    '''
+{"version":"v0.9","createSurface":{"surfaceId":"s","catalogId":"dev.portrai.assistant"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"s","components":[$components]}}
+''',
+  ]);
+  await tester.pump();
 }
