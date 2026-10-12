@@ -35,9 +35,9 @@ This document tracks what is missing, what was already fixed, and what each fix 
 
 ### Skills (expertise)
 Each skill is now `{ name, level, years, lastUsed }`. `level` is one of `expert`, `advanced`,
-`intermediate` or `familiar`. Only skills that map to technologies listed on experiences and projects have
-values; they were derived from those date ranges, so review them. The remaining skills (for example
-profiling or TDD) have only a name and need real values.
+`intermediate` or `familiar`. Skills that map to technologies listed on experiences and projects were derived from those date ranges.
+The remaining skills (for example profiling or TDD) use their category's level, years and last-used
+year as an estimate. Review all of them.
 
 ### Projects
 - The MediaMarkt country projects are one project with a `markets` list. Saturn and MediaWorld stay separate.
@@ -55,12 +55,12 @@ Questions the assistant cannot answer today because the data does not exist:
 |-------|-----------------|
 | Salary expectations | `availability.salaryExpectation` (or state that it is private) |
 | Age / date of birth | Decide whether to expose it at all |
-| Visa / work authorization | `availability.workAuthorization` (field exists, value empty) |
-| Notice period | `availability.noticePeriod` (field exists, value empty) |
+| Visa / work authorization | `availability.workAuthorization` (estimate, confirm the value) |
+| Notice period | `availability.noticePeriod` (estimate, confirm the value) |
 | Relocation reasons | `availability.relocationNotes` |
 | Hobbies and interests | `profile.interests` |
 | Soft skills | `profile.softSkills` |
-| Certifications and courses | `profile.certifications` (field exists, list empty) |
+| Certifications and courses | `profile.certifications` (sample entry, replace with real certifications) |
 
 ## Behaviour for missing data
 The assistant is instructed to say the information is not available in the portfolio instead of
