@@ -28,6 +28,7 @@ void main() {
       'DSSkillBars',
       'DSQuote',
       'DSStatGrid',
+      'DSCarousel',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -461,6 +462,18 @@ void main() {
       tester.getTopLeft(find.text('20')).dx,
       greaterThan(tester.getTopLeft(find.text('8+')).dx),
     );
+  });
+
+  testWidgets('should render every child when DSCarousel is used', (
+    tester,
+  ) async {
+    await _pumpSurface(tester, createAssistantCatalog(), '''
+{"id":"root","component":"DSCarousel","children":["a","b"]},
+{"id":"a","component":"DSText","text":"First card"},
+{"id":"b","component":"DSText","text":"Second card"}''');
+
+    expect(find.text('First card'), findsOneWidget);
+    expect(find.text('Second card'), findsOneWidget);
   });
 }
 

@@ -120,3 +120,36 @@ final dsStatGrid = CatalogItem(
     );
   },
 );
+
+final dsCarousel = CatalogItem(
+  name: 'DSCarousel',
+  dataSchema: S.object(
+    description:
+        'A horizontally scrolling row of cards, for several projects or '
+        'testimonials.',
+    properties: {
+      'children': S.list(
+        description: 'Component IDs, in display order, at most ten.',
+        items: A2uiSchemas.componentReference(),
+      ),
+    },
+    required: ['children'],
+  ),
+  widgetBuilder: (itemContext) {
+    final data = itemContext.data as JsonMap;
+    final children = buildCatalogChildren(itemContext, data['children']);
+    return Builder(
+      builder: (context) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: context.space(factor: 1.5),
+          children: [
+            for (final child in children.take(10))
+              SizedBox(width: context.space(factor: 30), child: child),
+          ],
+        ),
+      ),
+    );
+  },
+);

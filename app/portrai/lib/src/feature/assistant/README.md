@@ -113,6 +113,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
 | `DSQuote` | A quotation such as a testimonial, with optional author and role |
 | `DSStatGrid` | Two to four `DSMetric` components side by side |
+| `DSCarousel` | A horizontally scrolling row of up to ten child cards |
 | `DSLinkButton` | A button that opens a link. Registered only when the portfolio context has HTTPS URLs, and renders only URLs present in that context. Taps open through the remote assistant bloc and `OpenExternalUrlUseCase` |
 | `DSDivider` | A horizontal divider |
 

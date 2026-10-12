@@ -15,7 +15,7 @@ const _responseStyleInstruction =
     'DSExpandable for optional detail, DSTimeline for career or education '
     'history, DSSkillBars to compare skills by years, DSQuote for a '
     'testimonial copied exactly, '
-    'DSStatGrid for two to four DSMetric side by side, '
+    'DSStatGrid for two to four DSMetric side by side, DSCarousel for several cards, '
     'DSText variants heading, title, body '
     'and caption for prose. Group with a DSColumn root; use a DSCard only '
     'around a distinct group, and never around a one-line answer. For a '
