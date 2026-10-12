@@ -22,7 +22,9 @@
         "projectIds": [
           "aurora_marketplace",
           "pulsefit",
-          "moveit_mobility"
+          "moveit_mobility",
+          "orbit_pay",
+          "tidy_home"
         ],
         "engagementTypes": [
           "Freelance",
@@ -42,6 +44,10 @@
           {
             "question": "How long does an engagement take?",
             "answer": "Typically 3-9 months, depending on scope."
+          },
+          {
+            "question": "What does a typical rate look like?",
+            "answer": "Rates are $90-130/hour depending on scope and duration; fixed-price audits are available."
           }
         ]
       },
@@ -62,7 +68,8 @@
         ],
         "projectIds": [
           "aurora_marketplace",
-          "moveit_mobility"
+          "moveit_mobility",
+          "aurora_checkout"
         ],
         "engagementTypes": [
           "Freelance",
@@ -80,6 +87,10 @@
           {
             "question": "Can you work with our team?",
             "answer": "Yes, I pair with your engineers and run workshops."
+          },
+          {
+            "question": "What does a typical rate look like?",
+            "answer": "Rates are $90-130/hour depending on scope and duration; fixed-price audits are available."
           }
         ]
       },
@@ -101,7 +112,8 @@
         ],
         "projectIds": [
           "aurora_marketplace",
-          "pulsefit"
+          "pulsefit",
+          "aurora_design_system"
         ],
         "engagementTypes": [
           "Freelance",
@@ -119,6 +131,10 @@
           {
             "question": "Do you work with our designers?",
             "answer": "Absolutely, design-to-code collaboration is key."
+          },
+          {
+            "question": "What does a typical rate look like?",
+            "answer": "Rates are $90-130/hour depending on scope and duration; fixed-price audits are available."
           }
         ]
       },
@@ -138,7 +154,8 @@
           "Generative UI"
         ],
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ],
         "engagementTypes": [
           "Freelance",
@@ -156,6 +173,92 @@
           {
             "question": "Does it need internet?",
             "answer": "No, models run locally on the device."
+          },
+          {
+            "question": "What does a typical rate look like?",
+            "answer": "Rates are $90-130/hour depending on scope and duration; fixed-price audits are available."
+          }
+        ]
+      },
+      {
+        "title": "Performance Audits",
+        "description": "Faster startup, smoother scrolling, smaller apps.",
+        "image": "https://picsum.photos/seed/performance_audits/800/600",
+        "detail": "A two-week audit using DevTools and production telemetry that ends with a prioritised fix list and, optionally, hands-on implementation.",
+        "id": "performance_audits",
+        "deliverables": [
+          "Profiling report with measurements",
+          "Prioritised fix list",
+          "Performance budget and CI checks"
+        ],
+        "technologies": [
+          "Flutter",
+          "DevTools",
+          "Firebase Performance",
+          "Sentry"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "aurora_checkout",
+          "tidy_home"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consulting"
+        ],
+        "idealFor": [
+          "Apps with slow startup or jank"
+        ],
+        "process": [
+          "Baseline measurement",
+          "Profiling and analysis",
+          "Fixes and verification"
+        ],
+        "faq": [
+          {
+            "question": "How long is the audit?",
+            "answer": "Two weeks for a typical app."
+          }
+        ]
+      },
+      {
+        "title": "Mentoring & Workshops",
+        "description": "Level up your Flutter team.",
+        "image": "https://picsum.photos/seed/mentoring_workshops/800/600",
+        "detail": "Hands-on workshops and 1:1 mentoring on Flutter architecture, testing and on-device AI, delivered remotely or on site in the Netherlands.",
+        "id": "mentoring_workshops",
+        "deliverables": [
+          "Custom workshop material",
+          "Recorded sessions",
+          "Follow-up Q&A"
+        ],
+        "technologies": [
+          "Flutter",
+          "Testing",
+          "Clean Architecture",
+          "On-device AI"
+        ],
+        "projectIds": [
+          "aurora_design_system",
+          "pulsefit"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Training"
+        ],
+        "idealFor": [
+          "Teams adopting Flutter",
+          "Junior and mid-level engineers"
+        ],
+        "process": [
+          "Skill assessment",
+          "Workshop delivery",
+          "Follow-up coaching"
+        ],
+        "faq": [
+          {
+            "question": "How many people per workshop?",
+            "answer": "Up to 15 for the best hands-on experience."
           }
         ]
       }
@@ -185,7 +288,9 @@
         "projectIds": [
           "aurora_marketplace",
           "pulsefit",
-          "moveit_mobility"
+          "moveit_mobility",
+          "orbit_pay",
+          "tidy_home"
         ],
         "engagementTypes": [
           "Freelance",
@@ -205,6 +310,10 @@
           {
             "question": "¿Cuánto dura una colaboración?",
             "answer": "Normalmente de 3 a 9 meses, según el alcance."
+          },
+          {
+            "question": "¿Cuál es una tarifa típica?",
+            "answer": "Las tarifas son de $90-130/hora según alcance y duración; hay auditorías a precio cerrado."
           }
         ]
       },
@@ -225,7 +334,8 @@
         ],
         "projectIds": [
           "aurora_marketplace",
-          "moveit_mobility"
+          "moveit_mobility",
+          "aurora_checkout"
         ],
         "engagementTypes": [
           "Freelance",
@@ -243,6 +353,10 @@
           {
             "question": "¿Puedes trabajar con nuestro equipo?",
             "answer": "Sí, trabajo en pareja con tus ingenieros y organizo talleres."
+          },
+          {
+            "question": "¿Cuál es una tarifa típica?",
+            "answer": "Las tarifas son de $90-130/hora según alcance y duración; hay auditorías a precio cerrado."
           }
         ]
       },
@@ -264,7 +378,8 @@
         ],
         "projectIds": [
           "aurora_marketplace",
-          "pulsefit"
+          "pulsefit",
+          "aurora_design_system"
         ],
         "engagementTypes": [
           "Freelance",
@@ -282,6 +397,10 @@
           {
             "question": "¿Trabajas con nuestros diseñadores?",
             "answer": "Por supuesto, la colaboración diseño-código es clave."
+          },
+          {
+            "question": "¿Cuál es una tarifa típica?",
+            "answer": "Las tarifas son de $90-130/hora según alcance y duración; hay auditorías a precio cerrado."
           }
         ]
       },
@@ -301,7 +420,8 @@
           "Generative UI"
         ],
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ],
         "engagementTypes": [
           "Freelance",
@@ -319,6 +439,92 @@
           {
             "question": "¿Necesita internet?",
             "answer": "No, los modelos se ejecutan localmente en el dispositivo."
+          },
+          {
+            "question": "¿Cuál es una tarifa típica?",
+            "answer": "Las tarifas son de $90-130/hora según alcance y duración; hay auditorías a precio cerrado."
+          }
+        ]
+      },
+      {
+        "title": "Auditorías de rendimiento",
+        "description": "Arranque más rápido, desplazamiento más fluido, apps más pequeñas.",
+        "image": "https://picsum.photos/seed/performance_audits/800/600",
+        "detail": "Una auditoría de dos semanas con DevTools y telemetría de producción que termina con una lista priorizada de correcciones y, opcionalmente, implementación práctica.",
+        "id": "performance_audits",
+        "deliverables": [
+          "Informe de perfilado con mediciones",
+          "Lista priorizada de correcciones",
+          "Presupuesto de rendimiento y comprobaciones en CI"
+        ],
+        "technologies": [
+          "Flutter",
+          "DevTools",
+          "Firebase Performance",
+          "Sentry"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "aurora_checkout",
+          "tidy_home"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Consultoría"
+        ],
+        "idealFor": [
+          "Apps con arranque lento o jank"
+        ],
+        "process": [
+          "Medición de referencia",
+          "Perfilado y análisis",
+          "Correcciones y verificación"
+        ],
+        "faq": [
+          {
+            "question": "¿Cuánto dura la auditoría?",
+            "answer": "Dos semanas para una app típica."
+          }
+        ]
+      },
+      {
+        "title": "Mentoría y talleres",
+        "description": "Eleva a tu equipo Flutter.",
+        "image": "https://picsum.photos/seed/mentoring_workshops/800/600",
+        "detail": "Talleres prácticos y mentoría 1:1 sobre arquitectura Flutter, pruebas e IA en el dispositivo, en remoto o presencial en los Países Bajos.",
+        "id": "mentoring_workshops",
+        "deliverables": [
+          "Material de taller personalizado",
+          "Sesiones grabadas",
+          "Sesión de preguntas posterior"
+        ],
+        "technologies": [
+          "Flutter",
+          "Testing",
+          "Clean Architecture",
+          "On-device AI"
+        ],
+        "projectIds": [
+          "aurora_design_system",
+          "pulsefit"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Formación"
+        ],
+        "idealFor": [
+          "Equipos que adoptan Flutter",
+          "Ingenieros junior y de nivel medio"
+        ],
+        "process": [
+          "Evaluación de habilidades",
+          "Impartición del taller",
+          "Seguimiento y coaching"
+        ],
+        "faq": [
+          {
+            "question": "¿Cuántas personas por taller?",
+            "answer": "Hasta 15 para la mejor experiencia práctica."
           }
         ]
       }
@@ -348,7 +554,9 @@
         "projectIds": [
           "aurora_marketplace",
           "pulsefit",
-          "moveit_mobility"
+          "moveit_mobility",
+          "orbit_pay",
+          "tidy_home"
         ],
         "engagementTypes": [
           "Freelance",
@@ -368,6 +576,10 @@
           {
             "question": "Hoe lang duurt een samenwerking?",
             "answer": "Meestal 3-9 maanden, afhankelijk van de scope."
+          },
+          {
+            "question": "Wat is een gebruikelijk tarief?",
+            "answer": "Tarieven zijn $90-130/uur afhankelijk van scope en duur; audits met vaste prijs zijn mogelijk."
           }
         ]
       },
@@ -388,7 +600,8 @@
         ],
         "projectIds": [
           "aurora_marketplace",
-          "moveit_mobility"
+          "moveit_mobility",
+          "aurora_checkout"
         ],
         "engagementTypes": [
           "Freelance",
@@ -406,6 +619,10 @@
           {
             "question": "Kun je met ons team samenwerken?",
             "answer": "Ja, ik werk samen met je engineers en geef workshops."
+          },
+          {
+            "question": "Wat is een gebruikelijk tarief?",
+            "answer": "Tarieven zijn $90-130/uur afhankelijk van scope en duur; audits met vaste prijs zijn mogelijk."
           }
         ]
       },
@@ -427,7 +644,8 @@
         ],
         "projectIds": [
           "aurora_marketplace",
-          "pulsefit"
+          "pulsefit",
+          "aurora_design_system"
         ],
         "engagementTypes": [
           "Freelance",
@@ -445,6 +663,10 @@
           {
             "question": "Werk je samen met onze ontwerpers?",
             "answer": "Absoluut, samenwerking tussen design en code is essentieel."
+          },
+          {
+            "question": "Wat is een gebruikelijk tarief?",
+            "answer": "Tarieven zijn $90-130/uur afhankelijk van scope en duur; audits met vaste prijs zijn mogelijk."
           }
         ]
       },
@@ -464,7 +686,8 @@
           "Generative UI"
         ],
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ],
         "engagementTypes": [
           "Freelance",
@@ -482,6 +705,92 @@
           {
             "question": "Is internet nodig?",
             "answer": "Nee, modellen draaien lokaal op het apparaat."
+          },
+          {
+            "question": "Wat is een gebruikelijk tarief?",
+            "answer": "Tarieven zijn $90-130/uur afhankelijk van scope en duur; audits met vaste prijs zijn mogelijk."
+          }
+        ]
+      },
+      {
+        "title": "Performance-audits",
+        "description": "Snellere start, soepeler scrollen, kleinere apps.",
+        "image": "https://picsum.photos/seed/performance_audits/800/600",
+        "detail": "Een audit van twee weken met DevTools en productietelemetrie die eindigt met een geprioriteerde fixlijst en optioneel hands-on implementatie.",
+        "id": "performance_audits",
+        "deliverables": [
+          "Profilingrapport met metingen",
+          "Geprioriteerde fixlijst",
+          "Performancebudget en CI-checks"
+        ],
+        "technologies": [
+          "Flutter",
+          "DevTools",
+          "Firebase Performance",
+          "Sentry"
+        ],
+        "projectIds": [
+          "aurora_marketplace",
+          "aurora_checkout",
+          "tidy_home"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Advies"
+        ],
+        "idealFor": [
+          "Apps met trage start of jank"
+        ],
+        "process": [
+          "Nulmeting",
+          "Profiling en analyse",
+          "Fixes en verificatie"
+        ],
+        "faq": [
+          {
+            "question": "Hoe lang duurt de audit?",
+            "answer": "Twee weken voor een gemiddelde app."
+          }
+        ]
+      },
+      {
+        "title": "Mentoring & workshops",
+        "description": "Til je Flutter-team naar een hoger niveau.",
+        "image": "https://picsum.photos/seed/mentoring_workshops/800/600",
+        "detail": "Praktische workshops en 1:1 mentoring over Flutter-architectuur, testen en on-device AI, remote of op locatie in Nederland.",
+        "id": "mentoring_workshops",
+        "deliverables": [
+          "Workshopmateriaal op maat",
+          "Opgenomen sessies",
+          "Vervolg-Q&A"
+        ],
+        "technologies": [
+          "Flutter",
+          "Testing",
+          "Clean Architecture",
+          "On-device AI"
+        ],
+        "projectIds": [
+          "aurora_design_system",
+          "pulsefit"
+        ],
+        "engagementTypes": [
+          "Freelance",
+          "Training"
+        ],
+        "idealFor": [
+          "Teams die Flutter adopteren",
+          "Junior en medior engineers"
+        ],
+        "process": [
+          "Vaardigheidsassessment",
+          "Workshop geven",
+          "Vervolgcoaching"
+        ],
+        "faq": [
+          {
+            "question": "Hoeveel mensen per workshop?",
+            "answer": "Maximaal 15 voor de beste hands-on ervaring."
           }
         ]
       }

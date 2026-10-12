@@ -108,7 +108,26 @@
           "location": "Stockholm, Sweden"
         }
       ],
-      "certifications": []
+      "certifications": [
+        {
+          "name": "Google Developer Expert - Flutter & Dart",
+          "issuer": "Google",
+          "date": "2022-05-10",
+          "url": "https://developers.google.com/community/experts"
+        },
+        {
+          "name": "Professional Scrum Master I",
+          "issuer": "Scrum.org",
+          "date": "2021-03-18",
+          "url": "https://www.scrum.org/professional-scrum-master-i-certification"
+        },
+        {
+          "name": "Associate Android Developer",
+          "issuer": "Google",
+          "date": "2017-09-04",
+          "url": null
+        }
+      ]
     },
     "updatedAt": "2026-01-15T10:00:00Z"
   },
@@ -221,7 +240,26 @@
           "location": "Stockholm, Sweden"
         }
       ],
-      "certifications": []
+      "certifications": [
+        {
+          "name": "Google Developer Expert - Flutter & Dart",
+          "issuer": "Google",
+          "date": "2022-05-10",
+          "url": "https://developers.google.com/community/experts"
+        },
+        {
+          "name": "Professional Scrum Master I",
+          "issuer": "Scrum.org",
+          "date": "2021-03-18",
+          "url": "https://www.scrum.org/professional-scrum-master-i-certification"
+        },
+        {
+          "name": "Associate Android Developer",
+          "issuer": "Google",
+          "date": "2017-09-04",
+          "url": null
+        }
+      ]
     },
     "updatedAt": "2026-01-15T10:00:00Z"
   },
@@ -334,7 +372,26 @@
           "location": "Stockholm, Sweden"
         }
       ],
-      "certifications": []
+      "certifications": [
+        {
+          "name": "Google Developer Expert - Flutter & Dart",
+          "issuer": "Google",
+          "date": "2022-05-10",
+          "url": "https://developers.google.com/community/experts"
+        },
+        {
+          "name": "Professional Scrum Master I",
+          "issuer": "Scrum.org",
+          "date": "2021-03-18",
+          "url": "https://www.scrum.org/professional-scrum-master-i-certification"
+        },
+        {
+          "name": "Associate Android Developer",
+          "issuer": "Google",
+          "date": "2017-09-04",
+          "url": null
+        }
+      ]
     },
     "updatedAt": "2026-01-15T10:00:00Z"
   }

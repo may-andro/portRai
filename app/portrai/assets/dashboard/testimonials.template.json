@@ -14,7 +14,8 @@
         "projectContext": "Aurora Marketplace app",
         "experienceId": "aurora_commerce",
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ]
       },
       {
@@ -49,6 +50,70 @@
         "projectIds": [
           "lumen_sleep"
         ]
+      },
+      {
+        "id": "priya_nair",
+        "name": "Priya Nair",
+        "position": "Staff Product Designer",
+        "company": "Aurora Commerce",
+        "testimonial": "Nova speaks design fluently. The design system she built made our handoffs painless and every component is accessible by default.",
+        "date": "2025-06-15",
+        "profileImage": "https://picsum.photos/seed/priya_nair/400/400",
+        "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/priya-nair/",
+        "projectContext": "Aurora Design System",
+        "experienceId": "aurora_commerce",
+        "projectIds": [
+          "aurora_design_system"
+        ]
+      },
+      {
+        "id": "jonas_eriksen",
+        "name": "Jonas Eriksen",
+        "position": "Founder and CEO",
+        "company": "Orbit Pay",
+        "testimonial": "Nova shipped our MVP in ten weeks and it sailed through the security audit. Rare to find someone who is this fast without cutting corners.",
+        "date": "2022-04-10",
+        "profileImage": "https://picsum.photos/seed/jonas_eriksen/400/400",
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/jonas-eriksen/",
+        "projectContext": "Orbit Pay MVP",
+        "experienceId": "independent_consulting",
+        "projectIds": [
+          "orbit_pay"
+        ]
+      },
+      {
+        "id": "lena_hoffmann",
+        "name": "Lena Hoffmann",
+        "position": "Head of Engineering",
+        "company": "TidyHome",
+        "testimonial": "Her handover docs were so good that a new engineer was productive in two days. The app is rock solid.",
+        "date": "2025-09-02",
+        "profileImage": "https://picsum.photos/seed/lena_hoffmann/400/400",
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/lena-hoffmann/",
+        "projectContext": "TidyHome app",
+        "experienceId": "independent_consulting",
+        "projectIds": [
+          "tidy_home"
+        ]
+      },
+      {
+        "id": "anders_nyberg",
+        "name": "Anders Nyberg",
+        "position": "Studio Director",
+        "company": "Nordic Pixels",
+        "testimonial": "Nova was the most curious junior we ever hired. She taught herself OpenGL in a month and her puzzle game became our best performer.",
+        "date": "2016-09-01",
+        "profileImage": "https://picsum.photos/seed/anders_nyberg/400/400",
+        "companyLogo": "https://picsum.photos/seed/nordic_pixels/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/anders-nyberg/",
+        "projectContext": "Pixel Puzzle game",
+        "experienceId": "nordic_pixels",
+        "projectIds": [
+          "pixel_puzzle"
+        ]
       }
     ],
     "updatedAt": "2026-01-15T10:00:00Z"
@@ -68,7 +133,8 @@
         "projectContext": "App Aurora Marketplace",
         "experienceId": "aurora_commerce",
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ]
       },
       {
@@ -103,6 +169,70 @@
         "projectIds": [
           "lumen_sleep"
         ]
+      },
+      {
+        "id": "priya_nair",
+        "name": "Priya Nair",
+        "position": "Diseñadora de Producto Staff",
+        "company": "Aurora Commerce",
+        "testimonial": "Nova habla diseño con fluidez. El sistema de diseño que creó hizo que nuestros traspasos fueran sencillos y cada componente es accesible por defecto.",
+        "date": "2025-06-15",
+        "profileImage": "https://picsum.photos/seed/priya_nair/400/400",
+        "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/priya-nair/",
+        "projectContext": "Aurora Design System",
+        "experienceId": "aurora_commerce",
+        "projectIds": [
+          "aurora_design_system"
+        ]
+      },
+      {
+        "id": "jonas_eriksen",
+        "name": "Jonas Eriksen",
+        "position": "Fundador y CEO",
+        "company": "Orbit Pay",
+        "testimonial": "Nova lanzó nuestro MVP en diez semanas y superó la auditoría de seguridad sin problemas. Es raro encontrar a alguien tan rápida sin recortar esfuerzos.",
+        "date": "2022-04-10",
+        "profileImage": "https://picsum.photos/seed/jonas_eriksen/400/400",
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/jonas-eriksen/",
+        "projectContext": "MVP de Orbit Pay",
+        "experienceId": "independent_consulting",
+        "projectIds": [
+          "orbit_pay"
+        ]
+      },
+      {
+        "id": "lena_hoffmann",
+        "name": "Lena Hoffmann",
+        "position": "Directora de Ingeniería",
+        "company": "TidyHome",
+        "testimonial": "Su documentación de traspaso fue tan buena que un ingeniero nuevo fue productivo en dos días. La app es sólida como una roca.",
+        "date": "2025-09-02",
+        "profileImage": "https://picsum.photos/seed/lena_hoffmann/400/400",
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/lena-hoffmann/",
+        "projectContext": "App TidyHome",
+        "experienceId": "independent_consulting",
+        "projectIds": [
+          "tidy_home"
+        ]
+      },
+      {
+        "id": "anders_nyberg",
+        "name": "Anders Nyberg",
+        "position": "Director del estudio",
+        "company": "Nordic Pixels",
+        "testimonial": "Nova fue la junior más curiosa que contratamos. Aprendió OpenGL por su cuenta en un mes y su juego de puzles fue nuestro mejor resultado.",
+        "date": "2016-09-01",
+        "profileImage": "https://picsum.photos/seed/anders_nyberg/400/400",
+        "companyLogo": "https://picsum.photos/seed/nordic_pixels/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/anders-nyberg/",
+        "projectContext": "Juego Pixel Puzzle",
+        "experienceId": "nordic_pixels",
+        "projectIds": [
+          "pixel_puzzle"
+        ]
       }
     ],
     "updatedAt": "2026-01-15T10:00:00Z"
@@ -122,7 +252,8 @@
         "projectContext": "Aurora Marketplace-app",
         "experienceId": "aurora_commerce",
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ]
       },
       {
@@ -156,6 +287,70 @@
         "experienceId": "lumen_labs",
         "projectIds": [
           "lumen_sleep"
+        ]
+      },
+      {
+        "id": "priya_nair",
+        "name": "Priya Nair",
+        "position": "Staff Product Designer",
+        "company": "Aurora Commerce",
+        "testimonial": "Nova spreekt vloeiend design. Het designsysteem dat ze bouwde maakte onze overdrachten moeiteloos en elk component is standaard toegankelijk.",
+        "date": "2025-06-15",
+        "profileImage": "https://picsum.photos/seed/priya_nair/400/400",
+        "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/priya-nair/",
+        "projectContext": "Aurora Design System",
+        "experienceId": "aurora_commerce",
+        "projectIds": [
+          "aurora_design_system"
+        ]
+      },
+      {
+        "id": "jonas_eriksen",
+        "name": "Jonas Eriksen",
+        "position": "Oprichter en CEO",
+        "company": "Orbit Pay",
+        "testimonial": "Nova leverde onze MVP in tien weken op en die kwam moeiteloos door de securityaudit. Zeldzaam om iemand te vinden die zo snel is zonder concessies te doen.",
+        "date": "2022-04-10",
+        "profileImage": "https://picsum.photos/seed/jonas_eriksen/400/400",
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/jonas-eriksen/",
+        "projectContext": "Orbit Pay-MVP",
+        "experienceId": "independent_consulting",
+        "projectIds": [
+          "orbit_pay"
+        ]
+      },
+      {
+        "id": "lena_hoffmann",
+        "name": "Lena Hoffmann",
+        "position": "Head of Engineering",
+        "company": "TidyHome",
+        "testimonial": "Haar overdrachtsdocumentatie was zo goed dat een nieuwe engineer binnen twee dagen productief was. De app is rotsvast.",
+        "date": "2025-09-02",
+        "profileImage": "https://picsum.photos/seed/lena_hoffmann/400/400",
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/lena-hoffmann/",
+        "projectContext": "TidyHome-app",
+        "experienceId": "independent_consulting",
+        "projectIds": [
+          "tidy_home"
+        ]
+      },
+      {
+        "id": "anders_nyberg",
+        "name": "Anders Nyberg",
+        "position": "Studiodirecteur",
+        "company": "Nordic Pixels",
+        "testimonial": "Nova was de meest nieuwsgierige junior die we ooit aannamen. Ze leerde zichzelf in een maand OpenGL en haar puzzelgame werd onze best presterende titel.",
+        "date": "2016-09-01",
+        "profileImage": "https://picsum.photos/seed/anders_nyberg/400/400",
+        "companyLogo": "https://picsum.photos/seed/nordic_pixels/400/400",
+        "linkedinProfile": "https://www.linkedin.com/in/anders-nyberg/",
+        "projectContext": "Pixel Puzzle-game",
+        "experienceId": "nordic_pixels",
+        "projectIds": [
+          "pixel_puzzle"
         ]
       }
     ],

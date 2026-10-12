@@ -25,11 +25,14 @@
           "Personalised home with remote-config driven layouts",
           "Offline AI shopping assistant",
           "Shared design system with golden tests",
-          "Multi-country and multi-language support"
+          "Multi-country and multi-language support",
+          "Deferred components to keep the install size small"
         ],
         "achievements": [
           "Reduced cold start by 40%",
-          "Scaled to five countries with one codebase"
+          "Scaled to five countries with one codebase",
+          "Cut app size by 28%",
+          "Crash-free sessions at 99.8%"
         ],
         "teamSize": 12,
         "role": "Lead Developer",
@@ -63,6 +66,24 @@
             "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
             "website": "https://aurora.example.com/",
             "github": null
+          },
+          {
+            "country": "Belgium",
+            "latitude": 50.5039,
+            "longitude": 4.4699,
+            "appStore": "https://apps.apple.com/be/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Spain",
+            "latitude": 40.4637,
+            "longitude": -3.7492,
+            "appStore": "https://apps.apple.com/es/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
           }
         ]
       },
@@ -87,10 +108,13 @@
         "features": [
           "Adaptive training plans",
           "Wearable and heart-rate sync",
-          "Offline-first workouts"
+          "Offline-first workouts",
+          "Animated progress charts"
         ],
         "achievements": [
-          "Reached 1M installs in the first year"
+          "Reached 1M installs in the first year",
+          "Weekly releases for two years with no rollbacks",
+          "4.7 average store rating"
         ],
         "teamSize": 6,
         "role": "Lead Developer",
@@ -100,6 +124,10 @@
           {
             "label": "Downloads",
             "value": "1M+"
+          },
+          {
+            "label": "Store rating",
+            "value": "4.7/5"
           }
         ],
         "markets": [
@@ -134,10 +162,13 @@
         "features": [
           "Real-time vehicle map",
           "Multi-modal route planning",
-          "In-app payments"
+          "In-app payments",
+          "Offline map caching"
         ],
         "achievements": [
-          "Enabled three squads to ship in parallel"
+          "Enabled three squads to ship in parallel",
+          "Real-time map held 60 fps on mid-range devices",
+          "Payment success rate above 99%"
         ],
         "teamSize": 8,
         "role": "Lead Developer",
@@ -152,6 +183,25 @@
             "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
             "website": "https://pulsefit.example.com/",
             "github": null
+          },
+          {
+            "country": "Norway",
+            "latitude": 60.472,
+            "longitude": 8.4689,
+            "appStore": "https://apps.apple.com/no/app/moveit/id0000000004",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.moveit",
+            "website": "https://moveit.example.com/",
+            "github": null
+          }
+        ],
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "600K+"
+          },
+          {
+            "label": "Store rating",
+            "value": "4.5/5"
           }
         ]
       },
@@ -174,10 +224,13 @@
         "features": [
           "Smart alarm",
           "Background audio",
-          "Accessibility-first UI"
+          "Accessibility-first UI",
+          "Offline-first data sync"
         ],
         "achievements": [
-          "3M+ installs"
+          "3M+ installs",
+          "Crash rate reduced from 1.8% to 0.4%",
+          "Featured by Google Play in the Wellbeing collection"
         ],
         "teamSize": 5,
         "role": "Senior Developer",
@@ -187,6 +240,10 @@
           {
             "label": "Downloads",
             "value": "3M+"
+          },
+          {
+            "label": "Store rating",
+            "value": "4.6/5"
           }
         ],
         "markets": [
@@ -197,6 +254,423 @@
             "appStore": "https://apps.apple.com/de/app/lumen-sleep/id0000000003",
             "playStore": "https://play.google.com/store/apps/details?id=com.example.lumensleep",
             "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Assistant",
+        "description": "On-device AI shopping assistant that answers product and order questions offline.",
+        "longDescription": "Prototyped, then productionised a small-language-model assistant that runs fully on device. Includes retrieval over product data, guarded answers that admit when data is missing, and a feature-flagged rollout to 5% then 100% of users.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "On-device AI",
+          "Gemma",
+          "Prompt Engineering",
+          "Feature Flags",
+          "Clean Architecture",
+          "Analytics"
+        ],
+        "category": "AI & Assistants",
+        "status": "Ongoing",
+        "startDate": "2024-09-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_assistant/1200/800",
+        "features": [
+          "Offline question answering",
+          "Model download manager with resume",
+          "Grounded answers with source citations",
+          "Privacy-first: no prompts leave the device",
+          "Golden-question regression tests"
+        ],
+        "achievements": [
+          "Used by 1M+ people within six months",
+          "Answer helpfulness rated 4.4/5 in-app",
+          "Zero prompts sent to servers",
+          "Reduced support tickets about order status by 22%"
+        ],
+        "teamSize": 4,
+        "role": "Technical Lead",
+        "id": "aurora_assistant",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Active users",
+            "value": "1M+"
+          },
+          {
+            "label": "Helpfulness",
+            "value": "4.4/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Checkout",
+        "description": "Redesigned one-page checkout with saved payment methods and wallet support.",
+        "longDescription": "Led the redesign of the checkout flow with product and design, introducing wallet payments, address autocomplete and an experiment framework that allowed safe A/B testing.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Payments",
+          "A/B Testing",
+          "Firebase",
+          "Analytics",
+          "GraphQL"
+        ],
+        "category": "E-Commerce",
+        "status": "Completed",
+        "startDate": "2023-06-01",
+        "endDate": "2024-08-31",
+        "image": "https://picsum.photos/seed/aurora_checkout/1200/800",
+        "features": [
+          "One-page checkout",
+          "Apple Pay and Google Pay",
+          "Address autocomplete",
+          "Experiment framework for A/B tests",
+          "Saved payment methods"
+        ],
+        "achievements": [
+          "Increased checkout conversion by 18%",
+          "Reduced checkout time from 95s to 52s",
+          "Ran 14 A/B experiments in the first year",
+          "Cart abandonment down 9 points"
+        ],
+        "teamSize": 7,
+        "role": "Technical Lead",
+        "id": "aurora_checkout",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Conversion uplift",
+            "value": "+18%"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Design System",
+        "description": "Open-source Flutter design system shared by all Aurora apps.",
+        "longDescription": "Created and maintain the design system: tokens, themes for light and dark mode, accessible components, golden tests per theme and a Storybook catalogue published to the web.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Design Systems",
+          "Design Tokens",
+          "Storybook",
+          "Golden Testing",
+          "Accessibility"
+        ],
+        "category": "Developer Tools",
+        "status": "Ongoing",
+        "startDate": "2023-05-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_design_system/1200/800",
+        "features": [
+          "60+ reusable components",
+          "Light and dark themes",
+          "Accessibility checks built in",
+          "Golden tests per theme",
+          "Public Storybook catalogue"
+        ],
+        "achievements": [
+          "Adopted by 6 apps and 5 teams",
+          "Cut UI bug reports by 35%",
+          "Reached 900 GitHub stars",
+          "WCAG AA contrast on every component"
+        ],
+        "teamSize": 3,
+        "role": "Creator and Maintainer",
+        "id": "aurora_design_system",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "GitHub stars",
+            "value": "900+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": null,
+            "playStore": null,
+            "website": "https://aurora-ds.example.com/",
+            "github": "https://github.com/aurora-commerce/aurora-ds"
+          }
+        ]
+      },
+      {
+        "title": "Orbit Pay",
+        "description": "Fintech MVP for peer-to-peer payments and shared expenses.",
+        "longDescription": "Built the full Flutter MVP in ten weeks for a seed-stage startup, including onboarding with identity verification, instant transfers, shared expense groups and a security-hardened architecture that passed a regulatory audit.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "Stripe",
+          "Biometrics",
+          "Clean Architecture",
+          "Testing"
+        ],
+        "category": "Fintech",
+        "status": "Completed",
+        "startDate": "2021-06-01",
+        "endDate": "2022-03-31",
+        "image": "https://picsum.photos/seed/orbit_pay/1200/800",
+        "features": [
+          "Identity verification onboarding",
+          "Instant transfers",
+          "Shared expense groups",
+          "Biometric login",
+          "Certificate pinning"
+        ],
+        "achievements": [
+          "MVP shipped in 10 weeks",
+          "Passed a regulatory security audit first time",
+          "50K users in the first quarter",
+          "85% automated test coverage"
+        ],
+        "teamSize": 3,
+        "role": "Freelance Lead Developer",
+        "id": "orbit_pay",
+        "experienceId": "independent_consulting",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "150K+"
+          },
+          {
+            "label": "Store rating",
+            "value": "4.8/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/orbitpay/id0000000005",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.orbitpay",
+            "website": "https://orbitpay.example.com/",
+            "github": null
+          },
+          {
+            "country": "United Kingdom",
+            "latitude": 55.3781,
+            "longitude": -3.436,
+            "appStore": "https://apps.apple.com/gb/app/orbitpay/id0000000005",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.orbitpay",
+            "website": "https://orbitpay.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "TidyHome",
+        "description": "Smart-home controller app for lights, heating and energy monitoring.",
+        "longDescription": "Ongoing engagement building a Flutter app for a smart-home startup: device discovery over local network, scenes and schedules, energy dashboards and over-the-air firmware update flows.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "MQTT",
+          "Bluetooth LE",
+          "Home Assistant",
+          "BLoC",
+          "Charts"
+        ],
+        "category": "Smart Home",
+        "status": "Ongoing",
+        "startDate": "2024-01-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/tidy_home/1200/800",
+        "features": [
+          "Local network device discovery",
+          "Scenes and schedules",
+          "Energy usage dashboards",
+          "OTA firmware updates",
+          "Home Assistant integration"
+        ],
+        "achievements": [
+          "Controls 40+ device types",
+          "Round-trip command latency under 150 ms",
+          "Handover documentation reduced client onboarding to 2 days",
+          "Zero critical bugs in the last 3 releases"
+        ],
+        "teamSize": 2,
+        "role": "Freelance Developer",
+        "id": "tidy_home",
+        "experienceId": "independent_consulting",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "80K+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/tidyhome/id0000000006",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.tidyhome",
+            "website": "https://tidyhome.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/tidyhome/id0000000006",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.tidyhome",
+            "website": "https://tidyhome.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Lumen Wear",
+        "description": "Wear OS companion that tracks sleep stages from the wrist.",
+        "longDescription": "Hack-week prototype turned product: a Wear OS app syncing sleep data to the phone with battery-friendly sampling, complications and a smart-alarm window.",
+        "technologies": [
+          "Kotlin",
+          "Wear OS",
+          "Android",
+          "Room",
+          "Bluetooth LE",
+          "Firebase"
+        ],
+        "category": "Health & Wellness",
+        "status": "Completed",
+        "startDate": "2018-03-01",
+        "endDate": "2019-06-30",
+        "image": "https://picsum.photos/seed/lumen_wear/1200/800",
+        "features": [
+          "Sleep stage tracking",
+          "Watch face complication",
+          "Smart alarm window",
+          "Battery-friendly sampling",
+          "Phone sync"
+        ],
+        "achievements": [
+          "Won the internal Hack Week award",
+          "Used by 20% of Lumen Sleep users",
+          "Overnight battery drain under 4%",
+          "Featured in the Wear OS store"
+        ],
+        "teamSize": 3,
+        "role": "Senior Developer",
+        "id": "lumen_wear",
+        "experienceId": "lumen_labs",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "400K+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": null,
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.lumenwear",
+            "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Pixel Puzzle",
+        "description": "Casual puzzle game with 200 hand-crafted levels.",
+        "longDescription": "Built the Android version of a pixel-art puzzle game using libGDX: custom particle effects, level editor tooling and ad mediation. Retired in 2019 when the studio closed its mobile line.",
+        "technologies": [
+          "Java",
+          "libGDX",
+          "Android SDK",
+          "OpenGL",
+          "SQLite"
+        ],
+        "category": "Gaming",
+        "status": "Deprecated",
+        "startDate": "2014-03-01",
+        "endDate": "2016-05-31",
+        "image": "https://picsum.photos/seed/pixel_puzzle/1200/800",
+        "features": [
+          "200 hand-crafted levels",
+          "Custom particle effects",
+          "Level editor tooling",
+          "Ad mediation",
+          "Cloud save"
+        ],
+        "achievements": [
+          "800K downloads",
+          "4.5 average rating",
+          "Stable 60 fps on 2013-era phones",
+          "Reached top 20 puzzle games in Sweden"
+        ],
+        "teamSize": 4,
+        "role": "Android Developer",
+        "id": "pixel_puzzle",
+        "experienceId": "nordic_pixels",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "800K+"
+          },
+          {
+            "label": "Store rating",
+            "value": "4.5/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": null,
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pixelpuzzle",
+            "website": null,
             "github": null
           }
         ]
@@ -230,11 +704,14 @@
           "Inicio personalizado con diseños por configuración remota",
           "Asistente de compras con IA sin conexión",
           "Sistema de diseño compartido con pruebas golden",
-          "Soporte multipaís y multi-idioma"
+          "Soporte multipaís y multi-idioma",
+          "Componentes diferidos para reducir el tamaño de instalación"
         ],
         "achievements": [
           "Redujo el arranque en frío un 40%",
-          "Escalado a cinco países con una única base de código"
+          "Escalado a cinco países con una única base de código",
+          "Reducción del 28% del tamaño de la app",
+          "Sesiones sin fallos al 99,8%"
         ],
         "teamSize": 12,
         "role": "Desarrolladora Principal",
@@ -268,6 +745,24 @@
             "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
             "website": "https://aurora.example.com/",
             "github": null
+          },
+          {
+            "country": "Belgium",
+            "latitude": 50.5039,
+            "longitude": 4.4699,
+            "appStore": "https://apps.apple.com/be/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Spain",
+            "latitude": 40.4637,
+            "longitude": -3.7492,
+            "appStore": "https://apps.apple.com/es/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
           }
         ]
       },
@@ -292,10 +787,13 @@
         "features": [
           "Planes de entrenamiento adaptativos",
           "Sincronización con wearables y frecuencia cardíaca",
-          "Entrenamientos offline-first"
+          "Entrenamientos offline-first",
+          "Gráficos de progreso animados"
         ],
         "achievements": [
-          "1M de instalaciones en el primer año"
+          "1M de instalaciones en el primer año",
+          "Lanzamientos semanales durante dos años sin reversiones",
+          "Valoración media de 4,7 en tiendas"
         ],
         "teamSize": 6,
         "role": "Desarrolladora Principal",
@@ -305,6 +803,10 @@
           {
             "label": "Descargas",
             "value": "1M+"
+          },
+          {
+            "label": "Valoración en tiendas",
+            "value": "4.7/5"
           }
         ],
         "markets": [
@@ -339,10 +841,13 @@
         "features": [
           "Mapa de vehículos en tiempo real",
           "Planificación de rutas multimodal",
-          "Pagos en la app"
+          "Pagos en la app",
+          "Caché de mapas sin conexión"
         ],
         "achievements": [
-          "Permitió a tres equipos lanzar en paralelo"
+          "Permitió a tres equipos lanzar en paralelo",
+          "El mapa en tiempo real mantuvo 60 fps en dispositivos de gama media",
+          "Tasa de éxito de pagos superior al 99%"
         ],
         "teamSize": 8,
         "role": "Desarrolladora Principal",
@@ -357,6 +862,25 @@
             "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
             "website": "https://pulsefit.example.com/",
             "github": null
+          },
+          {
+            "country": "Norway",
+            "latitude": 60.472,
+            "longitude": 8.4689,
+            "appStore": "https://apps.apple.com/no/app/moveit/id0000000004",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.moveit",
+            "website": "https://moveit.example.com/",
+            "github": null
+          }
+        ],
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "600K+"
+          },
+          {
+            "label": "Valoración en tiendas",
+            "value": "4.5/5"
           }
         ]
       },
@@ -379,10 +903,13 @@
         "features": [
           "Alarma inteligente",
           "Audio en segundo plano",
-          "Interfaz centrada en accesibilidad"
+          "Interfaz centrada en accesibilidad",
+          "Sincronización offline-first"
         ],
         "achievements": [
-          "Más de 3M de instalaciones"
+          "Más de 3M de instalaciones",
+          "Tasa de fallos reducida del 1,8% al 0,4%",
+          "Destacada por Google Play en la colección de Bienestar"
         ],
         "teamSize": 5,
         "role": "Desarrolladora Sénior",
@@ -392,6 +919,10 @@
           {
             "label": "Descargas",
             "value": "3M+"
+          },
+          {
+            "label": "Valoración en tiendas",
+            "value": "4.6/5"
           }
         ],
         "markets": [
@@ -402,6 +933,423 @@
             "appStore": "https://apps.apple.com/de/app/lumen-sleep/id0000000003",
             "playStore": "https://play.google.com/store/apps/details?id=com.example.lumensleep",
             "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Assistant",
+        "description": "Asistente de compras con IA en el dispositivo que responde preguntas sobre productos y pedidos sin conexión.",
+        "longDescription": "Prototipé y luego llevé a producción un asistente con un modelo de lenguaje pequeño que se ejecuta por completo en el dispositivo. Incluye recuperación sobre datos de producto, respuestas con salvaguardas que admiten cuando faltan datos y un despliegue con feature flags al 5% y luego al 100%.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "On-device AI",
+          "Gemma",
+          "Prompt Engineering",
+          "Feature Flags",
+          "Clean Architecture",
+          "Analytics"
+        ],
+        "category": "IA y asistentes",
+        "status": "Ongoing",
+        "startDate": "2024-09-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_assistant/1200/800",
+        "features": [
+          "Respuestas a preguntas sin conexión",
+          "Gestor de descarga del modelo con reanudación",
+          "Respuestas fundamentadas con citas de fuentes",
+          "Privacidad ante todo: ningún prompt sale del dispositivo",
+          "Pruebas de regresión con preguntas golden"
+        ],
+        "achievements": [
+          "Usado por más de 1M de personas en seis meses",
+          "Utilidad de las respuestas valorada con 4,4/5 en la app",
+          "Cero prompts enviados a servidores",
+          "Redujo en un 22% los tickets de soporte sobre el estado de pedidos"
+        ],
+        "teamSize": 4,
+        "role": "Líder Técnica",
+        "id": "aurora_assistant",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Usuarios activos",
+            "value": "1M+"
+          },
+          {
+            "label": "Utilidad",
+            "value": "4.4/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Checkout",
+        "description": "Checkout de una sola página rediseñado con métodos de pago guardados y soporte de wallets.",
+        "longDescription": "Lideré el rediseño del flujo de checkout con producto y diseño, introduciendo pagos con wallet, autocompletado de direcciones y un framework de experimentos para A/B testing seguro.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Payments",
+          "A/B Testing",
+          "Firebase",
+          "Analytics",
+          "GraphQL"
+        ],
+        "category": "Comercio electrónico",
+        "status": "Completed",
+        "startDate": "2023-06-01",
+        "endDate": "2024-08-31",
+        "image": "https://picsum.photos/seed/aurora_checkout/1200/800",
+        "features": [
+          "Checkout en una página",
+          "Apple Pay y Google Pay",
+          "Autocompletado de direcciones",
+          "Framework de experimentos para pruebas A/B",
+          "Métodos de pago guardados"
+        ],
+        "achievements": [
+          "Aumento de la conversión del checkout en un 18%",
+          "Reducción del tiempo de checkout de 95 s a 52 s",
+          "Realizó 14 experimentos A/B el primer año",
+          "Abandono de carrito reducido 9 puntos"
+        ],
+        "teamSize": 7,
+        "role": "Líder Técnica",
+        "id": "aurora_checkout",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Mejora de conversión",
+            "value": "+18%"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Design System",
+        "description": "Sistema de diseño Flutter de código abierto compartido por todas las apps de Aurora.",
+        "longDescription": "Creé y mantengo el sistema de diseño: tokens, temas claro y oscuro, componentes accesibles, pruebas golden por tema y un catálogo Storybook publicado en la web.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Design Systems",
+          "Design Tokens",
+          "Storybook",
+          "Golden Testing",
+          "Accessibility"
+        ],
+        "category": "Herramientas para desarrolladores",
+        "status": "Ongoing",
+        "startDate": "2023-05-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_design_system/1200/800",
+        "features": [
+          "60+ componentes reutilizables",
+          "Temas claro y oscuro",
+          "Comprobaciones de accesibilidad integradas",
+          "Pruebas golden por tema",
+          "Catálogo Storybook público"
+        ],
+        "achievements": [
+          "Adoptado por 6 apps y 5 equipos",
+          "Reducción de reportes de errores de UI en un 35%",
+          "Alcanzó 900 estrellas en GitHub",
+          "Contraste WCAG AA en todos los componentes"
+        ],
+        "teamSize": 3,
+        "role": "Creadora y Mantenedora",
+        "id": "aurora_design_system",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Estrellas en GitHub",
+            "value": "900+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": null,
+            "playStore": null,
+            "website": "https://aurora-ds.example.com/",
+            "github": "https://github.com/aurora-commerce/aurora-ds"
+          }
+        ]
+      },
+      {
+        "title": "Orbit Pay",
+        "description": "MVP fintech para pagos entre personas y gastos compartidos.",
+        "longDescription": "Construí el MVP completo en Flutter en diez semanas para una startup en fase semilla, con onboarding con verificación de identidad, transferencias instantáneas, grupos de gastos compartidos y una arquitectura reforzada que superó una auditoría regulatoria.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "Stripe",
+          "Biometrics",
+          "Clean Architecture",
+          "Testing"
+        ],
+        "category": "Fintech",
+        "status": "Completed",
+        "startDate": "2021-06-01",
+        "endDate": "2022-03-31",
+        "image": "https://picsum.photos/seed/orbit_pay/1200/800",
+        "features": [
+          "Onboarding con verificación de identidad",
+          "Transferencias instantáneas",
+          "Grupos de gastos compartidos",
+          "Inicio de sesión biométrico",
+          "Fijación de certificados"
+        ],
+        "achievements": [
+          "MVP lanzado en 10 semanas",
+          "Superó una auditoría de seguridad regulatoria a la primera",
+          "50K usuarios en el primer trimestre",
+          "85% de cobertura de pruebas automatizadas"
+        ],
+        "teamSize": 3,
+        "role": "Desarrolladora Líder Freelance",
+        "id": "orbit_pay",
+        "experienceId": "independent_consulting",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "150K+"
+          },
+          {
+            "label": "Valoración en tiendas",
+            "value": "4.8/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/orbitpay/id0000000005",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.orbitpay",
+            "website": "https://orbitpay.example.com/",
+            "github": null
+          },
+          {
+            "country": "United Kingdom",
+            "latitude": 55.3781,
+            "longitude": -3.436,
+            "appStore": "https://apps.apple.com/gb/app/orbitpay/id0000000005",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.orbitpay",
+            "website": "https://orbitpay.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "TidyHome",
+        "description": "App de control de hogar inteligente para luces, calefacción y monitorización de energía.",
+        "longDescription": "Colaboración en curso creando una app Flutter para una startup de hogar inteligente: descubrimiento de dispositivos en red local, escenas y programaciones, paneles de energía y flujos de actualización de firmware por aire.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "MQTT",
+          "Bluetooth LE",
+          "Home Assistant",
+          "BLoC",
+          "Charts"
+        ],
+        "category": "Hogar inteligente",
+        "status": "Ongoing",
+        "startDate": "2024-01-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/tidy_home/1200/800",
+        "features": [
+          "Descubrimiento de dispositivos en red local",
+          "Escenas y programaciones",
+          "Paneles de consumo de energía",
+          "Actualizaciones de firmware OTA",
+          "Integración con Home Assistant"
+        ],
+        "achievements": [
+          "Controla más de 40 tipos de dispositivos",
+          "Latencia de comandos inferior a 150 ms",
+          "La documentación de traspaso redujo el onboarding del cliente a 2 días",
+          "Cero errores críticos en las últimas 3 versiones"
+        ],
+        "teamSize": 2,
+        "role": "Desarrolladora Freelance",
+        "id": "tidy_home",
+        "experienceId": "independent_consulting",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "80K+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/tidyhome/id0000000006",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.tidyhome",
+            "website": "https://tidyhome.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/tidyhome/id0000000006",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.tidyhome",
+            "website": "https://tidyhome.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Lumen Wear",
+        "description": "Compañero para Wear OS que registra las fases del sueño desde la muñeca.",
+        "longDescription": "Prototipo de hack week convertido en producto: una app Wear OS que sincroniza datos del sueño con el teléfono con muestreo de bajo consumo, complicaciones y una ventana de alarma inteligente.",
+        "technologies": [
+          "Kotlin",
+          "Wear OS",
+          "Android",
+          "Room",
+          "Bluetooth LE",
+          "Firebase"
+        ],
+        "category": "Salud y bienestar",
+        "status": "Completed",
+        "startDate": "2018-03-01",
+        "endDate": "2019-06-30",
+        "image": "https://picsum.photos/seed/lumen_wear/1200/800",
+        "features": [
+          "Seguimiento de fases del sueño",
+          "Complicación para la esfera",
+          "Ventana de alarma inteligente",
+          "Muestreo de bajo consumo",
+          "Sincronización con el teléfono"
+        ],
+        "achievements": [
+          "Ganó el premio interno Hack Week",
+          "Usada por el 20% de los usuarios de Lumen Sleep",
+          "Consumo de batería nocturno inferior al 4%",
+          "Destacada en la tienda de Wear OS"
+        ],
+        "teamSize": 3,
+        "role": "Desarrolladora Sénior",
+        "id": "lumen_wear",
+        "experienceId": "lumen_labs",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "400K+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": null,
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.lumenwear",
+            "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Pixel Puzzle",
+        "description": "Juego de puzles casual con 200 niveles diseñados a mano.",
+        "longDescription": "Construí la versión Android de un juego de puzles pixel-art con libGDX: efectos de partículas personalizados, herramientas de editor de niveles y mediación de anuncios. Retirado en 2019 cuando el estudio cerró su línea móvil.",
+        "technologies": [
+          "Java",
+          "libGDX",
+          "Android SDK",
+          "OpenGL",
+          "SQLite"
+        ],
+        "category": "Videojuegos",
+        "status": "Deprecated",
+        "startDate": "2014-03-01",
+        "endDate": "2016-05-31",
+        "image": "https://picsum.photos/seed/pixel_puzzle/1200/800",
+        "features": [
+          "200 niveles diseñados a mano",
+          "Efectos de partículas personalizados",
+          "Herramientas de editor de niveles",
+          "Mediación de anuncios",
+          "Guardado en la nube"
+        ],
+        "achievements": [
+          "800K descargas",
+          "Valoración media de 4,5",
+          "60 fps estables en móviles de 2013",
+          "Top 20 de juegos de puzles en Suecia"
+        ],
+        "teamSize": 4,
+        "role": "Desarrolladora Android",
+        "id": "pixel_puzzle",
+        "experienceId": "nordic_pixels",
+        "metrics": [
+          {
+            "label": "Descargas",
+            "value": "800K+"
+          },
+          {
+            "label": "Valoración en tiendas",
+            "value": "4.5/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": null,
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pixelpuzzle",
+            "website": null,
             "github": null
           }
         ]
@@ -435,11 +1383,14 @@
           "Gepersonaliseerde homepage met layouts via remote config",
           "Offline AI-winkelassistent",
           "Gedeeld designsysteem met golden tests",
-          "Ondersteuning voor meerdere landen en talen"
+          "Ondersteuning voor meerdere landen en talen",
+          "Deferred components om de installatiegrootte klein te houden"
         ],
         "achievements": [
           "Koude start met 40% verminderd",
-          "Opgeschaald naar vijf landen met één codebase"
+          "Opgeschaald naar vijf landen met één codebase",
+          "App-grootte met 28% verkleind",
+          "Crashvrije sessies op 99,8%"
         ],
         "teamSize": 12,
         "role": "Lead Developer",
@@ -473,6 +1424,24 @@
             "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
             "website": "https://aurora.example.com/",
             "github": null
+          },
+          {
+            "country": "Belgium",
+            "latitude": 50.5039,
+            "longitude": 4.4699,
+            "appStore": "https://apps.apple.com/be/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Spain",
+            "latitude": 40.4637,
+            "longitude": -3.7492,
+            "appStore": "https://apps.apple.com/es/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
           }
         ]
       },
@@ -497,10 +1466,13 @@
         "features": [
           "Adaptieve trainingsschema's",
           "Wearable- en hartslagsync",
-          "Offline-first workouts"
+          "Offline-first workouts",
+          "Geanimeerde voortgangsgrafieken"
         ],
         "achievements": [
-          "1M installaties in het eerste jaar"
+          "1M installaties in het eerste jaar",
+          "Twee jaar wekelijkse releases zonder rollbacks",
+          "Gemiddelde winkelbeoordeling van 4,7"
         ],
         "teamSize": 6,
         "role": "Lead Developer",
@@ -510,6 +1482,10 @@
           {
             "label": "Downloads",
             "value": "1M+"
+          },
+          {
+            "label": "Winkelbeoordeling",
+            "value": "4.7/5"
           }
         ],
         "markets": [
@@ -544,10 +1520,13 @@
         "features": [
           "Realtime voertuigenkaart",
           "Multimodale routeplanning",
-          "In-app betalingen"
+          "In-app betalingen",
+          "Offline kaartcaching"
         ],
         "achievements": [
-          "Drie squads in staat gesteld parallel te leveren"
+          "Drie squads in staat gesteld parallel te leveren",
+          "Realtime kaart hield 60 fps op middenklasse toestellen",
+          "Betalingssuccespercentage boven 99%"
         ],
         "teamSize": 8,
         "role": "Lead Developer",
@@ -562,6 +1541,25 @@
             "playStore": "https://play.google.com/store/apps/details?id=com.example.pulsefit",
             "website": "https://pulsefit.example.com/",
             "github": null
+          },
+          {
+            "country": "Norway",
+            "latitude": 60.472,
+            "longitude": 8.4689,
+            "appStore": "https://apps.apple.com/no/app/moveit/id0000000004",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.moveit",
+            "website": "https://moveit.example.com/",
+            "github": null
+          }
+        ],
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "600K+"
+          },
+          {
+            "label": "Winkelbeoordeling",
+            "value": "4.5/5"
           }
         ]
       },
@@ -584,10 +1582,13 @@
         "features": [
           "Slimme wekker",
           "Achtergrondaudio",
-          "Toegankelijkheidsgerichte UI"
+          "Toegankelijkheidsgerichte UI",
+          "Offline-first datasync"
         ],
         "achievements": [
-          "3M+ installaties"
+          "3M+ installaties",
+          "Crashpercentage verlaagd van 1,8% naar 0,4%",
+          "Uitgelicht door Google Play in de Wellbeing-collectie"
         ],
         "teamSize": 5,
         "role": "Senior Developer",
@@ -597,6 +1598,10 @@
           {
             "label": "Downloads",
             "value": "3M+"
+          },
+          {
+            "label": "Winkelbeoordeling",
+            "value": "4.6/5"
           }
         ],
         "markets": [
@@ -607,6 +1612,423 @@
             "appStore": "https://apps.apple.com/de/app/lumen-sleep/id0000000003",
             "playStore": "https://play.google.com/store/apps/details?id=com.example.lumensleep",
             "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Assistant",
+        "description": "On-device AI-winkelassistent die offline vragen over producten en bestellingen beantwoordt.",
+        "longDescription": "Prototypte en bracht daarna een assistent met een klein taalmodel naar productie die volledig op het apparaat draait. Met retrieval over productdata, beveiligde antwoorden die toegeven wanneer data ontbreekt en een uitrol met feature flags naar 5% en daarna 100%.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "On-device AI",
+          "Gemma",
+          "Prompt Engineering",
+          "Feature Flags",
+          "Clean Architecture",
+          "Analytics"
+        ],
+        "category": "AI & assistenten",
+        "status": "Ongoing",
+        "startDate": "2024-09-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_assistant/1200/800",
+        "features": [
+          "Offline vragen beantwoorden",
+          "Modeldownloadmanager met hervatten",
+          "Onderbouwde antwoorden met bronvermelding",
+          "Privacy eerst: geen prompts verlaten het apparaat",
+          "Golden-question regressietests"
+        ],
+        "achievements": [
+          "Binnen zes maanden gebruikt door 1M+ mensen",
+          "Behulpzaamheid van antwoorden 4,4/5 beoordeeld in de app",
+          "Nul prompts naar servers verzonden",
+          "Verminderde supporttickets over orderstatus met 22%"
+        ],
+        "teamSize": 4,
+        "role": "Technisch Lead",
+        "id": "aurora_assistant",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Actieve gebruikers",
+            "value": "1M+"
+          },
+          {
+            "label": "Behulpzaamheid",
+            "value": "4.4/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Checkout",
+        "description": "Opnieuw ontworpen checkout op één pagina met opgeslagen betaalmethoden en walletondersteuning.",
+        "longDescription": "Leidde de herontwerp van de checkoutflow met product en design en introduceerde walletbetalingen, adresautocomplete en een experimentframework voor veilig A/B-testen.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Payments",
+          "A/B Testing",
+          "Firebase",
+          "Analytics",
+          "GraphQL"
+        ],
+        "category": "E-commerce",
+        "status": "Completed",
+        "startDate": "2023-06-01",
+        "endDate": "2024-08-31",
+        "image": "https://picsum.photos/seed/aurora_checkout/1200/800",
+        "features": [
+          "Checkout op één pagina",
+          "Apple Pay en Google Pay",
+          "Adres-autocomplete",
+          "Experimentframework voor A/B-tests",
+          "Opgeslagen betaalmethoden"
+        ],
+        "achievements": [
+          "Checkoutconversie met 18% verhoogd",
+          "Checkouttijd verlaagd van 95 s naar 52 s",
+          "14 A/B-experimenten uitgevoerd in het eerste jaar",
+          "Winkelwagenverlating 9 punten gedaald"
+        ],
+        "teamSize": 7,
+        "role": "Technisch Lead",
+        "id": "aurora_checkout",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "Conversieverhoging",
+            "value": "+18%"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/aurora/id0000000001",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.aurora",
+            "website": "https://aurora.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Aurora Design System",
+        "description": "Open-source Flutter-designsysteem gedeeld door alle Aurora-apps.",
+        "longDescription": "Creëerde en onderhoud het designsysteem: tokens, thema's voor licht en donker, toegankelijke componenten, golden tests per thema en een Storybook-catalogus op het web.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Design Systems",
+          "Design Tokens",
+          "Storybook",
+          "Golden Testing",
+          "Accessibility"
+        ],
+        "category": "Developer tools",
+        "status": "Ongoing",
+        "startDate": "2023-05-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/aurora_design_system/1200/800",
+        "features": [
+          "60+ herbruikbare componenten",
+          "Licht en donker thema",
+          "Ingebouwde toegankelijkheidscontroles",
+          "Golden tests per thema",
+          "Publieke Storybook-catalogus"
+        ],
+        "achievements": [
+          "Gebruikt door 6 apps en 5 teams",
+          "UI-bugmeldingen met 35% verminderd",
+          "900 GitHub-sterren bereikt",
+          "WCAG AA-contrast op elk component"
+        ],
+        "teamSize": 3,
+        "role": "Maker en maintainer",
+        "id": "aurora_design_system",
+        "experienceId": "aurora_commerce",
+        "metrics": [
+          {
+            "label": "GitHub-sterren",
+            "value": "900+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": null,
+            "playStore": null,
+            "website": "https://aurora-ds.example.com/",
+            "github": "https://github.com/aurora-commerce/aurora-ds"
+          }
+        ]
+      },
+      {
+        "title": "Orbit Pay",
+        "description": "Fintech-MVP voor peer-to-peer betalingen en gedeelde uitgaven.",
+        "longDescription": "Bouwde de volledige Flutter-MVP in tien weken voor een seed-startup, met onboarding inclusief identiteitsverificatie, directe overboekingen, groepen voor gedeelde uitgaven en een beveiligde architectuur die een regelgevende audit doorstond.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "Stripe",
+          "Biometrics",
+          "Clean Architecture",
+          "Testing"
+        ],
+        "category": "Fintech",
+        "status": "Completed",
+        "startDate": "2021-06-01",
+        "endDate": "2022-03-31",
+        "image": "https://picsum.photos/seed/orbit_pay/1200/800",
+        "features": [
+          "Onboarding met identiteitsverificatie",
+          "Directe overboekingen",
+          "Groepen voor gedeelde uitgaven",
+          "Biometrisch inloggen",
+          "Certificate pinning"
+        ],
+        "achievements": [
+          "MVP in 10 weken opgeleverd",
+          "Regelgevende securityaudit in één keer doorstaan",
+          "50K gebruikers in het eerste kwartaal",
+          "85% geautomatiseerde testdekking"
+        ],
+        "teamSize": 3,
+        "role": "Freelance Lead Developer",
+        "id": "orbit_pay",
+        "experienceId": "independent_consulting",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "150K+"
+          },
+          {
+            "label": "Winkelbeoordeling",
+            "value": "4.8/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Netherlands",
+            "latitude": 52.1326,
+            "longitude": 5.2913,
+            "appStore": "https://apps.apple.com/nl/app/orbitpay/id0000000005",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.orbitpay",
+            "website": "https://orbitpay.example.com/",
+            "github": null
+          },
+          {
+            "country": "United Kingdom",
+            "latitude": 55.3781,
+            "longitude": -3.436,
+            "appStore": "https://apps.apple.com/gb/app/orbitpay/id0000000005",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.orbitpay",
+            "website": "https://orbitpay.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "TidyHome",
+        "description": "Smart-home-app voor het bedienen van verlichting, verwarming en energiemonitoring.",
+        "longDescription": "Lopende opdracht voor een smart-home-startup met een Flutter-app: apparaten vinden op het lokale netwerk, scènes en schema's, energiedashboards en OTA-firmwareupdates.",
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "MQTT",
+          "Bluetooth LE",
+          "Home Assistant",
+          "BLoC",
+          "Charts"
+        ],
+        "category": "Smart home",
+        "status": "Ongoing",
+        "startDate": "2024-01-01",
+        "endDate": null,
+        "image": "https://picsum.photos/seed/tidy_home/1200/800",
+        "features": [
+          "Apparaten ontdekken op het lokale netwerk",
+          "Scènes en schema's",
+          "Energieverbruiksdashboards",
+          "OTA-firmwareupdates",
+          "Home Assistant-integratie"
+        ],
+        "achievements": [
+          "Bestuurt 40+ apparaattypes",
+          "Commandolatentie onder 150 ms",
+          "Overdrachtsdocumentatie bracht klantonboarding terug tot 2 dagen",
+          "Geen kritieke bugs in de laatste 3 releases"
+        ],
+        "teamSize": 2,
+        "role": "Freelance Developer",
+        "id": "tidy_home",
+        "experienceId": "independent_consulting",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "80K+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": "https://apps.apple.com/se/app/tidyhome/id0000000006",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.tidyhome",
+            "website": "https://tidyhome.example.com/",
+            "github": null
+          },
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": "https://apps.apple.com/de/app/tidyhome/id0000000006",
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.tidyhome",
+            "website": "https://tidyhome.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Lumen Wear",
+        "description": "Wear OS-companion die slaapfasen vanaf de pols bijhoudt.",
+        "longDescription": "Hack-week-prototype dat een product werd: een Wear OS-app die slaapdata synchroniseert met de telefoon met batterijvriendelijke sampling, complications en een slim wekvenster.",
+        "technologies": [
+          "Kotlin",
+          "Wear OS",
+          "Android",
+          "Room",
+          "Bluetooth LE",
+          "Firebase"
+        ],
+        "category": "Gezondheid & welzijn",
+        "status": "Completed",
+        "startDate": "2018-03-01",
+        "endDate": "2019-06-30",
+        "image": "https://picsum.photos/seed/lumen_wear/1200/800",
+        "features": [
+          "Slaapfasen bijhouden",
+          "Watchface-complication",
+          "Slim wekvenster",
+          "Batterijvriendelijke sampling",
+          "Telefoonsynchronisatie"
+        ],
+        "achievements": [
+          "Won de interne Hack Week-prijs",
+          "Gebruikt door 20% van de Lumen Sleep-gebruikers",
+          "Nachtelijk batterijverbruik onder 4%",
+          "Uitgelicht in de Wear OS-store"
+        ],
+        "teamSize": 3,
+        "role": "Senior Developer",
+        "id": "lumen_wear",
+        "experienceId": "lumen_labs",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "400K+"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Germany",
+            "latitude": 51.1657,
+            "longitude": 10.4515,
+            "appStore": null,
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.lumenwear",
+            "website": "https://lumen-labs.example.com/",
+            "github": null
+          }
+        ]
+      },
+      {
+        "title": "Pixel Puzzle",
+        "description": "Casual puzzelgame met 200 handgemaakte levels.",
+        "longDescription": "Bouwde de Android-versie van een pixelart-puzzelgame met libGDX: eigen particle-effecten, level-editortools en ad-mediation. Stopgezet in 2019 toen de studio de mobiele lijn sloot.",
+        "technologies": [
+          "Java",
+          "libGDX",
+          "Android SDK",
+          "OpenGL",
+          "SQLite"
+        ],
+        "category": "Gaming",
+        "status": "Deprecated",
+        "startDate": "2014-03-01",
+        "endDate": "2016-05-31",
+        "image": "https://picsum.photos/seed/pixel_puzzle/1200/800",
+        "features": [
+          "200 handgemaakte levels",
+          "Eigen particle-effecten",
+          "Level-editortools",
+          "Ad-mediation",
+          "Cloud save"
+        ],
+        "achievements": [
+          "800K downloads",
+          "Gemiddelde beoordeling 4,5",
+          "Stabiele 60 fps op telefoons uit 2013",
+          "Top 20 puzzelgames in Zweden"
+        ],
+        "teamSize": 4,
+        "role": "Android Developer",
+        "id": "pixel_puzzle",
+        "experienceId": "nordic_pixels",
+        "metrics": [
+          {
+            "label": "Downloads",
+            "value": "800K+"
+          },
+          {
+            "label": "Winkelbeoordeling",
+            "value": "4.5/5"
+          }
+        ],
+        "markets": [
+          {
+            "country": "Sweden",
+            "latitude": 60.1282,
+            "longitude": 18.6435,
+            "appStore": null,
+            "playStore": "https://play.google.com/store/apps/details?id=com.example.pixelpuzzle",
+            "website": null,
             "github": null
           }
         ]

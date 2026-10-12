@@ -15,12 +15,16 @@
           "Define the mobile architecture and technical roadmap",
           "Mentor engineers and run the architecture guild",
           "Prototype and ship on-device AI features",
-          "Partner with product and design on discovery"
+          "Partner with product and design on discovery",
+          "Run quarterly technical planning with product and design leads",
+          "Own release quality across iOS, Android and web"
         ],
         "achievements": [
           "Cut cold-start time by 40% across all apps",
           "Launched an offline AI shopping assistant used by 1M+ people",
-          "Raised crash-free sessions to 99.8%"
+          "Raised crash-free sessions to 99.8%",
+          "Grew the mobile guild from 12 to 30 engineers across three countries",
+          "Reduced app size by 28% through deferred components and asset audits"
         ],
         "technologies": [
           "Flutter",
@@ -30,11 +34,53 @@
           "On-device AI",
           "Firebase",
           "GraphQL",
-          "CI/CD"
+          "CI/CD",
+          "Riverpod",
+          "Remote Config",
+          "Gemma",
+          "Sentry",
+          "Storybook",
+          "Melos"
         ],
         "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
         "url": "https://aurora_commerce.example.com/",
         "id": "aurora_commerce",
+        "latitude": 52.3676,
+        "longitude": 4.9041
+      },
+      {
+        "company": "Independent Consulting",
+        "position": "Independent Flutter Consultant",
+        "location": "Amsterdam, Netherlands [Remote]",
+        "startDate": "2021-06-01",
+        "endDate": null,
+        "current": true,
+        "employmentType": "Part-time",
+        "description": "Part-time consulting for startups and scale-ups on Flutter architecture, performance and on-device AI, next to a full-time role.",
+        "longDescription": "Since 2021 I have completed eleven short engagements, ranging from two-week architecture audits to nine-month product builds. Clients span fintech, smart home and health, and I typically work in the evenings and on Fridays.",
+        "responsibilities": [
+          "Audit client codebases and propose target architectures",
+          "Build MVPs and hand them over with tests and documentation",
+          "Run Flutter performance and testing workshops"
+        ],
+        "achievements": [
+          "Delivered 11 engagements with a 100% repeat-client rate",
+          "Launched a fintech MVP in 10 weeks that passed a regulatory audit",
+          "Cut a client app startup time from 4.2s to 1.9s",
+          "Trained 40+ engineers through workshops"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "Stripe",
+          "Clean Architecture",
+          "Testing",
+          "Home Assistant"
+        ],
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "url": "https://independent_consulting.example.com/",
+        "id": "independent_consulting",
         "latitude": 52.3676,
         "longitude": 4.9041
       },
@@ -51,11 +97,14 @@
         "responsibilities": [
           "Lead a squad of six developers",
           "Own CI/CD and release management",
-          "Establish testing strategy and code reviews"
+          "Establish testing strategy and code reviews",
+          "Run weekly demos and retrospectives with stakeholders"
         ],
         "achievements": [
           "Shipped weekly releases with zero downtime",
-          "Reached 85% test coverage on core modules"
+          "Reached 85% test coverage on core modules",
+          "Cut average code review time from 2 days to 6 hours",
+          "Onboarded 9 new engineers with a documented architecture playbook"
         ],
         "technologies": [
           "Flutter",
@@ -63,7 +112,11 @@
           "BLoC",
           "Storybook",
           "Fastlane",
-          "GitHub Actions"
+          "GitHub Actions",
+          "Maps",
+          "WebSockets",
+          "Stripe",
+          "Codemagic"
         ],
         "companyLogo": "https://picsum.photos/seed/pixelforge_studio/400/400",
         "url": "https://pixelforge_studio.example.com/",
@@ -83,11 +136,14 @@
         "longDescription": "Joined as an Android specialist and became the early Flutter champion, building offline-first features, wearable integrations and an accessibility-first component library.",
         "responsibilities": [
           "Develop native Android and Flutter features",
-          "Integrate wearables and health APIs"
+          "Integrate wearables and health APIs",
+          "Review pull requests and mentor two junior developers"
         ],
         "achievements": [
           "Grew the app to 3M+ installs",
-          "Introduced Flutter to the company"
+          "Introduced Flutter to the company",
+          "Won the internal Hack Week award for a Wear OS sleep companion",
+          "Cut crash rate from 1.8% to 0.4% in six months"
         ],
         "technologies": [
           "Kotlin",
@@ -95,7 +151,11 @@
           "Flutter",
           "Room",
           "Bluetooth LE",
-          "Accessibility"
+          "Accessibility",
+          "Wear OS",
+          "RxJava",
+          "Dagger",
+          "Firebase"
         ],
         "companyLogo": "https://picsum.photos/seed/lumen_labs/400/400",
         "url": "https://lumen_labs.example.com/",
@@ -115,20 +175,53 @@
         "longDescription": "Built and maintained a portfolio of Android titles, learning the foundations of performance tuning, animation and user-centred design.",
         "responsibilities": [
           "Develop Android apps in Java",
-          "Optimize rendering and memory usage"
+          "Optimize rendering and memory usage",
+          "Collaborate with artists on animation and sound integration"
         ],
         "achievements": [
-          "Shipped 8 titles to Google Play"
+          "Shipped 8 titles to Google Play",
+          "Reached a 4.5 average rating across published titles"
         ],
         "technologies": [
           "Java",
           "Android SDK",
           "OpenGL",
-          "SQLite"
+          "SQLite",
+          "libGDX",
+          "Google Play Services"
         ],
         "companyLogo": "https://picsum.photos/seed/nordic_pixels/400/400",
         "url": "https://nordic_pixels.example.com/",
         "id": "nordic_pixels",
+        "latitude": 57.7089,
+        "longitude": 11.9746
+      },
+      {
+        "company": "Fjord Robotics",
+        "position": "Software Engineering Intern",
+        "location": "Gothenburg, Sweden",
+        "startDate": "2012-06-01",
+        "endDate": "2013-07-31",
+        "current": false,
+        "employmentType": "Internship",
+        "description": "Built a companion Android app to control small educational robots.",
+        "longDescription": "During a master's internship I built the first Android remote for a line of educational robots, using Bluetooth and a small sensor dashboard, and presented it at a regional robotics fair.",
+        "responsibilities": [
+          "Implement Bluetooth control of the robots",
+          "Build a live sensor dashboard"
+        ],
+        "achievements": [
+          "Demoed the app to 300+ visitors at a robotics fair"
+        ],
+        "technologies": [
+          "Java",
+          "Android SDK",
+          "Bluetooth",
+          "C++"
+        ],
+        "companyLogo": "https://picsum.photos/seed/fjord_robotics/400/400",
+        "url": "https://fjord_robotics.example.com/",
+        "id": "fjord_robotics",
         "latitude": 57.7089,
         "longitude": 11.9746
       }
@@ -151,12 +244,16 @@
           "Definir la arquitectura móvil y la hoja de ruta técnica",
           "Mentorizar ingenieros y dirigir el gremio de arquitectura",
           "Prototipar y lanzar funciones de IA en el dispositivo",
-          "Colaborar con producto y diseño en el descubrimiento"
+          "Colaborar con producto y diseño en el descubrimiento",
+          "Dirigir la planificación técnica trimestral con líderes de producto y diseño",
+          "Responsable de la calidad de lanzamientos en iOS, Android y web"
         ],
         "achievements": [
           "Reducción del 40% del tiempo de arranque en todas las apps",
           "Lanzamiento de un asistente de compras con IA sin conexión usado por más de 1M de personas",
-          "Sesiones sin fallos elevadas al 99,8%"
+          "Sesiones sin fallos elevadas al 99,8%",
+          "Hice crecer el gremio móvil de 12 a 30 ingenieros en tres países",
+          "Reduje el tamaño de la app un 28% con componentes diferidos y auditoría de assets"
         ],
         "technologies": [
           "Flutter",
@@ -166,11 +263,53 @@
           "On-device AI",
           "Firebase",
           "GraphQL",
-          "CI/CD"
+          "CI/CD",
+          "Riverpod",
+          "Remote Config",
+          "Gemma",
+          "Sentry",
+          "Storybook",
+          "Melos"
         ],
         "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
         "url": "https://aurora_commerce.example.com/",
         "id": "aurora_commerce",
+        "latitude": 52.3676,
+        "longitude": 4.9041
+      },
+      {
+        "company": "Independent Consulting",
+        "position": "Consultora Flutter Independiente",
+        "location": "Ámsterdam, Países Bajos [Remoto]",
+        "startDate": "2021-06-01",
+        "endDate": null,
+        "current": true,
+        "employmentType": "Tiempo parcial",
+        "description": "Consultoría a tiempo parcial para startups y scale-ups sobre arquitectura Flutter, rendimiento e IA en el dispositivo, junto a un puesto a tiempo completo.",
+        "longDescription": "Desde 2021 he completado once colaboraciones breves, desde auditorías de arquitectura de dos semanas hasta productos de nueve meses. Los clientes abarcan fintech, hogar inteligente y salud, y suelo trabajar por las tardes y los viernes.",
+        "responsibilities": [
+          "Auditar bases de código de clientes y proponer arquitecturas objetivo",
+          "Construir MVPs y entregarlos con pruebas y documentación",
+          "Impartir talleres de rendimiento y pruebas en Flutter"
+        ],
+        "achievements": [
+          "11 colaboraciones entregadas con un 100% de clientes recurrentes",
+          "Lancé un MVP fintech en 10 semanas que superó una auditoría regulatoria",
+          "Reduje el arranque de la app de un cliente de 4,2 s a 1,9 s",
+          "Formé a más de 40 ingenieros mediante talleres"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "Stripe",
+          "Clean Architecture",
+          "Testing",
+          "Home Assistant"
+        ],
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "url": "https://independent_consulting.example.com/",
+        "id": "independent_consulting",
         "latitude": 52.3676,
         "longitude": 4.9041
       },
@@ -187,11 +326,14 @@
         "responsibilities": [
           "Liderar un equipo de seis desarrolladores",
           "Gestionar CI/CD y lanzamientos",
-          "Definir la estrategia de pruebas y revisiones de código"
+          "Definir la estrategia de pruebas y revisiones de código",
+          "Dirigir demos y retrospectivas semanales con stakeholders"
         ],
         "achievements": [
           "Lanzamientos semanales sin tiempo de inactividad",
-          "85% de cobertura de pruebas en los módulos principales"
+          "85% de cobertura de pruebas en los módulos principales",
+          "Reduje el tiempo medio de revisión de código de 2 días a 6 horas",
+          "Incorporé a 9 nuevos ingenieros con un playbook de arquitectura documentado"
         ],
         "technologies": [
           "Flutter",
@@ -199,7 +341,11 @@
           "BLoC",
           "Storybook",
           "Fastlane",
-          "GitHub Actions"
+          "GitHub Actions",
+          "Maps",
+          "WebSockets",
+          "Stripe",
+          "Codemagic"
         ],
         "companyLogo": "https://picsum.photos/seed/pixelforge_studio/400/400",
         "url": "https://pixelforge_studio.example.com/",
@@ -219,11 +365,14 @@
         "longDescription": "Me uní como especialista en Android y me convertí en la primera defensora de Flutter, creando funciones offline-first, integraciones con wearables y una librería de componentes centrada en accesibilidad.",
         "responsibilities": [
           "Desarrollar funciones nativas de Android y Flutter",
-          "Integrar wearables y APIs de salud"
+          "Integrar wearables y APIs de salud",
+          "Revisar pull requests y mentorizar a dos desarrolladores junior"
         ],
         "achievements": [
           "Aplicación con más de 3M de instalaciones",
-          "Introducción de Flutter en la empresa"
+          "Introducción de Flutter en la empresa",
+          "Gané el premio interno Hack Week por un compañero de sueño para Wear OS",
+          "Reduje la tasa de fallos del 1,8% al 0,4% en seis meses"
         ],
         "technologies": [
           "Kotlin",
@@ -231,7 +380,11 @@
           "Flutter",
           "Room",
           "Bluetooth LE",
-          "Accessibility"
+          "Accessibility",
+          "Wear OS",
+          "RxJava",
+          "Dagger",
+          "Firebase"
         ],
         "companyLogo": "https://picsum.photos/seed/lumen_labs/400/400",
         "url": "https://lumen_labs.example.com/",
@@ -251,20 +404,53 @@
         "longDescription": "Construí y mantuve un portafolio de títulos Android, aprendiendo los fundamentos de optimización, animación y diseño centrado en el usuario.",
         "responsibilities": [
           "Desarrollar apps Android en Java",
-          "Optimizar renderizado y uso de memoria"
+          "Optimizar renderizado y uso de memoria",
+          "Colaborar con artistas en animación e integración de sonido"
         ],
         "achievements": [
-          "8 títulos publicados en Google Play"
+          "8 títulos publicados en Google Play",
+          "Alcancé una valoración media de 4,5 en los títulos publicados"
         ],
         "technologies": [
           "Java",
           "Android SDK",
           "OpenGL",
-          "SQLite"
+          "SQLite",
+          "libGDX",
+          "Google Play Services"
         ],
         "companyLogo": "https://picsum.photos/seed/nordic_pixels/400/400",
         "url": "https://nordic_pixels.example.com/",
         "id": "nordic_pixels",
+        "latitude": 57.7089,
+        "longitude": 11.9746
+      },
+      {
+        "company": "Fjord Robotics",
+        "position": "Ingeniera de Software en Prácticas",
+        "location": "Gotemburgo, Suecia",
+        "startDate": "2012-06-01",
+        "endDate": "2013-07-31",
+        "current": false,
+        "employmentType": "Prácticas",
+        "description": "Creé una app Android complementaria para controlar pequeños robots educativos.",
+        "longDescription": "Durante unas prácticas de máster creé el primer mando Android para una línea de robots educativos, con Bluetooth y un panel de sensores, y lo presenté en una feria regional de robótica.",
+        "responsibilities": [
+          "Implementar el control Bluetooth de los robots",
+          "Crear un panel de sensores en vivo"
+        ],
+        "achievements": [
+          "Demostré la app a más de 300 visitantes en una feria de robótica"
+        ],
+        "technologies": [
+          "Java",
+          "Android SDK",
+          "Bluetooth",
+          "C++"
+        ],
+        "companyLogo": "https://picsum.photos/seed/fjord_robotics/400/400",
+        "url": "https://fjord_robotics.example.com/",
+        "id": "fjord_robotics",
         "latitude": 57.7089,
         "longitude": 11.9746
       }
@@ -287,12 +473,16 @@
           "De mobiele architectuur en technische roadmap bepalen",
           "Engineers coachen en de architectuurgilde leiden",
           "On-device AI-functies prototypen en opleveren",
-          "Samenwerken met product en design aan discovery"
+          "Samenwerken met product en design aan discovery",
+          "Kwartaalplanning technisch voorbereiden met product- en designleads",
+          "Verantwoordelijk voor releasekwaliteit op iOS, Android en web"
         ],
         "achievements": [
           "Koude starttijd met 40% verlaagd in alle apps",
           "Offline AI-winkelassistent gelanceerd met 1M+ gebruikers",
-          "Crashvrije sessies verhoogd naar 99,8%"
+          "Crashvrije sessies verhoogd naar 99,8%",
+          "De mobiele gilde laten groeien van 12 naar 30 engineers in drie landen",
+          "App-grootte met 28% verkleind via deferred components en asset-audits"
         ],
         "technologies": [
           "Flutter",
@@ -302,11 +492,53 @@
           "On-device AI",
           "Firebase",
           "GraphQL",
-          "CI/CD"
+          "CI/CD",
+          "Riverpod",
+          "Remote Config",
+          "Gemma",
+          "Sentry",
+          "Storybook",
+          "Melos"
         ],
         "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
         "url": "https://aurora_commerce.example.com/",
         "id": "aurora_commerce",
+        "latitude": 52.3676,
+        "longitude": 4.9041
+      },
+      {
+        "company": "Independent Consulting",
+        "position": "Onafhankelijk Flutter-consultant",
+        "location": "Amsterdam, Nederland [Remote]",
+        "startDate": "2021-06-01",
+        "endDate": null,
+        "current": true,
+        "employmentType": "Deeltijd",
+        "description": "Deeltijd advieswerk voor startups en scale-ups over Flutter-architectuur, performance en on-device AI, naast een fulltime rol.",
+        "longDescription": "Sinds 2021 heb ik elf korte opdrachten afgerond, van architectuuraudits van twee weken tot productbouw van negen maanden. Klanten komen uit fintech, smart home en gezondheid en ik werk meestal in de avonden en op vrijdag.",
+        "responsibilities": [
+          "Codebases van klanten auditen en doelarchitecturen voorstellen",
+          "MVP's bouwen en overdragen met tests en documentatie",
+          "Flutter-workshops over performance en testen geven"
+        ],
+        "achievements": [
+          "11 opdrachten opgeleverd met 100% terugkerende klanten",
+          "Fintech-MVP in 10 weken gelanceerd dat een regelgevende audit doorstond",
+          "Opstarttijd van een klant-app verlaagd van 4,2 s naar 1,9 s",
+          "40+ engineers getraind via workshops"
+        ],
+        "technologies": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "Stripe",
+          "Clean Architecture",
+          "Testing",
+          "Home Assistant"
+        ],
+        "companyLogo": "https://picsum.photos/seed/independent_consulting/400/400",
+        "url": "https://independent_consulting.example.com/",
+        "id": "independent_consulting",
         "latitude": 52.3676,
         "longitude": 4.9041
       },
@@ -323,11 +555,14 @@
         "responsibilities": [
           "Een squad van zes developers leiden",
           "CI/CD en releasemanagement beheren",
-          "Teststrategie en codereviews opzetten"
+          "Teststrategie en codereviews opzetten",
+          "Wekelijks demo's en retrospectives met stakeholders houden"
         ],
         "achievements": [
           "Wekelijkse releases zonder downtime",
-          "85% testdekking op kernmodules"
+          "85% testdekking op kernmodules",
+          "Gemiddelde codereviewtijd verlaagd van 2 dagen naar 6 uur",
+          "9 nieuwe engineers ingewerkt met een gedocumenteerd architectuurplaybook"
         ],
         "technologies": [
           "Flutter",
@@ -335,7 +570,11 @@
           "BLoC",
           "Storybook",
           "Fastlane",
-          "GitHub Actions"
+          "GitHub Actions",
+          "Maps",
+          "WebSockets",
+          "Stripe",
+          "Codemagic"
         ],
         "companyLogo": "https://picsum.photos/seed/pixelforge_studio/400/400",
         "url": "https://pixelforge_studio.example.com/",
@@ -355,11 +594,14 @@
         "longDescription": "Begon als Android-specialist en werd de eerste Flutter-voorvechter, met offline-first functies, wearable-integraties en een toegankelijkheidsgerichte componentenbibliotheek.",
         "responsibilities": [
           "Native Android- en Flutter-functies ontwikkelen",
-          "Wearables en gezondheids-API's integreren"
+          "Wearables en gezondheids-API's integreren",
+          "Pull requests reviewen en twee junior developers coachen"
         ],
         "achievements": [
           "App gegroeid naar 3M+ installaties",
-          "Flutter geïntroduceerd binnen het bedrijf"
+          "Flutter geïntroduceerd binnen het bedrijf",
+          "Interne Hack Week-prijs gewonnen met een Wear OS-slaapcompanion",
+          "Crashpercentage in zes maanden verlaagd van 1,8% naar 0,4%"
         ],
         "technologies": [
           "Kotlin",
@@ -367,7 +609,11 @@
           "Flutter",
           "Room",
           "Bluetooth LE",
-          "Accessibility"
+          "Accessibility",
+          "Wear OS",
+          "RxJava",
+          "Dagger",
+          "Firebase"
         ],
         "companyLogo": "https://picsum.photos/seed/lumen_labs/400/400",
         "url": "https://lumen_labs.example.com/",
@@ -387,20 +633,53 @@
         "longDescription": "Bouwde en onderhield een portfolio van Android-titels en leerde de basis van performance-tuning, animatie en gebruikersgericht ontwerp.",
         "responsibilities": [
           "Android-apps ontwikkelen in Java",
-          "Rendering en geheugengebruik optimaliseren"
+          "Rendering en geheugengebruik optimaliseren",
+          "Samenwerken met artiesten aan animatie en geluidsintegratie"
         ],
         "achievements": [
-          "8 titels gepubliceerd op Google Play"
+          "8 titels gepubliceerd op Google Play",
+          "Gemiddelde beoordeling van 4,5 bereikt over gepubliceerde titels"
         ],
         "technologies": [
           "Java",
           "Android SDK",
           "OpenGL",
-          "SQLite"
+          "SQLite",
+          "libGDX",
+          "Google Play Services"
         ],
         "companyLogo": "https://picsum.photos/seed/nordic_pixels/400/400",
         "url": "https://nordic_pixels.example.com/",
         "id": "nordic_pixels",
+        "latitude": 57.7089,
+        "longitude": 11.9746
+      },
+      {
+        "company": "Fjord Robotics",
+        "position": "Software Engineering Intern",
+        "location": "Göteborg, Zweden",
+        "startDate": "2012-06-01",
+        "endDate": "2013-07-31",
+        "current": false,
+        "employmentType": "Stage",
+        "description": "Bouwde een Android-companion-app om kleine educatieve robots te besturen.",
+        "longDescription": "Tijdens een masterstage bouwde ik de eerste Android-afstandsbediening voor een lijn educatieve robots, met Bluetooth en een sensordashboard, en presenteerde die op een regionale roboticabeurs.",
+        "responsibilities": [
+          "Bluetooth-besturing van de robots implementeren",
+          "Een live sensordashboard bouwen"
+        ],
+        "achievements": [
+          "De app gedemonstreerd aan 300+ bezoekers op een roboticabeurs"
+        ],
+        "technologies": [
+          "Java",
+          "Android SDK",
+          "Bluetooth",
+          "C++"
+        ],
+        "companyLogo": "https://picsum.photos/seed/fjord_robotics/400/400",
+        "url": "https://fjord_robotics.example.com/",
+        "id": "fjord_robotics",
         "latitude": 57.7089,
         "longitude": 11.9746
       }

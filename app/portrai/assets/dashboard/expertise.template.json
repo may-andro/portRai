@@ -40,6 +40,24 @@
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
+          },
+          {
+            "name": "Riverpod",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Desktop",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart FFI",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
           }
         ]
       },
@@ -69,6 +87,24 @@
             "name": "Coroutines & Flow",
             "level": "advanced",
             "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Android Wear OS",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Java",
+            "level": "advanced",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Hilt / Dagger",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]
@@ -106,6 +142,24 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MVVM",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Event Sourcing",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature-based Foldering",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
@@ -129,6 +183,18 @@
             "name": "Memory Management",
             "level": "advanced",
             "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Isolates & Concurrency",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "App Size Reduction",
+            "level": "advanced",
+            "years": 4,
             "lastUsed": 2026
           }
         ]
@@ -160,6 +226,24 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MQTT",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stripe / Payments",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Firebase Remote Config",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
@@ -183,6 +267,18 @@
             "name": "Integration Testing",
             "level": "advanced",
             "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "TDD",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Accessibility Testing",
+            "level": "intermediate",
+            "years": 3,
             "lastUsed": 2026
           }
         ]
@@ -208,6 +304,24 @@
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
+          },
+          {
+            "name": "Codemagic",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Play Console & App Store Connect",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature Flags & Staged Rollouts",
+            "level": "expert",
+            "years": 5,
+            "lastUsed": 2026
           }
         ]
       },
@@ -231,6 +345,60 @@
             "name": "Prompt Engineering",
             "level": "advanced",
             "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Gemma / Small Language Models",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Retrieval-Augmented Generation",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Model Evaluation",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://picsum.photos/seed/slack/400/400",
+        "title": "Leadership & Collaboration",
+        "skills": [
+          {
+            "name": "Mentoring",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Technical Roadmapping",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Agile / Scrum",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Public Speaking",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]
@@ -279,6 +447,24 @@
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
+          },
+          {
+            "name": "Riverpod",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Desktop",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart FFI",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
           }
         ]
       },
@@ -308,6 +494,24 @@
             "name": "Coroutines & Flow",
             "level": "advanced",
             "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Android Wear OS",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Java",
+            "level": "advanced",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Hilt / Dagger",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]
@@ -345,6 +549,24 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MVVM",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Event Sourcing",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature-based Foldering",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
@@ -368,6 +590,18 @@
             "name": "Memory Management",
             "level": "advanced",
             "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Isolates & Concurrency",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "App Size Reduction",
+            "level": "advanced",
+            "years": 4,
             "lastUsed": 2026
           }
         ]
@@ -399,6 +633,24 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MQTT",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stripe / Payments",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Firebase Remote Config",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
@@ -422,6 +674,18 @@
             "name": "Integration Testing",
             "level": "advanced",
             "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "TDD",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Accessibility Testing",
+            "level": "intermediate",
+            "years": 3,
             "lastUsed": 2026
           }
         ]
@@ -447,6 +711,24 @@
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
+          },
+          {
+            "name": "Codemagic",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Play Console & App Store Connect",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature Flags & Staged Rollouts",
+            "level": "expert",
+            "years": 5,
+            "lastUsed": 2026
           }
         ]
       },
@@ -470,6 +752,60 @@
             "name": "Prompt Engineering",
             "level": "advanced",
             "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Gemma / Small Language Models",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Retrieval-Augmented Generation",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Model Evaluation",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://picsum.photos/seed/slack/400/400",
+        "title": "Liderazgo y colaboración",
+        "skills": [
+          {
+            "name": "Mentoring",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Technical Roadmapping",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Agile / Scrum",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Public Speaking",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]
@@ -518,6 +854,24 @@
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
+          },
+          {
+            "name": "Riverpod",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Desktop",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart FFI",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
           }
         ]
       },
@@ -547,6 +901,24 @@
             "name": "Coroutines & Flow",
             "level": "advanced",
             "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Android Wear OS",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Java",
+            "level": "advanced",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Hilt / Dagger",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]
@@ -584,6 +956,24 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MVVM",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Event Sourcing",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature-based Foldering",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
@@ -607,6 +997,18 @@
             "name": "Memory Management",
             "level": "advanced",
             "years": 7,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Isolates & Concurrency",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "App Size Reduction",
+            "level": "advanced",
+            "years": 4,
             "lastUsed": 2026
           }
         ]
@@ -638,6 +1040,24 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MQTT",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stripe / Payments",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Firebase Remote Config",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
@@ -661,6 +1081,18 @@
             "name": "Integration Testing",
             "level": "advanced",
             "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "TDD",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Accessibility Testing",
+            "level": "intermediate",
+            "years": 3,
             "lastUsed": 2026
           }
         ]
@@ -686,6 +1118,24 @@
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
+          },
+          {
+            "name": "Codemagic",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Play Console & App Store Connect",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature Flags & Staged Rollouts",
+            "level": "expert",
+            "years": 5,
+            "lastUsed": 2026
           }
         ]
       },
@@ -709,6 +1159,60 @@
             "name": "Prompt Engineering",
             "level": "advanced",
             "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Gemma / Small Language Models",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Retrieval-Augmented Generation",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Model Evaluation",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://picsum.photos/seed/slack/400/400",
+        "title": "Leiderschap & samenwerking",
+        "skills": [
+          {
+            "name": "Mentoring",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Technical Roadmapping",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Agile / Scrum",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Public Speaking",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]
