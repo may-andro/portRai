@@ -56,6 +56,41 @@ void main() {
       });
     });
 
+    group('onError', () {
+      late void Function(FlutterErrorDetails)? originalOnError;
+
+      setUp(() => originalOnError = FlutterError.onError);
+
+      tearDown(() => FlutterError.onError = originalOnError);
+
+      test('should not stop the app when an image fails to load', () async {
+        mockFatalErrorController.mockIsFatalError(true);
+        await loggerErrorReporter.init();
+
+        FlutterError.onError!(
+          FlutterErrorDetails(
+            exception: StateError('Failed to load image'),
+            library: 'image resource service',
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        verifyNever(() => mockFatalErrorController.onFatalError(any()));
+      });
+
+      test('should stop the app when a fatal error is reported', () async {
+        mockFatalErrorController.mockIsFatalError(true);
+        await loggerErrorReporter.init();
+
+        FlutterError.onError!(
+          FlutterErrorDetails(exception: StateError('Boom')),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        verify(() => mockFatalErrorController.onFatalError(any())).called(1);
+      });
+    });
+
     group('reportError', () {
       test('should log error in $LogReporter ', () async {
         final exception = TestFatalException();

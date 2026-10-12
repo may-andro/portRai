@@ -43,7 +43,10 @@ class LoggerErrorReporter implements ErrorReporter {
     StackTrace stackTrace, {
     FlutterErrorDetails? flutterErrorDetails,
   }) async {
-    if (_fatalErrorController.isFatalError(error)) {
+    // A failed network image is a content problem and must not stop the app.
+    final isImageLoadError =
+        flutterErrorDetails?.library == 'image resource service';
+    if (!isImageLoadError && _fatalErrorController.isFatalError(error)) {
       await _handleFatalError(error, stackTrace);
       return;
     }
