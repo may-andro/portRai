@@ -49,7 +49,7 @@ In builds with the developer menu enabled, use the **Use demo data** switch (Dat
 The demo profile (Nova Lindqvist) is built so answers can be verified. Useful probes:
 
 - Roles and timeline: 6 experiences (two overlap: full-time Aurora Commerce and part-time Independent Consulting since 2021-06)
-- Counts: 11 projects, 6 services, 7 testimonials, 9 expertise groups, 3 certifications
+- Counts: 11 projects, 6 services, 7 testimonials, 9 expertise groups, 5 certifications
 - Multi-country project: Aurora Marketplace ships in NL, DE, BE and ES; MoveIt in SE and NO; Orbit Pay in NL and UK
 - Status mix: Ongoing, Completed and Deprecated projects (for example Pixel Puzzle is Deprecated)
 - Metrics: Aurora Assistant 1M+ active users, Aurora Checkout +18% conversion, Orbit Pay 150K+ downloads

@@ -110,20 +110,32 @@
       ],
       "certifications": [
         {
-          "name": "Google Developer Expert - Flutter & Dart",
-          "issuer": "Google",
+          "name": "Certified Flutter Architect",
+          "issuer": "Aurora Tech Academy",
           "date": "2022-05-10",
-          "url": "https://developers.google.com/community/experts"
+          "url": "https://academy.example.com/certificates/flutter-architect"
         },
         {
-          "name": "Professional Scrum Master I",
-          "issuer": "Scrum.org",
+          "name": "Advanced Mobile Performance Engineering",
+          "issuer": "Nordic Developer Institute",
+          "date": "2023-02-21",
+          "url": "https://nordic-dev.example.com/certificates/mobile-performance"
+        },
+        {
+          "name": "On-Device AI for Mobile Engineers",
+          "issuer": "Lumen Learning",
+          "date": "2024-11-08",
+          "url": "https://learning.example.com/certificates/on-device-ai"
+        },
+        {
+          "name": "Certified Agile Team Lead",
+          "issuer": "Fjord Agile Council",
           "date": "2021-03-18",
-          "url": "https://www.scrum.org/professional-scrum-master-i-certification"
+          "url": "https://agile.example.com/certificates/team-lead"
         },
         {
           "name": "Associate Android Developer",
-          "issuer": "Google",
+          "issuer": "Northern Lights Certification Board",
           "date": "2017-09-04",
           "url": null
         }
@@ -242,20 +254,32 @@
       ],
       "certifications": [
         {
-          "name": "Google Developer Expert - Flutter & Dart",
-          "issuer": "Google",
+          "name": "Certified Flutter Architect",
+          "issuer": "Aurora Tech Academy",
           "date": "2022-05-10",
-          "url": "https://developers.google.com/community/experts"
+          "url": "https://academy.example.com/certificates/flutter-architect"
         },
         {
-          "name": "Professional Scrum Master I",
-          "issuer": "Scrum.org",
+          "name": "Advanced Mobile Performance Engineering",
+          "issuer": "Nordic Developer Institute",
+          "date": "2023-02-21",
+          "url": "https://nordic-dev.example.com/certificates/mobile-performance"
+        },
+        {
+          "name": "On-Device AI for Mobile Engineers",
+          "issuer": "Lumen Learning",
+          "date": "2024-11-08",
+          "url": "https://learning.example.com/certificates/on-device-ai"
+        },
+        {
+          "name": "Certified Agile Team Lead",
+          "issuer": "Fjord Agile Council",
           "date": "2021-03-18",
-          "url": "https://www.scrum.org/professional-scrum-master-i-certification"
+          "url": "https://agile.example.com/certificates/team-lead"
         },
         {
           "name": "Associate Android Developer",
-          "issuer": "Google",
+          "issuer": "Northern Lights Certification Board",
           "date": "2017-09-04",
           "url": null
         }
@@ -374,20 +398,32 @@
       ],
       "certifications": [
         {
-          "name": "Google Developer Expert - Flutter & Dart",
-          "issuer": "Google",
+          "name": "Certified Flutter Architect",
+          "issuer": "Aurora Tech Academy",
           "date": "2022-05-10",
-          "url": "https://developers.google.com/community/experts"
+          "url": "https://academy.example.com/certificates/flutter-architect"
         },
         {
-          "name": "Professional Scrum Master I",
-          "issuer": "Scrum.org",
+          "name": "Advanced Mobile Performance Engineering",
+          "issuer": "Nordic Developer Institute",
+          "date": "2023-02-21",
+          "url": "https://nordic-dev.example.com/certificates/mobile-performance"
+        },
+        {
+          "name": "On-Device AI for Mobile Engineers",
+          "issuer": "Lumen Learning",
+          "date": "2024-11-08",
+          "url": "https://learning.example.com/certificates/on-device-ai"
+        },
+        {
+          "name": "Certified Agile Team Lead",
+          "issuer": "Fjord Agile Council",
           "date": "2021-03-18",
-          "url": "https://www.scrum.org/professional-scrum-master-i-certification"
+          "url": "https://agile.example.com/certificates/team-lead"
         },
         {
           "name": "Associate Android Developer",
-          "issuer": "Google",
+          "issuer": "Northern Lights Certification Board",
           "date": "2017-09-04",
           "url": null
         }
