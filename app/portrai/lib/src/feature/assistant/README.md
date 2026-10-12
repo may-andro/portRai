@@ -284,8 +284,8 @@ Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md)
 |---|---|---|---|
 | Android | Maps SDK for Android | Android apps: package `com.mayandro.portrai` plus one SHA-1 per signing key (debug, release, Play App Signing) | `portRaiMapKeyAndroid` in `~/.gradle/gradle.properties`, or the `MAPS_API_KEY` environment variable |
 | iOS | Maps SDK for iOS | iOS apps: bundle ID of the Runner target | `MAPS_API_KEY = <key>` in the git-ignored `ios/Flutter/Secrets.xcconfig` |
-| Web | Maps JavaScript API | Websites: HTTP referrers such as `https://<domain>/*` and `http://localhost:*/*` for local runs | Replace `MAPS_API_KEY` in the script URL in `web/index.html` at build time |
+| Web | Maps JavaScript API | Websites: HTTP referrers such as `https://<domain>/*` and `http://localhost:*/*` for local runs | `MAPS_API_KEY_WEB` in the git-ignored `app/portrai/.env.production`; the `deploy_portrai` script (and CI) replaces the `MAPS_API_KEY` placeholder in the built `index.html` |
 
 Get an Android SHA-1 with `keytool -list -v -alias <alias> -keystore <keystore>` or `./gradlew signingReport` in `android`. The debug keystore is `~/.android/debug.keystore` with alias `androiddebugkey` and password `android`.
 
-CI reads the Android and iOS keys from the `MAPS_API_KEY_ANDROID` and `MAPS_API_KEY_IOS` repository secrets and passes them to the build workflows as `MAPS_API_KEY`.
+CI reads the keys from the `MAPS_API_KEY_ANDROID`, `MAPS_API_KEY_IOS` and `MAPS_API_KEY_WEB` repository secrets and passes them to the build workflows as `MAPS_API_KEY`.
