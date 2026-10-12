@@ -11,7 +11,7 @@ class TestimonialModel {
     required this.company,
     required this.testimonial,
     required this.date,
-    required this.profileImage,
+    this.profileImage,
     required this.companyLogo,
     required this.linkedinProfile,
     required this.projectContext,
@@ -29,7 +29,7 @@ class TestimonialModel {
   final String company;
   final String testimonial;
   final String date;
-  final String profileImage;
+  final String? profileImage;
   final String companyLogo;
   final String linkedinProfile;
   final String projectContext;
