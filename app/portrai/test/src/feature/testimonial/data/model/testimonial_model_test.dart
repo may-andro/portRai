@@ -39,6 +39,13 @@ void main() {
       expect(TestimonialModel.fromJson(model.toJson()).toJson(), json);
     });
 
+    test('should have null profile image when it is missing in JSON', () {
+      final withoutImage = Map<String, dynamic>.of(json)
+        ..remove('profileImage');
+
+      expect(TestimonialModel.fromJson(withoutImage).profileImage, isNull);
+    });
+
     test('should reject missing required fields when deserializing JSON', () {
       final incomplete = Map<String, dynamic>.of(json)..remove('name');
 

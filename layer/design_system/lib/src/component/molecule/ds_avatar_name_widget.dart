@@ -18,14 +18,16 @@ class DSAvatarNameWidget extends StatelessWidget {
     super.key,
     required this.name,
     required this.caption,
-    required this.imageUrl,
+    this.imageUrl,
   });
 
   final String name;
 
   /// Subtitle shown above [name] — e.g. role, position, company.
   final String caption;
-  final String imageUrl;
+
+  /// When null, a placeholder person icon is shown instead of an image.
+  final String? imageUrl;
 
   static double getHeight(BuildContext context) {
     return max(_imageSize(context), _textsHeight(context));
@@ -54,13 +56,24 @@ class DSAvatarNameWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: context.space(factor: 2),
       children: [
-        DSNetworkImageWidget(
-          url: imageUrl,
-          width: size,
-          height: size,
-          shape: BoxShape.circle,
-          fit: BoxFit.contain,
-        ),
+        if (imageUrl case final url?)
+          DSNetworkImageWidget(
+            url: url,
+            width: size,
+            height: size,
+            shape: BoxShape.circle,
+            fit: BoxFit.contain,
+          )
+        else
+          CircleAvatar(
+            radius: size / 2,
+            backgroundColor: context.colorPalette.brand.primaryContainer.color,
+            child: Icon(
+              Icons.person,
+              size: size / 2,
+              color: context.colorPalette.brand.primary.color,
+            ),
+          ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
