@@ -99,3 +99,90 @@ final dsCodeBlock = CatalogItem(
     );
   },
 );
+
+final dsComparison = CatalogItem(
+  name: 'DSComparison',
+  dataSchema: S.object(
+    description:
+        'A table comparing a few things side by side, for example two roles '
+        'or two technologies.',
+    properties: {
+      'columns': S.list(
+        description: 'Column headings, two to four.',
+        items: S.string(),
+      ),
+      'rows': S.list(
+        description: 'At most eight rows.',
+        items: S.object(
+          properties: {
+            'label': S.string(description: 'Row name.'),
+            'values': S.list(
+              description: 'One value per column.',
+              items: S.string(),
+            ),
+          },
+          required: ['label', 'values'],
+        ),
+      ),
+    },
+    required: ['columns', 'rows'],
+  ),
+  widgetBuilder: (itemContext) {
+    final data = itemContext.data as JsonMap;
+    final columns = [
+      if (data['columns'] case final List<Object?> list) ...list.take(4),
+    ].map((column) => '$column').toList();
+    final rows = [
+      if (data['rows'] case final List<Object?> list)
+        for (final row in list.take(8))
+          if (row is Map && row['label'] is String && row['values'] is List)
+            (
+              label: row['label'] as String,
+              values: [
+                for (final value in (row['values'] as List<Object?>)) '$value',
+              ],
+            ),
+    ];
+    if (columns.isEmpty || rows.isEmpty) return const SizedBox.shrink();
+    return Builder(
+      builder: (context) {
+        Widget cell(String text, {bool heading = false}) => Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: context.space(factor: 0.75),
+            horizontal: context.space(factor: 0.5),
+          ),
+          child: DSTextWidget(
+            text,
+            style: heading
+                ? context.typography.emphasizedBodyMedium
+                : context.typography.bodyMedium,
+            color: context.colorPalette.neutral.grey9,
+          ),
+        );
+        return Table(
+          border: TableBorder(
+            horizontalInside: BorderSide(
+              color: context.colorPalette.neutral.grey3.color,
+            ),
+          ),
+          children: [
+            TableRow(
+              children: [
+                const SizedBox.shrink(),
+                for (final column in columns) cell(column, heading: true),
+              ],
+            ),
+            for (final row in rows)
+              TableRow(
+                children: [
+                  cell(row.label, heading: true),
+                  for (var i = 0; i < columns.length; i++)
+                    cell(i < row.values.length ? row.values[i] : ''),
+                ],
+              ),
+          ],
+        );
+      },
+    );
+  },
+);

@@ -33,6 +33,7 @@ void main() {
       'DSCallout',
       'DSProgressRing',
       'DSCodeBlock',
+      'DSComparison',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -536,6 +537,23 @@ void main() {
     );
 
     expect(find.text('flutter pub get\nflutter run'), findsOneWidget);
+  });
+
+  testWidgets('should render a table when DSComparison is used', (
+    tester,
+  ) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(),
+      '''
+{"id":"root","component":"DSComparison","columns":["Flutter","Kotlin"],
+ "rows":[{"label":"Years","values":["6","3"]},{"label":"Focus","values":["UI"]}]}''',
+    );
+
+    expect(find.byType(Table), findsOneWidget);
+    expect(find.text('Flutter'), findsOneWidget);
+    expect(find.text('Years'), findsOneWidget);
+    expect(find.text('UI'), findsOneWidget);
   });
 }
 
