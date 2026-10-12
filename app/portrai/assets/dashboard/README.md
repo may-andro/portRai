@@ -40,6 +40,22 @@ The setup action automatically creates `.json` files from `.template.json` files
 
 This prevents `asset_does_not_exist` warnings during `dart analyze`.
 
+## 🎛️ Switching Data Source
+
+In builds with the developer menu enabled, use the **Use demo data** switch (Data Source section) to make the asset repositories read the `*.template.json` files instead of the `*.json` ones. The choice is persisted; restart the app to apply it. While demo data is selected, the local cache is bypassed so real and demo data never mix.
+
+## 🤖 Testing the Assistant with Demo Data
+
+The demo profile (Nova Lindqvist) is built so answers can be verified. Useful probes:
+
+- Roles and timeline: 6 experiences (two overlap: full-time Aurora Commerce and part-time Independent Consulting since 2021-06)
+- Counts: 11 projects, 6 services, 2 testimonials, 9 expertise groups, 2 certifications
+- Multi-country project: Aurora Marketplace ships in NL, DE, BE and ES; MoveIt in SE and NO; Orbit Pay in NL and UK
+- Status mix: Ongoing, Completed and Deprecated projects (for example Pixel Puzzle is Deprecated)
+- Metrics: Aurora Assistant 1M+ active users, Aurora Checkout +18% conversion, Orbit Pay 150K+ downloads
+- Open-source link: Aurora Design System has a GitHub URL on its market
+- Intentional gaps (the assistant should say the data is not available): salary expectations, age, hobbies, soft skills
+
 ## 📝 File Structure
 
 ```

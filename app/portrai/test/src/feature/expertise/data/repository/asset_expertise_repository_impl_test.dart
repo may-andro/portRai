@@ -4,10 +4,12 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/expertise/data/mapper/expertise_mapper.dart';
 import 'package:portrai/src/feature/expertise/data/repository/asset_expertise_repository_impl.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
+import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/expertise/domain/repository/mock_expertise_repository.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -62,21 +64,26 @@ void main() {
   group('AssetExpertiseRepositoryImpl', () {
     late MockExpertiseRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetExpertiseRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockExpertiseRepository();
       logReporter = MockLogReporter();
+      getAssetSourceUseCase = MockGetAssetSourceUseCase()
+        ..stubCall(AssetSource.real);
       repository = AssetExpertiseRepositoryImpl(
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMessageHandler('flutter/assets', (message) async {
             final key = const StringCodec().decodeMessage(message);
-            if (key == 'assets/dashboard/expertise.json') {
+            if (key == 'assets/dashboard/expertise.json' ||
+                key == 'assets/dashboard/expertise.template.json') {
               return assetResponse();
             }
             return null;
@@ -177,7 +184,8 @@ void main() {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMessageHandler('flutter/assets', (message) async {
               final key = const StringCodec().decodeMessage(message);
-              if (key == 'assets/dashboard/expertise.json') {
+              if (key == 'assets/dashboard/expertise.json' ||
+                  key == 'assets/dashboard/expertise.template.json') {
                 return ByteData.sublistView(
                   Uint8List.fromList(utf8.encode('{invalid json')),
                 );
@@ -194,6 +202,18 @@ void main() {
           repository.getAllExpertise,
           throwsA(isA<ExpertiseParsingException>()),
         );
+      },
+    );
+
+    test(
+      'should load expertise from assets without using the cache when the asset source is template',
+      () async {
+        getAssetSourceUseCase.stubCall(AssetSource.template);
+
+        final result = await repository.getAllExpertise();
+
+        expect(result, expertiseList);
+        verifyZeroInteractions(cacheDelegateRepository);
       },
     );
   });

@@ -4,10 +4,12 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/profile/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/profile/data/repository/asset_profile_repository_impl.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 
+import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/profile/domain/repository/mock_profile_repository.dart';
 import '../../../../../mock/feature/profile/test_data/profile_test_data.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
@@ -40,21 +42,26 @@ void main() {
   group('AssetProfileRepositoryImpl', () {
     late MockProfileRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetProfileRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockProfileRepository();
       logReporter = MockLogReporter();
+      getAssetSourceUseCase = MockGetAssetSourceUseCase()
+        ..stubCall(AssetSource.real);
       repository = AssetProfileRepositoryImpl(
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMessageHandler('flutter/assets', (message) async {
             final key = const StringCodec().decodeMessage(message);
-            if (key == 'assets/dashboard/profile.json') {
+            if (key == 'assets/dashboard/profile.json' ||
+                key == 'assets/dashboard/profile.template.json') {
               return assetResponse();
             }
             return null;
@@ -148,12 +155,25 @@ void main() {
           cacheDelegateRepository,
           mapper,
           logReporter,
+          getAssetSourceUseCase,
         );
 
         expect(
           invalidLocaleRepository.getProfile(),
           throwsA(isA<ProfileParsingException>()),
         );
+      },
+    );
+
+    test(
+      'should load Profile from assets without using the cache when the asset source is template',
+      () async {
+        getAssetSourceUseCase.stubCall(AssetSource.template);
+
+        final result = await repository.getProfile();
+
+        expect(result, profile);
+        verifyZeroInteractions(cacheDelegateRepository);
       },
     );
   });

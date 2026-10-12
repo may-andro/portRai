@@ -2,7 +2,7 @@
   "en": {
     "experties": [
       {
-        "image": "https://cdn.simpleicons.org/flutter",
+        "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Flutter Development",
         "skills": [
           {
@@ -40,11 +40,29 @@
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
+          },
+          {
+            "name": "Riverpod",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Desktop",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart FFI",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/android",
+        "image": "https://picsum.photos/seed/android/400/400",
         "title": "Native Android Development",
         "skills": [
           {
@@ -70,11 +88,29 @@
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
+          },
+          {
+            "name": "Android Wear OS",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Java",
+            "level": "advanced",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Hilt / Dagger",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/diagramsdotnet",
+        "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Architecture & Patterns",
         "skills": [
           {
@@ -106,11 +142,29 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MVVM",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Event Sourcing",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature-based Foldering",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/speedtest",
+        "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Performance Optimization",
         "skills": [
           {
@@ -130,11 +184,23 @@
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
+          },
+          {
+            "name": "Isolates & Concurrency",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "App Size Reduction",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/firebase",
+        "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Backend Integration",
         "skills": [
           {
@@ -160,11 +226,29 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MQTT",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stripe / Payments",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Firebase Remote Config",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/testinglibrary",
+        "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Testing & QA",
         "skills": [
           {
@@ -184,11 +268,23 @@
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
+          },
+          {
+            "name": "TDD",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Accessibility Testing",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/githubactions",
+        "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Release & Deployment",
         "skills": [
           {
@@ -208,11 +304,29 @@
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
+          },
+          {
+            "name": "Codemagic",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Play Console & App Store Connect",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature Flags & Staged Rollouts",
+            "level": "expert",
+            "years": 5,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/googlegemini",
+        "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "AI & Generative UI",
         "skills": [
           {
@@ -232,6 +346,60 @@
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
+          },
+          {
+            "name": "Gemma / Small Language Models",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Retrieval-Augmented Generation",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Model Evaluation",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://picsum.photos/seed/slack/400/400",
+        "title": "Leadership & Collaboration",
+        "skills": [
+          {
+            "name": "Mentoring",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Technical Roadmapping",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Agile / Scrum",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Public Speaking",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
           }
         ]
       }
@@ -241,7 +409,7 @@
   "es": {
     "experties": [
       {
-        "image": "https://cdn.simpleicons.org/flutter",
+        "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Desarrollo con Flutter",
         "skills": [
           {
@@ -279,11 +447,29 @@
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
+          },
+          {
+            "name": "Riverpod",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Desktop",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart FFI",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/android",
+        "image": "https://picsum.photos/seed/android/400/400",
         "title": "Desarrollo nativo Android",
         "skills": [
           {
@@ -309,11 +495,29 @@
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
+          },
+          {
+            "name": "Android Wear OS",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Java",
+            "level": "advanced",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Hilt / Dagger",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/diagramsdotnet",
+        "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Arquitectura y patrones",
         "skills": [
           {
@@ -345,11 +549,29 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MVVM",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Event Sourcing",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature-based Foldering",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/speedtest",
+        "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Optimización del rendimiento",
         "skills": [
           {
@@ -369,11 +591,23 @@
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
+          },
+          {
+            "name": "Isolates & Concurrency",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "App Size Reduction",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/firebase",
+        "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Integración con backend",
         "skills": [
           {
@@ -399,11 +633,29 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MQTT",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stripe / Payments",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Firebase Remote Config",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/testinglibrary",
+        "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Pruebas y QA",
         "skills": [
           {
@@ -423,11 +675,23 @@
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
+          },
+          {
+            "name": "TDD",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Accessibility Testing",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/githubactions",
+        "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Lanzamiento y despliegue",
         "skills": [
           {
@@ -447,11 +711,29 @@
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
+          },
+          {
+            "name": "Codemagic",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Play Console & App Store Connect",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature Flags & Staged Rollouts",
+            "level": "expert",
+            "years": 5,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/googlegemini",
+        "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "IA e interfaces generativas",
         "skills": [
           {
@@ -471,6 +753,60 @@
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
+          },
+          {
+            "name": "Gemma / Small Language Models",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Retrieval-Augmented Generation",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Model Evaluation",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://picsum.photos/seed/slack/400/400",
+        "title": "Liderazgo y colaboración",
+        "skills": [
+          {
+            "name": "Mentoring",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Technical Roadmapping",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Agile / Scrum",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Public Speaking",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
           }
         ]
       }
@@ -480,7 +816,7 @@
   "nl": {
     "experties": [
       {
-        "image": "https://cdn.simpleicons.org/flutter",
+        "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Flutter-ontwikkeling",
         "skills": [
           {
@@ -518,11 +854,29 @@
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
+          },
+          {
+            "name": "Riverpod",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Flutter Desktop",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Dart FFI",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/android",
+        "image": "https://picsum.photos/seed/android/400/400",
         "title": "Native Android-ontwikkeling",
         "skills": [
           {
@@ -548,11 +902,29 @@
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
+          },
+          {
+            "name": "Android Wear OS",
+            "level": "advanced",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Java",
+            "level": "advanced",
+            "years": 12,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Hilt / Dagger",
+            "level": "advanced",
+            "years": 7,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/diagramsdotnet",
+        "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Architectuur & patronen",
         "skills": [
           {
@@ -584,11 +956,29 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MVVM",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Event Sourcing",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature-based Foldering",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/speedtest",
+        "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Performance-optimalisatie",
         "skills": [
           {
@@ -608,11 +998,23 @@
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
+          },
+          {
+            "name": "Isolates & Concurrency",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "App Size Reduction",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/firebase",
+        "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Backend-integratie",
         "skills": [
           {
@@ -638,11 +1040,29 @@
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
+          },
+          {
+            "name": "MQTT",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stripe / Payments",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Firebase Remote Config",
+            "level": "expert",
+            "years": 6,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/testinglibrary",
+        "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Testen & QA",
         "skills": [
           {
@@ -662,11 +1082,23 @@
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
+          },
+          {
+            "name": "TDD",
+            "level": "advanced",
+            "years": 6,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Accessibility Testing",
+            "level": "intermediate",
+            "years": 3,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/githubactions",
+        "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Release & deployment",
         "skills": [
           {
@@ -686,11 +1118,29 @@
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
+          },
+          {
+            "name": "Codemagic",
+            "level": "advanced",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Play Console & App Store Connect",
+            "level": "expert",
+            "years": 10,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Feature Flags & Staged Rollouts",
+            "level": "expert",
+            "years": 5,
+            "lastUsed": 2026
           }
         ]
       },
       {
-        "image": "https://cdn.simpleicons.org/googlegemini",
+        "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "AI & generatieve UI",
         "skills": [
           {
@@ -709,6 +1159,60 @@
             "name": "Prompt Engineering",
             "level": "advanced",
             "years": 3,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Gemma / Small Language Models",
+            "level": "advanced",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Retrieval-Augmented Generation",
+            "level": "intermediate",
+            "years": 2,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Model Evaluation",
+            "level": "familiar",
+            "years": 1,
+            "lastUsed": 2026
+          }
+        ]
+      },
+      {
+        "image": "https://picsum.photos/seed/slack/400/400",
+        "title": "Leiderschap & samenwerking",
+        "skills": [
+          {
+            "name": "Mentoring",
+            "level": "expert",
+            "years": 8,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Technical Roadmapping",
+            "level": "advanced",
+            "years": 5,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Agile / Scrum",
+            "level": "advanced",
+            "years": 9,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Public Speaking",
+            "level": "intermediate",
+            "years": 4,
+            "lastUsed": 2026
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "advanced",
+            "years": 7,
             "lastUsed": 2026
           }
         ]

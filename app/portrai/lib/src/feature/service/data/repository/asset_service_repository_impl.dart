@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/service/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/service/data/model/_model.dart';
 import 'package:portrai/src/feature/service/data/repository/cache_service_repository_impl.dart';
@@ -16,6 +17,7 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
     @Inject(CacheServiceRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._getAssetSourceUseCase,
   );
 
   static const _logTag = 'AssetServiceRepositoryImpl';
@@ -24,6 +26,7 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
   final ServiceRepository _cacheDelegateRepository;
   final ServiceMapper _mapper;
   final LogReporter _logReporter;
+  final GetAssetSourceUseCase _getAssetSourceUseCase;
 
   @override
   Future<void> cacheService(ServiceEntity expert) {
@@ -32,6 +35,9 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
 
   @override
   Future<List<ServiceEntity>> getServices() async {
+    final source = (await _getAssetSourceUseCase()).right;
+    if (source.isTemplate) return await _loadServiceFromAssets(source);
+
     try {
       final cachedService = await _cacheDelegateRepository.getServices();
       if (cachedService.isNotEmpty) {
@@ -47,18 +53,18 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
       );
     }
 
-    final servicesList = await _loadServiceFromAssets();
+    final servicesList = await _loadServiceFromAssets(source);
 
     await _cacheServiceSafely(servicesList);
 
     return servicesList;
   }
 
-  Future<List<ServiceEntity>> _loadServiceFromAssets() async {
+  Future<List<ServiceEntity>> _loadServiceFromAssets(AssetSource source) async {
     try {
       final locale = _appLocale.languageCode;
       final jsonString = await rootBundle.loadString(
-        'assets/dashboard/services.json',
+        source.assetPath('services'),
       );
       final localeServiceJson =
           (jsonDecode(jsonString) as Map<String, dynamic>)[locale]

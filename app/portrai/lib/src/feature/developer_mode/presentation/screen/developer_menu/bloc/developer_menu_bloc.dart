@@ -1,14 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_event.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_state.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/tracking/_tracking.dart';
 
 @register
 class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
-  DeveloperMenuBloc(this._trackingDelegate)
-    : super(const DeveloperMenuInitialState()) {
+  DeveloperMenuBloc(
+    this._trackingDelegate,
+    this._getAssetSourceUseCase,
+    this._updateAssetSourceUseCase,
+  ) : super(const DeveloperMenuInitialState()) {
     on<LoadDeveloperMenuEvent>(_onLoad);
+    on<AssetSourceClickEvent>(_onAssetSourceClick);
     on<ForceFatalCrashEvent>(_onForceFatalCrash);
     on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
     on<ForceBlacklistErrorEvent>(_onForceBlacklistError);
@@ -17,9 +22,25 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
   }
 
   final DeveloperMenuTrackingDelegate _trackingDelegate;
+  final GetAssetSourceUseCase _getAssetSourceUseCase;
+  final UpdateAssetSourceUseCase _updateAssetSourceUseCase;
 
-  void _onLoad(LoadDeveloperMenuEvent event, Emitter<DeveloperMenuState> emit) {
-    emit(const DeveloperMenuLoadedState());
+  Future<void> _onLoad(
+    LoadDeveloperMenuEvent event,
+    Emitter<DeveloperMenuState> emit,
+  ) async {
+    final result = await _getAssetSourceUseCase();
+    emit(DeveloperMenuLoadedState(assetSource: result.right));
+  }
+
+  Future<void> _onAssetSourceClick(
+    AssetSourceClickEvent event,
+    Emitter<DeveloperMenuState> emit,
+  ) async {
+    final result = await _updateAssetSourceUseCase(event.source);
+    if (result.isRight) {
+      emit(DeveloperMenuLoadedState(assetSource: event.source));
+    }
   }
 
   void _onForceFatalCrash(

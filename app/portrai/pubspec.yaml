@@ -65,3 +65,9 @@ flutter:
     - assets/dashboard/projects.json
     - assets/dashboard/services.json
     - assets/dashboard/testimonials.json
+    - assets/dashboard/experiences.template.json
+    - assets/dashboard/expertise.template.json
+    - assets/dashboard/profile.template.json
+    - assets/dashboard/projects.template.json
+    - assets/dashboard/services.template.json
+    - assets/dashboard/testimonials.template.json

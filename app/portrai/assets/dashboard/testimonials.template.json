@@ -8,13 +8,14 @@
         "company": "Aurora Commerce",
         "testimonial": "Nova transformed our mobile platform. The modular architecture and the offline assistant she shipped became a flagship feature, and our team grew faster under her mentoring.",
         "date": "2025-11-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Elin-Bergström",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=aurora_commerce",
+        "profileImage": "https://picsum.photos/seed/Elin-Bergström/400/400",
+        "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
         "linkedinProfile": "https://www.linkedin.com/in/elin-bergström/",
         "projectContext": "Aurora Marketplace app",
         "experienceId": "aurora_commerce",
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ]
       },
       {
@@ -24,30 +25,14 @@
         "company": "PixelForge Studio",
         "testimonial": "A rare mix of deep technical skill and great communication. Nova made weekly releases boring, which is the best compliment for a release lead.",
         "date": "2023-03-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Marcus-Holm",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=pixelforge_studio",
+        "profileImage": "https://picsum.photos/seed/Marcus-Holm/400/400",
+        "companyLogo": "https://picsum.photos/seed/pixelforge_studio/400/400",
         "linkedinProfile": "https://www.linkedin.com/in/marcus-holm/",
         "projectContext": "PulseFit and MoveIt apps",
         "experienceId": "pixelforge_studio",
         "projectIds": [
           "pulsefit",
           "moveit_mobility"
-        ]
-      },
-      {
-        "id": "lumen_labs",
-        "name": "Sofia Weber",
-        "position": "Head of Product",
-        "company": "Lumen Labs",
-        "testimonial": "Nova championed Flutter before anyone else and proved it by shipping. She cares deeply about accessibility and it shows in every screen.",
-        "date": "2020-02-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Sofia-Weber",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=lumen_labs",
-        "linkedinProfile": "https://www.linkedin.com/in/sofia-weber/",
-        "projectContext": "Lumen Sleep app",
-        "experienceId": "lumen_labs",
-        "projectIds": [
-          "lumen_sleep"
         ]
       }
     ],
@@ -62,13 +47,14 @@
         "company": "Aurora Commerce",
         "testimonial": "Nova transformó nuestra plataforma móvil. La arquitectura modular y el asistente sin conexión que lanzó se convirtieron en una función estrella, y nuestro equipo creció más rápido gracias a su mentoría.",
         "date": "2025-11-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Elin-Bergström",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=aurora_commerce",
+        "profileImage": "https://picsum.photos/seed/Elin-Bergström/400/400",
+        "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
         "linkedinProfile": "https://www.linkedin.com/in/elin-bergström/",
         "projectContext": "App Aurora Marketplace",
         "experienceId": "aurora_commerce",
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ]
       },
       {
@@ -78,30 +64,14 @@
         "company": "PixelForge Studio",
         "testimonial": "Una mezcla poco común de gran habilidad técnica y excelente comunicación. Nova hizo que los lanzamientos semanales fueran aburridos, el mejor elogio para una líder de lanzamientos.",
         "date": "2023-03-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Marcus-Holm",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=pixelforge_studio",
+        "profileImage": "https://picsum.photos/seed/Marcus-Holm/400/400",
+        "companyLogo": "https://picsum.photos/seed/pixelforge_studio/400/400",
         "linkedinProfile": "https://www.linkedin.com/in/marcus-holm/",
         "projectContext": "Apps PulseFit y MoveIt",
         "experienceId": "pixelforge_studio",
         "projectIds": [
           "pulsefit",
           "moveit_mobility"
-        ]
-      },
-      {
-        "id": "lumen_labs",
-        "name": "Sofia Weber",
-        "position": "Directora de Producto",
-        "company": "Lumen Labs",
-        "testimonial": "Nova defendió Flutter antes que nadie y lo demostró lanzando. Le importa profundamente la accesibilidad y se nota en cada pantalla.",
-        "date": "2020-02-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Sofia-Weber",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=lumen_labs",
-        "linkedinProfile": "https://www.linkedin.com/in/sofia-weber/",
-        "projectContext": "App Lumen Sleep",
-        "experienceId": "lumen_labs",
-        "projectIds": [
-          "lumen_sleep"
         ]
       }
     ],
@@ -116,13 +86,14 @@
         "company": "Aurora Commerce",
         "testimonial": "Nova heeft ons mobiele platform getransformeerd. De modulaire architectuur en de offline assistent die ze opleverde werden een boegbeeldfunctie, en ons team groeide sneller dankzij haar coaching.",
         "date": "2025-11-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Elin-Bergström",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=aurora_commerce",
+        "profileImage": "https://picsum.photos/seed/Elin-Bergström/400/400",
+        "companyLogo": "https://picsum.photos/seed/aurora_commerce/400/400",
         "linkedinProfile": "https://www.linkedin.com/in/elin-bergström/",
         "projectContext": "Aurora Marketplace-app",
         "experienceId": "aurora_commerce",
         "projectIds": [
-          "aurora_marketplace"
+          "aurora_marketplace",
+          "aurora_assistant"
         ]
       },
       {
@@ -132,30 +103,14 @@
         "company": "PixelForge Studio",
         "testimonial": "Een zeldzame combinatie van diepgaande technische kennis en geweldige communicatie. Nova maakte wekelijkse releases saai, het mooiste compliment voor een releaselead.",
         "date": "2023-03-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Marcus-Holm",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=pixelforge_studio",
+        "profileImage": "https://picsum.photos/seed/Marcus-Holm/400/400",
+        "companyLogo": "https://picsum.photos/seed/pixelforge_studio/400/400",
         "linkedinProfile": "https://www.linkedin.com/in/marcus-holm/",
         "projectContext": "PulseFit- en MoveIt-apps",
         "experienceId": "pixelforge_studio",
         "projectIds": [
           "pulsefit",
           "moveit_mobility"
-        ]
-      },
-      {
-        "id": "lumen_labs",
-        "name": "Sofia Weber",
-        "position": "Head of Product",
-        "company": "Lumen Labs",
-        "testimonial": "Nova pleitte als eerste voor Flutter en bewees het door te leveren. Ze geeft veel om toegankelijkheid en dat zie je in elk scherm.",
-        "date": "2020-02-01",
-        "profileImage": "https://api.dicebear.com/9.x/notionists/png?seed=Sofia-Weber",
-        "companyLogo": "https://api.dicebear.com/9.x/shapes/png?seed=lumen_labs",
-        "linkedinProfile": "https://www.linkedin.com/in/sofia-weber/",
-        "projectContext": "Lumen Sleep-app",
-        "experienceId": "lumen_labs",
-        "projectIds": [
-          "lumen_sleep"
         ]
       }
     ],

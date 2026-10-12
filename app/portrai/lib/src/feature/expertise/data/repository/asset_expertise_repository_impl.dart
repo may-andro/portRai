@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/expertise/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/expertise/data/model/_model.dart';
 import 'package:portrai/src/feature/expertise/data/repository/cache_expertise_repository_impl.dart';
@@ -17,12 +18,14 @@ class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
     @Inject(CacheExpertiseRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._getAssetSourceUseCase,
   );
 
   final AppLocale _appLocale;
   final ExpertiseRepository _cacheDelegateRepository;
   final ExpertiseMapper _mapper;
   final LogReporter _logReporter;
+  final GetAssetSourceUseCase _getAssetSourceUseCase;
 
   @override
   Future<void> cacheExpertise(ExpertiseEntity expert) {
@@ -31,6 +34,9 @@ class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
 
   @override
   Future<List<ExpertiseEntity>> getAllExpertise() async {
+    final source = (await _getAssetSourceUseCase()).right;
+    if (source.isTemplate) return await _loadExpertiseFromAssets(source);
+
     try {
       final cachedExpertise = await _cacheDelegateRepository.getAllExpertise();
       if (cachedExpertise.isNotEmpty) {
@@ -46,19 +52,21 @@ class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
       );
     }
 
-    final expertiseList = await _loadExpertiseFromAssets();
+    final expertiseList = await _loadExpertiseFromAssets(source);
 
     await _cacheExpertiseSafely(expertiseList);
 
     return expertiseList;
   }
 
-  Future<List<ExpertiseEntity>> _loadExpertiseFromAssets() async {
+  Future<List<ExpertiseEntity>> _loadExpertiseFromAssets(
+    AssetSource source,
+  ) async {
     try {
       final locale = _appLocale.languageCode;
       // Load JSON from assets file
       final jsonString = await rootBundle.loadString(
-        'assets/dashboard/expertise.json',
+        source.assetPath('expertise'),
       );
       final localeExpertiseJson =
           (jsonDecode(jsonString) as Map<String, dynamic>)[locale]

@@ -1,12 +1,15 @@
 import 'dart:convert';
+
 import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/testimonial/data/mapper/testimonial_mapper.dart';
 import 'package:portrai/src/feature/testimonial/data/repository/asset_testimonial_repository_impl.dart';
 import 'package:portrai/src/feature/testimonial/domain/_domain.dart';
 
+import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/testimonial/domain/repository/mock_testimonial_repository.dart';
 import '../../../../../mock/feature/testimonial/test_data/testimonial_test_data.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
@@ -42,21 +45,26 @@ void main() {
   group('AssetTestimonialRepositoryImpl', () {
     late MockTestimonialRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetTestimonialRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockTestimonialRepository();
       logReporter = MockLogReporter();
+      getAssetSourceUseCase = MockGetAssetSourceUseCase()
+        ..stubCall(AssetSource.real);
       repository = AssetTestimonialRepositoryImpl(
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMessageHandler('flutter/assets', (message) async {
             final key = const StringCodec().decodeMessage(message);
-            if (key == 'assets/dashboard/testimonials.json') {
+            if (key == 'assets/dashboard/testimonials.json' ||
+                key == 'assets/dashboard/testimonials.template.json') {
               return assetResponse();
             }
             return null;
@@ -183,7 +191,8 @@ void main() {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMessageHandler('flutter/assets', (message) async {
               final key = const StringCodec().decodeMessage(message);
-              if (key == 'assets/dashboard/testimonials.json') {
+              if (key == 'assets/dashboard/testimonials.json' ||
+                  key == 'assets/dashboard/testimonials.template.json') {
                 return ByteData.sublistView(
                   Uint8List.fromList(utf8.encode('{invalid json')),
                 );
@@ -200,6 +209,18 @@ void main() {
           repository.getTestimonials,
           throwsA(isA<TestimonialParsingException>()),
         );
+      },
+    );
+
+    test(
+      'should load testimonials from assets without using the cache when the asset source is template',
+      () async {
+        getAssetSourceUseCase.stubCall(AssetSource.template);
+
+        final result = await repository.getTestimonials();
+
+        expect(result, testimonials);
+        verifyZeroInteractions(cacheDelegateRepository);
       },
     );
   });

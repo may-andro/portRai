@@ -7,6 +7,7 @@ import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/firebase_options.dart';
 import 'package:portrai/src/feature/app_config/app_config_module_configurator.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/connectivity/connectivity_module_configurator.dart';
 import 'package:portrai/src/feature/developer_mode/developer_mode_module_configurator.dart';
@@ -61,6 +62,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   ForceUpdateModuleConfigurator(),
   ConnectivityModuleConfigurator(),
   LocaleModuleConfigurator(),
+  AssetSourceModuleConfigurator(),
   SettingModuleConfigurator(),
   DeveloperModeModuleConfigurator(),
   ExperienceModuleConfigurator(),
