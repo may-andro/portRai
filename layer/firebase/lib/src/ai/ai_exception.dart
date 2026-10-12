@@ -91,12 +91,19 @@ class AiEmptyResponseException extends AiException {
 }
 
 class AiIncompleteResponseException extends AiException {
-  const AiIncompleteResponseException(Object cause, StackTrace stackTrace)
-    : super(
-        'Firebase AI response did not complete normally',
-        cause,
-        stackTrace,
-      );
+  /// [finishReason] is the provider's reason name only, never generated text.
+  const AiIncompleteResponseException(
+    Object cause,
+    StackTrace stackTrace, {
+    String? finishReason,
+  }) : super(
+         finishReason == null
+             ? 'Firebase AI response did not complete normally'
+             : 'Firebase AI response did not complete normally '
+                   '(finish reason: $finishReason)',
+         cause,
+         stackTrace,
+       );
 }
 
 AiException handleAiException(Object error, StackTrace stackTrace) =>

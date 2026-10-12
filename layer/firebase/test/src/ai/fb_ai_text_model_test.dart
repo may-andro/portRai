@@ -400,4 +400,29 @@ void main() {
       );
     }
   }
+
+  test(
+    'should name the finish reason without response text when generation stops early',
+    () async {
+      final sdk = MockAiModelClient()
+        ..stubGenerateContentStream(
+          Stream.value(
+            response(
+              'secret generated text',
+              finishReason: FinishReason.maxTokens,
+            ),
+          ),
+        );
+      await expectLater(
+        FbAiTextModel(sdk).generateTextStream([Content.text('secret prompt')]),
+        emitsError(
+          isA<AiIncompleteResponseException>().having(
+            (e) => e.toString(),
+            'message',
+            allOf(contains('maxTokens'), isNot(contains('secret'))),
+          ),
+        ),
+      );
+    },
+  );
 }
