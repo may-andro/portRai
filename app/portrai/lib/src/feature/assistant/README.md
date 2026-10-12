@@ -122,6 +122,7 @@ ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
 | `DSCodeBlock` | A short code or command snippet, at most 40 lines, scrolling sideways |
 | `DSComparison` | A table with two to four columns and up to eight rows for side-by-side comparisons |
 | `DSEducationList` | Up to six degrees or certificates with institution, degree and period |
+| `DSProjectCard` | A project card with title, description, up to eight technology tags, an optional banner (only URLs present in the portfolio context) and an optional action such as `DSLinkButton` |
 
 String properties accept a literal or a data-model reference. Child properties are
 component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed

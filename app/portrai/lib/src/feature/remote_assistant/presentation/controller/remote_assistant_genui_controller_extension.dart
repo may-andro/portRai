@@ -21,6 +21,7 @@ const _responseStyleInstruction =
     'DSCodeBlock for a short code or command snippet, '
     'DSComparison for a side-by-side table, '
     'DSEducationList for degrees and certificates, '
+    'DSProjectCard for a project with tags and a DSLinkButton as its action, '
     'DSText variants heading, title, body '
     'and caption for prose. Group with a DSColumn root; use a DSCard only '
     'around a distinct group, and never around a one-line answer. For a '

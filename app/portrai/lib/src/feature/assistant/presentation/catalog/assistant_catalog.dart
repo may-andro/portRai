@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/assistant/presentation/catalog/item/info_ite
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/layout_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/link_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/map_items.dart';
+import 'package:portrai/src/feature/assistant/presentation/catalog/item/project_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/story_items.dart';
 import 'package:portrai/src/feature/assistant/presentation/catalog/item/text_items.dart';
 
@@ -39,6 +40,7 @@ Catalog createAssistantCatalog({
   dsCodeBlock,
   dsComparison,
   dsEducationList,
+  createDsProjectCard(allowedUrls),
   if (allowedUrls.isNotEmpty) createDsImage(allowedUrls),
   if (allowedUrls.isNotEmpty && onOpenLink != null)
     createDsLinkButton(allowedUrls: allowedUrls, onOpenLink: onOpenLink),

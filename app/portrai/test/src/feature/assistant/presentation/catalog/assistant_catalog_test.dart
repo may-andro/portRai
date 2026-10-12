@@ -35,6 +35,7 @@ void main() {
       'DSCodeBlock',
       'DSComparison',
       'DSEducationList',
+      'DSProjectCard',
     ]);
     expect(catalog.functions, isEmpty);
     expect(catalog.catalogIdAliases, isEmpty);
@@ -570,6 +571,26 @@ void main() {
     expect(find.text('2012 - 2016'), findsOneWidget);
     expect(find.text('Google'), findsOneWidget);
     expect(find.byIcon(Icons.school_outlined), findsNWidgets(2));
+  });
+
+  testWidgets('should show the banner only when its URL is allowed', (
+    tester,
+  ) async {
+    await _pumpSurface(
+      tester,
+      createAssistantCatalog(allowedUrls: {'https://cdn.test/p.png'}),
+      '''
+{"id":"root","component":"DSColumn","children":["ok","bad"]},
+{"id":"ok","component":"DSProjectCard","title":"Alpha","description":"An app",
+ "imageUrl":"https://cdn.test/p.png","tags":["Flutter","Dart"]},
+{"id":"bad","component":"DSProjectCard","title":"Beta",
+ "imageUrl":"https://evil.test/x.png"}''',
+    );
+
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(find.text('Beta'), findsOneWidget);
+    expect(find.text('Flutter'), findsOneWidget);
+    expect(find.byType(DSNetworkImageWidget), findsOneWidget);
   });
 }
 
