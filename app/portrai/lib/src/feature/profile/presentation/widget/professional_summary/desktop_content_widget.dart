@@ -24,7 +24,10 @@ class _DesktopContentWidget extends StatelessWidget {
               height: _ProfessionalSummaryWidget.height(context),
               alignment: Alignment.bottomCenter,
               margin: EdgeInsets.only(right: context.space(factor: 3)),
-              child: _ProfileImageWidget(isVisible: isVisible),
+              child: _ProfileImageWidget(
+                profile: profile,
+                isVisible: isVisible,
+              ),
             ),
           ),
         ],

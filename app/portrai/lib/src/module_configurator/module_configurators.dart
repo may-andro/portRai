@@ -6,6 +6,7 @@ import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/firebase_options.dart';
+import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/app_config/app_config_module_configurator.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
@@ -71,6 +72,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   TestimonialModuleConfigurator(),
   ProfileModuleConfigurator(),
   ExpertiseModuleConfigurator(),
+  AiImageGenModuleConfigurator(),
   PortfolioModuleConfigurator(),
   AssistantModuleConfigurator(),
   LocalAssistantModuleConfigurator(),

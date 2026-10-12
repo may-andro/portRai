@@ -10,7 +10,7 @@ to all Firebase services with proper initialization and configuration.
 - **Type-Safe Access**: Strongly typed service instances
 - **Dependency Injection**: Seamless integration with the module injector system
 - **Cross-Platform**: Support for Android, iOS, macOS, and Web platforms
-- **Firebase AI Logic**: Configurable Gemini text generation and streaming with typed errors
+- **Firebase AI Logic**: Configurable Gemini text generation and streaming, plus single-image generation (`FbAiController.createImageModel`), with typed errors
 
 ## Getting Started
 

@@ -1,8 +1,9 @@
 part of 'professional_summary_widget.dart';
 
 class _ProfileImageWidget extends StatelessWidget {
-  const _ProfileImageWidget({required this.isVisible});
+  const _ProfileImageWidget({required this.profile, required this.isVisible});
 
+  final ProfileEntity profile;
   final bool isVisible;
 
   @override
@@ -36,16 +37,23 @@ class _ProfileImageWidget extends StatelessWidget {
             ),
         Container(
           alignment: Alignment.bottomCenter,
-          child: SizedBox(child: DSImage.avatar(fit: BoxFit.cover))
-              .animate(target: isVisible ? 1 : 0)
-              .slideY(
-                begin: 1,
-                end: 0,
-                duration: 300.ms,
-                delay: 500.ms,
-                curve: Curves.decelerate,
-              )
-              .fadeIn(duration: 300.ms, delay: 500.ms),
+          child:
+              SizedBox(
+                    child: AiImageWidget(
+                      sourceImageUrl: profile.profileImage,
+                      removeBackground: true,
+                      fallback: DSImage.avatar(fit: BoxFit.cover),
+                    ),
+                  )
+                  .animate(target: isVisible ? 1 : 0)
+                  .slideY(
+                    begin: 1,
+                    end: 0,
+                    duration: 300.ms,
+                    delay: 500.ms,
+                    curve: Curves.decelerate,
+                  )
+                  .fadeIn(duration: 300.ms, delay: 500.ms),
         ),
       ],
     );

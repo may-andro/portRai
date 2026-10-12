@@ -60,7 +60,10 @@ class _TabletContentWidget extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: context.width * 0.5,
-                child: _ProfileImageWidget(isVisible: isVisible),
+                child: _ProfileImageWidget(
+                  profile: profile,
+                  isVisible: isVisible,
+                ),
               ),
             ],
           ),

@@ -1,11 +1,14 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portrai/src/feature/ai_image_gen/presentation/bloc/_bloc.dart'
+    as ai_image;
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import '../../../../../../../mock/feature/ai_image_gen/presentation/bloc/mock_ai_image_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../../../mock/feature/profile/presentation/widget/professional_summary/bloc/mock_professional_summary_bloc.dart';
@@ -32,6 +35,9 @@ void main() {
     addTearDown(bloc.close);
     MockProfessionalSummaryBloc()
       ..stubLoadingState()
+      ..registerFactory();
+    MockAiImageBloc()
+      ..stubState(const ai_image.LoadingState())
       ..registerFactory();
 
     await tester.pumpWidget(
