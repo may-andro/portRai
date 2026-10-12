@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/project/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/project/data/model/_model.dart';
 import 'package:portrai/src/feature/project/data/repository/cache_project_repository_impl.dart';
@@ -16,12 +17,14 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
     @Inject(CacheProjectRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._getAssetSourceUseCase,
   );
 
   final AppLocale _appLocale;
   final ProjectRepository _cacheDelegateRepository;
   final ProjectMapper _mapper;
   final LogReporter _logReporter;
+  final GetAssetSourceUseCase _getAssetSourceUseCase;
   static const _tag = 'AssetProjectRepositoryImpl';
 
   @override
@@ -31,6 +34,9 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
 
   @override
   Future<List<ProjectEntity>> getProjects() async {
+    final source = (await _getAssetSourceUseCase()).right;
+    if (source.isTemplate) return await _loadProjectsFromAssets(source);
+
     try {
       final cachedProjects = await _cacheDelegateRepository.getProjects();
       if (cachedProjects.isNotEmpty) {
@@ -46,7 +52,7 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
       );
     }
 
-    final projectList = await _loadProjectsFromAssets();
+    final projectList = await _loadProjectsFromAssets(source);
 
     await _cacheProjectsSafely(projectList);
 
@@ -55,6 +61,17 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
 
   @override
   Future<ProjectEntity> getProject(String id) async {
+    final source = (await _getAssetSourceUseCase()).right;
+    if (source.isTemplate) {
+      final projects = await _loadProjectsFromAssets(source);
+      return projects.firstWhere(
+        (p) => p.id == id,
+        orElse: () => throw ProjectNotFoundException(
+          cause: 'Project with id $id not found in assets',
+        ),
+      );
+    }
+
     try {
       return await _cacheDelegateRepository.getProject(id);
     } on ProjectNotFoundException {
@@ -71,7 +88,7 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
       );
     }
 
-    final projectList = await _loadProjectsFromAssets();
+    final projectList = await _loadProjectsFromAssets(source);
     await _cacheProjectsSafely(projectList);
 
     // Find the project in the loaded list
@@ -85,11 +102,13 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
     return project;
   }
 
-  Future<List<ProjectEntity>> _loadProjectsFromAssets() async {
+  Future<List<ProjectEntity>> _loadProjectsFromAssets(
+    AssetSource source,
+  ) async {
     try {
       final locale = _appLocale.languageCode;
       final jsonString = await rootBundle.loadString(
-        'assets/dashboard/projects.json',
+        source.assetPath('projects'),
       );
       final localeProjectJson =
           (jsonDecode(jsonString) as Map<String, dynamic>)[locale]

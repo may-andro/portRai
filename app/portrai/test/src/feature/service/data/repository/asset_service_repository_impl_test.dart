@@ -4,10 +4,12 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/service/data/mapper/service_mapper.dart';
 import 'package:portrai/src/feature/service/data/repository/asset_service_repository_impl.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 
+import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/service/domain/repository/mock_service_repository.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -26,7 +28,8 @@ void main() {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     messenger.setMockMessageHandler('flutter/assets', (message) async {
       final key = const StringCodec().decodeMessage(message);
-      if (key == 'assets/dashboard/services.json') {
+      if (key == 'assets/dashboard/services.json' ||
+          key == 'assets/dashboard/services.template.json') {
         return ByteData.view(Uint8List.fromList(utf8.encode(contents)).buffer);
       }
       return null;
@@ -36,16 +39,20 @@ void main() {
   group('AssetServiceRepositoryImpl', () {
     late MockServiceRepository cacheRepository;
     late MockLogReporter logReporter;
+    late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetServiceRepositoryImpl repository;
 
     setUp(() async {
       cacheRepository = MockServiceRepository();
       logReporter = MockLogReporter();
+      getAssetSourceUseCase = MockGetAssetSourceUseCase()
+        ..stubCall(AssetSource.real);
       repository = AssetServiceRepositoryImpl(
         AppLocale('en'),
         cacheRepository,
         ServiceMapper(appLocale: AppLocale('en')),
         logReporter,
+        getAssetSourceUseCase,
       );
       when(
         () => logReporter.error(any(), tag: any(named: 'tag')),
@@ -128,6 +135,7 @@ void main() {
           cacheRepository,
           ServiceMapper(appLocale: AppLocale('fr')),
           logReporter,
+          getAssetSourceUseCase,
         );
 
         expect(
@@ -153,6 +161,18 @@ void main() {
             tag: 'AssetServiceRepositoryImpl',
           ),
         ).called(1);
+      },
+    );
+
+    test(
+      'should load services from assets without using the cache when the asset source is template',
+      () async {
+        getAssetSourceUseCase.stubCall(AssetSource.template);
+
+        final result = await repository.getServices();
+
+        expect(result, const [service]);
+        verifyZeroInteractions(cacheRepository);
       },
     );
   });

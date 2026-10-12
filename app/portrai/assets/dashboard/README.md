@@ -38,6 +38,10 @@ The setup action automatically creates `.json` files from `.template.json` files
 
 This prevents `asset_does_not_exist` warnings during `dart analyze`.
 
+## 🎛️ Switching Data Source
+
+In builds with the developer menu enabled, use the **Use demo data** switch (Data Source section) to make the asset repositories read the `*.template.json` files instead of the `*.json` ones. The choice is persisted; restart the app to apply it. While demo data is selected, the local cache is bypassed so real and demo data never mix.
+
 ## 📝 File Structure
 
 ```

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 
 @immutable
 abstract class DeveloperMenuEvent extends Equatable {
@@ -23,6 +24,15 @@ class ForceNonFatalCrashEvent extends DeveloperMenuEvent {
 
 class ForceBlacklistErrorEvent extends DeveloperMenuEvent {
   const ForceBlacklistErrorEvent();
+}
+
+class AssetSourceClickEvent extends DeveloperMenuEvent {
+  const AssetSourceClickEvent(this.source);
+
+  final AssetSource source;
+
+  @override
+  List<Object?> get props => [source];
 }
 
 // Tracking Events

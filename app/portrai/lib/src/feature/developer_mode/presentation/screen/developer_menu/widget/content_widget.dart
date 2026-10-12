@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:tracking/tracking.dart';
@@ -130,6 +131,12 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
               const DSVerticalSpacerWidget(3),
 
               _SectionHeader(
+                title: context.localizations.developerMenuDataSource,
+              ),
+              const DSCardWidget(child: _AssetSourceTile()),
+              const DSVerticalSpacerWidget(3),
+
+              _SectionHeader(
                 title: context.localizations.developerMenuErrorSimulation,
               ),
               DSCardWidget(
@@ -202,6 +209,44 @@ class _SectionHeader extends StatelessWidget {
         style: context.typography.emphasizedTitleSmall,
         color: context.colorPalette.neutral.grey10,
       ),
+    );
+  }
+}
+
+class _AssetSourceTile extends StatelessWidget {
+  const _AssetSourceTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DeveloperMenuBloc, DeveloperMenuState>(
+      buildWhen: (previous, current) => current is DeveloperMenuLoadedState,
+      builder: (context, state) {
+        final isTemplate =
+            state is DeveloperMenuLoadedState && state.assetSource.isTemplate;
+        return SwitchListTile(
+          secondary: DSIconWidget(
+            Icons.dataset_outlined,
+            color: context.colorPalette.neutral.grey9,
+            size: DSIconSize.medium,
+          ),
+          title: DSTextWidget(
+            context.localizations.developerMenuUseTemplateData,
+            style: context.typography.emphasizedBodyMedium,
+            color: context.colorPalette.neutral.grey9,
+          ),
+          subtitle: DSTextWidget(
+            context.localizations.developerMenuUseTemplateDataDescription,
+            style: context.typography.emphasizedBodySmall,
+            color: context.colorPalette.neutral.grey9,
+          ),
+          value: isTemplate,
+          onChanged: (value) => context.bloc.add(
+            AssetSourceClickEvent(
+              value ? AssetSource.template : AssetSource.real,
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -4,10 +4,12 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/project/data/mapper/project_mapper.dart';
 import 'package:portrai/src/feature/project/data/repository/asset_project_repository_impl.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
 
+import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/project/domain/repository/mock_project_repository.dart';
 import '../../../../../mock/feature/project/test_data/project_test_data.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
@@ -32,21 +34,26 @@ void main() {
   group('AssetProjectRepositoryImpl', () {
     late MockProjectRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetProjectRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockProjectRepository();
       logReporter = MockLogReporter();
+      getAssetSourceUseCase = MockGetAssetSourceUseCase()
+        ..stubCall(AssetSource.real);
       repository = AssetProjectRepositoryImpl(
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMessageHandler('flutter/assets', (message) async {
             final key = const StringCodec().decodeMessage(message);
-            if (key == 'assets/dashboard/projects.json') {
+            if (key == 'assets/dashboard/projects.json' ||
+                key == 'assets/dashboard/projects.template.json') {
               return assetResponse();
             }
             return null;
@@ -169,7 +176,8 @@ void main() {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMessageHandler('flutter/assets', (message) async {
               final key = const StringCodec().decodeMessage(message);
-              if (key == 'assets/dashboard/projects.json') {
+              if (key == 'assets/dashboard/projects.json' ||
+                  key == 'assets/dashboard/projects.template.json') {
                 return ByteData.sublistView(
                   Uint8List.fromList(utf8.encode('{invalid json')),
                 );
@@ -183,6 +191,18 @@ void main() {
         rootBundle.evict('assets/dashboard/projects.json');
 
         expect(repository.getProjects, throwsA(isA<ProjectParsingException>()));
+      },
+    );
+
+    test(
+      'should load projects from assets without using the cache when the asset source is template',
+      () async {
+        getAssetSourceUseCase.stubCall(AssetSource.template);
+
+        final result = await repository.getProjects();
+
+        expect(result, projects);
+        verifyZeroInteractions(cacheDelegateRepository);
       },
     );
   });

@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/testimonial/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/testimonial/data/model/_model.dart';
 import 'package:portrai/src/feature/testimonial/data/repository/cache_testimonial_repository_impl.dart';
@@ -16,12 +17,14 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
     @Inject(CacheTestimonialRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._getAssetSourceUseCase,
   );
 
   final AppLocale _appLocale;
   final TestimonialRepository _cacheDelegateRepository;
   final TestimonialMapper _mapper;
   final LogReporter _logReporter;
+  final GetAssetSourceUseCase _getAssetSourceUseCase;
   static const _tag = 'AssetTestimonialRepositoryImpl';
 
   @override
@@ -31,6 +34,15 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
 
   @override
   Future<TestimonialEntity> getTestimonial(String id) async {
+    final source = (await _getAssetSourceUseCase()).right;
+    if (source.isTemplate) {
+      final testimonials = await _loadTestimonialsFromAssets(source);
+      return testimonials.firstWhereOrNull((test) => test.id == id) ??
+          (throw TestimonialNotFoundException(
+            cause: 'Testimonial with id "$id" not found in assets',
+          ));
+    }
+
     try {
       return await _cacheDelegateRepository.getTestimonial(id);
     } on TestimonialNotFoundException {
@@ -39,7 +51,7 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
         tag: _tag,
       );
 
-      final testimonials = await _loadTestimonialsFromAssets();
+      final testimonials = await _loadTestimonialsFromAssets(source);
 
       await _cacheTestimonialsSafely(testimonials);
 
@@ -61,7 +73,7 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
         stacktrace: stackTrace,
       );
 
-      final testimonials = await _loadTestimonialsFromAssets();
+      final testimonials = await _loadTestimonialsFromAssets(source);
 
       final testimonial = testimonials.firstWhereOrNull(
         (test) => test.id == id,
@@ -79,6 +91,9 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
 
   @override
   Future<List<TestimonialEntity>> getTestimonials() async {
+    final source = (await _getAssetSourceUseCase()).right;
+    if (source.isTemplate) return await _loadTestimonialsFromAssets(source);
+
     try {
       final cachedTestimonials = await _cacheDelegateRepository
           .getTestimonials();
@@ -94,18 +109,20 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
       );
     }
 
-    final testimonials = await _loadTestimonialsFromAssets();
+    final testimonials = await _loadTestimonialsFromAssets(source);
 
     await _cacheTestimonialsSafely(testimonials);
 
     return testimonials;
   }
 
-  Future<List<TestimonialEntity>> _loadTestimonialsFromAssets() async {
+  Future<List<TestimonialEntity>> _loadTestimonialsFromAssets(
+    AssetSource source,
+  ) async {
     try {
       final locale = _appLocale.languageCode;
       final jsonString = await rootBundle.loadString(
-        'assets/dashboard/testimonials.json',
+        source.assetPath('testimonials'),
       );
       final localeTestimonialJson =
           (jsonDecode(jsonString) as Map<String, dynamic>)[locale]

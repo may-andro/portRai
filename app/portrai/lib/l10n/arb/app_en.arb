@@ -637,6 +637,18 @@
   "@developerMenuFeatureFlagsDescription": {
     "description": "Description for the feature flags row in the developer menu"
   },
+  "developerMenuDataSource": "Data Source",
+  "@developerMenuDataSource": {
+    "description": "Section header for data source options in the developer menu"
+  },
+  "developerMenuUseTemplateData": "Use demo data",
+  "@developerMenuUseTemplateData": {
+    "description": "Label for the switch that selects template (demo) JSON assets in the developer menu"
+  },
+  "developerMenuUseTemplateDataDescription": "Load the fictional template assets instead of the real ones. Restart the app to apply",
+  "@developerMenuUseTemplateDataDescription": {
+    "description": "Description for the switch that selects template (demo) JSON assets in the developer menu"
+  },
   "developerMenuErrorSimulation": "Error Simulation",
   "@developerMenuErrorSimulation": {
     "description": "Section title for developer menu error simulations"
