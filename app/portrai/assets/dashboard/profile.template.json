@@ -16,17 +16,17 @@
         {
           "name": "Website",
           "url": "https://nova.example.com/",
-          "image": "https://cdn.simpleicons.org/googlechrome"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
         },
         {
           "name": "Play Store",
           "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
-          "image": "https://cdn.simpleicons.org/googleplay"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googleplay"
         },
         {
           "name": "App Store",
           "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
-          "image": "https://cdn.simpleicons.org/appstore"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=appstore"
         }
       ],
       "resume": {
@@ -38,17 +38,17 @@
         {
           "name": "Github",
           "url": "https://github.com/nova-lindqvist",
-          "image": "https://cdn.simpleicons.org/github"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=github"
         },
         {
           "name": "LinkedIn",
           "url": "https://www.linkedin.com/in/nova-lindqvist/",
-          "image": "https://cdn.simpleicons.org/linkedin"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=linkedin"
         },
         {
           "name": "Portfolio",
           "url": "https://nova.example.com/",
-          "image": "https://cdn.simpleicons.org/googlechrome"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
         }
       ],
       "availability": {
@@ -129,17 +129,17 @@
         {
           "name": "Website",
           "url": "https://nova.example.com/",
-          "image": "https://cdn.simpleicons.org/googlechrome"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
         },
         {
           "name": "Play Store",
           "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
-          "image": "https://cdn.simpleicons.org/googleplay"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googleplay"
         },
         {
           "name": "App Store",
           "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
-          "image": "https://cdn.simpleicons.org/appstore"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=appstore"
         }
       ],
       "resume": {
@@ -151,17 +151,17 @@
         {
           "name": "Github",
           "url": "https://github.com/nova-lindqvist",
-          "image": "https://cdn.simpleicons.org/github"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=github"
         },
         {
           "name": "LinkedIn",
           "url": "https://www.linkedin.com/in/nova-lindqvist/",
-          "image": "https://cdn.simpleicons.org/linkedin"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=linkedin"
         },
         {
           "name": "Portfolio",
           "url": "https://nova.example.com/",
-          "image": "https://cdn.simpleicons.org/googlechrome"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
         }
       ],
       "availability": {
@@ -242,17 +242,17 @@
         {
           "name": "Website",
           "url": "https://nova.example.com/",
-          "image": "https://cdn.simpleicons.org/googlechrome"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
         },
         {
           "name": "Play Store",
           "url": "https://play.google.com/store/apps/dev?id=0000000000000000000",
-          "image": "https://cdn.simpleicons.org/googleplay"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googleplay"
         },
         {
           "name": "App Store",
           "url": "https://apps.apple.com/developer/nova-lindqvist/id0000000000",
-          "image": "https://cdn.simpleicons.org/appstore"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=appstore"
         }
       ],
       "resume": {
@@ -264,17 +264,17 @@
         {
           "name": "Github",
           "url": "https://github.com/nova-lindqvist",
-          "image": "https://cdn.simpleicons.org/github"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=github"
         },
         {
           "name": "LinkedIn",
           "url": "https://www.linkedin.com/in/nova-lindqvist/",
-          "image": "https://cdn.simpleicons.org/linkedin"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=linkedin"
         },
         {
           "name": "Portfolio",
           "url": "https://nova.example.com/",
-          "image": "https://cdn.simpleicons.org/googlechrome"
+          "image": "https://api.dicebear.com/9.x/icons/png?seed=googlechrome"
         }
       ],
       "availability": {
