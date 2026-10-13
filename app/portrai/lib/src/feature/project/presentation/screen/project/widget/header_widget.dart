@@ -18,7 +18,7 @@ class _HeaderWidget extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (!kIsWeb)
+                if (!kIsWeb && defaultTargetPlatform != TargetPlatform.iOS)
                   IconButton(
                     tooltip: MaterialLocalizations.of(
                       context,
