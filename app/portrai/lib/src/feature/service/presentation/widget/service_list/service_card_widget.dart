@@ -19,7 +19,7 @@ class _ServiceCardWidget extends StatelessWidget {
       background: _BackgroundArtWidget(imageUrl: service.image),
       fillColor: textColor,
       padding: EdgeInsets.all(context.space(factor: 2)),
-      onTap: () => ServiceDetailWidget.show(context, service),
+      onTap: () => ServiceScreen.navigate(context, service: service),
       builder: (context, isHovering) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

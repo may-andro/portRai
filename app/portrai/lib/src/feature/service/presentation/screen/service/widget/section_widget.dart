@@ -27,7 +27,7 @@ class _SectionWidget extends StatelessWidget {
       children: [_buildTitle(context), child],
     );
 
-    return switch (style) {
+    final card = switch (style) {
       _SectionStyle.tinted => Container(
         width: double.infinity,
         padding: padding,
@@ -95,6 +95,12 @@ class _SectionWidget extends StatelessWidget {
         child: content,
       ),
     };
+
+    return _RevealWidget(
+      child: style == _SectionStyle.plain
+          ? card
+          : _HoverLiftWidget(child: card),
+    );
   }
 
   Widget _buildTitle(BuildContext context) {
@@ -191,22 +197,24 @@ class _CheckListWidget extends StatelessWidget {
       spacing: context.space(factor: 1.25),
       children: [
         for (final item in items)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: context.space(factor: 1.25),
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Icon(icon, size: 18, color: accent),
-              ),
-              Expanded(
-                child: DSTextWidget(
-                  item,
-                  style: context.typography.bodyMedium,
-                  color: context.colorPalette.neutral.grey9,
+          _HoverNudgeWidget(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: context.space(factor: 1.25),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(icon, size: 18, color: accent),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: DSTextWidget(
+                    item,
+                    style: context.typography.bodyMedium,
+                    color: context.colorPalette.neutral.grey9,
+                  ),
+                ),
+              ],
+            ),
           ),
       ],
     );
@@ -223,7 +231,9 @@ class _TagsWidget extends StatelessWidget {
     return Wrap(
       spacing: context.space(factor: 0.5),
       runSpacing: context.space(factor: 0.5),
-      children: [for (final tag in tags) DSTagWidget(label: tag)],
+      children: [
+        for (final tag in tags) _HoverPopWidget(child: DSTagWidget(label: tag)),
+      ],
     );
   }
 }

@@ -1,11 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
-import 'package:portrai/src/feature/service/presentation/widget/service_detail/service_detail.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/widget/service_detail_widget.dart';
 
-import '../../../../../../util/test_wrapper_widget.dart';
+import '../../../../../../../util/test_wrapper_widget.dart';
+import '../../../../../../../util/tracking_impression_test_util.dart';
 
 void main() {
+  setUp(resetTrackingImpressions);
+
   const minimal = ServiceEntity(
     image: 'service.png',
     title: 'App Development',
@@ -31,7 +35,11 @@ void main() {
     ServiceEntity service,
   ) async {
     await tester.pumpWidget(
-      TestWidgetWrapper(child: ServiceDetailWidget(service: service)),
+      TestWidgetWrapper(
+        child: SingleChildScrollView(
+          child: ServiceDetailWidget(service: service),
+        ),
+      ),
     );
     await tester.pump(const Duration(seconds: 1));
     return AppLocalizations.of(

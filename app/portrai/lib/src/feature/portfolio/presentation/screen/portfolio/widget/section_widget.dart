@@ -162,11 +162,20 @@ class ServicesSectionWidget extends SectionWidget {
         return ServiceListWidget(
           services: portfolio.services,
           isVisible: isVisible,
+          visibleItemsCount: context.allowedServiceCount,
         );
       },
       visibilityKey: trackingId,
       title: getTitle(context),
       background: const InverseSectionBackground(),
+      action: context.isDesktop
+          ? null
+          : SectionAction(
+              label: context.localizations.portfolioSectionSeeAll,
+              onPressed: () {
+                ServicesScreen.navigate(context);
+              },
+            ),
     );
   }
 
@@ -298,6 +307,17 @@ extension PortfolioExtension on PortfolioEntity {
 }
 
 extension on BuildContext {
+  int? get allowedServiceCount {
+    switch (deviceResolution) {
+      case DSDeviceResolution.mobile:
+        return 3;
+      case DSDeviceResolution.tablet:
+        return 4;
+      case DSDeviceResolution.desktop:
+        return null;
+    }
+  }
+
   int? get allowedExperienceCount {
     switch (deviceResolution) {
       case DSDeviceResolution.mobile:

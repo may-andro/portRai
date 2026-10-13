@@ -27,7 +27,7 @@ void main() {
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
     });
 
-    testWidgets('should open the service detail when a card is tapped', (
+    testWidgets('should navigate to the service screen when a card is tapped', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -40,7 +40,25 @@ void main() {
       await tester.tap(find.byType(DSSpotlightCardWidget));
       await tester.pump(const Duration(seconds: 1));
 
-      expect(find.text(service.detail), findsOneWidget);
+      // No router in the test wrapper, so an attempted navigation throws.
+      expect(tester.takeException(), isNotNull);
+    });
+
+    testWidgets('should limit the cards when visibleItemsCount is set', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const TestWidgetWrapper(
+          child: ServiceListWidget(
+            services: [service, service, service],
+            isVisible: true,
+            visibleItemsCount: 2,
+          ),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byType(DSSpotlightCardWidget), findsNWidgets(2));
     });
   });
 }

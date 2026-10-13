@@ -1,7 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
-import 'package:portrai/src/feature/service/presentation/widget/service_detail/service_detail.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/service_screen.dart';
 
 part 'service_card_widget.dart';
 
@@ -12,13 +12,20 @@ class ServiceListWidget extends StatelessWidget {
     super.key,
     required this.services,
     required this.isVisible,
+    this.visibleItemsCount,
   });
 
   final List<ServiceEntity> services;
   final bool isVisible;
 
+  /// Limits how many services are shown; all of them when null.
+  final int? visibleItemsCount;
+
   @override
   Widget build(BuildContext context) {
-    return _GridWidget(services: services, isVisible: isVisible);
+    return _GridWidget(
+      services: services.take(visibleItemsCount ?? services.length).toList(),
+      isVisible: isVisible,
+    );
   }
 }
