@@ -511,6 +511,38 @@
   "@present": {
     "description": "Label for the end date of an ongoing experience"
   },
+  "profileViewFullProfile": "View Full Profile",
+  "@profileViewFullProfile": {
+    "description": "Button label on the About Me summary that opens the full profile"
+  },
+  "profileAvailableForWork": "Available for work",
+  "@profileAvailableForWork": {
+    "description": "Badge on the About Me summary signalling the owner is open to work"
+  },
+  "serviceDetailDeliverables": "What you get",
+  "@serviceDetailDeliverables": {
+    "description": "Section title listing the deliverables of a service"
+  },
+  "serviceDetailTechnologies": "Technologies",
+  "@serviceDetailTechnologies": {
+    "description": "Section title listing the technologies used for a service"
+  },
+  "serviceDetailProcess": "How I work",
+  "@serviceDetailProcess": {
+    "description": "Section title listing the process steps of a service"
+  },
+  "serviceDetailIdealFor": "Ideal for",
+  "@serviceDetailIdealFor": {
+    "description": "Section title listing who a service is ideal for"
+  },
+  "serviceDetailEngagement": "Engagement types",
+  "@serviceDetailEngagement": {
+    "description": "Section title listing engagement types of a service"
+  },
+  "serviceDetailFaq": "FAQ",
+  "@serviceDetailFaq": {
+    "description": "Section title for service frequently asked questions"
+  },
   "profileYearsExperience": "Years Experience",
   "@profileYearsExperience": {
     "description": "Profile stats label for years of experience"

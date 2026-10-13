@@ -223,7 +223,6 @@ class AboutMeSectionWidget extends SectionWidget {
         );
       },
       visibilityKey: trackingId,
-      horizontalPadding: 0,
       hasBottomPadding: false,
       title: getTitle(context),
       background: const InverseSectionBackground(),
