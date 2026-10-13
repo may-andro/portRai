@@ -1,44 +1,198 @@
 part of 'testimonial_list_widget.dart';
 
+const _greyscale = ColorFilter.matrix([
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0, 0, 0, 1, 0, //
+]);
+
 class _CardItemWidget extends StatelessWidget {
   const _CardItemWidget({required this.testimonial});
 
   final TestimonialEntity testimonial;
 
+  static double _avatarSize(BuildContext context) {
+    return context.isMobile
+        ? context.space(factor: 6)
+        : context.space(factor: 5);
+  }
+
   static double getHeight(BuildContext context) {
-    return context.space(factor: 2) +
-        DSQuoteTextWidget.getHeight(context, maxLines: context.maxLines) +
+    return context.space(factor: 3) +
+        context.getTextHeight(context.typography.bodyLarge, context.maxLines) +
         context.space(factor: 2) +
-        DSAvatarNameWidget.getHeight(context) +
+        1 +
         context.space(factor: 2) +
+        _avatarSize(context) +
+        context.space(factor: 2.5) +
         context.bottomMargin;
   }
 
   @override
   Widget build(BuildContext context) {
-    return DSCardWidget(
-      elevation: context.dimen.elevationLevel1,
-      backgroundColor: context.colorPalette.containerHighest,
-      radius: context.dimen.radiusLevel2,
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+    final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
+    final logoSize = context.space(factor: 22);
+
+    return Container(
       margin: context.margin,
-      child: Padding(
-        padding: EdgeInsets.all(context.space(factor: 2)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: context.space(),
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        color: palette.surface.surfaceContainerLow.color,
+        border: Border.all(color: palette.border.color),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withAlpha(36),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Stack(
           children: [
-            DSQuoteTextWidget(
-              text: testimonial.testimonial,
-              maxLines: context.maxLines,
+            Positioned(
+              right: -logoSize * 0.2,
+              top: -logoSize * 0.15,
+              width: logoSize,
+              height: logoSize,
+              child: ColorFiltered(
+                colorFilter: _greyscale,
+                child: Opacity(
+                  opacity: 0.1,
+                  child: DSNetworkImageWidget(
+                    url: testimonial.companyLogo,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
             ),
-            DSAvatarNameWidget(
-              name: testimonial.name,
-              caption: testimonial.position,
-              imageUrl: testimonial.profileImage,
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 5,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [accent, palette.brand.primary.color],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: context.space(factor: 2.5),
+              top: -context.space(),
+              child: DSTextWidget(
+                '\u201C',
+                style: context.typography.emphasizedDisplayLarge,
+                color: DSColor(accent.withAlpha(90).toARGB32()),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                context.space(factor: 3),
+                context.space(factor: 3),
+                context.space(factor: 2.5),
+                context.space(factor: 2.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: context.getTextHeight(
+                      context.typography.bodyLarge,
+                      context.maxLines,
+                    ),
+                    child: DSTextWidget(
+                      testimonial.testimonial,
+                      style: context.typography.bodyLarge,
+                      color: palette.neutral.grey9,
+                      maxLines: context.maxLines,
+                      textOverflow: TextOverflow.ellipsis,
+                      isItalic: true,
+                    ),
+                  ),
+                  SizedBox(height: context.space(factor: 2)),
+                  Container(height: 1, color: palette.border.color),
+                  SizedBox(height: context.space(factor: 2)),
+                  _AuthorWidget(testimonial: testimonial),
+                ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AuthorWidget extends StatelessWidget {
+  const _AuthorWidget({required this.testimonial});
+
+  final TestimonialEntity testimonial;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final size = _CardItemWidget._avatarSize(context);
+    final image = testimonial.profileImage;
+
+    return Row(
+      spacing: context.space(factor: 1.5),
+      children: [
+        Container(
+          width: size,
+          height: size,
+          padding: const EdgeInsets.all(2.5),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [palette.accent.color, palette.brand.primary.color],
+            ),
+          ),
+          child: image == null
+              ? CircleAvatar(
+                  backgroundColor: palette.surface.surface.color,
+                  child: Icon(
+                    Icons.person,
+                    size: size / 2,
+                    color: palette.brand.primary.color,
+                  ),
+                )
+              : DSNetworkImageWidget(
+                  url: image,
+                  shape: BoxShape.circle,
+                  fit: BoxFit.cover,
+                ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DSTextWidget(
+                testimonial.name,
+                style: context.typography.emphasizedTitleSmall,
+                color: palette.neutral.grey10,
+                maxLines: 1,
+                textOverflow: TextOverflow.ellipsis,
+              ),
+              DSTextWidget(
+                '${testimonial.position} · ${testimonial.company}',
+                style: context.typography.bodySmall,
+                color: palette.neutral.grey7,
+                maxLines: 1,
+                textOverflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

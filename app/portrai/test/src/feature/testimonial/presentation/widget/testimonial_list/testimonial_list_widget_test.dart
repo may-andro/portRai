@@ -30,7 +30,10 @@ void main() {
 
         expect(find.text(testimonial.testimonial), findsOneWidget);
         expect(find.text(testimonial.name), findsOneWidget);
-        expect(find.text(testimonial.position), findsOneWidget);
+        expect(
+          find.text('${testimonial.position} · ${testimonial.company}'),
+          findsOneWidget,
+        );
 
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pump(const Duration(seconds: 1));
