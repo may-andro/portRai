@@ -96,19 +96,22 @@ class _HeaderWidget extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.only(right: context.space(factor: 6)),
-                    child: DSTextWidget(
-                      service.title,
-                      style: context.typography.emphasizedHeadlineMedium,
-                      color: const DSColor(0xFFFFFFFF),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(right: context.space(factor: 6)),
-                    child: DSTextWidget(
-                      service.description,
-                      style: context.typography.titleSmall,
-                      color: const DSColor(0xFFFFFFFF),
-                      isItalic: true,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: context.space(factor: 0.25),
+                      children: [
+                        DSTextWidget(
+                          service.title,
+                          style: context.typography.emphasizedHeadlineMedium,
+                          color: const DSColor(0xFFFFFFFF),
+                        ),
+                        DSTextWidget(
+                          service.description,
+                          style: context.typography.titleSmall,
+                          color: const DSColor(0xFFFFFFFF),
+                          isItalic: true,
+                        ),
+                      ],
                     ),
                   ),
                 ],

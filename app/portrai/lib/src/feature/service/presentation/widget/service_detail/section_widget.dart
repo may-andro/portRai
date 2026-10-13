@@ -8,14 +8,12 @@ class _SectionWidget extends StatelessWidget {
     required this.icon,
     required this.child,
     this.style = _SectionStyle.tinted,
-    this.index,
   });
 
   final String title;
   final IconData icon;
   final Widget child;
   final _SectionStyle style;
-  final int? index;
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +115,6 @@ class _SectionWidget extends StatelessWidget {
       _SectionStyle.plain => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (index != null)
-            DSTextWidget(
-              index.toString().padLeft(2, '0'),
-              style: typography.emphasizedDisplaySmall,
-              color: palette.accent,
-            ),
           DSTextWidget(
             title,
             style: typography.emphasizedHeadlineSmall,

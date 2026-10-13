@@ -96,7 +96,6 @@ class ServiceDetailWidget extends StatelessWidget {
             _SectionWidget(
               title: context.localizations.serviceDetailProcess,
               style: _SectionStyle.plain,
-              index: 2,
               icon: Icons.route_outlined,
               child: _StepsWidget(steps: service.process),
             ),
