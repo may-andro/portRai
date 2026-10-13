@@ -4,6 +4,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
+import 'package:portrai/src/feature/project/project.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
@@ -11,6 +13,8 @@ import '../../../../../../../mock/feature/external_app_handler/domain/use_case/m
 import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
 import '../../../../../../../mock/feature/profile/presentation/screen/profile/tracking/mock_profile_tracking_delegate.dart';
 import '../../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
+import '../../../../../../../mock/feature/project/domain/use_case/mock_get_projects_use_case.dart';
+import '../../../../../../../mock/feature/project/test_data/project_test_data.dart';
 
 void main() {
   final profile = createProfileEntity();
@@ -19,13 +23,17 @@ void main() {
 
   group('ProfileBloc', () {
     late MockGetProfileUseCase getProfile;
+    late MockGetProjectsUseCase getProjects;
     late MockOpenExternalUrlUseCase openUrl;
     late MockProfileTrackingDelegate tracking;
 
-    ProfileBloc buildBloc() => ProfileBloc(getProfile, openUrl, tracking);
+    ProfileBloc buildBloc() =>
+        ProfileBloc(getProfile, getProjects, openUrl, tracking);
 
     setUp(() {
       getProfile = MockGetProfileUseCase();
+      getProjects = MockGetProjectsUseCase()
+        ..stubCall(const Right<GetProjectsFailure, List<ProjectEntity>>([]));
       openUrl = MockOpenExternalUrlUseCase();
       tracking = MockProfileTrackingDelegate();
     });
@@ -38,6 +46,76 @@ void main() {
       act: (bloc) => bloc.add(const LoadProfileEvent()),
       expect: () => [const LoadingState(), LoadedState(profile: profile)],
       verify: (_) => verify(() => getProfile()).called(1),
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'should emit distinct work places when projects share market locations',
+      setUp: () {
+        getProfile.stubCall(Right<GetProfileFailure, ProfileEntity>(profile));
+        getProjects.stubCall(
+          Right<GetProjectsFailure, List<ProjectEntity>>([
+            createProjectEntity(
+              markets: const [
+                ProjectMarketEntity(
+                  country: 'Germany',
+                  latitude: 51.1657,
+                  longitude: 10.4515,
+                ),
+                ProjectMarketEntity(
+                  country: 'India',
+                  latitude: 20.5937,
+                  longitude: 78.9629,
+                ),
+              ],
+            ),
+            createProjectEntity(
+              id: 'second',
+              markets: const [
+                ProjectMarketEntity(
+                  country: 'Germany',
+                  latitude: 51.1657,
+                  longitude: 10.4515,
+                ),
+              ],
+            ),
+          ]),
+        );
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadProfileEvent()),
+      expect: () => [
+        const LoadingState(),
+        LoadedState(
+          profile: profile,
+          workPlaces: const [
+            WorkPlaceEntity(
+              country: 'Germany',
+              latitude: 51.1657,
+              longitude: 10.4515,
+            ),
+            WorkPlaceEntity(
+              country: 'India',
+              latitude: 20.5937,
+              longitude: 78.9629,
+            ),
+          ],
+        ),
+      ],
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'should still emit loaded without places when loading projects fails',
+      setUp: () {
+        getProfile.stubCall(Right<GetProfileFailure, ProfileEntity>(profile));
+        getProjects.stubCall(
+          const Left<GetProjectsFailure, List<ProjectEntity>>(
+            ProjectNetworkFailure(),
+          ),
+        );
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadProfileEvent()),
+      expect: () => [const LoadingState(), LoadedState(profile: profile)],
     );
 
     blocTest<ProfileBloc, ProfileState>(

@@ -25,10 +25,11 @@ final class ErrorState extends ProfileState {
 }
 
 final class LoadedState extends ProfileState {
-  const LoadedState({required this.profile});
+  const LoadedState({required this.profile, this.workPlaces = const []});
 
   final ProfileEntity profile;
+  final List<WorkPlaceEntity> workPlaces;
 
   @override
-  List<Object?> get props => [profile];
+  List<Object?> get props => [profile, workPlaces];
 }

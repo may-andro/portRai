@@ -9,6 +9,10 @@ ProfileEntity createProfileEntity({List<PublishedAtEntity>? publishedAt}) {
     email: 'mayank271993@gmail.com',
     phone: '+34-604467532',
     profileImage: 'https://example.com/profile.png',
+    profileImages: const [
+      'https://example.com/profile.png',
+      'https://example.com/profile-2.png',
+    ],
     coverImage: 'https://example.com/cover.png',
     summary: 'Builds products that scale.',
     detailedBio: 'Builds products that scale with clean architecture.',
@@ -97,6 +101,10 @@ ProfileModel createProfileModel({String locale = 'en'}) {
     email: 'mayank271993@gmail.com',
     phone: '+34-604467532',
     profileImage: 'https://example.com/profile.png',
+    profileImages: const [
+      'https://example.com/profile.png',
+      'https://example.com/profile-2.png',
+    ],
     coverImage: 'https://example.com/cover.png',
     summary: 'Builds products that scale.',
     detailedBio: 'Builds products that scale with clean architecture.',

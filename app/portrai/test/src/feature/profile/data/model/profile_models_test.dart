@@ -17,6 +17,12 @@ void main() {
       expect(model.locale, 'en');
     });
 
+    test('should default profile images to empty when the JSON omits them', () {
+      final json = createProfileJson()..remove('profileImages');
+
+      expect(ProfileModel.fromJson(json).profileImages, isEmpty);
+    });
+
     test(
       'should preserve all profile fields when serialized and deserialized',
       () {

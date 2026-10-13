@@ -551,6 +551,30 @@
   "@profileProjects": {
     "description": "Profile stats label for projects"
   },
+  "profileGlobalEyebrow": "Global Reach",
+  "@profileGlobalEyebrow": {
+    "description": "Eyebrow label of the worked-across-the-globe profile section"
+  },
+  "profileGlobalTitle": "Worked across the globe",
+  "@profileGlobalTitle": {
+    "description": "Headline of the worked-across-the-globe profile section"
+  },
+  "profileGlobalDescription": "I have worked with teams and clients of many backgrounds, ethnicities and cultures, shipping mobile products used in countries around the world.",
+  "@profileGlobalDescription": {
+    "description": "Description of the worked-across-the-globe profile section"
+  },
+  "profileCountries": "Countries",
+  "@profileCountries": {
+    "description": "Profile stats label for the number of countries"
+  },
+  "profileHireMe": "Hire me",
+  "@profileHireMe": {
+    "description": "Profile hero button that opens an email to hire the owner"
+  },
+  "profileMessageHint": "Tell me about your project or idea…",
+  "@profileMessageHint": {
+    "description": "Placeholder of the message box in the profile contact section"
+  },
   "profileDownloadResumeButton": "Download Resume",
   "@profileDownloadResumeButton": {
     "description": "Profile action label for downloading the resume"

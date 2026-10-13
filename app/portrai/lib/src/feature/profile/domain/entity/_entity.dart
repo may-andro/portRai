@@ -8,4 +8,5 @@ export 'profile_entity.dart';
 export 'published_at_entity.dart';
 export 'resume_entity.dart';
 export 'social_link_entity.dart';
+export 'work_place_entity.dart';
 export 'working_hours_entity.dart';
