@@ -108,7 +108,6 @@ class ExpertiseSectionWidget extends SectionWidget {
       },
       visibilityKey: trackingId,
       title: getTitle(context),
-      horizontalPadding: 0,
       background: const InverseSectionBackground(),
     );
   }
