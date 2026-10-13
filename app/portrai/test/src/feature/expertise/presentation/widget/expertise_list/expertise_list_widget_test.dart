@@ -36,7 +36,9 @@ void main() {
 
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: ExpertiseListWidget(allExpertise: expertise, isVisible: true),
+        child: SingleChildScrollView(
+          child: ExpertiseListWidget(allExpertise: expertise, isVisible: true),
+        ),
       ),
     );
     await tester.pump();
@@ -45,51 +47,49 @@ void main() {
   }
 
   group('ExpertiseListWidget', () {
+    testWidgets('should render every expertise card when shown on mobile', (
+      tester,
+    ) async {
+      await pumpExpertiseListWidget(
+        tester,
+        expertise: createExpertiseList(7),
+        size: const Size(390, 844),
+      );
+
+      expect(find.byType(DSSpotlightCardWidget), findsNWidgets(7));
+      expect(find.text('Expertise 6'), findsOneWidget);
+    });
+
+    testWidgets('should show the skills of a card when it is rendered', (
+      tester,
+    ) async {
+      await pumpExpertiseListWidget(
+        tester,
+        expertise: createExpertiseList(1),
+        size: const Size(390, 844),
+      );
+
+      expect(find.text('Skill 0'), findsOneWidget);
+    });
+
     testWidgets(
-      'should render only the first five expertise items when shown on mobile',
+      'should collapse extra skills into a counter when there are more than eight',
       (tester) async {
         await pumpExpertiseListWidget(
           tester,
-          expertise: createExpertiseList(7),
-          size: const Size(390, 844),
+          expertise: [
+            ExpertiseEntity(
+              image: 'https://example.com/a.png',
+              title: 'Many',
+              skills: [for (var i = 0; i < 11; i++) SkillEntity(name: 'S$i')],
+            ),
+          ],
+          size: const Size(1440, 1024),
         );
 
-        expect(find.byType(DSExpandableCardWidget), findsNWidgets(5));
-        expect(find.text('Expertise 4'), findsOneWidget);
-        expect(find.text('Expertise 5'), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'should render all available expertise items when fewer than five are provided on mobile',
-      (tester) async {
-        await pumpExpertiseListWidget(
-          tester,
-          expertise: createExpertiseList(3),
-          size: const Size(390, 844),
-        );
-
-        expect(find.byType(DSExpandableCardWidget), findsNWidgets(3));
-        expect(find.text('Expertise 2'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'should show the expertise skills when a mobile card is expanded',
-      (tester) async {
-        await pumpExpertiseListWidget(
-          tester,
-          expertise: createExpertiseList(1),
-          size: const Size(390, 844),
-        );
-
-        await tester.tapAt(
-          tester.getCenter(find.byType(DSExpandableCardWidget).first),
-        );
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 500));
-
-        expect(find.text('Skill 0'), findsOneWidget);
+        expect(find.text('S7'), findsOneWidget);
+        expect(find.text('S8'), findsNothing);
+        expect(find.text('+3'), findsOneWidget);
       },
     );
 
@@ -103,60 +103,7 @@ void main() {
           settleDuration: Duration.zero,
         );
 
-        expect(find.byType(DSCardWidget), findsNothing);
-        expect(find.byType(DSExpandableCardWidget), findsNothing);
-      },
-    );
-
-    testWidgets(
-      'should return the mobile image size when the viewport is mobile',
-      (tester) async {
-        tester.view.devicePixelRatio = 1;
-        tester.view.physicalSize = const Size(390, 844);
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        late double imageSize;
-        late double expectedImageSize;
-        await tester.pumpWidget(
-          TestWidgetWrapper(
-            child: Builder(
-              builder: (context) {
-                imageSize = context.expertiseImageSize;
-                expectedImageSize = context.space(factor: 8);
-                return const SizedBox.shrink();
-              },
-            ),
-          ),
-        );
-
-        expect(imageSize, expectedImageSize);
-      },
-    );
-
-    testWidgets(
-      'should return the desktop image size when the viewport is desktop',
-      (tester) async {
-        tester.view.devicePixelRatio = 1;
-        tester.view.physicalSize = const Size(1440, 1024);
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        late double imageSize;
-        late double expectedImageSize;
-        await tester.pumpWidget(
-          TestWidgetWrapper(
-            child: Builder(
-              builder: (context) {
-                imageSize = context.expertiseImageSize;
-                expectedImageSize = context.space(factor: 5);
-                return const SizedBox.shrink();
-              },
-            ),
-          ),
-        );
-
-        expect(imageSize, expectedImageSize);
+        expect(find.byType(DSSpotlightCardWidget), findsNothing);
       },
     );
   });
