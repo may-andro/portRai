@@ -117,7 +117,12 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
               Material(
                 type: MaterialType.transparency,
                 child: InkWell(
-                  onTap: _toggleExpand,
+                  onTap: context.isMobile
+                      ? () => ExperienceScreen.navigate(
+                          context,
+                          id: widget.experience.id,
+                        )
+                      : _toggleExpand,
                   child: Padding(
                     padding: EdgeInsets.all(context.space(factor: 2.5)),
                     child: _content(context),
@@ -254,12 +259,13 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
                 ],
               ),
             ),
-            AnimatedRotation(
-              turns: _expanded ? 0.5 : 0,
-              duration: 300.ms,
-              curve: Curves.easeOut,
-              child: Icon(Icons.expand_more_rounded, color: _onCard.color),
-            ),
+            if (!context.isMobile)
+              AnimatedRotation(
+                turns: _expanded ? 0.5 : 0,
+                duration: 300.ms,
+                curve: Curves.easeOut,
+                child: Icon(Icons.expand_more_rounded, color: _onCard.color),
+              ),
           ],
         ),
         const DSVerticalSpacerWidget(1.5),
@@ -284,18 +290,19 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
             ),
           ],
         ),
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) => _controller.isDismissed
-              ? const SizedBox.shrink()
-              : ClipRect(
-                  child: SizeTransition(
-                    sizeFactor: _expandAnimation,
-                    alignment: Alignment.topCenter,
-                    child: _expandedContent(context),
+        if (!context.isMobile)
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) => _controller.isDismissed
+                ? const SizedBox.shrink()
+                : ClipRect(
+                    child: SizeTransition(
+                      sizeFactor: _expandAnimation,
+                      alignment: Alignment.topCenter,
+                      child: _expandedContent(context),
+                    ),
                   ),
-                ),
-        ),
+          ),
       ],
     );
   }
