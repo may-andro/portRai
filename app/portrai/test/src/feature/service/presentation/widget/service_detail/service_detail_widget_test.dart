@@ -62,7 +62,10 @@ void main() {
       expect(find.text(l10n.serviceDetailDeliverables), findsOneWidget);
       expect(find.text(l10n.serviceDetailProcess), findsOneWidget);
       expect(find.text(l10n.serviceDetailTechnologies), findsOneWidget);
-      expect(find.text(l10n.serviceDetailIdealFor), findsOneWidget);
+      expect(
+        find.text(l10n.serviceDetailIdealFor.toUpperCase()),
+        findsOneWidget,
+      );
       expect(find.text(l10n.serviceDetailEngagement), findsOneWidget);
       expect(find.text(l10n.serviceDetailFaq), findsOneWidget);
       expect(find.text('How long?'), findsOneWidget);

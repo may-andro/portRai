@@ -1,58 +1,186 @@
 part of 'service_detail_widget.dart';
 
+enum _SectionStyle { tinted, plain, dark, accentBar, outlined, neutral }
+
 class _SectionWidget extends StatelessWidget {
   const _SectionWidget({
     required this.title,
     required this.icon,
     required this.child,
+    this.style = _SectionStyle.tinted,
+    this.index,
   });
 
   final String title;
   final IconData icon;
   final Widget child;
+  final _SectionStyle style;
+  final int? index;
 
   @override
   Widget build(BuildContext context) {
-    final accent = context.colorPalette.accent.color;
-
-    final card = Column(
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+    final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
+    final padding = EdgeInsets.all(context.space(factor: 2));
+    final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: context.space(factor: 1.5),
-      children: [
-        Row(
-          spacing: context.space(),
-          children: [
-            Container(
-              padding: EdgeInsets.all(context.space(factor: 0.75)),
-              decoration: BoxDecoration(
-                color: accent.withAlpha(36),
-                borderRadius: BorderRadius.circular(
-                  context.dimen.radiusLevel1.value,
-                ),
-              ),
-              child: Icon(icon, size: 18, color: accent),
-            ),
-            DSTextWidget(
-              title,
-              style: context.typography.emphasizedTitleSmall,
-              color: context.colorPalette.neutral.grey10,
-            ),
-          ],
-        ),
-        child,
-      ],
+      children: [_buildTitle(context), child],
     );
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.space(factor: 2)),
-      decoration: BoxDecoration(
-        color: accent.withAlpha(14),
-        borderRadius: BorderRadius.circular(context.dimen.radiusLevel3.value),
-        border: Border.all(color: accent.withAlpha(60)),
+    return switch (style) {
+      _SectionStyle.tinted => Container(
+        width: double.infinity,
+        padding: padding,
+        decoration: BoxDecoration(
+          color: accent.withAlpha(14),
+          borderRadius: radius,
+          border: Border.all(color: accent.withAlpha(60)),
+        ),
+        child: content,
       ),
-      child: card,
+      _SectionStyle.plain => Padding(
+        padding: EdgeInsets.symmetric(vertical: context.space()),
+        child: content,
+      ),
+      _SectionStyle.dark => Container(
+        width: double.infinity,
+        padding: padding,
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              palette.surface.inverseSurface.color,
+              Color.lerp(
+                palette.surface.inverseSurface.color,
+                palette.brand.primary.color,
+                0.3,
+              )!,
+            ],
+          ),
+        ),
+        child: content,
+      ),
+      _SectionStyle.accentBar => ClipRRect(
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel1.value),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: palette.neutral.grey9.color.withAlpha(10),
+            border: Border(left: BorderSide(color: accent, width: 5)),
+          ),
+          padding: padding,
+          child: content,
+        ),
+      ),
+      _SectionStyle.outlined => Container(
+        width: double.infinity,
+        padding: padding,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(
+            context.dimen.radiusLevel3.value * 2,
+          ),
+          border: Border.all(color: accent, width: 1.5),
+        ),
+        child: content,
+      ),
+      _SectionStyle.neutral => Container(
+        width: double.infinity,
+        padding: padding,
+        decoration: BoxDecoration(
+          color: palette.neutral.grey9.color.withAlpha(14),
+          borderRadius: radius,
+        ),
+        child: content,
+      ),
+    };
+  }
+
+  Widget _buildTitle(BuildContext context) {
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+    final typography = context.typography;
+
+    final badge = Container(
+      padding: EdgeInsets.all(context.space(factor: 0.75)),
+      decoration: BoxDecoration(
+        color: accent.withAlpha(36),
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel1.value),
+      ),
+      child: Icon(icon, size: 18, color: accent),
     );
+
+    return switch (style) {
+      _SectionStyle.plain => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (index != null)
+            DSTextWidget(
+              index.toString().padLeft(2, '0'),
+              style: typography.emphasizedDisplaySmall,
+              color: palette.accent,
+            ),
+          DSTextWidget(
+            title,
+            style: typography.emphasizedHeadlineSmall,
+            color: palette.neutral.grey10,
+          ),
+        ],
+      ),
+      _SectionStyle.dark => Row(
+        spacing: context.space(),
+        children: [
+          Icon(icon, size: 22, color: accent),
+          DSTextWidget(
+            title,
+            style: typography.titleLarge,
+            color: palette.surface.onInverseSurface,
+          ),
+        ],
+      ),
+      _SectionStyle.accentBar => DSTextWidget(
+        title.toUpperCase(),
+        style: typography.emphasizedLabelLarge,
+        color: palette.accent,
+      ),
+      _SectionStyle.outlined => Row(
+        spacing: context.space(),
+        children: [
+          badge,
+          DSTextWidget(
+            title,
+            style: typography.titleMedium,
+            color: palette.neutral.grey10,
+            isItalic: true,
+          ),
+        ],
+      ),
+      _SectionStyle.neutral => Row(
+        spacing: context.space(),
+        children: [
+          badge,
+          DSTextWidget(
+            title,
+            style: typography.emphasizedTitleMedium,
+            color: palette.neutral.grey10,
+          ),
+        ],
+      ),
+      _SectionStyle.tinted => Row(
+        spacing: context.space(),
+        children: [
+          badge,
+          DSTextWidget(
+            title,
+            style: typography.emphasizedTitleSmall,
+            color: palette.neutral.grey10,
+          ),
+        ],
+      ),
+    };
   }
 }
 

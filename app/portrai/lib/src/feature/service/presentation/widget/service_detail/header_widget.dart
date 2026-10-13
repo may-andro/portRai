@@ -98,7 +98,7 @@ class _HeaderWidget extends StatelessWidget {
                     padding: EdgeInsets.only(right: context.space(factor: 6)),
                     child: DSTextWidget(
                       service.title,
-                      style: context.typography.emphasizedHeadlineSmall,
+                      style: context.typography.emphasizedHeadlineMedium,
                       color: const DSColor(0xFFFFFFFF),
                     ),
                   ),
@@ -106,8 +106,9 @@ class _HeaderWidget extends StatelessWidget {
                     padding: EdgeInsets.only(right: context.space(factor: 6)),
                     child: DSTextWidget(
                       service.description,
-                      style: context.typography.bodyMedium,
+                      style: context.typography.titleSmall,
                       color: const DSColor(0xFFFFFFFF),
+                      isItalic: true,
                     ),
                   ),
                 ],

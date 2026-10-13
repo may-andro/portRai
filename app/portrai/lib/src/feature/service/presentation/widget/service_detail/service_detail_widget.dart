@@ -66,10 +66,22 @@ class ServiceDetailWidget extends StatelessWidget {
         spacing: context.space(factor: 3),
         children: [
           _HeaderWidget(service: service),
-          DSTextWidget(
-            service.detail,
-            style: context.typography.bodyLarge,
-            color: context.colorPalette.neutral.grey9,
+          Container(
+            padding: EdgeInsets.only(left: context.space(factor: 2)),
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(
+                  color: context.colorPalette.accent.color,
+                  width: 3,
+                ),
+              ),
+            ),
+            child: DSTextWidget(
+              service.detail,
+              style: context.typography.titleMedium,
+              color: context.colorPalette.neutral.grey10,
+              isItalic: true,
+            ),
           ),
           if (service.deliverables.isNotEmpty)
             _SectionWidget(
@@ -83,18 +95,22 @@ class ServiceDetailWidget extends StatelessWidget {
           if (service.process.isNotEmpty)
             _SectionWidget(
               title: context.localizations.serviceDetailProcess,
+              style: _SectionStyle.plain,
+              index: 2,
               icon: Icons.route_outlined,
               child: _StepsWidget(steps: service.process),
             ),
           if (service.technologies.isNotEmpty)
             _SectionWidget(
               title: context.localizations.serviceDetailTechnologies,
+              style: _SectionStyle.dark,
               icon: Icons.code_rounded,
               child: _TagsWidget(tags: service.technologies),
             ),
           if (service.idealFor.isNotEmpty)
             _SectionWidget(
               title: context.localizations.serviceDetailIdealFor,
+              style: _SectionStyle.accentBar,
               icon: Icons.track_changes_rounded,
               child: _CheckListWidget(
                 items: service.idealFor,
@@ -104,12 +120,14 @@ class ServiceDetailWidget extends StatelessWidget {
           if (service.engagementTypes.isNotEmpty)
             _SectionWidget(
               title: context.localizations.serviceDetailEngagement,
+              style: _SectionStyle.outlined,
               icon: Icons.handshake_outlined,
               child: _TagsWidget(tags: service.engagementTypes),
             ),
           if (service.faq.isNotEmpty)
             _SectionWidget(
               title: context.localizations.serviceDetailFaq,
+              style: _SectionStyle.neutral,
               icon: Icons.help_outline_rounded,
               child: _FaqWidget(faq: service.faq),
             ),
