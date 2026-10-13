@@ -15,7 +15,7 @@ class _SectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.colorPalette.accent.color;
 
-    return Column(
+    final card = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: context.space(factor: 1.5),
       children: [
@@ -41,6 +41,17 @@ class _SectionWidget extends StatelessWidget {
         ),
         child,
       ],
+    );
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(context.space(factor: 2)),
+      decoration: BoxDecoration(
+        color: accent.withAlpha(14),
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel3.value),
+        border: Border.all(color: accent.withAlpha(60)),
+      ),
+      child: card,
     );
   }
 }

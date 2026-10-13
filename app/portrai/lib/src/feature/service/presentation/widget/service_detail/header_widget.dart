@@ -100,3 +100,32 @@ class _HeaderWidget extends StatelessWidget {
     );
   }
 }
+
+class _ImageShowcaseWidget extends StatelessWidget {
+  const _ImageShowcaseWidget({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+
+    return Container(
+      width: double.infinity,
+      height: context.space(factor: 24),
+      padding: EdgeInsets.all(context.space(factor: 2)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel3.value),
+        border: Border.all(color: palette.accent.color.withAlpha(60)),
+        gradient: RadialGradient(
+          radius: 0.9,
+          colors: [
+            palette.brand.primary.color.withAlpha(60),
+            palette.brand.tertiary.color.withAlpha(14),
+          ],
+        ),
+      ),
+      child: DSNetworkImageWidget(url: imageUrl, fit: BoxFit.contain),
+    );
+  }
+}

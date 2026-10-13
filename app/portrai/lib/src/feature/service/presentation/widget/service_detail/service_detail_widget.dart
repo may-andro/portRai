@@ -71,6 +71,7 @@ class ServiceDetailWidget extends StatelessWidget {
             style: context.typography.bodyLarge,
             color: context.colorPalette.neutral.grey9,
           ),
+          _ImageShowcaseWidget(imageUrl: service.image),
           if (service.deliverables.isNotEmpty)
             _SectionWidget(
               title: context.localizations.serviceDetailDeliverables,

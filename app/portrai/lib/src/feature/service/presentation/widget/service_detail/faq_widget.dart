@@ -8,8 +8,7 @@ class _FaqWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.colorPalette.accent.color.withAlpha(18),
-      borderRadius: BorderRadius.circular(context.dimen.radiusLevel2.value),
+      color: Colors.transparent,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: context.space(factor: 1.5)),
         child: Column(
@@ -23,6 +22,7 @@ class _FaqWidget extends StatelessWidget {
                   tilePadding: EdgeInsets.zero,
                   childrenPadding: EdgeInsets.only(bottom: context.space()),
                   expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  expandedAlignment: Alignment.centerLeft,
                   title: DSTextWidget(
                     item.question,
                     style: context.typography.emphasizedBodyMedium,
