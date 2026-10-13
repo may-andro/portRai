@@ -62,8 +62,8 @@ class _CardItemWidget extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: accent.withAlpha(isHovering ? 90 : 36),
-            blurRadius: isHovering ? 32 : 24,
-            offset: const Offset(0, 10),
+            blurRadius: isHovering ? 28 : 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),

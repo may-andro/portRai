@@ -13,6 +13,10 @@ part 'tablet_content_widget.dart';
 
 part 'desktop_content_widget.dart';
 
+// Room for the hover lift and the card shadow so the section doesn't clip them.
+const _hoverLift = 8.0;
+const _shadowRoom = 36.0;
+
 class TestimonialListWidget extends StatelessWidget {
   const TestimonialListWidget({
     required this.testimonials,
@@ -25,25 +29,28 @@ class TestimonialListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DSResponsiveContainerWidget(
-      mobileBuilder: (_) {
-        return _MobileContentWidget(
-          testimonials: testimonials,
-          isVisible: isVisible,
-        );
-      },
-      tabletBuilder: (_) {
-        return _TabletContentWidget(
-          testimonials: testimonials,
-          isVisible: isVisible,
-        );
-      },
-      desktopBuilder: (_) {
-        return _DesktopContentWidget(
-          testimonials: testimonials,
-          isVisible: isVisible,
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.only(top: _hoverLift, bottom: _shadowRoom),
+      child: DSResponsiveContainerWidget(
+        mobileBuilder: (_) {
+          return _MobileContentWidget(
+            testimonials: testimonials,
+            isVisible: isVisible,
+          );
+        },
+        tabletBuilder: (_) {
+          return _TabletContentWidget(
+            testimonials: testimonials,
+            isVisible: isVisible,
+          );
+        },
+        desktopBuilder: (_) {
+          return _DesktopContentWidget(
+            testimonials: testimonials,
+            isVisible: isVisible,
+          );
+        },
+      ),
     );
   }
 }
