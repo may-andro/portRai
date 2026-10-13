@@ -123,15 +123,12 @@ class _ArrowWidget extends StatelessWidget {
       padding: EdgeInsets.all(context.space(factor: 0.5)),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isHovering ? accent : Colors.transparent,
-        border: Border.all(color: accent),
+        color: accent.withAlpha(isHovering ? 255 : 220),
       ),
       child: Icon(
         Icons.arrow_outward_rounded,
-        size: 16,
-        color: isHovering
-            ? context.colorPalette.brand.onTertiary.color
-            : accent,
+        size: 18,
+        color: context.colorPalette.brand.onTertiary.color,
       ),
     );
   }
