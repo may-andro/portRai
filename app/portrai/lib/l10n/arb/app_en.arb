@@ -908,5 +908,25 @@
   "assistantRetry": "Retry",
   "@assistantRetry": {
     "description": "Button that retries the AI model download"
+  },
+  "projectFactStatus": "Status",
+  "@projectFactStatus": {
+    "description": "Label of the project status fact in the project header"
+  },
+  "projectFactTeam": "Team",
+  "@projectFactTeam": {
+    "description": "Label of the team size fact in the project header"
+  },
+  "projectFactRole": "Role",
+  "@projectFactRole": {
+    "description": "Label of the role fact in the project header"
+  },
+  "projectFactPeriod": "Period",
+  "@projectFactPeriod": {
+    "description": "Label of the date range fact in the project header"
+  },
+  "projectFactMarkets": "Markets",
+  "@projectFactMarkets": {
+    "description": "Label of the countries fact in the project header"
   }
 }

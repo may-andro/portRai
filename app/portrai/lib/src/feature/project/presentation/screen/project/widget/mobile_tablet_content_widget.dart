@@ -47,14 +47,21 @@ class _MobileTabletContentWidget extends StatelessWidget {
             vertical: context.space(factor: 3),
             horizontal: context.horizontalPadding,
           ),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate([
-              ...state.scrollableSections.map(
-                (section) => section.buildWidget(context),
-              ),
-            ]),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              spacing: context.space(factor: 3),
+              children: [
+                for (final section in state.scrollableSections)
+                  section.buildWidget(context),
+              ],
+            ),
           ),
         ),
+        if (state.profile case final ProfileEntity profile)
+          SliverPadding(
+            padding: EdgeInsets.only(top: context.space(factor: 3)),
+            sliver: SliverToBoxAdapter(child: FooterWidget(profile: profile)),
+          ),
       ],
     );
   }

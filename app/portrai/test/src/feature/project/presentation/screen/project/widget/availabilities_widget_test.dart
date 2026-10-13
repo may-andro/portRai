@@ -38,19 +38,19 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.text('GitHub · Spain'), findsOneWidget);
-        expect(find.text('Website · Spain'), findsOneWidget);
-        expect(find.text('App Store · Spain'), findsOneWidget);
-        expect(find.text('Play Store · Spain'), findsOneWidget);
+        expect(find.text('GitHub'), findsOneWidget);
+        expect(find.text('Website'), findsOneWidget);
+        expect(find.text('App Store'), findsOneWidget);
+        expect(find.text('Play Store'), findsOneWidget);
 
-        await tester.tap(find.text('GitHub · Spain'));
+        await tester.tap(find.text('GitHub'));
         await tester.pump();
 
         verify(
           () => bloc.add(
             const OpenExternalUrlEvent(
               url: 'https://github.com/example/portrai',
-              label: 'GitHub · Spain',
+              label: 'GitHub',
             ),
           ),
         ).called(1);
@@ -78,5 +78,44 @@ void main() {
       expect(find.textContaining('App Store'), findsNothing);
       expect(find.textContaining('Play Store'), findsNothing);
     });
+
+    testWidgets(
+      'should dedupe shared links and add the country only when links differ',
+      (tester) async {
+        final bloc = MockProjectBloc()..stubState(const LoadingState());
+        final project = createProjectEntity(
+          markets: const [
+            ProjectMarketEntity(
+              country: 'Spain',
+              latitude: 40,
+              longitude: -3,
+              appStore: 'https://example.com/app',
+              playStore: 'https://example.com/play-es',
+            ),
+            ProjectMarketEntity(
+              country: 'Germany',
+              latitude: 51,
+              longitude: 10,
+              appStore: 'https://example.com/app',
+              playStore: 'https://example.com/play-de',
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: BlocProvider<ProjectBloc>.value(
+              value: bloc,
+              child: AvailabilitiesWidget(project: project),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(find.text('App Store'), findsOneWidget);
+        expect(find.text('Play Store · Spain'), findsOneWidget);
+        expect(find.text('Play Store · Germany'), findsOneWidget);
+      },
+    );
   });
 }

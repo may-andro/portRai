@@ -1,4 +1,5 @@
 import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
@@ -53,7 +54,7 @@ void main() {
             ),
           ),
         );
-        await tester.pump();
+        await tester.pump(const Duration(seconds: 3));
 
         expect(find.text('A polished portfolio app'), findsOneWidget);
         expect(find.text('Overview'), findsWidgets);
@@ -62,5 +63,39 @@ void main() {
         ).called(1);
       },
     );
+
+    for (final entry in const {
+      'mobile': Size(390, 844),
+      'narrow tablet': Size(600, 1000),
+      'tablet': Size(820, 1180),
+      'desktop': Size(1440, 900),
+    }.entries) {
+      testWidgets(
+        'should render the project details without errors when on ${entry.key}',
+        (tester) async {
+          tester.view.physicalSize = entry.value;
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.reset);
+          final project = createProjectEntity();
+          final bloc = MockProjectBloc()
+            ..stubState(
+              LoadedState(project: project, sections: project.sections),
+            );
+
+          await tester.pumpWidget(
+            TestWidgetWrapper(
+              child: BlocProvider<ProjectBloc>.value(
+                value: bloc,
+                child: const ContentWidget(),
+              ),
+            ),
+          );
+          await tester.pump(const Duration(seconds: 3));
+
+          expect(find.text('PortRai 🚀'), findsWidgets);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
   });
 }

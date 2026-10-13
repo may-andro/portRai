@@ -15,10 +15,26 @@ class _HeaderWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
-            child: Image.asset(
-              DSImage.logoPath,
-              package: 'design_system',
-              fit: BoxFit.cover,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!kIsWeb && defaultTargetPlatform != TargetPlatform.iOS)
+                  IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
+                    onPressed: context.popScreen,
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    color: context.colorPalette.neutral.grey9.color,
+                  ),
+                Flexible(
+                  child: Image.asset(
+                    DSImage.logoPath,
+                    package: 'design_system',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(

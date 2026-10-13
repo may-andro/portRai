@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/extension/_extension.dart';
@@ -9,6 +10,8 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
+import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
+import '../../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
 import '../../../../../../../mock/feature/project/presentation/screen/project/tracking/mock_project_tracking_delegate.dart';
 import '../../../../../../../mock/feature/project/test_data/project_test_data.dart';
 
@@ -18,24 +21,40 @@ void main() {
   setUpAll(() => registerFallbackValue(FakeOpenExternalUrlParam()));
 
   group('ProjectBloc', () {
+    late MockGetProfileUseCase getProfile;
     late MockOpenExternalUrlUseCase openUrl;
     late MockProjectTrackingDelegate tracking;
 
-    ProjectBloc buildBloc() => ProjectBloc(openUrl, tracking);
+    ProjectBloc buildBloc() => ProjectBloc(getProfile, openUrl, tracking);
 
     setUp(() {
+      getProfile = MockGetProfileUseCase();
       openUrl = MockOpenExternalUrlUseCase();
       tracking = MockProjectTrackingDelegate();
     });
 
     blocTest<ProjectBloc, ProjectState>(
-      'should emit a loaded state with generated sections when the project loads',
+      'should emit a loaded state with generated sections and profile when the project loads',
+      setUp: () => getProfile.stubCall(Right(createProfileEntity())),
       build: buildBloc,
       act: (bloc) => bloc.add(LoadProjectEvent(project)),
       expect: () => [
         isA<LoadedState>()
             .having((state) => state.project, 'project', project)
-            .having((state) => state.sections.length, 'sections length', 6),
+            .having((state) => state.sections.length, 'sections length', 6)
+            .having((state) => state.profile, 'profile', isNotNull),
+      ],
+    );
+
+    blocTest<ProjectBloc, ProjectState>(
+      'should emit a loaded state without profile when the profile fails to load',
+      setUp: () => getProfile.stubCall(
+        const Left<GetProfileFailure, ProfileEntity>(ProfileNotFoundFailure()),
+      ),
+      build: buildBloc,
+      act: (bloc) => bloc.add(LoadProjectEvent(project)),
+      expect: () => [
+        isA<LoadedState>().having((state) => state.profile, 'profile', isNull),
       ],
     );
 
