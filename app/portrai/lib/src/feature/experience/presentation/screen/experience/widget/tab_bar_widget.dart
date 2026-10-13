@@ -90,9 +90,7 @@ class _TabBarWidget extends StatelessWidget {
           dividerColor: Colors.transparent,
           overlayColor: WidgetStateProperty.all(Colors.transparent),
           labelPadding: EdgeInsets.zero,
-          padding: context.isDesktop
-              ? EdgeInsets.zero
-              : EdgeInsets.only(left: context.horizontalPadding),
+          padding: EdgeInsets.only(left: context.horizontalPadding),
           tabAlignment: TabAlignment.start,
           tabs: sections
               .map(
