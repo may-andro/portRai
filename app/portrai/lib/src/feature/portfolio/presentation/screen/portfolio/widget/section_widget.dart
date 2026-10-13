@@ -251,6 +251,14 @@ class TestimonialsSectionWidget extends SectionWidget {
       },
       visibilityKey: trackingId,
       title: getTitle(context),
+      action: portfolio.testimonials.length > maxPreviewTestimonials
+          ? SectionAction(
+              label: context.localizations.portfolioSectionSeeAll,
+              onPressed: () {
+                TestimonialListWidget.showAll(context, portfolio.testimonials);
+              },
+            )
+          : null,
       horizontalPadding: 0,
     );
   }
