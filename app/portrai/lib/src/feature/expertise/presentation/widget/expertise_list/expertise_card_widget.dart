@@ -101,7 +101,6 @@ class _ExpertiseCardWidget extends StatelessWidget {
                               textOverflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          _GlassChipWidget(label: '${skills.length}'),
                         ],
                       ),
                       Wrap(
