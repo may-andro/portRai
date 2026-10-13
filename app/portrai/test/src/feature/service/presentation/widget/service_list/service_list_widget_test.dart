@@ -23,8 +23,24 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.text(service.title), findsOneWidget);
-      expect(find.byType(DSCardWidget), findsOneWidget);
+      expect(find.byType(DSSpotlightCardWidget), findsOneWidget);
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
+    });
+
+    testWidgets('should open the service detail when a card is tapped', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const TestWidgetWrapper(
+          child: ServiceListWidget(services: [service], isVisible: true),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.byType(DSSpotlightCardWidget));
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.text(service.detail), findsOneWidget);
     });
   });
 }
