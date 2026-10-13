@@ -5,6 +5,16 @@ loaded automatically when relevant. Treat the summary below as always-on ground 
 the linked skill for full detail (code examples, rationale, edge cases) before acting in that
 area.
 
+## General Coding Behavior
+- State assumptions; if the request is ambiguous or has multiple interpretations, ask before coding.
+- Write the minimum code that fully solves the task: no unrequested features, options, or single-use abstractions.
+- Reuse existing helpers, components, and installed dependencies before writing new code; never add a dependency for a few lines.
+- Make surgical changes: every changed line traces to the request; match existing style; don't refactor or delete unrelated code (mention it instead).
+- Remove only imports/members your change made unused.
+- Never cut validation, error handling, security, accessibility, or the tests/callers your change affects (repo conventions below still apply).
+- Define a verifiable success check (test, analyze) and run it before finishing.
+- End with one or two lines: what was skipped or not verified, and any risk.
+
 ## Architecture Conventions
 See [`.github/skills/flutter-architecture-conventions/SKILL.md`](skills/flutter-architecture-conventions/SKILL.md).
 
