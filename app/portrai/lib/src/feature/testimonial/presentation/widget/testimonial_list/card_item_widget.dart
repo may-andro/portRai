@@ -38,22 +38,31 @@ class _CardItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return DSHoverableContainerWidget(
+      builder: (context, isHovering) => _buildCard(context, isHovering),
+    );
+  }
+
+  Widget _buildCard(BuildContext context, bool isHovering) {
     final palette = context.colorPalette;
     final accent = palette.accent.color;
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
     final logoSize = context.space(factor: 22);
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      transform: Matrix4.translationValues(0, isHovering ? -4 : 0, 0),
       height: getHeight(context) - context.bottomMargin,
       margin: context.margin,
       decoration: BoxDecoration(
         borderRadius: radius,
         color: palette.surface.surfaceContainerLow.color,
-        border: Border.all(color: palette.border.color),
+        border: Border.all(color: isHovering ? accent : palette.border.color),
         boxShadow: [
           BoxShadow(
-            color: accent.withAlpha(36),
-            blurRadius: 24,
+            color: accent.withAlpha(isHovering ? 90 : 36),
+            blurRadius: isHovering ? 32 : 24,
             offset: const Offset(0, 10),
           ),
         ],
@@ -67,21 +76,32 @@ class _CardItemWidget extends StatelessWidget {
               bottom: -logoSize * 0.1,
               width: logoSize,
               height: logoSize,
-              child: ColorFiltered(
-                colorFilter: _greyscale,
-                child: ShaderMask(
-                  blendMode: BlendMode.dstIn,
-                  shaderCallback: (bounds) {
-                    return const RadialGradient(
-                      colors: [Colors.black, Colors.transparent],
-                      stops: [0.35, 0.85],
-                    ).createShader(bounds);
-                  },
-                  child: Opacity(
-                    opacity: 0.16,
-                    child: DSNetworkImageWidget(
-                      url: testimonial.companyLogo,
-                      fit: BoxFit.contain,
+              child: AnimatedRotation(
+                turns: isHovering ? 0.03 : 0,
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOut,
+                child: AnimatedScale(
+                  scale: isHovering ? 1.2 : 1,
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOut,
+                  child: ColorFiltered(
+                    colorFilter: _greyscale,
+                    child: ShaderMask(
+                      blendMode: BlendMode.dstIn,
+                      shaderCallback: (bounds) {
+                        return const RadialGradient(
+                          colors: [Colors.black, Colors.transparent],
+                          stops: [0.35, 0.85],
+                        ).createShader(bounds);
+                      },
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 600),
+                        opacity: isHovering ? 0.3 : 0.16,
+                        child: DSNetworkImageWidget(
+                          url: testimonial.companyLogo,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -134,7 +154,10 @@ class _CardItemWidget extends StatelessWidget {
                   SizedBox(height: context.space(factor: 2)),
                   Container(height: 1, color: palette.border.color),
                   SizedBox(height: context.space(factor: 2)),
-                  _AuthorWidget(testimonial: testimonial),
+                  _AuthorWidget(
+                    testimonial: testimonial,
+                    isHovering: isHovering,
+                  ),
                 ],
               ),
             ),
@@ -146,9 +169,10 @@ class _CardItemWidget extends StatelessWidget {
 }
 
 class _AuthorWidget extends StatelessWidget {
-  const _AuthorWidget({required this.testimonial});
+  const _AuthorWidget({required this.testimonial, required this.isHovering});
 
   final TestimonialEntity testimonial;
+  final bool isHovering;
 
   @override
   Widget build(BuildContext context) {
@@ -159,30 +183,39 @@ class _AuthorWidget extends StatelessWidget {
     return Row(
       spacing: context.space(factor: 1.5),
       children: [
-        Container(
-          width: size,
-          height: size,
-          padding: const EdgeInsets.all(2.5),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [palette.accent.color, palette.brand.primary.color],
+        AnimatedScale(
+          scale: isHovering ? 1.12 : 1,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          child: AnimatedRotation(
+            turns: isHovering ? -0.02 : 0,
+            duration: const Duration(milliseconds: 300),
+            child: Container(
+              width: size,
+              height: size,
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [palette.accent.color, palette.brand.primary.color],
+                ),
+              ),
+              child: image == null
+                  ? CircleAvatar(
+                      backgroundColor: palette.surface.surface.color,
+                      child: Icon(
+                        Icons.person,
+                        size: size / 2,
+                        color: palette.brand.primary.color,
+                      ),
+                    )
+                  : DSNetworkImageWidget(
+                      url: image,
+                      shape: BoxShape.circle,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
-          child: image == null
-              ? CircleAvatar(
-                  backgroundColor: palette.surface.surface.color,
-                  child: Icon(
-                    Icons.person,
-                    size: size / 2,
-                    color: palette.brand.primary.color,
-                  ),
-                )
-              : DSNetworkImageWidget(
-                  url: image,
-                  shape: BoxShape.circle,
-                  fit: BoxFit.cover,
-                ),
         ),
         Expanded(
           child: Column(
