@@ -113,7 +113,6 @@ class ServiceDetailWidget extends StatelessWidget {
               icon: Icons.help_outline_rounded,
               child: _FaqWidget(faq: service.faq),
             ),
-          _FooterArtWidget(imageUrl: service.image),
         ],
       ),
     );
