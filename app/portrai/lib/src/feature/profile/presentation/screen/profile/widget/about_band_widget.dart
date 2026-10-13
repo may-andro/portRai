@@ -11,7 +11,10 @@ class _AboutBandWidget extends StatelessWidget {
     final photoWidth = isDesktop
         ? min(context.width * 0.34, 460.0)
         : min(context.width * 0.78, 340.0);
-    final photo = _BlobPhotoWidget(url: profile.photoAt(2), width: photoWidth);
+    final photo = _BlobPhotoWidget(
+      url: profile.profileImage,
+      width: photoWidth,
+    );
     final text = _AboutTextWidget(profile: profile, isDesktop: isDesktop);
 
     return _BandWidget(

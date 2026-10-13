@@ -48,19 +48,18 @@ class _AppBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
     return SliverAppBar(
       pinned: true,
       elevation: context.dimen.elevationNone.value,
       scrolledUnderElevation: context.dimen.elevationNone.value,
-      backgroundColor: palette.surface.inverseSurface.color,
-      surfaceTintColor: palette.neutral.transparent.color,
-      foregroundColor: palette.surface.onInverseSurface.color,
+      backgroundColor: context.colorPalette.background.color,
+      surfaceTintColor: context.colorPalette.neutral.transparent.color,
+      foregroundColor: context.colorPalette.surface.onInverseSurface.color,
       automaticallyImplyLeading: !kIsWeb,
       centerTitle: true,
       title: DSTextWidget(
         title,
-        color: palette.surface.onInverseSurface,
+        color: context.colorPalette.neutral.grey9,
         style: kIsWeb
             ? context.typography.emphasizedTitleLarge
             : context.typography.emphasizedTitleMedium,

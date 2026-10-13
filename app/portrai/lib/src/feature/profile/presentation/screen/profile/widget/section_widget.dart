@@ -234,14 +234,3 @@ class _CountUpWidget extends StatelessWidget {
     );
   }
 }
-
-/// Photos from the profile, main portrait first, reused when there are few.
-extension on ProfileEntity {
-  String photoAt(int index) {
-    final photos = <String>{
-      profileImage,
-      ...profileImages,
-    }.where((url) => url.isNotEmpty).toList();
-    return photos.isEmpty ? '' : photos[index % photos.length];
-  }
-}

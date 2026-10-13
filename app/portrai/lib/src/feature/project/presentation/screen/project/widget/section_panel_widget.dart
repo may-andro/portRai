@@ -124,7 +124,7 @@ class ProjectAchievementListWidget extends StatelessWidget {
                         (index + 1).toString().padLeft(2, '0'),
                         style: context.typography.emphasizedTitleLarge,
                         color: DSColor(
-                          palette.brand.primary.color.withAlpha(150).toARGB32(),
+                          palette.brand.secondary.color.withAlpha(150).toARGB32(),
                         ),
                       ),
                     ),
@@ -210,7 +210,7 @@ class ProjectFeatureListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final accent = palette.brand.primary.color;
+    final accent = palette.brand.tertiary.color;
     return Wrap(
       spacing: context.space(factor: 0.75),
       runSpacing: context.space(factor: 0.75),

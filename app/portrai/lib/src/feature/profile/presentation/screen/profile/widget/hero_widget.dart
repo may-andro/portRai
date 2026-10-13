@@ -29,26 +29,29 @@ class _HeroWidget extends StatelessWidget {
               horizontal: _horizontalInset(context),
               vertical: context.space(factor: isDesktop ? 6 : 4),
             ),
-            child: isDesktop
-                ? Row(
-                    spacing: context.space(factor: 4),
-                    children: [
-                      Expanded(
-                        child: _HeroTextWidget(
-                          profile: profile,
-                          isDesktop: true,
+            child: SizedBox(
+              width: double.infinity,
+              child: isDesktop
+                  ? Row(
+                      spacing: context.space(factor: 4),
+                      children: [
+                        Expanded(
+                          child: _HeroTextWidget(
+                            profile: profile,
+                            isDesktop: true,
+                          ),
                         ),
-                      ),
-                      stage,
-                    ],
-                  )
-                : Column(
-                    spacing: context.space(factor: 3),
-                    children: [
-                      stage,
-                      _HeroTextWidget(profile: profile, isDesktop: false),
-                    ],
-                  ),
+                        stage,
+                      ],
+                    )
+                  : Column(
+                      spacing: context.space(factor: 3),
+                      children: [
+                        stage,
+                        _HeroTextWidget(profile: profile, isDesktop: false),
+                      ],
+                    ),
+            ),
           ),
         ],
       ),
@@ -302,7 +305,7 @@ class _HeroStageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final portraitHeight = portraitWidth * 1.2;
     final stageHeight = portraitHeight * 1.12;
-    final cardSize = portraitWidth * 0.36;
+    final cardSize = portraitWidth * 0.32;
     final extras = profile.backdropImages;
     final slots = [
       (left: 0.0, top: stageHeight * 0.04, turns: -0.025, delay: 0),
@@ -313,8 +316,8 @@ class _HeroStageWidget extends StatelessWidget {
         delay: 700,
       ),
       (
-        left: stageWidth * 0.02,
-        top: stageHeight - cardSize * 1.1,
+        left: stageWidth - cardSize * 1.05,
+        top: stageHeight - cardSize * 1.3,
         turns: 0.015,
         delay: 1400,
       ),
@@ -326,6 +329,13 @@ class _HeroStageWidget extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          Center(
+            child: _HeroPortraitWidget(
+              url: profile.coverImage,
+              width: portraitWidth,
+              height: portraitHeight,
+            ),
+          ),
           for (
             var slotIndex = 0;
             slotIndex < extras.length && slotIndex < slots.length;
@@ -341,16 +351,9 @@ class _HeroStageWidget extends StatelessWidget {
                 delay: slots[slotIndex].delay,
               ),
             ),
-          Center(
-            child: _HeroPortraitWidget(
-              url: profile.profileImage,
-              width: portraitWidth,
-              height: portraitHeight,
-            ),
-          ),
           Positioned(
-            right: stageWidth * 0.0,
-            top: stageHeight * 0.02,
+            left: stageWidth * 0.06,
+            bottom: stageHeight * 0.02,
             child: _HeroChipWidget(
               icon: Icons.workspace_premium_rounded,
               label:
@@ -359,8 +362,8 @@ class _HeroStageWidget extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: stageWidth * 0.06,
-            bottom: stageHeight * 0.02,
+            right: stageWidth * 0.0,
+            top: stageHeight * 0.01,
             child: _HeroChipWidget(
               icon: Icons.circle,
               iconSize: 10,
@@ -458,11 +461,17 @@ class _HeroPortraitWidget extends StatelessWidget {
                       borderRadius: _shape,
                       child: ColoredBox(
                         color: palette.surface.surface.color,
-                        child: DSNetworkImageWidget(
-                          url: url,
-                          fit: BoxFit.fitHeight,
-                          width: width,
-                          height: height,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: context.space(),
+                            right: context.space(),
+                          ),
+                          child: DSNetworkImageWidget(
+                            url: url,
+                            fit: BoxFit.contain,
+                            width: width,
+                            height: height,
+                          ),
                         ),
                       ),
                     ),
