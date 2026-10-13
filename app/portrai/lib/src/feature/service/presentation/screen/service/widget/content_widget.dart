@@ -1,8 +1,11 @@
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/widget/service_detail_widget.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key, required this.service});
@@ -18,9 +21,9 @@ class ContentWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       slivers: [
         if (context.isDesktop)
-          const SliverToBoxAdapter(child: _HeaderWidget())
+          const SliverToBoxAdapter(child: PageHeaderWidget())
         else
-          _AppBarWidget(title: service.title),
+          PageAppBarWidget(title: service.title),
         SliverPadding(
           padding: EdgeInsets.symmetric(
             vertical: context.space(factor: 3),
@@ -35,57 +38,17 @@ class ContentWidget extends StatelessWidget {
             ),
           ),
         ),
+        BlocBuilder<ServiceBloc, ServiceState>(
+          builder: (context, state) {
+            return switch (state) {
+              LoadedState(:final profile) => SliverToBoxAdapter(
+                child: FooterWidget(profile: profile),
+              ),
+              LoadingState() => const SliverToBoxAdapter(),
+            };
+          },
+        ),
       ],
-    );
-  }
-}
-
-class _AppBarWidget extends StatelessWidget {
-  const _AppBarWidget({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      elevation: context.dimen.elevationNone.value,
-      scrolledUnderElevation: context.dimen.elevationNone.value,
-      backgroundColor: context.colorPalette.background.color,
-      surfaceTintColor: context.colorPalette.neutral.transparent.color,
-      automaticallyImplyLeading: !kIsWeb,
-      centerTitle: true,
-      title: DSTextWidget(
-        title,
-        color: context.colorPalette.neutral.grey9,
-        style: kIsWeb
-            ? context.typography.emphasizedTitleLarge
-            : context.typography.emphasizedTitleMedium,
-        maxLines: 1,
-      ),
-    );
-  }
-}
-
-class _HeaderWidget extends StatelessWidget {
-  const _HeaderWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: context.space(factor: 7),
-      padding: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
-      child: Row(
-        children: [
-          Flexible(
-            child: Image.asset(
-              DSImage.logoPath,
-              package: 'design_system',
-              fit: BoxFit.cover,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -9,17 +9,13 @@ import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bl
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/intro_widget.dart';
 import 'package:portrai/src/route/route.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:tracking/tracking.dart';
 
-part 'mobile_tablet_content_widget.dart';
-
 part 'desktop_content_widget.dart';
-
-part 'app_bar_widget.dart';
-
-part 'tab_bar_widget.dart';
-
 part 'header_widget.dart';
+part 'mobile_tablet_content_widget.dart';
+part 'tab_bar_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});

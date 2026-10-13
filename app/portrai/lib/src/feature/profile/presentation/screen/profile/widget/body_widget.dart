@@ -16,9 +16,9 @@ class _BodyWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       slivers: [
         if (isDesktop)
-          const SliverToBoxAdapter(child: _HeaderWidget())
+          const SliverToBoxAdapter(child: PageHeaderWidget())
         else
-          _AppBarWidget(title: profile.fullName),
+          PageAppBarWidget(title: profile.fullName),
         SliverToBoxAdapter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,56 +37,6 @@ class _BodyWidget extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _AppBarWidget extends StatelessWidget {
-  const _AppBarWidget({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      elevation: context.dimen.elevationNone.value,
-      scrolledUnderElevation: context.dimen.elevationNone.value,
-      backgroundColor: context.colorPalette.background.color,
-      surfaceTintColor: context.colorPalette.neutral.transparent.color,
-      foregroundColor: context.colorPalette.surface.onInverseSurface.color,
-      automaticallyImplyLeading: !kIsWeb,
-      centerTitle: true,
-      title: DSTextWidget(
-        title,
-        color: context.colorPalette.neutral.grey9,
-        style: kIsWeb
-            ? context.typography.emphasizedTitleLarge
-            : context.typography.emphasizedTitleMedium,
-      ),
-    );
-  }
-}
-
-class _HeaderWidget extends StatelessWidget {
-  const _HeaderWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: context.space(factor: 7),
-      padding: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
-      child: Row(
-        children: [
-          Flexible(
-            child: Image.asset(
-              DSImage.logoPath,
-              package: 'design_system',
-              fit: BoxFit.cover,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

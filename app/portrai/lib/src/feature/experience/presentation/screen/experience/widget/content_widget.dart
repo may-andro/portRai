@@ -1,24 +1,19 @@
 import 'dart:math';
 
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/widget/section_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
-part 'mobile_tablet_content_widget.dart';
-
 part 'desktop_content_widget.dart';
-
-part 'app_bar_widget.dart';
-
+part 'mobile_tablet_content_widget.dart';
 part 'tab_bar_widget.dart';
-
-part 'header_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});

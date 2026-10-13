@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
@@ -9,6 +8,8 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/services/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/widget/_widget.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -89,9 +90,14 @@ class _SuccessWidget extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         slivers: [
           if (context.isDesktop)
-            const SliverToBoxAdapter(child: _HeaderWidget())
+            const SliverToBoxAdapter(child: PageHeaderWidget())
           else
-            const _AppBarWidget(),
+            PageAppBarWidget(
+              title: context.localizations.portfolioSectionServices,
+              backgroundColor:
+                  context.colorPalette.surface.inverseSurface.color,
+              titleColor: context.colorPalette.surface.onInverseSurface,
+            ),
           SliverPadding(
             padding: EdgeInsets.symmetric(
               vertical: context.space(factor: 3),
@@ -106,55 +112,6 @@ class _SuccessWidget extends StatelessWidget {
               padding: EdgeInsets.only(top: context.space(factor: 3)),
               sliver: SliverToBoxAdapter(child: FooterWidget(profile: profile)),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AppBarWidget extends StatelessWidget {
-  const _AppBarWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.colorPalette;
-    return SliverAppBar(
-      pinned: true,
-      elevation: context.dimen.elevationNone.value,
-      scrolledUnderElevation: context.dimen.elevationNone.value,
-      backgroundColor: palette.surface.inverseSurface.color,
-      surfaceTintColor: palette.neutral.transparent.color,
-      foregroundColor: palette.surface.onInverseSurface.color,
-      automaticallyImplyLeading: !kIsWeb,
-      centerTitle: true,
-      title: DSTextWidget(
-        context.localizations.portfolioSectionServices,
-        color: palette.surface.onInverseSurface,
-        style: kIsWeb
-            ? context.typography.emphasizedTitleLarge
-            : context.typography.emphasizedTitleMedium,
-      ),
-    );
-  }
-}
-
-class _HeaderWidget extends StatelessWidget {
-  const _HeaderWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: context.space(factor: 7),
-      padding: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
-      child: Row(
-        children: [
-          Flexible(
-            child: Image.asset(
-              DSImage.logoPath,
-              package: 'design_system',
-              fit: BoxFit.cover,
-            ),
-          ),
         ],
       ),
     );

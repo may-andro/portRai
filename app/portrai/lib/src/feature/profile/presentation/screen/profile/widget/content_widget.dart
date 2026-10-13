@@ -10,23 +10,18 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/_widget.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
-part 'section_widget.dart';
-
-part 'motion_widget.dart';
-
-part 'hero_widget.dart';
-
-part 'global_band_widget.dart';
-
 part 'about_band_widget.dart';
-
 part 'background_band_widget.dart';
-
-part 'contact_band_widget.dart';
-
 part 'body_widget.dart';
+part 'contact_band_widget.dart';
+part 'global_band_widget.dart';
+part 'hero_widget.dart';
+part 'motion_widget.dart';
+part 'section_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
