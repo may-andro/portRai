@@ -82,16 +82,6 @@ class _HeaderWidget extends StatelessWidget {
                           fit: BoxFit.contain,
                         ),
                       ),
-                      const Spacer(),
-                      IconButton.filledTonal(
-                        tooltip: context.localizations.close,
-                        onPressed: context.popScreen,
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.white24,
-                          foregroundColor: Colors.white,
-                        ),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
                     ],
                   ),
                   Padding(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/route/_route.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/widget/_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 
@@ -33,20 +34,11 @@ class ServiceScreen extends StatelessWidget {
             onResume: () => context.bloc.add(ScreenVisibleEvent()),
             child: Scaffold(
               backgroundColor: context.colorPalette.background.color,
-              body: const _ContentWidget(),
+              body: ContentWidget(service: service),
             ),
           );
         },
       ),
     );
-  }
-}
-
-class _ContentWidget extends StatelessWidget {
-  const _ContentWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
