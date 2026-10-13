@@ -44,6 +44,8 @@ sealed class ScrollableProjectSectionDTO extends ProjectSectionDTO {
 
   String getTitle(BuildContext context);
 
+  IconData get icon;
+
   @protected
   Widget buildContent(BuildContext context);
 }
@@ -62,14 +64,19 @@ class OverviewSectionDTO extends ScrollableProjectSectionDTO {
       context.localizations.projectOverview;
 
   @override
+  IconData get icon => Icons.auto_awesome_rounded;
+
+  @override
   @protected
   Widget buildContent(BuildContext context) {
-    return DSDetailSectionWidget(
+    return ProjectSectionPanelWidget(
       title: getTitle(context),
+      icon: icon,
+      eyebrow: true,
       child: DSTextWidget(
         project.longDescription,
-        color: context.colorPalette.neutral.grey8,
-        style: context.typography.bodyMedium,
+        color: context.colorPalette.neutral.grey10,
+        style: context.typography.bodyLarge,
       ),
     );
   }
@@ -88,17 +95,15 @@ class TechnologiesSectionDTO extends ScrollableProjectSectionDTO {
       context.localizations.projectTechnologies;
 
   @override
+  IconData get icon => Icons.memory_rounded;
+
+  @override
   @protected
   Widget buildContent(BuildContext context) {
-    return DSDetailSectionWidget(
+    return ProjectSectionPanelWidget(
       title: getTitle(context),
-      child: Wrap(
-        spacing: context.space(),
-        runSpacing: context.space(),
-        children: project.technologies
-            .map((tech) => DSTagWidget(label: tech))
-            .toList(),
-      ),
+      icon: icon,
+      child: ProjectTechListWidget(items: project.technologies),
     );
   }
 }
@@ -116,11 +121,15 @@ class AchievementsSectionDTO extends ScrollableProjectSectionDTO {
       context.localizations.projectAchievements;
 
   @override
+  IconData get icon => Icons.emoji_events_rounded;
+
+  @override
   @protected
   Widget buildContent(BuildContext context) {
-    return DSDetailSectionWidget(
+    return ProjectSectionPanelWidget(
       title: getTitle(context),
-      child: DSBulletPointListWidget(bulletPoints: project.achievements),
+      icon: icon,
+      child: ProjectAchievementListWidget(items: project.achievements),
     );
   }
 }
@@ -138,11 +147,16 @@ class KeyFeaturesSectionDTO extends ScrollableProjectSectionDTO {
       context.localizations.projectKeyFeatures;
 
   @override
+  IconData get icon => Icons.bolt_rounded;
+
+  @override
   @protected
   Widget buildContent(BuildContext context) {
-    return DSDetailSectionWidget(
+    return ProjectSectionPanelWidget(
       title: getTitle(context),
-      child: DSBulletPointListWidget(bulletPoints: project.features),
+      icon: icon,
+      eyebrow: true,
+      child: ProjectFeatureListWidget(items: project.features),
     );
   }
 }
@@ -160,10 +174,14 @@ class AvailabilitiesSectionDTO extends ScrollableProjectSectionDTO {
       context.localizations.projectAvailableOn;
 
   @override
+  IconData get icon => Icons.rocket_launch_rounded;
+
+  @override
   @protected
   Widget buildContent(BuildContext context) {
-    return DSDetailSectionWidget(
+    return ProjectSectionPanelWidget(
       title: getTitle(context),
+      icon: icon,
       child: AvailabilitiesWidget(project: project),
     );
   }

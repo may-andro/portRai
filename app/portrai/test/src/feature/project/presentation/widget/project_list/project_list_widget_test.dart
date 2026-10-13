@@ -35,5 +35,39 @@ void main() {
         await tester.pump(const Duration(seconds: 1));
       },
     );
+
+    for (final entry in const {
+      'mobile': Size(390, 844),
+      'tablet': Size(820, 1180),
+      'desktop': Size(1440, 900),
+    }.entries) {
+      testWidgets(
+        'should render every project without errors when on ${entry.key}',
+        (tester) async {
+          tester.view.physicalSize = entry.value;
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.reset);
+
+          await tester.pumpWidget(
+            TestWidgetWrapper(
+              child: SingleChildScrollView(
+                child: ProjectListWidget(
+                  projects: [
+                    createProjectEntity(id: 'a'),
+                    createProjectEntity(id: 'b'),
+                    createProjectEntity(id: 'c'),
+                  ],
+                  isVisible: true,
+                ),
+              ),
+            ),
+          );
+          await tester.pump(const Duration(seconds: 2));
+
+          expect(find.text('🚀'), findsNWidgets(3));
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
   });
 }

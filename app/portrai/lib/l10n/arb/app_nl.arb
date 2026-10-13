@@ -289,5 +289,25 @@
   "remoteAssistantReset": "Chat wissen",
   "@remoteAssistantReset": {"description": "Action clearing the remote in-memory conversation and stopping local consumption of pending output"},
   "remoteAssistantGenerating": "Bezig met genereren — dit antwoord is nog niet volledig",
-  "@remoteAssistantGenerating": {"description": "Indicates that streamed text is provisional until generation completes successfully"}
+  "@remoteAssistantGenerating": {"description": "Indicates that streamed text is provisional until generation completes successfully"},
+  "projectFactStatus": "Status",
+  "@projectFactStatus": {
+    "description": "Label of the project status fact in the project header"
+  },
+  "projectFactTeam": "Team",
+  "@projectFactTeam": {
+    "description": "Label of the team size fact in the project header"
+  },
+  "projectFactRole": "Rol",
+  "@projectFactRole": {
+    "description": "Label of the role fact in the project header"
+  },
+  "projectFactPeriod": "Periode",
+  "@projectFactPeriod": {
+    "description": "Label of the date range fact in the project header"
+  },
+  "projectFactMarkets": "Markten",
+  "@projectFactMarkets": {
+    "description": "Label of the countries fact in the project header"
+  }
 }

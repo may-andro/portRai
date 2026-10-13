@@ -15,7 +15,7 @@ void main() {
         await tester.pumpWidget(
           TestWidgetWrapper(child: IntroWidget(project: project)),
         );
-        await tester.pump();
+        await tester.pump(const Duration(seconds: 3));
 
         expect(find.text('3 people'), findsOneWidget);
         expect(find.text('Jan 2024 - Mar 2025'), findsOneWidget);

@@ -44,6 +44,7 @@ void main() {
       tester,
     ) async {
       await pumpSections(tester);
+      await tester.pump(const Duration(seconds: 3));
 
       expect(find.text('Overview'), findsOneWidget);
       expect(find.text('Technologies'), findsOneWidget);

@@ -11,19 +11,29 @@ class AvailabilitiesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttons = <Widget>[];
-
-    for (final market in project.markets) {
-      _addStoreButtons(
-        context,
-        buttons,
-        website: market.website,
-        appStore: market.appStore,
-        playStore: market.playStore,
-        github: market.github,
-        country: market.country,
-      );
-    }
+    final l10n = context.localizations;
+    final buttons = [
+      ..._buttons(
+        label: l10n.projectGitHub,
+        icon: Icons.code,
+        links: _links((market) => market.github),
+      ),
+      ..._buttons(
+        label: l10n.projectWebsite,
+        icon: Icons.language,
+        links: _links((market) => market.website),
+      ),
+      ..._buttons(
+        label: l10n.projectAppStore,
+        icon: Icons.apple,
+        links: _links((market) => market.appStore),
+      ),
+      ..._buttons(
+        label: l10n.projectPlayStore,
+        icon: Icons.shop,
+        links: _links((market) => market.playStore),
+      ),
+    ];
 
     return Wrap(
       spacing: context.space(),
@@ -31,54 +41,31 @@ class AvailabilitiesWidget extends StatelessWidget {
       children: buttons,
     );
   }
-}
 
-void _addStoreButtons(
-  BuildContext context,
-  List<Widget> buttons, {
-  required String? website,
-  required String? appStore,
-  required String? playStore,
-  required String? github,
-  String? country,
-}) {
-  String label(String text) => country == null ? text : '$text · $country';
+  /// Maps each distinct URL to the countries it is offered in, so markets
+  /// sharing one link produce a single entry.
+  Map<String, List<String>> _links(String? Function(ProjectMarketEntity) get) {
+    final links = <String, List<String>>{};
+    for (final market in project.markets) {
+      final url = get(market);
+      if (url == null) continue;
+      links.putIfAbsent(url, () => []).add(market.country);
+    }
+    return links;
+  }
 
-  if (github != null) {
-    buttons.add(
-      _ButtonWidget(
-        label: label(context.localizations.projectGitHub),
-        icon: Icons.code,
-        url: github,
-      ),
-    );
-  }
-  if (website != null) {
-    buttons.add(
-      _ButtonWidget(
-        label: label(context.localizations.projectWebsite),
-        icon: Icons.language,
-        url: website,
-      ),
-    );
-  }
-  if (appStore != null) {
-    buttons.add(
-      _ButtonWidget(
-        label: label(context.localizations.projectAppStore),
-        icon: Icons.apple,
-        url: appStore,
-      ),
-    );
-  }
-  if (playStore != null) {
-    buttons.add(
-      _ButtonWidget(
-        label: label(context.localizations.projectPlayStore),
-        icon: Icons.shop,
-        url: playStore,
-      ),
-    );
+  /// Country is only added to the label when a store has several distinct links.
+  Iterable<Widget> _buttons({
+    required String label,
+    required IconData icon,
+    required Map<String, List<String>> links,
+  }) {
+    return links.entries.map((entry) {
+      final text = links.length == 1
+          ? label
+          : '$label · ${entry.value.join(', ')}';
+      return _ButtonWidget(label: text, icon: icon, url: entry.key);
+    });
   }
 }
 

@@ -3,8 +3,12 @@ import 'dart:math';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
+import 'package:portrai/src/feature/project/presentation/screen/project/widget/intro_widget.dart';
+import 'package:portrai/src/route/route.dart';
 import 'package:tracking/tracking.dart';
 
 part 'mobile_tablet_content_widget.dart';
@@ -72,16 +76,31 @@ class _SuccessWidget extends StatefulWidget {
 class _SuccessWidgetState extends State<_SuccessWidget>
     with TickerProviderStateMixin {
   late final ScrollController _scrollController;
-  late final TabController _tabController;
+  late TabController _tabController;
+  bool _hasTabController = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
-    _tabController = TabController(
-      length: widget.scrollableSections.length,
-      vsync: this,
-    );
+  }
+
+  /// Desktop shows "Available On" in the side column, so it gets no tab.
+  List<ScrollableProjectSectionDTO> get _tabSections => context.isDesktop
+      ? widget.scrollableSections
+            .where((s) => s is! AvailabilitiesSectionDTO)
+            .toList()
+      : widget.scrollableSections;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final length = _tabSections.length;
+    if (!_hasTabController || _tabController.length != length) {
+      if (_hasTabController) _tabController.dispose();
+      _tabController = TabController(length: length, vsync: this);
+      _hasTabController = true;
+    }
   }
 
   @override
@@ -123,7 +142,7 @@ class _SuccessWidgetState extends State<_SuccessWidget>
     final state = context.bloc.state;
     if (state is! LoadedState) return;
 
-    final sections = state.scrollableSections;
+    final sections = _tabSections;
     for (var i = 0; i < sections.length; i++) {
       final keyContext = sections[i].sectionKey.currentContext;
       if (keyContext case final BuildContext context) {
