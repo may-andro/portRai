@@ -36,7 +36,6 @@ class ServiceDetailWidget extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      showDragHandle: true,
       backgroundColor: context.colorPalette.background.color,
       constraints: BoxConstraints(maxHeight: context.height * 0.9),
       shape: RoundedRectangleBorder(
@@ -46,7 +45,12 @@ class ServiceDetailWidget extends StatelessWidget {
       ),
       builder: (_) {
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
+          padding: EdgeInsets.fromLTRB(
+            context.space(factor: 2),
+            context.space(factor: 2),
+            context.space(factor: 2),
+            0,
+          ),
           child: ServiceDetailWidget(service: service),
         );
       },
@@ -55,65 +59,62 @@ class ServiceDetailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _HeaderWidget(service: service),
-        Flexible(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              top: context.space(factor: 2),
-              bottom: context.space(factor: 3),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: context.space(factor: 3),
-              children: [
-                DSTextWidget(
-                  service.detail,
-                  style: context.typography.bodyLarge,
-                  color: context.colorPalette.neutral.grey9,
-                ),
-                if (service.deliverables.isNotEmpty)
-                  _SectionWidget(
-                    title: context.localizations.serviceDetailDeliverables,
-                    child: DSBulletPointListWidget(
-                      bulletPoints: service.deliverables,
-                    ),
-                  ),
-                if (service.process.isNotEmpty)
-                  _SectionWidget(
-                    title: context.localizations.serviceDetailProcess,
-                    child: _StepsWidget(steps: service.process),
-                  ),
-                if (service.technologies.isNotEmpty)
-                  _SectionWidget(
-                    title: context.localizations.serviceDetailTechnologies,
-                    child: _TagsWidget(tags: service.technologies),
-                  ),
-                if (service.idealFor.isNotEmpty)
-                  _SectionWidget(
-                    title: context.localizations.serviceDetailIdealFor,
-                    child: DSBulletPointListWidget(
-                      bulletPoints: service.idealFor,
-                    ),
-                  ),
-                if (service.engagementTypes.isNotEmpty)
-                  _SectionWidget(
-                    title: context.localizations.serviceDetailEngagement,
-                    child: _TagsWidget(tags: service.engagementTypes),
-                  ),
-                if (service.faq.isNotEmpty)
-                  _SectionWidget(
-                    title: context.localizations.serviceDetailFaq,
-                    child: _FaqWidget(faq: service.faq),
-                  ),
-              ],
-            ),
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: context.space(factor: 3)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.space(factor: 3),
+        children: [
+          _HeaderWidget(service: service),
+          DSTextWidget(
+            service.detail,
+            style: context.typography.bodyLarge,
+            color: context.colorPalette.neutral.grey9,
           ),
-        ),
-      ],
+          if (service.deliverables.isNotEmpty)
+            _SectionWidget(
+              title: context.localizations.serviceDetailDeliverables,
+              icon: Icons.inventory_2_outlined,
+              child: _CheckListWidget(
+                items: service.deliverables,
+                icon: Icons.check_circle_rounded,
+              ),
+            ),
+          if (service.process.isNotEmpty)
+            _SectionWidget(
+              title: context.localizations.serviceDetailProcess,
+              icon: Icons.route_outlined,
+              child: _StepsWidget(steps: service.process),
+            ),
+          if (service.technologies.isNotEmpty)
+            _SectionWidget(
+              title: context.localizations.serviceDetailTechnologies,
+              icon: Icons.code_rounded,
+              child: _TagsWidget(tags: service.technologies),
+            ),
+          if (service.idealFor.isNotEmpty)
+            _SectionWidget(
+              title: context.localizations.serviceDetailIdealFor,
+              icon: Icons.track_changes_rounded,
+              child: _CheckListWidget(
+                items: service.idealFor,
+                icon: Icons.arrow_circle_right_rounded,
+              ),
+            ),
+          if (service.engagementTypes.isNotEmpty)
+            _SectionWidget(
+              title: context.localizations.serviceDetailEngagement,
+              icon: Icons.handshake_outlined,
+              child: _TagsWidget(tags: service.engagementTypes),
+            ),
+          if (service.faq.isNotEmpty)
+            _SectionWidget(
+              title: context.localizations.serviceDetailFaq,
+              icon: Icons.help_outline_rounded,
+              child: _FaqWidget(faq: service.faq),
+            ),
+        ],
+      ),
     );
   }
 }

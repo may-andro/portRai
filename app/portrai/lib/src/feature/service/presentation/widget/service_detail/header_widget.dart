@@ -7,37 +7,96 @@ class _HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = context.space(factor: 8);
+    final palette = context.colorPalette;
+    final start = Color.lerp(palette.brand.primary.color, Colors.black, 0.35)!;
+    final end = Color.lerp(palette.brand.tertiary.color, Colors.black, 0.45)!;
+    final artSize = context.space(factor: 22);
 
-    return Row(
-      spacing: context.space(factor: 2),
-      children: [
-        Container(
-          width: size,
-          height: size,
-          padding: EdgeInsets.all(context.space(factor: 0.75)),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(
-              context.dimen.radiusLevel2.value,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(context.dimen.radiusLevel3.value),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [start, end],
+          ),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -artSize * 0.15,
+              bottom: -artSize * 0.2,
+              width: artSize,
+              height: artSize,
+              child: Transform.rotate(
+                angle: -0.2,
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) {
+                    return const RadialGradient(
+                      colors: [Colors.black, Colors.transparent],
+                      stops: [0.6, 1],
+                    ).createShader(bounds);
+                  },
+                  child: Opacity(
+                    opacity: 0.55,
+                    child: DSNetworkImageWidget(
+                      url: service.image,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
             ),
-            border: Border.all(color: context.colorPalette.neutral.grey5.color),
-          ),
-          child: DSNetworkImageWidget(url: service.image, fit: BoxFit.contain),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                context.space(factor: 2.5),
+                context.space(factor: 2.5),
+                context.space(factor: 2.5),
+                context.space(factor: 3),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: context.space(factor: 1.5),
+                children: [
+                  Row(
+                    children: [
+                      const Spacer(),
+                      IconButton.filledTonal(
+                        tooltip: context.localizations.close,
+                        onPressed: context.popScreen,
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white24,
+                          foregroundColor: Colors.white,
+                        ),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.space(factor: 2)),
+                  Padding(
+                    padding: EdgeInsets.only(right: context.space(factor: 6)),
+                    child: DSTextWidget(
+                      service.title,
+                      style: context.typography.emphasizedHeadlineSmall,
+                      color: const DSColor(0xFFFFFFFF),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: context.space(factor: 6)),
+                    child: DSTextWidget(
+                      service.description,
+                      style: context.typography.bodyMedium,
+                      color: const DSColor(0xFFFFFFFF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        Expanded(
-          child: DSTextWidget(
-            service.title,
-            style: context.typography.emphasizedTitleLarge,
-            color: context.colorPalette.neutral.grey10,
-          ),
-        ),
-        IconButton(
-          tooltip: context.localizations.close,
-          onPressed: context.popScreen,
-          icon: const Icon(Icons.close_rounded),
-        ),
-      ],
+      ),
     );
   }
 }
