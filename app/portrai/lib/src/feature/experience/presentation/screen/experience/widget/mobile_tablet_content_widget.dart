@@ -51,8 +51,11 @@ class _MobileTabletContentWidget extends StatelessWidget {
             vertical: context.space(factor: 3),
             horizontal: context.horizontalPadding,
           ),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate(scrollableSections),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              spacing: context.space(factor: 3),
+              children: scrollableSections,
+            ),
           ),
         ),
         if (state.profile case final ProfileEntity profile)
