@@ -18,13 +18,20 @@ class _CardItemWidget extends StatelessWidget {
         : context.space(factor: 5);
   }
 
+  static double _authorHeight(BuildContext context) {
+    final texts =
+        context.getTextHeight(context.typography.emphasizedTitleSmall, 1) +
+        context.getTextHeight(context.typography.bodySmall, 1);
+    return max(_avatarSize(context), texts);
+  }
+
   static double getHeight(BuildContext context) {
     return context.space(factor: 3) +
         context.getTextHeight(context.typography.bodyLarge, context.maxLines) +
         context.space(factor: 2) +
         1 +
         context.space(factor: 2) +
-        _avatarSize(context) +
+        _authorHeight(context) +
         context.space(factor: 2.5) +
         context.bottomMargin;
   }
@@ -37,6 +44,7 @@ class _CardItemWidget extends StatelessWidget {
     final logoSize = context.space(factor: 22);
 
     return Container(
+      height: getHeight(context) - context.bottomMargin,
       margin: context.margin,
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -55,17 +63,26 @@ class _CardItemWidget extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              right: -logoSize * 0.2,
-              top: -logoSize * 0.15,
+              right: -logoSize * 0.1,
+              bottom: -logoSize * 0.1,
               width: logoSize,
               height: logoSize,
               child: ColorFiltered(
                 colorFilter: _greyscale,
-                child: Opacity(
-                  opacity: 0.1,
-                  child: DSNetworkImageWidget(
-                    url: testimonial.companyLogo,
-                    fit: BoxFit.contain,
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) {
+                    return const RadialGradient(
+                      colors: [Colors.black, Colors.transparent],
+                      stops: [0.35, 0.85],
+                    ).createShader(bounds);
+                  },
+                  child: Opacity(
+                    opacity: 0.16,
+                    child: DSNetworkImageWidget(
+                      url: testimonial.companyLogo,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ),
@@ -87,7 +104,7 @@ class _CardItemWidget extends StatelessWidget {
             ),
             Positioned(
               left: context.space(factor: 2.5),
-              top: -context.space(),
+              top: context.space(),
               child: DSTextWidget(
                 '\u201C',
                 style: context.typography.emphasizedDisplayLarge,
@@ -104,11 +121,7 @@ class _CardItemWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: context.getTextHeight(
-                      context.typography.bodyLarge,
-                      context.maxLines,
-                    ),
+                  Expanded(
                     child: DSTextWidget(
                       testimonial.testimonial,
                       style: context.typography.bodyLarge,
