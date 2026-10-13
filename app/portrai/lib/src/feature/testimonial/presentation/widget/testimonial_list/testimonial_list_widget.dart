@@ -56,7 +56,10 @@ class TestimonialListWidget extends StatelessWidget {
         .toList();
 
     return Padding(
-      padding: const EdgeInsets.only(top: _hoverLift, bottom: _shadowRoom),
+      // The mobile carousel clips its own children, so it adds the room itself.
+      padding: context.isMobile
+          ? EdgeInsets.zero
+          : const EdgeInsets.only(top: _hoverLift, bottom: _shadowRoom),
       child: DSResponsiveContainerWidget(
         mobileBuilder: (_) {
           return _MobileContentWidget(

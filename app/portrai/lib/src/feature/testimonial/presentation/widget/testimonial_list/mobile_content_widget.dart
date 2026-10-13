@@ -28,14 +28,21 @@ class _MobileContentWidgetState extends State<_MobileContentWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         DSCarousalWidget(
-              height: _CardItemWidget.getHeight(context),
+              height:
+                  _CardItemWidget.getHeight(context) + _hoverLift + _shadowRoom,
               autoPlay: true,
               enableInfiniteScroll: true,
               onPageChanged: (index, _) {
                 _snappedItemIndex.value = index;
               },
               children: widget.testimonials.map((testimonial) {
-                return _CardItemWidget(testimonial: testimonial);
+                return Padding(
+                  padding: const EdgeInsets.only(
+                    top: _hoverLift,
+                    bottom: _shadowRoom,
+                  ),
+                  child: _CardItemWidget(testimonial: testimonial),
+                );
               }).toList(),
             )
             .animate(target: widget.isVisible ? 1 : 0)
