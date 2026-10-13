@@ -54,21 +54,29 @@ class _ExpertiseCardWidget extends StatelessWidget {
                   bottom: -artSize * 0.25,
                   width: artSize,
                   height: artSize,
-                  child: Transform.rotate(
-                    angle: 0.25,
-                    child: ShaderMask(
-                      blendMode: BlendMode.dstIn,
-                      shaderCallback: (bounds) {
-                        return const RadialGradient(
-                          colors: [Colors.black, Colors.transparent],
-                          stops: [0.55, 1],
-                        ).createShader(bounds);
-                      },
-                      child: Opacity(
-                        opacity: 0.28,
-                        child: DSNetworkImageWidget(
-                          url: expertise.image,
-                          fit: BoxFit.contain,
+                  child: AnimatedRotation(
+                    turns: isHovering ? 0.07 : 0.04,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOut,
+                    child: AnimatedScale(
+                      scale: isHovering ? 1.15 : 1,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOut,
+                      child: ShaderMask(
+                        blendMode: BlendMode.dstIn,
+                        shaderCallback: (bounds) {
+                          return const RadialGradient(
+                            colors: [Colors.black, Colors.transparent],
+                            stops: [0.55, 1],
+                          ).createShader(bounds);
+                        },
+                        child: AnimatedOpacity(
+                          opacity: isHovering ? 0.45 : 0.28,
+                          duration: const Duration(milliseconds: 500),
+                          child: DSNetworkImageWidget(
+                            url: expertise.image,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
@@ -154,8 +162,8 @@ class _GlassChipWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.space(factor: 0.75),
-        vertical: context.space(factor: 0.25),
+        horizontal: context.space(factor: 0.5),
+        vertical: context.space(factor: 0.125),
       ),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(30),
@@ -164,7 +172,7 @@ class _GlassChipWidget extends StatelessWidget {
       ),
       child: DSTextWidget(
         label,
-        style: context.typography.labelMedium,
+        style: context.typography.labelSmall,
         color: _white,
       ),
     );
