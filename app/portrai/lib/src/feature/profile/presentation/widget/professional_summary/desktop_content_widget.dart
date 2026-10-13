@@ -46,6 +46,7 @@ class _ProfessionalSummaryWidget extends StatelessWidget {
     return context.getTextHeight(context.typography.displaySmall, 3) +
         context.space(factor: 3) +
         context.getTextHeight(context.typography.titleSmall, 3) +
+        context.space(factor: 12) +
         context.space(factor: 3) +
         DSButtonSize.small.height +
         context.space(factor: 2) +
@@ -58,6 +59,12 @@ class _ProfessionalSummaryWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        _EyebrowWidget(
+          profile: profile,
+          isVisible: isVisible,
+          hasHorizontalPadding: false,
+        ),
+        const DSVerticalSpacerWidget(2),
         _UniquePropositionWidget(
           label: profile.uniqueValueProposition,
           isVisible: isVisible,
@@ -66,6 +73,12 @@ class _ProfessionalSummaryWidget extends StatelessWidget {
         const DSVerticalSpacerWidget(3),
         _ElevatorPitchWidget(
           label: profile.elevatorPitch,
+          isVisible: isVisible,
+          hasHorizontalPadding: false,
+        ),
+        const DSVerticalSpacerWidget(2),
+        _CurrentRoleWidget(
+          profile: profile,
           isVisible: isVisible,
           hasHorizontalPadding: false,
         ),

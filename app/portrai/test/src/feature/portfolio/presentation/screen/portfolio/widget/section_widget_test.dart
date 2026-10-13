@@ -48,7 +48,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
   }
 
   group('IntroSectionWidget', () {

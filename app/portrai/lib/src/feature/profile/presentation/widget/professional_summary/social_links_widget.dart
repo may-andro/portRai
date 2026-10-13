@@ -70,23 +70,44 @@ class _CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final cardColor = context.colorPalette.surface.inverseOnSurface;
     final borderColor = context.colorPalette.brand.secondary;
-    return Container(
-          height: context.socialHandleIconSize,
-          width: context.socialHandleIconSize,
-          padding: EdgeInsets.all(context.space()),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: cardColor.color,
-            border: Border.all(color: borderColor.color, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: borderColor.color.withAlpha(70),
-                blurRadius: context.dimen.radiusLevel1.value,
-                offset: const Offset(0, 4),
+    return DSHoverableContainerWidget(
+          builder: (context, isHovering) {
+            return AnimatedSlide(
+              duration: 200.ms,
+              curve: Curves.easeOutBack,
+              offset: Offset(0, isHovering ? -0.12 : 0),
+              child: AnimatedScale(
+                duration: 200.ms,
+                curve: Curves.easeOutBack,
+                scale: isHovering ? 1.15 : 1,
+                child: AnimatedContainer(
+                  duration: 200.ms,
+                  height: context.socialHandleIconSize,
+                  width: context.socialHandleIconSize,
+                  padding: EdgeInsets.all(context.space()),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isHovering
+                        ? borderColor.color.withAlpha(50)
+                        : cardColor.color,
+                    border: Border.all(color: borderColor.color, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: borderColor.color.withAlpha(
+                          isHovering ? 140 : 70,
+                        ),
+                        blurRadius:
+                            context.dimen.radiusLevel1.value *
+                            (isHovering ? 2 : 1),
+                        offset: Offset(0, isHovering ? 8 : 4),
+                      ),
+                    ],
+                  ),
+                  child: child,
+                ),
               ),
-            ],
-          ),
-          child: child,
+            );
+          },
         )
         .animate(target: isVisible ? 1 : 0)
         .slideY(

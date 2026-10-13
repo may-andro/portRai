@@ -15,15 +15,25 @@ class _ProfileImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final accent = context.colorPalette.accent.color;
 
-    return DSArchPortraitWidget(
-          height: height,
-          gradientColors: [accent.withAlpha(140), accent],
-          outlineColor: accent.withAlpha(160),
-          child: DSNetworkImageWidget(
-            url: url,
-            fit: BoxFit.fitWidth,
-            autoSizeImage: true,
-          ),
+    return DSHoverableContainerWidget(
+          builder: (context, isHovering) {
+            return AnimatedScale(
+              duration: 350.ms,
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.bottomCenter,
+              scale: isHovering ? 1.05 : 1,
+              child: DSArchPortraitWidget(
+                height: height,
+                gradientColors: [accent.withAlpha(140), accent],
+                outlineColor: accent.withAlpha(160),
+                child: DSNetworkImageWidget(
+                  url: url,
+                  fit: BoxFit.fitWidth,
+                  autoSizeImage: true,
+                ),
+              ),
+            );
+          },
         )
         .animate(target: isVisible ? 1 : 0)
         .slideY(begin: 0.15, duration: 600.ms, curve: Curves.easeOutBack)
