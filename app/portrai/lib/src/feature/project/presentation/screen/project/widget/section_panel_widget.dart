@@ -201,7 +201,7 @@ class ProjectTechListWidget extends StatelessWidget {
   }
 }
 
-/// Features as a two-column grid of small tiles with a bolt accent.
+/// Features as small content-sized pills with a bolt accent.
 class ProjectFeatureListWidget extends StatelessWidget {
   const ProjectFeatureListWidget({super.key, required this.items});
 
@@ -211,51 +211,41 @@ class ProjectFeatureListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final accent = palette.brand.primary.color;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final gap = context.space();
-        final columns = constraints.maxWidth >= 520 ? 2 : 1;
-        final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: [
-            for (final (index, item) in items.indexed)
-              SizedBox(
-                    width: width,
-                    child: Container(
-                      padding: EdgeInsets.all(context.space(factor: 1.5)),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          colors: [accent.withAlpha(30), accent.withAlpha(6)],
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: context.space(),
-                        children: [
-                          Icon(Icons.bolt_rounded, size: 18, color: accent),
-                          Expanded(
-                            child: DSTextWidget(
-                              item,
-                              style: context.typography.bodyMedium,
-                              color: palette.neutral.grey10,
-                            ),
-                          ),
-                        ],
+    return Wrap(
+      spacing: context.space(factor: 0.75),
+      runSpacing: context.space(factor: 0.75),
+      children: [
+        for (final (index, item) in items.indexed)
+          Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.space(),
+                  vertical: context.space(factor: 0.5),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  gradient: LinearGradient(
+                    colors: [accent.withAlpha(30), accent.withAlpha(8)],
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: context.space(factor: 0.5),
+                  children: [
+                    Icon(Icons.bolt_rounded, size: 14, color: accent),
+                    Flexible(
+                      child: DSTextWidget(
+                        item,
+                        style: context.typography.bodySmall,
+                        color: palette.neutral.grey10,
                       ),
                     ),
-                  )
-                  .animate(delay: (index * 60).ms)
-                  .fadeIn()
-                  .scale(
-                    begin: const Offset(0.95, 0.95),
-                    end: const Offset(1, 1),
-                  ),
-          ],
-        );
-      },
+                  ],
+                ),
+              )
+              .animate(delay: (index * 40).ms)
+              .fadeIn()
+              .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1)),
+      ],
     );
   }
 }
