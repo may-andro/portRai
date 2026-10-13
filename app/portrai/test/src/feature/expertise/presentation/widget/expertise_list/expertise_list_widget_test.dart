@@ -56,7 +56,7 @@ void main() {
         size: const Size(390, 844),
       );
 
-      expect(find.byType(DSSpotlightCardWidget), findsNWidgets(7));
+      expect(find.byType(DSHoverableContainerWidget), findsNWidgets(7));
       expect(find.text('Expertise 6'), findsOneWidget);
     });
 
@@ -103,7 +103,7 @@ void main() {
           settleDuration: Duration.zero,
         );
 
-        expect(find.byType(DSSpotlightCardWidget), findsNothing);
+        expect(find.byType(DSHoverableContainerWidget), findsNothing);
       },
     );
   });

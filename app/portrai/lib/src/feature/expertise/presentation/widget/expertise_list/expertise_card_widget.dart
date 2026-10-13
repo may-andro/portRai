@@ -1,6 +1,7 @@
 part of 'expertise_list_widget.dart';
 
 const _maxSkills = 8;
+const _white = DSColor(0xFFFFFFFF);
 
 class _ExpertiseCardWidget extends StatelessWidget {
   const _ExpertiseCardWidget({required this.expertise, required this.index});
@@ -11,61 +12,106 @@ class _ExpertiseCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final textColor = palette.surface.onInverseSurface;
-    final accent = [
+    final base = [
       palette.brand.primary,
       palette.brand.tertiary,
       palette.brand.secondary,
-    ][index % 3];
+    ][index % 3].color;
+    final start = Color.lerp(base, Colors.black, 0.25)!;
+    final end = Color.lerp(base, Colors.black, 0.65)!;
     final skills = expertise.skillNames;
     final hiddenCount = skills.length - _maxSkills;
+    final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
+    final artSize = context.space(factor: 20);
 
-    return DSSpotlightCardWidget(
-      glowColor: accent,
-      fillColor: textColor,
-      padding: EdgeInsets.all(context.space(factor: 2.5)),
+    return DSHoverableContainerWidget(
       builder: (context, isHovering) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: context.space(factor: 1.5),
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _IconTileWidget(
-                  imageUrl: expertise.image,
-                  color: accent,
-                  isHovering: isHovering,
-                ),
-                const Spacer(),
-                _CountPillWidget(count: skills.length, color: accent),
-              ],
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          transform: Matrix4.translationValues(0, isHovering ? -4 : 0, 0),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [start, end],
             ),
-            DSTextWidget(
-              expertise.title,
-              style: context.typography.emphasizedHeadlineSmall,
-              color: textColor,
-              maxLines: 2,
-              textOverflow: TextOverflow.ellipsis,
-            ),
-            Container(
-              height: 3,
-              width: isHovering ? 64 : 32,
-              decoration: BoxDecoration(
-                color: accent.color,
-                borderRadius: BorderRadius.circular(2),
+            boxShadow: [
+              BoxShadow(
+                color: base.withAlpha(isHovering ? 150 : 90),
+                blurRadius: isHovering ? 28 : 18,
+                offset: const Offset(0, 10),
               ),
-            ),
-            Wrap(
-              spacing: context.space(factor: 0.5),
-              runSpacing: context.space(factor: 0.5),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: radius,
+            child: Stack(
               children: [
-                for (final skill in skills.take(_maxSkills))
-                  DSTagWidget(label: skill),
-                if (hiddenCount > 0) DSTagWidget(label: '+$hiddenCount'),
+                Positioned(
+                  right: -artSize * 0.2,
+                  bottom: -artSize * 0.25,
+                  width: artSize,
+                  height: artSize,
+                  child: Transform.rotate(
+                    angle: 0.25,
+                    child: ShaderMask(
+                      blendMode: BlendMode.dstIn,
+                      shaderCallback: (bounds) {
+                        return const RadialGradient(
+                          colors: [Colors.black, Colors.transparent],
+                          stops: [0.55, 1],
+                        ).createShader(bounds);
+                      },
+                      child: Opacity(
+                        opacity: 0.28,
+                        child: DSNetworkImageWidget(
+                          url: expertise.image,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(context.space(factor: 2)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: context.space(factor: 1.5),
+                    children: [
+                      Row(
+                        spacing: context.space(factor: 1.5),
+                        children: [
+                          _IconTileWidget(imageUrl: expertise.image),
+                          Expanded(
+                            child: DSTextWidget(
+                              expertise.title,
+                              style: context.typography.emphasizedTitleLarge,
+                              color: _white,
+                              maxLines: 2,
+                              textOverflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          _GlassChipWidget(label: '${skills.length}'),
+                        ],
+                      ),
+                      Wrap(
+                        spacing: context.space(factor: 0.5),
+                        runSpacing: context.space(factor: 0.5),
+                        children: [
+                          for (final skill in skills.take(_maxSkills))
+                            _GlassChipWidget(label: skill),
+                          if (hiddenCount > 0)
+                            _GlassChipWidget(label: '+$hiddenCount'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -73,70 +119,53 @@ class _ExpertiseCardWidget extends StatelessWidget {
 }
 
 class _IconTileWidget extends StatelessWidget {
-  const _IconTileWidget({
-    required this.imageUrl,
-    required this.color,
-    required this.isHovering,
-  });
+  const _IconTileWidget({required this.imageUrl});
 
   final String imageUrl;
-  final DSColor color;
-  final bool isHovering;
 
   @override
   Widget build(BuildContext context) {
-    final size = context.space(factor: 7);
+    final size = context.space(factor: 6);
 
-    return AnimatedScale(
-      scale: isHovering ? 1.06 : 1,
-      duration: const Duration(milliseconds: 250),
-      child: Container(
-        width: size,
-        height: size,
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(context.dimen.radiusLevel3.value),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color.color, color.color.withAlpha(60)],
-          ),
-          boxShadow: [
-            BoxShadow(color: color.color.withAlpha(90), blurRadius: 18),
-          ],
-        ),
-        child: DSNetworkImageWidget(
-          url: imageUrl,
-          fit: BoxFit.cover,
-          borderRadius: BorderRadius.circular(context.dimen.radiusLevel2.value),
-        ),
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel2.value),
+        boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 12)],
+      ),
+      child: DSNetworkImageWidget(
+        url: imageUrl,
+        fit: BoxFit.cover,
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel1.value),
       ),
     );
   }
 }
 
-class _CountPillWidget extends StatelessWidget {
-  const _CountPillWidget({required this.count, required this.color});
+class _GlassChipWidget extends StatelessWidget {
+  const _GlassChipWidget({required this.label});
 
-  final int count;
-  final DSColor color;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.space(factor: 1.25),
-        vertical: context.space(factor: 0.5),
+        horizontal: context.space(factor: 0.75),
+        vertical: context.space(factor: 0.25),
       ),
       decoration: BoxDecoration(
+        color: Colors.white.withAlpha(30),
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: color.color.withAlpha(140)),
-        color: color.color.withAlpha(30),
+        border: Border.all(color: Colors.white.withAlpha(60)),
       ),
       child: DSTextWidget(
-        '$count',
-        style: context.typography.emphasizedLabelLarge,
-        color: context.colorPalette.surface.onInverseSurface,
+        label,
+        style: context.typography.labelMedium,
+        color: _white,
       ),
     );
   }
