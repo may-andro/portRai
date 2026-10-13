@@ -124,7 +124,9 @@ class ProjectAchievementListWidget extends StatelessWidget {
                         (index + 1).toString().padLeft(2, '0'),
                         style: context.typography.emphasizedTitleLarge,
                         color: DSColor(
-                          palette.brand.secondary.color.withAlpha(150).toARGB32(),
+                          palette.brand.secondary.color
+                              .withAlpha(150)
+                              .toARGB32(),
                         ),
                       ),
                     ),
