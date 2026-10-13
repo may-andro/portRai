@@ -28,7 +28,7 @@ class _ProfileImageWidget extends StatelessWidget {
                 outlineColor: accent.withAlpha(160),
                 child: DSNetworkImageWidget(
                   url: url,
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.fitHeight,
                   autoSizeImage: true,
                 ),
               ),

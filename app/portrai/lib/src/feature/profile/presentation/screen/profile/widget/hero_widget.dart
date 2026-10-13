@@ -100,7 +100,10 @@ class _HeroBackgroundWidget extends StatelessWidget {
                           palette.brand.secondary.color,
                           size,
                         )
-                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
                         .move(
                           begin: Offset.zero,
                           end: const Offset(-24, 18),
@@ -117,7 +120,10 @@ class _HeroBackgroundWidget extends StatelessWidget {
                           palette.brand.primary.color,
                           size * 0.7,
                         )
-                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
                         .move(
                           begin: Offset.zero,
                           end: const Offset(20, -16),
@@ -250,7 +256,7 @@ class _OpenToWorkPillWidget extends StatelessWidget {
                         color: _green.withAlpha(90),
                       ),
                     )
-                    .animate(onPlay: (c) => c.repeat())
+                    .animate(onPlay: (controller) => controller.repeat())
                     .scale(
                       begin: const Offset(0.5, 0.5),
                       end: const Offset(1.4, 1.4),
@@ -320,15 +326,19 @@ class _HeroStageWidget extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          for (var i = 0; i < extras.length && i < slots.length; i++)
+          for (
+            var slotIndex = 0;
+            slotIndex < extras.length && slotIndex < slots.length;
+            slotIndex++
+          )
             Positioned(
-              left: slots[i].left,
-              top: slots[i].top,
+              left: slots[slotIndex].left,
+              top: slots[slotIndex].top,
               child: _FloatingPhotoWidget(
-                url: extras[i],
+                url: extras[slotIndex],
                 size: cardSize,
-                turns: slots[i].turns,
-                delay: slots[i].delay,
+                turns: slots[slotIndex].turns,
+                delay: slots[slotIndex].delay,
               ),
             ),
           Center(
@@ -450,7 +460,7 @@ class _HeroPortraitWidget extends StatelessWidget {
                         color: palette.surface.surface.color,
                         child: DSNetworkImageWidget(
                           url: url,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fitHeight,
                           width: width,
                           height: height,
                         ),
@@ -527,7 +537,7 @@ class _FloatingPhotoWidgetState extends State<_FloatingPhotoWidget> {
                   borderRadius: BorderRadius.circular(16),
                   child: DSNetworkImageWidget(
                     url: widget.url,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fitHeight,
                     width: widget.size,
                     height: widget.size,
                   ),
@@ -536,7 +546,7 @@ class _FloatingPhotoWidgetState extends State<_FloatingPhotoWidget> {
             ),
           ),
         )
-        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
         .moveY(
           begin: -6,
           end: 6,
@@ -606,7 +616,7 @@ class _HeroChipWidget extends StatelessWidget {
                   ],
                 ),
               )
-              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
               .moveY(
                 begin: 4,
                 end: -4,
@@ -645,7 +655,7 @@ class _SocialIconButtonWidget extends StatelessWidget {
                 url: link.image,
                 width: 24,
                 height: 24,
-                fit: BoxFit.contain,
+                fit: BoxFit.fitHeight,
                 errorWidget: const Icon(Icons.link_rounded, size: 24),
               ),
             ),

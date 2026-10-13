@@ -11,7 +11,7 @@ class _AboutBandWidget extends StatelessWidget {
     final photoWidth = isDesktop
         ? min(context.width * 0.34, 460.0)
         : min(context.width * 0.78, 340.0);
-    final photo = _BlobPhotoWidget(url: profile.photoAt(1), width: photoWidth);
+    final photo = _BlobPhotoWidget(url: profile.photoAt(2), width: photoWidth);
     final text = _AboutTextWidget(profile: profile, isDesktop: isDesktop);
 
     return _BandWidget(
@@ -87,7 +87,7 @@ class _AboutTextWidget extends StatelessWidget {
               _AboutFactWidget(
                 icon: Icons.translate_rounded,
                 text: profile.languages
-                    .map((l) => '${l.language} (${l.proficiency})')
+                    .map((entry) => '${entry.language} (${entry.proficiency})')
                     .join(' · '),
               ),
           ],
@@ -145,18 +145,18 @@ class _BlobPhotoWidget extends StatefulWidget {
 class _BlobPhotoWidgetState extends State<_BlobPhotoWidget> {
   bool _hovering = false;
 
-  BorderRadius _shape(double w) => BorderRadius.only(
-    topLeft: Radius.circular(w * 0.5),
-    topRight: Radius.circular(w * 0.16),
-    bottomRight: Radius.circular(w * 0.5),
-    bottomLeft: Radius.circular(w * 0.16),
+  BorderRadius _shape(double photoWidth) => BorderRadius.only(
+    topLeft: Radius.circular(photoWidth * 0.5),
+    topRight: Radius.circular(photoWidth * 0.16),
+    bottomRight: Radius.circular(photoWidth * 0.5),
+    bottomLeft: Radius.circular(photoWidth * 0.16),
   );
 
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final w = widget.width;
-    final h = w * 1.05;
+    final photoWidth = widget.width;
+    final photoHeight = photoWidth * 1.05;
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
@@ -165,21 +165,21 @@ class _BlobPhotoWidgetState extends State<_BlobPhotoWidget> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
         child: SizedBox(
-          width: w,
-          height: h,
+          width: photoWidth,
+          height: photoHeight,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               Positioned(
-                left: -w * 0.08,
-                top: h * 0.06,
-                width: w,
-                height: h,
+                left: -photoWidth * 0.08,
+                top: photoHeight * 0.06,
+                width: photoWidth,
+                height: photoHeight,
                 child: Transform.rotate(
                   angle: -0.12,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(w * 0.45),
+                      borderRadius: BorderRadius.circular(photoWidth * 0.45),
                       color: palette.brand.primary.color.withAlpha(30),
                     ),
                   ),
@@ -188,7 +188,7 @@ class _BlobPhotoWidgetState extends State<_BlobPhotoWidget> {
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    borderRadius: _shape(w),
+                    borderRadius: _shape(photoWidth),
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -199,12 +199,12 @@ class _BlobPhotoWidgetState extends State<_BlobPhotoWidget> {
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: _shape(w),
+                    borderRadius: _shape(photoWidth),
                     child: DSNetworkImageWidget(
                       url: widget.url,
-                      fit: BoxFit.cover,
-                      width: w,
-                      height: h,
+                      fit: BoxFit.fitHeight,
+                      width: photoWidth,
+                      height: photoHeight,
                     ),
                   ),
                 ),
