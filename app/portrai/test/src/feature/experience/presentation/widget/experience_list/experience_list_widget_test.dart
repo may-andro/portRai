@@ -95,7 +95,7 @@ void main() {
   testWidgets('should reveal only the description when a card is tapped', (
     tester,
   ) async {
-    await pumpList(tester, sizes['tablet']!);
+    await pumpList(tester, sizes['desktop']!);
     final description = find.text('Description 0');
     expect(description, findsNothing);
 
@@ -108,16 +108,18 @@ void main() {
     expect(find.text('Flutter'), findsNothing);
   });
 
-  testWidgets(
-    'should navigate instead of expanding when a card is tapped on mobile',
-    (tester) async {
-      await pumpList(tester, sizes['mobile']!);
+  for (final size in ['mobile', 'tablet']) {
+    testWidgets(
+      'should navigate instead of expanding when a card is tapped on $size',
+      (tester) async {
+        await pumpList(tester, sizes[size]!);
 
-      await tester.tap(find.text('Position 0'));
-      await tester.pump();
+        await tester.tap(find.text('Position 0'));
+        await tester.pump();
 
-      expect(find.text('Description 0'), findsNothing);
-      expect(tester.takeException(), isNotNull);
-    },
-  );
+        expect(find.text('Description 0'), findsNothing);
+        expect(tester.takeException(), isNotNull);
+      },
+    );
+  }
 }

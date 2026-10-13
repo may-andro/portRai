@@ -21,6 +21,9 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
   static const _onCardMuted = DSColor(0xD9FFFFFF);
   static const _onCardAccent = DSColor(0xFF9CC9FF);
 
+  // Narrow cards (phones, tablets, split-width desktop) open the detail
+  // screen directly instead of expanding in place.
+  bool _compact = false;
   bool _expanded = false;
   bool _isHovering = false;
   bool _isCompanyHovering = false;
@@ -65,6 +68,22 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
     final startColor = Color.lerp(base, accent, 0.22)!;
     final endColor = Color.lerp(base, palette.brand.tertiary.color, 0.18)!;
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _compact = !context.isDesktop || constraints.maxWidth < 420;
+        return _buildCard(context, accent, startColor, endColor, radius);
+      },
+    );
+  }
+
+  Widget _buildCard(
+    BuildContext context,
+    Color accent,
+    Color startColor,
+    Color endColor,
+    BorderRadius radius,
+  ) {
+    final palette = context.colorPalette;
     return MouseRegion(
       onEnter: (_) => _setHover(true),
       onExit: (_) => _setHover(false),
@@ -117,7 +136,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
               Material(
                 type: MaterialType.transparency,
                 child: InkWell(
-                  onTap: context.isMobile
+                  onTap: _compact
                       ? () => ExperienceScreen.navigate(
                           context,
                           id: widget.experience.id,
@@ -259,7 +278,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
                 ],
               ),
             ),
-            if (!context.isMobile)
+            if (!_compact)
               AnimatedRotation(
                 turns: _expanded ? 0.5 : 0,
                 duration: 300.ms,
@@ -290,7 +309,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
             ),
           ],
         ),
-        if (!context.isMobile)
+        if (!_compact)
           AnimatedBuilder(
             animation: _controller,
             builder: (context, _) => _controller.isDismissed
