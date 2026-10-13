@@ -61,6 +61,9 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
+    - assets/profile/education.jpg
+    - assets/profile/contact_background.jpg
+    - assets/profile/contact_phone.jpg
     - assets/dashboard/experiences.json
     - assets/dashboard/expertise.json
     - assets/dashboard/profile.json

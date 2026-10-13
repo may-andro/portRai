@@ -28,7 +28,7 @@ class _MobileTabletContentWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       shrinkWrap: true,
       slivers: [
-        _AppBarWidget(title: state.experience.company),
+        PageAppBarWidget(title: state.experience.company),
         SliverPadding(
           padding: EdgeInsets.symmetric(
             vertical: context.space(factor: 3),

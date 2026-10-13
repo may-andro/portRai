@@ -112,6 +112,11 @@ See [`.github/skills/release-versioning-conventions/SKILL.md`](skills/release-ve
 - Releases are triggered by pushing a `<version>+<build>-<suffix>` tag (`-review`, `-prod`, `-review-storybook`, `-prod-storybook`) or `legal-<version>`.
 - Keep the tag's version/build in sync with the matching `pubspec.yaml` `version:` field before tagging.
 
+## Naming
+See [`.github/skills/naming-conventions/SKILL.md`](skills/naming-conventions/SKILL.md).
+
+- Never use single-letter or abbreviated names (`w`, `h`, `c`, `l`, `i`, `idx`) for variables, parameters or lambda arguments — use full, meaningful names that say what they hold or do.
+
 ## Adding new conventions
 When you notice a repeated pattern or correction, add it to the relevant skill file (or create a
 new skill under `.github/skills/<topic>/SKILL.md`) and add a one-line summary + link here, rather

@@ -8,6 +8,9 @@ class _ProfileImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final image = profile.profileImages.isNotEmpty
+        ? profile.profileImages.last
+        : profile.profileImage;
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -40,9 +43,12 @@ class _ProfileImageWidget extends StatelessWidget {
           child:
               SizedBox(
                     child: AiImageWidget(
-                      sourceImageUrl: profile.profileImage,
+                      sourceImageUrl: image,
                       removeBackground: true,
-                      fallback: DSImage.avatar(fit: BoxFit.cover),
+                      fallback: DSNetworkImageWidget(
+                        url: image,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   )
                   .animate(target: isVisible ? 1 : 0)

@@ -20,6 +20,7 @@ class ProfileModel {
     required this.email,
     required this.phone,
     required this.profileImage,
+    this.profileImages = const [],
     required this.coverImage,
     required this.summary,
     required this.detailedBio,
@@ -50,6 +51,9 @@ class ProfileModel {
   final String email;
   final String phone;
   final String profileImage;
+
+  @JsonKey(defaultValue: <String>[])
+  final List<String> profileImages;
   final String coverImage;
   final String summary;
   final String detailedBio;

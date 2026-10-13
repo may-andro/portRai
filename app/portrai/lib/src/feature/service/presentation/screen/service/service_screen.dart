@@ -26,7 +26,8 @@ class ServiceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        return appServiceLocator.get<ServiceBloc>();
+        return appServiceLocator.get<ServiceBloc>()
+          ..add(const LoadProfileEvent());
       },
       child: Builder(
         builder: (context) {

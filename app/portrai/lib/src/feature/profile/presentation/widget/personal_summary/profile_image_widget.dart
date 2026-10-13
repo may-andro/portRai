@@ -23,12 +23,12 @@ class _ProfileImageWidget extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               scale: isHovering ? 1.05 : 1,
               child: DSArchPortraitWidget(
-                height: height,
+                height: height * 0.9,
                 gradientColors: [accent.withAlpha(140), accent],
                 outlineColor: accent.withAlpha(160),
                 child: DSNetworkImageWidget(
                   url: url,
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.fitHeight,
                   autoSizeImage: true,
                 ),
               ),

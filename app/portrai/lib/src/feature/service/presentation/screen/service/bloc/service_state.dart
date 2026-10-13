@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:portrai/src/feature/service/domain/_domain.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 
 @immutable
 sealed class ServiceState extends Equatable {
@@ -15,10 +15,10 @@ final class LoadingState extends ServiceState {
 }
 
 final class LoadedState extends ServiceState {
-  const LoadedState(this.service);
+  const LoadedState({required this.profile});
 
-  final ServiceEntity service;
+  final ProfileEntity profile;
 
   @override
-  List<Object> get props => [service];
+  List<Object> get props => [profile];
 }

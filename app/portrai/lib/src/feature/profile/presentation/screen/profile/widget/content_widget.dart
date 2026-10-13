@@ -2,37 +2,26 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:design_system/design_system.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/_widget.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
-part 'mobile_tablet_content_widget.dart';
-
-part 'desktop_content_widget.dart';
-
-part 'name_title_widget.dart';
-
+part 'about_band_widget.dart';
+part 'background_band_widget.dart';
+part 'body_widget.dart';
+part 'contact_band_widget.dart';
+part 'global_band_widget.dart';
+part 'hero_widget.dart';
+part 'motion_widget.dart';
 part 'section_widget.dart';
-
-part 'profile_image_widget.dart';
-
-part 'social_links_section_widget.dart';
-
-part 'education_section_widget.dart';
-
-part 'about_me_section_widget.dart';
-
-part 'contact_section_widget.dart';
-
-part 'availability_section_widget.dart';
-
-part 'language_section_widget.dart';
-
-part 'intro_section_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
@@ -46,7 +35,10 @@ class ContentWidget extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           final LoadingState _ => const _LoadingWidget(),
-          final LoadedState state => _SuccessWidget(profile: state.profile),
+          final LoadedState state => _SuccessWidget(
+            profile: state.profile,
+            workPlaces: state.workPlaces,
+          ),
           final ErrorState state => _ErrorWidget(
             message: FailureTranslator.translate(context, state.failure),
           ),
@@ -92,20 +84,17 @@ class _ErrorWidget extends StatelessWidget {
 }
 
 class _SuccessWidget extends StatelessWidget {
-  const _SuccessWidget({required this.profile});
+  const _SuccessWidget({required this.profile, required this.workPlaces});
 
   final ProfileEntity profile;
+  final List<WorkPlaceEntity> workPlaces;
 
   @override
   Widget build(BuildContext context) {
     return TrackingImpressionDetectorWidget(
       impressionId: 'profile_success_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
-      child: DSResponsiveContainerWidget(
-        mobileBuilder: (_) => _MobileTabletContentWidget(profile),
-        tabletBuilder: (_) => _MobileTabletContentWidget(profile),
-        desktopBuilder: (_) => _DesktopContentWidget(profile),
-      ),
+      child: _BodyWidget(profile: profile, workPlaces: workPlaces),
     );
   }
 }

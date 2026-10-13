@@ -73,6 +73,7 @@ class GetAssistantContextUseCase
           'email': profile.email,
           'phone': profile.phone,
           'profileImage': profile.profileImage,
+          'profileImages': profile.profileImages,
           'coverImage': profile.coverImage,
           'summary': profile.summary,
           'detailedBio': profile.detailedBio,

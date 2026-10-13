@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/widget/_widget.dart';
 
+import '../../../../../../../mock/feature/service/presentation/screen/service/bloc/mock_service_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
 
@@ -29,7 +31,12 @@ void main() {
           addTearDown(tester.view.reset);
 
           await tester.pumpWidget(
-            const TestWidgetWrapper(child: ContentWidget(service: service)),
+            TestWidgetWrapper(
+              child: BlocProvider<ServiceBloc>.value(
+                value: MockServiceBloc()..stubState(const LoadingState()),
+                child: const ContentWidget(service: service),
+              ),
+            ),
           );
           await tester.pump(const Duration(seconds: 1));
 

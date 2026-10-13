@@ -17,6 +17,7 @@ class ProfileEntity extends Equatable {
     required this.email,
     required this.phone,
     required this.profileImage,
+    this.profileImages = const [],
     required this.coverImage,
     required this.summary,
     required this.detailedBio,
@@ -43,6 +44,9 @@ class ProfileEntity extends Equatable {
   final String email;
   final String phone;
   final String profileImage;
+
+  /// Additional profile photos, e.g. for a gallery or rotating portrait.
+  final List<String> profileImages;
   final String coverImage;
   final String summary;
   final String detailedBio;
@@ -70,6 +74,7 @@ class ProfileEntity extends Equatable {
     email,
     phone,
     profileImage,
+    profileImages,
     coverImage,
     summary,
     detailedBio,
