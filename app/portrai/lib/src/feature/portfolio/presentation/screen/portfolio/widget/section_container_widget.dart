@@ -142,27 +142,71 @@ class _HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = context.colorPalette.accent.color;
+    final textColor = background.getTextColor(context);
+
     return Padding(
       padding: EdgeInsetsGeometry.symmetric(
         vertical: context.space(factor: 3),
         horizontal: context.horizontalScreenPaddingDimen,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: context.space(factor: 2),
         children: [
-          DSTextWidget(
-                title,
-                style: context.typography.emphasizedTitleLarge,
-                color: background.getTextColor(context),
+          DSHoverableContainerWidget(
+                builder: (context, isHovering) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: context.space(factor: 1.5),
+                    children: [
+                      AnimatedContainer(
+                        duration: 250.ms,
+                        curve: Curves.easeOut,
+                        width: 5,
+                        height: context.space(factor: isHovering ? 6 : 4.5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(3),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              accent,
+                              context.colorPalette.brand.tertiary.color,
+                            ],
+                          ),
+                        ),
+                      ),
+                      DSTextWidget(
+                        title,
+                        style: context.typography.emphasizedHeadlineSmall,
+                        color: textColor,
+                      ),
+                    ],
+                  );
+                },
               )
               .animate(target: isVisible ? 1 : 0)
-              .slideX(
-                begin: -0.5,
-                duration: 300.ms,
-                delay: 0.ms,
-                curve: Curves.easeOut,
-              )
+              .slideX(begin: -0.3, duration: 400.ms, curve: Curves.easeOut)
               .fadeIn(delay: 100.ms, duration: 300.ms),
+          Expanded(
+            child:
+                Container(
+                      height: 1.5,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [accent.withAlpha(150), accent.withAlpha(0)],
+                        ),
+                      ),
+                    )
+                    .animate(target: isVisible ? 1 : 0)
+                    .scaleX(
+                      begin: 0,
+                      alignment: Alignment.centerLeft,
+                      duration: 700.ms,
+                      delay: 250.ms,
+                      curve: Curves.easeOutCubic,
+                    ),
+          ),
           if (action case final SectionAction action) ...[
             action
                 .build(context)

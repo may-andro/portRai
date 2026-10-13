@@ -60,24 +60,36 @@ class _StatItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DSTextWidget(
-          '$value+',
-          style: context.typography.emphasizedTitleLarge,
-          color: context.isDesktop
-              ? context.colorPalette.neutral.grey4
-              : context.colorPalette.neutral.grey9,
-        ),
-        DSTextWidget(
-          label,
-          style: context.typography.emphasizedLabelSmall,
-          color: context.isDesktop
-              ? context.colorPalette.neutral.grey5
-              : context.colorPalette.neutral.grey7,
-        ),
-      ],
+    return DSHoverableContainerWidget(
+      builder: (context, isHovering) {
+        return AnimatedScale(
+          duration: 200.ms,
+          curve: Curves.easeOutBack,
+          alignment: Alignment.centerLeft,
+          scale: isHovering ? 1.1 : 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DSTextWidget(
+                '$value+',
+                style: context.typography.emphasizedTitleLarge,
+                color: isHovering
+                    ? context.colorPalette.brand.primary
+                    : (context.isDesktop
+                          ? context.colorPalette.neutral.grey4
+                          : context.colorPalette.neutral.grey9),
+              ),
+              DSTextWidget(
+                label,
+                style: context.typography.emphasizedLabelSmall,
+                color: context.isDesktop
+                    ? context.colorPalette.neutral.grey5
+                    : context.colorPalette.neutral.grey7,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

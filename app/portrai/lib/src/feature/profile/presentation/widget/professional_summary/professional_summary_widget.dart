@@ -25,17 +25,23 @@ part 'desktop_content_widget.dart';
 
 part 'project_years_widget.dart';
 
+part 'project_backdrop_widget.dart';
+
+part 'identity_widget.dart';
+
 class ProfessionalSummaryWidget extends StatelessWidget {
   const ProfessionalSummaryWidget({
     super.key,
     required this.profile,
     required this.isVisible,
     required this.height,
+    this.projectImages = const [],
   });
 
   final ProfileEntity profile;
   final bool isVisible;
   final double height;
+  final List<String> projectImages;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +56,7 @@ class ProfessionalSummaryWidget extends StatelessWidget {
             profile: profile,
             isVisible: isVisible,
             height: height,
+            projectImages: projectImages,
           );
         },
       ),
@@ -62,15 +69,17 @@ class _SuccessContentWidget extends StatelessWidget {
     required this.profile,
     required this.isVisible,
     required this.height,
+    required this.projectImages,
   });
 
   final ProfileEntity profile;
   final bool isVisible;
   final double height;
+  final List<String> projectImages;
 
   @override
   Widget build(BuildContext context) {
-    return DSResponsiveContainerWidget(
+    final content = DSResponsiveContainerWidget(
       mobileBuilder: (_) {
         return _MobileContentWidget(
           profile: profile,
@@ -84,6 +93,18 @@ class _SuccessContentWidget extends StatelessWidget {
       desktopBuilder: (_) {
         return _DesktopContentWidget(profile: profile, isVisible: isVisible);
       },
+    );
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: _ProjectBackdropWidget(
+            imageUrls: projectImages,
+            isVisible: isVisible,
+          ),
+        ),
+        content,
+      ],
     );
   }
 }

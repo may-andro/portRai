@@ -12,6 +12,12 @@ class _TabletContentWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const DSVerticalSpacerWidget(5),
+        _EyebrowWidget(
+          profile: profile,
+          isVisible: isVisible,
+          hasHorizontalPadding: true,
+        ),
+        const DSVerticalSpacerWidget(2),
         _UniquePropositionWidget(
           label: profile.uniqueValueProposition,
           isVisible: isVisible,
@@ -37,6 +43,12 @@ class _TabletContentWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    _CurrentRoleWidget(
+                      profile: profile,
+                      isVisible: isVisible,
+                      hasHorizontalPadding: false,
+                    ),
+                    const DSVerticalSpacerWidget(2),
                     _HireButtonWidget(
                       isVisible: isVisible,
                       hasHorizontalPadding: false,

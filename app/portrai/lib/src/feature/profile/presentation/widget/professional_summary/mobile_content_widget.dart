@@ -19,12 +19,24 @@ class _MobileContentWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DSVerticalSpacerWidget(2),
+          _EyebrowWidget(
+            profile: profile,
+            isVisible: isVisible,
+            hasHorizontalPadding: true,
+          ),
+          const DSVerticalSpacerWidget(1),
           _UniquePropositionWidget(
             label: profile.uniqueValueProposition,
             isVisible: isVisible,
             hasHorizontalPadding: true,
           ),
-          const DSVerticalSpacerWidget(3),
+          const DSVerticalSpacerWidget(2),
+          _CurrentRoleWidget(
+            profile: profile,
+            isVisible: isVisible,
+            hasHorizontalPadding: true,
+          ),
+          const DSVerticalSpacerWidget(2),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: context.space(factor: 3)),
             child: _ProjectYearsWidget(

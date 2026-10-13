@@ -69,6 +69,11 @@ class IntroSectionWidget extends SectionWidget {
               profile: portfolio.profile,
               isVisible: isVisible,
               height: possibleViewPortHeight,
+              projectImages: portfolio.projects
+                  .map((project) => project.image)
+                  .where((image) => image.isNotEmpty)
+                  .toSet()
+                  .toList(),
             ),
             if (context.isDesktop)
               Positioned(

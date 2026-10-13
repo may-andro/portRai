@@ -25,11 +25,13 @@ class _DetailsWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: context.space(factor: 2),
           children: [
-            DSAvailabilityBadgeWidget(
-              label:
-                  '${context.localizations.profileAvailableForWork} · ${profile.availability.workType}',
-              color: Colors.greenAccent.shade400,
-              textColor: onSurface,
+            _HoverLiftWidget(
+              child: DSAvailabilityBadgeWidget(
+                label:
+                    '${context.localizations.profileAvailableForWork} · ${profile.availability.workType}',
+                color: Colors.greenAccent.shade400,
+                textColor: onSurface,
+              ),
             ),
             DSTextWidget(
               profile.fullName,
@@ -51,23 +53,27 @@ class _DetailsWidget extends StatelessWidget {
               spacing: context.space(factor: 1.5),
               runSpacing: context.space(factor: 1.5),
               children: [
-                DSIconInfoTileWidget(
-                  icon: Icons.location_on_rounded,
-                  label: context.localizations.profileLocation,
-                  value:
-                      '${profile.location.city}, ${profile.location.country}',
-                  startColor: context.colorPalette.brand.primary,
-                  endColor: context.colorPalette.brand.tertiary,
-                  textColor: onSurface,
-                ),
-                if (education != null)
-                  DSIconInfoTileWidget(
-                    icon: Icons.school_rounded,
-                    label: context.localizations.profileEducation,
-                    value: education.degree,
+                _HoverLiftWidget(
+                  child: DSIconInfoTileWidget(
+                    icon: Icons.location_on_rounded,
+                    label: context.localizations.profileLocation,
+                    value:
+                        '${profile.location.city}, ${profile.location.country}',
                     startColor: context.colorPalette.brand.primary,
                     endColor: context.colorPalette.brand.tertiary,
                     textColor: onSurface,
+                  ),
+                ),
+                if (education != null)
+                  _HoverLiftWidget(
+                    child: DSIconInfoTileWidget(
+                      icon: Icons.school_rounded,
+                      label: context.localizations.profileEducation,
+                      value: education.degree,
+                      startColor: context.colorPalette.brand.primary,
+                      endColor: context.colorPalette.brand.tertiary,
+                      textColor: onSurface,
+                    ),
                   ),
               ],
             ),
@@ -80,19 +86,24 @@ class _DetailsWidget extends StatelessWidget {
               runSpacing: context.space(),
               children: [
                 for (final language in profile.languages)
-                  DSInfoChipWidget(
-                    icon: Icons.translate_rounded,
-                    label: language.language,
+                  _HoverLiftWidget(
+                    child: DSInfoChipWidget(
+                      icon: Icons.translate_rounded,
+                      label: language.language,
+                    ),
                   ),
-                Tooltip(
-                  message: context.localizations.profileViewFullProfile,
-                  child: DSIconButtonWidget(
-                    Icons.arrow_outward_rounded,
-                    iconColor: context.colorPalette.brand.onPrimary,
-                    buttonColor: context.colorPalette.brand.primary,
-                    size: context.buttonSize,
-                    elevation: context.dimen.elevationLevel2,
-                    onPressed: () => ProfileScreen.navigate(context),
+                _HoverLiftWidget(
+                  scale: 1.12,
+                  child: Tooltip(
+                    message: context.localizations.profileViewFullProfile,
+                    child: DSIconButtonWidget(
+                      Icons.arrow_outward_rounded,
+                      iconColor: context.colorPalette.brand.onPrimary,
+                      buttonColor: context.colorPalette.brand.primary,
+                      size: context.buttonSize,
+                      elevation: context.dimen.elevationLevel2,
+                      onPressed: () => ProfileScreen.navigate(context),
+                    ),
                   ),
                 ),
               ],
@@ -117,13 +128,45 @@ class _AccentBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: context.space(factor: 8),
-      height: 4,
-      decoration: BoxDecoration(
-        color: context.colorPalette.accent.color,
-        borderRadius: BorderRadius.circular(2),
-      ),
+    return DSHoverableContainerWidget(
+      builder: (context, isHovering) {
+        return AnimatedContainer(
+          duration: 250.ms,
+          curve: Curves.easeOut,
+          width: context.space(factor: isHovering ? 14 : 8),
+          height: 4,
+          decoration: BoxDecoration(
+            color: context.colorPalette.accent.color,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HoverLiftWidget extends StatelessWidget {
+  const _HoverLiftWidget({required this.child, this.scale = 1.06});
+
+  final Widget child;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return DSHoverableContainerWidget(
+      builder: (context, isHovering) {
+        return AnimatedSlide(
+          duration: 200.ms,
+          curve: Curves.easeOutBack,
+          offset: Offset(0, isHovering ? -0.08 : 0),
+          child: AnimatedScale(
+            duration: 200.ms,
+            curve: Curves.easeOutBack,
+            scale: isHovering ? scale : 1,
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
