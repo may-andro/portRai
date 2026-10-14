@@ -7,15 +7,23 @@ void main() {
     'image': 'https://example.com/flutter.png',
     'title': 'Flutter Development',
     'skills': [
-      {'name': 'Flutter SDK', 'level': null, 'years': null, 'lastUsed': null},
+      {
+        'name': 'Flutter SDK',
+        'description': 'UI toolkit.',
+        'level': null,
+        'years': null,
+        'lastUsed': null,
+      },
       {
         'name': 'State Management',
+        'description': null,
         'level': null,
         'years': null,
         'lastUsed': null,
       },
     ],
     'locale': 'en',
+    'summary': 'Cross-platform apps.',
   };
 
   group('ExpertiseModel', () {
@@ -29,6 +37,7 @@ void main() {
         'State Management',
       ]);
       expect(model.locale, 'en');
+      expect(model.summary, 'Cross-platform apps.');
     });
 
     test('should preserve all fields when serialized and deserialized', () {

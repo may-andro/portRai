@@ -4,57 +4,67 @@
       {
         "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Flutter Development",
+        "summary": "Cross-platform apps built with Flutter and Dart, from pixel-perfect UI to platform integration.",
         "skills": [
           {
             "name": "Flutter SDK",
+            "description": "Widgets, rendering and tooling for polished cross-platform apps.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Dart",
+            "description": "Sound null safety, async/await and isolates for fast apps.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Custom Painters & Animations",
+            "description": "Canvas drawing and fluid motion for bespoke visuals.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Platform Channels / FFI",
+            "description": "Bridges between Dart and native code, via channels or FFI.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Responsive & Adaptive UI",
+            "description": "Layouts that adapt from phones to tablets and desktops.",
             "level": "expert",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Flutter Web",
+            "description": "Responsive web apps that share logic with mobile.",
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Riverpod",
+            "description": "Compile-safe, testable state and dependency management.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Flutter Desktop",
+            "description": "Windows, macOS and Linux apps from the same Flutter code.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Dart FFI",
+            "description": "Calling native C libraries straight from Dart.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
@@ -64,45 +74,53 @@
       {
         "image": "https://picsum.photos/seed/android/400/400",
         "title": "Native Android Development",
+        "summary": "Native Android development with Kotlin and Jetpack, focused on stable, modern and accessible apps.",
         "skills": [
           {
             "name": "Kotlin",
+            "description": "Concise, null-safe language for modern Android development.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Jetpack Compose",
+            "description": "Declarative native UI with state-driven composables.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Android SDK",
+            "description": "Core platform APIs, lifecycle and services for native Android.",
             "level": "expert",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "Coroutines & Flow",
+            "description": "Structured async work and reactive streams for Android.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Android Wear OS",
+            "description": "Glanceable watch apps, tiles and complications.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Java",
+            "description": "Mature JVM language used across legacy and modern Android code.",
             "level": "advanced",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "Hilt / Dagger",
+            "description": "Compile-time dependency injection for Android.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
@@ -112,51 +130,60 @@
       {
         "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Architecture & Patterns",
+        "summary": "Clean, modular architectures that keep large codebases testable, scalable and easy to change.",
         "skills": [
           {
             "name": "Clean Architecture",
+            "description": "Layered boundaries that keep business rules independent of frameworks.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "BLoC",
+            "description": "Predictable state with events, states and testable business logic.",
             "level": "expert",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Modularization",
+            "description": "Independent packages that speed up builds and teamwork.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Dependency Injection",
+            "description": "Loosely coupled classes wired through a single container.",
             "level": "advanced",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Domain-Driven Design",
+            "description": "Models and boundaries that mirror the business domain.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "MVVM",
+            "description": "Separates view and logic through observable view models.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Event Sourcing",
+            "description": "State rebuilt from an append-only log of events.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
           },
           {
             "name": "Feature-based Foldering",
+            "description": "Code grouped by feature so teams find and change it fast.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
@@ -166,33 +193,39 @@
       {
         "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Performance Optimization",
+        "summary": "Profiling and tuning apps so they start fast, scroll smoothly and use resources wisely.",
         "skills": [
           {
             "name": "Profiling with DevTools",
+            "description": "Timeline, memory and CPU views to track down jank.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Startup Optimization",
+            "description": "Faster cold starts through lean initialization.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Memory Management",
+            "description": "Leak-free apps through careful object lifecycles.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Isolates & Concurrency",
+            "description": "Heavy work moved off the UI thread to keep it responsive.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "App Size Reduction",
+            "description": "Smaller downloads through tree shaking and asset optimization.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
@@ -202,45 +235,53 @@
       {
         "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Backend Integration",
+        "summary": "Connecting apps to APIs and cloud services reliably, securely and with graceful offline behaviour.",
         "skills": [
           {
             "name": "Firebase",
+            "description": "Auth, data, messaging and analytics from one backend toolkit.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "GraphQL",
+            "description": "Typed queries that fetch exactly the data a screen needs.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "REST APIs",
+            "description": "Clean HTTP APIs with consistent errors and pagination.",
             "level": "expert",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "WebSockets",
+            "description": "Realtime two-way updates between server and app.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "MQTT",
+            "description": "Lightweight publish/subscribe messaging for connected devices.",
             "level": "intermediate",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Stripe / Payments",
+            "description": "Secure checkout, subscriptions and payment sheets.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Firebase Remote Config",
+            "description": "Change behaviour and content without shipping a new build.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
@@ -250,33 +291,39 @@
       {
         "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Testing & QA",
+        "summary": "Automated and manual testing strategies that catch regressions early and keep releases confident.",
         "skills": [
           {
             "name": "Unit & Widget Testing",
+            "description": "Fast tests for logic and widgets that catch regressions.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Golden Testing",
+            "description": "Pixel snapshots that guard the UI against visual regressions.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Integration Testing",
+            "description": "End-to-end flows verified on real devices and emulators.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "TDD",
+            "description": "Tests written first to drive small, safe changes.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Accessibility Testing",
+            "description": "Screen reader and contrast checks to catch barriers early.",
             "level": "intermediate",
             "years": 3,
             "lastUsed": 2026
@@ -286,39 +333,46 @@
       {
         "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Release & Deployment",
+        "summary": "Shipping to the stores and the web with repeatable, automated pipelines.",
         "skills": [
           {
             "name": "GitHub Actions",
+            "description": "Workflows that lint, test and ship on every pull request.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Fastlane",
+            "description": "Scripted builds, screenshots and store uploads.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Store Release Management",
+            "description": "Tracks, phased rollouts and review submissions handled smoothly.",
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
           },
           {
             "name": "Codemagic",
+            "description": "Cloud CI/CD tuned for Flutter builds and store uploads.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Play Console & App Store Connect",
+            "description": "Store listings, tracks and reviews managed end to end.",
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
           },
           {
             "name": "Feature Flags & Staged Rollouts",
+            "description": "Remote toggles and gradual releases that limit risk.",
             "level": "expert",
             "years": 5,
             "lastUsed": 2026
@@ -328,39 +382,46 @@
       {
         "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "AI & Generative UI",
+        "summary": "Building AI-powered experiences, from agentic workflows to interfaces generated on the fly.",
         "skills": [
           {
             "name": "On-device LLMs",
+            "description": "Private, low-latency language models running on the phone.",
             "level": "advanced",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Generative UI",
+            "description": "Interfaces composed on the fly from model output.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Prompt Engineering",
+            "description": "Prompts and few-shot examples that steer model behaviour.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Gemma / Small Language Models",
+            "description": "Compact open models that run close to the user.",
             "level": "advanced",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Retrieval-Augmented Generation",
+            "description": "Answers grounded in your own data via search plus a model.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Model Evaluation",
+            "description": "Benchmarks and test sets that measure model quality.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
@@ -370,33 +431,39 @@
       {
         "image": "https://picsum.photos/seed/slack/400/400",
         "title": "Leadership & Collaboration",
+        "summary": "Guiding teams and projects with clear communication, mentoring and pragmatic decisions.",
         "skills": [
           {
             "name": "Mentoring",
+            "description": "Growing teammates through pairing, reviews and feedback.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Technical Roadmapping",
+            "description": "Turning product goals into a phased technical plan.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Agile / Scrum",
+            "description": "Sprint planning, reviews and retros that keep delivery steady.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Public Speaking",
+            "description": "Talks and demos that make complex topics approachable.",
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Stakeholder Communication",
+            "description": "Clear updates and trade-offs for product and business partners.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
@@ -411,57 +478,67 @@
       {
         "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Desarrollo con Flutter",
+        "summary": "Apps multiplataforma con Flutter y Dart, desde interfaces cuidadas al píxel hasta la integración con la plataforma.",
         "skills": [
           {
             "name": "Flutter SDK",
+            "description": "Widgets, renderizado y herramientas para apps multiplataforma pulidas.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Dart",
+            "description": "Null safety, async/await e isolates para apps rápidas.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Custom Painters & Animations",
+            "description": "Dibujo en canvas y movimiento fluido para visuales a medida.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Platform Channels / FFI",
+            "description": "Puentes entre Dart y código nativo, mediante canales o FFI.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Responsive & Adaptive UI",
+            "description": "Diseños que se adaptan de móviles a tabletas y escritorio.",
             "level": "expert",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Flutter Web",
+            "description": "Apps web responsivas que comparten lógica con móvil.",
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Riverpod",
+            "description": "Gestión de estado y dependencias segura en compilación y testeable.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Flutter Desktop",
+            "description": "Apps para Windows, macOS y Linux con el mismo código Flutter.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Dart FFI",
+            "description": "Llamadas a librerías nativas en C directamente desde Dart.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
@@ -471,45 +548,53 @@
       {
         "image": "https://picsum.photos/seed/android/400/400",
         "title": "Desarrollo nativo Android",
+        "summary": "Desarrollo Android nativo con Kotlin y Jetpack, centrado en apps estables, modernas y accesibles.",
         "skills": [
           {
             "name": "Kotlin",
+            "description": "Lenguaje conciso y null-safe para el desarrollo Android moderno.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Jetpack Compose",
+            "description": "UI nativa declarativa con composables guiados por estado.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Android SDK",
+            "description": "APIs de plataforma, ciclo de vida y servicios para Android nativo.",
             "level": "expert",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "Coroutines & Flow",
+            "description": "Trabajo asíncrono estructurado y streams reactivos para Android.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Android Wear OS",
+            "description": "Apps de reloj, tiles y complicaciones pensadas para un vistazo.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Java",
+            "description": "Lenguaje maduro de la JVM usado en código Android antiguo y moderno.",
             "level": "advanced",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "Hilt / Dagger",
+            "description": "Inyección de dependencias en tiempo de compilación para Android.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
@@ -519,51 +604,60 @@
       {
         "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Arquitectura y patrones",
+        "summary": "Arquitecturas limpias y modulares que mantienen grandes bases de código testeables, escalables y fáciles de cambiar.",
         "skills": [
           {
             "name": "Clean Architecture",
+            "description": "Capas con límites claros que mantienen las reglas de negocio independientes del framework.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "BLoC",
+            "description": "Estado predecible con eventos, estados y lógica de negocio testeable.",
             "level": "expert",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Modularization",
+            "description": "Paquetes independientes que aceleran las builds y el trabajo en equipo.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Dependency Injection",
+            "description": "Clases desacopladas conectadas mediante un único contenedor.",
             "level": "advanced",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Domain-Driven Design",
+            "description": "Modelos y límites que reflejan el dominio del negocio.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "MVVM",
+            "description": "Separa vista y lógica mediante view models observables.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Event Sourcing",
+            "description": "Estado reconstruido a partir de un registro de eventos inmutable.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
           },
           {
             "name": "Feature-based Foldering",
+            "description": "Código agrupado por funcionalidad para encontrarlo y cambiarlo rápido.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
@@ -573,33 +667,39 @@
       {
         "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Optimización del rendimiento",
+        "summary": "Perfilado y ajuste de apps para que arranquen rápido, se desplacen con fluidez y usen bien los recursos.",
         "skills": [
           {
             "name": "Profiling with DevTools",
+            "description": "Vistas de timeline, memoria y CPU para localizar los tirones.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Startup Optimization",
+            "description": "Arranques en frío más rápidos con una inicialización ligera.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Memory Management",
+            "description": "Apps sin fugas gracias a un ciclo de vida de objetos cuidado.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Isolates & Concurrency",
+            "description": "Trabajo pesado fuera del hilo de UI para mantenerla fluida.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "App Size Reduction",
+            "description": "Descargas más pequeñas con tree shaking y optimización de recursos.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
@@ -609,45 +709,53 @@
       {
         "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Integración con backend",
+        "summary": "Conexión de apps con APIs y servicios cloud de forma fiable, segura y con buen comportamiento offline.",
         "skills": [
           {
             "name": "Firebase",
+            "description": "Auth, datos, mensajería y analítica desde un único conjunto de herramientas.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "GraphQL",
+            "description": "Consultas tipadas que obtienen justo los datos que necesita una pantalla.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "REST APIs",
+            "description": "APIs HTTP limpias con errores y paginación coherentes.",
             "level": "expert",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "WebSockets",
+            "description": "Actualizaciones bidireccionales en tiempo real entre servidor y app.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "MQTT",
+            "description": "Mensajería ligera de publicación/suscripción para dispositivos conectados.",
             "level": "intermediate",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Stripe / Payments",
+            "description": "Pagos seguros, suscripciones y hojas de pago.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Firebase Remote Config",
+            "description": "Cambia comportamiento y contenido sin publicar una nueva build.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
@@ -657,33 +765,39 @@
       {
         "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Pruebas y QA",
+        "summary": "Estrategias de pruebas automáticas y manuales que detectan regresiones pronto y dan confianza en cada release.",
         "skills": [
           {
             "name": "Unit & Widget Testing",
+            "description": "Tests rápidos de lógica y widgets que detectan regresiones.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Golden Testing",
+            "description": "Capturas de píxeles que protegen la UI frente a regresiones visuales.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Integration Testing",
+            "description": "Flujos de extremo a extremo verificados en dispositivos y emuladores.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "TDD",
+            "description": "Tests escritos primero para guiar cambios pequeños y seguros.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Accessibility Testing",
+            "description": "Pruebas con lectores de pantalla y contraste para detectar barreras pronto.",
             "level": "intermediate",
             "years": 3,
             "lastUsed": 2026
@@ -693,39 +807,46 @@
       {
         "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Lanzamiento y despliegue",
+        "summary": "Publicación en tiendas y web mediante pipelines automatizados y repetibles.",
         "skills": [
           {
             "name": "GitHub Actions",
+            "description": "Workflows que analizan, prueban y publican en cada pull request.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Fastlane",
+            "description": "Builds, capturas y subidas a tiendas automatizadas con scripts.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Store Release Management",
+            "description": "Canales, despliegues por fases y envíos a revisión gestionados sin fricción.",
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
           },
           {
             "name": "Codemagic",
+            "description": "CI/CD en la nube optimizado para builds de Flutter y subidas a tiendas.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Play Console & App Store Connect",
+            "description": "Fichas, canales y revisiones de tienda gestionados de principio a fin.",
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
           },
           {
             "name": "Feature Flags & Staged Rollouts",
+            "description": "Interruptores remotos y lanzamientos graduales que reducen el riesgo.",
             "level": "expert",
             "years": 5,
             "lastUsed": 2026
@@ -735,39 +856,46 @@
       {
         "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "IA e interfaces generativas",
+        "summary": "Creación de experiencias con IA, desde flujos agénticos hasta interfaces generadas al vuelo.",
         "skills": [
           {
             "name": "On-device LLMs",
+            "description": "Modelos de lenguaje privados y de baja latencia que corren en el móvil.",
             "level": "advanced",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Generative UI",
+            "description": "Interfaces compuestas al vuelo a partir de la salida del modelo.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Prompt Engineering",
+            "description": "Prompts y ejemplos few-shot que guían el comportamiento del modelo.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Gemma / Small Language Models",
+            "description": "Modelos abiertos compactos que se ejecutan cerca del usuario.",
             "level": "advanced",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Retrieval-Augmented Generation",
+            "description": "Respuestas basadas en tus propios datos mediante búsqueda y un modelo.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Model Evaluation",
+            "description": "Benchmarks y conjuntos de prueba que miden la calidad del modelo.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
@@ -777,33 +905,39 @@
       {
         "image": "https://picsum.photos/seed/slack/400/400",
         "title": "Liderazgo y colaboración",
+        "summary": "Guiar equipos y proyectos con comunicación clara, mentoría y decisiones pragmáticas.",
         "skills": [
           {
             "name": "Mentoring",
+            "description": "Hacer crecer al equipo con pair programming, revisiones y feedback.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Technical Roadmapping",
+            "description": "Convertir objetivos de producto en un plan técnico por fases.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Agile / Scrum",
+            "description": "Planificación de sprints, revisiones y retros que mantienen una entrega constante.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Public Speaking",
+            "description": "Charlas y demos que hacen accesibles los temas complejos.",
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Stakeholder Communication",
+            "description": "Actualizaciones claras y compromisos explicados a producto y negocio.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
@@ -818,57 +952,67 @@
       {
         "image": "https://picsum.photos/seed/flutter/400/400",
         "title": "Flutter-ontwikkeling",
+        "summary": "Cross-platform apps met Flutter en Dart, van pixel-perfecte UI tot platformintegratie.",
         "skills": [
           {
             "name": "Flutter SDK",
+            "description": "Widgets, rendering en tooling voor verfijnde cross-platform apps.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Dart",
+            "description": "Null safety, async/await en isolates voor snelle apps.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Custom Painters & Animations",
+            "description": "Canvas-tekenwerk en vloeiende beweging voor unieke visuals.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Platform Channels / FFI",
+            "description": "Bruggen tussen Dart en native code, via channels of FFI.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Responsive & Adaptive UI",
+            "description": "Layouts die meegroeien van telefoon naar tablet en desktop.",
             "level": "expert",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Flutter Web",
+            "description": "Responsieve webapps die logica delen met mobiel.",
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Riverpod",
+            "description": "Compile-veilig, testbaar state- en dependencybeheer.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Flutter Desktop",
+            "description": "Windows-, macOS- en Linux-apps met dezelfde Flutter-code.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Dart FFI",
+            "description": "Native C-bibliotheken rechtstreeks vanuit Dart aanroepen.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
@@ -878,45 +1022,53 @@
       {
         "image": "https://picsum.photos/seed/android/400/400",
         "title": "Native Android-ontwikkeling",
+        "summary": "Native Android-ontwikkeling met Kotlin en Jetpack, gericht op stabiele, moderne en toegankelijke apps.",
         "skills": [
           {
             "name": "Kotlin",
+            "description": "Beknopte, null-safe taal voor moderne Android-ontwikkeling.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Jetpack Compose",
+            "description": "Declaratieve native UI met state-gedreven composables.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Android SDK",
+            "description": "Kernplatform-API's, lifecycle en services voor native Android.",
             "level": "expert",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "Coroutines & Flow",
+            "description": "Gestructureerd async werk en reactieve streams voor Android.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Android Wear OS",
+            "description": "Snel leesbare horloge-apps, tiles en complicaties.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Java",
+            "description": "Volwassen JVM-taal in zowel legacy als moderne Android-code.",
             "level": "advanced",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "Hilt / Dagger",
+            "description": "Dependency injection tijdens compilatie voor Android.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
@@ -926,51 +1078,60 @@
       {
         "image": "https://picsum.photos/seed/diagramsdotnet/400/400",
         "title": "Architectuur & patronen",
+        "summary": "Schone, modulaire architecturen die grote codebases testbaar, schaalbaar en makkelijk aanpasbaar houden.",
         "skills": [
           {
             "name": "Clean Architecture",
+            "description": "Gelaagde grenzen die businessregels los van frameworks houden.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "BLoC",
+            "description": "Voorspelbare state met events, states en testbare businesslogica.",
             "level": "expert",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Modularization",
+            "description": "Onafhankelijke packages die builds en teamwerk versnellen.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Dependency Injection",
+            "description": "Losgekoppelde klassen verbonden via één container.",
             "level": "advanced",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Domain-Driven Design",
+            "description": "Modellen en grenzen die het businessdomein weerspiegelen.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "MVVM",
+            "description": "Scheidt view en logica via observeerbare view models.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Event Sourcing",
+            "description": "State opgebouwd uit een append-only log van events.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
           },
           {
             "name": "Feature-based Foldering",
+            "description": "Code gegroepeerd per feature zodat teams het snel vinden en aanpassen.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
@@ -980,33 +1141,39 @@
       {
         "image": "https://picsum.photos/seed/speedtest/400/400",
         "title": "Performance-optimalisatie",
+        "summary": "Apps profileren en afstemmen zodat ze snel starten, soepel scrollen en zuinig met resources omgaan.",
         "skills": [
           {
             "name": "Profiling with DevTools",
+            "description": "Timeline-, geheugen- en CPU-weergaven om jank op te sporen.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Startup Optimization",
+            "description": "Snellere cold starts dankzij slanke initialisatie.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Memory Management",
+            "description": "Lekvrije apps dankzij zorgvuldige object-lifecycles.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026
           },
           {
             "name": "Isolates & Concurrency",
+            "description": "Zwaar werk buiten de UI-thread zodat de app responsief blijft.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "App Size Reduction",
+            "description": "Kleinere downloads met tree shaking en asset-optimalisatie.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
@@ -1016,45 +1183,53 @@
       {
         "image": "https://picsum.photos/seed/firebase/400/400",
         "title": "Backend-integratie",
+        "summary": "Apps betrouwbaar en veilig koppelen aan API's en cloudservices, met nette offline-afhandeling.",
         "skills": [
           {
             "name": "Firebase",
+            "description": "Auth, data, messaging en analytics uit één backend-toolkit.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "GraphQL",
+            "description": "Getypeerde queries die precies de data ophalen die een scherm nodig heeft.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "REST APIs",
+            "description": "Nette HTTP-API's met consistente fouten en paginering.",
             "level": "expert",
             "years": 12,
             "lastUsed": 2026
           },
           {
             "name": "WebSockets",
+            "description": "Realtime tweerichtingsupdates tussen server en app.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "MQTT",
+            "description": "Lichtgewicht publish/subscribe-berichten voor verbonden apparaten.",
             "level": "intermediate",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Stripe / Payments",
+            "description": "Veilige checkout, abonnementen en betaalschermen.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Firebase Remote Config",
+            "description": "Wijzig gedrag en content zonder nieuwe build.",
             "level": "expert",
             "years": 6,
             "lastUsed": 2026
@@ -1064,33 +1239,39 @@
       {
         "image": "https://picsum.photos/seed/testinglibrary/400/400",
         "title": "Testen & QA",
+        "summary": "Geautomatiseerde en handmatige teststrategieën die regressies vroeg vangen en releases betrouwbaar maken.",
         "skills": [
           {
             "name": "Unit & Widget Testing",
+            "description": "Snelle tests voor logica en widgets die regressies opvangen.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Golden Testing",
+            "description": "Pixel-snapshots die de UI beschermen tegen visuele regressies.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Integration Testing",
+            "description": "End-to-end flows gecontroleerd op echte toestellen en emulators.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "TDD",
+            "description": "Eerst tests schrijven om kleine, veilige wijzigingen te sturen.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Accessibility Testing",
+            "description": "Controles met schermlezers en contrast om drempels vroeg te vinden.",
             "level": "intermediate",
             "years": 3,
             "lastUsed": 2026
@@ -1100,39 +1281,46 @@
       {
         "image": "https://picsum.photos/seed/githubactions/400/400",
         "title": "Release & deployment",
+        "summary": "Uitrollen naar de stores en het web met herhaalbare, geautomatiseerde pipelines.",
         "skills": [
           {
             "name": "GitHub Actions",
+            "description": "Workflows die linten, testen en releasen bij elke pull request.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Fastlane",
+            "description": "Gescripte builds, screenshots en store-uploads.",
             "level": "advanced",
             "years": 6,
             "lastUsed": 2026
           },
           {
             "name": "Store Release Management",
+            "description": "Tracks, gefaseerde uitrol en review-inzendingen soepel afgehandeld.",
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
           },
           {
             "name": "Codemagic",
+            "description": "Cloud-CI/CD afgestemd op Flutter-builds en store-uploads.",
             "level": "advanced",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Play Console & App Store Connect",
+            "description": "Store-listings, tracks en reviews van begin tot eind beheerd.",
             "level": "expert",
             "years": 10,
             "lastUsed": 2026
           },
           {
             "name": "Feature Flags & Staged Rollouts",
+            "description": "Remote toggles en gefaseerde uitrol die risico beperken.",
             "level": "expert",
             "years": 5,
             "lastUsed": 2026
@@ -1142,39 +1330,46 @@
       {
         "image": "https://picsum.photos/seed/googlegemini/400/400",
         "title": "AI & generatieve UI",
+        "summary": "AI-ervaringen bouwen, van agentische workflows tot interfaces die ter plekke worden gegenereerd.",
         "skills": [
           {
             "name": "On-device LLMs",
+            "description": "Privé taalmodellen met lage latency die op de telefoon draaien.",
             "level": "advanced",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Generative UI",
+            "description": "Interfaces die direct worden samengesteld uit modeloutput.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Prompt Engineering",
+            "description": "Prompts en few-shot voorbeelden die modelgedrag sturen.",
             "level": "advanced",
             "years": 3,
             "lastUsed": 2026
           },
           {
             "name": "Gemma / Small Language Models",
+            "description": "Compacte open modellen die dicht bij de gebruiker draaien.",
             "level": "advanced",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Retrieval-Augmented Generation",
+            "description": "Antwoorden gebaseerd op eigen data via zoeken plus een model.",
             "level": "intermediate",
             "years": 2,
             "lastUsed": 2026
           },
           {
             "name": "Model Evaluation",
+            "description": "Benchmarks en testsets die modelkwaliteit meten.",
             "level": "familiar",
             "years": 1,
             "lastUsed": 2026
@@ -1184,33 +1379,39 @@
       {
         "image": "https://picsum.photos/seed/slack/400/400",
         "title": "Leiderschap & samenwerking",
+        "summary": "Teams en projecten begeleiden met heldere communicatie, mentoring en pragmatische beslissingen.",
         "skills": [
           {
             "name": "Mentoring",
+            "description": "Teamgenoten laten groeien via pairing, reviews en feedback.",
             "level": "expert",
             "years": 8,
             "lastUsed": 2026
           },
           {
             "name": "Technical Roadmapping",
+            "description": "Productdoelen vertalen naar een gefaseerd technisch plan.",
             "level": "advanced",
             "years": 5,
             "lastUsed": 2026
           },
           {
             "name": "Agile / Scrum",
+            "description": "Sprintplanning, reviews en retro's die de oplevering stabiel houden.",
             "level": "advanced",
             "years": 9,
             "lastUsed": 2026
           },
           {
             "name": "Public Speaking",
+            "description": "Talks en demo's die complexe onderwerpen toegankelijk maken.",
             "level": "intermediate",
             "years": 4,
             "lastUsed": 2026
           },
           {
             "name": "Stakeholder Communication",
+            "description": "Heldere updates en afwegingen voor product- en businesspartners.",
             "level": "advanced",
             "years": 7,
             "lastUsed": 2026

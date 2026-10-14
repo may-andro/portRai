@@ -36,6 +36,7 @@ dependencies:
   json_annotation: ^4.9.0
   json_schema_builder: ^0.1.6
   log_reporter: any
+  lottie: ^3.6.1
   meta: ^1.16.0
   module_injector: any
   open_mail: ^1.2.1
@@ -61,6 +62,7 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
+    - assets/lottie/
     - assets/profile/education.jpg
     - assets/profile/contact_background.jpg
     - assets/profile/contact_phone.jpg

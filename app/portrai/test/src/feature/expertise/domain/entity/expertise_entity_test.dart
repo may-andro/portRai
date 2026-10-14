@@ -45,4 +45,36 @@ void main() {
       );
     });
   });
+
+  group('ExpertiseEntity stats', () {
+    const detailed = ExpertiseEntity(
+      image: 'https://example.com/flutter.png',
+      title: 'Flutter Development',
+      skills: [
+        SkillEntity(name: 'Flutter', level: 'expert', years: 8, lastUsed: 2026),
+        SkillEntity(name: 'Dart', level: 'expert', years: 6, lastUsed: 2025),
+        SkillEntity(name: 'FFI', level: 'advanced'),
+      ],
+    );
+
+    test('should count the expert skills when asking for the expert count', () {
+      expect(detailed.expertSkillCount, 2);
+    });
+
+    test('should return the longest and latest values when they are known', () {
+      expect(detailed.maxYears, 8);
+      expect(detailed.latestYearUsed, 2026);
+    });
+
+    test('should return null when no skill has years or last used', () {
+      const bare = ExpertiseEntity(
+        image: '',
+        title: 'Bare',
+        skills: [SkillEntity(name: 'Swift')],
+      );
+
+      expect(bare.maxYears, isNull);
+      expect(bare.latestYearUsed, isNull);
+    });
+  });
 }

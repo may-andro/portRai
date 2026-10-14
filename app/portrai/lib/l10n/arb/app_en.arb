@@ -495,6 +495,66 @@
   "@experiencesTitle": {
     "description": "Title of the experiences screen"
   },
+  "expertisesTitle": "Expertises",
+  "@expertisesTitle": {
+    "description": "Title of the expertises screen"
+  },
+  "expertiseSkillsHeading": "Skills & Technologies",
+  "@expertiseSkillsHeading": {
+    "description": "Heading above the skills grid on the expertise screen"
+  },
+  "expertiseStatSkills": "Skills",
+  "@expertiseStatSkills": {
+    "description": "Stat label: Number of skills in an expertise area"
+  },
+  "expertiseStatExpert": "Expert-level",
+  "@expertiseStatExpert": {
+    "description": "Stat label: Number of expert-level skills in an expertise area"
+  },
+  "expertiseStatYears": "Years of experience",
+  "@expertiseStatYears": {
+    "description": "Stat label: Longest hands-on experience in an expertise area"
+  },
+  "expertiseStatLastUsed": "Last used",
+  "@expertiseStatLastUsed": {
+    "description": "Stat label: Most recent year a skill of an expertise area was used"
+  },
+  "expertiseLevelExpert": "Expert",
+  "@expertiseLevelExpert": {
+    "description": "Skill level label: expert"
+  },
+  "expertiseLevelAdvanced": "Advanced",
+  "@expertiseLevelAdvanced": {
+    "description": "Skill level label: advanced"
+  },
+  "expertiseLevelIntermediate": "Intermediate",
+  "@expertiseLevelIntermediate": {
+    "description": "Skill level label: intermediate"
+  },
+  "expertiseLevelFamiliar": "Familiar",
+  "@expertiseLevelFamiliar": {
+    "description": "Skill level label: familiar"
+  },
+  "expertiseYearsExperience": "{count} yrs",
+  "@expertiseYearsExperience": {
+    "description": "Years of experience with a skill",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "expertiseLastUsed": "Last used {year}",
+  "@expertiseLastUsed": {
+    "description": "Year a skill was last used",
+    "placeholders": {
+      "year": {
+        "type": "String",
+        "example": "2024"
+      }
+    }
+  },
   "seeMore": "See More",
   "@seeMore": {
     "description": "Button label to open the details of an item"

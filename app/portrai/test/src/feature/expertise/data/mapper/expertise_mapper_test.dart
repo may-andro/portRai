@@ -43,5 +43,37 @@ void main() {
 
       expect(mapper.to(model), entity);
     });
+
+    test(
+      'should keep the summary and skill description when mapping both ways',
+      () {
+        const described = ExpertiseEntity(
+          image: 'https://example.com/flutter.png',
+          title: 'Flutter Development',
+          skills: [
+            SkillEntity(name: 'Flutter SDK', description: 'UI toolkit.'),
+          ],
+          summary: 'Cross-platform apps.',
+        );
+
+        final model = mapper.from(described);
+
+        expect(model.summary, 'Cross-platform apps.');
+        expect(model.skills.single.description, 'UI toolkit.');
+        expect(mapper.to(model), described);
+      },
+    );
+
+    test('should default to no summary when the json has none', () {
+      final model = ExpertiseModel.fromJson({
+        'image': 'https://example.com/flutter.png',
+        'title': 'Flutter Development',
+        'skills': <Map<String, dynamic>>[],
+        'locale': 'en',
+      });
+
+      expect(model.summary, isNull);
+      expect(model.skills, isEmpty);
+    });
   });
 }
