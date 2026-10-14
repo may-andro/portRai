@@ -24,103 +24,106 @@ class _ExpertiseCardWidget extends StatelessWidget {
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
     final artSize = context.space(factor: 20);
 
-    return DSHoverableContainerWidget(
-      builder: (context, isHovering) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOut,
-          transform: Matrix4.translationValues(0, isHovering ? -4 : 0, 0),
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [start, end],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: base.withAlpha(isHovering ? 150 : 90),
-                blurRadius: isHovering ? 28 : 18,
-                offset: const Offset(0, 10),
+    return GestureDetector(
+      onTap: () => ExpertiseScreen.navigate(context, expertise: expertise),
+      child: DSHoverableContainerWidget(
+        builder: (context, isHovering) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            transform: Matrix4.translationValues(0, isHovering ? -4 : 0, 0),
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [start, end],
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: radius,
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -artSize * 0.2,
-                  bottom: -artSize * 0.25,
-                  width: artSize,
-                  height: artSize,
-                  child: AnimatedRotation(
-                    turns: isHovering ? 0.07 : 0.04,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOut,
-                    child: AnimatedScale(
-                      scale: isHovering ? 1.15 : 1,
+              boxShadow: [
+                BoxShadow(
+                  color: base.withAlpha(isHovering ? 150 : 90),
+                  blurRadius: isHovering ? 28 : 18,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: radius,
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -artSize * 0.2,
+                    bottom: -artSize * 0.25,
+                    width: artSize,
+                    height: artSize,
+                    child: AnimatedRotation(
+                      turns: isHovering ? 0.07 : 0.04,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeOut,
-                      child: ShaderMask(
-                        blendMode: BlendMode.dstIn,
-                        shaderCallback: (bounds) {
-                          return const RadialGradient(
-                            colors: [Colors.black, Colors.transparent],
-                            stops: [0.55, 1],
-                          ).createShader(bounds);
-                        },
-                        child: AnimatedOpacity(
-                          opacity: isHovering ? 0.45 : 0.28,
-                          duration: const Duration(milliseconds: 500),
-                          child: DSNetworkImageWidget(
-                            url: expertise.image,
-                            fit: BoxFit.contain,
+                      child: AnimatedScale(
+                        scale: isHovering ? 1.15 : 1,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        child: ShaderMask(
+                          blendMode: BlendMode.dstIn,
+                          shaderCallback: (bounds) {
+                            return const RadialGradient(
+                              colors: [Colors.black, Colors.transparent],
+                              stops: [0.55, 1],
+                            ).createShader(bounds);
+                          },
+                          child: AnimatedOpacity(
+                            opacity: isHovering ? 0.45 : 0.28,
+                            duration: const Duration(milliseconds: 500),
+                            child: DSNetworkImageWidget(
+                              url: expertise.image,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(context.space(factor: 2)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: context.space(factor: 1.5),
-                    children: [
-                      Row(
-                        spacing: context.space(factor: 1.5),
-                        children: [
-                          _IconTileWidget(imageUrl: expertise.image),
-                          Expanded(
-                            child: DSTextWidget(
-                              expertise.title,
-                              style: context.typography.emphasizedTitleLarge,
-                              color: _white,
-                              maxLines: 2,
-                              textOverflow: TextOverflow.ellipsis,
+                  Padding(
+                    padding: EdgeInsets.all(context.space(factor: 2)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: context.space(factor: 1.5),
+                      children: [
+                        Row(
+                          spacing: context.space(factor: 1.5),
+                          children: [
+                            _IconTileWidget(imageUrl: expertise.image),
+                            Expanded(
+                              child: DSTextWidget(
+                                expertise.title,
+                                style: context.typography.emphasizedTitleLarge,
+                                color: _white,
+                                maxLines: 2,
+                                textOverflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Wrap(
-                        spacing: context.space(factor: 0.5),
-                        runSpacing: context.space(factor: 0.5),
-                        children: [
-                          for (final skill in skills.take(_maxSkills))
-                            _GlassChipWidget(label: skill),
-                          if (hiddenCount > 0)
-                            _GlassChipWidget(label: '+$hiddenCount'),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                        Wrap(
+                          spacing: context.space(factor: 0.5),
+                          runSpacing: context.space(factor: 0.5),
+                          children: [
+                            for (final skill in skills.take(_maxSkills))
+                              _GlassChipWidget(label: skill),
+                            if (hiddenCount > 0)
+                              _GlassChipWidget(label: '+$hiddenCount'),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

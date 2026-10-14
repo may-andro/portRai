@@ -109,11 +109,20 @@ class ExpertiseSectionWidget extends SectionWidget {
         return ExpertiseListWidget(
           allExpertise: portfolio.expertises,
           isVisible: isVisible,
+          visibleItemsCount: context.allowedExperienceCount,
         );
       },
       visibilityKey: trackingId,
       title: getTitle(context),
       background: const InverseSectionBackground(),
+      action: context.isDesktop
+          ? null
+          : SectionAction(
+              label: context.localizations.portfolioSectionSeeAll,
+              onPressed: () {
+                ExpertisesScreen.navigate(context);
+              },
+            ),
     );
   }
 

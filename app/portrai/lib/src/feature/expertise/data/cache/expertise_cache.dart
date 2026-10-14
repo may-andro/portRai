@@ -15,7 +15,7 @@ class ExpertiseCache extends DBCache<ExpertiseModel> {
   String get tableName => 'expertise_table';
 
   @override
-  int get tableVersion => 2;
+  int get tableVersion => 3;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -23,6 +23,7 @@ class ExpertiseCache extends DBCache<ExpertiseModel> {
     const DbColumnDefinition(name: 'title', nullable: false),
     const DbColumnDefinition(name: 'skills', nullable: false),
     const DbColumnDefinition(name: 'locale', nullable: false),
+    const DbColumnDefinition(name: 'summary'),
   ];
 
   @override

@@ -18,12 +18,14 @@ class ExpertiseMapper implements BiMapper<ExpertiseModel, ExpertiseEntity> {
         for (final skill in entity.skills)
           SkillModel(
             name: skill.name,
+            description: skill.description,
             level: skill.level,
             years: skill.years,
             lastUsed: skill.lastUsed,
           ),
       ],
       locale: appLocale.languageCode,
+      summary: entity.summary,
     );
   }
 
@@ -36,11 +38,13 @@ class ExpertiseMapper implements BiMapper<ExpertiseModel, ExpertiseEntity> {
         for (final skill in model.skills)
           SkillEntity(
             name: skill.name,
+            description: skill.description,
             level: skill.level,
             years: skill.years,
             lastUsed: skill.lastUsed,
           ),
       ],
+      summary: model.summary,
     );
   }
 }

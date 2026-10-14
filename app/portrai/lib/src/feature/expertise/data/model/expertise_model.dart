@@ -10,6 +10,7 @@ class ExpertiseModel {
     required this.title,
     required this.skills,
     required this.locale,
+    this.summary,
   });
 
   factory ExpertiseModel.fromJson(Map<String, dynamic> json) =>
@@ -19,6 +20,7 @@ class ExpertiseModel {
   final String title;
   final List<SkillModel> skills;
   final String locale;
+  final String? summary;
 
   Map<String, dynamic> toJson() => _$ExpertiseModelToJson(this);
 }

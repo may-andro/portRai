@@ -3,12 +3,16 @@ import 'package:equatable/equatable.dart';
 class SkillEntity extends Equatable {
   const SkillEntity({
     required this.name,
+    this.description,
     this.level,
     this.years,
     this.lastUsed,
   });
 
   final String name;
+
+  /// Short text explaining what the skill covers.
+  final String? description;
 
   /// One of `expert`, `advanced`, `intermediate` or `familiar`.
   final String? level;
@@ -20,5 +24,5 @@ class SkillEntity extends Equatable {
   final int? lastUsed;
 
   @override
-  List<Object?> get props => [name, level, years, lastUsed];
+  List<Object?> get props => [name, description, level, years, lastUsed];
 }

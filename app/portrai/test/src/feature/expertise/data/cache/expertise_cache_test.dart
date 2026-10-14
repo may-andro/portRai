@@ -24,9 +24,16 @@ void main() {
       expect(result['image'], model.image);
       expect(result['title'], model.title);
       expect(jsonDecode(result['skills'] as String), [
-        {'name': 'Flutter SDK', 'level': null, 'years': null, 'lastUsed': null},
+        {
+          'name': 'Flutter SDK',
+          'description': null,
+          'level': null,
+          'years': null,
+          'lastUsed': null,
+        },
         {
           'name': 'State Management',
+          'description': null,
           'level': null,
           'years': null,
           'lastUsed': null,

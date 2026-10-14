@@ -13,6 +13,7 @@ export 'ds_labeled_info_row_widget.dart';
 export 'ds_network_image_widget.dart';
 export 'ds_position_indicator_widget.dart';
 export 'ds_quote_text_widget.dart';
+export 'ds_skill_card_widget.dart';
 export 'ds_snack_bar_widget.dart';
 export 'ds_spotlight_card_widget.dart';
 export 'ds_tab_item_widget.dart';
