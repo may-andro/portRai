@@ -103,10 +103,7 @@ class _StatsChartWidgetState extends State<_StatsChartWidget> {
       );
     }
 
-    return AspectRatio(
-      aspectRatio: 800 / 300,
-      child: Lottie.memory(_animation!, fit: BoxFit.contain),
-    );
+    return DSLottieDataWidget(data: _animation!);
   }
 }
 

@@ -7,6 +7,7 @@ export 'divider/ds_vertical_divider_widget.dart';
 export 'icon/ds_icon_widget.dart';
 export 'image/image.dart';
 export 'loading/ds_loading_widget.dart';
+export 'lottie/lottie.dart';
 export 'space/ds_horizontal_spacer_widget.dart';
 export 'space/ds_vertical_spacer_widget.dart';
 export 'text/ds_text_widget.dart';

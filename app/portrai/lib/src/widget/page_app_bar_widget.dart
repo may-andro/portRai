@@ -1,9 +1,12 @@
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:portrai/src/widget/page_chrome_widget.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 
-/// Pinned title bar shown at the top of mobile and tablet screens. Follows the
-/// theme background unless colors are given.
+/// Top bar for scrolling pages, chosen by platform (see [PageChrome]): the
+/// logo header on the web, a title bar with a close button on Android and a
+/// plain title bar on iOS. Follows the theme background unless colors are
+/// given.
 class PageAppBarWidget extends StatelessWidget {
   const PageAppBarWidget({
     required this.title,
@@ -18,6 +21,11 @@ class PageAppBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chrome = PageChrome.current;
+    if (chrome == PageChrome.header) {
+      return const SliverToBoxAdapter(child: PageHeaderWidget());
+    }
+
     final palette = context.colorPalette;
     final resolvedTitleColor = titleColor ?? palette.neutral.grey9;
     return SliverAppBar(
@@ -27,16 +35,21 @@ class PageAppBarWidget extends StatelessWidget {
       backgroundColor: backgroundColor ?? palette.background.color,
       surfaceTintColor: palette.neutral.transparent.color,
       foregroundColor: resolvedTitleColor.color,
-      automaticallyImplyLeading: !kIsWeb,
+      automaticallyImplyLeading: false,
       centerTitle: true,
       title: DSTextWidget(
         title,
         color: resolvedTitleColor,
-        style: kIsWeb
-            ? context.typography.emphasizedTitleLarge
-            : context.typography.emphasizedTitleMedium,
+        style: context.typography.emphasizedTitleMedium,
         maxLines: 1,
       ),
+      actions: [
+        if (chrome == PageChrome.close && Navigator.of(context).canPop())
+          Padding(
+            padding: EdgeInsets.only(right: context.space()),
+            child: PageCloseButtonWidget(color: resolvedTitleColor.color),
+          ),
+      ],
     );
   }
 }

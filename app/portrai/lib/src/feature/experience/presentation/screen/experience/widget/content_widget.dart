@@ -8,7 +8,6 @@ import 'package:portrai/src/feature/experience/presentation/screen/experience/bl
 import 'package:portrai/src/feature/experience/presentation/screen/experience/widget/section_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
-import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
 part 'desktop_content_widget.dart';

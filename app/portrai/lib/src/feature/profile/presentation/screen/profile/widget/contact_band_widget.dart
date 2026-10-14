@@ -53,13 +53,32 @@ class _ContactBandWidget extends StatelessWidget {
         spacing: context.space(factor: 3),
         children: [
           heading,
-          Align(
-            alignment: Alignment.centerLeft,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: card,
-            ),
-          ),
+          if (isDesktop)
+            Row(
+              spacing: context.space(factor: 3),
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: card,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => Center(
+                      child: DSLottieIllustrationWidget(
+                        illustration: DSLottieIllustration.contactUs,
+                        width: min(constraints.maxWidth, 420),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            card,
         ],
       ),
     );
@@ -102,6 +121,7 @@ class _MessageCardWidget extends StatefulWidget {
 
 class _MessageCardWidgetState extends State<_MessageCardWidget> {
   final _controller = TextEditingController();
+  int _sendCount = 0;
 
   @override
   void dispose() {
@@ -110,6 +130,7 @@ class _MessageCardWidgetState extends State<_MessageCardWidget> {
   }
 
   void _send() {
+    setState(() => _sendCount++);
     final subject = Uri.encodeComponent(
       context.localizations.profileGetInTouch,
     );
@@ -194,10 +215,20 @@ class _MessageCardWidgetState extends State<_MessageCardWidget> {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: _WebButtonWidget(
-                          label: context.localizations.profileGetInTouch,
-                          icon: Icons.send_rounded,
-                          onPressed: _send,
+                        child: _HoverLiftWidget(
+                          child: DSButtonWidget(
+                            label: context.localizations.profileGetInTouch,
+                            iconDirection: DSButtonIconDirection.right,
+                            isExpanded: false,
+                            iconWidget: DSLottieIconWidget(
+                              icon: DSLottieIcon.paperPlane,
+                              size: 32,
+                              color: palette.brand.onPrimary.color,
+                              playback: DSLottiePlayback.trigger,
+                              trigger: _sendCount,
+                            ),
+                            onPressed: _send,
+                          ),
                         ),
                       ),
                     ],

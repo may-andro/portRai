@@ -23,34 +23,37 @@ class _HeroWidget extends StatelessWidget {
     return ClipRect(
       child: Stack(
         children: [
-          const Positioned.fill(child: _HeroBackgroundWidget()),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: _horizontalInset(context),
-              vertical: context.space(factor: isDesktop ? 6 : 4),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: isDesktop
-                  ? Row(
-                      spacing: context.space(factor: 4),
-                      children: [
-                        Expanded(
-                          child: _HeroTextWidget(
-                            profile: profile,
-                            isDesktop: true,
+          Positioned.fill(child: _HeroBackgroundWidget(isDesktop: isDesktop)),
+          PageChromeWidget(
+            closeColor: context.colorPalette.neutral.grey9.color,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: _horizontalInset(context),
+                vertical: context.space(factor: isDesktop ? 6 : 4),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: isDesktop
+                    ? Row(
+                        spacing: context.space(factor: 4),
+                        children: [
+                          Expanded(
+                            child: _HeroTextWidget(
+                              profile: profile,
+                              isDesktop: true,
+                            ),
                           ),
-                        ),
-                        stage,
-                      ],
-                    )
-                  : Column(
-                      spacing: context.space(factor: 3),
-                      children: [
-                        stage,
-                        _HeroTextWidget(profile: profile, isDesktop: false),
-                      ],
-                    ),
+                          stage,
+                        ],
+                      )
+                    : Column(
+                        spacing: context.space(factor: 3),
+                        children: [
+                          stage,
+                          _HeroTextWidget(profile: profile, isDesktop: false),
+                        ],
+                      ),
+              ),
             ),
           ),
         ],
@@ -60,24 +63,13 @@ class _HeroWidget extends StatelessWidget {
 }
 
 class _HeroBackgroundWidget extends StatelessWidget {
-  const _HeroBackgroundWidget();
+  const _HeroBackgroundWidget({required this.isDesktop});
+
+  final bool isDesktop;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    Widget blob(Color from, Color to, double size) => Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [from.withAlpha(70), to.withAlpha(20)],
-        ),
-      ),
-    );
-
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -89,54 +81,21 @@ class _HeroBackgroundWidget extends StatelessWidget {
           ],
         ),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final size = max(constraints.maxWidth * 0.55, 320.0);
-          return Stack(
-            children: [
-              Positioned(
-                right: -size * 0.25,
-                top: -size * 0.3,
-                child:
-                    blob(
-                          palette.brand.primary.color,
-                          palette.brand.secondary.color,
-                          size,
-                        )
-                        .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true),
-                        )
-                        .move(
-                          begin: Offset.zero,
-                          end: const Offset(-24, 18),
-                          duration: 9.seconds,
-                          curve: Curves.easeInOut,
-                        ),
-              ),
-              Positioned(
-                left: -size * 0.2,
-                bottom: -size * 0.35,
-                child:
-                    blob(
-                          palette.brand.secondary.color,
-                          palette.brand.primary.color,
-                          size * 0.7,
-                        )
-                        .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true),
-                        )
-                        .move(
-                          begin: Offset.zero,
-                          end: const Offset(20, -16),
-                          duration: 11.seconds,
-                          curve: Curves.easeInOut,
-                        ),
-              ),
-            ],
-          );
-        },
+      child: DSLottieBackgroundWidget(
+        illustration: isDesktop
+            ? DSLottieIllustration.heroOrbs
+            : DSLottieIllustration.heroOrbsMobile,
+        opacity: 1,
+        colorOverrides: [
+          DSLottieColorOverride(
+            keyPath: const ['Primary Orb', '**'],
+            color: palette.brand.primary,
+          ),
+          DSLottieColorOverride(
+            keyPath: const ['Secondary Orb', '**'],
+            color: palette.brand.secondary,
+          ),
+        ],
       ),
     );
   }
@@ -191,13 +150,17 @@ class _HeroTextWidget extends StatelessWidget {
               runSpacing: context.space(factor: 2),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _WebButtonWidget(
-                  label: context.localizations.profileHireMe,
-                  icon: Icons.arrow_outward_rounded,
-                  onPressed: () => context.bloc.add(
-                    OpenExternalUrlEvent(
-                      url: 'mailto:${profile.email}',
-                      label: 'Email',
+                _HoverLiftWidget(
+                  child: DSButtonWidget(
+                    label: context.localizations.profileHireMe,
+                    icon: Icons.arrow_outward_rounded,
+                    iconDirection: DSButtonIconDirection.right,
+                    isExpanded: false,
+                    onPressed: () => context.bloc.add(
+                      OpenExternalUrlEvent(
+                        url: 'mailto:${profile.email}',
+                        label: 'Email',
+                      ),
                     ),
                   ),
                 ),
@@ -251,21 +214,23 @@ class _OpenToWorkPillWidget extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _green.withAlpha(90),
-                      ),
-                    )
-                    .animate(onPlay: (controller) => controller.repeat())
-                    .scale(
-                      begin: const Offset(0.5, 0.5),
-                      end: const Offset(1.4, 1.4),
-                      duration: 1600.ms,
-                    )
-                    .fadeOut(duration: 1600.ms),
+                for (final delay in const [0, 800])
+                  Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _green.withAlpha(90),
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .scale(
+                        begin: const Offset(0.5, 0.5),
+                        end: const Offset(1.6, 1.6),
+                        delay: delay.ms,
+                        duration: 1600.ms,
+                      )
+                      .fadeOut(delay: delay.ms, duration: 1600.ms),
                 Container(
                   width: 8,
                   height: 8,
@@ -355,7 +320,7 @@ class _HeroStageWidget extends StatelessWidget {
             left: stageWidth * 0.06,
             bottom: stageHeight * 0.02,
             child: _HeroChipWidget(
-              icon: Icons.workspace_premium_rounded,
+              lottieIcon: DSLottieIcon.medal,
               label:
                   '${profile.yearsOfExperience}+ ${context.localizations.profileYearsExperience}',
               delay: 300,
@@ -568,14 +533,16 @@ class _FloatingPhotoWidgetState extends State<_FloatingPhotoWidget> {
 
 class _HeroChipWidget extends StatelessWidget {
   const _HeroChipWidget({
-    required this.icon,
     required this.label,
     required this.delay,
+    this.icon,
+    this.lottieIcon,
     this.iconSize = 18,
     this.iconColor,
-  });
+  }) : assert(icon != null || lottieIcon != null);
 
-  final IconData icon;
+  final IconData? icon;
+  final DSLottieIcon? lottieIcon;
   final String label;
   final int delay;
   final double iconSize;
@@ -612,11 +579,19 @@ class _HeroChipWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   spacing: context.space(factor: 0.75),
                   children: [
-                    Icon(
-                      icon,
-                      size: iconSize,
-                      color: iconColor ?? palette.brand.primary.color,
-                    ),
+                    if (lottieIcon != null)
+                      DSLottieIconWidget(
+                        icon: lottieIcon!,
+                        size: 32,
+                        color: iconColor ?? palette.brand.primary.color,
+                        playback: DSLottiePlayback.loop,
+                      )
+                    else
+                      Icon(
+                        icon,
+                        size: iconSize,
+                        color: iconColor ?? palette.brand.primary.color,
+                      ),
                     DSTextWidget(
                       label,
                       style: context.typography.emphasizedLabelLarge,
@@ -644,33 +619,28 @@ class _SocialIconButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brandIcon = DSBrandIcon.fromName(link.name);
+    void open() =>
+        context.bloc.add(OpenExternalUrlEvent(url: link.url, label: link.name));
+
     return _HoverLiftWidget(
       scale: 1.1,
-      child: Tooltip(
-        message: link.name,
-        child: Material(
-          color: Colors.white,
-          shape: const CircleBorder(),
-          elevation: 3,
-          shadowColor: Colors.black.withAlpha(60),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: () => context.bloc.add(
-              OpenExternalUrlEvent(url: link.url, label: link.name),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: DSNetworkImageWidget(
-                url: link.image,
-                width: 24,
-                height: 24,
-                fit: BoxFit.fitHeight,
-                errorWidget: const Icon(Icons.link_rounded, size: 24),
+      child: brandIcon != null
+          ? DSBrandIconButtonWidget(
+              brand: brandIcon,
+              tooltip: link.name,
+              onTap: open,
+            )
+          : Tooltip(
+              message: link.name,
+              child: DSIconButtonWidget(
+                Icons.link_rounded,
+                iconColor: context.colorPalette.brand.onPrimary,
+                buttonColor: context.colorPalette.brand.primary,
+                size: DSIconButtonSize.large,
+                onPressed: open,
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

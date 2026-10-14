@@ -12,6 +12,7 @@ class BaseButtonWidget extends StatelessWidget {
     required this.onPressed,
     required this.isDisabled,
     required this.height,
+    this.isExpanded = true,
     super.key,
   });
 
@@ -29,11 +30,21 @@ class BaseButtonWidget extends StatelessWidget {
 
   final double height;
 
+  final bool isExpanded;
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(
-        fixedSize: WidgetStateProperty.all(Size(double.infinity, height)),
+        fixedSize: isExpanded
+            ? WidgetStateProperty.all(Size(double.infinity, height))
+            : null,
+        minimumSize: isExpanded
+            ? null
+            : WidgetStateProperty.all(Size(0, height)),
+        maximumSize: isExpanded
+            ? null
+            : WidgetStateProperty.all(Size(double.infinity, height)),
         overlayColor: variant.getOverlayColor(context),
         foregroundColor: variant.getForegroundColor(context, isDisabled),
         backgroundColor: variant.getBackgroundColor(context, isDisabled),
@@ -53,6 +64,7 @@ class BaseButtonWidget extends StatelessWidget {
         isDisabled: isDisabled,
         loading: loading,
         border: border,
+        isExpanded: isExpanded,
       ),
     );
   }
@@ -65,7 +77,10 @@ class _ButtonChildWidget extends StatelessWidget {
     required this.variant,
     required this.border,
     required this.isDisabled,
+    required this.isExpanded,
   });
+
+  final bool isExpanded;
 
   final ContentDTO content;
 
@@ -83,6 +98,7 @@ class _ButtonChildWidget extends StatelessWidget {
       return _getLoadingContent(context);
     }
     return Center(
+      widthFactor: isExpanded ? null : 1,
       child: content.getContentWidget(
         context,
         variant.getDefaultTextColor(context),
@@ -112,6 +128,7 @@ class _ButtonChildWidget extends StatelessWidget {
 
     if (tempLoading is CircularLoading) {
       return Center(
+        widthFactor: isExpanded ? null : 1,
         child: tempLoading.getContentWidget(
           isDisabled
               ? variant.getDisabledTextColor(context)

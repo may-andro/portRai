@@ -27,7 +27,7 @@ class _DesktopContentWidget extends StatelessWidget {
       ).copyWith(scrollbars: false, overscroll: false),
       physics: const BouncingScrollPhysics(),
       slivers: [
-        const SliverToBoxAdapter(child: PageHeaderWidget()),
+        PageAppBarWidget(title: state.experience.company),
         SliverPadding(
           padding: EdgeInsets.symmetric(
             horizontal: context.horizontalPadding,

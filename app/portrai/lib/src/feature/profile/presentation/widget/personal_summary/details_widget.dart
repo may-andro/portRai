@@ -56,6 +56,10 @@ class _DetailsWidget extends StatelessWidget {
                 _HoverLiftWidget(
                   child: DSIconInfoTileWidget(
                     icon: Icons.location_on_rounded,
+                    iconWidget: const DSLottieIllustrationWidget(
+                      illustration: DSLottieIllustration.mapPin,
+                      width: 40,
+                    ),
                     label: context.localizations.profileLocation,
                     value:
                         '${profile.location.city}, ${profile.location.country}',
@@ -68,6 +72,10 @@ class _DetailsWidget extends StatelessWidget {
                   _HoverLiftWidget(
                     child: DSIconInfoTileWidget(
                       icon: Icons.school_rounded,
+                      iconWidget: const DSLottieIllustrationWidget(
+                        illustration: DSLottieIllustration.graduationHat,
+                        width: 40,
+                      ),
                       label: context.localizations.profileEducation,
                       value: education.degree,
                       startColor: context.colorPalette.brand.primary,

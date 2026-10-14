@@ -15,10 +15,6 @@ class _BodyWidget extends StatelessWidget {
       ).copyWith(scrollbars: false, overscroll: false),
       physics: const BouncingScrollPhysics(),
       slivers: [
-        if (isDesktop)
-          const SliverToBoxAdapter(child: PageHeaderWidget())
-        else
-          PageAppBarWidget(title: profile.fullName),
         SliverToBoxAdapter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

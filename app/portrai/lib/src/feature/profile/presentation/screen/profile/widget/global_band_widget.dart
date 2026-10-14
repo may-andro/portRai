@@ -43,7 +43,28 @@ class _GlobalBandWidget extends StatelessWidget {
         end: Alignment.bottomRight,
         colors: [palette.brand.primary.color, palette.brand.secondary.color],
       ),
-      background: const _BandDecorationWidget(),
+      background: Stack(
+        fit: StackFit.expand,
+        children: [
+          const _BandDecorationWidget(),
+          // Tucked into the corner so the map never covers it.
+          Positioned(
+            right: context.space(factor: 2),
+            bottom: context.space(factor: 2),
+            width: min(context.width * 0.5, isDesktop ? 300 : 200),
+            child: const AspectRatio(
+              aspectRatio: 4 / 3,
+              child: DSLottieBackgroundWidget(
+                illustration: DSLottieIllustration.globalNetwork,
+                grayscale: true,
+                opacity: 0.22,
+                fit: BoxFit.contain,
+                alignment: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: context.space(factor: 4),
@@ -110,19 +131,40 @@ class _GlobalTextWidget extends StatelessWidget {
           runSpacing: context.space(factor: 2),
           children: [
             _GlobalStatWidget(
-              icon: Icons.folder_special_outlined,
+              icon: const DSLottieIconWidget(
+                icon: DSLottieIcon.folder,
+                size: 48,
+                color: Colors.white,
+                playback: DSLottiePlayback.loop,
+              ),
               value: '${profile.projectsDelivered}+',
               label: localizations.profileProjects,
             ),
             if (workPlaces.isNotEmpty)
               _GlobalStatWidget(
-                icon: Icons.public_rounded,
+                // The globe artwork fills only part of its canvas, so it is
+                // scaled up to match the other stat icons.
+                icon: SizedBox.square(
+                  dimension: 48,
+                  child: Transform.scale(
+                    scale: 1.6,
+                    child: const DSLottieIllustrationWidget(
+                      illustration: DSLottieIllustration.globe,
+                      width: 48,
+                    ),
+                  ),
+                ),
                 value: '${workPlaces.length}',
                 label: localizations.profileCountries,
               )
             else
               _GlobalStatWidget(
-                icon: Icons.translate_rounded,
+                icon: const DSLottieIconWidget(
+                  icon: DSLottieIcon.language,
+                  size: 48,
+                  color: Colors.white,
+                  playback: DSLottiePlayback.loop,
+                ),
                 value: '${profile.languages.length}',
                 label: localizations.profileLanguages,
               ),
@@ -140,7 +182,7 @@ class _GlobalStatWidget extends StatelessWidget {
     required this.label,
   });
 
-  final IconData icon;
+  final Widget icon;
   final String value;
   final String label;
 
@@ -152,7 +194,7 @@ class _GlobalStatWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: context.space(factor: 1.5),
         children: [
-          Icon(icon, size: 40, color: Colors.white),
+          icon,
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -220,9 +262,11 @@ class _WorkMapWidget extends StatefulWidget {
 
 class _WorkMapWidgetState extends State<_WorkMapWidget> {
   static const _aspectRatio = 4 / 3;
+  static const _pulseSize = 72.0;
 
   BitmapDescriptor? _marker;
   bool _markerRequested = false;
+  List<Offset> _pinOffsets = const [];
 
   @override
   void didChangeDependencies() {
@@ -258,32 +302,76 @@ class _WorkMapWidgetState extends State<_WorkMapWidget> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(26),
           child: _sized(
-            GoogleMap(
-              onMapCreated: _fitPlaces,
-              initialCameraPosition: _cameraFor(widget.places),
-              style: isDark ? _darkMapStyle : _lightMapStyle,
-              markers: {
-                for (final (index, place) in widget.places.indexed)
-                  Marker(
-                    markerId: MarkerId('place_$index'),
-                    position: LatLng(place.latitude, place.longitude),
-                    icon: _marker ?? BitmapDescriptor.defaultMarker,
-                    anchor: const Offset(0.5, 0.92),
-                    infoWindow: InfoWindow(title: place.country),
+            Stack(
+              fit: StackFit.expand,
+              children: [
+                _buildMap(isDark),
+                for (final offset in _pinOffsets)
+                  Positioned(
+                    left: offset.dx - _pulseSize / 2,
+                    top: offset.dy - _pulseSize / 2,
+                    width: _pulseSize,
+                    height: _pulseSize,
+                    child: IgnorePointer(
+                      child: DSLottieIllustrationWidget(
+                        illustration: DSLottieIllustration.pinPulse,
+                        width: _pulseSize,
+                        colorOverrides: [
+                          DSLottieColorOverride(
+                            keyPath: const ['Pulse', '**'],
+                            color: context.colorPalette.brand.primary,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-              },
-              scrollGesturesEnabled: false,
-              zoomGesturesEnabled: false,
-              rotateGesturesEnabled: false,
-              tiltGesturesEnabled: false,
-              zoomControlsEnabled: false,
-              mapToolbarEnabled: false,
-              myLocationButtonEnabled: false,
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildMap(bool isDark) {
+    return GoogleMap(
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: _cameraFor(widget.places),
+      style: isDark ? _darkMapStyle : _lightMapStyle,
+      markers: {
+        for (final (index, place) in widget.places.indexed)
+          Marker(
+            markerId: MarkerId('place_$index'),
+            position: LatLng(place.latitude, place.longitude),
+            icon: _marker ?? BitmapDescriptor.defaultMarker,
+            anchor: const Offset(0.5, 0.92),
+            infoWindow: InfoWindow(title: place.country),
+          ),
+      },
+      scrollGesturesEnabled: false,
+      zoomGesturesEnabled: false,
+      rotateGesturesEnabled: false,
+      tiltGesturesEnabled: false,
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      myLocationButtonEnabled: false,
+    );
+  }
+
+  /// The camera is static, so pin positions are measured once after fitting.
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    final pixelRatio = defaultTargetPlatform == TargetPlatform.android
+        ? MediaQuery.devicePixelRatioOf(context)
+        : 1.0;
+    await _fitPlaces(controller);
+    final offsets = <Offset>[];
+    for (final place in widget.places) {
+      final point = await controller.getScreenCoordinate(
+        LatLng(place.latitude, place.longitude),
+      );
+      offsets.add(Offset(point.x / pixelRatio, point.y / pixelRatio));
+    }
+    if (mounted) setState(() => _pinOffsets = offsets);
   }
 
   Widget _sized(Widget map) {

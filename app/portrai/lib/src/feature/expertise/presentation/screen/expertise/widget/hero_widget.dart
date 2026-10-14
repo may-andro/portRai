@@ -15,10 +15,9 @@ extension on BuildContext {
 /// Full-bleed header that runs from the top edge of the screen. On desktop it
 /// hosts the logo header so the gradient continues behind it.
 class _HeroWidget extends StatelessWidget {
-  const _HeroWidget({required this.expertise, required this.showLogoHeader});
+  const _HeroWidget({required this.expertise});
 
   final ExpertiseEntity expertise;
-  final bool showLogoHeader;
 
   @override
   Widget build(BuildContext context) {
@@ -72,34 +71,29 @@ class _HeroWidget extends StatelessWidget {
                 tint: Colors.white,
               ),
             ),
-            Column(
-              children: [
-                if (showLogoHeader)
-                  const PageHeaderWidget()
-                else
-                  const _BackButtonWidget(),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.horizontalPadding,
-                    vertical: context.space(factor: isWide ? 5 : 3),
-                  ),
-                  child: isWide
-                      ? Row(
-                          spacing: context.space(factor: 4),
-                          children: [
-                            Expanded(child: text),
-                            _EmblemWidget(imageUrl: expertise.image),
-                          ],
-                        )
-                      : Column(
-                          spacing: context.space(factor: 3),
-                          children: [
-                            _EmblemWidget(imageUrl: expertise.image),
-                            text,
-                          ],
-                        ),
+            PageChromeWidget(
+              closeColor: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.horizontalPadding,
+                  vertical: context.space(factor: isWide ? 5 : 3),
                 ),
-              ],
+                child: isWide
+                    ? Row(
+                        spacing: context.space(factor: 4),
+                        children: [
+                          Expanded(child: text),
+                          _EmblemWidget(imageUrl: expertise.image),
+                        ],
+                      )
+                    : Column(
+                        spacing: context.space(factor: 3),
+                        children: [
+                          _EmblemWidget(imageUrl: expertise.image),
+                          text,
+                        ],
+                      ),
+              ),
             ),
           ],
         ),
@@ -136,11 +130,9 @@ class _EmblemWidget extends StatelessWidget {
                       scaleEnd: const Offset(1.1, 1.1),
                       duration: const Duration(seconds: 4),
                     ),
-                    Lottie.asset(
-                      AppLottieAssets.expertiseOrbit,
+                    DSLottieIllustrationWidget(
+                      illustration: DSLottieIllustration.orbit,
                       width: size,
-                      height: size,
-                      fit: BoxFit.contain,
                     ),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 400),
@@ -180,23 +172,3 @@ class _EmblemWidget extends StatelessWidget {
 }
 
 /// Back arrow that sits on the hero gradient, replacing a separate app bar.
-class _BackButtonWidget extends StatelessWidget {
-  const _BackButtonWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: EdgeInsets.only(left: context.space()),
-          child: IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-}

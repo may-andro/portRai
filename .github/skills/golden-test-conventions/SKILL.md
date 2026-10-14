@@ -81,6 +81,7 @@ has none.
 
 ## Related skills
 
+- `design-system-change-conventions` — golden + storybook must be updated on every design_system change.
 - `flutter-testing-conventions` — general test naming/mocking rules that
   still apply to non-golden tests in this package.
 - `ci-workflow-conventions` — why `design_system`'s workflow runs on

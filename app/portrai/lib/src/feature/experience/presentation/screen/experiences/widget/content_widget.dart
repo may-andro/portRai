@@ -9,7 +9,6 @@ import 'package:portrai/src/feature/experience/presentation/screen/experiences/b
 import 'package:portrai/src/feature/experience/presentation/widget/_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
-import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -89,10 +88,7 @@ class _SuccessWidget extends StatelessWidget {
         ).copyWith(scrollbars: false, overscroll: false),
         physics: const BouncingScrollPhysics(),
         slivers: [
-          if (!context.isDesktop)
-            PageAppBarWidget(title: context.localizations.experiencesTitle),
-          if (context.isDesktop)
-            const SliverToBoxAdapter(child: PageHeaderWidget()),
+          PageAppBarWidget(title: context.localizations.experiencesTitle),
           SliverPadding(
             padding: EdgeInsets.symmetric(
               vertical: context.space(factor: 3),

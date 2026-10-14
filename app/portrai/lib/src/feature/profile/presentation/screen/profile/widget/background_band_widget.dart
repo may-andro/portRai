@@ -60,7 +60,19 @@ class _EducationStripItemWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: context.space(factor: 1.5),
         children: [
-          const Icon(Icons.school_outlined, size: 30, color: Colors.white),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(4),
+              child: DSLottieIllustrationWidget(
+                illustration: DSLottieIllustration.graduationHat,
+                width: 40,
+              ),
+            ),
+          ),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
