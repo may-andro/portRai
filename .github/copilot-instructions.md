@@ -94,6 +94,11 @@ See [`.github/skills/error-handling-conventions/SKILL.md`](skills/error-handling
 - Domain failures extend `BasicFailure`; annotate user-facing ones with `@Localizable('<arbKey>')` and render via the generated `FailureTranslator.translate`.
 - `error_reporter`'s `BlacklistErrorHandler`/`FatalErrorHandler` are for reported/global errors, not domain `Failure`s.
 
+## Design System Changes
+See [`.github/skills/design-system-change-conventions/SKILL.md`](skills/design-system-change-conventions/SKILL.md).
+
+- Any change in `layer/design_system` must update its golden tests (regenerate and commit PNGs) and its Widgetbook use case in `app/storybook` (regenerate `main.directories.g.dart`) in the same change.
+
 ## Golden Tests
 See [`.github/skills/golden-test-conventions/SKILL.md`](skills/golden-test-conventions/SKILL.md).
 

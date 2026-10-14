@@ -5,7 +5,6 @@ import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/widget/service_detail_widget.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
-import 'package:portrai/src/widget/page_header_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key, required this.service});
@@ -20,10 +19,7 @@ class ContentWidget extends StatelessWidget {
       ).copyWith(scrollbars: false, overscroll: false),
       physics: const BouncingScrollPhysics(),
       slivers: [
-        if (context.isDesktop)
-          const SliverToBoxAdapter(child: PageHeaderWidget())
-        else
-          PageAppBarWidget(title: service.title),
+        PageAppBarWidget(title: service.title),
         SliverPadding(
           padding: EdgeInsets.symmetric(
             vertical: context.space(factor: 3),

@@ -10,6 +10,7 @@
 // ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
 import 'package:flutter/widgets.dart';
+import 'package:lottie/lottie.dart' as _lottie;
 
 class $AssetsImageGen {
   const $AssetsImageGen();
@@ -24,10 +25,94 @@ class $AssetsImageGen {
   List<AssetGenImage> get values => [avatar, logo];
 }
 
-class Assets {
-  const Assets._();
+class $AssetsLottieGen {
+  const $AssetsLottieGen();
 
+  /// File path: assets/lottie/contact_us.json
+  LottieGenImage get contactUs =>
+      const LottieGenImage('assets/lottie/contact_us.json');
+
+  /// File path: assets/lottie/folder.json
+  LottieGenImage get folder =>
+      const LottieGenImage('assets/lottie/folder.json');
+
+  /// File path: assets/lottie/github.json
+  LottieGenImage get github =>
+      const LottieGenImage('assets/lottie/github.json');
+
+  /// File path: assets/lottie/global_network.json
+  LottieGenImage get globalNetwork =>
+      const LottieGenImage('assets/lottie/global_network.json');
+
+  /// File path: assets/lottie/globe.json
+  LottieGenImage get globe => const LottieGenImage('assets/lottie/globe.json');
+
+  /// File path: assets/lottie/graduation_hat.json
+  LottieGenImage get graduationHat =>
+      const LottieGenImage('assets/lottie/graduation_hat.json');
+
+  /// File path: assets/lottie/hero_orbs.json
+  LottieGenImage get heroOrbs =>
+      const LottieGenImage('assets/lottie/hero_orbs.json');
+
+  /// File path: assets/lottie/hero_orbs_mobile.json
+  LottieGenImage get heroOrbsMobile =>
+      const LottieGenImage('assets/lottie/hero_orbs_mobile.json');
+
+  /// File path: assets/lottie/language.json
+  LottieGenImage get language =>
+      const LottieGenImage('assets/lottie/language.json');
+
+  /// File path: assets/lottie/linkedin.json
+  LottieGenImage get linkedin =>
+      const LottieGenImage('assets/lottie/linkedin.json');
+
+  /// File path: assets/lottie/loader.json
+  LottieGenImage get loader =>
+      const LottieGenImage('assets/lottie/loader.json');
+
+  /// File path: assets/lottie/map_pin.json
+  LottieGenImage get mapPin =>
+      const LottieGenImage('assets/lottie/map_pin.json');
+
+  /// File path: assets/lottie/medal.json
+  LottieGenImage get medal => const LottieGenImage('assets/lottie/medal.json');
+
+  /// File path: assets/lottie/orbit.json
+  LottieGenImage get orbit => const LottieGenImage('assets/lottie/orbit.json');
+
+  /// File path: assets/lottie/paper_plane.json
+  LottieGenImage get paperPlane =>
+      const LottieGenImage('assets/lottie/paper_plane.json');
+
+  /// File path: assets/lottie/pin_pulse.json
+  LottieGenImage get pinPulse =>
+      const LottieGenImage('assets/lottie/pin_pulse.json');
+
+  /// List of all assets
+  List<LottieGenImage> get values => [
+    contactUs,
+    folder,
+    github,
+    globalNetwork,
+    globe,
+    graduationHat,
+    heroOrbs,
+    heroOrbsMobile,
+    language,
+    linkedin,
+    loader,
+    mapPin,
+    medal,
+    orbit,
+    paperPlane,
+    pinPulse,
+  ];
+}
+
+abstract final class Assets {
   static const $AssetsImageGen image = $AssetsImageGen();
+  static const $AssetsLottieGen lottie = $AssetsLottieGen();
 }
 
 class AssetGenImage {
@@ -116,4 +201,71 @@ class AssetGenImageAnimation {
   final bool isAnimation;
   final Duration duration;
   final int frames;
+}
+
+class LottieGenImage {
+  const LottieGenImage(this._assetName, {this.flavors = const {}});
+
+  final String _assetName;
+  final Set<String> flavors;
+
+  _lottie.LottieBuilder lottie({
+    Animation<double>? controller,
+    bool? animate,
+    _lottie.FrameRate? frameRate,
+    bool? repeat,
+    bool? reverse,
+    _lottie.LottieDelegates? delegates,
+    _lottie.LottieOptions? options,
+    void Function(_lottie.LottieComposition)? onLoaded,
+    _lottie.LottieImageProviderFactory? imageProviderFactory,
+    Key? key,
+    AssetBundle? bundle,
+    Widget Function(BuildContext, Widget, _lottie.LottieComposition?)?
+    frameBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    double? width,
+    double? height,
+    BoxFit? fit,
+    AlignmentGeometry? alignment,
+    String? package,
+    bool? addRepaintBoundary,
+    FilterQuality? filterQuality,
+    void Function(String)? onWarning,
+    _lottie.LottieDecoder? decoder,
+    _lottie.RenderCache? renderCache,
+    bool? backgroundLoading,
+  }) {
+    return _lottie.Lottie.asset(
+      _assetName,
+      controller: controller,
+      animate: animate,
+      frameRate: frameRate,
+      repeat: repeat,
+      reverse: reverse,
+      delegates: delegates,
+      options: options,
+      onLoaded: onLoaded,
+      imageProviderFactory: imageProviderFactory,
+      key: key,
+      bundle: bundle,
+      frameBuilder: frameBuilder,
+      errorBuilder: errorBuilder,
+      width: width,
+      height: height,
+      fit: fit,
+      alignment: alignment,
+      package: package,
+      addRepaintBoundary: addRepaintBoundary,
+      filterQuality: filterQuality,
+      onWarning: onWarning,
+      decoder: decoder,
+      renderCache: renderCache,
+      backgroundLoading: backgroundLoading,
+    );
+  }
+
+  String get path => _assetName;
+
+  String get keyName => _assetName;
 }

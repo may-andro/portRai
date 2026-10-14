@@ -82,6 +82,36 @@ void main() {
           iconDirection: DSButtonIconDirection.right,
         ),
       ),
+      TestCase(
+        'icon widget left',
+        DSButtonWidget(
+          label: 'Icon Widget',
+          onPressed: () {},
+          iconWidget: const Icon(Icons.send_rounded, size: 20),
+        ),
+      ),
+      TestCase(
+        'icon widget right',
+        DSButtonWidget(
+          label: 'Icon Widget',
+          onPressed: () {},
+          iconWidget: const Icon(Icons.send_rounded, size: 20),
+          iconDirection: DSButtonIconDirection.right,
+        ),
+      ),
+      // Width
+      TestCase(
+        'compact',
+        Align(
+          alignment: Alignment.centerLeft,
+          child: DSButtonWidget(
+            label: 'Compact',
+            onPressed: () {},
+            icon: Icons.star,
+            isExpanded: false,
+          ),
+        ),
+      ),
       // States
       TestCase(
         'disabled',

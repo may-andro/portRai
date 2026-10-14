@@ -86,107 +86,6 @@ class _EyebrowWidget extends StatelessWidget {
   }
 }
 
-enum _WebButtonStyle { filled, light, outline, tonal }
-
-class _WebButtonWidget extends StatefulWidget {
-  const _WebButtonWidget({
-    required this.label,
-    required this.onPressed,
-    this.icon,
-    this.style = _WebButtonStyle.filled,
-  });
-
-  final String label;
-  final IconData? icon;
-  final VoidCallback onPressed;
-  final _WebButtonStyle style;
-
-  @override
-  State<_WebButtonWidget> createState() => _WebButtonWidgetState();
-}
-
-class _WebButtonWidgetState extends State<_WebButtonWidget> {
-  bool _hovering = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.colorPalette;
-    final filled = widget.style == _WebButtonStyle.filled;
-    final light = widget.style == _WebButtonStyle.light;
-    final tonal = widget.style == _WebButtonStyle.tonal;
-    final textColor = light || tonal ? palette.brand.primary : _white;
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovering = true),
-      onExit: (_) => setState(() => _hovering = false),
-      child: GestureDetector(
-        onTap: widget.onPressed,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          transform: Matrix4.translationValues(0, _hovering ? -3 : 0, 0),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.space(factor: 2.5),
-            vertical: context.space(factor: 1.75),
-          ),
-          decoration: BoxDecoration(
-            gradient: filled
-                ? LinearGradient(
-                    colors: [
-                      palette.brand.primary.color,
-                      palette.brand.secondary.color,
-                    ],
-                  )
-                : null,
-            color: light
-                ? Colors.white
-                : widget.style == _WebButtonStyle.outline
-                ? Colors.white.withAlpha(_hovering ? 40 : 0)
-                : tonal
-                ? palette.brand.primary.color.withAlpha(_hovering ? 40 : 0)
-                : null,
-            border: widget.style == _WebButtonStyle.outline
-                ? Border.all(color: Colors.white, width: 1.5)
-                : tonal
-                ? Border.all(color: palette.brand.primary.color, width: 1.5)
-                : null,
-            borderRadius: BorderRadius.circular(
-              context.dimen.radiusLevel1.value,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: (filled ? palette.brand.primary.color : Colors.black)
-                    .withAlpha(_hovering ? 110 : 50),
-                blurRadius: _hovering ? 26 : 14,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: context.space(),
-            children: [
-              Flexible(
-                child: DSTextWidget(
-                  widget.label.toUpperCase(),
-                  style: context.typography.emphasizedLabelLarge,
-                  color: textColor,
-                ),
-              ),
-              if (widget.icon != null)
-                AnimatedSlide(
-                  offset: _hovering ? const Offset(0.25, 0) : Offset.zero,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(widget.icon, size: 18, color: textColor.color),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _DownloadResumeButtonWidget extends StatelessWidget {
   const _DownloadResumeButtonWidget({required this.resumeUrl});
 
@@ -194,13 +93,18 @@ class _DownloadResumeButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _WebButtonWidget(
-      label: context.localizations.profileDownloadResumeButton,
-      icon: Icons.download_rounded,
-      style: _WebButtonStyle.tonal,
-      onPressed: () {
-        context.bloc.add(OpenExternalUrlEvent(url: resumeUrl, label: 'Resume'));
-      },
+    return _HoverLiftWidget(
+      child: DSButtonWidget(
+        label: context.localizations.profileDownloadResumeButton,
+        icon: Icons.download_rounded,
+        variant: DSButtonVariant.secondary,
+        isExpanded: false,
+        onPressed: () {
+          context.bloc.add(
+            OpenExternalUrlEvent(url: resumeUrl, label: 'Resume'),
+          );
+        },
+      ),
     );
   }
 }

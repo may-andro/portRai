@@ -41,6 +41,16 @@ Widget buildButton(BuildContext context) {
     labelBuilder: (value) => value.name,
   );
 
+  final hasIconWidget = context.knobs.boolean(
+    label: 'Has Icon Widget',
+    initialValue: false,
+  );
+
+  final isExpanded = context.knobs.boolean(
+    label: 'Expanded',
+    initialValue: true,
+  );
+
   final label = context.knobs.string(label: 'Label', initialValue: 'Button');
 
   return Center(
@@ -53,6 +63,8 @@ Widget buildButton(BuildContext context) {
       isDisabled: isDisabled,
       isLoading: isLoading,
       icon: hasIcon ? Icons.star : null,
+      iconWidget: hasIconWidget ? const Icon(Icons.send_rounded) : null,
+      isExpanded: isExpanded,
       iconDirection: iconDirection,
     ),
   );

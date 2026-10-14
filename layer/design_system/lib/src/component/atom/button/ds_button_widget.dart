@@ -13,6 +13,8 @@ class DSButtonWidget extends StatelessWidget {
     this.iconDirection = DSButtonIconDirection.left,
     this.size = DSButtonSize.large,
     this.icon,
+    this.iconWidget,
+    this.isExpanded = true,
     super.key,
   });
 
@@ -32,6 +34,12 @@ class DSButtonWidget extends StatelessWidget {
 
   final IconData? icon;
 
+  /// Replaces [icon], e.g. with an animated icon. It sizes itself.
+  final Widget? iconWidget;
+
+  /// Fills the available width when true, otherwise hugs its content.
+  final bool isExpanded;
+
   final DSButtonSize size;
 
   @override
@@ -44,18 +52,39 @@ class DSButtonWidget extends StatelessWidget {
       isDisabled: isDisabled,
       loading: isLoading ? CircularLoading() : null,
       height: size.height,
+      isExpanded: isExpanded,
     );
   }
 
   ContentDTO get _content {
+    final mainAxisSize = isExpanded ? MainAxisSize.max : MainAxisSize.min;
+    final widget = iconWidget;
+    if (widget != null) {
+      return WidgetIconTextContent(
+        label,
+        widget,
+        iconDirection == DSButtonIconDirection.right,
+        mainAxisSize: mainAxisSize,
+      );
+    }
     final iconData = icon;
     if (iconData == null) {
-      return TextContent(label);
+      return TextContent(label, mainAxisSize: mainAxisSize);
     }
     if (iconDirection == DSButtonIconDirection.left) {
-      return LeftIconTextContent(label, iconData, size.height * 0.5);
+      return LeftIconTextContent(
+        label,
+        iconData,
+        size.height * 0.5,
+        mainAxisSize: mainAxisSize,
+      );
     }
-    return RightIconTextContent(label, iconData, size.height * 0.5);
+    return RightIconTextContent(
+      label,
+      iconData,
+      size.height * 0.5,
+      mainAxisSize: mainAxisSize,
+    );
   }
 }
 

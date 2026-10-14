@@ -29,6 +29,36 @@ void main() {
           textColor: theme.colorPalette.neutral.grey9,
         ),
       ),
+      TestCase(
+        'animated location',
+        DSIconInfoTileWidget(
+          icon: Icons.location_on_outlined,
+          iconWidget: const DSLottieIllustrationWidget(
+            illustration: DSLottieIllustration.mapPin,
+            width: 40,
+          ),
+          label: 'LOCATION',
+          value: 'Amsterdam, NL',
+          startColor: theme.colorPalette.brand.primary,
+          endColor: theme.colorPalette.brand.tertiary,
+          textColor: theme.colorPalette.neutral.grey9,
+        ),
+      ),
+      TestCase(
+        'animated education',
+        DSIconInfoTileWidget(
+          icon: Icons.school_outlined,
+          iconWidget: const DSLottieIllustrationWidget(
+            illustration: DSLottieIllustration.graduationHat,
+            width: 40,
+          ),
+          label: 'EDUCATION',
+          value: 'MSc Computer Science',
+          startColor: theme.colorPalette.brand.tertiary,
+          endColor: theme.colorPalette.brand.primary,
+          textColor: theme.colorPalette.neutral.grey9,
+        ),
+      ),
     ],
   );
 }

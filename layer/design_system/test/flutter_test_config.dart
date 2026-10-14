@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 ///A common way to use this mechanic to configure tests for all your tests in a particular package is by using a flutter_test_config.dart file.
 ///This file is executed every time a test file is about to be run.
@@ -15,5 +16,7 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   );
 
   TestWidgetsFlutterBinding.ensureInitialized();
+  // Lottie widgets use a visibility detector whose timer would stay pending.
+  VisibilityDetectorController.instance.updateInterval = Duration.zero;
   return await AlchemistConfig.runWithConfig(config: config, run: testMain);
 }

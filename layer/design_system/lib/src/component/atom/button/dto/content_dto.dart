@@ -4,9 +4,15 @@ import 'package:meta/meta.dart';
 
 @internal
 abstract interface class ContentDTO {
-  ContentDTO(this.label, {this.left, this.right});
+  ContentDTO(
+    this.label, {
+    this.left,
+    this.right,
+    this.mainAxisSize = MainAxisSize.max,
+  });
 
   final String label;
+  final MainAxisSize mainAxisSize;
   final IconData? left;
   final IconData? right;
 
@@ -15,11 +21,13 @@ abstract interface class ContentDTO {
 
 @internal
 class TextContent extends ContentDTO {
-  TextContent(super.label) : super(left: null, right: null);
+  TextContent(super.label, {super.mainAxisSize})
+    : super(left: null, right: null);
 
   @override
   Widget getContentWidget(BuildContext context, Color iconColor) {
     return Row(
+      mainAxisSize: mainAxisSize,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(width: context.space(factor: 2)),
@@ -32,14 +40,19 @@ class TextContent extends ContentDTO {
 
 @internal
 class LeftIconTextContent extends ContentDTO {
-  LeftIconTextContent(super.label, IconData left, this.size)
-    : super(left: left, right: null);
+  LeftIconTextContent(
+    super.label,
+    IconData left,
+    this.size, {
+    super.mainAxisSize,
+  }) : super(left: left, right: null);
 
   final double size;
 
   @override
   Widget getContentWidget(BuildContext context, Color iconColor) {
     return Row(
+      mainAxisSize: mainAxisSize,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(width: context.space(factor: 2)),
@@ -54,20 +67,59 @@ class LeftIconTextContent extends ContentDTO {
 
 @internal
 class RightIconTextContent extends ContentDTO {
-  RightIconTextContent(super.label, IconData right, this.size)
-    : super(left: null, right: right);
+  RightIconTextContent(
+    super.label,
+    IconData right,
+    this.size, {
+    super.mainAxisSize,
+  }) : super(left: null, right: right);
 
   final double size;
 
   @override
   Widget getContentWidget(BuildContext context, Color iconColor) {
     return Row(
+      mainAxisSize: mainAxisSize,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(width: context.space(factor: 2)),
         _TextContentWidget(label),
         SizedBox(width: context.space(factor: 0.75)),
         _ImageContextWidget(right!, size, iconColor),
+        SizedBox(width: context.space(factor: 2)),
+      ],
+    );
+  }
+}
+
+@internal
+class WidgetIconTextContent extends ContentDTO {
+  WidgetIconTextContent(
+    super.label,
+    this.icon,
+    this.iconOnRight, {
+    super.mainAxisSize,
+  });
+
+  final Widget icon;
+  final bool iconOnRight;
+
+  @override
+  Widget getContentWidget(BuildContext context, Color iconColor) {
+    return Row(
+      mainAxisSize: mainAxisSize,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(width: context.space(factor: 2)),
+        if (!iconOnRight) ...[
+          icon,
+          SizedBox(width: context.space(factor: 0.75)),
+        ],
+        Flexible(child: _TextContentWidget(label)),
+        if (iconOnRight) ...[
+          SizedBox(width: context.space(factor: 0.75)),
+          icon,
+        ],
         SizedBox(width: context.space(factor: 2)),
       ],
     );

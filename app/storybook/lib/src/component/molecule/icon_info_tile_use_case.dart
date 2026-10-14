@@ -15,6 +15,10 @@ Widget buildIconInfoTile(BuildContext context) {
     ],
     labelBuilder: (icon) => icon.codePoint.toRadixString(16),
   );
+  final isAnimated = context.knobs.boolean(
+    label: 'Animated Icon',
+    initialValue: false,
+  );
   final label = context.knobs.string(label: 'Label', initialValue: 'LOCATION');
   final value = context.knobs.string(
     label: 'Value',
@@ -24,6 +28,12 @@ Widget buildIconInfoTile(BuildContext context) {
   return Center(
     child: DSIconInfoTileWidget(
       icon: icon,
+      iconWidget: isAnimated
+          ? const DSLottieIllustrationWidget(
+              illustration: DSLottieIllustration.mapPin,
+              width: 40,
+            )
+          : null,
       label: label,
       value: value,
       startColor: context.colorPalette.brand.primary,

@@ -16,6 +16,7 @@ class DSIconInfoTileWidget extends StatelessWidget {
     required this.startColor,
     required this.endColor,
     required this.textColor,
+    this.iconWidget,
   });
 
   final IconData icon;
@@ -24,6 +25,10 @@ class DSIconInfoTileWidget extends StatelessWidget {
   final DSColor startColor;
   final DSColor endColor;
   final DSColor textColor;
+
+  /// Replaces the [icon] badge entirely, e.g. with an animated icon, so it
+  /// sizes itself and gets no gradient container.
+  final Widget? iconWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -55,18 +60,23 @@ class DSIconInfoTileWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: context.space(factor: isCompact ? 1 : 1.5),
           children: [
-            Container(
-              padding: EdgeInsets.all(
-                context.space(factor: isCompact ? 0.75 : 1),
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                  context.dimen.radiusLevel1.value,
+            iconWidget ??
+                Container(
+                  padding: EdgeInsets.all(
+                    context.space(factor: isCompact ? 0.75 : 1),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      context.dimen.radiusLevel1.value,
+                    ),
+                    gradient: LinearGradient(colors: [start, end]),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: isCompact ? 16 : 20,
+                    color: Colors.white,
+                  ),
                 ),
-                gradient: LinearGradient(colors: [start, end]),
-              ),
-              child: Icon(icon, size: isCompact ? 16 : 20, color: Colors.white),
-            ),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

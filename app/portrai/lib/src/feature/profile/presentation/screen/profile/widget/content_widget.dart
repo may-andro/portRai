@@ -10,8 +10,7 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/_widget.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
-import 'package:portrai/src/widget/page_header_widget.dart';
+import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:tracking/tracking.dart';
 
 part 'about_band_widget.dart';
@@ -57,6 +56,7 @@ class _LoadingWidget extends StatelessWidget {
       impressionId: 'profile_loading_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
       child: DSLoadingWidget(
+        style: DSLoadingStyle.lottie,
         size: max(context.shortestSide * 0.1, context.space(factor: 2)),
       ),
     );
