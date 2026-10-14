@@ -14,15 +14,15 @@ class HalloweenLightColorPalette implements DSColorPalette {
     // Primary: Jack-o'-lantern Orange - classic Halloween pumpkin color
     primary: DSColor(0xFFE65100),
     // Deep pumpkin orange
-    onPrimary: DSColor(0xFFFFFFFF),
+    onPrimary: DSColor(0xFF000000),
     primaryContainer: DSColor(0xFFFFCCBC),
     // Light pumpkin
-    onPrimaryContainer: DSColor(0xFFBF360C),
+    onPrimaryContainer: DSColor(0xFFAC310B),
     primaryFixed: DSColor(0xFFFF5722),
     // Bright Halloween orange
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFE64A19),
-    onPrimaryFixedVariant: DSColor(0xFFBF360C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Witch Purple - mysterious and magical
     secondary: DSColor(0xFF4A148C),
@@ -35,20 +35,17 @@ class HalloweenLightColorPalette implements DSColorPalette {
     // Bright witch purple
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF4A148C),
-    onSecondaryFixedVariant: DSColor(0xFF2E0051),
+    onSecondaryFixedVariant: DSColor(0xFFD59EFF),
 
-    // Tertiary: Autumn Gold - harvest and candlelight
-    tertiary: DSColor(0xFFFF8F00),
-    // Rich autumn gold
-    onTertiary: DSColor(0xFF000000),
-    tertiaryContainer: DSColor(0xFFFFE0B2),
-    // Light golden yellow
-    onTertiaryContainer: DSColor(0xFFE65100),
-    tertiaryFixed: DSColor(0xFFFFA000),
-    // Bright autumn gold
-    onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFF8F00),
-    onTertiaryFixedVariant: DSColor(0xFFE65100),
+    // Tertiary: Muted sage and olive foliage.
+    tertiary: DSColor(0xFF526344),
+    onTertiary: DSColor(0xFFFFFFFF),
+    tertiaryContainer: DSColor(0xFFD5E8BE),
+    onTertiaryContainer: DSColor(0xFF17210E),
+    tertiaryFixed: DSColor(0xFFD5E8BE),
+    onTertiaryFixed: DSColor(0xFF17210E),
+    tertiaryFixedDim: DSColor(0xFFB9CEA3),
+    onTertiaryFixedVariant: DSColor(0xFF3C4D2F),
 
     inversePrimary: DSColor(0xFFFFAB40),
   );
@@ -63,9 +60,9 @@ class HalloweenLightColorPalette implements DSColorPalette {
 
     // Warning: Spooky amber
     warning: DSColor(0xFFFF6F00),
-    onWarning: DSColor(0xFFFFFFFF),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Eerie green
     success: DSColor(0xFF2E7D32),
@@ -113,7 +110,7 @@ class HalloweenLightColorPalette implements DSColorPalette {
     onSurface: DSColor(0xFF1C1B1F),
     surfaceVariant: DSColor(0xFFFFF3E0),
     // Very light orange tint
-    onSurfaceVariant: DSColor(0xFFE65100),
+    onSurfaceVariant: DSColor(0xFFC24400),
     surfaceDim: DSColor(0xFFFFF0E6),
     // Dimmed orange surface
     surfaceBright: DSColor(0xFFFFFFFF),

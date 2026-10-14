@@ -14,47 +14,47 @@ class ChuseokDarkColorPalette implements DSColorPalette {
     // Primary: Moonlight Red - softer traditional red for dark backgrounds
     primary: DSColor(0xFFEF9A9A),
     // Light traditional red
-    onPrimary: DSColor(0xFFB71C1C),
+    onPrimary: DSColor(0xFF000000),
     // Dark red text
     primaryContainer: DSColor(0xFFD32F2F),
     // Deep red container
-    onPrimaryContainer: DSColor(0xFFFFCDD2),
+    onPrimaryContainer: DSColor(0xFFFFF1F2),
     // Light red text
     primaryFixed: DSColor(0xFFE53935),
     // Fixed vibrant Korean red
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFD32F2F),
-    onPrimaryFixedVariant: DSColor(0xFFB71C1C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Lantern Gold - warm evening harvest colors
     secondary: DSColor(0xFFFFCC02),
     // Bright lantern gold
-    onSecondary: DSColor(0xFFE65100),
+    onSecondary: DSColor(0xFF000000),
     // Dark orange text
     secondaryContainer: DSColor(0xFFFF8F00),
     // Rich harvest gold container
-    onSecondaryContainer: DSColor(0xFFFFE0B2),
+    onSecondaryContainer: DSColor(0xFF5B3700),
     // Light golden text
     secondaryFixed: DSColor(0xFFFFA000),
     // Fixed bright harvest gold
     onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFFFF8F00),
-    onSecondaryFixedVariant: DSColor(0xFFE65100),
+    onSecondaryFixedVariant: DSColor(0xFF7B2B00),
 
     // Tertiary: Evening Blue - calm traditional blue for night
     tertiary: DSColor(0xFF64B5F6),
     // Light traditional blue
-    onTertiary: DSColor(0xFF0D47A1),
+    onTertiary: DSColor(0xFF000000),
     // Dark blue text
     tertiaryContainer: DSColor(0xFF1976D2),
     // Traditional blue container
-    onTertiaryContainer: DSColor(0xFFBBDEFB),
+    onTertiaryContainer: DSColor(0xFFFEFFFF),
     // Light blue text
     tertiaryFixed: DSColor(0xFF2196F3),
     // Fixed bright Korean blue
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
+    onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFF1976D2),
-    onTertiaryFixedVariant: DSColor(0xFF0D47A1),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFD32F2F),
   );
@@ -63,27 +63,27 @@ class ChuseokDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Gentle autumn red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Warm persimmon
     warning: DSColor(0xFFFFB74D),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF6F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF000000),
 
     // Success: Moonlit pine
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF2E7D32),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFFE8F4E8),
 
     // Info: Evening sky blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

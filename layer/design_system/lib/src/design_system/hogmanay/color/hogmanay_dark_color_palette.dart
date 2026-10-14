@@ -14,7 +14,7 @@ class HogmanayDarkColorPalette implements DSColorPalette {
     // Primary: Moonlit Highland Blue - luminous Scottish blue in darkness
     primary: DSColor(0xFF64B5F6),
     // Light luminous blue
-    onPrimary: DSColor(0xFF01579B),
+    onPrimary: DSColor(0xFF000000),
     // Dark blue text
     primaryContainer: DSColor(0xFF0D47A1),
     // Deep Scottish blue container
@@ -24,12 +24,12 @@ class HogmanayDarkColorPalette implements DSColorPalette {
     // Fixed bright Scottish blue
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF1565C0),
-    onPrimaryFixedVariant: DSColor(0xFF01579B),
+    onPrimaryFixedVariant: DSColor(0xFFFDFEFF),
 
     // Secondary: Moonlit Highland Green - mystical Scottish forest glow
     secondary: DSColor(0xFF66BB6A),
     // Light Highland green
-    onSecondary: DSColor(0xFF0D4E0F),
+    onSecondary: DSColor(0xFF000000),
     // Dark green text
     secondaryContainer: DSColor(0xFF1B5E20),
     // Deep Highland green container
@@ -39,22 +39,22 @@ class HogmanayDarkColorPalette implements DSColorPalette {
     // Fixed bright Highland green
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF1B5E20),
-    onSecondaryFixedVariant: DSColor(0xFF0D4E0F),
+    onSecondaryFixedVariant: DSColor(0xFFDBF9DC),
 
-    // Tertiary: Glowing Silver - ethereal moonlight and Celtic magic
-    tertiary: DSColor(0xFF90A4AE),
+    // Tertiary: Whisky Amber - warm hearth and tradition
+    tertiary: DSColor(0xFFAEA290),
     // Bright glowing silver
-    onTertiary: DSColor(0xFF263238),
+    onTertiary: DSColor(0xFF000000),
     // Dark grey text
-    tertiaryContainer: DSColor(0xFF455A64),
+    tertiaryContainer: DSColor(0xFF645745),
     // Cool silver grey container
-    onTertiaryContainer: DSColor(0xFFECEFF1),
+    onTertiaryContainer: DSColor(0xFFF1EFEC),
     // Light silver text
-    tertiaryFixed: DSColor(0xFF607D8B),
+    tertiaryFixed: DSColor(0xFF8B7960),
     // Fixed bright silver
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
-    tertiaryFixedDim: DSColor(0xFF546E7A),
-    onTertiaryFixedVariant: DSColor(0xFF263238),
+    onTertiaryFixed: DSColor(0xFF000000),
+    tertiaryFixedDim: DSColor(0xFF7A6A54),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFF0D47A1),
   );
@@ -63,27 +63,27 @@ class HogmanayDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing Highland red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Moonlit Highland amber
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Glowing Celtic green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF2E7D32),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFFE8F4E8),
 
     // Info: Starlit Scottish blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

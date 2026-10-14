@@ -14,41 +14,41 @@ class SakuraLightColorPalette implements DSColorPalette {
     // Primary: Cherry Blossom Pink - soft, delicate pink representing sakura petals
     primary: DSColor(0xFFE91E63),
     // Gentle cherry blossom pink
-    onPrimary: DSColor(0xFFFFFFFF),
+    onPrimary: DSColor(0xFF000000),
     primaryContainer: DSColor(0xFFF8BBD9),
     // Very light sakura pink
     onPrimaryContainer: DSColor(0xFF880E4F),
     primaryFixed: DSColor(0xFFEC407A),
     // Vibrant cherry pink
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFE91E63),
-    onPrimaryFixedVariant: DSColor(0xFF880E4F),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Spring Green - fresh new leaves and bamboo
-    secondary: DSColor(0xFF4CAF50),
+    secondary: DSColor(0xFF47A44B),
     // Fresh spring green
-    onSecondary: DSColor(0xFFFFFFFF),
+    onSecondary: DSColor(0xFF000000),
     secondaryContainer: DSColor(0xFFC8E6C9),
     // Light spring green
     onSecondaryContainer: DSColor(0xFF1B5E20),
     secondaryFixed: DSColor(0xFF66BB6A),
     // Bright spring green
-    onSecondaryFixed: DSColor(0xFFFFFFFF),
-    secondaryFixedDim: DSColor(0xFF4CAF50),
-    onSecondaryFixedVariant: DSColor(0xFF1B5E20),
+    onSecondaryFixed: DSColor(0xFF000000),
+    secondaryFixedDim: DSColor(0xFF47A44B),
+    onSecondaryFixedVariant: DSColor(0xFF000000),
 
     // Tertiary: Peaceful White - pure snow white representing purity and peace
     tertiary: DSColor(0xFF607D8B),
     // Soft blue-grey
-    onTertiary: DSColor(0xFFFFFFFF),
+    onTertiary: DSColor(0xFF000000),
     tertiaryContainer: DSColor(0xFFECEFF1),
     // Very light blue-grey
     onTertiaryContainer: DSColor(0xFF263238),
     tertiaryFixed: DSColor(0xFF78909C),
     // Light blue-grey
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
+    onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFF607D8B),
-    onTertiaryFixedVariant: DSColor(0xFF263238),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFE1BEE7),
   );
@@ -57,7 +57,7 @@ class SakuraLightColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Gentle rose red
     error: DSColor(0xFFE57373),
-    onError: DSColor(0xFFFFFFFF),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFFFCDD2),
     onErrorContainer: DSColor(0xFFB71C1C),
 
@@ -65,17 +65,17 @@ class SakuraLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFFB74D),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: New leaf green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 
     // Info: Spring sky blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFFFFFFFF),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFFBBDEFB),
     onInfoContainer: DSColor(0xFF0D47A1),
   );
@@ -113,7 +113,7 @@ class SakuraLightColorPalette implements DSColorPalette {
     onSurface: DSColor(0xFF1C1B1F),
     surfaceVariant: DSColor(0xFFFFF0F5),
     // Very light pink tint
-    onSurfaceVariant: DSColor(0xFFE91E63),
+    onSurfaceVariant: DSColor(0xFFD81557),
     surfaceDim: DSColor(0xFFFFE8F0),
     // Dimmed pink surface
     surfaceBright: DSColor(0xFFFFFFFF),

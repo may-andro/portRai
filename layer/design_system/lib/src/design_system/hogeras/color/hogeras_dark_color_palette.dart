@@ -14,47 +14,47 @@ class HogerasDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Bonfire - warm flames dancing in darkness
     primary: DSColor(0xFFEF9A9A),
     // Light glowing red
-    onPrimary: DSColor(0xFFB71C1C),
+    onPrimary: DSColor(0xFF000000),
     // Dark red text
     primaryContainer: DSColor(0xFFD32F2F),
     // Deep fire red container
-    onPrimaryContainer: DSColor(0xFFFFCDD2),
+    onPrimaryContainer: DSColor(0xFFFFF1F2),
     // Light red text
     primaryFixed: DSColor(0xFFE53935),
     // Fixed vibrant bonfire red
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFD32F2F),
-    onPrimaryFixedVariant: DSColor(0xFFB71C1C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Moonlit Mediterranean - serene coastal night waters
     secondary: DSColor(0xFF64B5F6),
     // Light moonlit blue
-    onSecondary: DSColor(0xFF0D47A1),
+    onSecondary: DSColor(0xFF000000),
     // Dark blue text
     secondaryContainer: DSColor(0xFF1976D2),
     // Deep Mediterranean blue container
-    onSecondaryContainer: DSColor(0xFFBBDEFB),
+    onSecondaryContainer: DSColor(0xFFFEFFFF),
     // Light blue text
     secondaryFixed: DSColor(0xFF2196F3),
     // Fixed bright Mediterranean blue
-    onSecondaryFixed: DSColor(0xFFFFFFFF),
+    onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFF1976D2),
-    onSecondaryFixedVariant: DSColor(0xFF0D47A1),
+    onSecondaryFixedVariant: DSColor(0xFF000000),
 
     // Tertiary: Ember Gold - warm glowing embers in night air
     tertiary: DSColor(0xFFFFD54F),
     // Bright ember gold
-    onTertiary: DSColor(0xFFFF8F00),
+    onTertiary: DSColor(0xFF000000),
     // Orange text
     tertiaryContainer: DSColor(0xFFFFB300),
     // Spanish gold container
-    onTertiaryContainer: DSColor(0xFFFFE082),
+    onTertiaryContainer: DSColor(0xFF634B00),
     // Light golden text
     tertiaryFixed: DSColor(0xFFFFC107),
     // Fixed pure Spanish sun
     onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFFFFB300),
-    onTertiaryFixedVariant: DSColor(0xFFFF8F00),
+    onTertiaryFixedVariant: DSColor(0xFF7F4700),
 
     inversePrimary: DSColor(0xFFD32F2F),
   );
@@ -63,27 +63,27 @@ class HogerasDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing intense flame
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Warm sunset ember
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Moonlit Mediterranean green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF388E3C),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Starlit coastal blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

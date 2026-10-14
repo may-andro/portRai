@@ -14,22 +14,22 @@ class DiwaliDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Gold - luminous divine light piercing darkness
     primary: DSColor(0xFFFFCC02),
     // Bright glowing gold
-    onPrimary: DSColor(0xFFE65100),
+    onPrimary: DSColor(0xFF000000),
     // Deep orange text
     primaryContainer: DSColor(0xFFFF8F00),
     // Rich golden container
-    onPrimaryContainer: DSColor(0xFFFFE0B2),
+    onPrimaryContainer: DSColor(0xFF5B3700),
     // Light golden text
     primaryFixed: DSColor(0xFFFFC107),
     // Fixed bright festival gold
     onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFFFB300),
-    onPrimaryFixedVariant: DSColor(0xFFE65100),
+    onPrimaryFixedVariant: DSColor(0xFF943400),
 
     // Secondary: Luminous Purple - spiritual glow in darkness
     secondary: DSColor(0xFFBA68C8),
     // Light luminous purple
-    onSecondary: DSColor(0xFF4A148C),
+    onSecondary: DSColor(0xFF000000),
     // Dark purple text
     secondaryContainer: DSColor(0xFF6A1B9A),
     // Deep purple container
@@ -39,22 +39,22 @@ class DiwaliDarkColorPalette implements DSColorPalette {
     // Fixed bright purple
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF7B1FA2),
-    onSecondaryFixedVariant: DSColor(0xFF4A148C),
+    onSecondaryFixedVariant: DSColor(0xFFE5D4F9),
 
-    // Tertiary: Radiant Orange - glowing diya flames
-    tertiary: DSColor(0xFFFFAB40),
+    // Tertiary: Rangoli Magenta - festive pink of rangoli and celebration
+    tertiary: DSColor(0xFFFF40A0),
     // Bright radiant orange
-    onTertiary: DSColor(0xFFBF360C),
+    onTertiary: DSColor(0xFF000000),
     // Dark orange text
-    tertiaryContainer: DSColor(0xFFE65100),
+    tertiaryContainer: DSColor(0xFFE60073),
     // Vibrant orange container
-    onTertiaryContainer: DSColor(0xFFFFCCBC),
+    onTertiaryContainer: DSColor(0xFF000000),
     // Light coral text
-    tertiaryFixed: DSColor(0xFFFF5722),
+    tertiaryFixed: DSColor(0xFFFF2291),
     // Fixed bright sacred orange
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
-    tertiaryFixedDim: DSColor(0xFFE64A19),
-    onTertiaryFixedVariant: DSColor(0xFFBF360C),
+    onTertiaryFixed: DSColor(0xFF000000),
+    tertiaryFixedDim: DSColor(0xFFE61980),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFFF8F00),
   );
@@ -63,27 +63,27 @@ class DiwaliDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing sacred red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Luminous saffron
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Glowing prosperity green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF2E7D32),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFFE8F4E8),
 
     // Info: Divine luminous blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

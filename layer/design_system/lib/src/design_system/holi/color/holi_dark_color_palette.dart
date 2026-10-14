@@ -14,17 +14,17 @@ class HoliDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Festival Pink - luminous Holi colors in darkness
     primary: DSColor(0xFFF48FB1),
     // Light glowing pink
-    onPrimary: DSColor(0xFF880E4F),
+    onPrimary: DSColor(0xFF000000),
     // Dark pink text
     primaryContainer: DSColor(0xFFE91E63),
     // Bright festival magenta container
-    onPrimaryContainer: DSColor(0xFFF8BBD9),
+    onPrimaryContainer: DSColor(0xFF000000),
     // Light pink text
     primaryFixed: DSColor(0xFFEC407A),
     // Fixed vibrant Holi pink
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFE91E63),
-    onPrimaryFixedVariant: DSColor(0xFF880E4F),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Luminous Spring Gold - bright gulal powder glow
     secondary: DSColor(0xFFFFEB3B),
@@ -33,28 +33,28 @@ class HoliDarkColorPalette implements DSColorPalette {
     // Black text
     secondaryContainer: DSColor(0xFFFDD835),
     // Golden yellow container
-    onSecondaryContainer: DSColor(0xFFFFF9C4),
+    onSecondaryContainer: DSColor(0xFF685E00),
     // Light yellow text
     secondaryFixed: DSColor(0xFFFFEE58),
     // Fixed pure sunshine yellow
     onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFFFFEB3B),
-    onSecondaryFixedVariant: DSColor(0xFFF57F17),
+    onSecondaryFixedVariant: DSColor(0xFFA45107),
 
     // Tertiary: Glowing Electric Blue - vibrant sky celebration
     tertiary: DSColor(0xFF64B5F6),
     // Light electric blue
-    onTertiary: DSColor(0xFF0D47A1),
+    onTertiary: DSColor(0xFF000000),
     // Dark blue text
     tertiaryContainer: DSColor(0xFF2196F3),
     // Electric festival blue container
-    onTertiaryContainer: DSColor(0xFFBBDEFB),
+    onTertiaryContainer: DSColor(0xFF000000),
     // Light blue text
     tertiaryFixed: DSColor(0xFF42A5F5),
     // Fixed bright electric blue
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
+    onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFF2196F3),
-    onTertiaryFixedVariant: DSColor(0xFF0D47A1),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFE91E63),
   );
@@ -63,27 +63,27 @@ class HoliDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing red gulal
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Luminous turmeric orange
     warning: DSColor(0xFFFFB74D),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF9800),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF603A00),
 
     // Success: Glowing spring green
     success: DSColor(0xFF81C784),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF4CAF50),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Luminous festival blue
     info: DSColor(0xFF64B5F6),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF2196F3),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFF000000),
   );
 
   @override

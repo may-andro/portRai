@@ -14,47 +14,47 @@ class ObonDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Spiritual Light - luminous purple in peaceful darkness
     primary: DSColor(0xFF9575CD),
     // Light spiritual purple
-    onPrimary: DSColor(0xFF4527A0),
+    onPrimary: DSColor(0xFF000000),
     // Dark purple text
     primaryContainer: DSColor(0xFF673AB7),
     // Deep spiritual purple container
-    onPrimaryContainer: DSColor(0xFFD1C4E9),
+    onPrimaryContainer: DSColor(0xFFD4C8EA),
     // Light purple text
     primaryFixed: DSColor(0xFF7C4DFF),
     // Fixed vibrant spiritual purple
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF673AB7),
-    onPrimaryFixedVariant: DSColor(0xFF4527A0),
+    onPrimaryFixedVariant: DSColor(0xFFF8F7FD),
 
     // Secondary: Glowing Lantern - warm traditional lantern glow in darkness
     secondary: DSColor(0xFFFFCC02),
     // Bright glowing lantern gold
-    onSecondary: DSColor(0xFFE65100),
+    onSecondary: DSColor(0xFF000000),
     // Dark orange text
     secondaryContainer: DSColor(0xFFFF8F00),
     // Traditional lantern gold container
-    onSecondaryContainer: DSColor(0xFFFFE0B2),
+    onSecondaryContainer: DSColor(0xFF5B3700),
     // Light golden text
     secondaryFixed: DSColor(0xFFFFA000),
     // Fixed bright lantern gold
     onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFFFF8F00),
-    onSecondaryFixedVariant: DSColor(0xFFE65100),
+    onSecondaryFixedVariant: DSColor(0xFF7B2B00),
 
-    // Tertiary: Serene Moonlight - tranquil evening sky glow
-    tertiary: DSColor(0xFF7986CB),
+    // Tertiary: Lantern Teal - calm water and spirit lights
+    tertiary: DSColor(0xFF79CBC4),
     // Light moonlit blue
-    onTertiary: DSColor(0xFF283593),
+    onTertiary: DSColor(0xFF000000),
     // Dark blue text
-    tertiaryContainer: DSColor(0xFF3F51B5),
+    tertiaryContainer: DSColor(0xFF3FB5AB),
     // Serene moonlit blue container
-    onTertiaryContainer: DSColor(0xFFC5CAE9),
+    onTertiaryContainer: DSColor(0xFF000000),
     // Light blue text
-    tertiaryFixed: DSColor(0xFF5C6BC0),
+    tertiaryFixed: DSColor(0xFF5CC0B8),
     // Fixed bright moonlit blue
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
-    tertiaryFixedDim: DSColor(0xFF3F51B5),
-    onTertiaryFixedVariant: DSColor(0xFF283593),
+    onTertiaryFixed: DSColor(0xFF000000),
+    tertiaryFixedDim: DSColor(0xFF3FB5AB),
+    onTertiaryFixedVariant: DSColor(0xFF194B4B),
 
     inversePrimary: DSColor(0xFF673AB7),
   );
@@ -63,27 +63,27 @@ class ObonDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Gentle glowing red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Luminous sunset amber
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Peaceful moonlit green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF388E3C),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Serene tranquil blue
     info: DSColor(0xFF5C6BC0),
-    onInfo: DSColor(0xFF283593),
+    onInfo: DSColor(0xFFFFFFFF),
     infoContainer: DSColor(0xFF3F51B5),
-    onInfoContainer: DSColor(0xFFC5CAE9),
+    onInfoContainer: DSColor(0xFFCCD1EC),
   );
 
   @override

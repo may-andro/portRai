@@ -27,3 +27,26 @@ final photoWidth = widget.width;
 final photoHeight = photoWidth * 1.05;
 profile.languages.map((language) => language.language);
 ```
+
+## Ambiguous names
+
+A name must say *what the value is*, not just that it exists or where it came from.
+
+- Never name a value `result`, `data`, `response`, `value`, `item`, `info` or `obj`, and never `override`/`default` etc. on their own.
+- Don't put a mechanism word (`Override`, `Manager`, `Helper`) in a class or file name when the domain noun says it all: `DesignSystemCache`, not `DesignSystemOverrideCache`.
+- Name the thing: `cachedDesignSystem`, `selectedDesignSystem`, `assetSourceEither`.
+- Values of type `Either` (use case results) end in `Either`: `setDesignSystemEither`, `resetDesignSystemEither`. The unwrapped value gets the domain name: `cachedDesignSystemEither.right` → `designSystem`.
+- Don't name a variable after the verb or mechanism that produced it (`overrideResult`); name the content.
+- Nullable/optional values say what absence means when it is not obvious: `designSystem` (`null` = follow the month).
+
+```dart
+// Bad
+final overrideResult = await getDesignSystemUseCase();
+final result = await resetUseCase();
+final override = state.designSystem;
+
+// Good
+final cachedDesignSystemEither = await getDesignSystemUseCase();
+final resetDesignSystemEither = await resetDesignSystemUseCase();
+final selectedDesignSystem = state.designSystem;
+```

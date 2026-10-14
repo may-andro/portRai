@@ -22,7 +22,7 @@ class HogmanayLightColorPalette implements DSColorPalette {
     // Bright Scottish blue
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF1565C0),
-    onPrimaryFixedVariant: DSColor(0xFF01579B),
+    onPrimaryFixedVariant: DSColor(0xFFFDFEFF),
 
     // Secondary: Highland Green - Scottish forest and tartan green
     secondary: DSColor(0xFF1B5E20),
@@ -35,20 +35,20 @@ class HogmanayLightColorPalette implements DSColorPalette {
     // Bright Highland green
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF1B5E20),
-    onSecondaryFixedVariant: DSColor(0xFF0D4E0F),
+    onSecondaryFixedVariant: DSColor(0xFFDBF9DC),
 
-    // Tertiary: Silver White - winter snow and Celtic silver
-    tertiary: DSColor(0xFF455A64),
+    // Tertiary: Whisky Amber - warm hearth and tradition
+    tertiary: DSColor(0xFF645745),
     // Cool silver grey
     onTertiary: DSColor(0xFFFFFFFF),
-    tertiaryContainer: DSColor(0xFFECEFF1),
+    tertiaryContainer: DSColor(0xFFF1EFEC),
     // Light silver white
-    onTertiaryContainer: DSColor(0xFF263238),
-    tertiaryFixed: DSColor(0xFF607D8B),
+    onTertiaryContainer: DSColor(0xFF383126),
+    tertiaryFixed: DSColor(0xFF8B7960),
     // Bright silver
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
-    tertiaryFixedDim: DSColor(0xFF546E7A),
-    onTertiaryFixedVariant: DSColor(0xFF263238),
+    onTertiaryFixed: DSColor(0xFF000000),
+    tertiaryFixedDim: DSColor(0xFF7A6A54),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFF64B5F6),
   );
@@ -65,7 +65,7 @@ class HogmanayLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Celtic green
     success: DSColor(0xFF2E7D32),

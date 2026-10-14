@@ -12,17 +12,17 @@ class DiwaliLightColorPalette implements DSColorPalette {
   @override
   BrandColorScheme get brand => const BrandColorScheme(
     // Primary: Divine Gold (सोना) - representing prosperity and divine light
-    primary: DSColor(0xFFFF8F00),
+    primary: DSColor(0xFFDB7B00),
     // Rich divine gold
     onPrimary: DSColor(0xFF000000),
     primaryContainer: DSColor(0xFFFFE0B2),
     // Light golden yellow
-    onPrimaryContainer: DSColor(0xFFE65100),
+    onPrimaryContainer: DSColor(0xFFB33F00),
     primaryFixed: DSColor(0xFFFFC107),
     // Bright festival gold
     onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFFFB300),
-    onPrimaryFixedVariant: DSColor(0xFFE65100),
+    onPrimaryFixedVariant: DSColor(0xFF943400),
 
     // Secondary: Royal Purple (बैंगनी) - representing spirituality and wisdom
     secondary: DSColor(0xFF6A1B9A),
@@ -35,20 +35,20 @@ class DiwaliLightColorPalette implements DSColorPalette {
     // Bright purple
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF7B1FA2),
-    onSecondaryFixedVariant: DSColor(0xFF4A148C),
+    onSecondaryFixedVariant: DSColor(0xFFE5D4F9),
 
-    // Tertiary: Sacred Orange (नारंगी) - representing energy and enthusiasm
-    tertiary: DSColor(0xFFE65100),
+    // Tertiary: Rangoli Magenta - festive pink of rangoli and celebration
+    tertiary: DSColor(0xFFE60073),
     // Vibrant sacred orange
-    onTertiary: DSColor(0xFFFFFFFF),
-    tertiaryContainer: DSColor(0xFFFFCCBC),
+    onTertiary: DSColor(0xFF000000),
+    tertiaryContainer: DSColor(0xFFFFBCDE),
     // Light coral
-    onTertiaryContainer: DSColor(0xFFBF360C),
-    tertiaryFixed: DSColor(0xFFFF5722),
+    onTertiaryContainer: DSColor(0xFFAC0B5C),
+    tertiaryFixed: DSColor(0xFFFF2291),
     // Bright sacred orange
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
-    tertiaryFixedDim: DSColor(0xFFE64A19),
-    onTertiaryFixedVariant: DSColor(0xFFBF360C),
+    onTertiaryFixed: DSColor(0xFF000000),
+    tertiaryFixedDim: DSColor(0xFFE61980),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFFFCC02),
   );
@@ -65,7 +65,7 @@ class DiwaliLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Prosperity green
     success: DSColor(0xFF2E7D32),
@@ -113,7 +113,7 @@ class DiwaliLightColorPalette implements DSColorPalette {
     onSurface: DSColor(0xFF1C1B1F),
     surfaceVariant: DSColor(0xFFFFF8E1),
     // Very light golden tint
-    onSurfaceVariant: DSColor(0xFFFF8F00),
+    onSurfaceVariant: DSColor(0xFFA85E00),
     surfaceDim: DSColor(0xFFFFF4E6),
     // Dimmed golden surface
     surfaceBright: DSColor(0xFFFFFFFF),

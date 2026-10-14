@@ -25,12 +25,17 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
   final GetAssetSourceUseCase _getAssetSourceUseCase;
   final UpdateAssetSourceUseCase _updateAssetSourceUseCase;
 
+  DeveloperMenuLoadedState get _loadedState => switch (state) {
+    final DeveloperMenuLoadedState loaded => loaded,
+    _ => const DeveloperMenuLoadedState(),
+  };
+
   Future<void> _onLoad(
     LoadDeveloperMenuEvent event,
     Emitter<DeveloperMenuState> emit,
   ) async {
-    final result = await _getAssetSourceUseCase();
-    emit(DeveloperMenuLoadedState(assetSource: result.right));
+    final assetSourceEither = await _getAssetSourceUseCase();
+    emit(DeveloperMenuLoadedState(assetSource: assetSourceEither.right));
   }
 
   Future<void> _onAssetSourceClick(
@@ -39,7 +44,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
   ) async {
     final result = await _updateAssetSourceUseCase(event.source);
     if (result.isRight) {
-      emit(DeveloperMenuLoadedState(assetSource: event.source));
+      emit(_loadedState.withAssetSource(event.source));
     }
   }
 

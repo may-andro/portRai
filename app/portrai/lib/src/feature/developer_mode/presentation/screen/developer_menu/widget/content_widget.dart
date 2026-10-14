@@ -4,6 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
+import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:tracking/tracking.dart';
@@ -134,6 +135,12 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                 title: context.localizations.developerMenuDataSource,
               ),
               const DSCardWidget(child: _AssetSourceTile()),
+              const DSVerticalSpacerWidget(3),
+
+              _SectionHeader(
+                title: context.localizations.developerMenuDesignSystem,
+              ),
+              const DesignSystemSelectorWidget(),
               const DSVerticalSpacerWidget(3),
 
               _SectionHeader(

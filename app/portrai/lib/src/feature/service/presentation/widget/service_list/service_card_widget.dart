@@ -9,14 +9,17 @@ class _ServiceCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = context.colorPalette.surface.onInverseSurface;
+    final textColor = context.colorPalette.surface.onSurface;
     final accent = context.colorPalette.brand.tertiary;
     final technologies = service.technologies;
     final hiddenCount = technologies.length - _maxTechnologies;
 
     return DSSpotlightCardWidget(
       glowColor: accent,
-      background: _BackgroundArtWidget(imageUrl: service.image),
+      background: ColoredBox(
+        color: context.colorPalette.surface.surfaceContainer.color,
+        child: _BackgroundArtWidget(imageUrl: service.image),
+      ),
       fillColor: textColor,
       padding: EdgeInsets.all(context.space(factor: 2)),
       onTap: () => ServiceScreen.navigate(context, service: service),
@@ -116,7 +119,7 @@ class _ArrowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = context.colorPalette.brand.tertiary.color;
+    final accent = context.colorPalette.brand.tertiaryContainer.color;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -128,7 +131,7 @@ class _ArrowWidget extends StatelessWidget {
       child: Icon(
         Icons.arrow_outward_rounded,
         size: 18,
-        color: context.colorPalette.brand.onTertiary.color,
+        color: context.colorPalette.brand.onTertiaryContainer.color,
       ),
     );
   }

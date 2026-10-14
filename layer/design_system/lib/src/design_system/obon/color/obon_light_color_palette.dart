@@ -22,33 +22,33 @@ class ObonLightColorPalette implements DSColorPalette {
     // Vibrant spiritual purple
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF673AB7),
-    onPrimaryFixedVariant: DSColor(0xFF4527A0),
+    onPrimaryFixedVariant: DSColor(0xFFF8F7FD),
 
     // Secondary: Lantern Gold - warm traditional lantern color
-    secondary: DSColor(0xFFFF8F00),
+    secondary: DSColor(0xFFD67800),
     // Traditional lantern gold
     onSecondary: DSColor(0xFF000000),
     secondaryContainer: DSColor(0xFFFFE0B2),
     // Light lantern yellow
-    onSecondaryContainer: DSColor(0xFFE65100),
+    onSecondaryContainer: DSColor(0xFFB33F00),
     secondaryFixed: DSColor(0xFFFFA000),
     // Bright lantern gold
     onSecondaryFixed: DSColor(0xFF000000),
-    secondaryFixedDim: DSColor(0xFFFF8F00),
-    onSecondaryFixedVariant: DSColor(0xFFE65100),
+    secondaryFixedDim: DSColor(0xFFD67800),
+    onSecondaryFixedVariant: DSColor(0xFF7B2B00),
 
-    // Tertiary: Moonlit Blue - serene evening sky representing spiritual tranquility
-    tertiary: DSColor(0xFF3F51B5),
+    // Tertiary: Lantern Teal - calm water and spirit lights
+    tertiary: DSColor(0xFF379E96),
     // Serene moonlit blue
-    onTertiary: DSColor(0xFFFFFFFF),
-    tertiaryContainer: DSColor(0xFFC5CAE9),
+    onTertiary: DSColor(0xFF000000),
+    tertiaryContainer: DSColor(0xFFC5E9E6),
     // Light moonlit blue
-    onTertiaryContainer: DSColor(0xFF283593),
-    tertiaryFixed: DSColor(0xFF5C6BC0),
+    onTertiaryContainer: DSColor(0xFF1E6F68),
+    tertiaryFixed: DSColor(0xFF5CC0B8),
     // Bright moonlit blue
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
-    tertiaryFixedDim: DSColor(0xFF3F51B5),
-    onTertiaryFixedVariant: DSColor(0xFF283593),
+    onTertiaryFixed: DSColor(0xFF000000),
+    tertiaryFixedDim: DSColor(0xFF379E96),
+    onTertiaryFixedVariant: DSColor(0xFF194B4B),
 
     inversePrimary: DSColor(0xFF9575CD),
   );
@@ -65,11 +65,11 @@ class ObonLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Peaceful green
     success: DSColor(0xFF388E3C),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 

@@ -14,22 +14,22 @@ class HalloweenDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Pumpkin - eerie jack-o'-lantern glow in darkness
     primary: DSColor(0xFFFFAB40),
     // Bright glowing orange
-    onPrimary: DSColor(0xFFBF360C),
+    onPrimary: DSColor(0xFF000000),
     // Dark orange text
     primaryContainer: DSColor(0xFFE65100),
     // Deep pumpkin container
-    onPrimaryContainer: DSColor(0xFFFFCCBC),
+    onPrimaryContainer: DSColor(0xFF000000),
     // Light orange text
     primaryFixed: DSColor(0xFFFF5722),
     // Fixed bright Halloween orange
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFE64A19),
-    onPrimaryFixedVariant: DSColor(0xFFBF360C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Mystical Purple - haunting witch magic in darkness
     secondary: DSColor(0xFFBA68C8),
     // Light mystical purple
-    onSecondary: DSColor(0xFF2E0051),
+    onSecondary: DSColor(0xFF000000),
     // Dark purple text
     secondaryContainer: DSColor(0xFF4A148C),
     // Deep witch purple container
@@ -39,22 +39,17 @@ class HalloweenDarkColorPalette implements DSColorPalette {
     // Fixed bright witch purple
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF4A148C),
-    onSecondaryFixedVariant: DSColor(0xFF2E0051),
+    onSecondaryFixedVariant: DSColor(0xFFD59EFF),
 
-    // Tertiary: Ghostly Gold - ethereal candlelight glow
-    tertiary: DSColor(0xFFFFCC02),
-    // Bright ghostly gold
-    onTertiary: DSColor(0xFFE65100),
-    // Dark orange text
-    tertiaryContainer: DSColor(0xFFFF8F00),
-    // Rich autumn gold container
-    onTertiaryContainer: DSColor(0xFFFFE0B2),
-    // Light golden text
-    tertiaryFixed: DSColor(0xFFFFA000),
-    // Fixed bright autumn gold
-    onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFF8F00),
-    onTertiaryFixedVariant: DSColor(0xFFE65100),
+    // Tertiary: Muted sage and olive foliage.
+    tertiary: DSColor(0xFFB9CEA3),
+    onTertiary: DSColor(0xFF25351A),
+    tertiaryContainer: DSColor(0xFF3C4D2F),
+    onTertiaryContainer: DSColor(0xFFD5E8BE),
+    tertiaryFixed: DSColor(0xFFD5E8BE),
+    onTertiaryFixed: DSColor(0xFF17210E),
+    tertiaryFixedDim: DSColor(0xFFB9CEA3),
+    onTertiaryFixedVariant: DSColor(0xFF3C4D2F),
 
     inversePrimary: DSColor(0xFFE65100),
   );
@@ -63,27 +58,27 @@ class HalloweenDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing blood red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Eerie amber
     warning: DSColor(0xFFFFB74D),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF6F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF000000),
 
     // Success: Phantom green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF2E7D32),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFFE8F4E8),
 
     // Info: Ghostly blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1565C0),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFCEE7FC),
   );
 
   @override
