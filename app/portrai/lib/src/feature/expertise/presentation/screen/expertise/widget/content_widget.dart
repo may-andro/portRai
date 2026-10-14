@@ -8,7 +8,6 @@ import 'package:portrai/src/feature/expertise/presentation/screen/expertise/bloc
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/lottie/_lottie.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/utility/app_lottie_assets.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:tracking/tracking.dart';
 
@@ -41,12 +40,6 @@ class ContentWidget extends StatelessWidget {
         ).copyWith(scrollbars: false, overscroll: false),
         physics: const BouncingScrollPhysics(),
         slivers: [
-          if (!useLogoHeader)
-            PageAppBarWidget(
-              title: expertise.title,
-              backgroundColor: context.heroStartColor,
-              titleColor: _white,
-            ),
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

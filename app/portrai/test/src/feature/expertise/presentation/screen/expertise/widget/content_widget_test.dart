@@ -63,7 +63,7 @@ void main() {
     ) async {
       await pumpContent(tester, const Size(390, 844));
 
-      expect(find.text('Mobile Development'), findsNWidgets(2));
+      expect(find.text('Mobile Development'), findsOneWidget);
       expect(find.text('Flutter'), findsOneWidget);
       expect(find.text('Apps for every platform.'), findsOneWidget);
       expect(find.text('UI toolkit.'), findsOneWidget);

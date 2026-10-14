@@ -74,7 +74,10 @@ class _HeroWidget extends StatelessWidget {
             ),
             Column(
               children: [
-                if (showLogoHeader) const PageHeaderWidget(),
+                if (showLogoHeader)
+                  const PageHeaderWidget()
+                else
+                  const _BackButtonWidget(),
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.horizontalPadding,
@@ -172,6 +175,28 @@ class _EmblemWidget extends StatelessWidget {
               curve: Curves.easeInOut,
             );
       },
+    );
+  }
+}
+
+/// Back arrow that sits on the hero gradient, replacing a separate app bar.
+class _BackButtonWidget extends StatelessWidget {
+  const _BackButtonWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: EdgeInsets.only(left: context.space()),
+          child: IconButton(
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          ),
+        ),
+      ),
     );
   }
 }
