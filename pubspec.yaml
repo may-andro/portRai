@@ -23,6 +23,9 @@ dev_dependencies:
   lint: ^2.8.0
   melos: ^7.1.1
   build_runner: ^2.16.0
+  # build 4.1.0 is incompatible with build_runner 2.16.1, the newest one that
+  # resolves while analyzer stays below 14.
+  build: '>=4.0.9 <4.1.0'
 
 melos:
   command:
