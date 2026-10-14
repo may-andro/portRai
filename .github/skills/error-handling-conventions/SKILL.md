@@ -15,6 +15,11 @@ for the full use-case pattern). `BasicFailure` (`layer/use_case/lib/src/model/fa
 carries an optional `cause` and auto-implements `toString()`/`Equatable`
 props — don't override `toString()` or `props` yourself.
 
+Each fallible use case owns its failure hierarchy, named after the operation (for example,
+`SetDesignSystemFailure` and `ResetDesignSystemFailure`), rather than sharing a generic
+feature-wide failure. Preserve the original error in `cause`; when composing use cases,
+propagate the child failure without replacing it with a generic failure.
+
 Remote assistant failures may additionally carry an optional `serviceMessage` copied
 only from the Firebase layer's explicit backend error-field property. This supplements
 the translated failure description in presentation; it does not replace `@Localizable`

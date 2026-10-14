@@ -14,7 +14,7 @@ class PachamamaDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Sacred Earth - warm earth mother glow in darkness
     primary: DSColor(0xFFBCAAA4),
     // Light warm earth brown
-    onPrimary: DSColor(0xFF3E2723),
+    onPrimary: DSColor(0xFF000000),
     // Dark brown text
     primaryContainer: DSColor(0xFF5D4037),
     // Deep sacred earth brown container
@@ -24,37 +24,37 @@ class PachamamaDarkColorPalette implements DSColorPalette {
     // Fixed rich earth brown
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF6D4C41),
-    onPrimaryFixedVariant: DSColor(0xFF3E2723),
+    onPrimaryFixedVariant: DSColor(0xFFE5D4D1),
 
     // Secondary: Luminous Life Force - glowing sacred green energy
     secondary: DSColor(0xFF81C784),
     // Light sacred green
-    onSecondary: DSColor(0xFF1B5E20),
+    onSecondary: DSColor(0xFF000000),
     // Dark green text
     secondaryContainer: DSColor(0xFF2E7D32),
     // Deep sacred green container
-    onSecondaryContainer: DSColor(0xFFC8E6C9),
+    onSecondaryContainer: DSColor(0xFFE8F4E8),
     // Light green text
     secondaryFixed: DSColor(0xFF4CAF50),
     // Fixed vibrant life green
-    onSecondaryFixed: DSColor(0xFFFFFFFF),
+    onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFF388E3C),
-    onSecondaryFixedVariant: DSColor(0xFF1B5E20),
+    onSecondaryFixedVariant: DSColor(0xFF000000),
 
-    // Tertiary: Glowing Harvest - warm abundance in moonlight
-    tertiary: DSColor(0xFFFFCC02),
+    // Tertiary: Lake Turquoise - Andean sky and water
+    tertiary: DSColor(0xFF02C0FF),
     // Bright glowing harvest gold
-    onTertiary: DSColor(0xFFE65100),
+    onTertiary: DSColor(0xFF000000),
     // Dark orange text
-    tertiaryContainer: DSColor(0xFFFF8F00),
+    tertiaryContainer: DSColor(0xFF00BFFF),
     // Bright harvest gold container
-    onTertiaryContainer: DSColor(0xFFFFE0B2),
+    onTertiaryContainer: DSColor(0xFF00445B),
     // Light golden text
-    tertiaryFixed: DSColor(0xFFFFA000),
+    tertiaryFixed: DSColor(0xFF00BFFF),
     // Fixed pure harvest gold
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFF8F00),
-    onTertiaryFixedVariant: DSColor(0xFFE65100),
+    tertiaryFixedDim: DSColor(0xFF00BFFF),
+    onTertiaryFixedVariant: DSColor(0xFF004961),
 
     inversePrimary: DSColor(0xFF5D4037),
   );
@@ -63,27 +63,27 @@ class PachamamaDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing clay red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Luminous corn amber
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Glowing earth green
     success: DSColor(0xFF81C784),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF4CAF50),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Starlit mountain blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

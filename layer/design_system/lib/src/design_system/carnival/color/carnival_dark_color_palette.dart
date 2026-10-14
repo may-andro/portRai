@@ -14,7 +14,7 @@ class CarnivalDarkColorPalette implements DSColorPalette {
     // Primary: Electric Purple - glowing neon for dark backgrounds
     primary: DSColor(0xFFBA68C8),
     // Light vibrant purple
-    onPrimary: DSColor(0xFF4A148C),
+    onPrimary: DSColor(0xFF000000),
     // Dark purple text
     primaryContainer: DSColor(0xFF6A1B9A),
     // Deep purple container
@@ -24,37 +24,37 @@ class CarnivalDarkColorPalette implements DSColorPalette {
     // Fixed bright purple
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF7B1FA2),
-    onPrimaryFixedVariant: DSColor(0xFF4A148C),
+    onPrimaryFixedVariant: DSColor(0xFFE5D4F9),
 
     // Secondary: Neon Orange - electric festival energy
     secondary: DSColor(0xFFFFAB40),
     // Bright electric orange
-    onSecondary: DSColor(0xFFBF360C),
+    onSecondary: DSColor(0xFF000000),
     // Dark orange text
     secondaryContainer: DSColor(0xFFE65100),
     // Vibrant orange container
-    onSecondaryContainer: DSColor(0xFFFFE0B2),
+    onSecondaryContainer: DSColor(0xFF000000),
     // Light orange text
     secondaryFixed: DSColor(0xFFFF9800),
     // Fixed bright orange
     onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFFFF6F00),
-    onSecondaryFixedVariant: DSColor(0xFFBF360C),
+    onSecondaryFixedVariant: DSColor(0xFF7C2308),
 
     // Tertiary: Glowing Gold - luminous party lights
     tertiary: DSColor(0xFFFFD54F),
     // Bright glowing yellow
-    onTertiary: DSColor(0xFFFF8F00),
+    onTertiary: DSColor(0xFF000000),
     // Warm orange text
     tertiaryContainer: DSColor(0xFFFFD600),
     // Golden container
-    onTertiaryContainer: DSColor(0xFFFFF9C4),
+    onTertiaryContainer: DSColor(0xFF685E00),
     // Light yellow text
     tertiaryFixed: DSColor(0xFFFFEB3B),
     // Fixed festival yellow
     onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFFFDD835),
-    onTertiaryFixedVariant: DSColor(0xFFFF8F00),
+    onTertiaryFixedVariant: DSColor(0xFF995600),
 
     inversePrimary: DSColor(0xFF6A1B9A),
   );
@@ -63,27 +63,27 @@ class CarnivalDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Electric red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Neon amber
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Party green
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF388E3C),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Electric blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

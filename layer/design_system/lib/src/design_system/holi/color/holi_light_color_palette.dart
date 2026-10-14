@@ -14,41 +14,41 @@ class HoliLightColorPalette implements DSColorPalette {
     // Primary: Festival Magenta - vibrant Holi pink representing joy and celebration
     primary: DSColor(0xFFE91E63),
     // Bright festival magenta
-    onPrimary: DSColor(0xFFFFFFFF),
+    onPrimary: DSColor(0xFF000000),
     primaryContainer: DSColor(0xFFF8BBD9),
     // Light festival pink
     onPrimaryContainer: DSColor(0xFF880E4F),
     primaryFixed: DSColor(0xFFEC407A),
     // Vibrant Holi pink
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFE91E63),
-    onPrimaryFixedVariant: DSColor(0xFF880E4F),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Spring Yellow - bright sunshine representing new beginnings
-    secondary: DSColor(0xFFFFEB3B),
+    secondary: DSColor(0xFFA19100),
     // Bright spring yellow
     onSecondary: DSColor(0xFF000000),
     secondaryContainer: DSColor(0xFFFFF9C4),
     // Light sunshine yellow
-    onSecondaryContainer: DSColor(0xFFF57F17),
+    onSecondaryContainer: DSColor(0xFFB35808),
     secondaryFixed: DSColor(0xFFFFEE58),
     // Pure sunshine yellow
     onSecondaryFixed: DSColor(0xFF000000),
-    secondaryFixedDim: DSColor(0xFFFFEB3B),
-    onSecondaryFixedVariant: DSColor(0xFFF57F17),
+    secondaryFixedDim: DSColor(0xFFA19100),
+    onSecondaryFixedVariant: DSColor(0xFFA45107),
 
     // Tertiary: Electric Blue - vibrant sky blue representing freedom and happiness
     tertiary: DSColor(0xFF2196F3),
     // Electric festival blue
-    onTertiary: DSColor(0xFFFFFFFF),
+    onTertiary: DSColor(0xFF000000),
     tertiaryContainer: DSColor(0xFFBBDEFB),
     // Light sky blue
     onTertiaryContainer: DSColor(0xFF0D47A1),
     tertiaryFixed: DSColor(0xFF42A5F5),
     // Bright electric blue
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
+    onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFF2196F3),
-    onTertiaryFixedVariant: DSColor(0xFF0D47A1),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFE1BEE7),
   );
@@ -65,17 +65,17 @@ class HoliLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF9800),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Green spring
     success: DSColor(0xFF4CAF50),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 
     // Info: Festival blue
     info: DSColor(0xFF2196F3),
-    onInfo: DSColor(0xFFFFFFFF),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFFBBDEFB),
     onInfoContainer: DSColor(0xFF0D47A1),
   );
@@ -113,7 +113,7 @@ class HoliLightColorPalette implements DSColorPalette {
     onSurface: DSColor(0xFF1C1B1F),
     surfaceVariant: DSColor(0xFFFFF0F5),
     // Very light pink tint
-    onSurfaceVariant: DSColor(0xFFE91E63),
+    onSurfaceVariant: DSColor(0xFFD81557),
     surfaceDim: DSColor(0xFFFFE8F0),
     // Dimmed pink surface
     surfaceBright: DSColor(0xFFFFFFFF),

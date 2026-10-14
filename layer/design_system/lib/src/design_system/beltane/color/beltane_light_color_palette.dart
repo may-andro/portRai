@@ -19,7 +19,7 @@ class BeltaneLightColorPalette implements DSColorPalette {
     primaryFixed: DSColor(0xFF4CAF50), // Vibrant green
     onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFF388E3C),
-    onPrimaryFixedVariant: DSColor(0xFF1B5E20),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Earth Brown
     secondary: DSColor(0xFF5D4037), // Rich earth brown
@@ -29,17 +29,17 @@ class BeltaneLightColorPalette implements DSColorPalette {
     secondaryFixed: DSColor(0xFF795548), // Warm brown
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF6D4C41),
-    onSecondaryFixedVariant: DSColor(0xFF3E2723),
+    onSecondaryFixedVariant: DSColor(0xFFE5D4D1),
 
-    // Tertiary: Golden Sun
-    tertiary: DSColor(0xFFFF8F00), // Bright golden amber
-    onTertiary: DSColor(0xFF000000),
-    tertiaryContainer: DSColor(0xFFFFE0B2), // Light golden yellow
-    onTertiaryContainer: DSColor(0xFFE65100),
-    tertiaryFixed: DSColor(0xFFFFC107), // Pure gold
+    // Tertiary: Heather Violet - spring blossoms
+    tertiary: DSColor(0xFFA000D6), // Bright golden amber
+    onTertiary: DSColor(0xFFFFFFFF),
+    tertiaryContainer: DSColor(0xFFECB2FF), // Light golden yellow
+    onTertiaryContainer: DSColor(0xFF8600B3),
+    tertiaryFixed: DSColor(0xFFC107FF), // Pure gold
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFFB300),
-    onTertiaryFixedVariant: DSColor(0xFFE65100),
+    tertiaryFixedDim: DSColor(0xFFBF00FF),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFF81C784),
   );
@@ -54,13 +54,13 @@ class BeltaneLightColorPalette implements DSColorPalette {
 
     // Warning: Autumn orange
     warning: DSColor(0xFFFF6F00),
-    onWarning: DSColor(0xFFFFFFFF),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: New leaf green
     success: DSColor(0xFF388E3C),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 

@@ -14,47 +14,47 @@ class SakuraDarkColorPalette implements DSColorPalette {
     // Primary: Moonlit Cherry Blossoms - ethereal pink glow in darkness
     primary: DSColor(0xFFF48FB1),
     // Light ethereal pink
-    onPrimary: DSColor(0xFF880E4F),
+    onPrimary: DSColor(0xFF000000),
     // Dark pink text
     primaryContainer: DSColor(0xFFE91E63),
     // Cherry blossom pink container
-    onPrimaryContainer: DSColor(0xFFF8BBD9),
+    onPrimaryContainer: DSColor(0xFF000000),
     // Light pink text
     primaryFixed: DSColor(0xFFEC407A),
     // Fixed vibrant cherry pink
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFE91E63),
-    onPrimaryFixedVariant: DSColor(0xFF880E4F),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Moonlit Spring Leaves - gentle green glow
     secondary: DSColor(0xFF81C784),
     // Light spring green
-    onSecondary: DSColor(0xFF1B5E20),
+    onSecondary: DSColor(0xFF000000),
     // Dark green text
     secondaryContainer: DSColor(0xFF4CAF50),
     // Fresh spring green container
-    onSecondaryContainer: DSColor(0xFFC8E6C9),
+    onSecondaryContainer: DSColor(0xFF000000),
     // Light green text
     secondaryFixed: DSColor(0xFF66BB6A),
     // Fixed bright spring green
-    onSecondaryFixed: DSColor(0xFFFFFFFF),
+    onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFF4CAF50),
-    onSecondaryFixedVariant: DSColor(0xFF1B5E20),
+    onSecondaryFixedVariant: DSColor(0xFF000000),
 
     // Tertiary: Serene Moonlight - tranquil evening sky
     tertiary: DSColor(0xFF90A4AE),
     // Light serene blue-grey
-    onTertiary: DSColor(0xFF263238),
+    onTertiary: DSColor(0xFF000000),
     // Dark grey text
     tertiaryContainer: DSColor(0xFF607D8B),
     // Soft blue-grey container
-    onTertiaryContainer: DSColor(0xFFECEFF1),
+    onTertiaryContainer: DSColor(0xFF000000),
     // Light grey text
     tertiaryFixed: DSColor(0xFF78909C),
     // Fixed light blue-grey
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
+    onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFF607D8B),
-    onTertiaryFixedVariant: DSColor(0xFF263238),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFE91E63),
   );
@@ -63,27 +63,27 @@ class SakuraDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Gentle glowing rose
     error: DSColor(0xFFEF9A9A),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFE57373),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFF000000),
 
     // Warning: Soft moonlit amber
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFB74D),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF754600),
 
     // Success: Glowing new leaves
     success: DSColor(0xFF81C784),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF66BB6A),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Starlit spring sky
     info: DSColor(0xFF64B5F6),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF42A5F5),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFF000000),
   );
 
   @override

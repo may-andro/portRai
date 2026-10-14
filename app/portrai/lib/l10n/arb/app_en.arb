@@ -765,6 +765,34 @@
   "@developerMenuUseTemplateDataDescription": {
     "description": "Description for the switch that selects template (demo) JSON assets in the developer menu"
   },
+  "developerMenuDesignSystem": "Design system",
+  "@developerMenuDesignSystem": {
+    "description": "Section header for the design system tools in the developer menu"
+  },
+  "developerMenuDesignSystemPicker": "Design system",
+  "@developerMenuDesignSystemPicker": {
+    "description": "Label for the dropdown that selects the design system in the developer menu"
+  },
+  "developerMenuDesignSystemPickerDescription": "Pick a festival design system manually. Restart the app to apply",
+  "@developerMenuDesignSystemPickerDescription": {
+    "description": "Description for the design system dropdown in the developer menu"
+  },
+  "developerMenuDesignSystemAutomatic": "Automatic (by month)",
+  "@developerMenuDesignSystemAutomatic": {
+    "description": "Dropdown option meaning the design system follows the current month"
+  },
+  "developerMenuDesignSystemReset": "Reset design system",
+  "@developerMenuDesignSystemReset": {
+    "description": "Label for the action that resets the design system in the developer menu"
+  },
+  "developerMenuDesignSystemResetDescription": "Clear the selection and follow the current month again",
+  "@developerMenuDesignSystemResetDescription": {
+    "description": "Description for the action that resets the design system in the developer menu"
+  },
+  "developerMenuDesignSystemRestartRequired": "Restart the app to apply the new design system",
+  "@developerMenuDesignSystemRestartRequired": {
+    "description": "Snackbar asking to restart the app after the design system changed"
+  },
   "developerMenuErrorSimulation": "Error Simulation",
   "@developerMenuErrorSimulation": {
     "description": "Section title for developer menu error simulations"

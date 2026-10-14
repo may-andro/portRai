@@ -20,9 +20,9 @@ class HogerasLightColorPalette implements DSColorPalette {
     onPrimaryContainer: DSColor(0xFFB71C1C),
     primaryFixed: DSColor(0xFFE53935),
     // Vibrant bonfire red
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFD32F2F),
-    onPrimaryFixedVariant: DSColor(0xFFB71C1C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Mediterranean Blue - coastal waters and summer sky
     secondary: DSColor(0xFF1976D2),
@@ -33,22 +33,22 @@ class HogerasLightColorPalette implements DSColorPalette {
     onSecondaryContainer: DSColor(0xFF0D47A1),
     secondaryFixed: DSColor(0xFF2196F3),
     // Bright Mediterranean blue
-    onSecondaryFixed: DSColor(0xFFFFFFFF),
+    onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFF1976D2),
-    onSecondaryFixedVariant: DSColor(0xFF0D47A1),
+    onSecondaryFixedVariant: DSColor(0xFF000000),
 
     // Tertiary: Spanish Sun Gold - radiant summer sunshine
-    tertiary: DSColor(0xFFFFB300),
+    tertiary: DSColor(0xFFC28800),
     // Bright Spanish gold
     onTertiary: DSColor(0xFF000000),
     tertiaryContainer: DSColor(0xFFFFE082),
     // Light sunshine yellow
-    onTertiaryContainer: DSColor(0xFFFF8F00),
+    onTertiaryContainer: DSColor(0xFF945300),
     tertiaryFixed: DSColor(0xFFFFC107),
     // Pure Spanish sun
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFFB300),
-    onTertiaryFixedVariant: DSColor(0xFFFF8F00),
+    tertiaryFixedDim: DSColor(0xFFC28800),
+    onTertiaryFixedVariant: DSColor(0xFF7F4700),
 
     inversePrimary: DSColor(0xFFEF9A9A),
   );
@@ -65,11 +65,11 @@ class HogerasLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Mediterranean green
     success: DSColor(0xFF388E3C),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 

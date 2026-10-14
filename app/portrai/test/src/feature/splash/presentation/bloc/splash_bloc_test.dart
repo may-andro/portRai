@@ -12,8 +12,10 @@ class _NoOpModuleConfigurator extends ModuleConfigurator {
       Future.value();
 
   @override
-  Future<void> registerDependencies(ServiceLocator serviceLocator) =>
-      Future.value();
+  Future<void> registerDependencies(ServiceLocator serviceLocator) {
+    serviceLocator.registerSingleton<DesignSystem>(() => DesignSystem.hogmanay);
+    return Future.value();
+  }
 
   @override
   Future<void> postDependenciesSetup(ServiceLocator serviceLocator) =>

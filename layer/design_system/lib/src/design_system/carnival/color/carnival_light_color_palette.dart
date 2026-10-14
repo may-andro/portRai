@@ -22,33 +22,33 @@ class CarnivalLightColorPalette implements DSColorPalette {
     // Bright purple
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF7B1FA2),
-    onPrimaryFixedVariant: DSColor(0xFF4A148C),
+    onPrimaryFixedVariant: DSColor(0xFFE5D4F9),
 
     // Secondary: Festive Orange
     secondary: DSColor(0xFFE65100),
     // Vibrant carnival orange
-    onSecondary: DSColor(0xFFFFFFFF),
+    onSecondary: DSColor(0xFF000000),
     secondaryContainer: DSColor(0xFFFFE0B2),
     // Light peach
-    onSecondaryContainer: DSColor(0xFFBF360C),
+    onSecondaryContainer: DSColor(0xFFBA350C),
     secondaryFixed: DSColor(0xFFFF9800),
     // Bright orange
     onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFFFF6F00),
-    onSecondaryFixedVariant: DSColor(0xFFBF360C),
+    onSecondaryFixedVariant: DSColor(0xFF7C2308),
 
     // Tertiary: Golden Celebration
-    tertiary: DSColor(0xFFFFD600),
+    tertiary: DSColor(0xFFA88D00),
     // Bright carnival gold
     onTertiary: DSColor(0xFF000000),
     tertiaryContainer: DSColor(0xFFFFF9C4),
     // Light yellow
-    onTertiaryContainer: DSColor(0xFFFF8F00),
+    onTertiaryContainer: DSColor(0xFFA85E00),
     tertiaryFixed: DSColor(0xFFFFEB3B),
     // Pure festival yellow
     onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFFFDD835),
-    onTertiaryFixedVariant: DSColor(0xFFFF8F00),
+    onTertiaryFixedVariant: DSColor(0xFF995600),
 
     inversePrimary: DSColor(0xFFBA68C8),
   );
@@ -65,11 +65,11 @@ class CarnivalLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Celebration green
     success: DSColor(0xFF388E3C),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 

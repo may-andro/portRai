@@ -142,7 +142,11 @@ class _HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = context.colorPalette.accent.color;
+    final accent = switch (background) {
+      InverseSectionBackground() =>
+        context.colorPalette.brand.inversePrimary.color,
+      SurfaceSectionBackground() => context.colorPalette.accent.color,
+    };
     final textColor = background.getTextColor(context);
 
     return Padding(
@@ -169,10 +173,7 @@ class _HeaderWidget extends StatelessWidget {
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [
-                              accent,
-                              context.colorPalette.brand.tertiary.color,
-                            ],
+                            colors: [accent, accent.withAlpha(180)],
                           ),
                         ),
                       ),

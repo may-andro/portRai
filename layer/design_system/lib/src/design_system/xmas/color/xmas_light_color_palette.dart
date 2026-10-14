@@ -20,9 +20,9 @@ class ChristmasLightColorPalette implements DSColorPalette {
     onPrimaryContainer: DSColor(0xFFB71C1C),
     primaryFixed: DSColor(0xFFE53935),
     // Vibrant Christmas red
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFD32F2F),
-    onPrimaryFixedVariant: DSColor(0xFFB71C1C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Evergreen - classic Christmas tree green
     secondary: DSColor(0xFF1B5E20),
@@ -35,20 +35,20 @@ class ChristmasLightColorPalette implements DSColorPalette {
     // Bright evergreen
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF1B5E20),
-    onSecondaryFixedVariant: DSColor(0xFF0D4E0F),
+    onSecondaryFixedVariant: DSColor(0xFFDBF9DC),
 
-    // Tertiary: Holiday Gold - warm Christmas ornament gold
-    tertiary: DSColor(0xFFFFB300),
+    // Tertiary: Winter Blue - frost and winter sky
+    tertiary: DSColor(0xFF0071C2),
     // Bright holiday gold
-    onTertiary: DSColor(0xFF000000),
-    tertiaryContainer: DSColor(0xFFFFE082),
+    onTertiary: DSColor(0xFFFFFFFF),
+    tertiaryContainer: DSColor(0xFF82CBFF),
     // Light golden yellow
-    onTertiaryContainer: DSColor(0xFFFF8F00),
-    tertiaryFixed: DSColor(0xFFFFC107),
+    onTertiaryContainer: DSColor(0xFF00538F),
+    tertiaryFixed: DSColor(0xFF0798FF),
     // Pure holiday gold
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFFB300),
-    onTertiaryFixedVariant: DSColor(0xFFFF8F00),
+    tertiaryFixedDim: DSColor(0xFF0071C2),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFEF9A9A),
   );
@@ -65,7 +65,7 @@ class ChristmasLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Winter green
     success: DSColor(0xFF2E7D32),

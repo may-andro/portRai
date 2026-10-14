@@ -20,22 +20,22 @@ class ChuseokLightColorPalette implements DSColorPalette {
     onPrimaryContainer: DSColor(0xFFB71C1C),
     primaryFixed: DSColor(0xFFE53935),
     // Vibrant Korean red
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFD32F2F),
-    onPrimaryFixedVariant: DSColor(0xFFB71C1C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Harvest Gold (황금색)
-    secondary: DSColor(0xFFFF8F00),
+    secondary: DSColor(0xFFD67800),
     // Rich harvest gold
-    onSecondary: DSColor(0xFFFFFFFF),
+    onSecondary: DSColor(0xFF000000),
     secondaryContainer: DSColor(0xFFFFE0B2),
     // Light golden yellow
-    onSecondaryContainer: DSColor(0xFFE65100),
+    onSecondaryContainer: DSColor(0xFFB33F00),
     secondaryFixed: DSColor(0xFFFFA000),
     // Bright harvest gold
     onSecondaryFixed: DSColor(0xFF000000),
-    secondaryFixedDim: DSColor(0xFFFF8F00),
-    onSecondaryFixedVariant: DSColor(0xFFE65100),
+    secondaryFixedDim: DSColor(0xFFD67800),
+    onSecondaryFixedVariant: DSColor(0xFF7B2B00),
 
     // Tertiary: Traditional Blue (단청 파랑)
     tertiary: DSColor(0xFF1976D2),
@@ -46,9 +46,9 @@ class ChuseokLightColorPalette implements DSColorPalette {
     onTertiaryContainer: DSColor(0xFF0D47A1),
     tertiaryFixed: DSColor(0xFF2196F3),
     // Bright Korean blue
-    onTertiaryFixed: DSColor(0xFFFFFFFF),
+    onTertiaryFixed: DSColor(0xFF000000),
     tertiaryFixedDim: DSColor(0xFF1976D2),
-    onTertiaryFixedVariant: DSColor(0xFF0D47A1),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFEF9A9A),
   );
@@ -63,9 +63,9 @@ class ChuseokLightColorPalette implements DSColorPalette {
 
     // Warning: Persimmon orange
     warning: DSColor(0xFFFF6F00),
-    onWarning: DSColor(0xFFFFFFFF),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Pine green
     success: DSColor(0xFF2E7D32),

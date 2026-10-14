@@ -14,22 +14,22 @@ class ChristmasDarkColorPalette implements DSColorPalette {
     // Primary: Glowing Christmas Light - warm festive red in cozy darkness
     primary: DSColor(0xFFEF9A9A),
     // Light glowing red
-    onPrimary: DSColor(0xFFB71C1C),
+    onPrimary: DSColor(0xFF000000),
     // Dark red text
     primaryContainer: DSColor(0xFFD32F2F),
     // Deep Christmas red container
-    onPrimaryContainer: DSColor(0xFFFFCDD2),
+    onPrimaryContainer: DSColor(0xFFFFF1F2),
     // Light red text
     primaryFixed: DSColor(0xFFE53935),
     // Fixed vibrant Christmas red
-    onPrimaryFixed: DSColor(0xFFFFFFFF),
+    onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFFD32F2F),
-    onPrimaryFixedVariant: DSColor(0xFFB71C1C),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Glowing Evergreen - warm Christmas tree lights
     secondary: DSColor(0xFF81C784),
     // Light glowing green
-    onSecondary: DSColor(0xFF0D4E0F),
+    onSecondary: DSColor(0xFF000000),
     // Dark green text
     secondaryContainer: DSColor(0xFF1B5E20),
     // Deep evergreen container
@@ -39,22 +39,22 @@ class ChristmasDarkColorPalette implements DSColorPalette {
     // Fixed bright evergreen
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF1B5E20),
-    onSecondaryFixedVariant: DSColor(0xFF0D4E0F),
+    onSecondaryFixedVariant: DSColor(0xFFDBF9DC),
 
-    // Tertiary: Warm Holiday Glow - cozy ornament gold by firelight
-    tertiary: DSColor(0xFFFFD54F),
+    // Tertiary: Winter Blue - frost and winter sky
+    tertiary: DSColor(0xFF4FB6FF),
     // Bright warm gold
-    onTertiary: DSColor(0xFFFF8F00),
+    onTertiary: DSColor(0xFF000000),
     // Orange text
-    tertiaryContainer: DSColor(0xFFFFB300),
+    tertiaryContainer: DSColor(0xFF0095FF),
     // Holiday gold container
-    onTertiaryContainer: DSColor(0xFFFFE082),
+    onTertiaryContainer: DSColor(0xFF000000),
     // Light golden text
-    tertiaryFixed: DSColor(0xFFFFC107),
+    tertiaryFixed: DSColor(0xFF0798FF),
     // Fixed pure holiday gold
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFFB300),
-    onTertiaryFixedVariant: DSColor(0xFFFF8F00),
+    tertiaryFixedDim: DSColor(0xFF0095FF),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFFD32F2F),
   );
@@ -63,27 +63,27 @@ class ChristmasDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Glowing holiday red
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFFB71C1C),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Warm gingerbread amber
     warning: DSColor(0xFFFFCC02),
-    onWarning: DSColor(0xFFE65100),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Glowing winter green
     success: DSColor(0xFF81C784),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF2E7D32),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFFE8F4E8),
 
     // Info: Starlit winter blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1565C0),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFCEE7FC),
   );
 
   @override

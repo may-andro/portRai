@@ -20,7 +20,7 @@ class PachamamaLightColorPalette implements DSColorPalette {
     // Rich earth brown
     onPrimaryFixed: DSColor(0xFFFFFFFF),
     primaryFixedDim: DSColor(0xFF6D4C41),
-    onPrimaryFixedVariant: DSColor(0xFF3E2723),
+    onPrimaryFixedVariant: DSColor(0xFFE5D4D1),
 
     // Secondary: Sacred Green - representing fertility and life force
     secondary: DSColor(0xFF2E7D32),
@@ -31,22 +31,22 @@ class PachamamaLightColorPalette implements DSColorPalette {
     onSecondaryContainer: DSColor(0xFF1B5E20),
     secondaryFixed: DSColor(0xFF4CAF50),
     // Vibrant life green
-    onSecondaryFixed: DSColor(0xFFFFFFFF),
+    onSecondaryFixed: DSColor(0xFF000000),
     secondaryFixedDim: DSColor(0xFF388E3C),
-    onSecondaryFixedVariant: DSColor(0xFF1B5E20),
+    onSecondaryFixedVariant: DSColor(0xFF000000),
 
-    // Tertiary: Harvest Gold - representing abundance and prosperity
-    tertiary: DSColor(0xFFFF8F00),
+    // Tertiary: Lake Turquoise - Andean sky and water
+    tertiary: DSColor(0xFF009CD1),
     // Bright harvest gold
     onTertiary: DSColor(0xFF000000),
-    tertiaryContainer: DSColor(0xFFFFE0B2),
+    tertiaryContainer: DSColor(0xFFB2ECFF),
     // Light golden yellow
-    onTertiaryContainer: DSColor(0xFFE65100),
-    tertiaryFixed: DSColor(0xFFFFA000),
+    onTertiaryContainer: DSColor(0xFF006B8F),
+    tertiaryFixed: DSColor(0xFF00BFFF),
     // Pure harvest gold
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFF8F00),
-    onTertiaryFixedVariant: DSColor(0xFFE65100),
+    tertiaryFixedDim: DSColor(0xFF009CD1),
+    onTertiaryFixedVariant: DSColor(0xFF004961),
 
     inversePrimary: DSColor(0xFFBCAAA4),
   );
@@ -63,11 +63,11 @@ class PachamamaLightColorPalette implements DSColorPalette {
     warning: DSColor(0xFFFF8F00),
     onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFFE0B2),
-    onWarningContainer: DSColor(0xFFE65100),
+    onWarningContainer: DSColor(0xFFB33F00),
 
     // Success: Earth green
     success: DSColor(0xFF4CAF50),
-    onSuccess: DSColor(0xFFFFFFFF),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFFC8E6C9),
     onSuccessContainer: DSColor(0xFF1B5E20),
 

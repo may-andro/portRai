@@ -13,33 +13,33 @@ class BeltaneDarkColorPalette implements DSColorPalette {
   BrandColorScheme get brand => const BrandColorScheme(
     // Primary: Moonlit Green - softer, more muted for dark backgrounds
     primary: DSColor(0xFF81C784), // Light spring green for dark theme
-    onPrimary: DSColor(0xFF1B5E20), // Dark forest green text
+    onPrimary: DSColor(0xFF000000), // Dark forest green text
     primaryContainer: DSColor(0xFF2E7D32), // Deep forest green container
-    onPrimaryContainer: DSColor(0xFFA5D6A7), // Light green text
+    onPrimaryContainer: DSColor(0xFFE8F4E8), // Light green text
     primaryFixed: DSColor(0xFF4CAF50), // Fixed vibrant green
     onPrimaryFixed: DSColor(0xFF000000),
     primaryFixedDim: DSColor(0xFF388E3C),
-    onPrimaryFixedVariant: DSColor(0xFF1B5E20),
+    onPrimaryFixedVariant: DSColor(0xFF000000),
 
     // Secondary: Night Earth - warmer browns for cozy dark feel
     secondary: DSColor(0xFFBCAAA4), // Light warm brown
-    onSecondary: DSColor(0xFF3E2723), // Dark brown text
+    onSecondary: DSColor(0xFF000000), // Dark brown text
     secondaryContainer: DSColor(0xFF5D4037), // Rich earth brown container
     onSecondaryContainer: DSColor(0xFFD7CCC8), // Light earth tone text
     secondaryFixed: DSColor(0xFF795548), // Fixed warm brown
     onSecondaryFixed: DSColor(0xFFFFFFFF),
     secondaryFixedDim: DSColor(0xFF6D4C41),
-    onSecondaryFixedVariant: DSColor(0xFF3E2723),
+    onSecondaryFixedVariant: DSColor(0xFFE5D4D1),
 
-    // Tertiary: Warm Ember - golden tones for dark environments
-    tertiary: DSColor(0xFFFFCC02), // Bright warm gold
-    onTertiary: DSColor(0xFF3E2723), // Dark brown text
-    tertiaryContainer: DSColor(0xFFFF8F00), // Golden amber container
-    onTertiaryContainer: DSColor(0xFFFFE0B2), // Light golden text
-    tertiaryFixed: DSColor(0xFFFFC107), // Fixed pure gold
+    // Tertiary: Heather Violet - spring blossoms
+    tertiary: DSColor(0xFFC002FF), // Bright warm gold
+    onTertiary: DSColor(0xFF000000), // Dark brown text
+    tertiaryContainer: DSColor(0xFFBF00FF), // Golden amber container
+    onTertiaryContainer: DSColor(0xFFFFFFFF), // Light golden text
+    tertiaryFixed: DSColor(0xFFC107FF), // Fixed pure gold
     onTertiaryFixed: DSColor(0xFF000000),
-    tertiaryFixedDim: DSColor(0xFFFFB300),
-    onTertiaryFixedVariant: DSColor(0xFFE65100),
+    tertiaryFixedDim: DSColor(0xFFBF00FF),
+    onTertiaryFixedVariant: DSColor(0xFF000000),
 
     inversePrimary: DSColor(0xFF2E7D32),
   );
@@ -48,27 +48,27 @@ class BeltaneDarkColorPalette implements DSColorPalette {
   SemanticColorScheme get semantic => const SemanticColorScheme(
     // Error: Warm red ember
     error: DSColor(0xFFEF5350),
-    onError: DSColor(0xFF3E2723),
+    onError: DSColor(0xFF000000),
     errorContainer: DSColor(0xFFD32F2F),
-    onErrorContainer: DSColor(0xFFFFCDD2),
+    onErrorContainer: DSColor(0xFFFFF1F2),
 
     // Warning: Golden flame
     warning: DSColor(0xFFFFB74D),
-    onWarning: DSColor(0xFF3E2723),
+    onWarning: DSColor(0xFF000000),
     warningContainer: DSColor(0xFFFF8F00),
-    onWarningContainer: DSColor(0xFFFFE0B2),
+    onWarningContainer: DSColor(0xFF5B3700),
 
     // Success: Forest glow
     success: DSColor(0xFF66BB6A),
-    onSuccess: DSColor(0xFF1B5E20),
+    onSuccess: DSColor(0xFF000000),
     successContainer: DSColor(0xFF388E3C),
-    onSuccessContainer: DSColor(0xFFC8E6C9),
+    onSuccessContainer: DSColor(0xFF000000),
 
     // Info: Moonlight blue
     info: DSColor(0xFF42A5F5),
-    onInfo: DSColor(0xFF0D47A1),
+    onInfo: DSColor(0xFF000000),
     infoContainer: DSColor(0xFF1976D2),
-    onInfoContainer: DSColor(0xFFBBDEFB),
+    onInfoContainer: DSColor(0xFFFEFFFF),
   );
 
   @override

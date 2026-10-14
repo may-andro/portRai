@@ -21,6 +21,9 @@ class DeveloperMenuLoadedState extends DeveloperMenuState {
 
   final AssetSource assetSource;
 
+  DeveloperMenuLoadedState withAssetSource(AssetSource assetSource) =>
+      DeveloperMenuLoadedState(assetSource: assetSource);
+
   @override
   List<Object?> get props => [assetSource];
 }

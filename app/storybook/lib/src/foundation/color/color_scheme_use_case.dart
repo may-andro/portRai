@@ -73,6 +73,36 @@ Widget buildSurfaceColorScheme(BuildContext context) {
   ]);
 }
 
+@UseCase(name: 'ColorScheme - Accent Pairs', type: BrandColorScheme)
+Widget buildAccentColorPairs(BuildContext context) {
+  final brand = context.colorPalette.brand;
+  final pairs = <String, (DSColor, DSColor)>{
+    'Tertiary': (brand.tertiary, brand.onTertiary),
+    'Tertiary Container': (brand.tertiaryContainer, brand.onTertiaryContainer),
+    'Tertiary Fixed': (brand.tertiaryFixed, brand.onTertiaryFixed),
+    'Tertiary Fixed Dim': (
+      brand.tertiaryFixedDim,
+      brand.onTertiaryFixedVariant,
+    ),
+  };
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      for (final pair in pairs.entries)
+        Container(
+          margin: EdgeInsets.all(context.space(factor: 0.5)),
+          padding: EdgeInsets.all(context.space()),
+          color: pair.value.$1.color,
+          child: DSTextWidget(
+            pair.key,
+            style: context.typography.bodyLarge,
+            color: pair.value.$2,
+          ),
+        ),
+    ],
+  );
+}
+
 @UseCase(name: 'ColorScheme - Outline', type: OutlineColorScheme)
 Widget buildOutlineColorScheme(BuildContext context) {
   final colorScheme = context.colorPalette.outline;
