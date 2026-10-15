@@ -99,13 +99,17 @@ class GenerateAiImageUseCase
   Future<Either<GenerateAiImageFailure, AiImageEntity>> execute(
     GenerateAiImageParam param,
   ) async {
-    final flagResult = await _isFeatureEnabledUseCase(
+    final isFeatureEnabledEither = await _isFeatureEnabledUseCase(
       AiImageGenFeatureFlags.aiImageGeneration,
     );
-    if (flagResult.isLeft) {
-      throw AiImageUnavailableException(cause: flagResult.left);
+    if (isFeatureEnabledEither.isLeft) {
+      return Left(
+        AiImageUnavailableFailure(cause: isFeatureEnabledEither.left),
+      );
     }
-    if (!flagResult.right) throw const AiImageFeatureDisabledException();
+    if (!isFeatureEnabledEither.right) {
+      return const Left(AiImageFeatureDisabledFailure());
+    }
 
     final image = await _repository.generateAiImage(
       sourceImageUrl: param.sourceImageUrl,
@@ -118,10 +122,6 @@ class GenerateAiImageUseCase
   @override
   GenerateAiImageFailure mapErrorToFailure(Object e, StackTrace st) {
     return switch (e) {
-      AiImageFeatureDisabledException() => AiImageFeatureDisabledFailure(
-        cause: e,
-      ),
-      AiImageUnavailableException() => AiImageUnavailableFailure(cause: e),
       AiImageSourceException() => AiImageSourceFailure(cause: e),
       AiImageGenerationException() => AiImageGenerationFailure(cause: e),
       _ => AiImageUnknownFailure(cause: e),

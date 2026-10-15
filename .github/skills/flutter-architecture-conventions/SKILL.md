@@ -34,6 +34,32 @@ class GetFooUseCase {
 }
 ```
 
+### Use cases never throw — they always return a `Failure`
+A use case's public result is always an `Either`; callers must never need a `try/catch`.
+
+- Inside `execute`, never `throw` for a domain/business outcome (feature disabled, invalid input,
+  a composed use case returning `Left`, empty result, ...). Return `Left(SomeFailure(...))` directly.
+  When composing use cases, return `Left(childEither.left)` (propagate the child failure unchanged).
+- Exceptions may only originate from infrastructure calls (repositories, data sources, SDKs).
+  Do not catch-and-rethrow them or add domain `throw`s; they are converted by
+  `mapErrorToFailure`, which is the safety net and must be **total**: every exception type maps to
+  a concrete `Failure`, with a catch-all `Unknown` failure as the last case. It never rethrows.
+- Never use exceptions as control flow between a use case's own steps just to reach
+  `mapErrorToFailure`.
+
+```dart
+// ✅ Correct
+final isEnabledEither = await _isFeatureEnabledUseCase(flag);
+if (isEnabledEither.isLeft) {
+  return Left(AiImageUnavailableFailure(cause: isEnabledEither.left));
+}
+if (!isEnabledEither.right) return const Left(AiImageFeatureDisabledFailure());
+
+// ❌ Wrong
+if (isEnabledEither.isLeft) throw AiImageUnavailableException(cause: isEnabledEither.left);
+if (!isEnabledEither.right) throw const AiImageFeatureDisabledException();
+```
+
 ## Don't duplicate logging
 The globally registered `LogUseCaseInterceptor` already logs every use case's params, success, and error automatically. Don't add manual `LogReporter.error`/`.debug` calls in blocs or presentation code just to report a use case failure/success - it's already logged.
 

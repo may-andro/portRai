@@ -1,239 +1,470 @@
-part of 'service_detail_widget.dart';
+part of 'content_widget.dart';
 
-enum _SectionStyle { tinted, plain, dark, accentBar, outlined, neutral }
-
-class _SectionWidget extends StatelessWidget {
+class _SectionWidget extends StatefulWidget {
   const _SectionWidget({
     required this.title,
     required this.icon,
     required this.child,
-    this.style = _SectionStyle.tinted,
+    this.isAlternate = false,
+    this.backgroundAsset,
   });
 
   final String title;
   final IconData icon;
   final Widget child;
-  final _SectionStyle style;
+  final bool isAlternate;
+  final String? backgroundAsset;
 
+  @override
+  State<_SectionWidget> createState() => _SectionWidgetState();
+}
+
+class _SectionWidgetState extends State<_SectionWidget> {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final accent = palette.accent.color;
-    final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
-    final padding = EdgeInsets.all(context.space(factor: 2));
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: context.space(factor: 1.5),
-      children: [_buildTitle(context), child],
+      children: [_buildTitle(context), widget.child],
     );
 
-    final card = switch (style) {
-      _SectionStyle.tinted => Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: BoxDecoration(
-          color: accent.withAlpha(14),
-          borderRadius: radius,
-          border: Border.all(color: accent.withAlpha(60)),
-        ),
-        child: content,
-      ),
-      _SectionStyle.plain => Padding(
-        padding: EdgeInsets.symmetric(vertical: context.space()),
-        child: content,
-      ),
-      _SectionStyle.dark => Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: radius,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              palette.surface.inverseSurface.color,
-              Color.lerp(
-                palette.surface.inverseSurface.color,
-                palette.brand.primary.color,
-                0.3,
-              )!,
-            ],
-          ),
-        ),
-        child: content,
-      ),
-      _SectionStyle.accentBar => ClipRRect(
-        borderRadius: BorderRadius.circular(context.dimen.radiusLevel1.value),
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: palette.neutral.grey9.color.withAlpha(10),
-            border: Border(left: BorderSide(color: accent, width: 5)),
-          ),
-          padding: padding,
-          child: content,
+    final backgroundColor = widget.isAlternate
+        ? Color.alphaBlend(accent.withAlpha(30), palette.background.color)
+        : palette.background.color;
+    final band = Container(
+      width: double.infinity,
+      color: backgroundColor,
+      child: ClipRect(
+        child: Stack(
+          children: [
+            if (widget.backgroundAsset case final backgroundAsset?)
+              Positioned.fill(
+                child: _SectionArtworkWidget(
+                  assetPath: backgroundAsset,
+                  accent: accent,
+                ),
+              ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.horizontalPadding,
+                vertical: context.space(factor: 6),
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: content,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      _SectionStyle.outlined => Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            context.dimen.radiusLevel3.value * 2,
-          ),
-          border: Border.all(color: accent, width: 1.5),
-        ),
-        child: content,
-      ),
-      _SectionStyle.neutral => Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: BoxDecoration(
-          color: palette.neutral.grey9.color.withAlpha(14),
-          borderRadius: radius,
-        ),
-        child: content,
-      ),
-    };
-
-    return _RevealWidget(
-      child: style == _SectionStyle.plain
-          ? card
-          : _HoverLiftWidget(child: card),
     );
+
+    return _RevealWidget(child: band);
   }
 
   Widget _buildTitle(BuildContext context) {
     final palette = context.colorPalette;
     final accent = palette.accent.color;
     final typography = context.typography;
-
     final badge = Container(
-      padding: EdgeInsets.all(context.space(factor: 0.75)),
+      padding: EdgeInsets.all(context.space()),
       decoration: BoxDecoration(
         color: accent.withAlpha(36),
         borderRadius: BorderRadius.circular(context.dimen.radiusLevel1.value),
       ),
-      child: Icon(icon, size: 18, color: accent),
+      child: Icon(widget.icon, size: 26, color: accent),
     );
 
-    return switch (style) {
-      _SectionStyle.plain => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DSTextWidget(
-            title,
-            style: typography.emphasizedHeadlineSmall,
-            color: palette.neutral.grey10,
-          ),
-        ],
-      ),
-      _SectionStyle.dark => Row(
-        spacing: context.space(),
-        children: [
-          Icon(icon, size: 22, color: accent),
-          DSTextWidget(
-            title,
-            style: typography.titleLarge,
-            color: palette.surface.onInverseSurface,
-          ),
-        ],
-      ),
-      _SectionStyle.accentBar => DSTextWidget(
-        title.toUpperCase(),
-        style: typography.emphasizedLabelLarge,
-        color: palette.accent,
-      ),
-      _SectionStyle.outlined => Row(
-        spacing: context.space(),
-        children: [
-          badge,
-          DSTextWidget(
-            title,
-            style: typography.titleMedium,
-            color: palette.neutral.grey10,
-            isItalic: true,
-          ),
-        ],
-      ),
-      _SectionStyle.neutral => Row(
-        spacing: context.space(),
-        children: [
-          badge,
-          DSTextWidget(
-            title,
-            style: typography.emphasizedTitleMedium,
-            color: palette.neutral.grey10,
-          ),
-        ],
-      ),
-      _SectionStyle.tinted => Row(
-        spacing: context.space(),
-        children: [
-          badge,
-          DSTextWidget(
-            title,
-            style: typography.emphasizedTitleSmall,
-            color: palette.neutral.grey10,
-          ),
-        ],
-      ),
-    };
-  }
-}
-
-class _CheckListWidget extends StatelessWidget {
-  const _CheckListWidget({required this.items, required this.icon});
-
-  final List<String> items;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = context.colorPalette.accent.color;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       spacing: context.space(factor: 1.25),
       children: [
-        for (final item in items)
-          _HoverNudgeWidget(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: context.space(factor: 1.25),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Icon(icon, size: 18, color: accent),
-                ),
-                Expanded(
-                  child: DSTextWidget(
-                    item,
-                    style: context.typography.bodyMedium,
-                    color: context.colorPalette.neutral.grey9,
-                  ),
-                ),
-              ],
-            ),
-          ),
+        badge,
+        DSTextWidget(
+          widget.title,
+          style: context.isMobile
+              ? typography.emphasizedHeadlineSmall
+              : typography.emphasizedHeadlineMedium,
+          color: palette.neutral.grey10,
+        ),
       ],
     );
   }
 }
 
-class _TagsWidget extends StatelessWidget {
-  const _TagsWidget({required this.tags});
+class _SectionArtworkWidget extends StatelessWidget {
+  const _SectionArtworkWidget({required this.assetPath, required this.accent});
 
-  final List<String> tags;
+  final String assetPath;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: FractionallySizedBox(
+        widthFactor: context.isMobile ? 0.8 : 0.5,
+        heightFactor: 1,
+        child: ShaderMask(
+          blendMode: BlendMode.dstIn,
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [Colors.transparent, Colors.white],
+            stops: [0, 0.65],
+          ).createShader(bounds),
+          child: Opacity(
+            opacity: 0.2,
+            child: ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                accent.withAlpha(40),
+                BlendMode.srcATop,
+              ),
+              child: SizedBox.expand(
+                child: Image.asset(assetPath, fit: BoxFit.cover),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DeliverablesWidget extends StatelessWidget {
+  const _DeliverablesWidget({required this.deliverables});
+
+  final List<String> deliverables;
+
+  @override
+  Widget build(BuildContext context) {
+    final cardSpacing = context.space(factor: 1.5);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardsPerRow = constraints.maxWidth >= 760 ? 2 : 1;
+        final cardWidth =
+            (constraints.maxWidth - cardSpacing * (cardsPerRow - 1)) /
+            cardsPerRow;
+
+        return Wrap(
+          spacing: cardSpacing,
+          runSpacing: cardSpacing,
+          children: [
+            for (final (deliverableIndex, deliverable) in deliverables.indexed)
+              SizedBox(
+                width: cardWidth,
+                child: _DeliverableCardWidget(
+                  deliverable: deliverable,
+                  index: deliverableIndex + 1,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DeliverableCardWidget extends StatelessWidget {
+  const _DeliverableCardWidget({
+    required this.deliverable,
+    required this.index,
+  });
+
+  final String deliverable;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+    final indexLabel = index.toString().padLeft(2, '0');
+
+    return Container(
+      constraints: BoxConstraints(minHeight: context.space(factor: 9)),
+      padding: EdgeInsets.all(context.space(factor: 1.75)),
+      decoration: BoxDecoration(
+        color: palette.surface.surface.color,
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel2.value),
+        border: Border.all(color: accent.withAlpha(55)),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withAlpha(12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        spacing: context.space(factor: 1.5),
+        children: [
+          DSTextWidget(
+            indexLabel,
+            style: context.typography.emphasizedTitleMedium,
+            color: palette.accent,
+          ),
+          Container(
+            width: 1,
+            height: context.space(factor: 5),
+            color: accent.withAlpha(75),
+          ),
+          Expanded(
+            child: DSTextWidget(
+              deliverable,
+              style: context.typography.emphasizedBodyMedium,
+              color: palette.neutral.grey10,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(context.space(factor: 0.5)),
+            decoration: BoxDecoration(
+              color: accent.withAlpha(28),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.check_rounded, size: 18, color: accent),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EngagementTypesWidget extends StatelessWidget {
+  const _EngagementTypesWidget({required this.types});
+
+  final List<String> types;
+
+  @override
+  Widget build(BuildContext context) {
+    final engagementIcons = [
+      Icons.handshake_outlined,
+      Icons.calendar_month_outlined,
+      Icons.sync_rounded,
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Wrap(
+          spacing: context.space(factor: 1.25),
+          runSpacing: context.space(factor: 1.25),
+          children: [
+            for (final (typeIndex, engagementType) in types.indexed)
+              _EngagementTypeChipWidget(
+                type: engagementType,
+                icon: engagementIcons[typeIndex % engagementIcons.length],
+                maxWidth: constraints.maxWidth,
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _EngagementTypeChipWidget extends StatelessWidget {
+  const _EngagementTypeChipWidget({
+    required this.type,
+    required this.icon,
+    required this.maxWidth,
+  });
+
+  final String type;
+  final IconData icon;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: _HoverPopWidget(
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.space(factor: 1.5),
+            vertical: context.space(),
+          ),
+          decoration: BoxDecoration(
+            color: palette.surface.surface.color,
+            borderRadius: BorderRadius.circular(
+              context.dimen.radiusLevel2.value,
+            ),
+            border: Border.all(color: accent.withAlpha(65)),
+            boxShadow: [
+              BoxShadow(
+                color: accent.withAlpha(14),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: context.space(),
+            children: [
+              Container(
+                padding: EdgeInsets.all(context.space(factor: 0.75)),
+                decoration: BoxDecoration(
+                  color: accent.withAlpha(28),
+                  borderRadius: BorderRadius.circular(
+                    context.dimen.radiusLevel1.value,
+                  ),
+                ),
+                child: Icon(icon, size: 18, color: accent),
+              ),
+              Flexible(
+                child: DSTextWidget(
+                  type,
+                  style: context.typography.emphasizedBodyMedium,
+                  color: palette.neutral.grey10,
+                ),
+              ),
+              Icon(
+                Icons.arrow_outward_rounded,
+                size: 15,
+                color: accent.withAlpha(190),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TechnologyStackWidget extends StatelessWidget {
+  const _TechnologyStackWidget({required this.technologies});
+
+  final List<String> technologies;
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: context.space(factor: 0.5),
-      runSpacing: context.space(factor: 0.5),
+      spacing: context.space(factor: 1.5),
+      runSpacing: context.space(factor: 1.5),
       children: [
-        for (final tag in tags) _HoverPopWidget(child: DSTagWidget(label: tag)),
+        for (final (technologyIndex, technology) in technologies.indexed)
+          _TechnologyChipWidget(technology: technology, index: technologyIndex),
       ],
+    );
+  }
+}
+
+class _TechnologyChipWidget extends StatelessWidget {
+  const _TechnologyChipWidget({required this.technology, required this.index});
+
+  final String technology;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+
+    return _HoverPopWidget(
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.space(factor: 1.25),
+          vertical: context.space(factor: 0.85),
+        ),
+        decoration: BoxDecoration(
+          color: palette.surface.surface.color,
+          borderRadius: BorderRadius.circular(context.space(factor: 0.75)),
+          border: Border.all(color: accent.withAlpha(75)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: context.space(factor: 0.75),
+          children: [
+            Icon(
+              index.isEven ? Icons.terminal_rounded : Icons.code_rounded,
+              size: 17,
+              color: accent,
+            ),
+            DSTextWidget(
+              technology,
+              style: context.typography.emphasizedLabelLarge,
+              color: palette.neutral.grey10,
+            ),
+            Container(
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _IdealForWidget extends StatelessWidget {
+  const _IdealForWidget({required this.audiences});
+
+  final List<String> audiences;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: context.space(factor: 1.5),
+      children: [
+        for (final (audienceIndex, audience) in audiences.indexed)
+          _IdealAudienceCardWidget(audience: audience, index: audienceIndex),
+      ],
+    );
+  }
+}
+
+class _IdealAudienceCardWidget extends StatelessWidget {
+  const _IdealAudienceCardWidget({required this.audience, required this.index});
+
+  final String audience;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(context.space(factor: 1.5)),
+      decoration: BoxDecoration(
+        color: palette.surface.surface.color.withAlpha(150),
+        borderRadius: BorderRadius.circular(context.dimen.radiusLevel2.value),
+        border: Border.all(color: accent.withAlpha(65)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: context.space(factor: 1.25),
+        children: [
+          Container(
+            padding: EdgeInsets.all(context.space(factor: 0.5)),
+            decoration: BoxDecoration(
+              color: accent.withAlpha(28),
+              borderRadius: BorderRadius.circular(
+                context.dimen.radiusLevel1.value,
+              ),
+            ),
+            child: Icon(
+              index.isEven ? Icons.bolt_rounded : Icons.arrow_forward_rounded,
+              size: 18,
+              color: accent,
+            ),
+          ),
+          Expanded(
+            child: DSTextWidget(
+              audience,
+              style: context.typography.bodyMedium,
+              color: palette.neutral.grey10,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -35,7 +35,7 @@ class ServiceScreen extends StatelessWidget {
             onResume: () => context.bloc.add(ScreenVisibleEvent()),
             child: Scaffold(
               backgroundColor: context.colorPalette.background.color,
-              body: ContentWidget(service: service),
+              body: SafeArea(child: ContentWidget(service: service)),
             ),
           );
         },

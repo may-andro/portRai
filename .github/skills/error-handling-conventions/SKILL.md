@@ -40,6 +40,14 @@ class GetAppStoreUrlUnknownFailure extends GetAppStoreUrlFailure {
 `Failure`s are what blocs put into state and what the UI renders — they are
 **not** reported to crash/error reporting on their own.
 
+### Use cases never throw
+
+A use case never throws to its caller and never uses `throw` for its own domain outcomes:
+it always resolves to `Left(failure)` or `Right(value)`. Return `Left(...)` explicitly for
+expected cases; exceptions are reserved for infrastructure/repository errors and are mapped by
+a total `mapErrorToFailure` (ending in an `Unknown` failure). See
+`flutter-architecture-conventions` for the code example.
+
 ### Repository exception boundary
 
 Repositories propagate infrastructure exceptions or normalize them into typed exceptions;
@@ -87,8 +95,8 @@ ad hoc at call sites.
 
 ## Don't invent
 
-- Don't substitute exceptions for use case result failures — every use case failure extends
-  `BasicFailure`. Typed repository exceptions cross the data boundary and are mapped by the
+- Don't `throw` from a use case or substitute exceptions for use case result failures — every use
+  case failure extends `BasicFailure` and is returned as `Left`. Typed repository exceptions cross the data boundary and are mapped by the
   use case before reaching presentation.
 - Don't call `ErrorReporter`/`FatalErrorController` directly from a bloc to
   report a `Failure` — logging/reporting of use case failures is already

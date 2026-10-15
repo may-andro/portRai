@@ -1,100 +1,203 @@
-import 'dart:math';
+part of 'content_widget.dart';
 
-import 'package:collection/collection.dart';
-import 'package:design_system/design_system.dart';
-import 'package:flutter/material.dart';
-import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/service/domain/_domain.dart';
+class _DetailQuoteBandWidget extends StatefulWidget {
+  const _DetailQuoteBandWidget({required this.detail, required this.imageUrl});
 
-part 'section_widget.dart';
+  final String detail;
+  final String imageUrl;
 
-part 'header_widget.dart';
+  @override
+  State<_DetailQuoteBandWidget> createState() => _DetailQuoteBandWidgetState();
+}
 
-part 'faq_widget.dart';
+class _DetailQuoteBandWidgetState extends State<_DetailQuoteBandWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _imageController;
 
-part 'motion_widget.dart';
+  @override
+  void initState() {
+    super.initState();
+    _imageController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 9),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _imageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final isMobile = context.isMobile;
+    final quoteBackground = palette.surface.inverseSurface.color;
+    final quoteGradientEnd = Color.alphaBlend(
+      palette.accent.color.withAlpha(72),
+      quoteBackground,
+    );
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          end: Alignment.bottomRight,
+          colors: [quoteBackground, quoteGradientEnd],
+        ),
+      ),
+      child: ClipRect(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: _imageController,
+                builder: (context, _) {
+                  final floatOffset = (_imageController.value - 0.5) * 8;
+
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: FractionallySizedBox(
+                      widthFactor: isMobile ? 0.55 : 0.42,
+                      heightFactor: 1,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: context.space(),
+                        ),
+                        child: Transform.translate(
+                          offset: Offset(0, floatOffset),
+                          child: Opacity(
+                            opacity: 0.38,
+                            child: ColorFiltered(
+                              colorFilter: ColorFilter.mode(
+                                palette.accent.color,
+                                BlendMode.srcATop,
+                              ),
+                              child: SizedBox.expand(
+                                child: DSNetworkImageWidget(
+                                  url: widget.imageUrl,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.horizontalPadding,
+                vertical: context.space(factor: 6),
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: context.space(factor: 2),
+                    children: [
+                      Icon(
+                        Icons.format_quote_rounded,
+                        size: context.isMobile ? 34 : 42,
+                        color: palette.accent.color,
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: context.space()),
+                          child: DSTextWidget(
+                            widget.detail,
+                            style: context.typography.bodyLarge,
+                            color: palette.surface.onInverseSurface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /// Details of a [ServiceEntity], laid out as a column of styled sections.
-class ServiceDetailWidget extends StatelessWidget {
-  const ServiceDetailWidget({super.key, required this.service});
+class _ServiceDetailWidget extends StatelessWidget {
+  const _ServiceDetailWidget({required this.service});
 
   final ServiceEntity service;
 
   @override
   Widget build(BuildContext context) {
+    final localizations = context.localizations;
+    final sections = [
+      if (service.deliverables.isNotEmpty)
+        (
+          title: localizations.serviceDetailDeliverables,
+          icon: Icons.inventory_2_outlined,
+          backgroundAsset: null,
+          child: _DeliverablesWidget(deliverables: service.deliverables),
+        ),
+      if (service.process.isNotEmpty)
+        (
+          title: localizations.serviceDetailProcess,
+          icon: Icons.route_outlined,
+          backgroundAsset: null,
+          child: _StepsWidget(steps: service.process),
+        ),
+      if (service.technologies.isNotEmpty)
+        (
+          title: localizations.serviceDetailTechnologies,
+          icon: Icons.code_rounded,
+          backgroundAsset: 'assets/service/technology_background.jpg',
+          child: _TechnologyStackWidget(technologies: service.technologies),
+        ),
+      if (service.idealFor.isNotEmpty)
+        (
+          title: localizations.serviceDetailIdealFor,
+          icon: Icons.track_changes_rounded,
+          backgroundAsset: null,
+          child: _IdealForWidget(audiences: service.idealFor),
+        ),
+      if (service.engagementTypes.isNotEmpty)
+        (
+          title: localizations.serviceDetailEngagement,
+          icon: Icons.handshake_outlined,
+          backgroundAsset: null,
+          child: _EngagementTypesWidget(types: service.engagementTypes),
+        ),
+      if (service.faq.isNotEmpty)
+        (
+          title: localizations.serviceDetailFaq,
+          icon: Icons.help_outline_rounded,
+          backgroundAsset: 'assets/service/faq_background.jpg',
+          child: _FaqWidget(faq: service.faq),
+        ),
+    ];
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: context.space(factor: 3),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _RevealWidget(
-          child: _HoverLiftWidget(child: _HeaderWidget(service: service)),
-        ),
-        _RevealWidget(
-          index: 1,
-          child: Container(
-            padding: EdgeInsets.only(left: context.space(factor: 2)),
-            decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: context.colorPalette.accent.color,
-                  width: 3,
-                ),
-              ),
-            ),
-            child: DSTextWidget(
-              service.detail,
-              style: context.typography.titleMedium,
-              color: context.colorPalette.neutral.grey10,
-              isItalic: true,
-            ),
+          child: _DetailQuoteBandWidget(
+            detail: service.detail,
+            imageUrl: service.image,
           ),
         ),
-        if (service.deliverables.isNotEmpty)
+        for (final (sectionIndex, section) in sections.indexed)
           _SectionWidget(
-            title: context.localizations.serviceDetailDeliverables,
-            icon: Icons.inventory_2_outlined,
-            child: _CheckListWidget(
-              items: service.deliverables,
-              icon: Icons.check_circle_rounded,
-            ),
-          ),
-        if (service.process.isNotEmpty)
-          _SectionWidget(
-            title: context.localizations.serviceDetailProcess,
-            style: _SectionStyle.plain,
-            icon: Icons.route_outlined,
-            child: _StepsWidget(steps: service.process),
-          ),
-        if (service.technologies.isNotEmpty)
-          _SectionWidget(
-            title: context.localizations.serviceDetailTechnologies,
-            style: _SectionStyle.dark,
-            icon: Icons.code_rounded,
-            child: _TagsWidget(tags: service.technologies),
-          ),
-        if (service.idealFor.isNotEmpty)
-          _SectionWidget(
-            title: context.localizations.serviceDetailIdealFor,
-            style: _SectionStyle.accentBar,
-            icon: Icons.track_changes_rounded,
-            child: _CheckListWidget(
-              items: service.idealFor,
-              icon: Icons.arrow_circle_right_rounded,
-            ),
-          ),
-        if (service.engagementTypes.isNotEmpty)
-          _SectionWidget(
-            title: context.localizations.serviceDetailEngagement,
-            style: _SectionStyle.outlined,
-            icon: Icons.handshake_outlined,
-            child: _TagsWidget(tags: service.engagementTypes),
-          ),
-        if (service.faq.isNotEmpty)
-          _SectionWidget(
-            title: context.localizations.serviceDetailFaq,
-            style: _SectionStyle.neutral,
-            icon: Icons.help_outline_rounded,
-            child: _FaqWidget(faq: service.faq),
+            title: section.title,
+            icon: section.icon,
+            isAlternate: sectionIndex.isOdd,
+            backgroundAsset: section.backgroundAsset,
+            child: section.child,
           ),
       ],
     );
