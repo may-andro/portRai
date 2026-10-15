@@ -74,6 +74,24 @@ jobs:
       - name: Use CocoaPods for iOS dependencies
         run: flutter config --no-enable-swift-package-manager
 
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ inputs.app-path }}/ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: ios-pods-${{ runner.os }}-${{ hashFiles(format('{0}/ios/Podfile', inputs.app-path), '**/pubspec.yaml') }}
+          restore-keys: |
+            ios-pods-${{ runner.os }}-
+
+      - name: Cache Xcode build intermediates
+        uses: actions/cache@v4
+        with:
+          path: ${{ inputs.app-path }}/build/ios/Pods.build
+          key: ios-xcode-${{ runner.os }}-${{ hashFiles(format('{0}/ios/Podfile', inputs.app-path), '**/pubspec.yaml') }}
+          restore-keys: |
+            ios-xcode-${{ runner.os }}-
+
       - name: Generate workspace code
         uses: ./.github/actions/generate-workspace-code
         with:
