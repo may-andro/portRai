@@ -64,6 +64,8 @@ flutter:
     - assets/profile/education.jpg
     - assets/profile/contact_background.jpg
     - assets/profile/contact_phone.jpg
+    - assets/service/faq_background.jpg
+    - assets/service/technology_background.jpg
     - assets/dashboard/experiences.json
     - assets/dashboard/expertise.json
     - assets/dashboard/profile.json

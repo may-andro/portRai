@@ -13,14 +13,6 @@ sealed class AiImageGenException implements AppException {
   }
 }
 
-class AiImageUnavailableException extends AiImageGenException {
-  const AiImageUnavailableException({super.cause});
-}
-
-class AiImageFeatureDisabledException extends AiImageGenException {
-  const AiImageFeatureDisabledException({super.cause});
-}
-
 class AiImageSourceException extends AiImageGenException {
   const AiImageSourceException({super.cause});
 }

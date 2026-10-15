@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
-import 'package:portrai/src/feature/service/presentation/screen/service/widget/service_detail_widget.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/widget/_widget.dart';
 
+import '../../../../../../../mock/feature/service/presentation/screen/service/bloc/mock_service_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
 
@@ -36,18 +38,48 @@ void main() {
   ) async {
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: SingleChildScrollView(
-          child: ServiceDetailWidget(service: service),
+        child: BlocProvider<ServiceBloc>.value(
+          value: MockServiceBloc()..stubState(const LoadingState()),
+          child: ContentWidget(service: service),
         ),
       ),
     );
     await tester.pump(const Duration(seconds: 1));
-    return AppLocalizations.of(
-      tester.element(find.byType(ServiceDetailWidget)),
-    );
+    return AppLocalizations.of(tester.element(find.byType(ContentWidget)));
   }
 
-  group('ServiceDetailWidget', () {
+  group('Service details', () {
+    testWidgets(
+      'should wrap long audience chips within the screen width on mobile',
+      (tester) async {
+        const mobileWidth = 390.0;
+        tester.view.physicalSize = const Size(mobileWidth, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        const serviceWithLongAudiences = ServiceEntity(
+          image: 'service.png',
+          title: 'App Development',
+          description: 'Beautiful apps',
+          detail: 'Detailed service description',
+          idealFor: [
+            'Apps that must connect to APIs, Firebase or GraphQL backends',
+            'Products that need real-time data such as live maps or order tracking',
+          ],
+        );
+        await pump(tester, serviceWithLongAudiences);
+
+        for (final audience in serviceWithLongAudiences.idealFor) {
+          expect(find.text(audience), findsOneWidget);
+          expect(
+            tester.getRect(find.text(audience)).right,
+            lessThanOrEqualTo(mobileWidth),
+          );
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('should hide optional sections when the lists are empty', (
       tester,
     ) async {
@@ -70,10 +102,7 @@ void main() {
       expect(find.text(l10n.serviceDetailDeliverables), findsOneWidget);
       expect(find.text(l10n.serviceDetailProcess), findsOneWidget);
       expect(find.text(l10n.serviceDetailTechnologies), findsOneWidget);
-      expect(
-        find.text(l10n.serviceDetailIdealFor.toUpperCase()),
-        findsOneWidget,
-      );
+      expect(find.text(l10n.serviceDetailIdealFor), findsOneWidget);
       expect(find.text(l10n.serviceDetailEngagement), findsOneWidget);
       expect(find.text(l10n.serviceDetailFaq), findsOneWidget);
       expect(find.text('How long?'), findsOneWidget);
