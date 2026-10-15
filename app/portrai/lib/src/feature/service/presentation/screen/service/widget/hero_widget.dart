@@ -51,22 +51,37 @@ class _HeroWidgetState extends State<_HeroWidget>
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1100),
-                    child: Row(
-                      spacing: context.space(factor: isWide ? 4 : 1),
-                      children: [
-                        Expanded(
-                          child: _HeroCopyWidget(
-                            service: widget.service,
-                            isWide: isWide,
+                    child: isWide
+                        ? Row(
+                            spacing: context.space(factor: 4),
+                            children: [
+                              Expanded(
+                                child: _HeroCopyWidget(
+                                  service: widget.service,
+                                  isWide: true,
+                                ),
+                              ),
+                              _ServiceIconWidget(
+                                imageUrl: widget.service.image,
+                                animation: _backgroundController,
+                                isMobile: false,
+                              ),
+                            ],
+                          )
+                        : Column(
+                            spacing: context.space(factor: 3),
+                            children: [
+                              _ServiceIconWidget(
+                                imageUrl: widget.service.image,
+                                animation: _backgroundController,
+                                isMobile: true,
+                              ),
+                              _HeroCopyWidget(
+                                service: widget.service,
+                                isWide: false,
+                              ),
+                            ],
                           ),
-                        ),
-                        _ServiceIconWidget(
-                          imageUrl: widget.service.image,
-                          animation: _backgroundController,
-                          isMobile: context.isMobile,
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),

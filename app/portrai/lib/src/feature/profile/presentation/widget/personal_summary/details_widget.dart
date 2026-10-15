@@ -43,7 +43,7 @@ class _DetailsWidget extends StatelessWidget {
             DSTextWidget(
               profile.subtitle,
               style: context.typography.emphasizedTitleMedium,
-              color: context.colorPalette.accent,
+              color: onSurface,
               textAlign: textAlign,
             ),
             Wrap(
@@ -144,7 +144,7 @@ class _AccentBarWidget extends StatelessWidget {
           width: context.space(factor: isHovering ? 14 : 8),
           height: 4,
           decoration: BoxDecoration(
-            color: context.colorPalette.accent.color,
+            color: context.colorPalette.surface.onInverseSurface.color,
             borderRadius: BorderRadius.circular(2),
           ),
         );

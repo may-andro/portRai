@@ -33,14 +33,16 @@ class _SocialLinksWidget extends StatelessWidget {
               );
             },
             customBorder: const CircleBorder(),
-            splashColor: Colors.blue,
+            splashColor: context.colorPalette.brand.secondary.color.withAlpha(
+              30,
+            ),
             child: _CardWidget(
               animationDelay: (100 + index * 300).ms,
               animationBegin: 1 + (index * 0.2),
               isVisible: isVisible,
               child: DSNetworkImageWidget(
                 url: socialHandle.image,
-                color: context.colorPalette.brand.secondary,
+                color: context.colorPalette.brand.onSecondaryContainer,
                 width: context.socialHandleIconSize,
                 height: context.socialHandleIconSize,
                 fit: BoxFit.cover,
@@ -68,8 +70,8 @@ class _CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardColor = context.colorPalette.surface.inverseOnSurface;
-    final borderColor = context.colorPalette.brand.secondary;
+    final cardColor = context.colorPalette.brand.secondaryContainer;
+    final borderColor = context.colorPalette.outline.outlineVariant;
     return DSHoverableContainerWidget(
           builder: (context, isHovering) {
             return AnimatedSlide(
@@ -88,14 +90,21 @@ class _CardWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isHovering
-                        ? borderColor.color.withAlpha(50)
+                        ? Color.alphaBlend(
+                            context.colorPalette.brand.secondary.color
+                                .withAlpha(20),
+                            cardColor.color,
+                          )
                         : cardColor.color,
-                    border: Border.all(color: borderColor.color, width: 2),
+                    border: Border.all(
+                      color: isHovering
+                          ? context.colorPalette.brand.secondary.color
+                          : borderColor.color,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: borderColor.color.withAlpha(
-                          isHovering ? 140 : 70,
-                        ),
+                        color: context.colorPalette.utility.shadow.color
+                            .withAlpha(isHovering ? 30 : 12),
                         blurRadius:
                             context.dimen.radiusLevel1.value *
                             (isHovering ? 2 : 1),
