@@ -16,39 +16,24 @@ class IsAppUpdateRequiredUnknownFailure extends IsAppUpdateRequiredFailure {
 }
 
 /// Checks whether the currently running app version is below the
-/// `minimumRequiredAppVersion` configured in [AppConfig].
+/// `minimumRequiredAppVersion` configured in [PortraiAppConfigEntity].
 @register
 class IsAppUpdateRequiredUseCase
     extends BaseNoParamUseCase<bool, IsAppUpdateRequiredFailure> {
-  IsAppUpdateRequiredUseCase(
-    this._getMinimumRequiredAppVersionUseCase,
-    this._appVersionRepository,
-  );
+  IsAppUpdateRequiredUseCase(this._appConfig, this._appVersionRepository);
 
-  final GetMinimumRequiredAppVersionUseCase
-  _getMinimumRequiredAppVersionUseCase;
+  final PortraiAppConfigEntity _appConfig;
   final AppVersionRepository _appVersionRepository;
 
   @protected
   @override
   FutureOr<Either<IsAppUpdateRequiredFailure, bool>> execute() async {
-    final minimumRequiredAppVersionResult =
-        await _getMinimumRequiredAppVersionUseCase();
-
-    if (minimumRequiredAppVersionResult.isLeft) {
-      return Left(
-        IsAppUpdateRequiredUnknownFailure(
-          cause: minimumRequiredAppVersionResult.left,
-        ),
-      );
-    }
-
     final currentAppVersion = await _appVersionRepository
         .getCurrentAppVersion();
 
     return Right(
       currentAppVersion.isLowerVersionThan(
-        minimumRequiredAppVersionResult.right,
+        _appConfig.minimumRequiredAppVersion,
       ),
     );
   }
