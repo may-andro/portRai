@@ -38,6 +38,8 @@
 		<string>superhuman</string>
 		<string>protonmail</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>PortRai displays locations on maps. Your location is only used to show your position on the map if you choose to enable it, and it is never collected or stored.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
