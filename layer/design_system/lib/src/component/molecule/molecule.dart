@@ -4,6 +4,7 @@ export 'ds_availability_badge_widget.dart';
 export 'ds_avatar_name_widget.dart';
 export 'ds_detail_section_widget.dart';
 export 'ds_expandable_card_widget.dart';
+export 'ds_festive_backdrop_widget.dart';
 export 'ds_floating_shapes_background_widget.dart';
 export 'ds_gradient_blob_widget.dart';
 export 'ds_hoverable_container_widget.dart';

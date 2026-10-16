@@ -3,26 +3,15 @@ part of 'footer_widget.dart';
 class _IntroWidget extends StatelessWidget {
   const _IntroWidget();
 
-  static double getHeight(BuildContext context) {
-    return max(
-      _ImageWidget.getHeight(context),
-      _TaglineWidget.getHeight(context),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: getHeight(context),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: context.space(),
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          _ImageWidget(),
-          Flexible(child: Center(child: _TaglineWidget())),
-        ],
-      ),
+    return Row(
+      spacing: context.space(),
+      mainAxisSize: MainAxisSize.min,
+      children: const [
+        _ImageWidget(),
+        Flexible(child: _TaglineWidget()),
+      ],
     );
   }
 }
@@ -36,24 +25,23 @@ class _ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The logo shrinks on narrow layouts so the tagline keeps its room.
+    final size = min(
+      getHeight(context),
+      MediaQuery.sizeOf(context).width * 0.15,
+    );
     return Image.asset(
       DSImage.logoPath,
       package: 'design_system',
       color: context.colorPalette.surface.onInverseSurface.color,
-      height: getHeight(context),
-      width: getHeight(context),
+      height: size,
+      width: size,
     );
   }
 }
 
 class _TaglineWidget extends StatelessWidget {
   const _TaglineWidget();
-
-  static double getHeight(BuildContext context) {
-    return context.nameTextHeight +
-        context.taglineTextHeight +
-        context.space(factor: 0.25);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +61,7 @@ class _TaglineWidget extends StatelessWidget {
           context.localizations.footerPitch,
           style: context.taglineTextStyle,
           color: context.colorPalette.onInverseSurface,
-          maxLines: 1,
+          maxLines: 3,
           textOverflow: TextOverflow.ellipsis,
         ),
       ],
@@ -85,8 +73,4 @@ extension on BuildContext {
   DSTextStyle get nameTextStyle => typography.emphasizedTitleMedium;
 
   DSTextStyle get taglineTextStyle => typography.labelSmall;
-
-  double get nameTextHeight => getTextHeight(nameTextStyle, 1);
-
-  double get taglineTextHeight => getTextHeight(taglineTextStyle, 1);
 }

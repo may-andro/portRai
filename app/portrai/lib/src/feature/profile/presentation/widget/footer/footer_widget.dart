@@ -16,6 +16,8 @@ part 'copytext_widget.dart';
 
 part 'download_app_widget.dart';
 
+part 'festive_banner_widget.dart';
+
 part 'help_widget.dart';
 
 part 'intro_widget.dart';
@@ -62,27 +64,50 @@ class _SuccessWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ColoredBox(
       color: context.colorPalette.surface.inverseSurface.color,
-      child: SafeArea(
-        child: Column(
-          spacing: context.space(factor: 2),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const DSVerticalSpacerWidget(1),
-            DSResponsiveWidthContainerWidget(
-              xsBuilder: (_) => const _MobileContentWidget(),
-              sBuilder: (_) => const _TabletContentWidget(),
-              mBuilder: (_) => const _TabletContentWidget(),
-              lBuilder: (_) => const _DesktopContentWidget(),
-              xlBuilder: (_) => const _DesktopContentWidget(),
+      child: Stack(
+        children: [
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DSFestiveBackdropWidget(
+                shape: DSFestiveBackdropShape.rectangle,
+                particleCount: 40,
+                effectOpacity: 0.7,
+              ),
             ),
-            DSHorizontalDividerWidget(
-              color: context.colorPalette.border,
-              thickness: 1,
+          ),
+          // Scrim keeps the text legible over the festive effect.
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ColoredBox(
+                color: context.colorPalette.surface.inverseSurface.color
+                    .withValues(alpha: 0.55),
+              ),
             ),
-            const Align(child: _CopytextWidget()),
-            const DSVerticalSpacerWidget(2),
-          ],
-        ),
+          ),
+          SafeArea(
+            child: Column(
+              spacing: context.space(factor: 2),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const DSVerticalSpacerWidget(1),
+                DSResponsiveWidthContainerWidget(
+                  xsBuilder: (_) => const _MobileContentWidget(),
+                  sBuilder: (_) => const _TabletContentWidget(),
+                  mBuilder: (_) => const _TabletContentWidget(),
+                  lBuilder: (_) => const _DesktopContentWidget(),
+                  xlBuilder: (_) => const _DesktopContentWidget(),
+                ),
+                DSHorizontalDividerWidget(
+                  color: context.colorPalette.border,
+                  thickness: 1,
+                ),
+                const Align(child: _CopytextWidget()),
+                const DSVerticalSpacerWidget(2),
+              ],
+            ),
+          ),
+          const Positioned(right: 0, bottom: 0, child: _FestiveBannerWidget()),
+        ],
       ),
     );
   }

@@ -1096,5 +1096,63 @@
   "experienceOlderRole": "Earlier role",
   "@experienceOlderRole": {
     "description": "Label for the experience that started before the current one"
+  },
+  "festiveBannerTitle": "Celebrating {festival}",
+  "@festiveBannerTitle": {
+    "description": "Footer banner announcing the active festive theme",
+    "placeholders": {
+      "festival": {
+        "type": "String",
+        "example": "Diwali"
+      }
+    }
+  },
+  "festivalNameBeltane": "Beltane",
+  "@festivalNameBeltane": {
+    "description": "Display name of the Beltane festive theme"
+  },
+  "festivalNameCarnival": "Carnival",
+  "@festivalNameCarnival": {
+    "description": "Display name of the Carnival festive theme"
+  },
+  "festivalNameChuseok": "Chuseok",
+  "@festivalNameChuseok": {
+    "description": "Display name of the Chuseok festive theme"
+  },
+  "festivalNameDiwali": "Diwali",
+  "@festivalNameDiwali": {
+    "description": "Display name of the Diwali festive theme"
+  },
+  "festivalNameHalloween": "Halloween",
+  "@festivalNameHalloween": {
+    "description": "Display name of the Halloween festive theme"
+  },
+  "festivalNameHogeras": "Hogueras",
+  "@festivalNameHogeras": {
+    "description": "Display name of the Hogueras festive theme"
+  },
+  "festivalNameHogmanay": "Hogmanay",
+  "@festivalNameHogmanay": {
+    "description": "Display name of the Hogmanay festive theme"
+  },
+  "festivalNameHoli": "Holi",
+  "@festivalNameHoli": {
+    "description": "Display name of the Holi festive theme"
+  },
+  "festivalNameObon": "Obon",
+  "@festivalNameObon": {
+    "description": "Display name of the Obon festive theme"
+  },
+  "festivalNamePachamama": "Pachamama",
+  "@festivalNamePachamama": {
+    "description": "Display name of the Pachamama festive theme"
+  },
+  "festivalNameSakura": "Sakura",
+  "@festivalNameSakura": {
+    "description": "Display name of the Sakura festive theme"
+  },
+  "festivalNameXmas": "Christmas",
+  "@festivalNameXmas": {
+    "description": "Display name of the Christmas festive theme"
   }
 }
