@@ -12,7 +12,7 @@ class _BackgroundBandWidget extends StatelessWidget {
     if (profile.educations.isEmpty) return const SizedBox.shrink();
     final palette = context.colorPalette;
 
-    return _BandWidget(
+    return PageBandWidget(
       verticalFactor: isDesktop ? 4 : 3,
       background: Stack(
         fit: StackFit.expand,
@@ -38,7 +38,10 @@ class _BackgroundBandWidget extends StatelessWidget {
         runSpacing: context.space(factor: 2),
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          _EyebrowWidget(context.localizations.profileEducation, onDark: true),
+          PageEyebrowWidget(
+            context.localizations.profileEducation,
+            onDark: true,
+          ),
           for (final education in profile.educations)
             _EducationStripItemWidget(education: education),
         ],
@@ -54,7 +57,7 @@ class _EducationStripItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.03,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -80,12 +83,12 @@ class _EducationStripItemWidget extends StatelessWidget {
                 DSTextWidget(
                   '${education.degree} · ${education.field}',
                   style: context.typography.emphasizedBodyLarge,
-                  color: _white,
+                  color: pageOnDarkColor,
                 ),
                 DSTextWidget(
                   '${education.institution}, ${education.location}',
                   style: context.typography.bodySmall,
-                  color: _white,
+                  color: pageOnDarkColor,
                 ),
               ],
             ),

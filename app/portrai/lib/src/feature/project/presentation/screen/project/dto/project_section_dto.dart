@@ -4,6 +4,8 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/_widget.dart';
+import 'package:portrai/src/widget/page_band_widget.dart';
+import 'package:portrai/src/widget/page_image_backdrop_widget.dart';
 import 'package:tracking/tracking.dart';
 
 abstract class ProjectSectionDTO {
@@ -69,15 +71,11 @@ class OverviewSectionDTO extends ScrollableProjectSectionDTO {
   @override
   @protected
   Widget buildContent(BuildContext context) {
-    return ProjectSectionPanelWidget(
+    return PageSectionBandWidget(
       title: getTitle(context),
-      icon: icon,
-      eyebrow: true,
-      child: DSTextWidget(
-        project.longDescription,
-        color: context.colorPalette.neutral.grey10,
-        style: context.typography.bodyLarge,
-      ),
+      color: context.colorPalette.surface.surface.color,
+      background: ProjectImageBackdropWidget(imageUrl: project.image),
+      child: ProjectOverviewWidget(project: project),
     );
   }
 }
@@ -100,10 +98,49 @@ class TechnologiesSectionDTO extends ScrollableProjectSectionDTO {
   @override
   @protected
   Widget buildContent(BuildContext context) {
-    return ProjectSectionPanelWidget(
+    final washColor = context.colorPalette.surface.surface.color;
+    // Mirrored image, washed from top to bottom, so it reads differently
+    // from the experience page's side-lit version.
+    return PageSectionBandWidget(
       title: getTitle(context),
-      icon: icon,
-      child: ProjectTechListWidget(items: project.technologies),
+      color: washColor,
+      background: PageImageBackdropWidget(
+        asset: 'assets/service/technology_background.jpg',
+        washColor: washColor,
+        isFlipped: true,
+        imageAlignment: Alignment.bottomCenter,
+        washBegin: Alignment.topCenter,
+        washEnd: Alignment.bottomCenter,
+        washOpacityAtBegin: 0.96,
+        washOpacityAtEnd: 0.82,
+      ),
+      child: ProjectTechMarqueeWidget(items: project.technologies),
+    );
+  }
+}
+
+class MarketsSectionDTO extends ScrollableProjectSectionDTO {
+  MarketsSectionDTO(ProjectEntity project)
+    : super(
+        trackingId: 'project_markets_section',
+        sectionKey: GlobalKey(),
+        project: project,
+      );
+
+  @override
+  String getTitle(BuildContext context) =>
+      context.localizations.projectFactMarkets;
+
+  @override
+  IconData get icon => Icons.public_rounded;
+
+  @override
+  @protected
+  Widget buildContent(BuildContext context) {
+    return PageSectionBandWidget(
+      title: getTitle(context),
+      color: context.colorPalette.surface.surface.color,
+      child: ProjectMarketsWidget(markets: project.markets),
     );
   }
 }
@@ -126,10 +163,10 @@ class AchievementsSectionDTO extends ScrollableProjectSectionDTO {
   @override
   @protected
   Widget buildContent(BuildContext context) {
-    return ProjectSectionPanelWidget(
+    return PageSectionBandWidget(
       title: getTitle(context),
-      icon: icon,
-      child: ProjectAchievementListWidget(items: project.achievements),
+      color: context.colorPalette.surface.surfaceContainer.color,
+      child: ProjectAchievementStripWidget(items: project.achievements),
     );
   }
 }
@@ -152,11 +189,10 @@ class KeyFeaturesSectionDTO extends ScrollableProjectSectionDTO {
   @override
   @protected
   Widget buildContent(BuildContext context) {
-    return ProjectSectionPanelWidget(
+    return PageSectionBandWidget(
       title: getTitle(context),
-      icon: icon,
-      eyebrow: true,
-      child: ProjectFeatureListWidget(items: project.features),
+      color: context.colorPalette.surface.surfaceContainer.color,
+      child: ProjectFeatureBentoWidget(items: project.features),
     );
   }
 }
@@ -179,9 +215,19 @@ class AvailabilitiesSectionDTO extends ScrollableProjectSectionDTO {
   @override
   @protected
   Widget buildContent(BuildContext context) {
-    return ProjectSectionPanelWidget(
+    final palette = context.colorPalette;
+    const base = Color(0xFF0E1726);
+    return PageSectionBandWidget(
       title: getTitle(context),
-      icon: icon,
+      onDark: true,
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color.lerp(base, palette.brand.primary.color, 0.3)!,
+          Color.lerp(base, palette.brand.tertiary.color, 0.25)!,
+        ],
+      ),
       child: AvailabilitiesWidget(project: project),
     );
   }

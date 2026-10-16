@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/widget/section_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:tracking/tracking.dart';
 
 part 'desktop_content_widget.dart';
@@ -47,6 +47,7 @@ class _LoadingWidget extends StatelessWidget {
       impressionId: 'experience_loading_content_view',
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
       child: DSLoadingWidget(
+        style: DSLoadingStyle.lottie,
         size: max(context.shortestSide * 0.1, context.space(factor: 2)),
       ),
     );
@@ -94,9 +95,12 @@ class _SuccessWidgetState extends State<_SuccessWidget>
     // Create section widgets from experience entity
     _scrollableSections = [
       OverviewSectionWidget(experience: widget.experience),
-      TechnologiesSectionWidget(experience: widget.experience),
       AchievementsSectionWidget(experience: widget.experience),
       ResponsibilitiesSectionWidget(experience: widget.experience),
+      TechnologiesSectionWidget(experience: widget.experience),
+      if (widget.experience.latitude != null &&
+          widget.experience.longitude != null)
+        LocationSectionWidget(experience: widget.experience),
     ];
     _scrollController = ScrollController()..addListener(_onScroll);
     _tabController = TabController(
@@ -164,6 +168,30 @@ class _SuccessWidgetState extends State<_SuccessWidget>
         }
       }
     }
+  }
+}
+
+/// All scrollable sections followed by links to the neighbouring roles.
+class _SectionListWidget extends StatelessWidget {
+  const _SectionListWidget({required this.scrollableSections});
+
+  final List<ScrollableSectionWidget> scrollableSections;
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.state;
+    return Column(
+      children: [
+        ...scrollableSections,
+        if (state is LoadedState &&
+            (state.newerExperience != null || state.olderExperience != null))
+          AdjacentExperiencesSectionWidget(
+            experience: state.experience,
+            newerExperience: state.newerExperience,
+            olderExperience: state.olderExperience,
+          ),
+      ],
+    );
   }
 }
 

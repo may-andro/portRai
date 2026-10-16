@@ -17,7 +17,7 @@ class _AboutBandWidget extends StatelessWidget {
     );
     final text = _AboutTextWidget(profile: profile, isDesktop: isDesktop);
 
-    return _BandWidget(
+    return PageBandWidget(
       color: context.colorPalette.surface.surface.color,
       child: isDesktop
           ? Row(
@@ -45,7 +45,7 @@ class _AboutTextWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: context.space(factor: 2),
       children: [
-        _EyebrowWidget(context.localizations.profileAboutMe),
+        PageEyebrowWidget(context.localizations.profileAboutMe),
         DSTextWidget(
           profile.currentRole,
           style: isDesktop

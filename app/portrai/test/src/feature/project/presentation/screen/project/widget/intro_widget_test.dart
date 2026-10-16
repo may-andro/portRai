@@ -8,7 +8,7 @@ import '../../../../../../../util/test_wrapper_widget.dart';
 void main() {
   group('IntroWidget', () {
     testWidgets(
-      'should render localized info chips and use the project ID for the hero tag',
+      'should render the title and use the project ID for the hero tag',
       (tester) async {
         final project = createProjectEntity();
 
@@ -17,8 +17,8 @@ void main() {
         );
         await tester.pump(const Duration(seconds: 3));
 
-        expect(find.text('3 people'), findsOneWidget);
-        expect(find.text('Jan 2024 - Mar 2025'), findsOneWidget);
+        expect(find.text(project.title), findsOneWidget);
+        expect(find.text(project.description), findsOneWidget);
         expect(
           find.byWidgetPredicate(
             (widget) =>

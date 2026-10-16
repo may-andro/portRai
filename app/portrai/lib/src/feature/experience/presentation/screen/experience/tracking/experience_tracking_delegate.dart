@@ -31,4 +31,13 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
+
+  void trackAdjacentExperienceClick(String experienceId) {
+    trackEvent(
+      Tracking(
+        name: 'adjacent_experience',
+        action: ClickAction(label: experienceId),
+      ),
+    );
+  }
 }

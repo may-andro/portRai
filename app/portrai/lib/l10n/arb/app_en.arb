@@ -1040,5 +1040,41 @@
   "projectFactMarkets": "Markets",
   "@projectFactMarkets": {
     "description": "Label of the countries fact in the project header"
+  },
+  "experienceSectionOverview": "Overview",
+  "@experienceSectionOverview": {
+    "description": "Experience overview section title"
+  },
+  "experienceSectionAchievements": "Achievements",
+  "@experienceSectionAchievements": {
+    "description": "Experience achievements section title"
+  },
+  "experienceSectionResponsibilities": "Responsibilities",
+  "@experienceSectionResponsibilities": {
+    "description": "Experience responsibilities section title"
+  },
+  "experienceSectionTechnologies": "Technologies",
+  "@experienceSectionTechnologies": {
+    "description": "Experience technologies section title"
+  },
+  "experienceSectionLocation": "Location",
+  "@experienceSectionLocation": {
+    "description": "Experience location section title"
+  },
+  "experienceFactDuration": "Duration",
+  "@experienceFactDuration": {
+    "description": "Experience key fact label for time spent in the role"
+  },
+  "experienceKeepExploring": "Keep exploring",
+  "@experienceKeepExploring": {
+    "description": "Experience adjacent roles section title"
+  },
+  "experienceNewerRole": "Newer role",
+  "@experienceNewerRole": {
+    "description": "Label for the experience that started after the current one"
+  },
+  "experienceOlderRole": "Earlier role",
+  "@experienceOlderRole": {
+    "description": "Label for the experience that started before the current one"
   }
 }

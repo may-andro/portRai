@@ -37,6 +37,15 @@ final class HeaderTabClickEvent extends ExperienceEvent {
   List<Object?> get props => [trackingId];
 }
 
+final class AdjacentExperienceClickEvent extends ExperienceEvent {
+  const AdjacentExperienceClickEvent(this.experienceId);
+
+  final String experienceId;
+
+  @override
+  List<Object?> get props => [experienceId];
+}
+
 // Tracking Events
 final class ScreenVisibleEvent extends ExperienceEvent {
   const ScreenVisibleEvent();

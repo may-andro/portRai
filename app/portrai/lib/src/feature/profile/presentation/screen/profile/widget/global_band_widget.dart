@@ -36,7 +36,7 @@ class _GlobalBandWidget extends StatelessWidget {
       ],
     );
 
-    return _BandWidget(
+    return PageBandWidget(
       verticalFactor: isDesktop ? 5 : 3,
       gradient: LinearGradient(
         begin: Alignment.topLeft,
@@ -112,18 +112,18 @@ class _GlobalTextWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: context.space(factor: 2),
       children: [
-        _EyebrowWidget(localizations.profileGlobalEyebrow, onDark: true),
+        PageEyebrowWidget(localizations.profileGlobalEyebrow, onDark: true),
         DSTextWidget(
           localizations.profileGlobalTitle,
           style: isDesktop
               ? context.typography.emphasizedDisplaySmall
               : context.typography.emphasizedHeadlineMedium,
-          color: _white,
+          color: pageOnDarkColor,
         ),
         DSTextWidget(
           localizations.profileGlobalDescription,
           style: context.typography.bodyLarge,
-          color: _white,
+          color: pageOnDarkColor,
         ),
         SizedBox(height: context.space(factor: 0.5)),
         Wrap(
@@ -188,7 +188,7 @@ class _GlobalStatWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.05,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -198,15 +198,15 @@ class _GlobalStatWidget extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _CountUpWidget(
+              CountUpWidget(
                 value: value,
                 style: context.typography.emphasizedHeadlineMedium,
-                color: _white,
+                color: pageOnDarkColor,
               ),
               DSTextWidget(
                 label.toUpperCase(),
                 style: context.typography.emphasizedLabelMedium,
-                color: _white,
+                color: pageOnDarkColor,
               ),
             ],
           ),
@@ -223,7 +223,7 @@ class _CountryChipWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.06,
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -240,7 +240,7 @@ class _CountryChipWidget extends StatelessWidget {
         child: DSTextWidget(
           country,
           style: context.typography.emphasizedLabelLarge,
-          color: _white,
+          color: pageOnDarkColor,
         ),
       ),
     );
@@ -285,7 +285,7 @@ class _WorkMapWidgetState extends State<_WorkMapWidget> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.01,
       child: DecoratedBox(
         decoration: BoxDecoration(

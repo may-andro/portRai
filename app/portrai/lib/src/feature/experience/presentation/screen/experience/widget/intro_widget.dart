@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/extension/experience_date_range_extension.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
+import 'package:portrai/src/widget/page_band_widget.dart';
+import 'package:portrai/src/widget/page_chrome_widget.dart';
 
 class IntroWidget extends StatelessWidget {
   const IntroWidget({super.key, required this.experience});
@@ -19,124 +21,208 @@ class IntroWidget extends StatelessWidget {
     const base = Color(0xFF0E1726);
     final start = Color.lerp(base, palette.brand.primary.color, 0.25)!;
     final end = Color.lerp(base, palette.brand.tertiary.color, 0.2)!;
-    final radius = BorderRadius.circular(
-      context.dimen.radiusLevel3.value * 1.5,
-    );
     return LayoutBuilder(
       builder: (context, constraints) {
         // Judge by the card's own width, not the device, so it never gets squeezed.
         final isMobile = constraints.maxWidth < 760;
-        return _buildCard(context, isMobile, radius, start, end);
+        return _buildHero(context, isMobile, start, end);
       },
     );
   }
 
-  Widget _buildCard(
+  Widget _buildHero(
     BuildContext context,
     bool isMobile,
-    BorderRadius radius,
     Color start,
     Color end,
   ) {
     final palette = context.colorPalette;
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: radius,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [start, end],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: palette.brand.primary.color.withAlpha(50),
-            blurRadius: 40,
-            offset: const Offset(0, 18),
-          ),
-        ],
       ),
-      child: ClipRRect(
-        borderRadius: radius,
+      child: ClipRect(
         child: Stack(
           children: [
             Positioned(
               right: -context.space(factor: 10),
               top: -context.space(factor: 10),
-              child: _GlowWidget(color: palette.brand.primary.color),
+              child: _GlowWidget(
+                color: palette.brand.primary.color,
+                driftX: -40,
+                driftY: 30,
+              ),
             ),
             Positioned(
               left: -context.space(factor: 12),
               bottom: -context.space(factor: 12),
-              child: _GlowWidget(color: palette.brand.tertiary.color),
+              child: _GlowWidget(
+                color: palette.brand.tertiary.color,
+                driftX: 50,
+                driftY: -30,
+              ),
             ),
             Positioned.fill(child: _PatternWidget()),
+            Positioned.fill(
+              child: DSFloatingShapesBackgroundWidget(
+                color: Colors.white.withAlpha(60),
+                shapeCount: 22,
+              ),
+            ),
+            const Positioned.fill(child: _SheenWidget()),
             _WatermarkWidget(experience: experience, isMobile: isMobile),
-            Padding(
-              padding: EdgeInsets.all(context.space(factor: isMobile ? 3 : 5)),
-              child: isMobile
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: context.space(factor: 2.5),
-                      children: [
-                        _LogoWidget(experience: experience, compact: isMobile),
-                        _TitleBlockWidget(
-                          experience: experience,
-                          compact: isMobile,
-                        ),
-                        _StatsWidget(experience: experience),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: context.space(factor: 4),
-                      children: [
-                        Row(
-                          spacing: context.space(factor: 4),
-                          children: [
-                            _LogoWidget(
-                              experience: experience,
-                              compact: isMobile,
-                            ),
-                            Expanded(
-                              child: _TitleBlockWidget(
+            PageChromeWidget(
+              closeColor: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: pageHorizontalInset(context),
+                  vertical: context.space(factor: isMobile ? 4 : 8),
+                ),
+                child: isMobile
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: context.space(factor: 2.5),
+                        children: [
+                          _LogoWidget(
+                            experience: experience,
+                            compact: isMobile,
+                          ),
+                          _TitleBlockWidget(
+                            experience: experience,
+                            compact: isMobile,
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: context.space(factor: 4),
+                        children: [
+                          Row(
+                            spacing: context.space(factor: 4),
+                            children: [
+                              _LogoWidget(
                                 experience: experience,
                                 compact: isMobile,
                               ),
-                            ),
-                          ],
-                        ),
-                        _StatsWidget(experience: experience),
-                      ],
-                    ),
+                              Expanded(
+                                child: _TitleBlockWidget(
+                                  experience: experience,
+                                  compact: isMobile,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.06, end: 0);
+    ).animate().fadeIn(duration: 600.ms);
   }
 }
 
-class _PatternWidget extends StatelessWidget {
+/// Dot grid that slowly pans diagonally, like a moving texture.
+class _PatternWidget extends StatefulWidget {
+  @override
+  State<_PatternWidget> createState() => _PatternWidgetState();
+}
+
+class _PatternWidgetState extends State<_PatternWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: 12.seconds,
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(child: CustomPaint(painter: _DotGridPainter()));
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: CustomPaint(painter: _DotGridPainter(_controller)),
+      ),
+    );
   }
 }
 
 class _DotGridPainter extends CustomPainter {
+  _DotGridPainter(this.animation) : super(repaint: animation);
+
+  final Animation<double> animation;
+
+  static const _gap = 22.0;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withAlpha(22);
-    const gap = 22.0;
-    for (var x = gap / 2; x < size.width; x += gap) {
-      for (var y = gap / 2; y < size.height; y += gap) {
+    final paint = Paint()..color = Colors.white.withAlpha(26);
+    final shift = animation.value * _gap;
+    for (var x = -_gap + shift; x < size.width; x += _gap) {
+      for (var y = -_gap + shift; y < size.height; y += _gap) {
         canvas.drawCircle(Offset(x, y), 1.2, paint);
       }
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DotGridPainter oldDelegate) => false;
+}
+
+/// Soft diagonal light band that sweeps across the hero now and then.
+class _SheenWidget extends StatelessWidget {
+  const _SheenWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final bandWidth = constraints.maxWidth * 0.18;
+          return ClipRect(
+            child: OverflowBox(
+              alignment: Alignment.centerLeft,
+              maxWidth: double.infinity,
+              child:
+                  Transform.rotate(
+                        angle: 0.35,
+                        child: Container(
+                          width: bandWidth,
+                          height: constraints.maxHeight * 2,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withAlpha(0),
+                                Colors.white.withAlpha(22),
+                                Colors.white.withAlpha(0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .moveX(
+                        begin: -bandWidth,
+                        end: constraints.maxWidth + bandWidth,
+                        duration: 7.seconds,
+                        delay: 2.seconds,
+                        curve: Curves.easeInOut,
+                      ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _WatermarkWidget extends StatelessWidget {
@@ -184,28 +270,43 @@ class _WatermarkWidget extends StatelessWidget {
 }
 
 class _GlowWidget extends StatelessWidget {
-  const _GlowWidget({required this.color});
+  const _GlowWidget({
+    required this.color,
+    required this.driftX,
+    required this.driftY,
+  });
 
   final Color color;
+  final double driftX;
+  final double driftY;
 
   @override
   Widget build(BuildContext context) {
     final size = context.space(factor: 30);
     return IgnorePointer(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [color.withAlpha(90), color.withAlpha(0)],
-          ),
-        ),
-      ),
+      child:
+          Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [color.withAlpha(90), color.withAlpha(0)],
+                  ),
+                ),
+              )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .move(
+                begin: Offset.zero,
+                end: Offset(driftX, driftY),
+                duration: 8.seconds,
+                curve: Curves.easeInOut,
+              ),
     );
   }
 }
 
+/// Circular logo badge with a pulsing halo and a slowly rotating gradient ring.
 class _LogoWidget extends StatelessWidget {
   const _LogoWidget({required this.experience, required this.compact});
 
@@ -214,34 +315,80 @@ class _LogoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = context.space(factor: compact ? 11 : 14);
-    return Hero(
-          tag: 'experience-image-${experience.id}',
-          child: Container(
-            width: size,
-            height: size,
-            padding: EdgeInsets.all(size * 0.14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(size * 0.24),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x66000000),
-                  blurRadius: 30,
-                  offset: Offset(0, 12),
+    final palette = context.colorPalette;
+    final accent = palette.brand.primary.color;
+    final secondary = palette.brand.tertiary.color;
+    final size = context.space(factor: compact ? 12 : 16);
+    const ringThickness = 4.0;
+    return SizedBox(
+          width: size,
+          height: size,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withAlpha(120),
+                          blurRadius: 36,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                  )
+                  .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true),
+                  )
+                  .scale(
+                    begin: const Offset(0.92, 0.92),
+                    end: const Offset(1.08, 1.08),
+                    duration: 2.5.seconds,
+                    curve: Curves.easeInOut,
+                  ),
+              Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: SweepGradient(
+                        colors: [
+                          accent,
+                          secondary,
+                          Colors.white.withAlpha(30),
+                          accent,
+                        ],
+                      ),
+                    ),
+                  )
+                  .animate(onPlay: (controller) => controller.repeat())
+                  .rotate(duration: 8.seconds),
+              Hero(
+                tag: 'experience-image-${experience.id}',
+                child: Container(
+                  width: size - ringThickness * 2,
+                  height: size - ringThickness * 2,
+                  padding: EdgeInsets.all(size * 0.18),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: DSNetworkImageWidget(
+                    url: experience.companyLogo,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-              ],
-            ),
-            child: DSNetworkImageWidget(
-              url: experience.companyLogo,
-              fit: BoxFit.contain,
-            ),
+              ),
+            ],
           ),
         )
         .animate()
         .scale(
-          begin: const Offset(0.7, 0.7),
-          duration: 700.ms,
+          begin: const Offset(0.6, 0.6),
+          duration: 800.ms,
           delay: 200.ms,
           curve: Curves.elasticOut,
         )
@@ -387,80 +534,6 @@ class _PillWidgetState extends State<_PillWidget> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _StatsWidget extends StatelessWidget {
-  const _StatsWidget({required this.experience});
-
-  final ExperienceEntity experience;
-
-  String _duration() {
-    final end = experience.endDate ?? DateTime.now();
-    final start = experience.startDate;
-    final months = ((end.year - start.year) * 12 + end.month - start.month + 1)
-        .clamp(1, 1200);
-    final years = months ~/ 12;
-    final rest = months % 12;
-    if (years == 0) return '${rest}m';
-    return rest == 0 ? '${years}y' : '${years}y ${rest}m';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final stats = [
-      ('Duration', _duration()),
-      ('Technologies', '${experience.technologies.length}'),
-      ('Achievements', '${experience.achievements.length}'),
-    ];
-    return Row(
-      spacing: context.space(),
-      children: [
-        for (final (index, stat) in stats.indexed)
-          Expanded(
-            child:
-                Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: context.space(factor: 1.5),
-                        horizontal: context.space(),
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          context.dimen.radiusLevel2.value,
-                        ),
-                        color: Colors.white.withAlpha(16),
-                        border: Border.all(color: Colors.white12),
-                      ),
-                      child: Column(
-                        spacing: context.space(factor: 0.25),
-                        children: [
-                          FittedBox(
-                            child: DSTextWidget(
-                              stat.$2,
-                              style: context.typography.emphasizedHeadlineSmall,
-                              color: IntroWidget._onHero,
-                            ),
-                          ),
-                          DSTextWidget(
-                            stat.$1,
-                            style: context.typography.bodySmall,
-                            color: IntroWidget._onHeroMuted,
-                            maxLines: 1,
-                          ),
-                        ],
-                      ),
-                    )
-                    .animate(delay: (500 + index * 120).ms)
-                    .fadeIn()
-                    .slideY(
-                      begin: 0.3,
-                      end: 0,
-                      duration: 500.ms,
-                      curve: Curves.easeOutCubic,
-                    ),
-          ),
-      ],
     );
   }
 }

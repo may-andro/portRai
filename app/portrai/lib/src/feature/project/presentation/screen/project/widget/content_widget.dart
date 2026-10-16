@@ -1,20 +1,16 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
-import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
-import 'package:portrai/src/feature/project/presentation/screen/project/widget/intro_widget.dart';
-import 'package:portrai/src/route/route.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/feature/project/presentation/screen/project/widget/metrics_widget.dart';
+import 'package:portrai/src/widget/page_band_widget.dart';
 import 'package:tracking/tracking.dart';
 
-part 'desktop_content_widget.dart';
-part 'header_widget.dart';
-part 'mobile_tablet_content_widget.dart';
+part 'body_widget.dart';
 part 'tab_bar_widget.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -50,6 +46,7 @@ class _LoadingWidget extends StatelessWidget {
         context.bloc.add(const LoadingContentViewVisibleEvent());
       },
       child: DSLoadingWidget(
+        style: DSLoadingStyle.lottie,
         size: max(context.shortestSide * 0.1, context.space(factor: 2)),
       ),
     );
@@ -81,17 +78,10 @@ class _SuccessWidgetState extends State<_SuccessWidget>
     _scrollController = ScrollController()..addListener(_onScroll);
   }
 
-  /// Desktop shows "Available On" in the side column, so it gets no tab.
-  List<ScrollableProjectSectionDTO> get _tabSections => context.isDesktop
-      ? widget.scrollableSections
-            .where((s) => s is! AvailabilitiesSectionDTO)
-            .toList()
-      : widget.scrollableSections;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final length = _tabSections.length;
+    final length = widget.scrollableSections.length;
     if (!_hasTabController || _tabController.length != length) {
       if (_hasTabController) _tabController.dispose();
       _tabController = TabController(length: length, vsync: this);
@@ -113,23 +103,9 @@ class _SuccessWidgetState extends State<_SuccessWidget>
       onImpression: () {
         context.bloc.add(const SuccessContentViewVisibleEvent());
       },
-      child: DSResponsiveContainerWidget(
-        mobileBuilder: (context) {
-          return _MobileTabletContentWidget(
-            scrollController: _scrollController,
-            tabController: _tabController,
-          );
-        },
-        tabletBuilder: (context) {
-          return _MobileTabletContentWidget(
-            scrollController: _scrollController,
-            tabController: _tabController,
-          );
-        },
-        desktopBuilder: (context) => _DesktopContentWidget(
-          scrollController: _scrollController,
-          tabController: _tabController,
-        ),
+      child: _BodyWidget(
+        scrollController: _scrollController,
+        tabController: _tabController,
       ),
     );
   }
@@ -138,7 +114,7 @@ class _SuccessWidgetState extends State<_SuccessWidget>
     final state = context.bloc.state;
     if (state is! LoadedState) return;
 
-    final sections = _tabSections;
+    final sections = widget.scrollableSections;
     for (var i = 0; i < sections.length; i++) {
       final keyContext = sections[i].sectionKey.currentContext;
       if (keyContext case final BuildContext context) {
@@ -154,19 +130,6 @@ class _SuccessWidgetState extends State<_SuccessWidget>
           }
         }
       }
-    }
-  }
-}
-
-extension on BuildContext {
-  double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
     }
   }
 }
