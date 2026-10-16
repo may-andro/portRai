@@ -8,10 +8,31 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/experience/domain/use_case/mock_get_experience_use_case.dart';
+import '../../../../../../../mock/feature/experience/domain/use_case/mock_get_experiences_use_case.dart';
 import '../../../../../../../mock/feature/experience/presentation/screen/experience/tracking/mock_experience_tracking_delegate.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
+
+ExperienceEntity _experienceStartingIn(int year, String id) {
+  return ExperienceEntity(
+    company: 'Company $id',
+    position: 'Position $id',
+    location: 'Amsterdam',
+    startDate: DateTime(year),
+    endDate: null,
+    current: false,
+    employmentType: 'Full-time',
+    description: 'Description',
+    longDescription: 'Long description',
+    responsibilities: const [],
+    achievements: const [],
+    technologies: const [],
+    companyLogo: 'logo.png',
+    url: null,
+    id: id,
+  );
+}
 
 void main() {
   final experience = ExperienceEntity(
@@ -36,15 +57,27 @@ void main() {
 
   group('ExperienceBloc', () {
     late MockGetExperienceUseCase getExperience;
+    late MockGetExperiencesUseCase getExperiences;
     late MockGetProfileUseCase getProfile;
     late MockOpenExternalUrlUseCase openUrl;
     late MockExperienceTrackingDelegate tracking;
 
-    ExperienceBloc buildBloc() =>
-        ExperienceBloc(getExperience, getProfile, openUrl, tracking);
+    ExperienceBloc buildBloc() => ExperienceBloc(
+      getExperience,
+      getExperiences,
+      getProfile,
+      openUrl,
+      tracking,
+    );
 
     setUp(() {
       getExperience = MockGetExperienceUseCase();
+      getExperiences = MockGetExperiencesUseCase()
+        ..stubCall(
+          const Left<GetExperiencesFailure, List<ExperienceEntity>>(
+            ExperiencesNotFoundFailure(),
+          ),
+        );
       getProfile = MockGetProfileUseCase();
       openUrl = MockOpenExternalUrlUseCase();
       tracking = MockExperienceTrackingDelegate();
@@ -68,6 +101,50 @@ void main() {
       expect: () => [const LoadingState(), LoadedState(experience: experience)],
       verify: (_) {
         verify(() => getExperience(experience.id)).called(1);
+      },
+    );
+
+    blocTest<ExperienceBloc, ExperienceState>(
+      'should emit loaded with the newer and older experiences when the experience is in the middle',
+      setUp: () {
+        final newest = _experienceStartingIn(2025, 'newest');
+        final oldest = _experienceStartingIn(2020, 'oldest');
+        getProfile.stubCall(
+          const Left<GetProfileFailure, ProfileEntity>(
+            ProfileNotFoundFailure(),
+          ),
+        );
+        getExperience.stubCall(
+          experience.id,
+          Right<GetExperienceFailure, ExperienceEntity>(experience),
+        );
+        getExperiences.stubCall(
+          Right<GetExperiencesFailure, List<ExperienceEntity>>([
+            oldest,
+            newest,
+            experience,
+          ]),
+        );
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(LoadExperienceEvent(experience.id)),
+      expect: () => [
+        const LoadingState(),
+        LoadedState(
+          experience: experience,
+          newerExperience: _experienceStartingIn(2025, 'newest'),
+          olderExperience: _experienceStartingIn(2020, 'oldest'),
+        ),
+      ],
+    );
+
+    blocTest<ExperienceBloc, ExperienceState>(
+      'should track the adjacent experience click when it is tapped',
+      build: buildBloc,
+      act: (bloc) => bloc.add(const AdjacentExperienceClickEvent('other')),
+      expect: () => const <ExperienceState>[],
+      verify: (_) {
+        verify(() => tracking.trackAdjacentExperienceClick('other')).called(1);
       },
     );
 

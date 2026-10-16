@@ -46,11 +46,11 @@ void main() {
       await pumpSections(tester);
       await tester.pump(const Duration(seconds: 3));
 
-      expect(find.text('Overview'), findsOneWidget);
-      expect(find.text('Technologies'), findsOneWidget);
-      expect(find.text('Achievements'), findsOneWidget);
-      expect(find.text('Key Features'), findsOneWidget);
-      expect(find.text('Available On'), findsOneWidget);
+      expect(find.text('OVERVIEW'), findsOneWidget);
+      expect(find.text('TECHNOLOGIES'), findsOneWidget);
+      expect(find.text('ACHIEVEMENTS'), findsOneWidget);
+      expect(find.text('KEY FEATURES'), findsOneWidget);
+      expect(find.text('AVAILABLE ON'), findsOneWidget);
     });
 
     testWidgets(
@@ -76,9 +76,9 @@ void main() {
 
         expect(titles, [
           'Overview',
+          'Key Features',
           'Technologies',
           'Achievements',
-          'Key Features',
           'Available On',
         ]);
       },

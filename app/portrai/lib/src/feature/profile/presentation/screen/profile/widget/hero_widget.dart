@@ -28,7 +28,7 @@ class _HeroWidget extends StatelessWidget {
             closeColor: context.colorPalette.neutral.grey9.color,
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: _horizontalInset(context),
+                horizontal: pageHorizontalInset(context),
                 vertical: context.space(factor: isDesktop ? 6 : 4),
               ),
               child: SizedBox(
@@ -150,7 +150,7 @@ class _HeroTextWidget extends StatelessWidget {
               runSpacing: context.space(factor: 2),
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _HoverLiftWidget(
+                HoverLiftWidget(
                   child: DSButtonWidget(
                     label: context.localizations.profileHireMe,
                     icon: Icons.arrow_outward_rounded,
@@ -364,7 +364,7 @@ class _HeroPortraitWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
           scale: 1.03,
           child: SizedBox(
             width: width,
@@ -551,7 +551,7 @@ class _HeroChipWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.06,
       child:
           Container(
@@ -623,7 +623,7 @@ class _SocialIconButtonWidget extends StatelessWidget {
     void open() =>
         context.bloc.add(OpenExternalUrlEvent(url: link.url, label: link.name));
 
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.1,
       child: brandIcon != null
           ? DSBrandIconButtonWidget(

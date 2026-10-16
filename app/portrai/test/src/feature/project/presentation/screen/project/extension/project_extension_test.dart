@@ -12,9 +12,9 @@ void main() {
       expect(sections, hasLength(6));
       expect(sections[0], isA<IntroSectionDTO>());
       expect(sections[1], isA<OverviewSectionDTO>());
-      expect(sections[2], isA<TechnologiesSectionDTO>());
-      expect(sections[3], isA<AchievementsSectionDTO>());
-      expect(sections[4], isA<KeyFeaturesSectionDTO>());
+      expect(sections[2], isA<KeyFeaturesSectionDTO>());
+      expect(sections[3], isA<TechnologiesSectionDTO>());
+      expect(sections[4], isA<AchievementsSectionDTO>());
       expect(sections[5], isA<AvailabilitiesSectionDTO>());
     });
   });

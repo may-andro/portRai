@@ -26,11 +26,23 @@ final class ErrorState extends ExperienceState {
 }
 
 final class LoadedState extends ExperienceState {
-  const LoadedState({required this.experience, this.profile});
+  const LoadedState({
+    required this.experience,
+    this.profile,
+    this.newerExperience,
+    this.olderExperience,
+  });
 
   final ExperienceEntity experience;
   final ProfileEntity? profile;
+  final ExperienceEntity? newerExperience;
+  final ExperienceEntity? olderExperience;
 
   @override
-  List<Object?> get props => [experience, profile];
+  List<Object?> get props => [
+    experience,
+    profile,
+    newerExperience,
+    olderExperience,
+  ];
 }

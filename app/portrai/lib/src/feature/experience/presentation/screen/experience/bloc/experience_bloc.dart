@@ -13,6 +13,7 @@ import 'package:portrai/src/feature/profile/profile.dart';
 class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
   ExperienceBloc(
     this._getExperienceUseCase,
+    this._getExperiencesUseCase,
     this._getProfileUseCase,
     this._openExternalUrlUseCase,
     this._trackingDelegate,
@@ -20,12 +21,14 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     on<LoadExperienceEvent>(_mapLoadExperienceEventToState);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
     on<HeaderTabClickEvent>(_mapHeaderTabClickEventToState);
+    on<AdjacentExperienceClickEvent>(_mapAdjacentExperienceClickEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
     on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
     on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
   }
 
   final GetExperienceUseCase _getExperienceUseCase;
+  final GetExperiencesUseCase _getExperiencesUseCase;
   final GetProfileUseCase _getProfileUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final ExperienceTrackingDelegate _trackingDelegate;
@@ -43,13 +46,36 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     );
 
     final eitherExperienceResult = await _getExperienceUseCase(event.id);
-    eitherExperienceResult.fold(
-      (failure) {
-        emit(ErrorState(failure: failure));
-      },
-      (experience) {
-        emit(LoadedState(experience: experience, profile: profile));
-      },
+    if (eitherExperienceResult.isLeft) {
+      emit(ErrorState(failure: eitherExperienceResult.left));
+      return;
+    }
+    final experience = eitherExperienceResult.right;
+
+    final eitherExperiencesResult = await _getExperiencesUseCase();
+    final experiencesNewestFirst = eitherExperiencesResult.fold(
+      (_) => <ExperienceEntity>[],
+      (experiences) => [...experiences]
+        ..sort((first, second) => second.startDate.compareTo(first.startDate)),
+    );
+    final experienceIndex = experiencesNewestFirst.indexWhere(
+      (candidate) => candidate.id == experience.id,
+    );
+    final hasNewerExperience = experienceIndex > 0;
+    final hasOlderExperience =
+        experienceIndex >= 0 &&
+        experienceIndex < experiencesNewestFirst.length - 1;
+    emit(
+      LoadedState(
+        experience: experience,
+        profile: profile,
+        newerExperience: hasNewerExperience
+            ? experiencesNewestFirst[experienceIndex - 1]
+            : null,
+        olderExperience: hasOlderExperience
+            ? experiencesNewestFirst[experienceIndex + 1]
+            : null,
+      ),
     );
   }
 
@@ -88,6 +114,13 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     Emitter<ExperienceState> emit,
   ) {
     _trackingDelegate.trackTabItemSelection(event.trackingId);
+  }
+
+  FutureOr<void> _mapAdjacentExperienceClickEventToState(
+    AdjacentExperienceClickEvent event,
+    Emitter<ExperienceState> emit,
+  ) {
+    _trackingDelegate.trackAdjacentExperienceClick(event.experienceId);
   }
 
   FutureOr<void> _mapSectionVisibleEventToState(

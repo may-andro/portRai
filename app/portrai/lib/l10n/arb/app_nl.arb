@@ -334,5 +334,14 @@
   "projectFactMarkets": "Markten",
   "@projectFactMarkets": {
     "description": "Label of the countries fact in the project header"
-  }
+  },
+  "experienceSectionOverview": "Overzicht",
+  "experienceSectionAchievements": "Prestaties",
+  "experienceSectionResponsibilities": "Verantwoordelijkheden",
+  "experienceSectionTechnologies": "Technologieën",
+  "experienceSectionLocation": "Locatie",
+  "experienceFactDuration": "Duur",
+  "experienceKeepExploring": "Blijf ontdekken",
+  "experienceNewerRole": "Recentere functie",
+  "experienceOlderRole": "Eerdere functie"
 }

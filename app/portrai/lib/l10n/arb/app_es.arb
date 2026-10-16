@@ -334,5 +334,14 @@
   "projectFactMarkets": "Mercados",
   "@projectFactMarkets": {
     "description": "Label of the countries fact in the project header"
-  }
+  },
+  "experienceSectionOverview": "Resumen",
+  "experienceSectionAchievements": "Logros",
+  "experienceSectionResponsibilities": "Responsabilidades",
+  "experienceSectionTechnologies": "Tecnologías",
+  "experienceSectionLocation": "Ubicación",
+  "experienceFactDuration": "Duración",
+  "experienceKeepExploring": "Sigue explorando",
+  "experienceNewerRole": "Puesto más reciente",
+  "experienceOlderRole": "Puesto anterior"
 }

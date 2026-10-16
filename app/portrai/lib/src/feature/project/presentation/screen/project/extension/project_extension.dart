@@ -6,9 +6,10 @@ extension ProjectEntityExtension on ProjectEntity {
     return [
       IntroSectionDTO(this),
       OverviewSectionDTO(this),
+      KeyFeaturesSectionDTO(this),
       TechnologiesSectionDTO(this),
       AchievementsSectionDTO(this),
-      KeyFeaturesSectionDTO(this),
+      if (markets.isNotEmpty) MarketsSectionDTO(this),
       AvailabilitiesSectionDTO(this),
     ];
   }

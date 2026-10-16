@@ -1,425 +1,425 @@
+import 'dart:math' as math;
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
-import 'package:portrai/src/feature/project/presentation/extension/project_date_range_extension.dart';
+import 'package:portrai/src/widget/page_band_widget.dart';
+import 'package:portrai/src/widget/page_chrome_widget.dart';
 
-/// App-store style header: a big icon, the story, and a facts strip.
+/// Full-bleed hero: story on one side, the app icon on an animated stage on
+/// the other.
 class IntroWidget extends StatelessWidget {
-  const IntroWidget({super.key, required this.project, this.sidebar = false});
+  const IntroWidget({super.key, required this.project});
 
   final ProjectEntity project;
 
-  /// Compact vertical layout for the left column on desktop.
-  final bool sidebar;
+  static const _onHero = DSColor(0xFFFFFFFF);
+  static const _onHeroMuted = DSColor(0xD9FFFFFF);
 
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    if (sidebar) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: context.space(factor: 3),
-        children: [
-          _TiltedIconWidget(project: project, size: context.space(factor: 11)),
-          _StoryWidget(project: project, large: false),
-          _FactsWidget(project: project, vertical: true),
-        ],
-      ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.04, end: 0);
-    }
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.space()),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: context.space(factor: 3),
-        children: [
-          Row(
-            spacing: context.space(factor: 2),
-            children: [
-              _TiltedIconWidget(
-                project: project,
-                size: context.space(factor: 10),
-              ),
-              Expanded(
-                child: _StoryWidget(
-                  project: project,
-                  large: false,
-                  showDescription: false,
+    const base = Color(0xFF0E1726);
+    final start = Color.lerp(base, palette.brand.primary.color, 0.3)!;
+    final end = Color.lerp(base, palette.brand.tertiary.color, 0.25)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 900;
+        final stage = _StageWidget(project: project, isWide: isWide);
+        final story = _StoryWidget(project: project, isWide: isWide);
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [start, end],
+            ),
+          ),
+          child: ClipRect(
+            child: Stack(
+              children: [
+                _BlobWidget(
+                  color: palette.brand.primary.color,
+                  alignment: const Alignment(-1, -0.9),
+                  driftX: 60,
+                  driftY: 40,
+                  seconds: 9,
                 ),
-              ),
-            ],
-          ),
-          DSTextWidget(
-            project.description,
-            style: context.typography.bodyMedium,
-            color: palette.neutral.grey8,
-          ),
-          _FactsWidget(project: project, grid: true),
-        ],
-      ),
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.04, end: 0);
-  }
-}
-
-/// Icon on a tilted gradient plate, so it pops without filling the column.
-class _TiltedIconWidget extends StatelessWidget {
-  const _TiltedIconWidget({required this.project, required this.size});
-
-  final ProjectEntity project;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.colorPalette;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: context.space(),
-        top: size * 0.15,
-        bottom: context.space(factor: 2),
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            left: size * 0.14,
-            top: size * 0.14,
-            child: Transform.rotate(
-              angle: 0.14,
-              child: Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size * 0.225),
-                  gradient: LinearGradient(
-                    colors: [
-                      palette.brand.primary.color,
-                      palette.brand.tertiary.color,
-                    ],
+                _BlobWidget(
+                  color: palette.brand.tertiary.color,
+                  alignment: const Alignment(1, 0.9),
+                  driftX: -70,
+                  driftY: -30,
+                  seconds: 11,
+                ),
+                _BlobWidget(
+                  color: palette.brand.secondary.color,
+                  alignment: const Alignment(0.2, -1.2),
+                  driftX: 50,
+                  driftY: 50,
+                  seconds: 13,
+                ),
+                const Positioned.fill(child: _GridWidget()),
+                PageChromeWidget(
+                  closeColor: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: pageHorizontalInset(context),
+                      vertical: context.space(factor: isWide ? 8 : 4),
+                    ),
+                    child: isWide
+                        ? Row(
+                            spacing: context.space(factor: 6),
+                            children: [
+                              Expanded(flex: 6, child: story),
+                              Expanded(flex: 4, child: stage),
+                            ],
+                          )
+                        : Column(
+                            spacing: context.space(factor: 4),
+                            children: [stage, story],
+                          ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-          Positioned(
-            left: size * 0.14 + size * 0.7,
-            top: -size * 0.1,
-            child: Container(
-              width: size * 0.3,
-              height: size * 0.3,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: palette.brand.primary.color.withAlpha(120),
-                  width: 2,
+        ).animate().fadeIn(duration: 600.ms);
+      },
+    );
+  }
+}
+
+class _BlobWidget extends StatelessWidget {
+  const _BlobWidget({
+    required this.color,
+    required this.alignment,
+    required this.driftX,
+    required this.driftY,
+    required this.seconds,
+  });
+
+  final Color color;
+  final Alignment alignment;
+  final double driftX;
+  final double driftY;
+  final int seconds;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.space(factor: 36);
+    return IgnorePointer(
+      child: Align(
+        alignment: alignment,
+        child:
+            Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [color.withAlpha(110), color.withAlpha(0)],
+                    ),
+                  ),
+                )
+                .animate(
+                  onPlay: (controller) => controller.repeat(reverse: true),
+                )
+                .move(
+                  begin: Offset.zero,
+                  end: Offset(driftX, driftY),
+                  duration: seconds.seconds,
+                  curve: Curves.easeInOut,
                 ),
-              ),
-            ),
-          ),
-          _IconWidget(project: project, size: size),
-        ],
       ),
     );
   }
 }
 
-class _IconWidget extends StatelessWidget {
-  const _IconWidget({required this.project, required this.size});
-
-  final ProjectEntity project;
-  final double size;
+/// Fine grid lines that fade out towards the bottom, like blueprint paper.
+class _GridWidget extends StatelessWidget {
+  const _GridWidget();
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
-    return Hero(
-      tag: 'project-image-${project.id}',
-      child: Container(
-        width: size,
-        height: size,
-        padding: EdgeInsets.all(size * 0.1),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(size * 0.225),
-          boxShadow: [
-            BoxShadow(
-              color: palette.brand.primary.color.withAlpha(90),
-              blurRadius: 40,
-              offset: const Offset(0, 18),
-            ),
-          ],
-        ),
-        child: DSNetworkImageWidget(url: project.image, fit: BoxFit.contain),
+    return IgnorePointer(
+      child: ShaderMask(
+        blendMode: BlendMode.dstIn,
+        shaderCallback: (bounds) {
+          return const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white, Colors.transparent],
+          ).createShader(bounds);
+        },
+        child: CustomPaint(painter: _GridPainter()),
       ),
-    ).animate().scale(
-      begin: const Offset(0.8, 0.8),
-      duration: 600.ms,
-      curve: Curves.easeOutBack,
     );
   }
+}
+
+class _GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withAlpha(16)
+      ..strokeWidth = 1;
+    const gap = 56.0;
+    for (var x = 0.0; x < size.width; x += gap) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (var y = 0.0; y < size.height; y += gap) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _StoryWidget extends StatelessWidget {
-  const _StoryWidget({
-    required this.project,
-    required this.large,
-    this.showDescription = true,
-  });
-
-  final bool showDescription;
+  const _StoryWidget({required this.project, required this.isWide});
 
   final ProjectEntity project;
-  final bool large;
+  final bool isWide;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: context.space(factor: 1.5),
+          children: [
+            PageEyebrowWidget(project.category, onDark: true),
+            DSTextWidget(
+              project.title,
+              style: isWide
+                  ? context.typography.emphasizedDisplaySmall
+                  : context.typography.emphasizedHeadlineLarge,
+              color: IntroWidget._onHero,
+              maxLines: 3,
+            ),
+            DSTextWidget(
+              project.description,
+              style: context.typography.bodyLarge,
+              color: IntroWidget._onHeroMuted,
+            ),
+            _StatusPillWidget(status: project.status),
+          ],
+        )
+        .animate(delay: 300.ms)
+        .fadeIn(duration: 500.ms)
+        .slideX(begin: 0.04, end: 0, duration: 500.ms);
+  }
+}
+
+class _StatusPillWidget extends StatelessWidget {
+  const _StatusPillWidget({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.space(factor: 1.5),
+        vertical: context.space(factor: 0.75),
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(100),
+        color: Colors.white.withAlpha(20),
+        border: Border.all(color: Colors.white24),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: context.space(factor: 0.75),
+        children: [
+          Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF4ADE80),
+                ),
+              )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .fade(begin: 0.4, end: 1, duration: 1.2.seconds),
+          DSTextWidget(
+            status.toUpperCase(),
+            style: context.typography.emphasizedLabelMedium,
+            color: IntroWidget._onHero,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The app icon on a tilted gradient plate, surrounded by slowly counter-
+/// rotating dashed rings and two floating badges.
+class _StageWidget extends StatelessWidget {
+  const _StageWidget({required this.project, required this.isWide});
+
+  final ProjectEntity project;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: context.space(),
-      children: [
-        Row(
-          spacing: context.space(),
+    final stageSize = isWide ? 340.0 : 230.0;
+    final plateSize = stageSize * 0.52;
+    return Center(
+      child: SizedBox(
+        width: stageSize,
+        height: stageSize,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Container(
-              width: context.space(factor: 3),
-              height: 3,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
-                gradient: LinearGradient(
-                  colors: [
-                    palette.brand.primary.color,
-                    palette.brand.tertiary.color,
-                  ],
+            _DashedRingWidget(size: stageSize, turns: 1, seconds: 50),
+            _DashedRingWidget(size: stageSize * 0.76, turns: -1, seconds: 36),
+            Transform.rotate(
+                  angle: 0.16,
+                  child: Container(
+                    width: plateSize,
+                    height: plateSize,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(plateSize * 0.225),
+                      gradient: LinearGradient(
+                        colors: [
+                          palette.brand.primary.color,
+                          palette.brand.tertiary.color,
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                .animate(
+                  onPlay: (controller) => controller.repeat(reverse: true),
+                )
+                .scale(
+                  begin: const Offset(1.08, 1.08),
+                  end: const Offset(1.2, 1.2),
+                  duration: 3.seconds,
+                  curve: Curves.easeInOut,
                 ),
-              ),
+            Hero(
+                  tag: 'project-image-${project.id}',
+                  child: Container(
+                    width: plateSize,
+                    height: plateSize,
+                    padding: EdgeInsets.all(plateSize * 0.12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(plateSize * 0.225),
+                      boxShadow: [
+                        BoxShadow(
+                          color: palette.brand.primary.color.withAlpha(120),
+                          blurRadius: 50,
+                          offset: const Offset(0, 20),
+                        ),
+                      ],
+                    ),
+                    child: DSNetworkImageWidget(
+                      url: project.image,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                )
+                .animate()
+                .scale(
+                  begin: const Offset(0.7, 0.7),
+                  duration: 800.ms,
+                  delay: 200.ms,
+                  curve: Curves.elasticOut,
+                )
+                .fadeIn(duration: 300.ms, delay: 200.ms),
+            const _FloatingBadgeWidget(
+              alignment: Alignment(0.95, -0.55),
+              icon: Icons.bolt_rounded,
+              seconds: 3,
             ),
-            Flexible(
-              child: DSTextWidget(
-                project.category.toUpperCase(),
-                style: context.typography.emphasizedLabelMedium,
-                color: palette.brand.primary,
-                maxLines: 1,
-              ),
+            const _FloatingBadgeWidget(
+              alignment: Alignment(-0.95, 0.6),
+              icon: Icons.auto_awesome_rounded,
+              seconds: 4,
             ),
           ],
         ),
-        DSTextWidget(
-          project.title,
-          style: large
-              ? context.typography.emphasizedHeadlineLarge
-              : context.typography.emphasizedHeadlineMedium,
-          color: palette.neutral.grey10,
-          maxLines: 2,
-        ),
-        if (showDescription)
-          DSTextWidget(
-            project.description,
-            style: large
-                ? context.typography.bodyLarge
-                : context.typography.bodyMedium,
-            color: palette.neutral.grey8,
-            maxLines: 4,
-          ),
-      ],
-    );
-  }
-}
-
-/// Plain label/value columns split by hairlines, like an app-store info row.
-class _FactsWidget extends StatelessWidget {
-  const _FactsWidget({
-    required this.project,
-    this.vertical = false,
-    this.grid = false,
-  });
-
-  final bool grid;
-
-  final ProjectEntity project;
-  final bool vertical;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.localizations;
-    final palette = context.colorPalette;
-    final markets = project.markets.map((m) => m.country).toSet().toList();
-    final facts = [
-      (l10n.projectFactStatus, project.status, project.statusIcon),
-      (
-        l10n.projectFactTeam,
-        l10n.projectTeamSize('${project.teamSize}'),
-        Icons.group_outlined,
-      ),
-      (l10n.projectFactRole, project.role, Icons.work_outline),
-      (
-        l10n.projectFactPeriod,
-        project.formattedDateRange(context),
-        Icons.calendar_month_outlined,
-      ),
-      if (markets.isNotEmpty)
-        (l10n.projectFactMarkets, markets.join(' · '), Icons.public),
-    ];
-
-    if (vertical) {
-      return Column(
-        children: [
-          for (final (index, fact) in facts.indexed)
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: context.space()),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: palette.neutral.grey3.color),
-                  bottom: index == facts.length - 1
-                      ? BorderSide(color: palette.neutral.grey3.color)
-                      : BorderSide.none,
-                ),
-              ),
-              child: _FactWidget(
-                label: fact.$1,
-                value: fact.$2,
-                icon: fact.$3,
-                maxLines: 3,
-              ),
-            ),
-        ],
-      );
-    }
-
-    if (grid) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final gap = context.space(factor: 2);
-          final columns = constraints.maxWidth >= 600 ? 3 : 2;
-          final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
-          return Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: context.space(factor: 1.5)),
-            decoration: BoxDecoration(
-              border: Border.symmetric(
-                horizontal: BorderSide(color: palette.neutral.grey3.color),
-              ),
-            ),
-            child: Wrap(
-              spacing: gap,
-              runSpacing: gap,
-              children: [
-                for (final fact in facts)
-                  SizedBox(
-                    width: width,
-                    child: _FactWidget(
-                      label: fact.$1,
-                      value: fact.$2,
-                      icon: fact.$3,
-                      maxLines: 2,
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      );
-    }
-
-    final children = <Widget>[];
-    for (final (index, fact) in facts.indexed) {
-      if (index > 0) {
-        children.add(
-          Container(
-            width: 1,
-            height: 44,
-            margin: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
-            color: palette.neutral.grey3.color,
-          ),
-        );
-      }
-      children.add(_FactWidget(label: fact.$1, value: fact.$2, icon: fact.$3));
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: context.space(factor: 1.5)),
-      decoration: BoxDecoration(
-        border: Border.symmetric(
-          horizontal: BorderSide(color: palette.neutral.grey3.color),
-        ),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: IntrinsicHeight(child: Row(children: children)),
       ),
     );
   }
 }
 
-class _FactWidget extends StatelessWidget {
-  const _FactWidget({
-    required this.label,
-    required this.value,
+class _FloatingBadgeWidget extends StatelessWidget {
+  const _FloatingBadgeWidget({
+    required this.alignment,
     required this.icon,
-    this.maxLines = 1,
+    required this.seconds,
   });
 
-  final int maxLines;
-  final String label;
-  final String value;
+  final Alignment alignment;
   final IconData icon;
+  final int seconds;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 320),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: context.space(factor: 0.5),
-        children: [
-          DSTextWidget(
-            label.toUpperCase(),
-            style: context.typography.emphasizedLabelSmall,
-            color: palette.neutral.grey7,
-            maxLines: 1,
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: context.space(factor: 0.75),
-            children: [
-              Icon(icon, size: 18, color: palette.brand.primary.color),
-              Flexible(
-                child: DSTextWidget(
-                  value,
-                  style: context.typography.emphasizedTitleSmall,
-                  color: palette.neutral.grey10,
-                  maxLines: maxLines,
+    return Align(
+      alignment: alignment,
+      child:
+          Container(
+                padding: EdgeInsets.all(context.space(factor: 1.25)),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withAlpha(28),
+                  border: Border.all(color: Colors.white30),
                 ),
+                child: Icon(icon, size: 20, color: Colors.white),
+              )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .moveY(
+                begin: -8,
+                end: 8,
+                duration: seconds.seconds,
+                curve: Curves.easeInOut,
               ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
 
-extension on ProjectEntity {
-  IconData get statusIcon {
-    switch (status.toLowerCase()) {
-      case 'active':
-      case 'ongoing':
-        return Icons.autorenew;
-      case 'completed':
-      case 'shipped':
-        return Icons.check_circle_outline;
-      case 'maintained':
-        return Icons.verified_outlined;
-      case 'paused':
-        return Icons.pause_circle_outline;
-      case 'archived':
-      case 'deprecated':
-        return Icons.archive_outlined;
-      default:
-        return Icons.info_outline;
+class _DashedRingWidget extends StatelessWidget {
+  const _DashedRingWidget({
+    required this.size,
+    required this.turns,
+    required this.seconds,
+  });
+
+  final double size;
+  final double turns;
+  final int seconds;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(size: Size.square(size), painter: _DashedRingPainter())
+        .animate(onPlay: (controller) => controller.repeat())
+        .rotate(begin: 0, end: turns, duration: seconds.seconds);
+  }
+}
+
+class _DashedRingPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withAlpha(46)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    const dashCount = 48;
+    const sweep = 2 * math.pi / dashCount;
+    final rect = Offset.zero & size;
+    for (var dashIndex = 0; dashIndex < dashCount; dashIndex++) {
+      canvas.drawArc(rect, dashIndex * sweep, sweep * 0.5, false, paint);
     }
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

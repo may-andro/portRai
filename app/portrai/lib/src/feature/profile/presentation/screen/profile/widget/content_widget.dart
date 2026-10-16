@@ -10,6 +10,7 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/_widget.dart';
+import 'package:portrai/src/widget/page_band_widget.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:tracking/tracking.dart';
 
@@ -96,18 +97,5 @@ class _SuccessWidget extends StatelessWidget {
       onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
       child: _BodyWidget(profile: profile, workPlaces: workPlaces),
     );
-  }
-}
-
-extension on BuildContext {
-  EdgeInsets get horizontalScreenPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return EdgeInsets.symmetric(horizontal: space(factor: 3));
-      case DSDeviceResolution.tablet:
-        return EdgeInsets.symmetric(horizontal: space(factor: 5));
-      case DSDeviceResolution.desktop:
-        return EdgeInsets.zero;
-    }
   }
 }

@@ -28,15 +28,9 @@ class _MobileTabletContentWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       shrinkWrap: true,
       slivers: [
-        PageAppBarWidget(title: state.experience.company),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(
-            vertical: context.space(factor: 3),
-            horizontal: context.horizontalPadding,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: IntroSectionWidget(experience: experience),
-          ),
+        SliverToBoxAdapter(child: IntroSectionWidget(experience: experience)),
+        SliverToBoxAdapter(
+          child: KeyFactsSectionWidget(experience: experience),
         ),
         SliverPersistentHeader(
           pinned: true,
@@ -46,23 +40,11 @@ class _MobileTabletContentWidget extends StatelessWidget {
             height: DSTabItemWidget.getHeight(context),
           ),
         ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(
-            vertical: context.space(factor: 3),
-            horizontal: context.horizontalPadding,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: Column(
-              spacing: context.space(factor: 3),
-              children: scrollableSections,
-            ),
-          ),
+        SliverToBoxAdapter(
+          child: _SectionListWidget(scrollableSections: scrollableSections),
         ),
         if (state.profile case final ProfileEntity profile)
-          SliverPadding(
-            padding: EdgeInsets.only(top: context.space(factor: 3)),
-            sliver: SliverToBoxAdapter(child: FooterWidget(profile: profile)),
-          ),
+          SliverToBoxAdapter(child: FooterWidget(profile: profile)),
       ],
     );
   }

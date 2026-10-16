@@ -15,19 +15,19 @@ class _ContactBandWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: context.space(factor: 2),
       children: [
-        _EyebrowWidget(localizations.profileContact, onDark: true),
+        PageEyebrowWidget(localizations.profileContact, onDark: true),
         DSTextWidget(
           localizations.profileGetInTouch,
           style: isDesktop
               ? context.typography.emphasizedDisplayMedium
               : context.typography.emphasizedHeadlineLarge,
-          color: _white,
+          color: pageOnDarkColor,
         ),
       ],
     );
     final card = _MessageCardWidget(profile: profile);
 
-    return _BandWidget(
+    return PageBandWidget(
       verticalFactor: isDesktop ? 5 : 3,
       background: Stack(
         fit: StackFit.expand,
@@ -148,7 +148,7 @@ class _MessageCardWidgetState extends State<_MessageCardWidget> {
     final palette = context.colorPalette;
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
     const ink = Color(0xFF1B1B1F);
-    return _HoverLiftWidget(
+    return HoverLiftWidget(
       scale: 1.01,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -215,7 +215,7 @@ class _MessageCardWidgetState extends State<_MessageCardWidget> {
                       ),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: _HoverLiftWidget(
+                        child: HoverLiftWidget(
                           child: DSButtonWidget(
                             label: context.localizations.profileGetInTouch,
                             iconDirection: DSButtonIconDirection.right,
