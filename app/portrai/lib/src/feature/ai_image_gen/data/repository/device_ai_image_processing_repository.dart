@@ -19,14 +19,15 @@ class DeviceAiImageProcessingRepository implements AiImageProcessingRepository {
   final AiImageCache _cache;
   final AiImageMapper _mapper;
 
-  final _inFlight = <String, Future<AiImageEntity>>{};
+  /// Requests still running, by cache key; duplicate calls share one request.
+  final _runningRequestsByKey = <String, Future<AiImageEntity>>{};
 
   @override
   Future<AiImageEntity> removeBackground(AiImageEntity image) {
     final key = _cacheKey(image.bytes);
-    return _inFlight[key] ??= _process(image, key).whenComplete(() {
+    return _runningRequestsByKey[key] ??= _process(image, key).whenComplete(() {
       // Must not return the removed future: whenComplete would await itself.
-      _inFlight.remove(key);
+      _runningRequestsByKey.remove(key);
     });
   }
 

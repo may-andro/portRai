@@ -111,6 +111,12 @@ extension ContextExtension on BuildContext {
 
 Use `context.bloc`/`context.state` in widgets instead of `context.read<XBloc>()`/`context.watch<XBloc>().state`.
 
+## Entities are plain; models carry JSON; mappers bridge them
+- **Entities** (`domain/entity/`) only define fields, equality and `toString`. They never contain `fromJson`/`toJson` or any serialization knowledge.
+- **Models** (`data/model/`) are the data-layer shape and own JSON support (`@JsonSerializable` with `fromJson`/`toJson`; use `explicitToJson: true` for nested models). Nested values get their own model, e.g. `AiImageAppConfigModel` inside `PortraiAppConfigModel`.
+- **Mappers** (`data/mapper/`) transform model ↔ entity. Repositories parse JSON into a model and map it to an entity; caches (`KeyValueCache`/`DBCache`) store models, never entities. A nested model gets its own mapper which the parent mapper receives through its constructor.
+- Every entity returned from a repository therefore has a data-layer equivalent. If an entity has no model, or an entity parses JSON itself, that is a violation of this convention (see `app_config`: `PortraiAppConfigEntity` / `PortraiAppConfigModel` / `PortraiAppConfigMapper`).
+
 ## Mappers implement `Mapper`/`BiMapper`
 Every model↔entity mapper in `data/mapper/` implements `BiMapper<Model, Entity>` (or `Mapper<From, To>` when only one direction exists) from the `core` layer, is `@register`ed and `const` where possible. Use `to`/`from` (or `map`) for the interface methods.
 

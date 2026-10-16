@@ -39,6 +39,7 @@ void main() {
             .generateAiImage(
               sourceImageUrl: 'https://example.com/a.png',
               prompt: 'Draw',
+              model: 'model',
             )
             .timeout(const Duration(seconds: 2));
 
@@ -63,6 +64,7 @@ void main() {
             .generateAiImage(
               sourceImageUrl: 'https://example.com/a.png',
               prompt: 'Draw',
+              model: 'model',
             )
             .timeout(const Duration(seconds: 2));
 
@@ -85,6 +87,7 @@ void main() {
           repository.generateAiImage(
             sourceImageUrl: 'https://example.com/a.png',
             prompt: 'Draw',
+            model: 'model',
           ),
           throwsA(isA<AiImageCacheException>()),
         );

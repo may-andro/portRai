@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/app/restart_app.dart';
 import 'package:portrai/src/feature/design_system/domain/use_case/_use_case.dart';
 import 'package:portrai/src/feature/design_system/presentation/bloc/design_system_event.dart';
 import 'package:portrai/src/feature/design_system/presentation/bloc/design_system_state.dart';
@@ -37,6 +38,7 @@ class DesignSystemBloc extends Bloc<DesignSystemEvent, DesignSystemState> {
     DesignSystemClickEvent event,
     Emitter<DesignSystemState> emit,
   ) async {
+    final previousDesignSystem = state.designSystem;
     final setDesignSystemEither = await _setDesignSystemUseCase(
       event.designSystem,
     );
@@ -49,12 +51,12 @@ class DesignSystemBloc extends Bloc<DesignSystemEvent, DesignSystemState> {
         failure: setDesignSystemEither.isLeft
             ? setDesignSystemEither.left
             : null,
-        isRestartRequired:
-            state.isRestartRequired ||
-            (setDesignSystemEither.isRight &&
-                state.designSystem != event.designSystem),
       ),
     );
+    if (setDesignSystemEither.isRight &&
+        state.designSystem != previousDesignSystem) {
+      await restartApp();
+    }
   }
 
   Future<void> _mapDesignSystemResetClickEventToState(
@@ -71,10 +73,10 @@ class DesignSystemBloc extends Bloc<DesignSystemEvent, DesignSystemState> {
         failure: resetDesignSystemEither.isLeft
             ? resetDesignSystemEither.left
             : null,
-        isRestartRequired:
-            resetDesignSystemEither.isLeft && state.isRestartRequired,
-        shouldRestartApp: resetDesignSystemEither.isRight,
       ),
     );
+    if (resetDesignSystemEither.isRight) {
+      await restartApp();
+    }
   }
 }

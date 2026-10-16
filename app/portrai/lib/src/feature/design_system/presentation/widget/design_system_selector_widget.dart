@@ -2,16 +2,11 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/app/restart_app.dart';
 import 'package:portrai/src/feature/design_system/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
-part 'restart_app_tile_widget.dart';
-
 class DesignSystemSelectorWidget extends StatelessWidget {
-  const DesignSystemSelectorWidget({super.key, this.onRestart = restartApp});
-
-  final Future<void> Function() onRestart;
+  const DesignSystemSelectorWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,26 +14,19 @@ class DesignSystemSelectorWidget extends StatelessWidget {
       create: (_) =>
           appServiceLocator.get<DesignSystemBloc>()
             ..add(const LoadDesignSystemEvent()),
-      child: _SelectorWidget(onRestart: onRestart),
+      child: const _SelectorWidget(),
     );
   }
 }
 
 class _SelectorWidget extends StatelessWidget {
-  const _SelectorWidget({required this.onRestart});
-
-  final Future<void> Function() onRestart;
+  const _SelectorWidget();
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<DesignSystemBloc, DesignSystemState>(
-      listenWhen: (previous, current) =>
-          current.failure != null || current.shouldRestartApp,
-      listener: (context, state) async {
-        if (state.shouldRestartApp) {
-          await onRestart();
-          return;
-        }
+      listenWhen: (previous, current) => current.failure != null,
+      listener: (context, state) {
         final failure = state.failure;
         if (failure != null) {
           context.showSnackBar(
@@ -50,10 +38,7 @@ class _SelectorWidget extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        final canReset =
-            state.isLoaded &&
-            state.designSystem != null &&
-            !state.shouldRestartApp;
+        final canReset = state.isLoaded && state.designSystem != null;
         final resetColor = canReset
             ? context.colorPalette.neutral.grey9
             : context.colorPalette.neutral.grey5;
@@ -135,10 +120,6 @@ class _SelectorWidget extends StatelessWidget {
                     ? null
                     : () =>
                           context.bloc.add(const DesignSystemResetClickEvent()),
-              ),
-              _RestartAppTileWidget(
-                isRestartRequired: state.isRestartRequired,
-                onRestart: onRestart,
               ),
             ],
           ),

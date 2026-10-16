@@ -9,6 +9,7 @@ extension MockAiImageRepositoryStub on MockAiImageRepository {
       () => generateAiImage(
         sourceImageUrl: any(named: 'sourceImageUrl'),
         prompt: any(named: 'prompt'),
+        model: any(named: 'model'),
       ),
     ).thenAnswer((_) async => result);
   }
@@ -18,6 +19,7 @@ extension MockAiImageRepositoryStub on MockAiImageRepository {
       () => generateAiImage(
         sourceImageUrl: any(named: 'sourceImageUrl'),
         prompt: any(named: 'prompt'),
+        model: any(named: 'model'),
       ),
     ).thenThrow(error);
   }

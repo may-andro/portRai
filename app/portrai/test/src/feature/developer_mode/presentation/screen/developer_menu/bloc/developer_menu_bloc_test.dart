@@ -1,11 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/asset_source/domain/use_case/asset_source_failure.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../../mock/feature/ai_image_gen/domain/use_case/mock_get_ai_image_settings_use_case.dart';
+import '../../../../../../../mock/feature/ai_image_gen/domain/use_case/mock_update_ai_image_settings_use_case.dart';
 import '../../../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../../../mock/feature/asset_source/domain/use_case/mock_update_asset_source_use_case.dart';
 import '../../../../../../../mock/feature/developer_mode/presentation/screen/developer_menu/tracking/mock_developer_menu_tracking_delegate.dart';
@@ -16,11 +19,15 @@ void main() {
 
     late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late MockUpdateAssetSourceUseCase updateAssetSourceUseCase;
+    late MockGetAiImageSettingsUseCase getAiImageSettingsUseCase;
+    late MockUpdateAiImageSettingsUseCase updateAiImageSettingsUseCase;
 
     DeveloperMenuBloc buildBloc() => DeveloperMenuBloc(
       trackingDelegate,
       getAssetSourceUseCase,
       updateAssetSourceUseCase,
+      getAiImageSettingsUseCase,
+      updateAiImageSettingsUseCase,
     );
 
     setUp(() {
@@ -28,6 +35,11 @@ void main() {
       getAssetSourceUseCase = MockGetAssetSourceUseCase()
         ..stubCall(AssetSource.real);
       updateAssetSourceUseCase = MockUpdateAssetSourceUseCase()
+        ..registerFallbacks()
+        ..stubCall(const Right(null));
+      getAiImageSettingsUseCase = MockGetAiImageSettingsUseCase()
+        ..stubCall(const AiImageSettings());
+      updateAiImageSettingsUseCase = MockUpdateAiImageSettingsUseCase()
         ..registerFallbacks()
         ..stubCall(const Right(null));
     });

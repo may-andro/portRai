@@ -3,6 +3,7 @@ import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/app_config/app_config.dart';
+import 'package:portrai/src/feature/app_config/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/app_config/data/repository/remote_app_config_repository_impl.dart';
 import 'package:portrai/src/feature/app_config/domain/exception/app_config_exception.dart';
 
@@ -32,6 +33,7 @@ void main() {
         firestoreController,
         buildConfig,
         cacheDelegateRepository,
+        const PortraiAppConfigMapper(AiImageAppConfigMapper()),
         logReporter,
       );
     });

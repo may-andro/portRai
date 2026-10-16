@@ -24,6 +24,9 @@ class AppConfigModuleConfigurator extends SimpleModuleConfigurator {
       );
     }
 
-    sl.registerSingleton<AppConfig>(() => appConfigEither.right);
+    final appConfig = appConfigEither.right;
+    sl
+      ..registerSingleton<AppConfig>(() => appConfig)
+      ..registerSingleton<PortraiAppConfigEntity>(() => appConfig);
   }
 }

@@ -117,6 +117,10 @@
   "@errorLocaleFailedToLoadUnknownReason": {
     "description": "Error when locale loading fails unexpectedly"
   },
+  "errorAiImageSettingsSave": "Failed to save AI image settings",
+  "@errorAiImageSettingsSave": {
+    "description": "Error when the AI image settings cannot be saved"
+  },
   "errorLocaleFailedToSaveToCache": "Failed to save language settings",
   "@errorLocaleFailedToSaveToCache": {
     "description": "Error when locale cannot be saved"
@@ -789,9 +793,25 @@
   "@developerMenuDesignSystemResetDescription": {
     "description": "Description for the action that resets the design system in the developer menu"
   },
-  "developerMenuDesignSystemRestartRequired": "Restart the app to apply the new design system",
-  "@developerMenuDesignSystemRestartRequired": {
-    "description": "Snackbar asking to restart the app after the design system changed"
+  "developerMenuAiImage": "AI image",
+  "@developerMenuAiImage": {
+    "description": "Section header for AI image options in the developer menu"
+  },
+  "developerMenuAiImageStyle": "AI image style",
+  "@developerMenuAiImageStyle": {
+    "description": "Label for the AI image style picker in the developer menu"
+  },
+  "developerMenuAiImageStyleDescription": "Style used when generating the profile image. The app restarts to apply",
+  "@developerMenuAiImageStyleDescription": {
+    "description": "Description for the AI image style picker in the developer menu"
+  },
+  "developerMenuAiImageModel": "AI image model",
+  "@developerMenuAiImageModel": {
+    "description": "Label for the AI image model picker in the developer menu"
+  },
+  "developerMenuAiImageModelDescription": "Gemini model used to generate the image. The app restarts to apply",
+  "@developerMenuAiImageModelDescription": {
+    "description": "Description for the AI image model picker in the developer menu"
   },
   "developerMenuErrorSimulation": "Error Simulation",
   "@developerMenuErrorSimulation": {

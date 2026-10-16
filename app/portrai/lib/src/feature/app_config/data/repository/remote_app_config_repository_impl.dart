@@ -2,6 +2,8 @@ import 'package:core/core.dart';
 import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/app_config/data/mapper/_mapper.dart';
+import 'package:portrai/src/feature/app_config/data/model/_model.dart';
 import 'package:portrai/src/feature/app_config/data/repository/cache_app_config_repository_impl.dart';
 import 'package:portrai/src/feature/app_config/domain/_domain.dart';
 
@@ -11,6 +13,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
     this._firestoreController,
     this._buildConfig,
     @Inject(CacheAppConfigRepositoryImpl) this._cacheDelegateRepository,
+    this._mapper,
     this._logReporter,
   );
 
@@ -20,6 +23,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
   final FbFirestoreController _firestoreController;
   final BuildConfig _buildConfig;
   final AppConfigRepository _cacheDelegateRepository;
+  final PortraiAppConfigMapper _mapper;
   final LogReporter _logReporter;
 
   @override
@@ -55,7 +59,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
       }
 
       try {
-        return PortraiAppConfigEntity.fromJson(appConfigJson);
+        return _mapper.to(PortraiAppConfigModel.fromJson(appConfigJson));
       } catch (e, st) {
         throw AppConfigParsingException(
           cause: 'Failed to parse app config from Firestore: $e',

@@ -1,12 +1,12 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/app_config/data/cache/app_config_cache.dart';
+import 'package:portrai/src/feature/app_config/data/model/_model.dart';
 
 class MockAppConfigCache extends Mock implements AppConfigCache {}
 
 extension MockAppConfigCacheStub on MockAppConfigCache {
   /// Stubs `get()` to return [appConfig].
-  void stubGet(PortraiAppConfigEntity? appConfig) {
+  void stubGet(PortraiAppConfigModel? appConfig) {
     when(get).thenAnswer((_) async => appConfig);
   }
 

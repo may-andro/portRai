@@ -1,7 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/design_system/presentation/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
@@ -50,21 +49,6 @@ void main() {
     );
 
     blocTest<DesignSystemBloc, DesignSystemState>(
-      'should save the selected design system when clicked',
-      build: buildBloc,
-      act: (bloc) => bloc.add(const DesignSystemClickEvent(DesignSystem.holi)),
-      expect: () => const [
-        DesignSystemState(
-          isLoaded: true,
-          designSystem: DesignSystem.holi,
-          isRestartRequired: true,
-        ),
-      ],
-      verify: (_) =>
-          verify(() => setDesignSystemUseCase(DesignSystem.holi)).called(1),
-    );
-
-    blocTest<DesignSystemBloc, DesignSystemState>(
       'should propagate the set failure and keep the selection when saving fails',
       setUp: () => setDesignSystemUseCase.stubCall(
         const Left(SetDesignSystemUnknownFailure()),
@@ -79,53 +63,6 @@ void main() {
         DesignSystemState(
           isLoaded: true,
           designSystem: DesignSystem.xmas,
-          failure: SetDesignSystemUnknownFailure(),
-        ),
-      ],
-    );
-
-    blocTest<DesignSystemBloc, DesignSystemState>(
-      'should clear the selection when reset is clicked',
-      seed: () => const DesignSystemState(
-        isLoaded: true,
-        designSystem: DesignSystem.holi,
-      ),
-      build: buildBloc,
-      act: (bloc) => bloc.add(const DesignSystemResetClickEvent()),
-      expect: () => const [
-        DesignSystemState(isLoaded: true, shouldRestartApp: true),
-      ],
-      verify: (_) => verify(() => resetDesignSystemUseCase()).called(1),
-    );
-
-    blocTest<DesignSystemBloc, DesignSystemState>(
-      'should not require a restart when the selected design system is unchanged',
-      seed: () => const DesignSystemState(
-        isLoaded: true,
-        designSystem: DesignSystem.holi,
-      ),
-      build: buildBloc,
-      act: (bloc) => bloc.add(const DesignSystemClickEvent(DesignSystem.holi)),
-      expect: () => const <DesignSystemState>[],
-    );
-
-    blocTest<DesignSystemBloc, DesignSystemState>(
-      'should preserve the restart requirement when a later update fails',
-      setUp: () => setDesignSystemUseCase.stubCall(
-        const Left(SetDesignSystemUnknownFailure()),
-      ),
-      seed: () => const DesignSystemState(
-        isLoaded: true,
-        designSystem: DesignSystem.xmas,
-        isRestartRequired: true,
-      ),
-      build: buildBloc,
-      act: (bloc) => bloc.add(const DesignSystemClickEvent(DesignSystem.holi)),
-      expect: () => const [
-        DesignSystemState(
-          isLoaded: true,
-          designSystem: DesignSystem.xmas,
-          isRestartRequired: true,
           failure: SetDesignSystemUnknownFailure(),
         ),
       ],

@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/app/restart_app.dart';
+import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_event.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_state.dart';
@@ -11,9 +13,13 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     this._trackingDelegate,
     this._getAssetSourceUseCase,
     this._updateAssetSourceUseCase,
+    this._getAiImageSettingsUseCase,
+    this._updateAiImageSettingsUseCase,
   ) : super(const DeveloperMenuInitialState()) {
     on<LoadDeveloperMenuEvent>(_onLoad);
     on<AssetSourceClickEvent>(_onAssetSourceClick);
+    on<AiImageStyleClickEvent>(_onAiImageStyleClick);
+    on<AiImageModelClickEvent>(_onAiImageModelClick);
     on<ForceFatalCrashEvent>(_onForceFatalCrash);
     on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
     on<ForceBlacklistErrorEvent>(_onForceBlacklistError);
@@ -24,6 +30,8 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
   final DeveloperMenuTrackingDelegate _trackingDelegate;
   final GetAssetSourceUseCase _getAssetSourceUseCase;
   final UpdateAssetSourceUseCase _updateAssetSourceUseCase;
+  final GetAiImageSettingsUseCase _getAiImageSettingsUseCase;
+  final UpdateAiImageSettingsUseCase _updateAiImageSettingsUseCase;
 
   DeveloperMenuLoadedState get _loadedState => switch (state) {
     final DeveloperMenuLoadedState loaded => loaded,
@@ -35,7 +43,13 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     Emitter<DeveloperMenuState> emit,
   ) async {
     final assetSourceEither = await _getAssetSourceUseCase();
-    emit(DeveloperMenuLoadedState(assetSource: assetSourceEither.right));
+    final aiImageSettingsEither = await _getAiImageSettingsUseCase();
+    emit(
+      DeveloperMenuLoadedState(
+        assetSource: assetSourceEither.right,
+        aiImageSettings: aiImageSettingsEither.right ?? const AiImageSettings(),
+      ),
+    );
   }
 
   Future<void> _onAssetSourceClick(
@@ -45,6 +59,34 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     final result = await _updateAssetSourceUseCase(event.source);
     if (result.isRight) {
       emit(_loadedState.withAssetSource(event.source));
+    }
+  }
+
+  Future<void> _onAiImageStyleClick(
+    AiImageStyleClickEvent event,
+    Emitter<DeveloperMenuState> emit,
+  ) => _updateAiImageSettings(
+    _loadedState.aiImageSettings.copyWith(style: event.style),
+    emit,
+  );
+
+  Future<void> _onAiImageModelClick(
+    AiImageModelClickEvent event,
+    Emitter<DeveloperMenuState> emit,
+  ) => _updateAiImageSettings(
+    _loadedState.aiImageSettings.copyWith(model: event.model),
+    emit,
+  );
+
+  Future<void> _updateAiImageSettings(
+    AiImageSettings settings,
+    Emitter<DeveloperMenuState> emit,
+  ) async {
+    final result = await _updateAiImageSettingsUseCase(settings);
+    if (result.isRight) {
+      emit(_loadedState.withAiImageSettings(settings));
+      // Last step: restarting tears the app, and with it this bloc, down.
+      await restartApp();
     }
   }
 
