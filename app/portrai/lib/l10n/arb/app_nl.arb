@@ -348,5 +348,18 @@
   "experienceFactDuration": "Duur",
   "experienceKeepExploring": "Blijf ontdekken",
   "experienceNewerRole": "Recentere functie",
-  "experienceOlderRole": "Eerdere functie"
+  "experienceOlderRole": "Eerdere functie",
+  "festiveBannerTitle": "We vieren {festival}",
+  "festivalNameBeltane": "Beltane",
+  "festivalNameCarnival": "Carnaval",
+  "festivalNameChuseok": "Chuseok",
+  "festivalNameDiwali": "Diwali",
+  "festivalNameHalloween": "Halloween",
+  "festivalNameHogeras": "Hogueras",
+  "festivalNameHogmanay": "Hogmanay",
+  "festivalNameHoli": "Holi",
+  "festivalNameObon": "Obon",
+  "festivalNamePachamama": "Pachamama",
+  "festivalNameSakura": "Sakura",
+  "festivalNameXmas": "Kerst"
 }

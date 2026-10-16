@@ -348,5 +348,18 @@
   "experienceFactDuration": "Duración",
   "experienceKeepExploring": "Sigue explorando",
   "experienceNewerRole": "Puesto más reciente",
-  "experienceOlderRole": "Puesto anterior"
+  "experienceOlderRole": "Puesto anterior",
+  "festiveBannerTitle": "Celebrando {festival}",
+  "festivalNameBeltane": "Beltane",
+  "festivalNameCarnival": "Carnaval",
+  "festivalNameChuseok": "Chuseok",
+  "festivalNameDiwali": "Diwali",
+  "festivalNameHalloween": "Halloween",
+  "festivalNameHogeras": "Hogueras",
+  "festivalNameHogmanay": "Hogmanay",
+  "festivalNameHoli": "Holi",
+  "festivalNameObon": "Obon",
+  "festivalNamePachamama": "Pachamama",
+  "festivalNameSakura": "Sakura",
+  "festivalNameXmas": "Navidad"
 }

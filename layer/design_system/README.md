@@ -107,6 +107,7 @@ import 'package:design_system/design_system.dart';
 | `DSAppBarWidget` | Branded app bar with optional back button and action slots |
 | `DSDetailSectionWidget` | Titled section header above arbitrary child content |
 | `DSExpandableCardWidget` | Animated collapsible card with chevron header |
+| `DSFestiveBackdropWidget` | Animated, painted backdrop that follows the active festive design system (circle or rectangle) |
 | `DSGradientBlobWidget` | Pulsating radial-gradient decorative blob |
 | `DSHoverableContainerWidget` | `MouseRegion` builder exposing hover state |
 | `DSInfoChipWidget` | Icon + label pill using secondary container colours |
