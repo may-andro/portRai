@@ -26,36 +26,38 @@ class FirebaseAiImageRepository implements AiImageRepository {
   final AiImageCache _cache;
   final AiImageMapper _mapper;
 
-  final _inFlight = <String, Future<AiImageEntity>>{};
+  /// Requests still running, by cache key; duplicate calls share one request.
+  final _runningRequestsByKey = <String, Future<AiImageEntity>>{};
 
   @override
   Future<AiImageEntity> generateAiImage({
     required String sourceImageUrl,
     required String prompt,
+    required String model,
   }) {
-    final key = _cacheKey(sourceImageUrl, prompt);
-    return _inFlight[key] ??= _load(sourceImageUrl, prompt, key).whenComplete(
-      () {
-        // Must not return the removed future: whenComplete would await itself.
-        _inFlight.remove(key);
-      },
-    );
+    final key = _cacheKey(sourceImageUrl, prompt, model);
+    return _runningRequestsByKey[key] ??=
+        _load(sourceImageUrl, prompt, model, key).whenComplete(() {
+          // Must not return the removed future: whenComplete would await itself.
+          _runningRequestsByKey.remove(key);
+        });
   }
 
-  String _cacheKey(String sourceImageUrl, String prompt) =>
+  String _cacheKey(String sourceImageUrl, String prompt, String model) =>
       '${AiImageRequestLimits.promptVersion}|'
-      '${AiImageRequestLimits.model}|$sourceImageUrl|$prompt';
+      '$model|$sourceImageUrl|$prompt';
 
   Future<AiImageEntity> _load(
     String sourceImageUrl,
     String prompt,
+    String model,
     String key,
   ) async {
     final cached = await _readCache(key);
     if (cached != null) return cached;
 
     final source = await _downloadSource(sourceImageUrl);
-    final generated = await _generate(source, prompt).timeout(
+    final generated = await _generate(source, prompt, model).timeout(
       AiImageRequestLimits.requestTimeout,
       onTimeout: () => throw const AiImageGenerationException(
         cause: 'Image generation timed out',
@@ -121,11 +123,12 @@ class FirebaseAiImageRepository implements AiImageRepository {
   Future<FbAiImage> _generate(
     ({Uint8List bytes, String mimeType}) source,
     String prompt,
+    String modelId,
   ) async {
     FbAiImageModel? model;
     try {
       model = _aiController.createImageModel(
-        model: AiImageRequestLimits.model,
+        model: modelId,
         systemInstruction: _systemInstruction,
       );
       return await model.generateImage([

@@ -24,13 +24,13 @@ class InitializeAppConfigUnknownFailure extends InitializeAppConfigFailure {
 }
 
 /// Fetches [PortraiAppConfigEntity] from remote (falling back to cache) so it can
-/// be registered as the app-wide `AppConfig` singleton.
+/// be registered as the app-wide singleton.
 ///
 /// This is a **startup-only** use case: it is meant to be called exactly
 /// once, by `AppConfigModuleConfigurator` during DI setup. Do not call it
 /// from other use cases, blocs, or widgets to "get" the current app config -
-/// once startup has registered it, retrieve it via `sl.get<AppConfig>()`
-/// (or inject `AppConfig` directly) instead.
+/// once startup has registered it, retrieve it via `sl.get<PortraiAppConfigEntity>()`
+/// (or inject `PortraiAppConfigEntity` directly) instead.
 @register
 class InitializeAppConfigUseCase
     extends

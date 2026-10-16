@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
@@ -137,6 +138,14 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
               const DSCardWidget(child: _AssetSourceTile()),
               const DSVerticalSpacerWidget(3),
 
+              _SectionHeader(title: context.localizations.developerMenuAiImage),
+              const DSCardWidget(
+                child: Column(
+                  children: [_AiImageStyleTile(), _AiImageModelTile()],
+                ),
+              ),
+              const DSVerticalSpacerWidget(3),
+
               _SectionHeader(
                 title: context.localizations.developerMenuDesignSystem,
               ),
@@ -254,6 +263,135 @@ class _AssetSourceTile extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _AiImageStyleTile extends StatelessWidget {
+  const _AiImageStyleTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DeveloperMenuBloc, DeveloperMenuState>(
+      buildWhen: (previous, current) => current is DeveloperMenuLoadedState,
+      builder: (context, state) {
+        final selected = state is DeveloperMenuLoadedState
+            ? state.aiImageSettings.style
+            : AiImageStyle.avatar;
+        return _PickerTile<AiImageStyle>(
+          icon: Icons.brush_outlined,
+          title: context.localizations.developerMenuAiImageStyle,
+          subTitle: context.localizations.developerMenuAiImageStyleDescription,
+          value: selected,
+          options: AiImageStyle.values,
+          labelOf: (style) => style.label,
+          onChanged: (style) => context.bloc.add(AiImageStyleClickEvent(style)),
+        );
+      },
+    );
+  }
+}
+
+class _AiImageModelTile extends StatelessWidget {
+  const _AiImageModelTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DeveloperMenuBloc, DeveloperMenuState>(
+      buildWhen: (previous, current) => current is DeveloperMenuLoadedState,
+      builder: (context, state) {
+        final selected = state is DeveloperMenuLoadedState
+            ? state.aiImageSettings.model
+            : AiImageModelType.geminiFlashImage;
+        return _PickerTile<AiImageModelType>(
+          icon: Icons.memory_outlined,
+          title: context.localizations.developerMenuAiImageModel,
+          subTitle: context.localizations.developerMenuAiImageModelDescription,
+          value: selected,
+          options: AiImageModelType.values,
+          labelOf: (model) => model.label,
+          onChanged: (model) => context.bloc.add(AiImageModelClickEvent(model)),
+        );
+      },
+    );
+  }
+}
+
+class _PickerTile<T> extends StatelessWidget {
+  const _PickerTile({
+    required this.icon,
+    required this.title,
+    required this.subTitle,
+    required this.value,
+    required this.options,
+    required this.labelOf,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subTitle;
+  final T value;
+  final List<T> options;
+  final String Function(T option) labelOf;
+  final ValueChanged<T> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(context.space()),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DSIconWidget(
+                icon,
+                color: context.colorPalette.neutral.grey9,
+                size: DSIconSize.medium,
+              ),
+              const DSHorizontalSpacerWidget(2),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DSTextWidget(
+                      title,
+                      style: context.typography.emphasizedBodyMedium,
+                      color: context.colorPalette.neutral.grey9,
+                    ),
+                    DSTextWidget(
+                      subTitle,
+                      style: context.typography.emphasizedBodySmall,
+                      color: context.colorPalette.neutral.grey9,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const DSVerticalSpacerWidget(1),
+          DropdownButtonFormField<T>(
+            initialValue: value,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            items: [
+              for (final option in options)
+                DropdownMenuItem(
+                  value: option,
+                  child: Text(labelOf(option), overflow: TextOverflow.ellipsis),
+                ),
+            ],
+            onChanged: (selected) {
+              if (selected != null) onChanged(selected);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

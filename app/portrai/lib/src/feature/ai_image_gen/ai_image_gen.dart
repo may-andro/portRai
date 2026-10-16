@@ -1,4 +1,9 @@
 export 'ai_image_gen_module_configurator.dart';
+export 'domain/entity/ai_image_model_type.dart';
+export 'domain/entity/ai_image_prompts.dart';
+export 'domain/entity/ai_image_settings.dart';
+export 'domain/entity/ai_image_style.dart';
 export 'domain/feature_flag/ai_image_gen_feature_flags.dart';
-export 'domain/use_case/generate_ai_image_use_case.dart' show AiImagePrompts;
+export 'domain/use_case/get_ai_image_settings_use_case.dart';
+export 'domain/use_case/update_ai_image_settings_use_case.dart';
 export 'presentation/widget/ai_image_widget.dart';

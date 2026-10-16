@@ -15,7 +15,9 @@ import 'package:portrai/src/feature/profile/domain/use_case/get_profile_use_case
 import 'package:tracking/src/reporter/tracking_reporter.dart';
 
 void $registerLocaleDependencies(ServiceLocator sl) {
-  sl.registerSingleton<AppLocaleCache>(() => AppLocaleCache());
+  sl.registerSingleton<AppLocaleCache>(
+    () => AppLocaleCache(),
+  );
   sl.registerSingleton<LocaleRepository>(
     () => LocaleRepositoryImpl(sl.get<AppLocale>(), sl.get<AppLocaleCache>()),
   );
@@ -29,12 +31,7 @@ void $registerLocaleDependencies(ServiceLocator sl) {
     () => UpdateLocaleUseCase(sl.get<LocaleRepository>()),
   );
   sl.registerFactory<LocaleSelectionBloc>(
-    () => LocaleSelectionBloc(
-      sl.get<GetLocaleUseCase>(),
-      sl.get<UpdateLocaleUseCase>(),
-      sl.get<GetProfileUseCase>(),
-      sl.get<LocaleSelectionTrackingDelegate>(),
-    ),
+    () => LocaleSelectionBloc(sl.get<GetLocaleUseCase>(), sl.get<UpdateLocaleUseCase>(), sl.get<GetProfileUseCase>(), sl.get<LocaleSelectionTrackingDelegate>()),
   );
   sl.registerFactory<LocaleSelectionTrackingDelegate>(
     () => LocaleSelectionTrackingDelegate(sl.get<TrackingReporter>()),

@@ -21,10 +21,7 @@ class AiImageBloc extends Bloc<AiImageEvent, AiImageState> {
     Emitter<AiImageState> emit,
   ) async {
     final result = await _generateAiImageUseCase(
-      GenerateAiImageParam(
-        sourceImageUrl: event.sourceImageUrl,
-        prompt: event.prompt,
-      ),
+      GenerateAiImageParam(sourceImageUrl: event.sourceImageUrl),
     );
     final generated = result.fold((_) => null, (image) => image);
     if (generated == null) {

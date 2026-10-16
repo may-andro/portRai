@@ -7,8 +7,6 @@ class DesignSystemState extends Equatable {
     this.isLoaded = false,
     this.designSystem,
     this.failure,
-    this.isRestartRequired = false,
-    this.shouldRestartApp = false,
   });
 
   final bool isLoaded;
@@ -16,15 +14,7 @@ class DesignSystemState extends Equatable {
   /// `null` means the design system follows the current month.
   final DesignSystem? designSystem;
   final BasicFailure? failure;
-  final bool isRestartRequired;
-  final bool shouldRestartApp;
 
   @override
-  List<Object?> get props => [
-    isLoaded,
-    designSystem,
-    failure,
-    isRestartRequired,
-    shouldRestartApp,
-  ];
+  List<Object?> get props => [isLoaded, designSystem, failure];
 }

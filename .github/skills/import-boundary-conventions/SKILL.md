@@ -50,6 +50,12 @@ Keep feature repositories internal: do not export them from a feature's public b
 Other features access domain operations and data through the owning feature's use cases,
 not its repository contracts.
 
+This also applies to dependency injection: never register an implementation of another feature's
+repository interface (for example an `app_config` class implementing an `ai_image_gen`
+repository). If feature A needs data owned by feature B, A calls one of B's exposed use cases and
+uses B's exposed entities. Keep the dependency one-way (A -> B); if B would need A's types back,
+define the small value entity in B instead of making the features import each other.
+
 ## Why this matters
 Bypassing the public barrel couples callers to another module's/feature's internal file layout,
 so an internal refactor (renaming/moving/splitting a file under `src/` or a feature's private

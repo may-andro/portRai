@@ -12,14 +12,12 @@ sealed class AiImageEvent extends Equatable {
 final class LoadImageEvent extends AiImageEvent {
   const LoadImageEvent({
     required this.sourceImageUrl,
-    required this.prompt,
     this.removeBackground = false,
   });
 
   final String sourceImageUrl;
-  final String prompt;
   final bool removeBackground;
 
   @override
-  List<Object?> get props => [sourceImageUrl, prompt, removeBackground];
+  List<Object?> get props => [sourceImageUrl, removeBackground];
 }

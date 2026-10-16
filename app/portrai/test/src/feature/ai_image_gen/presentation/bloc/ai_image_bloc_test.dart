@@ -16,10 +16,7 @@ void main() {
     bytes: Uint8List.fromList([1, 2, 3]),
     mimeType: 'image/png',
   );
-  const event = LoadImageEvent(
-    sourceImageUrl: 'https://example.com/a.png',
-    prompt: 'Draw',
-  );
+  const event = LoadImageEvent(sourceImageUrl: 'https://example.com/a.png');
 
   final transparent = AiImageEntity(
     bytes: Uint8List.fromList([9]),
@@ -53,7 +50,6 @@ void main() {
         () => useCase(
           const GenerateAiImageParam(
             sourceImageUrl: 'https://example.com/a.png',
-            prompt: 'Draw',
           ),
         ),
       ).called(1);
@@ -72,7 +68,6 @@ void main() {
 
   const removeEvent = LoadImageEvent(
     sourceImageUrl: 'https://example.com/a.png',
-    prompt: 'Draw',
     removeBackground: true,
   );
 

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 
 @immutable
@@ -33,6 +34,24 @@ class AssetSourceClickEvent extends DeveloperMenuEvent {
 
   @override
   List<Object?> get props => [source];
+}
+
+class AiImageStyleClickEvent extends DeveloperMenuEvent {
+  const AiImageStyleClickEvent(this.style);
+
+  final AiImageStyle style;
+
+  @override
+  List<Object?> get props => [style];
+}
+
+class AiImageModelClickEvent extends DeveloperMenuEvent {
+  const AiImageModelClickEvent(this.model);
+
+  final AiImageModelType model;
+
+  @override
+  List<Object?> get props => [model];
 }
 
 // Tracking Events

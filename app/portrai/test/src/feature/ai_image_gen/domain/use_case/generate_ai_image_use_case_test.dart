@@ -7,12 +7,14 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/ai_image_gen/domain/repository/mock_ai_image_repository.dart';
+import '../../../../../mock/feature/ai_image_gen/domain/use_case/mock_resolve_ai_image_request_settings_use_case.dart';
 import '../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 
 void main() {
   group('GenerateAiImageUseCase', () {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockAiImageRepository repository;
+    late MockResolveAiImageRequestSettingsUseCase resolveSettingsUseCase;
     late GenerateAiImageUseCase useCase;
 
     final image = AiImageEntity(
@@ -21,13 +23,20 @@ void main() {
     );
     const param = GenerateAiImageParam(
       sourceImageUrl: 'https://example.com/a.png',
-      prompt: 'Draw',
     );
 
     setUp(() {
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase();
       repository = MockAiImageRepository();
-      useCase = GenerateAiImageUseCase(isFeatureEnabledUseCase, repository);
+      resolveSettingsUseCase = MockResolveAiImageRequestSettingsUseCase()
+        ..stubCall(
+          const AiImageRequestSettings(prompt: 'prompt', model: 'model'),
+        );
+      useCase = GenerateAiImageUseCase(
+        isFeatureEnabledUseCase,
+        repository,
+        resolveSettingsUseCase,
+      );
     });
 
     void stubFlag(Either<IsFeatureEnabledFailure, bool> result) {
@@ -38,7 +47,7 @@ void main() {
     }
 
     test(
-      'should return image for the source and prompt when the flag is enabled',
+      'should return image generated with the resolved settings when the flag is enabled',
       () async {
         stubFlag(const Right(true));
         repository.stubGenerateAiImage(image);
@@ -49,7 +58,8 @@ void main() {
         verify(
           () => repository.generateAiImage(
             sourceImageUrl: 'https://example.com/a.png',
-            prompt: 'Draw',
+            prompt: 'prompt',
+            model: 'model',
           ),
         ).called(1);
       },
@@ -67,6 +77,7 @@ void main() {
           () => repository.generateAiImage(
             sourceImageUrl: any(named: 'sourceImageUrl'),
             prompt: any(named: 'prompt'),
+            model: any(named: 'model'),
           ),
         );
       },

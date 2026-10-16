@@ -12,10 +12,6 @@ import '../../../../../mock/feature/design_system/domain/use_case/mock_set_desig
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
-  var restartCount = 0;
-
-  setUp(() => restartCount = 0);
-
   Future<void> pumpSelector(
     WidgetTester tester, {
     DesignSystem? designSystem,
@@ -42,11 +38,7 @@ void main() {
         child: DSThemeBuilderWidget(
           brightness: brightness,
           designSystem: DesignSystem.beltane,
-          child: Scaffold(
-            body: DesignSystemSelectorWidget(
-              onRestart: () async => restartCount++,
-            ),
-          ),
+          child: const Scaffold(body: DesignSystemSelectorWidget()),
         ),
       ),
     );
@@ -66,14 +58,11 @@ void main() {
 
       await tester.tap(find.text('Reset design system'));
       await tester.pumpAndSettle();
-
-      expect(restartCount, 0);
-      expect(find.text('Restart').hitTestable(), findsNothing);
     },
   );
 
   testWidgets(
-    'should display the stored selection without a restart message when loaded',
+    'should display the stored selection without restarting when loaded',
     (tester) async {
       await pumpSelector(tester, designSystem: DesignSystem.holi);
       expect(
@@ -85,7 +74,6 @@ void main() {
         DesignSystem.holi,
       );
       expect(find.byType(SnackBar), findsNothing);
-      expect(find.text('Restart').hitTestable(), findsNothing);
       expect(
         tester
             .widget<ListTile>(
@@ -93,82 +81,6 @@ void main() {
             )
             .enabled,
         isTrue,
-      );
-    },
-  );
-
-  testWidgets(
-    'should save the selection and show a restart message when a design system is chosen',
-    (tester) async {
-      await pumpSelector(tester);
-      await tester.tap(find.byType(DropdownButton<DesignSystem>));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('holi').last);
-      await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<DropdownButton<DesignSystem>>(
-              find.byType(DropdownButton<DesignSystem>),
-            )
-            .value,
-        DesignSystem.holi,
-      );
-      expect(find.byType(SnackBar), findsNothing);
-      expect(find.text('Restart').hitTestable(), findsOneWidget);
-      expect(
-        find
-            .text('Restart the app to apply the new design system')
-            .hitTestable(),
-        findsOneWidget,
-      );
-    },
-  );
-
-  testWidgets(
-    'should restore automatic selection and restart immediately when reset is tapped',
-    (tester) async {
-      await pumpSelector(tester, designSystem: DesignSystem.holi);
-      await tester.tap(find.text('Reset design system'));
-      await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<DropdownButton<DesignSystem>>(
-              find.byType(DropdownButton<DesignSystem>),
-            )
-            .value,
-        isNull,
-      );
-      expect(find.byType(SnackBar), findsNothing);
-      expect(restartCount, 1);
-      expect(find.text('Restart').hitTestable(), findsNothing);
-      expect(
-        find
-            .text('Restart the app to apply the new design system')
-            .hitTestable(),
-        findsNothing,
-      );
-    },
-  );
-
-  testWidgets(
-    'should restart directly without showing a restart button when resetting in dark mode',
-    (tester) async {
-      await pumpSelector(
-        tester,
-        designSystem: DesignSystem.holi,
-        brightness: Brightness.dark,
-      );
-      await tester.tap(find.text('Reset design system'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SnackBar), findsNothing);
-      expect(restartCount, 1);
-      expect(find.text('Restart').hitTestable(), findsNothing);
-      expect(
-        find
-            .text('Restart the app to apply the new design system')
-            .hitTestable(),
-        findsNothing,
       );
     },
   );
@@ -192,16 +104,9 @@ void main() {
         DesignSystem.holi,
       );
       expect(find.byType(SnackBar), findsOneWidget);
-      expect(restartCount, 0);
       expect(
         find.text('Something went wrong. Please try again'),
         findsOneWidget,
-      );
-      expect(
-        find
-            .text('Restart the app to apply the new design system')
-            .hitTestable(),
-        findsNothing,
       );
     },
   );

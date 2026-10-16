@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:core/core.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/app_config/app_config_module_configurator.di.g.dart';
 import 'package:portrai/src/feature/app_config/domain/_domain.dart';
@@ -24,6 +23,7 @@ class AppConfigModuleConfigurator extends SimpleModuleConfigurator {
       );
     }
 
-    sl.registerSingleton<AppConfig>(() => appConfigEither.right);
+    final appConfig = appConfigEither.right;
+    sl.registerSingleton<PortraiAppConfigEntity>(() => appConfig);
   }
 }

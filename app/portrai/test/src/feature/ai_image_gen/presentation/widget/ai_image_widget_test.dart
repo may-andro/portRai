@@ -20,9 +20,7 @@ void main() {
   );
 
   setUpAll(
-    () => registerFallbackValue(
-      const LoadImageEvent(sourceImageUrl: '', prompt: ''),
-    ),
+    () => registerFallbackValue(const LoadImageEvent(sourceImageUrl: '')),
   );
 
   setUp(() => appServiceLocator.reset());
@@ -54,10 +52,7 @@ void main() {
 
     verify(
       () => bloc.add(
-        const LoadImageEvent(
-          sourceImageUrl: 'https://example.com/a.png',
-          prompt: AiImagePrompts.avatar,
-        ),
+        const LoadImageEvent(sourceImageUrl: 'https://example.com/a.png'),
       ),
     ).called(1);
   });
