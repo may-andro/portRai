@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:use_case/use_case.dart';
 
 enum RemoteAssistantStatus { loading, unavailable, ready }
@@ -31,6 +32,7 @@ class RemoteAssistantState extends Equatable {
     this.genuiSurfaces = const [],
     this.partialAnswer = '',
     this.failure,
+    this.userRole,
   });
 
   final RemoteAssistantStatus status;
@@ -43,6 +45,7 @@ class RemoteAssistantState extends Equatable {
   final List<RemoteAssistantSurface> genuiSurfaces;
   final String partialAnswer;
   final Failure? failure;
+  final UserRole? userRole;
 
   bool get isReady => status == RemoteAssistantStatus.ready;
 
@@ -72,6 +75,7 @@ class RemoteAssistantState extends Equatable {
     String? partialAnswer,
     Failure? failure,
     bool clearFailure = false,
+    UserRole? userRole,
   }) => RemoteAssistantState(
     status: status ?? this.status,
     isFeatureEnabled: isFeatureEnabled ?? this.isFeatureEnabled,
@@ -87,6 +91,7 @@ class RemoteAssistantState extends Equatable {
         : genuiSurfaces ?? this.genuiSurfaces,
     partialAnswer: partialAnswer ?? this.partialAnswer,
     failure: clearFailure ? null : failure ?? this.failure,
+    userRole: userRole ?? this.userRole,
   );
 
   @override
@@ -101,6 +106,7 @@ class RemoteAssistantState extends Equatable {
     genuiSurfaces,
     partialAnswer,
     failure,
+    userRole,
   ];
 
   @override

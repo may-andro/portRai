@@ -64,9 +64,14 @@ class SectionContainerWidget extends StatefulWidget {
     this.horizontalPadding,
     this.title,
     this.action,
+    this.backgroundDetail,
   });
 
   final Widget Function(BuildContext context, bool isVisible) builder;
+
+  /// Painted behind the whole section, edge to edge, ignoring the padding
+  /// that applies to the content.
+  final Widget Function(BuildContext context, bool isVisible)? backgroundDetail;
   final String visibilityKey;
   final SectionBackground background;
   final bool hasBottomPadding;
@@ -94,24 +99,34 @@ class _SectionContainerWidgetState extends State<SectionContainerWidget> {
       onVisibilityChanged: _onVisibilityChanged,
       child: ColoredBox(
         color: widget.background.getBgColor(context).color,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
           children: [
-            if (widget.title case final String title) ...[
-              _HeaderWidget(
-                title: title,
-                background: widget.background,
-                isVisible: _isVisible,
-                action: widget.action,
-              ),
-            ],
-            ClipRect(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: widget.builder(context, _isVisible),
-              ),
+            if (widget.backgroundDetail case final detail?)
+              Positioned.fill(child: detail(context, _isVisible)),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.title case final String title) ...[
+                  _HeaderWidget(
+                    title: title,
+                    background: widget.background,
+                    isVisible: _isVisible,
+                    action: widget.action,
+                  ),
+                ],
+                ClipRect(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                    ),
+                    child: widget.builder(context, _isVisible),
+                  ),
+                ),
+                if (widget.hasBottomPadding) ...[
+                  const DSVerticalSpacerWidget(3),
+                ],
+              ],
             ),
-            if (widget.hasBottomPadding) ...[const DSVerticalSpacerWidget(3)],
           ],
         ),
       ),

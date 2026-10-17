@@ -18,7 +18,9 @@ enum DSLottieIllustration {
   mapPin(1),
   developerRole(1330 / 920),
   recruiterRole(1330 / 920),
-  explorerRole(1);
+  explorerRole(1),
+  techStack(1),
+  computerWindow(1);
 
   const DSLottieIllustration(this.aspectRatio);
 
@@ -65,6 +67,8 @@ enum DSLottieIllustration {
       case DSLottieIllustration.orbit:
       case DSLottieIllustration.developerRole:
       case DSLottieIllustration.explorerRole:
+      case DSLottieIllustration.techStack:
+      case DSLottieIllustration.computerWindow:
         return const [];
     }
   }
@@ -95,6 +99,10 @@ enum DSLottieIllustration {
         return Assets.lottie.recruiterRole;
       case DSLottieIllustration.explorerRole:
         return Assets.lottie.explorerRole;
+      case DSLottieIllustration.techStack:
+        return Assets.lottie.techStack;
+      case DSLottieIllustration.computerWindow:
+        return Assets.lottie.computerWindow;
     }
   }
 }

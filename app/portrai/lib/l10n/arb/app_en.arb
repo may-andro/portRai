@@ -503,6 +503,10 @@
   "@expertisesTitle": {
     "description": "Title of the expertises screen"
   },
+  "expertiseViewDetails": "View details",
+  "@expertiseViewDetails": {
+    "description": "Button on the expertise orbit that opens the selected expertise"
+  },
   "expertiseSkillsHeading": "Skills & Technologies",
   "@expertiseSkillsHeading": {
     "description": "Heading above the skills grid on the expertise screen"
@@ -1194,5 +1198,21 @@
   "settingChangeRole": "Change role",
   "@settingChangeRole": {
     "description": "Settings item that lets the user pick their role again"
+  },
+  "assistantSuggestionTechStack": "Which technologies and tools are used?",
+  "@assistantSuggestionTechStack": {
+    "description": "Suggested question asking about the technology stack"
+  },
+  "assistantSuggestionArchitecture": "How are the apps architected?",
+  "@assistantSuggestionArchitecture": {
+    "description": "Suggested question asking about app architecture"
+  },
+  "assistantSuggestionAvailability": "Is he available for new work?",
+  "@assistantSuggestionAvailability": {
+    "description": "Suggested question asking about availability for hiring"
+  },
+  "assistantSuggestionContact": "How can I get in touch?",
+  "@assistantSuggestionContact": {
+    "description": "Suggested question asking how to contact the person"
   }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
@@ -25,7 +26,10 @@ class ContentWidget extends StatelessWidget {
           final ErrorState state => _ErrorWidget(
             errorMessage: FailureTranslator.translate(context, state.failure),
           ),
-          final LoadedState state => _SuccessWidget(portfolio: state.portfolio),
+          final LoadedState state => _SuccessWidget(
+            portfolio: state.portfolio,
+            userRole: state.userRole,
+          ),
         };
       },
     );
@@ -33,9 +37,10 @@ class ContentWidget extends StatelessWidget {
 }
 
 class _SuccessWidget extends StatefulWidget {
-  const _SuccessWidget({required this.portfolio});
+  const _SuccessWidget({required this.portfolio, this.userRole});
 
   final PortfolioEntity portfolio;
+  final UserRole? userRole;
 
   @override
   State<_SuccessWidget> createState() => _SuccessWidgetState();
@@ -50,7 +55,7 @@ class _SuccessWidgetState extends State<_SuccessWidget>
   @override
   void initState() {
     super.initState();
-    _scrollableSections = widget.portfolio.scrollableSections;
+    _scrollableSections = widget.portfolio.sectionsFor(widget.userRole);
     _scrollController = ScrollController()..addListener(_onScroll);
     _tabController = TabController(
       length: _scrollableSections.length,

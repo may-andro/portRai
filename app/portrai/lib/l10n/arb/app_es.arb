@@ -119,6 +119,7 @@
   "version": "Hecho con Flutter · {appVersion}",
   "experiencesTitle": "Experiencias",
   "expertisesTitle": "Experiencia Técnica",
+  "expertiseViewDetails": "Ver detalles",
   "expertiseSkillsHeading": "Habilidades y tecnologías",
   "expertiseStatSkills": "Habilidades",
   "expertiseStatExpert": "Nivel experto",
@@ -371,5 +372,9 @@
   "onboardingRoleRecruiterDescription": "Consulta la experiencia, la disponibilidad y cómo contactar.",
   "onboardingRoleOtherDescription": "Recorre el portafolio completo a tu ritmo.",
   "settingRoleSection": "Rol",
-  "settingChangeRole": "Cambiar rol"
+  "settingChangeRole": "Cambiar rol",
+  "assistantSuggestionTechStack": "¿Qué tecnologías y herramientas se usan?",
+  "assistantSuggestionArchitecture": "¿Cómo está diseñada la arquitectura de las apps?",
+  "assistantSuggestionAvailability": "¿Está disponible para nuevos trabajos?",
+  "assistantSuggestionContact": "¿Cómo puedo ponerme en contacto?"
 }

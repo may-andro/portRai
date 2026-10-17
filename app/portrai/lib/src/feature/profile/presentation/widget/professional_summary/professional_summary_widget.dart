@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,20 @@ part 'project_backdrop_widget.dart';
 
 part 'identity_widget.dart';
 
+part 'variant/professional_summary_variant.dart';
+
+part 'variant/overview_professional_summary.dart';
+
+part 'variant/engineering_professional_summary.dart';
+
+part 'variant/hiring_professional_summary.dart';
+
+part 'component/code_card_widget.dart';
+
+part 'component/availability_card_widget.dart';
+
+part 'component/blueprint_grid_widget.dart';
+
 class ProfessionalSummaryWidget extends StatelessWidget {
   const ProfessionalSummaryWidget({
     super.key,
@@ -36,12 +52,15 @@ class ProfessionalSummaryWidget extends StatelessWidget {
     required this.isVisible,
     required this.height,
     this.projectImages = const [],
+    this.variant = const OverviewProfessionalSummary(),
   });
 
   final ProfileEntity profile;
   final bool isVisible;
   final double height;
   final List<String> projectImages;
+
+  final ProfessionalSummaryVariant variant;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +73,7 @@ class ProfessionalSummaryWidget extends StatelessWidget {
         builder: (context) {
           return _SuccessContentWidget(
             profile: profile,
+            variant: variant,
             isVisible: isVisible,
             height: height,
             projectImages: projectImages,
@@ -67,43 +87,55 @@ class ProfessionalSummaryWidget extends StatelessWidget {
 class _SuccessContentWidget extends StatelessWidget {
   const _SuccessContentWidget({
     required this.profile,
+    required this.variant,
     required this.isVisible,
     required this.height,
     required this.projectImages,
   });
 
   final ProfileEntity profile;
+  final ProfessionalSummaryVariant variant;
   final bool isVisible;
   final double height;
   final List<String> projectImages;
 
   @override
   Widget build(BuildContext context) {
-    final content = DSResponsiveContainerWidget(
+    final responsiveContent = DSResponsiveContainerWidget(
       mobileBuilder: (_) {
         return _MobileContentWidget(
           profile: profile,
+          variant: variant,
           isVisible: isVisible,
           height: height,
         );
       },
       tabletBuilder: (_) {
-        return _TabletContentWidget(profile: profile, isVisible: isVisible);
+        return _TabletContentWidget(
+          profile: profile,
+          variant: variant,
+          isVisible: isVisible,
+        );
       },
       desktopBuilder: (_) {
-        return _DesktopContentWidget(profile: profile, isVisible: isVisible);
+        return _DesktopContentWidget(
+          profile: profile,
+          variant: variant,
+          isVisible: isVisible,
+        );
       },
     );
 
     return Stack(
       children: [
         Positioned.fill(
-          child: _ProjectBackdropWidget(
-            imageUrls: projectImages,
+          child: variant.buildBackdrop(
+            context,
             isVisible: isVisible,
+            projectImages: projectImages,
           ),
         ),
-        content,
+        responsiveContent,
       ],
     );
   }

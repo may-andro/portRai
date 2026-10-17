@@ -195,6 +195,12 @@ instruction appended by `sendPortfolioQuestion` tells the model to answer inside
 one surface, avoid markdown, choose the component that fits the data and never
 repeat surface content as text.
 
+When the user has a saved role (see the onboarding feature), the remote assistant
+bloc passes it as `userRole` and `sendPortfolioQuestion` appends a short,
+enum-derived emphasis instruction (developer: projects, tech and code;
+recruiter: availability, experience and contact). It never widens what the
+portfolio grounding allows.
+
 #### Classes
 
 `AssistantGenuiController` (`presentation/controller/`) is a per-turn lifecycle

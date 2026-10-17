@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/widget/content_widget.dart';
 
@@ -38,6 +39,35 @@ void main() {
     expect(find.byType(DSTextWidget), findsOneWidget);
     expect(find.byType(FilledButton), findsNothing);
   });
+
+  for (final (role, expected, notExpected) in [
+    (
+      UserRole.developer,
+      'Which technologies and tools are used?',
+      'Is he available for new work?',
+    ),
+    (
+      UserRole.recruiter,
+      'Is he available for new work?',
+      'Which technologies and tools are used?',
+    ),
+    (null, 'Which services are offered?', 'Is he available for new work?'),
+  ]) {
+    testWidgets('should show matching starter questions when the role is '
+        '$role', (tester) async {
+      await pumpContent(
+        tester,
+        RemoteAssistantState(
+          status: RemoteAssistantStatus.ready,
+          portfolioContext: 'Portfolio',
+          userRole: role,
+        ),
+      );
+
+      expect(find.text(expected), findsOneWidget);
+      expect(find.text(notExpected), findsNothing);
+    });
+  }
 
   testWidgets('should share chat presentation when remote AI is ready', (
     tester,

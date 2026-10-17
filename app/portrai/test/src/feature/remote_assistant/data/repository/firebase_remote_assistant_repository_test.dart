@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag_definition.dart';
 import 'package:portrai/src/feature/feature_flag/domain/use_case/is_feature_enabled_use_case.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/remote_assistant/data/repository/firebase_remote_assistant_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
@@ -145,6 +146,49 @@ void main() {
       );
     },
   );
+
+  for (final (role, expected) in [
+    (UserRole.developer, 'The user is a developer'),
+    (UserRole.recruiter, 'The user is a recruiter'),
+    (UserRole.other, null),
+    (null, null),
+  ]) {
+    test('should '
+        '${expected == null ? 'omit' : 'add'} the role instruction when the '
+        'user role is $role', () async {
+      final harness = _buildHarness(responseStream: Stream.value(''));
+      addTearDown(harness.repository.close);
+      final genuiController = AssistantGenuiController();
+      addTearDown(genuiController.dispose);
+
+      await genuiController.sendPortfolioQuestion(
+        askRemotePortfolioQuestionUseCase: AskRemotePortfolioQuestionUseCase(
+          harness.repository,
+          MockIsRemoteAssistantSupportedUseCase()..stubCall(const Right(true)),
+        ),
+        question: 'Question',
+        portfolioContext: 'Context',
+        history: const [],
+        userRole: role,
+      );
+
+      final instruction =
+          verify(
+                () => harness.aiController.createTextModel(
+                  model: any(named: 'model'),
+                  generationConfig: any(named: 'generationConfig'),
+                  systemInstruction: captureAny(named: 'systemInstruction'),
+                  safetySettings: any(named: 'safetySettings'),
+                ),
+              ).captured.single
+              as String;
+      if (expected == null) {
+        expect(instruction, isNot(contains('The user is a')));
+      } else {
+        expect(instruction, contains(expected));
+      }
+    });
+  }
 
   test(
     'should recreate models only when instructions change across request modes',

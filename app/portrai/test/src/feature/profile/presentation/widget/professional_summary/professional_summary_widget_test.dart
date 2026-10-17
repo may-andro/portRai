@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/professional_summary/bloc/_bloc.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../../../mock/feature/ai_image_gen/presentation/bloc/mock_ai_image_bloc.dart';
 import '../../../../../../mock/feature/profile/presentation/widget/professional_summary/bloc/mock_professional_summary_bloc.dart';
@@ -14,6 +15,10 @@ import '../../../../../../util/test_wrapper_widget.dart';
 void main() {
   final profile = createProfileEntity();
 
+  setUp(() {
+    VisibilityDetectorController.instance.updateInterval = Duration.zero;
+  });
+
   tearDown(() => appServiceLocator.reset());
 
   Future<void> pumpWidget(
@@ -22,6 +27,7 @@ void main() {
     List<String> projectImages = const [],
     Brightness brightness = Brightness.light,
     DesignSystem designSystem = DesignSystem.beltane,
+    ProfessionalSummaryVariant variant = const OverviewProfessionalSummary(),
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -42,6 +48,7 @@ void main() {
           child: SingleChildScrollView(
             child: ProfessionalSummaryWidget(
               profile: profile,
+              variant: variant,
               isVisible: true,
               height: size.height,
               projectImages: projectImages,
@@ -58,6 +65,89 @@ void main() {
     'tablet': Size(820, 1180),
     'desktop': Size(1440, 900),
   };
+
+  const variants = <String, ProfessionalSummaryVariant>{
+    'overview': OverviewProfessionalSummary(),
+    'engineering': EngineeringProfessionalSummary(stack: ['Dart', 'Kotlin']),
+    'hiring': HiringProfessionalSummary(),
+  };
+
+  for (final size in sizes.entries) {
+    for (final variant in variants.entries) {
+      testWidgets(
+        'should render without overflow when ${variant.key} is ${size.key}',
+        (tester) async {
+          await pumpWidget(tester, size: size.value, variant: variant.value);
+
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+
+    testWidgets(
+      'should not grow the section beyond the overview when every variant is ${size.key}',
+      (tester) async {
+        final sizesByVariant = <String, Size>{};
+        for (final variant in variants.entries) {
+          await appServiceLocator.reset();
+          await pumpWidget(tester, size: size.value, variant: variant.value);
+          sizesByVariant[variant.key] = tester.getSize(
+            find.byType(ProfessionalSummaryWidget),
+          );
+        }
+
+        for (final entry in sizesByVariant.entries) {
+          expect(
+            entry.value.height,
+            lessThanOrEqualTo(sizesByVariant['overview']!.height),
+            reason: entry.key,
+          );
+        }
+      },
+    );
+  }
+
+  testWidgets('should show a single GitHub entry when engineering', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      size: sizes['desktop']!,
+      variant: variants['engineering']!,
+    );
+
+    final githubImages = find.byWidgetPredicate(
+      (widget) =>
+          widget is DSNetworkImageWidget &&
+          widget.url == profile.socialLinks.first.image,
+    );
+    expect(githubImages, findsOneWidget);
+  });
+
+  testWidgets('should show the tech stack illustration when engineering', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      size: sizes['desktop']!,
+      variant: variants['engineering']!,
+    );
+
+    expect(find.byType(DSLottieIllustrationWidget), findsOneWidget);
+  });
+
+  testWidgets('should show availability and resume first when hiring', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      size: sizes['desktop']!,
+      variant: variants['hiring']!,
+    );
+
+    expect(find.text(profile.availability.status), findsOneWidget);
+    expect(find.text(profile.title), findsOneWidget);
+  });
 
   for (final brightness in Brightness.values) {
     for (final designSystem in DesignSystem.values) {

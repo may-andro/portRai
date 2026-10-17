@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_container_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
+import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/user_role_summary_extension.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/project.dart';
 import 'package:portrai/src/feature/service/service.dart';
@@ -42,8 +44,10 @@ sealed class SectionWidget extends StatelessWidget {
 
 // 1. Intro Section - Hero section with catchy phrase, pitch, social links
 class IntroSectionWidget extends SectionWidget {
-  IntroSectionWidget({super.key, required super.portfolio})
+  IntroSectionWidget({super.key, required super.portfolio, this.userRole})
     : super(trackingId: 'portfolio_intro_section');
+
+  final UserRole? userRole;
 
   @override
   @protected
@@ -69,6 +73,7 @@ class IntroSectionWidget extends SectionWidget {
               profile: portfolio.profile,
               isVisible: isVisible,
               height: possibleViewPortHeight,
+              variant: userRole.summaryVariant(portfolio),
               projectImages: portfolio.projects
                   .map((project) => project.image)
                   .where((image) => image.isNotEmpty)
@@ -104,17 +109,10 @@ class ExpertiseSectionWidget extends SectionWidget {
   @override
   @protected
   Widget buildContent(BuildContext context) {
-    return SectionContainerWidget(
-      builder: (context, isVisible) {
-        return ExpertiseListWidget(
-          allExpertise: portfolio.expertises,
-          isVisible: isVisible,
-          visibleItemsCount: context.allowedExperienceCount,
-        );
-      },
+    return _ExpertiseSectionBodyWidget(
+      expertises: portfolio.expertises,
       visibilityKey: trackingId,
       title: getTitle(context),
-      background: const InverseSectionBackground(),
       action: context.isDesktop
           ? null
           : SectionAction(
@@ -129,6 +127,61 @@ class ExpertiseSectionWidget extends SectionWidget {
   @override
   String getTitle(BuildContext context) {
     return context.localizations.portfolioSectionExpertises;
+  }
+}
+
+/// Keeps the selected expertise so the orbit and the section background detail
+/// stay in sync.
+class _ExpertiseSectionBodyWidget extends StatefulWidget {
+  const _ExpertiseSectionBodyWidget({
+    required this.expertises,
+    required this.visibilityKey,
+    required this.title,
+    required this.action,
+  });
+
+  final List<ExpertiseEntity> expertises;
+  final String visibilityKey;
+  final String title;
+  final SectionAction? action;
+
+  @override
+  State<_ExpertiseSectionBodyWidget> createState() =>
+      _ExpertiseSectionBodyWidgetState();
+}
+
+class _ExpertiseSectionBodyWidgetState
+    extends State<_ExpertiseSectionBodyWidget> {
+  final _selection = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    _selection.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionContainerWidget(
+      builder: (context, isVisible) {
+        return ExpertiseOrbitWidget(
+          expertises: widget.expertises,
+          isVisible: isVisible,
+          selection: _selection,
+        );
+      },
+      backgroundDetail: (context, isVisible) {
+        return ExpertiseOrbitBackdropWidget(
+          expertises: widget.expertises,
+          selection: _selection,
+          isVisible: isVisible,
+        );
+      },
+      visibilityKey: widget.visibilityKey,
+      title: widget.title,
+      background: const InverseSectionBackground(),
+      action: widget.action,
+    );
   }
 }
 
@@ -293,26 +346,79 @@ class TestimonialsSectionWidget extends SectionWidget {
 }
 
 extension PortfolioExtension on PortfolioEntity {
-  List<SectionWidget> get scrollableSections {
-    final sections = <SectionWidget>[IntroSectionWidget(portfolio: this)];
-    if (expertises.isNotEmpty) {
-      sections.add(ExpertiseSectionWidget(portfolio: this));
-    }
-    if (projects.isNotEmpty) {
-      sections.add(ProjectsSectionWidget(portfolio: this));
-    }
-    if (services.isNotEmpty) {
-      sections.add(ServicesSectionWidget(portfolio: this));
-    }
-    if (experiences.isNotEmpty) {
-      sections.add(ExperienceSectionWidget(portfolio: this));
-    }
-    sections.add(AboutMeSectionWidget(portfolio: this));
-    if (testimonials.isNotEmpty) {
-      sections.add(TestimonialsSectionWidget(portfolio: this));
-    }
-    return sections;
+  List<SectionWidget> get scrollableSections => sectionsFor(null);
+
+  /// Static, free personalization: the intro stays first and the remaining
+  /// sections are ordered by what the role cares about. Expertise, services and
+  /// about use the inverse background and the others the surface one, so every
+  /// order must alternate between the two groups, starting with an inverse
+  /// section. Empty sections are skipped.
+  List<SectionWidget> sectionsFor(UserRole? userRole) {
+    final order = switch (userRole) {
+      UserRole.developer => _SectionKind.developerOrder,
+      UserRole.recruiter => _SectionKind.recruiterOrder,
+      UserRole.other || null => _SectionKind.defaultOrder,
+    };
+    return [
+      IntroSectionWidget(portfolio: this, userRole: userRole),
+      for (final kind in order)
+        if (_buildSection(kind) case final SectionWidget section) section,
+    ];
   }
+
+  SectionWidget? _buildSection(_SectionKind kind) => switch (kind) {
+    _SectionKind.expertise when expertises.isNotEmpty => ExpertiseSectionWidget(
+      portfolio: this,
+    ),
+    _SectionKind.projects when projects.isNotEmpty => ProjectsSectionWidget(
+      portfolio: this,
+    ),
+    _SectionKind.services when services.isNotEmpty => ServicesSectionWidget(
+      portfolio: this,
+    ),
+    _SectionKind.experience when experiences.isNotEmpty =>
+      ExperienceSectionWidget(portfolio: this),
+    _SectionKind.about => AboutMeSectionWidget(portfolio: this),
+    _SectionKind.testimonials when testimonials.isNotEmpty =>
+      TestimonialsSectionWidget(portfolio: this),
+    _ => null,
+  };
+}
+
+enum _SectionKind {
+  expertise,
+  projects,
+  services,
+  experience,
+  about,
+  testimonials;
+
+  static const defaultOrder = [
+    expertise,
+    projects,
+    services,
+    experience,
+    about,
+    testimonials,
+  ];
+
+  static const developerOrder = [
+    expertise,
+    projects,
+    about,
+    experience,
+    services,
+    testimonials,
+  ];
+
+  static const recruiterOrder = [
+    expertise,
+    experience,
+    about,
+    projects,
+    services,
+    testimonials,
+  ];
 }
 
 extension on BuildContext {

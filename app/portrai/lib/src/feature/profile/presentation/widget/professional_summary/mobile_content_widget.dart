@@ -3,63 +3,38 @@ part of 'professional_summary_widget.dart';
 class _MobileContentWidget extends StatelessWidget {
   const _MobileContentWidget({
     required this.profile,
+    required this.variant,
     required this.isVisible,
     required this.height,
   });
 
   final ProfileEntity profile;
+  final ProfessionalSummaryVariant variant;
   final bool isVisible;
   final double height;
 
   @override
   Widget build(BuildContext context) {
+    final scope = ProfessionalSummaryScope(
+      profile: profile,
+      isVisible: isVisible,
+      resolution: DSDeviceResolution.mobile,
+    );
+
     return SizedBox(
       height: height,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DSVerticalSpacerWidget(2),
-          _EyebrowWidget(
-            profile: profile,
-            isVisible: isVisible,
-            hasHorizontalPadding: true,
-          ),
-          const DSVerticalSpacerWidget(1),
-          _UniquePropositionWidget(
-            label: profile.uniqueValueProposition,
-            isVisible: isVisible,
-            hasHorizontalPadding: true,
-          ),
+          variant.buildHeader(context, scope),
           const DSVerticalSpacerWidget(2),
-          _CurrentRoleWidget(
-            profile: profile,
-            isVisible: isVisible,
-            hasHorizontalPadding: true,
-          ),
-          const DSVerticalSpacerWidget(2),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.space(factor: 3)),
-            child: _ProjectYearsWidget(
-              isVisible: isVisible,
-              animationDelay: 100.ms,
-            ),
-          ),
-          const DSVerticalSpacerWidget(2),
-          _HireButtonWidget(isVisible: isVisible, hasHorizontalPadding: true),
-          const DSVerticalSpacerWidget(2),
-          _SocialLinksWidget(
-            socialLinkSize: context.space(factor: 6),
-            isVisible: isVisible,
-            hasHorizontalPadding: true,
-          ),
+          variant.buildBody(context, scope),
           const DSVerticalSpacerWidget(3),
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: context.space()),
-              child: _ProfileImageWidget(
-                profile: profile,
-                isVisible: isVisible,
-              ),
+              child: variant.buildVisual(context, scope),
             ),
           ),
         ],

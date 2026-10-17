@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
@@ -11,6 +12,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
@@ -53,6 +55,7 @@ Portfolio summary.
     bool rollout = true,
     bool generativeUi = false,
     bool platformSupported = true,
+    UserRole? userRole,
   }) {
     getContext = MockGetAssistantContextUseCase();
     when(() => getContext()).thenAnswer((_) => const Right('Portfolio'));
@@ -87,6 +90,8 @@ Portfolio summary.
       platformSupport,
       openUrl,
       tracking,
+      MockGetUserUseCase()
+        ..stubCall(userRole == null ? null : UserEntity(role: userRole)),
     );
     addTearDown(bloc.close);
     return bloc;
@@ -107,6 +112,20 @@ Portfolio summary.
       (state) => state.isReady && state.portfolioContext != null,
     );
   }
+
+  test('should expose the saved role when the assistant starts', () async {
+    final bloc = createBloc(userRole: UserRole.recruiter);
+    await start(bloc);
+
+    expect(bloc.state.userRole, UserRole.recruiter);
+  });
+
+  test('should have no role when no user is saved', () async {
+    final bloc = createBloc();
+    await start(bloc);
+
+    expect(bloc.state.userRole, isNull);
+  });
 
   test(
     'should open the external url when a link click event is added',

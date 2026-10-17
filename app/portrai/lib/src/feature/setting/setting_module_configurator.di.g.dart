@@ -10,6 +10,11 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/set
 
 void $registerSettingDependencies(ServiceLocator sl) {
   sl.registerFactory<SettingBloc>(
-    () => SettingBloc(sl.get<IsFeatureEnabledUseCase>(), sl.get<BuildConfig>(), sl.get<IsLocalAssistantSupportedUseCase>(), sl.get<GetUserUseCase>()),
+    () => SettingBloc(
+      sl.get<IsFeatureEnabledUseCase>(),
+      sl.get<BuildConfig>(),
+      sl.get<IsLocalAssistantSupportedUseCase>(),
+      sl.get<GetUserUseCase>(),
+    ),
   );
 }

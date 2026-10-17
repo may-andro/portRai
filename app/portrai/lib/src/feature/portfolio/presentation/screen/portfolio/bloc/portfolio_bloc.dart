@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/portfolio_event.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/portfolio_state.dart';
@@ -18,6 +19,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     this._trackingDelegate,
     this._isFeatureEnabledUseCase,
     this._isLocalAssistantSupportedUseCase,
+    this._getUserUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
@@ -32,6 +34,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
   final PortfolioTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
+  final GetUserUseCase _getUserUseCase;
   int _availabilityRevision = 0;
 
   Future<void> _mapLoadPortfolioEventToState(
@@ -42,7 +45,13 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     try {
       final result = await _getPortfolioUseCase();
       if (result.isRight) {
-        emit(LoadedState(portfolio: result.right));
+        final userEither = await _getUserUseCase();
+        emit(
+          LoadedState(
+            portfolio: result.right,
+            userRole: userEither.isRight ? userEither.right?.role : null,
+          ),
+        );
         await _refreshAssistantAvailability(emit);
         return;
       }
