@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
@@ -11,16 +12,19 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
 
 void main() {
   group('SettingBloc', () {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
+    late MockGetUserUseCase getUserUseCase;
 
     SettingBloc buildBloc() => SettingBloc(
       isFeatureEnabledUseCase,
       BuildConfig(buildEnvironment: BuildEnvironment.prod),
       local,
+      getUserUseCase,
     );
 
     setUp(() {
@@ -32,7 +36,12 @@ void main() {
         ..stubCall(
           definition: RemoteAssistantFeatureFlags.remoteAssistant,
           result: const Right(false),
+        )
+        ..stubCall(
+          definition: OnboardingFeatureFlags.roleOnboarding,
+          result: const Right(false),
         );
+      getUserUseCase = MockGetUserUseCase()..stubCall(null);
       local = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
     });
 
@@ -134,6 +143,7 @@ void main() {
         isFeatureEnabledUseCase,
         BuildConfig(buildEnvironment: BuildEnvironment.staging),
         local,
+        getUserUseCase,
       ),
       act: (bloc) => bloc.add(const LoadSettingsEvent()),
       expect: () => const [
@@ -195,6 +205,47 @@ void main() {
           isLanguageSelectorEnabled:
               SettingFeatureFlags.languageSelector.defaultValue,
         ),
+      ],
+    );
+    blocTest<SettingBloc, SettingState>(
+      'should expose the saved role when role onboarding is enabled',
+      setUp: () {
+        isFeatureEnabledUseCase
+          ..stubCall(
+            definition: SettingFeatureFlags.languageSelector,
+            result: const Right(false),
+          )
+          ..stubCall(
+            definition: OnboardingFeatureFlags.roleOnboarding,
+            result: const Right(true),
+          );
+        getUserUseCase.stubCall(const UserEntity(role: UserRole.recruiter));
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadSettingsEvent()),
+      expect: () => const [
+        SettingLoadingState(),
+        SettingLoadedState(
+          isLanguageSelectorEnabled: false,
+          userRole: UserRole.recruiter,
+        ),
+      ],
+    );
+
+    blocTest<SettingBloc, SettingState>(
+      'should not expose a role when role onboarding is disabled',
+      setUp: () {
+        isFeatureEnabledUseCase.stubCall(
+          definition: SettingFeatureFlags.languageSelector,
+          result: const Right(false),
+        );
+        getUserUseCase.stubCall(const UserEntity(role: UserRole.developer));
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadSettingsEvent()),
+      expect: () => const [
+        SettingLoadingState(),
+        SettingLoadedState(isLanguageSelectorEnabled: false),
       ],
     );
   });

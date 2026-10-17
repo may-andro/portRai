@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 
 sealed class SettingState extends Equatable {
   const SettingState();
@@ -20,17 +21,20 @@ class SettingLoadedState extends SettingState {
     required this.isLanguageSelectorEnabled,
     this.isDevMenuEnabled = false,
     this.isLocalAssistantAvailable = false,
+    this.userRole,
   });
 
   final bool isLanguageSelectorEnabled;
   final bool isDevMenuEnabled;
   final bool isLocalAssistantAvailable;
+  final UserRole? userRole;
 
   @override
   List<Object?> get props => [
     isLanguageSelectorEnabled,
     isDevMenuEnabled,
     isLocalAssistantAvailable,
+    userRole,
   ];
 }
 

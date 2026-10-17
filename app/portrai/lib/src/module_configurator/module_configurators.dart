@@ -20,6 +20,7 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/force_update/force_update_module_configurator.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/project.dart';
@@ -76,6 +77,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   ExpertiseModuleConfigurator(),
   AiImageGenModuleConfigurator(),
   PortfolioModuleConfigurator(),
+  OnboardingModuleConfigurator(),
   AssistantModuleConfigurator(),
   LocalAssistantModuleConfigurator(),
   RemoteAssistantModuleConfigurator(),

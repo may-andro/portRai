@@ -26,6 +26,18 @@ void main() {
       );
     });
 
+    test('should keep registered redirects in registration order', () {
+      String? firstRedirect(BuildContext context, Uri requestedUri) => null;
+      String? secondRedirect(BuildContext context, Uri requestedUri) =>
+          '/other';
+
+      controller
+        ..registerRedirect(firstRedirect)
+        ..registerRedirect(secondRedirect);
+
+      expect(controller.redirects, [firstRedirect, secondRedirect]);
+    });
+
     test('should register a route when a new route is added', () {
       controller.register(route);
 

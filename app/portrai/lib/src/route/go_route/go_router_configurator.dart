@@ -49,6 +49,13 @@ class GoRouterConfigurator {
       navigatorKey: createRootNavigatorKey(),
       initialLocation: '/',
       routes: allRoutes,
+      redirect: (context, state) async {
+        for (final redirect in _controller.redirects) {
+          final redirectPath = await redirect(context, state.uri);
+          if (redirectPath != null) return redirectPath;
+        }
+        return null;
+      },
       observers: navigationObservers,
       errorBuilder: (_, _) => const RouteNotFoundScreen(),
     );

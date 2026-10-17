@@ -11,6 +11,9 @@ extension GoRouteExtension on BuildContext {
 
   void popScreen() => pop();
 
+  /// Replaces the navigation stack with [route].
+  void goScreen(ModuleRouteInfo route) => goNamed(route.name);
+
   void pushScreen(
     ModuleRouteInfo route, {
     Map<String, String> pathParameters = const <String, String>{},

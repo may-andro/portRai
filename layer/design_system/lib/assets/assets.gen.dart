@@ -32,6 +32,14 @@ class $AssetsLottieGen {
   LottieGenImage get contactUs =>
       const LottieGenImage('assets/lottie/contact_us.json');
 
+  /// File path: assets/lottie/developer_role.json
+  LottieGenImage get developerRole =>
+      const LottieGenImage('assets/lottie/developer_role.json');
+
+  /// File path: assets/lottie/explorer_role.json
+  LottieGenImage get explorerRole =>
+      const LottieGenImage('assets/lottie/explorer_role.json');
+
   /// File path: assets/lottie/folder.json
   LottieGenImage get folder =>
       const LottieGenImage('assets/lottie/folder.json');
@@ -89,9 +97,15 @@ class $AssetsLottieGen {
   LottieGenImage get pinPulse =>
       const LottieGenImage('assets/lottie/pin_pulse.json');
 
+  /// File path: assets/lottie/recruiter_role.json
+  LottieGenImage get recruiterRole =>
+      const LottieGenImage('assets/lottie/recruiter_role.json');
+
   /// List of all assets
   List<LottieGenImage> get values => [
     contactUs,
+    developerRole,
+    explorerRole,
     folder,
     github,
     globalNetwork,
@@ -107,6 +121,7 @@ class $AssetsLottieGen {
     orbit,
     paperPlane,
     pinPulse,
+    recruiterRole,
   ];
 }
 

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
@@ -17,6 +18,7 @@ import 'package:portrai/src/route/observer/route_observer_widget.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
 import '../../../../../../../util/assistant_test_fixture.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -38,12 +40,17 @@ void main() {
       ..stubCall(
         definition: SettingFeatureFlags.languageSelector,
         result: const Right(false),
+      )
+      ..stubCall(
+        definition: OnboardingFeatureFlags.roleOnboarding,
+        result: const Right(false),
       );
     appServiceLocator.registerFactory<SettingBloc>(
       () => SettingBloc(
         flag,
         BuildConfig(buildEnvironment: BuildEnvironment.prod),
         fixture.isLocalAssistantSupportedUseCase,
+        MockGetUserUseCase()..stubCall(null),
       ),
     );
     final router = GoRouter(

@@ -15,7 +15,10 @@ enum DSLottieIllustration {
   pinPulse(1),
   orbit(1),
   globe(1),
-  mapPin(1);
+  mapPin(1),
+  developerRole(1330 / 920),
+  recruiterRole(1330 / 920),
+  explorerRole(1);
 
   const DSLottieIllustration(this.aspectRatio);
 
@@ -50,6 +53,7 @@ enum DSLottieIllustration {
           override(const ['Shape Layer 2', '**'], palette.brand.tertiary),
         ];
       case DSLottieIllustration.graduationHat:
+      case DSLottieIllustration.recruiterRole:
         return [
           override(const ['**', 'Accent'], palette.brand.primary),
         ];
@@ -59,6 +63,8 @@ enum DSLottieIllustration {
       case DSLottieIllustration.heroOrbsMobile:
       case DSLottieIllustration.pinPulse:
       case DSLottieIllustration.orbit:
+      case DSLottieIllustration.developerRole:
+      case DSLottieIllustration.explorerRole:
         return const [];
     }
   }
@@ -83,6 +89,12 @@ enum DSLottieIllustration {
         return Assets.lottie.orbit;
       case DSLottieIllustration.pinPulse:
         return Assets.lottie.pinPulse;
+      case DSLottieIllustration.developerRole:
+        return Assets.lottie.developerRole;
+      case DSLottieIllustration.recruiterRole:
+        return Assets.lottie.recruiterRole;
+      case DSLottieIllustration.explorerRole:
+        return Assets.lottie.explorerRole;
     }
   }
 }

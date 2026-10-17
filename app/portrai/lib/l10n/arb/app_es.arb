@@ -361,5 +361,15 @@
   "festivalNameObon": "Obon",
   "festivalNamePachamama": "Pachamama",
   "festivalNameSakura": "Sakura",
-  "festivalNameXmas": "Navidad"
+  "festivalNameXmas": "Navidad",
+  "onboardingTitle": "¡Bienvenido! ¿Qué te trae por aquí?",
+  "onboardingSubtitle": "Elige la opción que mejor te describa para adaptar tu experiencia.",
+  "onboardingRoleDeveloper": "Soy desarrollador",
+  "onboardingRoleRecruiter": "Soy reclutador",
+  "onboardingRoleOther": "Solo estoy explorando",
+  "onboardingRoleDeveloperDescription": "Explora el stack tecnológico, la arquitectura y el código de mis proyectos.",
+  "onboardingRoleRecruiterDescription": "Consulta la experiencia, la disponibilidad y cómo contactar.",
+  "onboardingRoleOtherDescription": "Recorre el portafolio completo a tu ritmo.",
+  "settingRoleSection": "Rol",
+  "settingChangeRole": "Cambiar rol"
 }
