@@ -361,5 +361,15 @@
   "festivalNameObon": "Obon",
   "festivalNamePachamama": "Pachamama",
   "festivalNameSakura": "Sakura",
-  "festivalNameXmas": "Kerst"
+  "festivalNameXmas": "Kerst",
+  "onboardingTitle": "Welkom! Wat brengt je hier?",
+  "onboardingSubtitle": "Kies de optie die het best bij je past, zodat we je ervaring kunnen afstemmen.",
+  "onboardingRoleDeveloper": "Ik ben ontwikkelaar",
+  "onboardingRoleRecruiter": "Ik ben recruiter",
+  "onboardingRoleOther": "Ik kijk gewoon rond",
+  "onboardingRoleDeveloperDescription": "Duik in de techstack, architectuur en code achter mijn projecten.",
+  "onboardingRoleRecruiterDescription": "Bekijk ervaring, beschikbaarheid en hoe je contact opneemt.",
+  "onboardingRoleOtherDescription": "Blader op je eigen tempo door het volledige portfolio.",
+  "settingRoleSection": "Rol",
+  "settingChangeRole": "Rol wijzigen"
 }

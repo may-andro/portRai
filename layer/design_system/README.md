@@ -196,6 +196,8 @@ DSLottieIconWidget(icon: DSLottieIcon.medal, size: 32, color: Colors.white, play
 // Replays each time `trigger` changes (e.g. a send button)
 DSLottieIconWidget(icon: DSLottieIcon.paperPlane, playback: DSLottiePlayback.trigger, trigger: sendCount)
 DSLottieIllustrationWidget(illustration: DSLottieIllustration.contactUs)
+// Role scenes: developerRole, recruiterRole (header recolored with the brand) and explorerRole
+DSLottieIllustrationWidget(illustration: DSLottieIllustration.recruiterRole, width: 200)
 DSLottieBackgroundWidget(illustration: DSLottieIllustration.heroOrbs, colorOverrides: [...])
 DSLoadingWidget(style: DSLoadingStyle.lottie)
 ```

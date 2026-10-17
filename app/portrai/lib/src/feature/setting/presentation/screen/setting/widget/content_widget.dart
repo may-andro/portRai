@@ -5,6 +5,7 @@ import 'package:portrai/src/feature/developer_mode/presentation/screen/developer
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
+import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
 import 'package:portrai/src/widget/app_version_widget.dart';
 
@@ -40,6 +41,12 @@ class ContentWidget extends StatelessWidget {
                           title: context.localizations.language,
                         ),
                         const LanguageCardWidget(),
+                      ],
+                      if (state.userRole case final userRole?) ...[
+                        SectionTitleWidget(
+                          title: context.localizations.settingRoleSection,
+                        ),
+                        RoleCardWidget(role: userRole),
                       ],
                       if (state.isLocalAssistantAvailable) ...[
                         SectionTitleWidget(

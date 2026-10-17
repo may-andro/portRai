@@ -30,6 +30,33 @@ void main() {
     expect(tester.getSize(find.byType(LottieBuilder)), const Size(400, 300));
   });
 
+  for (final illustration in [
+    DSLottieIllustration.developerRole,
+    DSLottieIllustration.recruiterRole,
+    DSLottieIllustration.explorerRole,
+  ]) {
+    testWidgets('should size ${illustration.name} by its aspect ratio when '
+        'shown', (tester) async {
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          brightness: Brightness.light,
+          designSystem: DesignSystem.values.first,
+          child: Center(
+            child: DSLottieIllustrationWidget(
+              illustration: illustration,
+              width: 266,
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSize(find.byType(LottieBuilder)),
+        Size(266, 266 / illustration.aspectRatio),
+      );
+    });
+  }
+
   testWidgets('should fill its parent and apply the grayscale filter when '
       'used as a background', (tester) async {
     await tester.pumpWidget(

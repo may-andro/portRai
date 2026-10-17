@@ -18,6 +18,7 @@ void main() {
       (tester) async {
         var homeInitCount = 0;
         final controller = MockModuleRouteController();
+        when(() => controller.redirects).thenReturn(const []);
         when(() => controller.allRoutes).thenReturn([
           ModuleRoute(
             name: 'home',
@@ -63,6 +64,7 @@ void main() {
         'should use ${kIsWeb ? 'fade transitions' : 'adaptive pages'} when navigating on $platform',
         (tester) async {
           final controller = MockModuleRouteController();
+          when(() => controller.redirects).thenReturn(const []);
           when(() => controller.allRoutes).thenReturn([
             ModuleRoute(
               name: 'home',
@@ -116,6 +118,7 @@ void main() {
       (tester) async {
         final controller = MockModuleRouteController();
         final configurator = GoRouterConfigurator(controller, const []);
+        when(() => controller.redirects).thenReturn(const []);
         when(() => controller.allRoutes).thenReturn([
           ModuleRoute(
             name: 'home',
@@ -162,6 +165,7 @@ void main() {
       (tester) async {
         final controller = MockModuleRouteController();
         final configurator = GoRouterConfigurator(controller, const []);
+        when(() => controller.redirects).thenReturn(const []);
         when(() => controller.allRoutes).thenReturn([
           ModuleRoute(
             name: 'home',

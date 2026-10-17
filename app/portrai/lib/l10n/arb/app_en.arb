@@ -1154,5 +1154,45 @@
   "festivalNameXmas": "Christmas",
   "@festivalNameXmas": {
     "description": "Display name of the Christmas festive theme"
+  },
+  "onboardingTitle": "Welcome! What brings you here?",
+  "@onboardingTitle": {
+    "description": "Onboarding screen title asking the user about their role"
+  },
+  "onboardingSubtitle": "Pick the option that fits you best so we can tailor your experience.",
+  "@onboardingSubtitle": {
+    "description": "Onboarding screen subtitle explaining why the role is requested"
+  },
+  "onboardingRoleDeveloper": "I'm a developer",
+  "@onboardingRoleDeveloper": {
+    "description": "Onboarding button for users who are developers"
+  },
+  "onboardingRoleRecruiter": "I'm a recruiter",
+  "@onboardingRoleRecruiter": {
+    "description": "Onboarding button for users who are recruiters"
+  },
+  "onboardingRoleOther": "Just exploring",
+  "@onboardingRoleOther": {
+    "description": "Onboarding button for users who are neither developers nor recruiters"
+  },
+  "onboardingRoleDeveloperDescription": "Dive into the tech stack, architecture and code behind my projects.",
+  "@onboardingRoleDeveloperDescription": {
+    "description": "Onboarding card description for visitors who are developers"
+  },
+  "onboardingRoleRecruiterDescription": "See experience, availability and how to get in touch.",
+  "@onboardingRoleRecruiterDescription": {
+    "description": "Onboarding card description for visitors who are recruiters"
+  },
+  "onboardingRoleOtherDescription": "Browse the full portfolio at your own pace.",
+  "@onboardingRoleOtherDescription": {
+    "description": "Onboarding card description for visitors who are just exploring"
+  },
+  "settingRoleSection": "Role",
+  "@settingRoleSection": {
+    "description": "Settings section title for the user role"
+  },
+  "settingChangeRole": "Change role",
+  "@settingChangeRole": {
+    "description": "Settings item that lets the user pick their role again"
   }
 }

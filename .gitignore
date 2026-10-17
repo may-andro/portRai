@@ -34,6 +34,8 @@
 # Generated files
 # ==========================================
 **/*.g.dart
+# Widgetbook directories are committed so CI skips regenerating them
+!app/storybook/lib/main.directories.g.dart
 **/*.freezed.dart
 **/*.mocks.dart
 **/l10n/

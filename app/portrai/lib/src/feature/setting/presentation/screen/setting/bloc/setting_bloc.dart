@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/_domain.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_event.dart';
@@ -16,6 +17,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     this._isFeatureEnabledUseCase,
     this._buildConfig,
     this._isLocalAssistantSupportedUseCase,
+    this._getUserUseCase,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
@@ -23,6 +25,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final BuildConfig _buildConfig;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
+  final GetUserUseCase _getUserUseCase;
   int _loadRevision = 0;
 
   Future<void> _mapLoadSettingsEventToState(
@@ -56,12 +59,22 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
             localSupported.isRight && localSupported.right;
       }
     }
+
+    UserRole? userRole;
+    final onboarding = await _isFeatureEnabledUseCase(
+      OnboardingFeatureFlags.roleOnboarding,
+    );
+    if (onboarding.isRight && onboarding.right) {
+      final user = await _getUserUseCase();
+      userRole = user.isRight ? user.right?.role : null;
+    }
     if (emit.isDone || revision != _loadRevision) return;
     emit(
       SettingLoadedState(
         isLanguageSelectorEnabled: isLanguageSelectorEnabled,
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
         isLocalAssistantAvailable: isLocalAssistantAvailable,
+        userRole: userRole,
       ),
     );
   }
