@@ -150,9 +150,6 @@ class _OrbitRingWidget extends StatelessWidget {
     final offset = layout.nodeOffset(index);
     final isSelected = index == selected;
     final nodeSize = layout.nodeSize;
-    final iconSize = nodeSize * 0.48;
-    final iconColor = isSelected ? background : foreground;
-    final title = expertises[index].title;
 
     return Positioned(
       left: layout.center.dx + offset.dx - nodeSize / 2,
@@ -196,37 +193,18 @@ class _OrbitRingWidget extends StatelessWidget {
                     ),
                 ],
               ),
-              child: title.toLowerCase().contains('flutter')
-                  ? CustomPaint(
-                      size: Size.square(iconSize),
-                      painter: _FlutterLogoPainter(color: iconColor),
-                    )
-                  : Icon(_iconFor(title), size: iconSize, color: iconColor),
+              child: Padding(
+                padding: EdgeInsets.all(nodeSize * 0.18),
+                child: DSNetworkImageWidget(
+                  url: expertises[index].image,
+                  fit: BoxFit.cover,
+                  borderRadius: BorderRadius.circular(nodeSize),
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
   }
-}
-
-IconData _iconFor(String title) {
-  final name = title.toLowerCase();
-  const icons = <String, IconData>{
-    'android': Icons.android,
-    'ios': Icons.phone_iphone_rounded,
-    'architecture': Icons.account_tree_outlined,
-    'performance': Icons.speed_rounded,
-    'backend': Icons.dns_outlined,
-    'testing': Icons.bug_report_outlined,
-    'release': Icons.rocket_launch_outlined,
-    'deploy': Icons.rocket_launch_outlined,
-    'ai': Icons.auto_awesome_rounded,
-    'leadership': Icons.groups_outlined,
-    'design': Icons.palette_outlined,
-  };
-  for (final entry in icons.entries) {
-    if (name.contains(entry.key)) return entry.value;
-  }
-  return Icons.code_rounded;
 }
