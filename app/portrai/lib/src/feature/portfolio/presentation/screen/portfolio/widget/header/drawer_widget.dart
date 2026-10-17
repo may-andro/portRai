@@ -30,7 +30,9 @@ class DrawerWidget extends StatelessWidget {
               if (context.state case final PortfolioState state
                   when state is LoadedState) ...[
                 SliverToBoxAdapter(
-                  child: _ItemsWidget(state.portfolio.scrollableSections),
+                  child: _ItemsWidget(
+                    state.portfolio.sectionsFor(state.userRole),
+                  ),
                 ),
               ],
               const SliverToBoxAdapter(child: DSVerticalSpacerWidget(3)),

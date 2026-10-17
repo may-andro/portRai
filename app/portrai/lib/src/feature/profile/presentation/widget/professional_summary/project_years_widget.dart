@@ -17,8 +17,9 @@ class _ProjectYearsWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Row(
-          spacing: context.space(factor: 2),
+    return Wrap(
+          spacing: context.space(factor: 3),
+          runSpacing: context.space(factor: 1.5),
           children: [
             _StatItemWidget(
               label: context.localizations.totalExperienceInYears,
@@ -67,26 +68,26 @@ class _StatItemWidget extends StatelessWidget {
           curve: Curves.easeOutBack,
           alignment: Alignment.centerLeft,
           scale: isHovering ? 1.1 : 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DSTextWidget(
-                '$value+',
-                style: context.typography.emphasizedTitleLarge,
-                color: isHovering
-                    ? context.colorPalette.brand.primary
-                    : (context.isDesktop
-                          ? context.colorPalette.neutral.grey4
-                          : context.colorPalette.neutral.grey9),
-              ),
-              DSTextWidget(
-                label,
-                style: context.typography.emphasizedLabelSmall,
-                color: context.isDesktop
-                    ? context.colorPalette.neutral.grey5
-                    : context.colorPalette.neutral.grey7,
-              ),
-            ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: context.space(factor: 20)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DSTextWidget(
+                  '$value+',
+                  style: context.typography.emphasizedTitleLarge,
+                  color: isHovering
+                      ? context.colorPalette.brand.primary
+                      : context.colorPalette.surface.onSurface,
+                ),
+                DSTextWidget(
+                  label,
+                  style: context.typography.emphasizedLabelSmall,
+                  color: context.colorPalette.neutral.grey7,
+                  maxLines: 2,
+                ),
+              ],
+            ),
           ),
         );
       },

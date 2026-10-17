@@ -119,6 +119,7 @@
   "version": "Gemaakt met Flutter · {appVersion}",
   "experiencesTitle": "Ervaringen",
   "expertisesTitle": "Expertise",
+  "expertiseViewDetails": "Bekijk details",
   "expertiseSkillsHeading": "Vaardigheden & technologieën",
   "expertiseStatSkills": "Vaardigheden",
   "expertiseStatExpert": "Expertniveau",
@@ -371,5 +372,9 @@
   "onboardingRoleRecruiterDescription": "Bekijk ervaring, beschikbaarheid en hoe je contact opneemt.",
   "onboardingRoleOtherDescription": "Blader op je eigen tempo door het volledige portfolio.",
   "settingRoleSection": "Rol",
-  "settingChangeRole": "Rol wijzigen"
+  "settingChangeRole": "Rol wijzigen",
+  "assistantSuggestionTechStack": "Welke technologieën en tools worden gebruikt?",
+  "assistantSuggestionArchitecture": "Hoe zijn de apps opgebouwd?",
+  "assistantSuggestionAvailability": "Is hij beschikbaar voor nieuw werk?",
+  "assistantSuggestionContact": "Hoe kan ik contact opnemen?"
 }

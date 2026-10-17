@@ -5,6 +5,7 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
@@ -23,6 +24,7 @@ class RemoteAssistantBloc
     this._isRemoteAssistantSupportedUseCase,
     this._openExternalUrlUseCase,
     this._trackingDelegate,
+    this._getUserUseCase,
   ) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
     on<RemoteAssistantInitializedEvent>(
@@ -46,6 +48,7 @@ class RemoteAssistantBloc
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   final RemoteAssistantTrackingDelegate _trackingDelegate;
+  final GetUserUseCase _getUserUseCase;
   int _controlRevision = 0;
   int _requestRevision = 0;
   final Set<AssistantGenuiController> _genuiControllers = {};
@@ -176,7 +179,14 @@ class RemoteAssistantBloc
     if (!await _checkFlag(emit, revision) || revision != _controlRevision) {
       return;
     }
-    emit(state.copyWith(status: RemoteAssistantStatus.ready));
+    final userEither = await _getUserUseCase();
+    if (emit.isDone || revision != _controlRevision) return;
+    emit(
+      state.copyWith(
+        status: RemoteAssistantStatus.ready,
+        userRole: userEither.isRight ? userEither.right?.role : null,
+      ),
+    );
     if (state.portfolioContext == null) await _loadContext(emit, revision);
   }
 
@@ -308,6 +318,7 @@ class RemoteAssistantBloc
         question: question,
         portfolioContext: state.portfolioContext!,
         history: boundedHistory,
+        userRole: state.userRole,
         onText: (text) {
           if (emit.isDone || revision != _requestRevision || !state.isReady) {
             return;

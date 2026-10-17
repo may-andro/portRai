@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
@@ -10,6 +11,7 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/tracking/mock_portfolio_tracking_delegate.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
@@ -22,15 +24,18 @@ void main() {
     late MockPortfolioTrackingDelegate trackingDelegate;
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
+    late MockGetUserUseCase getUserUseCase;
 
     PortfolioBloc buildBloc() => PortfolioBloc(
       getPortfolioUseCase,
       trackingDelegate,
       isFeatureEnabledUseCase,
       local,
+      getUserUseCase,
     );
 
     setUp(() {
+      getUserUseCase = MockGetUserUseCase()..stubCall(null);
       getPortfolioUseCase = MockGetPortfolioUseCase();
       trackingDelegate = MockPortfolioTrackingDelegate();
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase()
@@ -135,6 +140,22 @@ void main() {
       act: (bloc) => bloc.add(const LoadPortfolioEvent()),
       expect: () => [const LoadingState(), LoadedState(portfolio: portfolio)],
       verify: (_) => verify(() => getPortfolioUseCase()).called(1),
+    );
+
+    blocTest<PortfolioBloc, PortfolioState>(
+      'should load the saved role when loading the portfolio succeeds',
+      setUp: () {
+        getPortfolioUseCase.stubCall(
+          Right<GetPortfolioFailure, PortfolioEntity>(portfolio),
+        );
+        getUserUseCase.stubCall(const UserEntity(role: UserRole.developer));
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadPortfolioEvent()),
+      expect: () => [
+        const LoadingState(),
+        LoadedState(portfolio: portfolio, userRole: UserRole.developer),
+      ],
     );
 
     blocTest<PortfolioBloc, PortfolioState>(

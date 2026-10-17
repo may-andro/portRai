@@ -1,5 +1,6 @@
 import 'package:genui/genui.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
@@ -51,6 +52,21 @@ const _mapInstruction =
     'profile location, experiences or a project market (a country where the '
     'product is offered, not where the work was done). Never invent coordinates.';
 
+/// Trusted, enum-derived guidance. It only shapes emphasis and never widens
+/// what the portfolio grounding allows the assistant to say.
+String _roleInstruction(UserRole? role) => switch (role) {
+  UserRole.developer =>
+    ' The user is a developer: favor technical depth. Lead with projects, '
+        'technologies and architecture, using DSProjectCard with DSTag, '
+        'DSSkillBars and DSCodeBlock when the portfolio information supports '
+        'them.',
+  UserRole.recruiter =>
+    ' The user is a recruiter: favor hiring signals. Lead with availability '
+        'in a DSCallout, years of experience in a DSMetric, career history in '
+        'a DSTimeline and a DSContactCard when relevant.',
+  UserRole.other || null => '',
+};
+
 extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
   /// Sends a known text question and authoritative context, not raw GenUI
   /// messages or UI interaction parts, through the portfolio use case.
@@ -60,6 +76,7 @@ extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
     required String question,
     required String portfolioContext,
     required List<AssistantMessageEntity> history,
+    UserRole? userRole,
     void Function(String text)? onText,
     void Function(SurfaceUpdate update)? onSurfaceUpdate,
   }) async {
@@ -84,7 +101,8 @@ extension RemoteAssistantGenuiControllerExtension on AssistantGenuiController {
                     '${supportsImages ? _imageInstruction : ''}'
                     '${supportsLinks ? _linkInstruction : ''}'
                     '${supportsSuggestions ? _suggestionInstruction : ''}'
-                    '${supportsMaps ? _mapInstruction : ''}',
+                    '${supportsMaps ? _mapInstruction : ''}'
+                    '${_roleInstruction(userRole)}',
               ),
             ),
       );

@@ -50,19 +50,27 @@ class _EyebrowWidget extends StatelessWidget {
   }
 }
 
-class _CurrentRoleWidget extends StatelessWidget {
-  const _CurrentRoleWidget({
-    required this.profile,
+class _Fact {
+  const _Fact({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+}
+
+class _FactsWidget extends StatelessWidget {
+  const _FactsWidget({
+    required this.facts,
     required this.hasHorizontalPadding,
     required this.isVisible,
   });
 
-  final ProfileEntity profile;
+  final List<_Fact> facts;
   final bool hasHorizontalPadding;
   final bool isVisible;
 
   @override
   Widget build(BuildContext context) {
+    if (facts.isEmpty) return const SizedBox.shrink();
     final accent = context.colorPalette.brand.primary.color;
 
     return Padding(
@@ -70,57 +78,57 @@ class _CurrentRoleWidget extends StatelessWidget {
           ? context.horizontalScreenPadding
           : EdgeInsets.zero,
       child:
-          Align(
-                alignment: Alignment.centerLeft,
-                child: DSHoverableContainerWidget(
-                  builder: (context, isHovering) => AnimatedContainer(
-                    duration: 220.ms,
-                    curve: Curves.easeOut,
-                    transform: Matrix4.translationValues(
-                      0,
-                      isHovering ? -3 : 0,
-                      0,
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.space(factor: 1.5),
-                      vertical: context.space(),
-                    ),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: accent.withAlpha(isHovering ? 90 : 0),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
+          Wrap(
+                spacing: context.space(),
+                runSpacing: context.space(),
+                children: [
+                  for (final fact in facts)
+                    DSHoverableContainerWidget(
+                      builder: (context, isHovering) => AnimatedContainer(
+                        duration: 220.ms,
+                        curve: Curves.easeOut,
+                        transform: Matrix4.translationValues(
+                          0,
+                          isHovering ? -3 : 0,
+                          0,
                         ),
-                      ],
-                      color: accent.withAlpha(isHovering ? 55 : 30),
-                      borderRadius: BorderRadius.circular(
-                        context.dimen.radiusLevel3.value,
-                      ),
-                      border: Border.all(color: accent.withAlpha(90)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: context.space(),
-                      children: [
-                        Icon(
-                          Icons.work_outline_rounded,
-                          size: 16,
-                          color: accent,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.space(factor: 1.5),
+                          vertical: context.space(),
                         ),
-                        Flexible(
-                          child: DSTextWidget(
-                            '${profile.currentRole}  ·  ${profile.currentCompany}',
-                            style: context.typography.emphasizedLabelMedium,
-                            color: context.colorPalette.surface.onSurface,
-                            maxLines: 1,
-                            textOverflow: TextOverflow.ellipsis,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: accent.withAlpha(isHovering ? 90 : 0),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                          color: accent.withAlpha(isHovering ? 55 : 30),
+                          borderRadius: BorderRadius.circular(
+                            context.dimen.radiusLevel3.value,
                           ),
+                          border: Border.all(color: accent.withAlpha(90)),
                         ),
-                      ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: context.space(),
+                          children: [
+                            Icon(fact.icon, size: 16, color: accent),
+                            Flexible(
+                              child: DSTextWidget(
+                                fact.label,
+                                style: context.typography.emphasizedLabelMedium,
+                                color: context.colorPalette.surface.onSurface,
+                                maxLines: 1,
+                                textOverflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                ],
               )
               .animate(target: isVisible ? 1 : 0)
               .slideY(

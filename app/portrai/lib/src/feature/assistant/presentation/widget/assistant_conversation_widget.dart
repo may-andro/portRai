@@ -17,6 +17,7 @@ class AssistantConversationWidget extends StatefulWidget {
     required this.onSubmit,
     this.errorText,
     this.messageContentBuilder,
+    this.suggestions,
   });
 
   final List<AssistantMessageEntity> messages;
@@ -24,6 +25,10 @@ class AssistantConversationWidget extends StatefulWidget {
   final Widget? header;
   final ValueChanged<String> onSubmit;
   final String? errorText;
+
+  /// Starter questions shown before the first message; defaults to the
+  /// general portfolio questions.
+  final List<String>? suggestions;
   final Widget? Function(
     BuildContext context,
     AssistantMessageEntity message,
@@ -87,6 +92,7 @@ class _AssistantConversationWidgetState
             Expanded(
               child: widget.messages.isEmpty
                   ? _SuggestionsWidget(
+                      suggestions: widget.suggestions,
                       onSelected: _submit,
                       isBusy: widget.isSendingQuestion,
                     )

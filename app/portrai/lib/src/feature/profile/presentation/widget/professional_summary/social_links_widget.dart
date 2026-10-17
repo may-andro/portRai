@@ -2,11 +2,13 @@ part of 'professional_summary_widget.dart';
 
 class _SocialLinksWidget extends StatelessWidget {
   const _SocialLinksWidget({
+    this.names,
     required this.socialLinkSize,
     required this.hasHorizontalPadding,
     required this.isVisible,
   });
 
+  final Set<String>? names;
   final bool hasHorizontalPadding;
   final double socialLinkSize;
   final bool isVisible;
@@ -19,13 +21,18 @@ class _SocialLinksWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final links = state.appSocialLinks.where(
+      (link) => names == null || names!.contains(link.name.toLowerCase()),
+    );
+    if (links.isEmpty) return const SizedBox.shrink();
+
     return Padding(
       padding: hasHorizontalPadding
           ? context.horizontalScreenPadding
           : EdgeInsets.zero,
       child: Wrap(
         spacing: context.space(factor: 2),
-        children: state.appSocialLinks.mapIndexed((index, socialHandle) {
+        children: links.mapIndexed((index, socialHandle) {
           return InkWell(
             onTap: () {
               context.bloc.add(

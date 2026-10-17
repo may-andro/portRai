@@ -4,10 +4,14 @@ class _HireButtonWidget extends StatelessWidget {
   const _HireButtonWidget({
     required this.hasHorizontalPadding,
     required this.isVisible,
+    this.showResume = true,
+    this.resumeFirst = false,
   });
 
   final bool hasHorizontalPadding;
   final bool isVisible;
+  final bool showResume;
+  final bool resumeFirst;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +21,44 @@ class _HireButtonWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final hasResume = showResume && state.profile.resume.url.isNotEmpty;
+    final hireMe = _HoverScaleWidget(
+      child: DSButtonWidget(
+        label: context.localizations.hireMe,
+        icon: Icons.arrow_forward_rounded,
+        onPressed: () {
+          context.bloc.add(OpenEmailClientEvent(state.profile.email));
+        },
+        iconDirection: DSButtonIconDirection.right,
+        variant: hasResume && resumeFirst
+            ? DSButtonVariant.secondary
+            : DSButtonVariant.primary,
+        border: DSButtonBorder.rounded,
+        size: DSButtonSize.small,
+      ),
+    );
+    final resume = hasResume
+        ? _HoverScaleWidget(
+            child: DSButtonWidget(
+              label: context.localizations.downloadResume,
+              icon: Icons.download_rounded,
+              onPressed: () {
+                context.bloc.add(
+                  OpenExternalUrlEvent(
+                    state.profile.resume.url,
+                    context.localizations.downloadResume,
+                  ),
+                );
+              },
+              variant: resumeFirst
+                  ? DSButtonVariant.primary
+                  : DSButtonVariant.secondary,
+              border: DSButtonBorder.rounded,
+              size: DSButtonSize.small,
+            ),
+          )
+        : null;
+
     return Padding(
       padding: hasHorizontalPadding
           ? context.horizontalScreenPadding
@@ -25,40 +67,7 @@ class _HireButtonWidget extends StatelessWidget {
           FittedBox(
                 child: Row(
                   spacing: context.space(factor: 1.5),
-                  children: [
-                    _HoverScaleWidget(
-                      child: DSButtonWidget(
-                        label: context.localizations.hireMe,
-                        icon: Icons.arrow_forward_rounded,
-                        onPressed: () {
-                          context.bloc.add(
-                            OpenEmailClientEvent(state.profile.email),
-                          );
-                        },
-                        iconDirection: DSButtonIconDirection.right,
-                        border: DSButtonBorder.rounded,
-                        size: DSButtonSize.small,
-                      ),
-                    ),
-                    if (state.profile.resume.url.isNotEmpty)
-                      _HoverScaleWidget(
-                        child: DSButtonWidget(
-                          label: context.localizations.downloadResume,
-                          icon: Icons.download_rounded,
-                          onPressed: () {
-                            context.bloc.add(
-                              OpenExternalUrlEvent(
-                                state.profile.resume.url,
-                                context.localizations.downloadResume,
-                              ),
-                            );
-                          },
-                          variant: DSButtonVariant.secondary,
-                          border: DSButtonBorder.rounded,
-                          size: DSButtonSize.small,
-                        ),
-                      ),
-                  ],
+                  children: resumeFirst ? [?resume, hireMe] : [hireMe, ?resume],
                 ),
               )
               .animate(target: isVisible ? 1 : 0)

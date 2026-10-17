@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/portfolio_event.dart';
 import 'package:use_case/use_case.dart';
@@ -32,6 +33,7 @@ final class LoadedState extends PortfolioState {
     this.lastNavigationSource,
     this.isLocalAssistantAvailable = false,
     this.isRemoteAssistantAvailable = false,
+    this.userRole,
   });
 
   final PortfolioEntity portfolio;
@@ -39,6 +41,7 @@ final class LoadedState extends PortfolioState {
   final NavigationSource? lastNavigationSource;
   final bool isLocalAssistantAvailable;
   final bool isRemoteAssistantAvailable;
+  final UserRole? userRole;
 
   @override
   List<Object?> get props => [
@@ -47,6 +50,7 @@ final class LoadedState extends PortfolioState {
     lastNavigationSource,
     isLocalAssistantAvailable,
     isRemoteAssistantAvailable,
+    userRole,
   ];
 
   LoadedState copyWith({
@@ -55,6 +59,7 @@ final class LoadedState extends PortfolioState {
     NavigationSource? lastNavigationSource,
     bool? isLocalAssistantAvailable,
     bool? isRemoteAssistantAvailable,
+    UserRole? userRole,
   }) {
     return LoadedState(
       portfolio: portfolio ?? this.portfolio,
@@ -64,6 +69,7 @@ final class LoadedState extends PortfolioState {
           isLocalAssistantAvailable ?? this.isLocalAssistantAvailable,
       isRemoteAssistantAvailable:
           isRemoteAssistantAvailable ?? this.isRemoteAssistantAvailable,
+      userRole: userRole ?? this.userRole,
     );
   }
 }

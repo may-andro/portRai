@@ -71,6 +71,7 @@ class ContentWidget extends StatelessWidget {
                     messages: state.visibleMessages,
                     isSendingQuestion: state.isSendingQuestion,
                     errorText: errorText,
+                    suggestions: state.userRole.assistantSuggestions(context),
                     onSubmit: (question) => context.bloc.add(
                       SendRemoteAssistantQuestionClickEvent(question),
                     ),

@@ -1,85 +1,79 @@
 part of 'professional_summary_widget.dart';
 
 class _TabletContentWidget extends StatelessWidget {
-  const _TabletContentWidget({required this.profile, required this.isVisible});
+  const _TabletContentWidget({
+    required this.profile,
+    required this.variant,
+    required this.isVisible,
+  });
 
   final ProfileEntity profile;
+  final ProfessionalSummaryVariant variant;
   final bool isVisible;
 
   @override
   Widget build(BuildContext context) {
+    final scope = ProfessionalSummaryScope(
+      profile: profile,
+      isVisible: isVisible,
+      resolution: DSDeviceResolution.tablet,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const DSVerticalSpacerWidget(5),
-        _EyebrowWidget(
-          profile: profile,
-          isVisible: isVisible,
-          hasHorizontalPadding: true,
-        ),
-        const DSVerticalSpacerWidget(2),
-        _UniquePropositionWidget(
-          label: profile.uniqueValueProposition,
-          isVisible: isVisible,
-          hasHorizontalPadding: true,
-        ),
+        variant.buildHeader(context, scope),
         const DSVerticalSpacerWidget(3),
-        _ElevatorPitchWidget(
-          label: profile.elevatorPitch,
-          isVisible: isVisible,
-          hasHorizontalPadding: true,
-        ),
-        const DSVerticalSpacerWidget(3),
-        SizedBox(
-          height: context.space(factor: 30),
-          child: Stack(
-            children: [
-              Positioned(
-                left: context.space(factor: 5),
-                top: 0,
-                bottom: 0,
-                width: context.width * 0.5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+        if (variant.hasFlexibleTabletHeight)
+          Padding(
+            padding: EdgeInsets.only(
+              left: context.space(factor: 5),
+              right: context.space(factor: 2),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  spacing: context.space(factor: 2),
                   children: [
-                    _CurrentRoleWidget(
-                      profile: profile,
-                      isVisible: isVisible,
-                      hasHorizontalPadding: false,
-                    ),
-                    const DSVerticalSpacerWidget(2),
-                    _HireButtonWidget(
-                      isVisible: isVisible,
-                      hasHorizontalPadding: false,
-                    ),
-                    const DSVerticalSpacerWidget(2),
-                    _SocialLinksWidget(
-                      socialLinkSize: context.space(factor: 5),
-                      isVisible: isVisible,
-                      hasHorizontalPadding: false,
-                    ),
-                    const DSVerticalSpacerWidget(2),
-                    _ProjectYearsWidget(
-                      isVisible: isVisible,
-                      animationDelay: 900.ms,
-                    ),
+                    Expanded(child: variant.buildBody(context, scope)),
+                    Expanded(child: variant.buildVisual(context, scope)),
                   ],
                 ),
-              ),
-              Positioned(
-                right: context.space(factor: 2),
-                top: 0,
-                bottom: 0,
-                width: context.width * 0.5,
-                child: _ProfileImageWidget(
-                  profile: profile,
-                  isVisible: isVisible,
+                const DSVerticalSpacerWidget(2),
+                variant.buildTabletActions(context, scope),
+                const DSVerticalSpacerWidget(2),
+              ],
+            ),
+          )
+        else
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: double.infinity,
+              minHeight: context.space(factor: 30),
+            ),
+            child: Stack(
+              children: [
+                // The body sets the height so it can never overflow; the
+                // visual fills whatever height results beside it.
+                Padding(
+                  padding: EdgeInsets.only(left: context.space(factor: 5)),
+                  child: SizedBox(
+                    width: context.width * 0.5 - context.space(factor: 7),
+                    child: variant.buildBody(context, scope),
+                  ),
                 ),
-              ),
-            ],
+                Positioned(
+                  right: context.space(factor: 2),
+                  top: 0,
+                  bottom: 0,
+                  width: context.width * 0.5,
+                  child: variant.buildVisual(context, scope),
+                ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
