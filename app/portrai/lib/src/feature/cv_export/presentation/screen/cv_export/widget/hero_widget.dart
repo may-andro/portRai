@@ -10,7 +10,8 @@ class _HeroWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final isDesktop = context.isDesktop;
+    final isDesktop =
+        context.deviceWidth.index >= DSDeviceWidthResolution.m.index;
     final textAlign = isDesktop ? TextAlign.left : TextAlign.center;
 
     final text = Column(

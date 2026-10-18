@@ -21,14 +21,17 @@ part 'section_picker_widget.dart';
 part 'template_picker_widget.dart';
 
 extension on BuildContext {
-  /// Same page margins as the other screens.
+  /// Same page margins as the other screens, scaled by the window width.
   double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
+    switch (deviceWidth) {
+      case DSDeviceWidthResolution.xs:
         return space(factor: 3);
-      case DSDeviceResolution.tablet:
+      case DSDeviceWidthResolution.s:
         return space(factor: 5);
-      case DSDeviceResolution.desktop:
+      case DSDeviceWidthResolution.m:
+        return width * 0.08;
+      case DSDeviceWidthResolution.l:
+      case DSDeviceWidthResolution.xl:
         return width * 0.15;
     }
   }
@@ -42,14 +45,25 @@ class ContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controls = _ControlsWidget(state: state);
-    final preview = _SectionWidget(
+    Widget previewOf(double height) => _SectionWidget(
       title: context.localizations.cvExportPreviewSection,
       child: SizedBox(
-        height: context.isDesktop
-            ? MediaQuery.sizeOf(context).height * 0.75
-            : context.space(factor: 70),
+        height: height,
         child: _PreviewWidget(state: state),
       ),
+    );
+
+    Widget stackedBody(BuildContext context) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [previewOf(context.space(factor: 70)), controls],
+    );
+    Widget sideBySideBody(BuildContext context) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(width: context.space(factor: 45), child: controls),
+        SizedBox(width: context.space(factor: 3)),
+        Expanded(child: previewOf(MediaQuery.sizeOf(context).height * 0.75)),
+      ],
     );
 
     return Stack(
@@ -65,22 +79,13 @@ class ContentWidget extends StatelessWidget {
                 context.space(factor: 14),
               ),
               sliver: SliverToBoxAdapter(
-                child: context.isDesktop
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: context.space(factor: 45),
-                            child: controls,
-                          ),
-                          SizedBox(width: context.space(factor: 3)),
-                          Expanded(child: preview),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [preview, controls],
-                      ),
+                child: DSResponsiveWidthContainerWidget(
+                  xsBuilder: stackedBody,
+                  sBuilder: stackedBody,
+                  mBuilder: stackedBody,
+                  lBuilder: sideBySideBody,
+                  xlBuilder: sideBySideBody,
+                ),
               ),
             ),
           ],
