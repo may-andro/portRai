@@ -30,11 +30,11 @@ class _PhotoPickerWidget extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  width: photoSize * 0.8,
+                  width: photoSize,
                   height: photoSize,
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(photoSize * 0.2),
+                    shape: BoxShape.circle,
                     border: Border.all(
                       color: photoUrl == selectedPhotoUrl
                           ? context.colorPalette.neutral.grey1.color
@@ -42,11 +42,23 @@ class _PhotoPickerWidget extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(photoSize * 0.16),
+                  child: ClipOval(
                     child: ColoredBox(
                       color: context.colorPalette.neutral.grey3.color,
-                      child: Image.network(photoUrl, fit: BoxFit.contain),
+                      // Same framing as the PDF: the portrait fills the
+                      // circle with the head kept in view.
+                      child: Transform.translate(
+                        offset: Offset(0, photoSize * 0.05),
+                        child: Transform.scale(
+                          scale: 1.1,
+                          alignment: Alignment.topCenter,
+                          child: Image.network(
+                            photoUrl,
+                            fit: BoxFit.contain,
+                            alignment: Alignment.topCenter,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

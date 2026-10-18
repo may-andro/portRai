@@ -47,17 +47,20 @@ class CvPdfBlocks {
     return '${input.dateFormat.format(experience.startDate)} - $endText';
   }
 
-  /// A portrait frame that shows the whole photo; cut-out portraits end with
-  /// a flat edge that a circle would leave floating.
+  /// The photo in a circle, scaled so the portrait fills the circle with the
+  /// head kept in view; cut-out portraits end with a flat edge that would
+  /// otherwise float inside the circle.
   pdf_widgets.Widget photo({required double size, PdfColor? borderColor}) {
     final borderWidth = _style.scaled(2.5);
-    final frameWidth = size * 0.8;
-    final radius = size * 0.16;
+    final photoSize = size - borderWidth * 2;
+    final image = pdf_widgets.MemoryImage(input.photo!);
+    final imageHeight = photoSize * 1.1;
+    final imageWidth = imageHeight * (image.width ?? 1) / (image.height ?? 1);
     return pdf_widgets.Container(
-      width: frameWidth,
+      width: size,
       height: size,
       decoration: pdf_widgets.BoxDecoration(
-        borderRadius: pdf_widgets.BorderRadius.circular(radius),
+        shape: pdf_widgets.BoxShape.circle,
         color: _style.photoBackdrop,
         border: pdf_widgets.Border.all(
           color: borderColor ?? _style.accent,
@@ -65,13 +68,24 @@ class CvPdfBlocks {
         ),
       ),
       padding: pdf_widgets.EdgeInsets.all(borderWidth),
-      child: pdf_widgets.ClipRRect(
-        horizontalRadius: radius - borderWidth,
-        verticalRadius: radius - borderWidth,
-        child: pdf_widgets.Image(
-          pdf_widgets.MemoryImage(input.photo!),
-          width: frameWidth - borderWidth * 2,
-          height: size - borderWidth * 2,
+      child: pdf_widgets.ClipOval(
+        child: pdf_widgets.SizedBox(
+          width: photoSize,
+          height: photoSize,
+          child: pdf_widgets.Stack(
+            children: [
+              pdf_widgets.Positioned(
+                top: photoSize * 0.05,
+                left: (photoSize - imageWidth) / 2,
+                child: pdf_widgets.Image(
+                  image,
+                  width: imageWidth,
+                  height: imageHeight,
+                  fit: pdf_widgets.BoxFit.fill,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
