@@ -62,11 +62,14 @@ class CvPdfBlocks {
       ),
       padding: pdf_widgets.EdgeInsets.all(borderWidth),
       child: pdf_widgets.ClipOval(
-        child: pdf_widgets.Image(
-          pdf_widgets.MemoryImage(input.photo!),
+        child: pdf_widgets.Container(
           width: photoSize,
           height: photoSize,
-          fit: pdf_widgets.BoxFit.cover,
+          color: _style.tint,
+          child: pdf_widgets.Image(
+            pdf_widgets.MemoryImage(input.photo!),
+            alignment: pdf_widgets.Alignment.bottomCenter,
+          ),
         ),
       ),
     );

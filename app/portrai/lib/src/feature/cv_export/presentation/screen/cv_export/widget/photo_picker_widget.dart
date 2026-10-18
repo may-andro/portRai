@@ -42,17 +42,13 @@ class _PhotoPickerWidget extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                  child: ClipOval(
+                    child: ColoredBox(
                       color: context.colorPalette.neutral.grey3.color,
-                    ),
-                    child: Padding(
-                      // Keeps the corners of the whole image inside the circle.
-                      padding: EdgeInsets.all(photoSize * 0.14),
-                      child: DSNetworkImageWidget(
-                        url: photoUrl,
+                      child: Image.network(
+                        photoUrl,
                         fit: BoxFit.contain,
+                        alignment: Alignment.bottomCenter,
                       ),
                     ),
                   ),
