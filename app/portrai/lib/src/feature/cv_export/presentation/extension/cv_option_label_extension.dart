@@ -13,6 +13,17 @@ extension CvTemplateLabelExtension on CvTemplate {
   }
 }
 
+extension CvTemplateDescriptionExtension on CvTemplate {
+  String description(BuildContext context) {
+    return switch (this) {
+      CvTemplate.sidebar => context.localizations.cvTemplateSidebarDescription,
+      CvTemplate.classic => context.localizations.cvTemplateClassicDescription,
+      CvTemplate.minimal => context.localizations.cvTemplateMinimalDescription,
+      CvTemplate.bold => context.localizations.cvTemplateBoldDescription,
+    };
+  }
+}
+
 extension CvAccentLabelExtension on CvAccent {
   String label(BuildContext context) {
     return switch (this) {

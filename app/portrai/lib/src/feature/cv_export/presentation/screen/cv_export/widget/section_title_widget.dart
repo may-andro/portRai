@@ -7,15 +7,15 @@ class _SectionTitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: context.space(factor: 3),
-        bottom: context.space(factor: 1.5),
-      ),
-      child: DSTextWidget(
-        title.toUpperCase(),
-        style: context.typography.labelMedium,
-        color: context.colorPalette.surface.onSurfaceVariant,
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: context.space()),
+        child: DSTextWidget(
+          title,
+          style: context.typography.titleMedium,
+          color: context.colorPalette.neutral.grey9,
+        ),
       ),
     );
   }

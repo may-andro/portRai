@@ -9,42 +9,53 @@ class _AccentPickerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final swatchSize = context.space(factor: 4.5);
 
-    return Wrap(
-      spacing: context.space(factor: 1.5),
-      runSpacing: context.space(factor: 1.5),
-      children: [
-        for (final accent in CvAccent.values)
-          Tooltip(
-            message: accent.label(context),
-            child: InkResponse(
-              onTap: () => context.bloc.add(SelectCvAccentClickEvent(accent)),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: swatchSize,
-                height: swatchSize,
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: accent == selectedAccent
-                        ? Color(accent.argb)
-                        : Colors.transparent,
-                    width: 2,
+    return _OptionCardWidget(
+      child: Padding(
+        padding: EdgeInsets.all(context.space(factor: 2)),
+        child: Wrap(
+          spacing: context.space(factor: 1.5),
+          runSpacing: context.space(factor: 1.5),
+          children: [
+            for (final accent in CvAccent.values)
+              Tooltip(
+                message: accent.label(context),
+                child: InkResponse(
+                  onTap: () {
+                    context.bloc.add(SelectCvAccentClickEvent(accent));
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: swatchSize,
+                    height: swatchSize,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: accent == selectedAccent
+                            ? context.colorPalette.neutral.grey1.color
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(accent.argb),
+                        shape: BoxShape.circle,
+                      ),
+                      child: accent == selectedAccent
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            )
+                          : null,
+                    ),
                   ),
-                ),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Color(accent.argb),
-                    shape: BoxShape.circle,
-                  ),
-                  child: accent == selectedAccent
-                      ? const Icon(Icons.check, color: Colors.white, size: 16)
-                      : null,
                 ),
               ),
-            ),
-          ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 }

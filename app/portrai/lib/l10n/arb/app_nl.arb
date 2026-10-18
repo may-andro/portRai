@@ -417,6 +417,22 @@
   "@cvTemplateBold": {
     "description": "Name of the CV template with a colored banner"
   },
+  "cvTemplateSidebarDescription": "Gekleurde zijkolom met contact en vaardigheden, ervaring rechts",
+  "@cvTemplateSidebarDescription": {
+    "description": "One line description of the Sidebar CV template"
+  },
+  "cvTemplateClassicDescription": "Traditionele enkele kolom met gelijnde sectiekoppen",
+  "@cvTemplateClassicDescription": {
+    "description": "One line description of the Classic CV template"
+  },
+  "cvTemplateMinimalDescription": "Luchtige enkele kolom met kleine sectielabels in de kantlijn",
+  "@cvTemplateMinimalDescription": {
+    "description": "One line description of the Minimal CV template"
+  },
+  "cvTemplateBoldDescription": "Gekleurde koptekstbanner boven een hoofdkolom en een vaardighedenkolom",
+  "@cvTemplateBoldDescription": {
+    "description": "One line description of the Bold CV template"
+  },
   "cvAccentTeal": "Blauwgroen",
   "@cvAccentTeal": {
     "description": "Name of the teal CV accent color"

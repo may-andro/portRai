@@ -1255,6 +1255,22 @@
   "@cvTemplateBold": {
     "description": "Name of the CV template with a colored banner"
   },
+  "cvTemplateSidebarDescription": "Tinted side column with contacts and skills, experience on the right",
+  "@cvTemplateSidebarDescription": {
+    "description": "One line description of the Sidebar CV template"
+  },
+  "cvTemplateClassicDescription": "Traditional single column with ruled section headings",
+  "@cvTemplateClassicDescription": {
+    "description": "One line description of the Classic CV template"
+  },
+  "cvTemplateMinimalDescription": "Airy single column with small section labels in the margin",
+  "@cvTemplateMinimalDescription": {
+    "description": "One line description of the Minimal CV template"
+  },
+  "cvTemplateBoldDescription": "Colored header banner above a main column and a skills column",
+  "@cvTemplateBoldDescription": {
+    "description": "One line description of the Bold CV template"
+  },
   "cvAccentTeal": "Teal",
   "@cvAccentTeal": {
     "description": "Name of the teal CV accent color"

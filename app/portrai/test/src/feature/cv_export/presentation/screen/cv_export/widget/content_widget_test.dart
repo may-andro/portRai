@@ -70,7 +70,7 @@ void main() {
     ) async {
       await pumpContent(tester);
 
-      await tester.tap(find.widgetWithText(FilterChip, 'Skills'));
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Skills'));
 
       verify(
         () => bloc.add(const ToggleCvSectionClickEvent(CvSection.skills)),

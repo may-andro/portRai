@@ -11,13 +11,11 @@ part 'accent_picker_widget.dart';
 part 'controls_widget.dart';
 part 'download_button_widget.dart';
 part 'failure_widget.dart';
-part 'panel_widget.dart';
-part 'photo_switch_widget.dart';
+part 'option_card_widget.dart';
 part 'preview_widget.dart';
 part 'section_picker_widget.dart';
 part 'section_title_widget.dart';
 part 'template_picker_widget.dart';
-part 'template_thumbnail_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({required this.state, super.key});
@@ -26,32 +24,29 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final padding = EdgeInsets.all(context.space(factor: 2));
+    final horizontalPadding = context.space(factor: 2);
 
     if (context.isDesktop) {
       return Padding(
-        padding: padding,
+        padding: EdgeInsets.all(horizontalPadding),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
               width: context.space(factor: 45),
-              child: _PanelWidget(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.all(context.space(factor: 2)),
-                        child: _ControlsWidget(state: state),
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: _ControlsWidget(state: state),
                     ),
-                    _DownloadButtonWidget(state: state),
-                  ],
-                ),
+                  ),
+                  _DownloadButtonWidget(state: state),
+                ],
               ),
             ),
-            SizedBox(width: context.space(factor: 2)),
+            SizedBox(width: horizontalPadding),
             Expanded(child: _PreviewWidget(state: state)),
           ],
         ),
@@ -62,7 +57,7 @@ class ContentWidget extends StatelessWidget {
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: padding,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -70,13 +65,7 @@ class ContentWidget extends StatelessWidget {
                   height: context.space(factor: 70),
                   child: _PreviewWidget(state: state),
                 ),
-                SizedBox(height: context.space(factor: 2)),
-                _PanelWidget(
-                  child: Padding(
-                    padding: EdgeInsets.all(context.space(factor: 2)),
-                    child: _ControlsWidget(state: state),
-                  ),
-                ),
+                _ControlsWidget(state: state),
               ],
             ),
           ),

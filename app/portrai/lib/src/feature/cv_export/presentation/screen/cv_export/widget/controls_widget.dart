@@ -10,33 +10,15 @@ class _ControlsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(
-              Icons.description_outlined,
-              color: context.colorPalette.brand.primary.color,
-            ),
-            SizedBox(width: context.space()),
-            Expanded(
-              child: DSTextWidget(
-                context.localizations.cvExportTitle,
-                style: context.typography.headlineSmall,
-                color: context.colorPalette.surface.onSurface,
-              ),
-            ),
-          ],
-        ),
         _SectionTitleWidget(context.localizations.cvExportTemplateSection),
-        _TemplatePickerWidget(
-          selectedTemplate: state.options.template,
-          accent: state.options.accent,
-        ),
+        _TemplatePickerWidget(selectedTemplate: state.options.template),
         _SectionTitleWidget(context.localizations.cvExportAccentSection),
         _AccentPickerWidget(selectedAccent: state.options.accent),
         _SectionTitleWidget(context.localizations.cvExportContentSection),
-        _SectionPickerWidget(selectedSections: state.options.sections),
-        SizedBox(height: context.space(factor: 2)),
-        _PhotoSwitchWidget(isIncluded: state.options.isPhotoIncluded),
+        _SectionPickerWidget(
+          selectedSections: state.options.sections,
+          isPhotoIncluded: state.options.isPhotoIncluded,
+        ),
         if (state.failure case final failure?) _FailureWidget(failure: failure),
       ],
     );
