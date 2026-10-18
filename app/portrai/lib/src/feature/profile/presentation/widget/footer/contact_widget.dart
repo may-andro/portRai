@@ -13,8 +13,6 @@ class _ContactWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final resumeUrl = state.profile.resume.url;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,11 +29,7 @@ class _ContactWidget extends StatelessWidget {
           children: [
             DSButtonWidget(
               label: context.localizations.downloadResume,
-              onPressed: () {
-                context.bloc.add(
-                  OpenExternalUrlEvent(label: 'Resume', url: resumeUrl),
-                );
-              },
+              onPressed: () => CvExportScreen.navigate(context),
               icon: Icons.file_present_rounded,
               iconDirection: DSButtonIconDirection.right,
               size: _buttonSize,

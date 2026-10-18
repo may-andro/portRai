@@ -5,6 +5,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';

@@ -51,13 +51,12 @@ use the short description, and switch to the long one only when the whole CV sti
 - `domain/`: entities, `BuildCvDocumentUseCase`, `GenerateCvPdfUseCase`, `ShareCvPdfUseCase`.
 - `data/pdf/`: `CvPdfRenderer`, the shared blocks in `cv_pdf_blocks.dart`, contact icons, the
   photo loader and one file per template in `template/`.
-- `presentation/`: the export screen (bloc, tracking delegate, widgets), the route and the
-  `CvExportButtonWidget` shown in the portfolio header.
+- `presentation/`: the export screen (bloc, tracking delegate, widgets) and its route.
 
 ## Getting Started
 
-Register `CvExportModuleConfigurator` in `module_configurators.dart`. The portfolio header shows
-`CvExportButtonWidget`, which opens the `CvExportModuleRoute.cvExport` screen. Import
+Register `CvExportModuleConfigurator` in `module_configurators.dart`. The footer's Resume button
+opens the `CvExportModuleRoute.cvExport` screen through `CvExportScreen.navigate`. Import
 `cv_export.dart` from consumers, not private feature barrels.
 
 ## Technical Notes

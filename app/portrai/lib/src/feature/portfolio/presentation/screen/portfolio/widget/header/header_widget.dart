@@ -1,6 +1,5 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/extension/_extension.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';

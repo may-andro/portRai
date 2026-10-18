@@ -17,13 +17,7 @@ class _HeaderMobileTabletContentWidget extends StatelessWidget {
             child: DSImage.logo(fit: BoxFit.cover),
           ),
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CvExportButtonWidget(size: context.portfolioIconButtonSize),
-            const SettingButtonWidget(),
-          ],
-        ),
+        const SettingButtonWidget(),
       ],
     );
   }
