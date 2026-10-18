@@ -20,12 +20,24 @@ part 'section_widget.dart';
 part 'section_picker_widget.dart';
 part 'template_picker_widget.dart';
 
+extension on BuildContext {
+  /// Same page margins as the other screens.
+  double get horizontalPadding {
+    switch (deviceResolution) {
+      case DSDeviceResolution.mobile:
+        return space(factor: 3);
+      case DSDeviceResolution.tablet:
+        return space(factor: 5);
+      case DSDeviceResolution.desktop:
+        return width * 0.15;
+    }
+  }
+}
+
 class ContentWidget extends StatelessWidget {
   const ContentWidget({required this.state, super.key});
 
   final CvExportLoadedState state;
-
-  static const double maxContentWidth = 1200;
 
   @override
   Widget build(BuildContext context) {
@@ -45,36 +57,30 @@ class ContentWidget extends StatelessWidget {
         CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(child: _HeroWidget()),
-            SliverToBoxAdapter(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: maxContentWidth),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      context.space(factor: 2),
-                      context.space(factor: 3),
-                      context.space(factor: 2),
-                      context.space(factor: 14),
-                    ),
-                    child: context.isDesktop
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: context.space(factor: 45),
-                                child: controls,
-                              ),
-                              SizedBox(width: context.space(factor: 3)),
-                              Expanded(child: preview),
-                            ],
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [preview, controls],
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                context.horizontalPadding,
+                context.space(factor: 3),
+                context.horizontalPadding,
+                context.space(factor: 14),
+              ),
+              sliver: SliverToBoxAdapter(
+                child: context.isDesktop
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: context.space(factor: 45),
+                            child: controls,
                           ),
-                  ),
-                ),
+                          SizedBox(width: context.space(factor: 3)),
+                          Expanded(child: preview),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [preview, controls],
+                      ),
               ),
             ),
           ],

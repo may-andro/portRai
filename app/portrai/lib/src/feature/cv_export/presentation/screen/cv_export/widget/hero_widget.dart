@@ -1,6 +1,7 @@
 part of 'content_widget.dart';
 
 /// Gradient header with the logo chrome, the screen title and a short intro.
+/// Stacked and centered on mobile and tablet, side by side on desktop.
 class _HeroWidget extends StatelessWidget {
   const _HeroWidget();
 
@@ -9,11 +10,33 @@ class _HeroWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final isWide = !context.isMobile;
-    final alignment = isWide
-        ? CrossAxisAlignment.start
-        : CrossAxisAlignment.center;
-    final textAlign = isWide ? TextAlign.left : TextAlign.center;
+    final isDesktop = context.isDesktop;
+    final textAlign = isDesktop ? TextAlign.left : TextAlign.center;
+
+    final text = Column(
+      crossAxisAlignment: isDesktop
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
+      spacing: context.space(),
+      children: [
+        DSTextWidget(
+          context.localizations.cvExportTitle,
+          style: context.typography.headlineLarge,
+          color: _white,
+          textAlign: textAlign,
+        ),
+        DSTextWidget(
+          context.localizations.cvExportIntro,
+          style: context.typography.bodyMedium,
+          color: _white,
+          textAlign: textAlign,
+        ),
+      ],
+    );
+    final illustration = DSLottieIllustrationWidget(
+      illustration: DSLottieIllustration.talentSearch,
+      width: context.space(factor: isDesktop ? 14 : 16),
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -36,49 +59,23 @@ class _HeroWidget extends StatelessWidget {
             ),
             PageChromeWidget(
               closeColor: Colors.white,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: ContentWidget.maxContentWidth,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.space(factor: 2),
-                      vertical: context.space(factor: isWide ? 5 : 3),
-                    ),
-                    child: Row(
-                      spacing: context.space(factor: 3),
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: alignment,
-                            spacing: context.space(factor: 2),
-                            children: [
-                              DSTextWidget(
-                                context.localizations.cvExportTitle,
-                                style: isWide
-                                    ? context.typography.displayMedium
-                                    : context.typography.headlineLarge,
-                                color: _white,
-                                textAlign: textAlign,
-                              ),
-                              DSTextWidget(
-                                context.localizations.cvExportIntro,
-                                style: context.typography.bodyLarge,
-                                color: _white,
-                                textAlign: textAlign,
-                              ),
-                            ],
-                          ),
-                        ),
-                        DSLottieIllustrationWidget(
-                          illustration: DSLottieIllustration.talentSearch,
-                          width: context.space(factor: isWide ? 28 : 14),
-                        ),
-                      ],
-                    ),
-                  ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.horizontalPadding,
+                  vertical: context.space(factor: 2),
                 ),
+                child: isDesktop
+                    ? Row(
+                        spacing: context.space(factor: 4),
+                        children: [
+                          Expanded(child: text),
+                          illustration,
+                        ],
+                      )
+                    : Column(
+                        spacing: context.space(),
+                        children: [illustration, text],
+                      ),
               ),
             ),
           ],

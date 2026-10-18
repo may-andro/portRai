@@ -66,9 +66,17 @@ class _ContentChipWidget extends StatelessWidget {
       onSelected: onSelected,
       showCheckmark: true,
       checkmarkColor: textColor.color,
-      backgroundColor: Colors.transparent,
-      selectedColor: palette.neutral.grey1.color,
-      side: BorderSide(color: palette.neutral.grey3.color),
+      elevation: 0,
+      pressElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      color: WidgetStatePropertyAll(
+        isSelected ? palette.neutral.grey1.color : palette.inverseSurface.color,
+      ),
+      side: BorderSide(
+        color: isSelected
+            ? palette.neutral.grey1.color
+            : palette.neutral.grey4.color,
+      ),
       label: DSTextWidget(
         label,
         style: context.typography.labelLarge,
