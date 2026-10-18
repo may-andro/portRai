@@ -9,13 +9,13 @@ class _SectionTitleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        top: context.space(factor: 2),
-        bottom: context.space(),
+        top: context.space(factor: 3),
+        bottom: context.space(factor: 1.5),
       ),
       child: DSTextWidget(
-        title,
-        style: context.typography.titleSmall,
-        color: context.colorPalette.neutral.grey9,
+        title.toUpperCase(),
+        style: context.typography.labelMedium,
+        color: context.colorPalette.surface.onSurfaceVariant,
       ),
     );
   }

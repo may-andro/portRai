@@ -7,12 +7,31 @@ class _DownloadButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DSButtonWidget(
-      label: context.localizations.cvExportDownload,
-      icon: Icons.download_rounded,
-      isLoading: state.isDownloading,
-      isDisabled: state.pdfBytes == null || state.isGenerating,
-      onPressed: () => context.bloc.add(const DownloadCvClickEvent()),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: context.colorPalette.surface.surfaceContainerLow.color,
+        border: Border(
+          top: BorderSide(
+            color: context.colorPalette.outline.outlineVariant.color,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.all(context.space(factor: 2)),
+          child: SizedBox(
+            width: double.infinity,
+            child: DSButtonWidget(
+              label: context.localizations.cvExportDownload,
+              icon: Icons.download_rounded,
+              isLoading: state.isDownloading,
+              isDisabled: state.pdfBytes == null || state.isGenerating,
+              onPressed: () => context.bloc.add(const DownloadCvClickEvent()),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

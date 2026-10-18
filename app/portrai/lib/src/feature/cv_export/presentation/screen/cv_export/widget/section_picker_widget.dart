@@ -14,6 +14,16 @@ class _SectionPickerWidget extends StatelessWidget {
         for (final section in CvSection.values)
           FilterChip(
             selected: selectedSections.contains(section),
+            showCheckmark: false,
+            avatar: Icon(
+              selectedSections.contains(section)
+                  ? Icons.check_circle
+                  : Icons.add_circle_outline,
+              size: 18,
+              color: selectedSections.contains(section)
+                  ? context.colorPalette.brand.primary.color
+                  : context.colorPalette.surface.onSurfaceVariant.color,
+            ),
             selectedColor: context.colorPalette.brand.primaryContainer.color,
             label: DSTextWidget(
               section.label(context),
