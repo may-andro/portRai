@@ -177,7 +177,7 @@ class BuildCvDocumentUseCase
   List<String> _languageCodesOf(ProfileEntity profile) {
     final codes = <String>[];
     for (final language in profile.languages) {
-      final code = CvLanguageCode.of(language.language);
+      final code = CvLanguageCode.ofLanguage(language);
       if (!codes.contains(code)) codes.add(code);
     }
     return codes;

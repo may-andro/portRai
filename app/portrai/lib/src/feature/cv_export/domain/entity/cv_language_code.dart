@@ -1,3 +1,5 @@
+import 'package:portrai/src/feature/profile/domain/entity/language_entity.dart';
+
 /// Short codes for the language names found in the (localized) portfolio data.
 class CvLanguageCode {
   const CvLanguageCode._();
@@ -26,6 +28,14 @@ class CvLanguageCode {
     'italiano': 'IT',
     'hindi': 'HI',
   };
+
+  /// The code of [language]: its ISO code when the data has one, else the
+  /// code looked up from the localized name.
+  static String ofLanguage(LanguageEntity language) {
+    final code = language.code?.trim();
+    if (code != null && code.isNotEmpty) return code.toUpperCase();
+    return of(language.language);
+  }
 
   /// The code of [languageName], or the name itself when it is unknown.
   static String of(String languageName) {

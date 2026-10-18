@@ -12,6 +12,7 @@ class LanguageMapper implements BiMapper<LanguageModel, LanguageEntity> {
     return LanguageModel(
       language: entity.language,
       proficiency: entity.proficiency,
+      code: entity.code,
     );
   }
 
@@ -20,6 +21,7 @@ class LanguageMapper implements BiMapper<LanguageModel, LanguageEntity> {
     return LanguageEntity(
       language: model.language,
       proficiency: model.proficiency,
+      code: model.code,
     );
   }
 }
