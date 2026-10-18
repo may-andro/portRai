@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 /// How much content a CV keeps so that it fits a single page.
 ///
-/// Level 0 keeps the most content; every next level trims more.
+/// Level 0 keeps the most content; every next level trims a little more.
 class CvFitLevelEntity extends Equatable {
   const CvFitLevelEntity({
     required this.maxExperiences,
@@ -17,93 +17,36 @@ class CvFitLevelEntity extends Equatable {
     required this.fontScale,
   });
 
-  static const List<CvFitLevelEntity> levels = [
-    // Roomier than the next level so spare space is filled with more skills.
-    CvFitLevelEntity(
-      maxExperiences: 3,
-      maxHighlightsPerExperience: 4,
-      maxHighlightLength: 160,
-      maxProjects: 16,
-      maxSkillGroups: 10,
-      maxSkillsPerGroup: 12,
-      maxEducations: 3,
-      maxSummaryLength: 400,
-      maxProjectDescriptionLength: 180,
-      fontScale: 1,
-    ),
-    CvFitLevelEntity(
-      maxExperiences: 3,
-      maxHighlightsPerExperience: 4,
-      maxHighlightLength: 160,
-      maxProjects: 16,
-      maxSkillGroups: 6,
-      maxSkillsPerGroup: 8,
-      maxEducations: 2,
-      maxSummaryLength: 400,
-      maxProjectDescriptionLength: 180,
-      fontScale: 1,
-    ),
-    CvFitLevelEntity(
-      maxExperiences: 3,
-      maxHighlightsPerExperience: 3,
-      maxHighlightLength: 140,
-      maxProjects: 16,
-      maxSkillGroups: 6,
-      maxSkillsPerGroup: 7,
-      maxEducations: 2,
-      maxSummaryLength: 320,
-      maxProjectDescriptionLength: 150,
-      fontScale: 1,
-    ),
-    CvFitLevelEntity(
-      maxExperiences: 3,
-      maxHighlightsPerExperience: 3,
-      maxHighlightLength: 120,
-      maxProjects: 14,
-      maxSkillGroups: 5,
-      maxSkillsPerGroup: 6,
-      maxEducations: 2,
-      maxSummaryLength: 260,
-      maxProjectDescriptionLength: 120,
-      fontScale: 0.95,
-    ),
-    CvFitLevelEntity(
-      maxExperiences: 3,
-      maxHighlightsPerExperience: 2,
-      maxHighlightLength: 110,
-      maxProjects: 12,
-      maxSkillGroups: 4,
-      maxSkillsPerGroup: 6,
-      maxEducations: 2,
-      maxSummaryLength: 220,
-      maxProjectDescriptionLength: 100,
-      fontScale: 0.92,
-    ),
-    CvFitLevelEntity(
-      maxExperiences: 3,
-      maxHighlightsPerExperience: 2,
-      maxHighlightLength: 90,
-      maxProjects: 8,
-      maxSkillGroups: 4,
-      maxSkillsPerGroup: 5,
-      maxEducations: 1,
-      maxSummaryLength: 180,
-      maxProjectDescriptionLength: 80,
-      fontScale: 0.9,
-    ),
-    CvFitLevelEntity(
-      maxExperiences: 2,
-      maxHighlightsPerExperience: 2,
-      maxHighlightLength: 80,
-      maxProjects: 0,
-      maxSkillGroups: 3,
-      maxSkillsPerGroup: 4,
-      maxEducations: 1,
-      maxSummaryLength: 140,
-      maxProjectDescriptionLength: 60,
-      fontScale: 0.85,
-    ),
-  ];
+  /// The level at [progress], from 0 (all content) to 1 (most compact).
+  factory CvFitLevelEntity._interpolated(double progress) {
+    int between(int full, int compact, [double start = 0]) {
+      final stepProgress = ((progress - start) / (1 - start)).clamp(0.0, 1.0);
+      return (full + (compact - full) * stepProgress).round();
+    }
+
+    return CvFitLevelEntity(
+      maxExperiences: progress < 0.9 ? 3 : 2,
+      maxHighlightsPerExperience: between(4, 2),
+      maxHighlightLength: between(260, 80),
+      // Projects are cheap and valuable, so they are dropped last.
+      maxProjects: between(16, 0, 0.5),
+      maxSkillGroups: between(10, 3),
+      maxSkillsPerGroup: between(14, 4),
+      maxEducations: between(3, 1),
+      maxSummaryLength: between(600, 140),
+      maxProjectDescriptionLength: between(180, 60),
+      fontScale: 1 - 0.15 * progress,
+    );
+  }
+
+  static const int _levelCount = 32;
+
+  /// A gradual ladder from the full content to the most compact one, so a CV
+  /// loses only as much content as it needs to fit a single page.
+  static final List<CvFitLevelEntity> levels = List.unmodifiable([
+    for (var levelIndex = 0; levelIndex < _levelCount; levelIndex++)
+      CvFitLevelEntity._interpolated(levelIndex / (_levelCount - 1)),
+  ]);
 
   final int maxExperiences;
   final int maxHighlightsPerExperience;

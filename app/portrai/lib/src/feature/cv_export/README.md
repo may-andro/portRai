@@ -9,8 +9,8 @@ PDF CV. Everything runs locally; no data leaves the device and no AI is involved
 - Five accent colors and a toggle for each content section.
 - Optional profile photo, off by default.
 - Live preview and download/share on mobile, desktop and web.
-- Guaranteed single page: the renderer retries with progressively less content and
-  smaller type until the CV fits.
+- Guaranteed single page: the renderer searches a gradual ladder of content levels for the fullest one that fits,
+  then enlarges the type as far as it still fits.
 - Fills the page: the full content is first rendered with enlarged type (up to 1.4x) and
   shrunk until it fits.
 - Ongoing experiences come first, then finished ones by start date; only the first three are shown, followed by a link to the portfolio website

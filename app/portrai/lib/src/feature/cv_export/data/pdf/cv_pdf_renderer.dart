@@ -18,7 +18,7 @@ import 'package:portrai/src/feature/cv_export/domain/exception/_exception.dart';
 @register
 class CvPdfRenderer {
   static const double _maxFontScale = 1.4;
-  static const double _fontScaleStep = 0.04;
+  static const double _fontScaleStep = 0.02;
   static const String _fallbackLocaleCode = 'en';
 
   CvPdfTemplate _templateOf(CvTemplate template) {
@@ -74,27 +74,42 @@ class CvPdfRenderer {
       }
     }
 
-    for (final level in CvFitLevelEntity.levels) {
-      final fittedDocument = document.fit(level);
-      final fittingPdfBytes = await tryRender(fittedDocument, level.fontScale);
-      if (fittingPdfBytes == null) continue;
-      var bestPdfBytes = fittingPdfBytes;
+    // Fitting is monotonic: less content always fits better. A binary search
+    // finds the fullest level that fits, then the largest font scale for it.
+    final levels = CvFitLevelEntity.levels;
+    CvFitLevelEntity? fullestLevel;
+    Uint8List? fullestPdfBytes;
+    var low = 0;
+    var high = levels.length - 1;
+    while (low <= high) {
+      final middle = (low + high) ~/ 2;
+      final pdfBytes = await tryRender(
+        document.fit(levels[middle]),
+        levels[middle].fontScale,
+      );
+      if (pdfBytes != null) {
+        fullestLevel = levels[middle];
+        fullestPdfBytes = pdfBytes;
+        high = middle - 1;
+      } else {
+        low = middle + 1;
+      }
+    }
 
-      // Only the full content is enlarged to fill the page; a binary search
-      // finds the largest font scale that still fits, as fitting is monotonic.
-      if (level == CvFitLevelEntity.levels.first) {
-        final fontScales = _enlargedFontScales(level);
-        var low = 0;
-        var high = fontScales.length - 1;
-        while (low <= high) {
-          final middle = (low + high) ~/ 2;
-          final pdfBytes = await tryRender(fittedDocument, fontScales[middle]);
-          if (pdfBytes != null) {
-            bestPdfBytes = pdfBytes;
-            high = middle - 1;
-          } else {
-            low = middle + 1;
-          }
+    if (fullestLevel != null && fullestPdfBytes != null) {
+      final fittedDocument = document.fit(fullestLevel);
+      final fontScales = _enlargedFontScales(fullestLevel);
+      var bestPdfBytes = fullestPdfBytes;
+      var low = 0;
+      var high = fontScales.length - 1;
+      while (low <= high) {
+        final middle = (low + high) ~/ 2;
+        final pdfBytes = await tryRender(fittedDocument, fontScales[middle]);
+        if (pdfBytes != null) {
+          bestPdfBytes = pdfBytes;
+          high = middle - 1;
+        } else {
+          low = middle + 1;
         }
       }
       return bestPdfBytes;
