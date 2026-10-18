@@ -8,6 +8,7 @@ class CvExperienceEntity extends Equatable {
     required this.startDate,
     required this.endDate,
     required this.overview,
+    this.detailedOverview = '',
     this.url,
   });
 
@@ -22,6 +23,9 @@ class CvExperienceEntity extends Equatable {
   /// A short paragraph describing the role.
   final String overview;
 
+  /// A longer description, used instead of [overview] when there is room.
+  final String detailedOverview;
+
   /// The employer website; makes the company clickable when present.
   final String? url;
 
@@ -33,6 +37,7 @@ class CvExperienceEntity extends Equatable {
     startDate,
     endDate,
     overview,
+    detailedOverview,
     url,
   ];
 }

@@ -141,6 +141,7 @@ class BuildCvDocumentUseCase
             endDate: experience.current ? null : experience.endDate,
             url: _validUrl(experience.url),
             overview: _overviewOf(experience),
+            detailedOverview: experience.longDescription,
           ),
       ],
       websiteUrl: _websiteUrlOf(profile),

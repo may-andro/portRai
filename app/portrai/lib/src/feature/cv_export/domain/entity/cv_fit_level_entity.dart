@@ -25,7 +25,7 @@ class CvFitLevelEntity extends Equatable {
 
     return CvFitLevelEntity(
       maxExperiences: progress < 0.9 ? 3 : 2,
-      maxOverviewLength: between(500, 110),
+      maxOverviewLength: between(900, 110),
       // Projects are cheap and valuable, so they are dropped last.
       maxProjects: between(16, 0, 0.5),
       maxSkillGroups: between(10, 3),

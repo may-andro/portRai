@@ -52,6 +52,35 @@ void main() {
       );
     });
 
+    test('should use the detailed overview only when it fits the level', () {
+      final experience = CvExperienceEntity(
+        position: 'Engineer',
+        company: 'Company',
+        location: '',
+        startDate: DateTime(2020),
+        endDate: null,
+        overview: 'Short overview.',
+        detailedOverview: 'Detailed overview. ' * 10,
+      );
+      final withExperience = CvDocumentEntity(
+        fullName: 'Ada',
+        title: 'Title',
+        summary: '',
+        photoUrl: '',
+        contacts: const [],
+        experiences: [experience],
+        projects: const [],
+        skillGroups: const [],
+        educations: const [],
+      );
+
+      final roomy = withExperience.fit(CvFitLevelEntity.levels.first);
+      final compact = withExperience.fit(CvFitLevelEntity.levels.last);
+
+      expect(roomy.experiences.single.overview, startsWith('Detailed'));
+      expect(compact.experiences.single.overview, 'Short overview.');
+    });
+
     test('should truncate the summary with dots when it is too long', () {
       final level = CvFitLevelEntity.levels.last;
 

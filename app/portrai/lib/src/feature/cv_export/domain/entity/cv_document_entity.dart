@@ -72,7 +72,7 @@ class CvDocumentEntity extends Equatable {
             startDate: experience.startDate,
             endDate: experience.endDate,
             url: experience.url,
-            overview: _truncate(experience.overview, level.maxOverviewLength),
+            overview: _overviewFor(experience, level.maxOverviewLength),
           ),
       ],
       projects: [
@@ -119,6 +119,16 @@ class CvDocumentEntity extends Equatable {
         .replaceAll('\u2026', '...')
         .replaceAll(RegExp('[\u2022\u25CF\u25AA]'), '-')
         .replaceAll(RegExp('[\u00A0\u2007\u202F]'), ' ');
+  }
+
+  /// The detailed overview when it fits [maxLength], otherwise the short one,
+  /// truncated if needed; a complete short text reads better than a cut long one.
+  static String _overviewFor(CvExperienceEntity experience, int maxLength) {
+    final detailedOverview = _clean(experience.detailedOverview).trim();
+    if (detailedOverview.isNotEmpty && detailedOverview.length <= maxLength) {
+      return detailedOverview;
+    }
+    return _truncate(experience.overview, maxLength);
   }
 
   static String _truncate(String text, int maxLength) {
