@@ -54,6 +54,13 @@ class CvPdfStyle {
     0.94 + accent.blue * 0.06,
   );
 
+  /// A soft accent backdrop behind the cut-out profile photo.
+  PdfColor get photoBackdrop => PdfColor(
+    0.8 + accent.red * 0.2,
+    0.8 + accent.green * 0.2,
+    0.8 + accent.blue * 0.2,
+  );
+
   pdf_widgets.TextStyle text({
     double size = 9,
     bool isBold = false,

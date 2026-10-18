@@ -55,6 +55,7 @@ class CvPdfBlocks {
       height: size,
       decoration: pdf_widgets.BoxDecoration(
         shape: pdf_widgets.BoxShape.circle,
+        color: _style.photoBackdrop,
         border: pdf_widgets.Border.all(
           color: borderColor ?? _style.accent,
           width: borderWidth,
@@ -62,14 +63,10 @@ class CvPdfBlocks {
       ),
       padding: pdf_widgets.EdgeInsets.all(borderWidth),
       child: pdf_widgets.ClipOval(
-        child: pdf_widgets.Container(
+        child: pdf_widgets.Image(
+          pdf_widgets.MemoryImage(input.photo!),
           width: photoSize,
           height: photoSize,
-          color: _style.tint,
-          child: pdf_widgets.Image(
-            pdf_widgets.MemoryImage(input.photo!),
-            alignment: pdf_widgets.Alignment.bottomCenter,
-          ),
         ),
       ),
     );
