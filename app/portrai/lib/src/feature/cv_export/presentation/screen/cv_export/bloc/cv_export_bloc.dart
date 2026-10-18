@@ -19,6 +19,7 @@ class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
     on<SelectCvTemplateClickEvent>(_mapSelectCvTemplateClickEventToState);
     on<SelectCvAccentClickEvent>(_mapSelectCvAccentClickEventToState);
     on<ToggleCvPhotoClickEvent>(_mapToggleCvPhotoClickEventToState);
+    on<SelectCvPhotoClickEvent>(_mapSelectCvPhotoClickEventToState);
     on<ToggleCvSectionClickEvent>(_mapToggleCvSectionClickEventToState);
     on<DownloadCvClickEvent>(_mapDownloadCvClickEventToState);
   }
@@ -83,6 +84,18 @@ class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
     await _applyOptions(
       emit,
       (options) => options.copyWith(isPhotoIncluded: event.isIncluded),
+    );
+  }
+
+  Future<void> _mapSelectCvPhotoClickEventToState(
+    SelectCvPhotoClickEvent event,
+    Emitter<CvExportState> emit,
+  ) async {
+    _trackingDelegate.trackPhotoSelection(event.index);
+    await _applyOptions(
+      emit,
+      (options) =>
+          options.copyWith(photoUrl: event.photoUrl, isPhotoIncluded: true),
     );
   }
 

@@ -101,6 +101,10 @@ class BuildCvDocumentUseCase
       title: profile.title,
       summary: profile.summary,
       photoUrl: profile.profileImage,
+      photoUrls: {
+        profile.profileImage,
+        ...profile.profileImages,
+      }.where((url) => url.isNotEmpty).toList(),
       contacts: [
         if (profile.email.isNotEmpty)
           CvContactEntity(

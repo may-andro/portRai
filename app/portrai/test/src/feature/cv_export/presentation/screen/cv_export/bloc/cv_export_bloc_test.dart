@@ -132,6 +132,23 @@ void main() {
     );
 
     blocTest<CvExportBloc, CvExportState>(
+      'should select the photo and include it when another photo is picked',
+      build: buildBloc,
+      seed: () => loadedState(bytes: pdfBytes, revision: 1),
+      act: (bloc) => bloc.add(
+        const SelectCvPhotoClickEvent(
+          photoUrl: 'https://photo.test/2',
+          index: 1,
+        ),
+      ),
+      verify: (bloc) {
+        final loaded = bloc.state as CvExportLoadedState;
+        expect(loaded.options.photoUrl, 'https://photo.test/2');
+        expect(loaded.options.isPhotoIncluded, isTrue);
+      },
+    );
+
+    blocTest<CvExportBloc, CvExportState>(
       'should keep the previous pdf and expose the failure when generation fails',
       setUp: () {
         generatePdf.stubCall(

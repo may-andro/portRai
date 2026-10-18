@@ -17,6 +17,7 @@ class CvDocumentEntity extends Equatable {
     required this.projects,
     required this.skillGroups,
     required this.educations,
+    this.photoUrls = const [],
     this.websiteUrl,
     this.hasMoreExperiences = false,
   });
@@ -25,6 +26,9 @@ class CvDocumentEntity extends Equatable {
   final String title;
   final String summary;
   final String photoUrl;
+
+  /// Every distinct profile image the user can pick from.
+  final List<String> photoUrls;
   final List<CvContactEntity> contacts;
   final List<CvExperienceEntity> experiences;
   final List<CvProjectEntity> projects;
@@ -56,6 +60,7 @@ class CvDocumentEntity extends Equatable {
       title: _clean(title),
       summary: _truncate(summary, level.maxSummaryLength),
       photoUrl: photoUrl,
+      photoUrls: photoUrls,
       websiteUrl: websiteUrl,
       hasMoreExperiences:
           hasMoreExperiences || experiences.length > level.maxExperiences,
@@ -162,6 +167,7 @@ class CvDocumentEntity extends Equatable {
     title,
     summary,
     photoUrl,
+    photoUrls,
     contacts,
     experiences,
     projects,

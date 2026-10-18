@@ -41,6 +41,15 @@ class CvExportTrackingDelegate extends ScreenTrackingDelegate {
     );
   }
 
+  void trackPhotoSelection(int index) {
+    trackEvent(
+      Tracking(
+        name: 'cv_photo_select',
+        action: ClickAction(label: 'photo_$index'),
+      ),
+    );
+  }
+
   void trackSectionToggle(String sectionName) {
     trackEvent(
       Tracking(

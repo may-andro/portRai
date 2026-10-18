@@ -58,7 +58,7 @@ class PrintingCvPdfRepository implements CvPdfRepository {
     required CvLabelsEntity labels,
   }) async {
     final photoBytes = options.isPhotoIncluded
-        ? await _photoBytesOf(document.photoUrl)
+        ? await _photoBytesOf(options.photoUrl ?? document.photoUrl)
         : null;
     // On the web there are no isolates: compute then runs on the main thread.
     final outcome = await compute(

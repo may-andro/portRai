@@ -44,6 +44,16 @@ class ToggleCvPhotoClickEvent extends CvExportEvent {
   List<Object?> get props => [isIncluded];
 }
 
+class SelectCvPhotoClickEvent extends CvExportEvent {
+  const SelectCvPhotoClickEvent({required this.photoUrl, required this.index});
+
+  final String photoUrl;
+  final int index;
+
+  @override
+  List<Object?> get props => [photoUrl, index];
+}
+
 class ToggleCvSectionClickEvent extends CvExportEvent {
   const ToggleCvSectionClickEvent(this.section);
 

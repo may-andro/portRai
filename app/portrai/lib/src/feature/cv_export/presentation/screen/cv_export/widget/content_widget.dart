@@ -15,6 +15,7 @@ part 'download_button_widget.dart';
 part 'failure_widget.dart';
 part 'hero_widget.dart';
 part 'option_card_widget.dart';
+part 'photo_picker_widget.dart';
 part 'preview_widget.dart';
 part 'section_widget.dart';
 part 'section_picker_widget.dart';

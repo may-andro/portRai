@@ -1231,6 +1231,14 @@
   "@cvExportAccentHint": {
     "description": "Hint under the accent color section title"
   },
+  "cvExportPhotoSection": "Photo",
+  "@cvExportPhotoSection": {
+    "description": "Title of the section where the user picks the CV photo"
+  },
+  "cvExportPhotoHint": "Pick the photo for your CV",
+  "@cvExportPhotoHint": {
+    "description": "Hint under the photo section title"
+  },
   "cvExportContentHint": "Choose what is included",
   "@cvExportContentHint": {
     "description": "Hint under the content section title"
