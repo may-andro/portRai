@@ -7,7 +7,7 @@ class CvExperienceEntity extends Equatable {
     required this.location,
     required this.startDate,
     required this.endDate,
-    required this.highlights,
+    required this.overview,
     this.url,
   });
 
@@ -18,7 +18,9 @@ class CvExperienceEntity extends Equatable {
 
   /// `null` means the position is current.
   final DateTime? endDate;
-  final List<String> highlights;
+
+  /// A short paragraph describing the role.
+  final String overview;
 
   /// The employer website; makes the company clickable when present.
   final String? url;
@@ -30,7 +32,7 @@ class CvExperienceEntity extends Equatable {
     location,
     startDate,
     endDate,
-    highlights,
+    overview,
     url,
   ];
 }

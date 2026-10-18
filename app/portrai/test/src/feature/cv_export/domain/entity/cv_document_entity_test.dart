@@ -23,8 +23,8 @@ void main() {
       );
       for (final experience in fitted.experiences) {
         expect(
-          experience.highlights.length,
-          lessThanOrEqualTo(level.maxHighlightsPerExperience),
+          experience.overview.length,
+          lessThanOrEqualTo(level.maxOverviewLength + 3),
         );
       }
     });
@@ -47,8 +47,8 @@ void main() {
         CvFitLevelEntity.levels.last.maxSkillGroups,
       );
       expect(
-        fitted.experiences.first.highlights.length,
-        CvFitLevelEntity.levels.first.maxHighlightsPerExperience,
+        fitted.experiences.first.overview.length,
+        greaterThan(CvFitLevelEntity.levels.last.maxOverviewLength + 3),
       );
     });
 

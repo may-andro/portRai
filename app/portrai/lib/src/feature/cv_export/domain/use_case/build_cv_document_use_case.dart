@@ -140,7 +140,7 @@ class BuildCvDocumentUseCase
             startDate: experience.startDate,
             endDate: experience.current ? null : experience.endDate,
             url: _validUrl(experience.url),
-            highlights: _highlightsOf(experience),
+            overview: _overviewOf(experience),
           ),
       ],
       websiteUrl: _websiteUrlOf(profile),
@@ -269,15 +269,15 @@ class BuildCvDocumentUseCase
     ];
   }
 
-  List<String> _highlightsOf(ExperienceEntity experience) {
-    final highlights = [
+  /// The short description, or the achievements and responsibilities joined
+  /// into one paragraph when the experience has no description.
+  String _overviewOf(ExperienceEntity experience) {
+    final description = experience.description.trim();
+    if (description.isNotEmpty) return description;
+    return [
       ...experience.achievements,
       ...experience.responsibilities,
-    ].where((highlight) => highlight.trim().isNotEmpty).toList();
-    if (highlights.isNotEmpty) return highlights;
-    return experience.description.trim().isEmpty
-        ? const []
-        : [experience.description];
+    ].map((item) => item.trim()).where((item) => item.isNotEmpty).join('. ');
   }
 
   List<String> _skillNamesByLevel(ExpertiseEntity expertise) {

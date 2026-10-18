@@ -253,7 +253,7 @@ class CvExportTestFixture {
             startDate: DateTime(2024 - index * 2),
             endDate: index == 0 ? null : DateTime(2025 - index * 2),
             url: 'https://company$index.example.com',
-            highlights: [for (var item = 0; item < 6; item++) longText],
+            overview: longText,
           ),
       ],
       projects: [
@@ -313,7 +313,7 @@ class CvExportTestFixture {
           location: 'London',
           startDate: DateTime(2020),
           endDate: null,
-          highlights: const ['Built things'],
+          overview: 'Built things',
         ),
       ],
       projects: const [],

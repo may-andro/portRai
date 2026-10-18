@@ -72,12 +72,7 @@ class CvDocumentEntity extends Equatable {
             startDate: experience.startDate,
             endDate: experience.endDate,
             url: experience.url,
-            highlights: [
-              for (final highlight in experience.highlights.take(
-                level.maxHighlightsPerExperience,
-              ))
-                _truncate(highlight, level.maxHighlightLength),
-            ],
+            overview: _truncate(experience.overview, level.maxOverviewLength),
           ),
       ],
       projects: [

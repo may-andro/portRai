@@ -151,24 +151,23 @@ void main() {
     );
 
     test(
-      'should use the achievements then responsibilities as highlights',
+      'should use the description as overview when the experience has one',
       () async {
         final document = await build();
 
-        expect(document.experiences.first.highlights, [
-          'Led a team of six engineers',
-          'Cut build time by 40%',
-          'Code reviews',
-        ]);
+        expect(document.experiences[2].overview, 'Built mobile apps.');
       },
     );
 
     test(
-      'should fall back to the description when there are no highlights',
+      'should join achievements and responsibilities when there is no description',
       () async {
         final document = await build();
 
-        expect(document.experiences[2].highlights, ['Built mobile apps.']);
+        expect(
+          document.experiences.first.overview,
+          'Led a team of six engineers. Cut build time by 40%. Code reviews',
+        );
       },
     );
 

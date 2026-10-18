@@ -118,7 +118,7 @@ class CvPdfBlocks {
     );
   }
 
-  /// A position with its employer, period and highlights.
+  /// A position with its employer, period and overview.
   pdf_widgets.Widget experience(
     CvExperienceEntity experience, {
     bool isPeriodOnTop = true,
@@ -165,7 +165,8 @@ class CvPdfBlocks {
           ),
           if (!isPeriodOnTop) periodText,
           pdf_widgets.SizedBox(height: _style.scaled(3)),
-          for (final highlight in experience.highlights) bullet(highlight),
+          if (experience.overview.isNotEmpty)
+            pdf_widgets.Text(experience.overview, style: _style.text()),
         ],
       ),
     );
@@ -243,35 +244,6 @@ class CvPdfBlocks {
             ],
           ),
       ],
-    );
-  }
-
-  pdf_widgets.Widget bullet(String text, {double size = 9}) {
-    return pdf_widgets.Padding(
-      padding: pdf_widgets.EdgeInsets.only(bottom: _style.scaled(1.5)),
-      child: pdf_widgets.Row(
-        crossAxisAlignment: pdf_widgets.CrossAxisAlignment.start,
-        children: [
-          pdf_widgets.Container(
-            width: _style.scaled(9),
-            padding: pdf_widgets.EdgeInsets.only(
-              top: _style.scaled(size * 0.4),
-            ),
-            alignment: pdf_widgets.Alignment.topLeft,
-            child: pdf_widgets.Container(
-              width: _style.scaled(3),
-              height: _style.scaled(3),
-              decoration: pdf_widgets.BoxDecoration(
-                color: _style.accent,
-                shape: pdf_widgets.BoxShape.circle,
-              ),
-            ),
-          ),
-          pdf_widgets.Expanded(
-            child: pdf_widgets.Text(text, style: _style.text(size: size)),
-          ),
-        ],
-      ),
     );
   }
 

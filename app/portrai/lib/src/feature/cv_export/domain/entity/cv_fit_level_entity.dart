@@ -6,8 +6,7 @@ import 'package:equatable/equatable.dart';
 class CvFitLevelEntity extends Equatable {
   const CvFitLevelEntity({
     required this.maxExperiences,
-    required this.maxHighlightsPerExperience,
-    required this.maxHighlightLength,
+    required this.maxOverviewLength,
     required this.maxProjects,
     required this.maxSkillGroups,
     required this.maxSkillsPerGroup,
@@ -26,8 +25,7 @@ class CvFitLevelEntity extends Equatable {
 
     return CvFitLevelEntity(
       maxExperiences: progress < 0.9 ? 3 : 2,
-      maxHighlightsPerExperience: between(4, 2),
-      maxHighlightLength: between(260, 80),
+      maxOverviewLength: between(500, 110),
       // Projects are cheap and valuable, so they are dropped last.
       maxProjects: between(16, 0, 0.5),
       maxSkillGroups: between(10, 3),
@@ -49,8 +47,7 @@ class CvFitLevelEntity extends Equatable {
   ]);
 
   final int maxExperiences;
-  final int maxHighlightsPerExperience;
-  final int maxHighlightLength;
+  final int maxOverviewLength;
   final int maxProjects;
   final int maxSkillGroups;
   final int maxSkillsPerGroup;
@@ -64,8 +61,7 @@ class CvFitLevelEntity extends Equatable {
   @override
   List<Object?> get props => [
     maxExperiences,
-    maxHighlightsPerExperience,
-    maxHighlightLength,
+    maxOverviewLength,
     maxProjects,
     maxSkillGroups,
     maxSkillsPerGroup,
