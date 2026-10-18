@@ -87,6 +87,7 @@ class CvPdfBlocks {
     double size = 8.5,
   }) {
     final iconSize = _style.scaled(size * 1.15);
+    final url = contact.url;
     final text = pdf_widgets.Row(
       mainAxisSize: pdf_widgets.MainAxisSize.min,
       children: [
@@ -98,11 +99,16 @@ class CvPdfBlocks {
         pdf_widgets.SizedBox(width: _style.scaled(4)),
         pdf_widgets.Text(
           _contactTextOf(contact),
-          style: _style.text(size: size, color: color),
+          style: _style
+              .text(size: size, color: color)
+              .copyWith(
+                decoration: url == null
+                    ? null
+                    : pdf_widgets.TextDecoration.underline,
+              ),
         ),
       ],
     );
-    final url = contact.url;
     return url == null
         ? text
         : pdf_widgets.UrlLink(destination: url, child: text);
