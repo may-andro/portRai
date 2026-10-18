@@ -13,6 +13,9 @@ class SidebarCvPdfTemplate extends CvPdfTemplate {
   static const double _sidebarWidth = 190;
 
   @override
+  bool get hasSkillsColumn => true;
+
+  @override
   pdf_widgets.Page build(CvPdfInput input) {
     final style = input.style;
     final blocks = CvPdfBlocks(input);

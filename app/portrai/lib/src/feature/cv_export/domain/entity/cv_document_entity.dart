@@ -42,9 +42,13 @@ class CvDocumentEntity extends Equatable {
   ///
   /// The skills and education are trimmed to [skillsLevel] when given, as
   /// they live in their own column and fill up independently.
+  ///
+  /// The experiences use their short overview only when [useDetailedOverview]
+  /// is false.
   CvDocumentEntity fit(
     CvFitLevelEntity level, {
     CvFitLevelEntity? skillsLevel,
+    bool useDetailedOverview = true,
   }) {
     final sideLevel = skillsLevel ?? level;
     return CvDocumentEntity(
@@ -72,7 +76,11 @@ class CvDocumentEntity extends Equatable {
             startDate: experience.startDate,
             endDate: experience.endDate,
             url: experience.url,
-            overview: _overviewFor(experience, level.maxOverviewLength),
+            overview: _overviewFor(
+              experience,
+              level.maxOverviewLength,
+              useDetailedOverview: useDetailedOverview,
+            ),
           ),
       ],
       projects: [
@@ -123,9 +131,15 @@ class CvDocumentEntity extends Equatable {
 
   /// The detailed overview when it fits [maxLength], otherwise the short one,
   /// truncated if needed; a complete short text reads better than a cut long one.
-  static String _overviewFor(CvExperienceEntity experience, int maxLength) {
+  static String _overviewFor(
+    CvExperienceEntity experience,
+    int maxLength, {
+    required bool useDetailedOverview,
+  }) {
     final detailedOverview = _clean(experience.detailedOverview).trim();
-    if (detailedOverview.isNotEmpty && detailedOverview.length <= maxLength) {
+    if (useDetailedOverview &&
+        detailedOverview.isNotEmpty &&
+        detailedOverview.length <= maxLength) {
       return detailedOverview;
     }
     return _truncate(experience.overview, maxLength);

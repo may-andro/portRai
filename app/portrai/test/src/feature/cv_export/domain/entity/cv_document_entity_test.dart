@@ -79,6 +79,14 @@ void main() {
 
       expect(roomy.experiences.single.overview, startsWith('Detailed'));
       expect(compact.experiences.single.overview, 'Short overview.');
+      expect(
+        withExperience
+            .fit(CvFitLevelEntity.levels.first, useDetailedOverview: false)
+            .experiences
+            .single
+            .overview,
+        'Short overview.',
+      );
     });
 
     test('should truncate the summary with dots when it is too long', () {

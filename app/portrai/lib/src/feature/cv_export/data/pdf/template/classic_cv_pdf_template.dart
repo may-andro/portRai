@@ -15,6 +15,9 @@ class ClassicCvPdfTemplate extends CvPdfTemplate {
   }
 
   @override
+  bool get hasSkillsColumn => false;
+
+  @override
   pdf_widgets.Page build(CvPdfInput input) {
     final document = input.document;
     final style = input.style;

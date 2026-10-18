@@ -6,6 +6,11 @@ import 'package:portrai/src/feature/cv_export/data/pdf/cv_pdf_style.dart';
 abstract class CvPdfTemplate {
   const CvPdfTemplate();
 
+  /// Whether the skills sit in a column of their own next to the main content.
+  /// Otherwise everything shares one flow, so long experience texts compete
+  /// with the skills for space.
+  bool get hasSkillsColumn;
+
   CvPdfStyle createStyle({required int accentArgb, required double fontScale}) {
     return CvPdfStyle.sans(accentArgb: accentArgb, fontScale: fontScale);
   }

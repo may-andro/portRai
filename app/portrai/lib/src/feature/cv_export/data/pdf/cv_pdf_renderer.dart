@@ -101,36 +101,73 @@ class CvPdfRenderer {
       return fullest;
     }
 
-    final contentFit = await fullestFit(
-      levels.length,
-      (index) => tryRender(
-        document.fit(levels[index], skillsLevel: mostCompactLevel),
-        levels[index].fontScale,
-      ),
-    );
-
-    if (contentFit != null) {
-      final contentLevel = levels[contentFit.index];
-      final skillsFit = await fullestFit(
-        levels.length,
-        (index) => tryRender(
-          document.fit(contentLevel, skillsLevel: levels[index]),
-          contentLevel.fontScale,
-        ),
-      );
-      final skillsLevel = levels[skillsFit?.index ?? levels.length - 1];
-      final fittedDocument = document.fit(
-        contentLevel,
-        skillsLevel: skillsLevel,
-      );
-      final fontScales = _enlargedFontScales(contentLevel);
-      var bestPdfBytes = skillsFit?.pdfBytes ?? contentFit.pdfBytes;
+    Future<Uint8List> enlarged(
+      CvDocumentEntity fittedDocument,
+      CvFitLevelEntity level,
+      Uint8List fallbackPdfBytes,
+    ) async {
+      final fontScales = _enlargedFontScales(level);
       final enlargedFit = await fullestFit(
         fontScales.length,
         (index) => tryRender(fittedDocument, fontScales[index]),
       );
-      if (enlargedFit != null) bestPdfBytes = enlargedFit.pdfBytes;
-      return bestPdfBytes;
+      return enlargedFit?.pdfBytes ?? fallbackPdfBytes;
+    }
+
+    if (template.hasSkillsColumn) {
+      final contentFit = await fullestFit(
+        levels.length,
+        (index) => tryRender(
+          document.fit(levels[index], skillsLevel: mostCompactLevel),
+          levels[index].fontScale,
+        ),
+      );
+      if (contentFit != null) {
+        final contentLevel = levels[contentFit.index];
+        final skillsFit = await fullestFit(
+          levels.length,
+          (index) => tryRender(
+            document.fit(contentLevel, skillsLevel: levels[index]),
+            contentLevel.fontScale,
+          ),
+        );
+        final skillsLevel = levels[skillsFit?.index ?? levels.length - 1];
+        return await enlarged(
+          document.fit(contentLevel, skillsLevel: skillsLevel),
+          contentLevel,
+          skillsFit?.pdfBytes ?? contentFit.pdfBytes,
+        );
+      }
+    } else {
+      // Everything shares one flow: keep the short overviews so the skills are
+      // not trimmed, and only use the detailed ones when all of it still fits.
+      final contentFit = await fullestFit(
+        levels.length,
+        (index) => tryRender(
+          document.fit(levels[index], useDetailedOverview: false),
+          levels[index].fontScale,
+        ),
+      );
+      if (contentFit != null) {
+        final contentLevel = levels[contentFit.index];
+        var fittedDocument = document.fit(
+          contentLevel,
+          useDetailedOverview: false,
+        );
+        var fittingPdfBytes = contentFit.pdfBytes;
+        if (contentFit.index == 0) {
+          final detailedDocument = document.fit(contentLevel);
+          final detailedPdfBytes = await tryRender(
+            detailedDocument,
+            contentLevel.fontScale,
+          );
+          if (detailedPdfBytes != null) {
+            fittedDocument = detailedDocument;
+            fittingPdfBytes = detailedPdfBytes;
+          }
+        }
+        return await enlarged(fittedDocument, contentLevel, fittingPdfBytes);
+      }
     }
     throw CvPdfGenerationException(
       'The CV does not fit a single page.',

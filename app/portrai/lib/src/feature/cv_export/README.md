@@ -13,7 +13,7 @@ PDF CV. Everything runs locally; no data leaves the device and no AI is involved
   then enlarges the type as far as it still fits.
 - Fills the page: the full content is first rendered with enlarged type (up to 1.4x) and
   shrunk until it fits.
-- Each experience shows an overview paragraph instead of bullets: the long description when there is room, otherwise the short one.
+- Each experience shows an overview paragraph instead of bullets: the long description when there is room, otherwise the short one. Templates without a separate skills column keep the short one unless everything still fits, so the skills are not trimmed.
 - Ongoing experiences come first, then finished ones by start date; only the first three are shown, followed by a link to the portfolio website
   for the rest.
 - Languages are a contact entry with language codes (for example `EN, ES, NL`) instead of a section.

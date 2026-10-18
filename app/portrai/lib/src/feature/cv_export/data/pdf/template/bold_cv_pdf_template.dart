@@ -12,6 +12,9 @@ class BoldCvPdfTemplate extends CvPdfTemplate {
   static const double _sideColumnWidth = 170;
 
   @override
+  bool get hasSkillsColumn => true;
+
+  @override
   pdf_widgets.Page build(CvPdfInput input) {
     final document = input.document;
     final style = input.style;

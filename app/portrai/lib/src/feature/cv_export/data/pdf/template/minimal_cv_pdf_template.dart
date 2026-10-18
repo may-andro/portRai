@@ -13,6 +13,9 @@ class MinimalCvPdfTemplate extends CvPdfTemplate {
   static const double _gutterWidth = 92;
 
   @override
+  bool get hasSkillsColumn => false;
+
+  @override
   pdf_widgets.Page build(CvPdfInput input) {
     final document = input.document;
     final style = input.style;
