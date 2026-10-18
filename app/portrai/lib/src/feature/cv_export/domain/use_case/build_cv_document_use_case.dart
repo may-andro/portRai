@@ -98,10 +98,19 @@ class BuildCvDocumentUseCase
       photoUrl: profile.profileImage,
       contacts: [
         if (profile.email.isNotEmpty)
-          CvContactEntity(text: profile.email, url: 'mailto:${profile.email}'),
+          CvContactEntity(
+            text: profile.email,
+            url: 'mailto:${profile.email}',
+            type: CvContactType.email,
+          ),
         if (profile.phone.isNotEmpty)
-          CvContactEntity(text: profile.phone, url: 'tel:${profile.phone}'),
-        if (location.isNotEmpty) CvContactEntity(text: location),
+          CvContactEntity(
+            text: profile.phone,
+            url: 'tel:${profile.phone}',
+            type: CvContactType.phone,
+          ),
+        if (location.isNotEmpty)
+          CvContactEntity(text: location, type: CvContactType.location),
         for (final socialLink in profile.socialLinks.take(_maxSocialLinks))
           CvContactEntity(
             text: socialLink.url.replaceFirst(
@@ -109,6 +118,7 @@ class BuildCvDocumentUseCase
               '',
             ),
             url: socialLink.url,
+            type: _contactTypeOf(socialLink.url),
           ),
       ],
       experiences: [
@@ -166,6 +176,13 @@ class BuildCvDocumentUseCase
           ),
       ],
     );
+  }
+
+  CvContactType _contactTypeOf(String url) {
+    final lowerCaseUrl = url.toLowerCase();
+    if (lowerCaseUrl.contains('github.com')) return CvContactType.github;
+    if (lowerCaseUrl.contains('linkedin.com')) return CvContactType.linkedin;
+    return CvContactType.website;
   }
 
   String? _validUrl(String? url) {

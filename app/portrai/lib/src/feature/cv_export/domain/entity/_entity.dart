@@ -1,5 +1,6 @@
 export 'cv_accent.dart';
 export 'cv_contact_entity.dart';
+export 'cv_contact_type.dart';
 export 'cv_document_entity.dart';
 export 'cv_education_entity.dart';
 export 'cv_experience_entity.dart';

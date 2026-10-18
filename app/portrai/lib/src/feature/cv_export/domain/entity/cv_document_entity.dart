@@ -53,7 +53,11 @@ class CvDocumentEntity extends Equatable {
           hasMoreExperiences || experiences.length > level.maxExperiences,
       contacts: [
         for (final contact in contacts)
-          CvContactEntity(text: _clean(contact.text), url: contact.url),
+          CvContactEntity(
+            text: _clean(contact.text),
+            url: contact.url,
+            type: contact.type,
+          ),
       ],
       experiences: [
         for (final experience in experiences.take(level.maxExperiences))

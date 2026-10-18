@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf_widgets;
+import 'package:portrai/src/feature/cv_export/data/pdf/cv_contact_icons.dart';
 import 'package:portrai/src/feature/cv_export/data/pdf/cv_pdf_style.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/_entity.dart';
 
@@ -62,9 +63,21 @@ class CvPdfBlocks {
     PdfColor color = CvPdfStyle.ink,
     double size = 8.5,
   }) {
-    final text = pdf_widgets.Text(
-      contact.text,
-      style: _style.text(size: size, color: color),
+    final iconSize = _style.scaled(size * 1.15);
+    final text = pdf_widgets.Row(
+      mainAxisSize: pdf_widgets.MainAxisSize.min,
+      children: [
+        pdf_widgets.SvgImage(
+          svg: CvContactIcons.svgOf(contact.type, color),
+          width: iconSize,
+          height: iconSize,
+        ),
+        pdf_widgets.SizedBox(width: _style.scaled(4)),
+        pdf_widgets.Text(
+          contact.text,
+          style: _style.text(size: size, color: color),
+        ),
+      ],
     );
     final url = contact.url;
     return url == null

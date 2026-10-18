@@ -78,6 +78,17 @@ void main() {
       ]);
     });
 
+    test('should give each contact the type matching its icon', () async {
+      final document = await build();
+
+      expect(document.contacts.map((contact) => contact.type), [
+        CvContactType.email,
+        CvContactType.phone,
+        CvContactType.location,
+        CvContactType.github,
+      ]);
+    });
+
     test('should link the website and the companies', () async {
       final document = await build();
 
