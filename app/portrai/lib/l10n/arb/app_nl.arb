@@ -465,6 +465,10 @@
   "@cvSectionContact": {
     "description": "CV sidebar heading for contact details"
   },
+  "cvSeeMoreOnWebsite": "Bekijk al mijn ervaring en details op mijn website",
+  "@cvSeeMoreOnWebsite": {
+    "description": "CV line pointing to the portfolio website for the full experience"
+  },
   "cvPresent": "Heden",
   "@cvPresent": {
     "description": "Label shown instead of an end date for a current position"

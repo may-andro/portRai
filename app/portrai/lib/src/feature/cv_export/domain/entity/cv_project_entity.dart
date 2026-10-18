@@ -6,6 +6,7 @@ class CvProjectEntity extends Equatable {
     required this.role,
     required this.description,
     required this.technologies,
+    this.url,
   });
 
   final String title;
@@ -13,6 +14,9 @@ class CvProjectEntity extends Equatable {
   final String description;
   final List<String> technologies;
 
+  /// Makes the project clickable in the PDF when present.
+  final String? url;
+
   @override
-  List<Object?> get props => [title, role, description, technologies];
+  List<Object?> get props => [title, role, description, technologies, url];
 }

@@ -8,6 +8,7 @@ class CvExperienceEntity extends Equatable {
     required this.startDate,
     required this.endDate,
     required this.highlights,
+    this.url,
   });
 
   final String position;
@@ -19,6 +20,9 @@ class CvExperienceEntity extends Equatable {
   final DateTime? endDate;
   final List<String> highlights;
 
+  /// The employer website; makes the company clickable when present.
+  final String? url;
+
   @override
   List<Object?> get props => [
     position,
@@ -27,5 +31,6 @@ class CvExperienceEntity extends Equatable {
     startDate,
     endDate,
     highlights,
+    url,
   ];
 }

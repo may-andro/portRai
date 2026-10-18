@@ -20,7 +20,7 @@ class CvFitLevelEntity extends Equatable {
 
   static const List<CvFitLevelEntity> levels = [
     CvFitLevelEntity(
-      maxExperiences: 5,
+      maxExperiences: 3,
       maxHighlightsPerExperience: 4,
       maxHighlightLength: 160,
       maxProjects: 3,
@@ -33,7 +33,7 @@ class CvFitLevelEntity extends Equatable {
       fontScale: 1,
     ),
     CvFitLevelEntity(
-      maxExperiences: 4,
+      maxExperiences: 3,
       maxHighlightsPerExperience: 3,
       maxHighlightLength: 140,
       maxProjects: 3,
@@ -46,7 +46,7 @@ class CvFitLevelEntity extends Equatable {
       fontScale: 1,
     ),
     CvFitLevelEntity(
-      maxExperiences: 4,
+      maxExperiences: 3,
       maxHighlightsPerExperience: 3,
       maxHighlightLength: 120,
       maxProjects: 2,

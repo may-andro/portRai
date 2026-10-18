@@ -119,17 +119,22 @@ class BuildCvDocumentUseCase
             location: experience.location,
             startDate: experience.startDate,
             endDate: experience.current ? null : experience.endDate,
+            url: _validUrl(experience.url),
             highlights: _highlightsOf(experience),
           ),
       ],
+      websiteUrl: _websiteUrlOf(profile),
+      // Only projects that can be opened are listed on the CV.
       projects: [
         for (final project in sortedProjects)
-          CvProjectEntity(
-            title: project.title,
-            role: project.role,
-            description: project.description,
-            technologies: project.technologies,
-          ),
+          if (_projectUrlOf(project) != null)
+            CvProjectEntity(
+              title: project.title,
+              role: project.role,
+              description: project.description,
+              technologies: project.technologies,
+              url: _projectUrlOf(project),
+            ),
       ],
       skillGroups: [
         for (final expertise in expertiseList)
@@ -161,6 +166,43 @@ class BuildCvDocumentUseCase
           ),
       ],
     );
+  }
+
+  String? _validUrl(String? url) {
+    final trimmedUrl = url?.trim();
+    if (trimmedUrl == null || !trimmedUrl.startsWith('http')) return null;
+    return trimmedUrl;
+  }
+
+  String? _websiteUrlOf(ProfileEntity profile) {
+    for (final published in profile.publishedAt) {
+      if (published.name.toLowerCase() == 'website') {
+        final url = _validUrl(published.url);
+        if (url != null) return url;
+      }
+    }
+    for (final socialLink in profile.socialLinks) {
+      if (socialLink.name.toLowerCase() == 'portfolio') {
+        final url = _validUrl(socialLink.url);
+        if (url != null) return url;
+      }
+    }
+    return null;
+  }
+
+  /// The most representative link of a project: website, then the stores.
+  String? _projectUrlOf(ProjectEntity project) {
+    for (final market in project.markets) {
+      for (final candidate in [
+        market.website,
+        market.playStore,
+        market.appStore,
+      ]) {
+        final url = _validUrl(candidate);
+        if (url != null) return url;
+      }
+    }
+    return null;
   }
 
   List<String> _highlightsOf(ExperienceEntity experience) {

@@ -84,6 +84,7 @@ void main() {
             educationHeading: 'Education',
             languagesHeading: 'Languages',
             contactHeading: 'Contact',
+            moreExperienceLabel: 'See all experience on my website',
           ),
           photoBytes: null,
         );

@@ -14,10 +14,12 @@ import 'package:portrai/src/feature/profile/domain/entity/coordinates_entity.dar
 import 'package:portrai/src/feature/profile/domain/entity/education_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/language_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/location_entity.dart';
+import 'package:portrai/src/feature/profile/domain/entity/published_at_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/resume_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/social_link_entity.dart';
 import 'package:portrai/src/feature/profile/domain/entity/working_hours_entity.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
 import 'package:portrai/src/feature/project/project.dart';
 
 /// Deterministic portfolio and CV content for the CV export tests.
@@ -34,6 +36,7 @@ class CvExportTestFixture {
     educationHeading: 'Education',
     languagesHeading: 'Languages',
     contactHeading: 'Contact',
+    moreExperienceLabel: 'See all experience on my website',
   );
 
   static ProfileEntity profile() {
@@ -49,7 +52,13 @@ class CvExportTestFixture {
       detailedBio: '',
       elevatorPitch: '',
       uniqueValueProposition: '',
-      publishedAt: [],
+      publishedAt: [
+        PublishedAtEntity(
+          name: 'Website',
+          url: 'https://ada.example.com',
+          image: '',
+        ),
+      ],
       resume: ResumeEntity(url: '', lastUpdated: '', image: ''),
       socialLinks: [
         SocialLinkEntity(
@@ -129,8 +138,17 @@ class CvExportTestFixture {
 
   static List<ProjectEntity> projects() {
     return [
-      _project(title: 'Old Project', startDate: DateTime(2016)),
-      _project(title: 'New Project', startDate: DateTime(2023)),
+      _project(
+        title: 'Old Project',
+        startDate: DateTime(2016),
+        website: 'https://old.example.com',
+      ),
+      _project(
+        title: 'New Project',
+        startDate: DateTime(2023),
+        website: 'https://new.example.com',
+      ),
+      _project(title: 'Unlinked Project', startDate: DateTime(2020)),
     ];
   }
 
@@ -162,6 +180,7 @@ class CvExportTestFixture {
       title: 'Senior Flutter & Android Developer',
       summary: List.filled(8, longText).join(' '),
       photoUrl: 'https://example.com/ada.png',
+      websiteUrl: 'https://ada.example.com',
       contacts: const [
         CvContactEntity(text: 'ada@example.com', url: 'mailto:ada@example.com'),
         CvContactEntity(text: '+34 600 000 000', url: 'tel:+34600000000'),
@@ -176,6 +195,7 @@ class CvExportTestFixture {
             location: 'Madrid, Spain',
             startDate: DateTime(2024 - index * 2),
             endDate: index == 0 ? null : DateTime(2025 - index * 2),
+            url: 'https://company$index.example.com',
             highlights: [for (var item = 0; item < 6; item++) longText],
           ),
       ],
@@ -186,6 +206,7 @@ class CvExportTestFixture {
             role: 'Lead developer',
             description: longText,
             technologies: const ['Flutter', 'Dart', 'Firebase', 'Kotlin'],
+            url: 'https://project$index.example.com',
           ),
       ],
       skillGroups: [
@@ -271,7 +292,7 @@ class CvExportTestFixture {
       achievements: achievements,
       technologies: const [],
       companyLogo: '',
-      url: null,
+      url: 'https://${company.replaceAll(' ', '').toLowerCase()}.example.com',
       id: company,
     );
   }
@@ -279,6 +300,7 @@ class CvExportTestFixture {
   static ProjectEntity _project({
     required String title,
     required DateTime startDate,
+    String? website,
   }) {
     return ProjectEntity(
       title: title,
@@ -294,6 +316,15 @@ class CvExportTestFixture {
       achievements: const [],
       teamSize: 3,
       role: 'Lead',
+      markets: [
+        if (website != null)
+          ProjectMarketEntity(
+            country: 'ES',
+            latitude: 0,
+            longitude: 0,
+            website: website,
+          ),
+      ],
       id: title,
     );
   }

@@ -66,10 +66,7 @@ class MinimalCvPdfTemplate extends CvPdfTemplate {
             labels.experienceHeading,
             pdf_widgets.Column(
               crossAxisAlignment: pdf_widgets.CrossAxisAlignment.start,
-              children: [
-                for (final experience in document.experiences)
-                  blocks.experience(experience, isPeriodOnTop: false),
-              ],
+              children: [...blocks.experiences(isPeriodOnTop: false)],
             ),
           ),
         if (input.isShown(CvSection.projects) && document.projects.isNotEmpty)
@@ -78,10 +75,7 @@ class MinimalCvPdfTemplate extends CvPdfTemplate {
             labels.projectsHeading,
             pdf_widgets.Column(
               crossAxisAlignment: pdf_widgets.CrossAxisAlignment.start,
-              children: [
-                for (final project in document.projects)
-                  blocks.project(project),
-              ],
+              children: [blocks.projectLinks()],
             ),
           ),
         if (input.isShown(CvSection.skills) && document.skillGroups.isNotEmpty)

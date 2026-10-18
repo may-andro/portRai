@@ -120,15 +120,81 @@ class CvPdfBlocks {
               experience.position,
               style: _style.text(size: 10.5, isBold: true),
             ),
-          pdf_widgets.Text(
-            companyLine,
-            style: _style.text(isBold: true, color: _style.accent),
+          _link(
+            experience.url,
+            pdf_widgets.Text(
+              companyLine,
+              style: _style.text(isBold: true, color: _style.accent),
+            ),
           ),
           if (!isPeriodOnTop) periodText,
           pdf_widgets.SizedBox(height: _style.scaled(3)),
           for (final highlight in experience.highlights) bullet(highlight),
         ],
       ),
+    );
+  }
+
+  pdf_widgets.Widget _link(String? url, pdf_widgets.Widget child) {
+    return url == null
+        ? child
+        : pdf_widgets.UrlLink(destination: url, child: child);
+  }
+
+  /// The experiences followed by a pointer to the website when some were
+  /// left out.
+  List<pdf_widgets.Widget> experiences({bool isPeriodOnTop = true}) {
+    final document = input.document;
+    final websiteUrl = document.websiteUrl;
+    return [
+      for (final experience in document.experiences)
+        this.experience(experience, isPeriodOnTop: isPeriodOnTop),
+      if (document.hasMoreExperiences && websiteUrl != null)
+        _link(
+          websiteUrl,
+          pdf_widgets.Text(
+            input.labels.moreExperienceLabel,
+            style: _style
+                .text(isItalic: true, color: _style.accent)
+                .copyWith(decoration: pdf_widgets.TextDecoration.underline),
+          ),
+        ),
+    ];
+  }
+
+  /// The projects as a compact list of clickable names.
+  pdf_widgets.Widget projectLinks() {
+    return pdf_widgets.Wrap(
+      spacing: _style.scaled(18),
+      runSpacing: _style.scaled(5),
+      children: [
+        for (final project in input.document.projects)
+          _link(
+            project.url,
+            pdf_widgets.Row(
+              mainAxisSize: pdf_widgets.MainAxisSize.min,
+              children: [
+                pdf_widgets.Container(
+                  width: _style.scaled(3),
+                  height: _style.scaled(3),
+                  margin: pdf_widgets.EdgeInsets.only(right: _style.scaled(5)),
+                  decoration: pdf_widgets.BoxDecoration(
+                    color: _style.accent,
+                    shape: pdf_widgets.BoxShape.circle,
+                  ),
+                ),
+                pdf_widgets.Text(
+                  project.title,
+                  style: _style
+                      .text(size: 9.5, isBold: true)
+                      .copyWith(
+                        decoration: pdf_widgets.TextDecoration.underline,
+                      ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 
@@ -156,38 +222,6 @@ class CvPdfBlocks {
           pdf_widgets.Expanded(
             child: pdf_widgets.Text(text, style: _style.text(size: size)),
           ),
-        ],
-      ),
-    );
-  }
-
-  pdf_widgets.Widget project(CvProjectEntity project) {
-    return pdf_widgets.Padding(
-      padding: pdf_widgets.EdgeInsets.only(bottom: _style.scaled(8)),
-      child: pdf_widgets.Column(
-        crossAxisAlignment: pdf_widgets.CrossAxisAlignment.start,
-        children: [
-          pdf_widgets.RichText(
-            text: pdf_widgets.TextSpan(
-              children: [
-                pdf_widgets.TextSpan(
-                  text: project.title,
-                  style: _style.text(size: 10, isBold: true),
-                ),
-                if (project.role.trim().isNotEmpty)
-                  pdf_widgets.TextSpan(
-                    text: '  ${project.role}',
-                    style: _style.text(size: 8.5, color: CvPdfStyle.muted),
-                  ),
-              ],
-            ),
-          ),
-          pdf_widgets.Text(project.description, style: _style.text()),
-          if (project.technologies.isNotEmpty)
-            pdf_widgets.Text(
-              project.technologies.join(' · '),
-              style: _style.text(size: 8, isBold: true, color: _style.accent),
-            ),
         ],
       ),
     );

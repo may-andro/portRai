@@ -19,6 +19,8 @@ class CvDocumentEntity extends Equatable {
     required this.skillGroups,
     required this.educations,
     required this.languages,
+    this.websiteUrl,
+    this.hasMoreExperiences = false,
   });
 
   final String fullName;
@@ -32,6 +34,12 @@ class CvDocumentEntity extends Equatable {
   final List<CvEducationEntity> educations;
   final List<CvLanguageEntity> languages;
 
+  /// The portfolio website with the full experience and details.
+  final String? websiteUrl;
+
+  /// Whether experiences were left out of this document.
+  final bool hasMoreExperiences;
+
   /// Returns a copy trimmed to [level], keeping the most relevant content:
   /// experiences and projects are already ordered most recent first.
   CvDocumentEntity fit(CvFitLevelEntity level) {
@@ -40,6 +48,9 @@ class CvDocumentEntity extends Equatable {
       title: _clean(title),
       summary: _truncate(summary, level.maxSummaryLength),
       photoUrl: photoUrl,
+      websiteUrl: websiteUrl,
+      hasMoreExperiences:
+          hasMoreExperiences || experiences.length > level.maxExperiences,
       contacts: [
         for (final contact in contacts)
           CvContactEntity(text: _clean(contact.text), url: contact.url),
@@ -52,6 +63,7 @@ class CvDocumentEntity extends Equatable {
             location: _clean(experience.location),
             startDate: experience.startDate,
             endDate: experience.endDate,
+            url: experience.url,
             highlights: [
               for (final highlight in experience.highlights.take(
                 level.maxHighlightsPerExperience,
@@ -70,6 +82,7 @@ class CvDocumentEntity extends Equatable {
               level.maxProjectDescriptionLength,
             ),
             technologies: project.technologies.take(6).map(_clean).toList(),
+            url: project.url,
           ),
       ],
       skillGroups: [
@@ -135,5 +148,7 @@ class CvDocumentEntity extends Equatable {
     skillGroups,
     educations,
     languages,
+    websiteUrl,
+    hasMoreExperiences,
   ];
 }

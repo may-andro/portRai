@@ -465,6 +465,10 @@
   "@cvSectionContact": {
     "description": "CV sidebar heading for contact details"
   },
+  "cvSeeMoreOnWebsite": "Consulta toda mi experiencia y los detalles en mi sitio web",
+  "@cvSeeMoreOnWebsite": {
+    "description": "CV line pointing to the portfolio website for the full experience"
+  },
   "cvPresent": "Actualidad",
   "@cvPresent": {
     "description": "Label shown instead of an end date for a current position"

@@ -69,6 +69,25 @@ void main() {
       ]);
     });
 
+    test('should only list projects that have a link', () async {
+      final document = await build();
+
+      expect(document.projects.map((project) => project.url), [
+        'https://new.example.com',
+        'https://old.example.com',
+      ]);
+    });
+
+    test('should link the website and the companies', () async {
+      final document = await build();
+
+      expect(document.websiteUrl, 'https://ada.example.com');
+      expect(
+        document.experiences.first.url,
+        'https://currentcompany.example.com',
+      );
+    });
+
     test(
       'should leave the end date empty when the experience is current',
       () async {

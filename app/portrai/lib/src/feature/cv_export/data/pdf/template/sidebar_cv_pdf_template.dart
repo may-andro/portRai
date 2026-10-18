@@ -132,13 +132,12 @@ class SidebarCvPdfTemplate extends CvPdfTemplate {
         if (input.isShown(CvSection.experience) &&
             document.experiences.isNotEmpty) ...[
           _heading(style, labels.experienceHeading),
-          for (final experience in document.experiences)
-            blocks.experience(experience),
+          ...blocks.experiences(),
         ],
         if (input.isShown(CvSection.projects) &&
             document.projects.isNotEmpty) ...[
           _heading(style, labels.projectsHeading),
-          for (final project in document.projects) blocks.project(project),
+          blocks.projectLinks(),
         ],
       ],
     );

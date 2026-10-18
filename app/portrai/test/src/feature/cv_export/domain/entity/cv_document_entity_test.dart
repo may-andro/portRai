@@ -29,6 +29,13 @@ void main() {
       }
     });
 
+    test('should keep only the last three experiences and flag the rest', () {
+      final fitted = document.fit(CvFitLevelEntity.levels.first);
+
+      expect(fitted.experiences.length, 3);
+      expect(fitted.hasMoreExperiences, isTrue);
+    });
+
     test('should truncate the summary with dots when it is too long', () {
       final level = CvFitLevelEntity.levels.last;
 
