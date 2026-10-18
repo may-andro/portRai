@@ -18,7 +18,7 @@ import 'package:portrai/src/feature/cv_export/domain/exception/_exception.dart';
 @register
 class CvPdfRenderer {
   static const double _maxFontScale = 1.4;
-  static const double _fontScaleStep = 0.02;
+  static const double _fontScaleStep = 0.04;
   static const String _fallbackLocaleCode = 'en';
 
   CvPdfTemplate _templateOf(CvTemplate template) {
@@ -41,36 +41,63 @@ class CvPdfRenderer {
     final validPhotoBytes = _isRenderableImage(photoBytes) ? photoBytes : null;
 
     Object? lastError;
+    Future<Uint8List?> tryRender(
+      CvDocumentEntity fittedDocument,
+      double fontScale,
+    ) async {
+      // Lets the UI repaint between the expensive renders (no isolates on web).
+      await Future<void>.delayed(Duration.zero);
+      try {
+        final input = CvPdfInput(
+          document: fittedDocument,
+          options: options,
+          labels: labels,
+          style: template.createStyle(
+            accentArgb: options.accent.argb,
+            fontScale: fontScale,
+          ),
+          photo: validPhotoBytes,
+          dateFormat: dateFormat,
+        );
+        final pdfDocument = pdf_widgets.Document(
+          title: document.fullName,
+          author: document.fullName,
+        )..addPage(template.build(input));
+        final pdfBytes = await pdfDocument.save();
+        return pdfDocument.document.pdfPageList.pages.length == 1
+            ? pdfBytes
+            : null;
+      } on Exception catch (exception) {
+        // A layout that cannot fit the page throws: treat it as not fitting.
+        lastError = exception;
+        return null;
+      }
+    }
+
     for (final level in CvFitLevelEntity.levels) {
       final fittedDocument = document.fit(level);
-      // Start large so a short CV fills the page, and shrink until it fits.
-      final isFullContent = level == CvFitLevelEntity.levels.first;
-      for (final fontScale in _fontScalesFor(level, isFullContent)) {
-        try {
-          final input = CvPdfInput(
-            document: fittedDocument,
-            options: options,
-            labels: labels,
-            style: template.createStyle(
-              accentArgb: options.accent.argb,
-              fontScale: fontScale,
-            ),
-            photo: validPhotoBytes,
-            dateFormat: dateFormat,
-          );
-          final pdfDocument = pdf_widgets.Document(
-            title: document.fullName,
-            author: document.fullName,
-          )..addPage(template.build(input));
-          final pdfBytes = await pdfDocument.save();
-          if (pdfDocument.document.pdfPageList.pages.length == 1) {
-            return pdfBytes;
+      final fittingPdfBytes = await tryRender(fittedDocument, level.fontScale);
+      if (fittingPdfBytes == null) continue;
+      var bestPdfBytes = fittingPdfBytes;
+
+      // Only the full content is enlarged to fill the page; a binary search
+      // finds the largest font scale that still fits, as fitting is monotonic.
+      if (level == CvFitLevelEntity.levels.first) {
+        final fontScales = _enlargedFontScales(level);
+        var low = 0;
+        var high = fontScales.length - 1;
+        while (low <= high) {
+          final middle = (low + high) ~/ 2;
+          final pdfBytes = await tryRender(fittedDocument, fontScales[middle]);
+          if (pdfBytes != null) {
+            bestPdfBytes = pdfBytes;
+            high = middle - 1;
+          } else {
+            low = middle + 1;
           }
-        } on Exception catch (exception) {
-          // A layout that cannot fit the page throws: try a smaller one.
-          lastError = exception;
         }
       }
+      return bestPdfBytes;
     }
     throw CvPdfGenerationException(
       'The CV does not fit a single page.',
@@ -78,17 +105,15 @@ class CvPdfRenderer {
     );
   }
 
-  List<double> _fontScalesFor(CvFitLevelEntity level, bool isFullContent) {
-    // Only the full content is enlarged; trimmed levels exist to make it fit.
-    final largestFontScale = isFullContent ? _maxFontScale : 1.0;
+  /// Font scales above the level's own, from the largest to the smallest.
+  List<double> _enlargedFontScales(CvFitLevelEntity level) {
     return [
       for (
-        var fontScale = largestFontScale;
+        var fontScale = _maxFontScale;
         fontScale > level.fontScale;
         fontScale -= _fontScaleStep
       )
         fontScale,
-      level.fontScale,
     ];
   }
 
