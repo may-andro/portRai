@@ -47,14 +47,17 @@ class CvPdfBlocks {
     return '${input.dateFormat.format(experience.startDate)} - $endText';
   }
 
+  /// A portrait frame that shows the whole photo; cut-out portraits end with
+  /// a flat edge that a circle would leave floating.
   pdf_widgets.Widget photo({required double size, PdfColor? borderColor}) {
     final borderWidth = _style.scaled(2.5);
-    final photoSize = size - borderWidth * 2;
+    final frameWidth = size * 0.8;
+    final radius = size * 0.16;
     return pdf_widgets.Container(
-      width: size,
+      width: frameWidth,
       height: size,
       decoration: pdf_widgets.BoxDecoration(
-        shape: pdf_widgets.BoxShape.circle,
+        borderRadius: pdf_widgets.BorderRadius.circular(radius),
         color: _style.photoBackdrop,
         border: pdf_widgets.Border.all(
           color: borderColor ?? _style.accent,
@@ -62,11 +65,13 @@ class CvPdfBlocks {
         ),
       ),
       padding: pdf_widgets.EdgeInsets.all(borderWidth),
-      child: pdf_widgets.ClipOval(
+      child: pdf_widgets.ClipRRect(
+        horizontalRadius: radius - borderWidth,
+        verticalRadius: radius - borderWidth,
         child: pdf_widgets.Image(
           pdf_widgets.MemoryImage(input.photo!),
-          width: photoSize,
-          height: photoSize,
+          width: frameWidth - borderWidth * 2,
+          height: size - borderWidth * 2,
         ),
       ),
     );

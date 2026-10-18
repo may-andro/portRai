@@ -30,11 +30,11 @@ class _PhotoPickerWidget extends StatelessWidget {
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  width: photoSize,
+                  width: photoSize * 0.8,
                   height: photoSize,
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(photoSize * 0.2),
                     border: Border.all(
                       color: photoUrl == selectedPhotoUrl
                           ? context.colorPalette.neutral.grey1.color
@@ -42,14 +42,11 @@ class _PhotoPickerWidget extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                  child: ClipOval(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(photoSize * 0.16),
                     child: ColoredBox(
                       color: context.colorPalette.neutral.grey3.color,
-                      child: Image.network(
-                        photoUrl,
-                        fit: BoxFit.contain,
-                        alignment: Alignment.bottomCenter,
-                      ),
+                      child: Image.network(photoUrl, fit: BoxFit.contain),
                     ),
                   ),
                 ),
