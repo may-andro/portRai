@@ -62,7 +62,7 @@ class BoldCvPdfTemplate extends CvPdfTemplate {
               ),
               if (input.isPhotoShown) ...[
                 pdf_widgets.SizedBox(width: style.scaled(16)),
-                blocks.photo(size: 84),
+                blocks.photo(size: 84, borderColor: CvPdfStyle.white),
               ],
             ],
           ),

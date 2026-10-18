@@ -39,7 +39,14 @@ class CvDocumentEntity extends Equatable {
 
   /// Returns a copy trimmed to [level], keeping the most relevant content:
   /// experiences and projects are already ordered most recent first.
-  CvDocumentEntity fit(CvFitLevelEntity level) {
+  ///
+  /// The skills and education are trimmed to [skillsLevel] when given, as
+  /// they live in their own column and fill up independently.
+  CvDocumentEntity fit(
+    CvFitLevelEntity level, {
+    CvFitLevelEntity? skillsLevel,
+  }) {
+    final sideLevel = skillsLevel ?? level;
     return CvDocumentEntity(
       fullName: _clean(fullName),
       title: _clean(title),
@@ -87,17 +94,17 @@ class CvDocumentEntity extends Equatable {
           ),
       ],
       skillGroups: [
-        for (final group in skillGroups.take(level.maxSkillGroups))
+        for (final group in skillGroups.take(sideLevel.maxSkillGroups))
           CvSkillGroupEntity(
             title: _clean(group.title),
             skills: group.skills
-                .take(level.maxSkillsPerGroup)
+                .take(sideLevel.maxSkillsPerGroup)
                 .map(_clean)
                 .toList(),
           ),
       ],
       educations: [
-        for (final education in educations.take(level.maxEducations))
+        for (final education in educations.take(sideLevel.maxEducations))
           CvEducationEntity(
             degree: _clean(education.degree),
             institution: _clean(education.institution),

@@ -36,6 +36,22 @@ void main() {
       expect(fitted.hasMoreExperiences, isTrue);
     });
 
+    test('should trim the skills to their own level when one is given', () {
+      final fitted = document.fit(
+        CvFitLevelEntity.levels.first,
+        skillsLevel: CvFitLevelEntity.levels.last,
+      );
+
+      expect(
+        fitted.skillGroups.length,
+        CvFitLevelEntity.levels.last.maxSkillGroups,
+      );
+      expect(
+        fitted.experiences.first.highlights.length,
+        CvFitLevelEntity.levels.first.maxHighlightsPerExperience,
+      );
+    });
+
     test('should truncate the summary with dots when it is too long', () {
       final level = CvFitLevelEntity.levels.last;
 

@@ -74,44 +74,62 @@ class CvPdfRenderer {
       }
     }
 
-    // Fitting is monotonic: less content always fits better. A binary search
-    // finds the fullest level that fits, then the largest font scale for it.
+    // Fitting is monotonic: less content always fits better. The main content
+    // and the skills column are searched independently, as one of them is
+    // often full while the other still has room.
     final levels = CvFitLevelEntity.levels;
-    CvFitLevelEntity? fullestLevel;
-    Uint8List? fullestPdfBytes;
-    var low = 0;
-    var high = levels.length - 1;
-    while (low <= high) {
-      final middle = (low + high) ~/ 2;
-      final pdfBytes = await tryRender(
-        document.fit(levels[middle]),
-        levels[middle].fontScale,
-      );
-      if (pdfBytes != null) {
-        fullestLevel = levels[middle];
-        fullestPdfBytes = pdfBytes;
-        high = middle - 1;
-      } else {
-        low = middle + 1;
-      }
-    }
+    final mostCompactLevel = levels.last;
 
-    if (fullestLevel != null && fullestPdfBytes != null) {
-      final fittedDocument = document.fit(fullestLevel);
-      final fontScales = _enlargedFontScales(fullestLevel);
-      var bestPdfBytes = fullestPdfBytes;
+    // The fullest index in [0, count) that fits, or null when none does.
+    Future<({int index, Uint8List pdfBytes})?> fullestFit(
+      int count,
+      Future<Uint8List?> Function(int index) attempt,
+    ) async {
+      ({int index, Uint8List pdfBytes})? fullest;
       var low = 0;
-      var high = fontScales.length - 1;
+      var high = count - 1;
       while (low <= high) {
         final middle = (low + high) ~/ 2;
-        final pdfBytes = await tryRender(fittedDocument, fontScales[middle]);
+        final pdfBytes = await attempt(middle);
         if (pdfBytes != null) {
-          bestPdfBytes = pdfBytes;
+          fullest = (index: middle, pdfBytes: pdfBytes);
           high = middle - 1;
         } else {
           low = middle + 1;
         }
       }
+      return fullest;
+    }
+
+    final contentFit = await fullestFit(
+      levels.length,
+      (index) => tryRender(
+        document.fit(levels[index], skillsLevel: mostCompactLevel),
+        levels[index].fontScale,
+      ),
+    );
+
+    if (contentFit != null) {
+      final contentLevel = levels[contentFit.index];
+      final skillsFit = await fullestFit(
+        levels.length,
+        (index) => tryRender(
+          document.fit(contentLevel, skillsLevel: levels[index]),
+          contentLevel.fontScale,
+        ),
+      );
+      final skillsLevel = levels[skillsFit?.index ?? levels.length - 1];
+      final fittedDocument = document.fit(
+        contentLevel,
+        skillsLevel: skillsLevel,
+      );
+      final fontScales = _enlargedFontScales(contentLevel);
+      var bestPdfBytes = skillsFit?.pdfBytes ?? contentFit.pdfBytes;
+      final enlargedFit = await fullestFit(
+        fontScales.length,
+        (index) => tryRender(fittedDocument, fontScales[index]),
+      );
+      if (enlargedFit != null) bestPdfBytes = enlargedFit.pdfBytes;
       return bestPdfBytes;
     }
     throw CvPdfGenerationException(

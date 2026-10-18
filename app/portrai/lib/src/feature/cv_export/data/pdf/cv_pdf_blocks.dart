@@ -47,13 +47,27 @@ class CvPdfBlocks {
     return '${input.dateFormat.format(experience.startDate)} - $endText';
   }
 
-  pdf_widgets.Widget photo({required double size}) {
-    return pdf_widgets.ClipOval(
-      child: pdf_widgets.Image(
-        pdf_widgets.MemoryImage(input.photo!),
-        width: size,
-        height: size,
-        fit: pdf_widgets.BoxFit.cover,
+  pdf_widgets.Widget photo({required double size, PdfColor? borderColor}) {
+    final borderWidth = _style.scaled(2.5);
+    final photoSize = size - borderWidth * 2;
+    return pdf_widgets.Container(
+      width: size,
+      height: size,
+      decoration: pdf_widgets.BoxDecoration(
+        shape: pdf_widgets.BoxShape.circle,
+        border: pdf_widgets.Border.all(
+          color: borderColor ?? _style.accent,
+          width: borderWidth,
+        ),
+      ),
+      padding: pdf_widgets.EdgeInsets.all(borderWidth),
+      child: pdf_widgets.ClipOval(
+        child: pdf_widgets.Image(
+          pdf_widgets.MemoryImage(input.photo!),
+          width: photoSize,
+          height: photoSize,
+          fit: pdf_widgets.BoxFit.cover,
+        ),
       ),
     );
   }
