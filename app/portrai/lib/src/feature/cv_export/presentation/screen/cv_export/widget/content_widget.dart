@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart' show PdfPageFormat;
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
@@ -46,24 +49,21 @@ class ContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controls = _ControlsWidget(state: state);
-    Widget previewOf(double height) => _SectionWidget(
+    final preview = _SectionWidget(
       title: context.localizations.cvExportPreviewSection,
-      child: SizedBox(
-        height: height,
-        child: _PreviewWidget(state: state),
-      ),
+      child: _PreviewWidget(state: state),
     );
 
     Widget stackedBody(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [previewOf(context.space(factor: 70)), controls],
+      children: [preview, controls],
     );
     Widget sideBySideBody(BuildContext context) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(width: context.space(factor: 45), child: controls),
         SizedBox(width: context.space(factor: 3)),
-        Expanded(child: previewOf(MediaQuery.sizeOf(context).height * 0.75)),
+        Expanded(child: preview),
       ],
     );
 

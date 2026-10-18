@@ -9,7 +9,39 @@ class _PreviewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final pdfBytes = state.pdfBytes;
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
+    final pageMargin = context.space(factor: 2);
+    final loader = Center(
+      child: DSLoadingWidget(size: context.space(factor: 5)),
+    );
 
+    // The preview is exactly one A4 page plus its margin.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final pageWidth = constraints.maxWidth - pageMargin * 2;
+        final height =
+            pageWidth * PdfPageFormat.a4.height / PdfPageFormat.a4.width +
+            pageMargin * 2;
+        return SizedBox(
+          height: height,
+          child: _buildPreview(
+            context,
+            radius: radius,
+            pdfBytes: pdfBytes,
+            loader: loader,
+            pageMargin: pageMargin,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPreview(
+    BuildContext context, {
+    required BorderRadius radius,
+    required Uint8List? pdfBytes,
+    required Widget loader,
+    required double pageMargin,
+  }) {
     return ClipRRect(
       borderRadius: radius,
       child: ColoredBox(
@@ -17,11 +49,12 @@ class _PreviewWidget extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: pdfBytes == null
-                  ? Center(
-                      child: DSLoadingWidget(size: context.space(factor: 5)),
-                    )
+              // One loader until the new page is ready, instead of the old page
+              // followed by a second spinner.
+              child: pdfBytes == null || state.isGenerating
+                  ? loader
                   : PdfPreview(
+                      loadingWidget: loader,
                       key: ValueKey(state.pdfRevision),
                       build: (_) => pdfBytes,
                       useActions: false,
@@ -30,9 +63,7 @@ class _PreviewWidget extends StatelessWidget {
                       canDebug: false,
                       allowPrinting: false,
                       allowSharing: false,
-                      previewPageMargin: EdgeInsets.all(
-                        context.space(factor: 2),
-                      ),
+                      previewPageMargin: EdgeInsets.all(pageMargin),
                       pdfPreviewPageDecoration: const BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -48,13 +79,6 @@ class _PreviewWidget extends StatelessWidget {
                       ),
                     ),
             ),
-            if (state.isGenerating)
-              const Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: LinearProgressIndicator(),
-              ),
           ],
         ),
       ),
