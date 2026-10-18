@@ -17,12 +17,14 @@ class CvExportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Read here: a bloc's create callback cannot listen to inherited widgets.
+    final labels = context.cvLabels;
     return Scaffold(
       appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
       body: BlocProvider(
-        create: (context) {
+        create: (_) {
           return appServiceLocator.get<CvExportBloc>()
-            ..add(LoadCvExportEvent(context.cvLabels));
+            ..add(LoadCvExportEvent(labels));
         },
         child: BlocBuilder<CvExportBloc, CvExportState>(
           builder: (context, state) {
