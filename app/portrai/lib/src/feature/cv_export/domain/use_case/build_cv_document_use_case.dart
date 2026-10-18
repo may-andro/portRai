@@ -87,8 +87,12 @@ class BuildCvDocumentUseCase
       profile.location.country,
     ].where((part) => part.trim().isNotEmpty).join(', ');
 
+    // Ongoing positions come first, the finished ones follow by start date.
     final sortedExperiences = [...experiences]
-      ..sort((first, second) => second.startDate.compareTo(first.startDate));
+      ..sort((first, second) {
+        if (first.current != second.current) return first.current ? -1 : 1;
+        return second.startDate.compareTo(first.startDate);
+      });
     final sortedProjects = [...projects]
       ..sort((first, second) => second.startDate.compareTo(first.startDate));
 

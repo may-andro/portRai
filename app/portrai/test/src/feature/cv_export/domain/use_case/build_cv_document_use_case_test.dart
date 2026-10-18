@@ -55,11 +55,12 @@ void main() {
 
     Future<CvDocumentEntity> build() async => (await useCase()).right;
 
-    test('should order experiences most recent first', () async {
+    test('should list ongoing experiences first then by start date', () async {
       final document = await build();
 
       expect(document.experiences.map((experience) => experience.company), [
         'Current Company',
+        'Recent Completed Company',
         'Middle Company',
         'Old Company',
       ]);
@@ -167,7 +168,7 @@ void main() {
       () async {
         final document = await build();
 
-        expect(document.experiences[1].highlights, ['Built mobile apps.']);
+        expect(document.experiences[2].highlights, ['Built mobile apps.']);
       },
     );
 

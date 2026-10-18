@@ -18,6 +18,19 @@ class CvFitLevelEntity extends Equatable {
   });
 
   static const List<CvFitLevelEntity> levels = [
+    // Roomier than the next level so spare space is filled with more skills.
+    CvFitLevelEntity(
+      maxExperiences: 3,
+      maxHighlightsPerExperience: 4,
+      maxHighlightLength: 160,
+      maxProjects: 16,
+      maxSkillGroups: 10,
+      maxSkillsPerGroup: 12,
+      maxEducations: 3,
+      maxSummaryLength: 400,
+      maxProjectDescriptionLength: 180,
+      fontScale: 1,
+    ),
     CvFitLevelEntity(
       maxExperiences: 3,
       maxHighlightsPerExperience: 4,

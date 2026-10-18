@@ -127,6 +127,11 @@ class CvExportTestFixture {
         responsibilities: ['Code reviews'],
       ),
       _experience(
+        company: 'Recent Completed Company',
+        startDate: DateTime(2023),
+        endDate: DateTime(2024),
+      ),
+      _experience(
         company: 'Middle Company',
         startDate: DateTime(2018, 7),
         endDate: DateTime(2021, 12),
