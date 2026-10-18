@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_link_entity.dart';
 
 class CvProjectEntity extends Equatable {
   const CvProjectEntity({
@@ -6,7 +7,7 @@ class CvProjectEntity extends Equatable {
     required this.role,
     required this.description,
     required this.technologies,
-    this.url,
+    this.links = const [],
   });
 
   final String title;
@@ -14,9 +15,9 @@ class CvProjectEntity extends Equatable {
   final String description;
   final List<String> technologies;
 
-  /// Makes the project clickable in the PDF when present.
-  final String? url;
+  /// Website and store listings, the first one is the primary link.
+  final List<CvProjectLinkEntity> links;
 
   @override
-  List<Object?> get props => [title, role, description, technologies, url];
+  List<Object?> get props => [title, role, description, technologies, links];
 }

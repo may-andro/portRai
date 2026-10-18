@@ -16,7 +16,7 @@ PDF CV. Everything runs locally; no data leaves the device and no AI is involved
 - Only the last three experiences are shown, followed by a link to the portfolio website
   for the rest.
 - Companies, contacts and projects are hyperlinks; the projects section lists only the
-  projects that have a link, as a compact list of clickable names.
+  projects that have a link, as a compact list of clickable names followed by their Web, iOS and Android links.
 
 ## Getting Started
 

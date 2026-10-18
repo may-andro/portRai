@@ -72,9 +72,13 @@ void main() {
     test('should only list projects that have a link', () async {
       final document = await build();
 
-      expect(document.projects.map((project) => project.url), [
-        'https://new.example.com',
-        'https://old.example.com',
+      expect(document.projects.map((project) => project.title), [
+        'New Project',
+        'Old Project',
+      ]);
+      expect(document.projects.first.links.map((link) => link.label), [
+        'Web',
+        'iOS',
       ]);
     });
 

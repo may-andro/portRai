@@ -86,7 +86,7 @@ class CvDocumentEntity extends Equatable {
               level.maxProjectDescriptionLength,
             ),
             technologies: project.technologies.take(6).map(_clean).toList(),
-            url: project.url,
+            links: project.links,
           ),
       ],
       skillGroups: [

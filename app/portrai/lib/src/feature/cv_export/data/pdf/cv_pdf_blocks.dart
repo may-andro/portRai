@@ -175,37 +175,50 @@ class CvPdfBlocks {
     ];
   }
 
-  /// The projects as a compact list of clickable names.
+  /// The projects as a compact list: a clickable name followed by its
+  /// website and store links.
   pdf_widgets.Widget projectLinks() {
+    const underline = pdf_widgets.TextDecoration.underline;
     return pdf_widgets.Wrap(
-      spacing: _style.scaled(18),
+      spacing: _style.scaled(16),
       runSpacing: _style.scaled(5),
       children: [
         for (final project in input.document.projects)
-          _link(
-            project.url,
-            pdf_widgets.Row(
-              mainAxisSize: pdf_widgets.MainAxisSize.min,
-              children: [
-                pdf_widgets.Container(
-                  width: _style.scaled(3),
-                  height: _style.scaled(3),
-                  margin: pdf_widgets.EdgeInsets.only(right: _style.scaled(5)),
-                  decoration: pdf_widgets.BoxDecoration(
-                    color: _style.accent,
-                    shape: pdf_widgets.BoxShape.circle,
-                  ),
+          pdf_widgets.Row(
+            mainAxisSize: pdf_widgets.MainAxisSize.min,
+            children: [
+              pdf_widgets.Container(
+                width: _style.scaled(3),
+                height: _style.scaled(3),
+                margin: pdf_widgets.EdgeInsets.only(right: _style.scaled(5)),
+                decoration: pdf_widgets.BoxDecoration(
+                  color: _style.accent,
+                  shape: pdf_widgets.BoxShape.circle,
                 ),
+              ),
+              _link(
+                project.links.first.url,
                 pdf_widgets.Text(
                   project.title,
                   style: _style
                       .text(size: 9.5, isBold: true)
-                      .copyWith(
-                        decoration: pdf_widgets.TextDecoration.underline,
-                      ),
+                      .copyWith(decoration: underline),
                 ),
-              ],
-            ),
+              ),
+              for (final link in project.links)
+                pdf_widgets.Padding(
+                  padding: pdf_widgets.EdgeInsets.only(left: _style.scaled(4)),
+                  child: _link(
+                    link.url,
+                    pdf_widgets.Text(
+                      link.label,
+                      style: _style
+                          .text(size: 7.5, color: _style.accent)
+                          .copyWith(decoration: underline),
+                    ),
+                  ),
+                ),
+            ],
           ),
       ],
     );

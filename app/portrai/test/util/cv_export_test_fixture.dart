@@ -5,6 +5,7 @@ import 'package:portrai/src/feature/cv_export/domain/entity/cv_experience_entity
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_labels_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_language_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_entity.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_link_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_skill_group_entity.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
@@ -147,6 +148,7 @@ class CvExportTestFixture {
         title: 'New Project',
         startDate: DateTime(2023),
         website: 'https://new.example.com',
+        appStore: 'https://apps.apple.com/app/new',
       ),
       _project(title: 'Unlinked Project', startDate: DateTime(2020)),
     ];
@@ -206,7 +208,12 @@ class CvExportTestFixture {
             role: 'Lead developer',
             description: longText,
             technologies: const ['Flutter', 'Dart', 'Firebase', 'Kotlin'],
-            url: 'https://project$index.example.com',
+            links: [
+              CvProjectLinkEntity(
+                label: 'Web',
+                url: 'https://project$index.example.com',
+              ),
+            ],
           ),
       ],
       skillGroups: [
@@ -301,6 +308,7 @@ class CvExportTestFixture {
     required String title,
     required DateTime startDate,
     String? website,
+    String? appStore,
   }) {
     return ProjectEntity(
       title: title,
@@ -317,12 +325,13 @@ class CvExportTestFixture {
       teamSize: 3,
       role: 'Lead',
       markets: [
-        if (website != null)
+        if (website != null || appStore != null)
           ProjectMarketEntity(
             country: 'ES',
             latitude: 0,
             longitude: 0,
             website: website,
+            appStore: appStore,
           ),
       ],
       id: title,

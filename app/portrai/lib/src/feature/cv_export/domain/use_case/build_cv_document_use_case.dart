@@ -137,13 +137,13 @@ class BuildCvDocumentUseCase
       // Only projects that can be opened are listed on the CV.
       projects: [
         for (final project in sortedProjects)
-          if (_projectUrlOf(project) != null)
+          if (_projectLinksOf(project).isNotEmpty)
             CvProjectEntity(
               title: project.title,
               role: project.role,
               description: project.description,
               technologies: project.technologies,
-              url: _projectUrlOf(project),
+              links: _projectLinksOf(project),
             ),
       ],
       skillGroups: [
@@ -207,19 +207,26 @@ class BuildCvDocumentUseCase
     return null;
   }
 
-  /// The most representative link of a project: website, then the stores.
-  String? _projectUrlOf(ProjectEntity project) {
-    for (final market in project.markets) {
-      for (final candidate in [
-        market.website,
-        market.playStore,
-        market.appStore,
-      ]) {
-        final url = _validUrl(candidate);
-        if (url != null) return url;
+  /// The valid website and store links of a project, without duplicates.
+  List<CvProjectLinkEntity> _projectLinksOf(ProjectEntity project) {
+    final links = <CvProjectLinkEntity>[];
+    void add(String label, String? candidate) {
+      final url = _validUrl(candidate);
+      if (url != null && links.every((link) => link.url != url)) {
+        links.add(CvProjectLinkEntity(label: label, url: url));
       }
     }
-    return null;
+
+    for (final market in project.markets) {
+      add('Web', market.website);
+    }
+    for (final market in project.markets) {
+      add('iOS', market.appStore);
+    }
+    for (final market in project.markets) {
+      add('Android', market.playStore);
+    }
+    return links;
   }
 
   List<String> _highlightsOf(ExperienceEntity experience) {
