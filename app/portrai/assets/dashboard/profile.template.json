@@ -88,14 +88,17 @@
       "languages": [
         {
           "language": "English",
+          "code": "en",
           "proficiency": "Native"
         },
         {
           "language": "Dutch",
+          "code": "nl",
           "proficiency": "Fluent"
         },
         {
           "language": "Swedish",
+          "code": "sv",
           "proficiency": "Proficient"
         }
       ],
@@ -219,14 +222,17 @@
       "languages": [
         {
           "language": "Inglés",
+          "code": "en",
           "proficiency": "Nativa"
         },
         {
           "language": "Neerlandés",
+          "code": "nl",
           "proficiency": "Fluido"
         },
         {
           "language": "Sueco",
+          "code": "sv",
           "proficiency": "Competente"
         }
       ],
@@ -350,14 +356,17 @@
       "languages": [
         {
           "language": "Engels",
+          "code": "en",
           "proficiency": "Moedertaal"
         },
         {
           "language": "Nederlands",
+          "code": "nl",
           "proficiency": "Vloeiend"
         },
         {
           "language": "Zweeds",
+          "code": "sv",
           "proficiency": "Vaardig"
         }
       ],
