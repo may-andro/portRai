@@ -376,5 +376,165 @@
   "assistantSuggestionTechStack": "Welke technologieën en tools worden gebruikt?",
   "assistantSuggestionArchitecture": "Hoe zijn de apps opgebouwd?",
   "assistantSuggestionAvailability": "Is hij beschikbaar voor nieuw werk?",
-  "assistantSuggestionContact": "Hoe kan ik contact opnemen?"
+  "assistantSuggestionContact": "Hoe kan ik contact opnemen?",
+  "cvExportTitle": "CV exporteren",
+  "@cvExportTitle": {
+    "description": "Title of the CV export screen"
+  },
+  "cvExportIntro": "Maak van je portfolio een cv van één pagina als PDF. Kies een opmaak, accent en inhoud, bekijk het voorbeeld en download het.",
+  "@cvExportIntro": {
+    "description": "Short introduction at the top of the CV export screen"
+  },
+  "cvExportTemplateHint": "Kies de opmaak van je cv",
+  "@cvExportTemplateHint": {
+    "description": "Hint under the template section title"
+  },
+  "cvExportAccentHint": "Gebruikt voor koppen, lijnen en links",
+  "@cvExportAccentHint": {
+    "description": "Hint under the accent color section title"
+  },
+  "cvExportPhotoSection": "Foto",
+  "@cvExportPhotoSection": {
+    "description": "Title of the section where the user picks the CV photo"
+  },
+  "cvExportPhotoHint": "Kies de foto voor je CV",
+  "@cvExportPhotoHint": {
+    "description": "Hint under the photo section title"
+  },
+  "cvExportContentHint": "Kies wat er wordt opgenomen",
+  "@cvExportContentHint": {
+    "description": "Hint under the content section title"
+  },
+  "cvExportPreviewSection": "Voorbeeld",
+  "@cvExportPreviewSection": {
+    "description": "Title of the CV preview section"
+  },
+  "cvExportDownload": "CV downloaden",
+  "@cvExportDownload": {
+    "description": "Label of the button and header action that downloads the CV as a PDF"
+  },
+  "cvExportTemplateSection": "Sjabloon",
+  "@cvExportTemplateSection": {
+    "description": "Title of the CV template selection section"
+  },
+  "cvExportAccentSection": "Accentkleur",
+  "@cvExportAccentSection": {
+    "description": "Title of the CV accent color selection section"
+  },
+  "cvExportContentSection": "Inhoud",
+  "@cvExportContentSection": {
+    "description": "Title of the section where the user chooses which CV sections to include"
+  },
+  "cvExportIncludePhoto": "Foto opnemen",
+  "@cvExportIncludePhoto": {
+    "description": "Switch label to include the profile photo in the CV"
+  },
+  "cvTemplateSidebar": "Zijbalk",
+  "@cvTemplateSidebar": {
+    "description": "Name of the CV template with a tinted side column"
+  },
+  "cvTemplateClassic": "Klassiek",
+  "@cvTemplateClassic": {
+    "description": "Name of the traditional single column CV template"
+  },
+  "cvTemplateMinimal": "Minimalistisch",
+  "@cvTemplateMinimal": {
+    "description": "Name of the airy minimal CV template"
+  },
+  "cvTemplateBold": "Opvallend",
+  "@cvTemplateBold": {
+    "description": "Name of the CV template with a colored banner"
+  },
+  "cvTemplateSidebarDescription": "Gekleurde zijkolom met contact en vaardigheden, ervaring rechts",
+  "@cvTemplateSidebarDescription": {
+    "description": "One line description of the Sidebar CV template"
+  },
+  "cvTemplateClassicDescription": "Traditionele enkele kolom met gelijnde sectiekoppen",
+  "@cvTemplateClassicDescription": {
+    "description": "One line description of the Classic CV template"
+  },
+  "cvTemplateMinimalDescription": "Luchtige enkele kolom met kleine sectielabels in de kantlijn",
+  "@cvTemplateMinimalDescription": {
+    "description": "One line description of the Minimal CV template"
+  },
+  "cvTemplateBoldDescription": "Gekleurde koptekstbanner boven een hoofdkolom en een vaardighedenkolom",
+  "@cvTemplateBoldDescription": {
+    "description": "One line description of the Bold CV template"
+  },
+  "cvAccentTeal": "Blauwgroen",
+  "@cvAccentTeal": {
+    "description": "Name of the teal CV accent color"
+  },
+  "cvAccentIndigo": "Indigo",
+  "@cvAccentIndigo": {
+    "description": "Name of the indigo CV accent color"
+  },
+  "cvAccentCrimson": "Karmozijn",
+  "@cvAccentCrimson": {
+    "description": "Name of the crimson CV accent color"
+  },
+  "cvAccentForest": "Bosgroen",
+  "@cvAccentForest": {
+    "description": "Name of the forest green CV accent color"
+  },
+  "cvAccentCharcoal": "Antraciet",
+  "@cvAccentCharcoal": {
+    "description": "Name of the charcoal CV accent color"
+  },
+  "cvSectionSummary": "Samenvatting",
+  "@cvSectionSummary": {
+    "description": "CV section heading and toggle for the profile summary"
+  },
+  "cvSectionExperience": "Ervaring",
+  "@cvSectionExperience": {
+    "description": "CV section heading and toggle for work experience"
+  },
+  "cvSectionProjects": "Projecten",
+  "@cvSectionProjects": {
+    "description": "CV section heading and toggle for projects"
+  },
+  "cvSectionSkills": "Vaardigheden",
+  "@cvSectionSkills": {
+    "description": "CV section heading and toggle for skills"
+  },
+  "cvSectionEducation": "Opleiding",
+  "@cvSectionEducation": {
+    "description": "CV section heading and toggle for education"
+  },
+  "cvSectionLanguages": "Talen",
+  "@cvSectionLanguages": {
+    "description": "CV section heading and toggle for spoken languages"
+  },
+  "cvSectionContact": "Contact",
+  "@cvSectionContact": {
+    "description": "CV sidebar heading for contact details"
+  },
+  "cvSeeMoreOnWebsite": "Bekijk al mijn ervaring en details op mijn website",
+  "@cvSeeMoreOnWebsite": {
+    "description": "CV line pointing to the portfolio website for the full experience"
+  },
+  "cvWebsiteContact": "Website",
+  "@cvWebsiteContact": {
+    "description": "CV contact link text for the personal website"
+  },
+  "cvPresent": "Heden",
+  "@cvPresent": {
+    "description": "Label shown instead of an end date for a current position"
+  },
+  "errorCvDataUnavailable": "Je portfoliogegevens konden niet worden geladen voor het cv.",
+  "@errorCvDataUnavailable": {
+    "description": "Error shown when the data needed to build the CV cannot be loaded"
+  },
+  "errorCvPdfGeneration": "Het cv kon niet worden gemaakt.",
+  "@errorCvPdfGeneration": {
+    "description": "Error shown when the CV PDF cannot be generated"
+  },
+  "errorCvPdfShare": "Het cv kon niet worden gedownload.",
+  "@errorCvPdfShare": {
+    "description": "Error shown when the CV PDF cannot be downloaded or shared"
+  },
+  "errorCvUnknown": "Er ging iets mis bij het voorbereiden van het cv.",
+  "@errorCvUnknown": {
+    "description": "Generic error shown for unexpected CV export problems"
+  }
 }

@@ -1,0 +1,179 @@
+import 'package:equatable/equatable.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_contact_entity.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_education_entity.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_experience_entity.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_fit_level_entity.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_entity.dart';
+import 'package:portrai/src/feature/cv_export/domain/entity/cv_skill_group_entity.dart';
+
+class CvDocumentEntity extends Equatable {
+  const CvDocumentEntity({
+    required this.fullName,
+    required this.title,
+    required this.summary,
+    required this.photoUrl,
+    required this.contacts,
+    required this.experiences,
+    required this.projects,
+    required this.skillGroups,
+    required this.educations,
+    this.photoUrls = const [],
+    this.websiteUrl,
+    this.hasMoreExperiences = false,
+  });
+
+  final String fullName;
+  final String title;
+  final String summary;
+  final String photoUrl;
+
+  /// Every distinct profile image the user can pick from.
+  final List<String> photoUrls;
+  final List<CvContactEntity> contacts;
+  final List<CvExperienceEntity> experiences;
+  final List<CvProjectEntity> projects;
+  final List<CvSkillGroupEntity> skillGroups;
+  final List<CvEducationEntity> educations;
+
+  /// The portfolio website with the full experience and details.
+  final String? websiteUrl;
+
+  /// Whether experiences were left out of this document.
+  final bool hasMoreExperiences;
+
+  /// Returns a copy trimmed to [level], keeping the most relevant content:
+  /// experiences and projects are already ordered most recent first.
+  ///
+  /// The skills and education are trimmed to [skillsLevel] when given, as
+  /// they live in their own column and fill up independently.
+  ///
+  /// The experiences use their short overview only when [useDetailedOverview]
+  /// is false.
+  CvDocumentEntity fit(
+    CvFitLevelEntity level, {
+    CvFitLevelEntity? skillsLevel,
+    bool useDetailedOverview = true,
+  }) {
+    final sideLevel = skillsLevel ?? level;
+    return CvDocumentEntity(
+      fullName: _clean(fullName),
+      title: _clean(title),
+      summary: _truncate(summary, level.maxSummaryLength),
+      photoUrl: photoUrl,
+      photoUrls: photoUrls,
+      websiteUrl: websiteUrl,
+      hasMoreExperiences:
+          hasMoreExperiences || experiences.length > level.maxExperiences,
+      contacts: [
+        for (final contact in contacts)
+          CvContactEntity(
+            text: _clean(contact.text),
+            url: contact.url,
+            type: contact.type,
+          ),
+      ],
+      experiences: [
+        for (final experience in experiences.take(level.maxExperiences))
+          CvExperienceEntity(
+            position: _clean(experience.position),
+            company: _clean(experience.company),
+            location: _clean(experience.location),
+            startDate: experience.startDate,
+            endDate: experience.endDate,
+            url: experience.url,
+            overview: _overviewFor(
+              experience,
+              level.maxOverviewLength,
+              useDetailedOverview: useDetailedOverview,
+            ),
+          ),
+      ],
+      projects: [
+        for (final project in projects.take(level.maxProjects))
+          CvProjectEntity(
+            title: _clean(project.title),
+            role: _clean(project.role),
+            description: _truncate(
+              project.description,
+              level.maxProjectDescriptionLength,
+            ),
+            technologies: project.technologies.take(6).map(_clean).toList(),
+            links: project.links,
+          ),
+      ],
+      skillGroups: [
+        for (final group in skillGroups.take(sideLevel.maxSkillGroups))
+          CvSkillGroupEntity(
+            title: _clean(group.title),
+            skills: group.skills
+                .take(sideLevel.maxSkillsPerGroup)
+                .map(_clean)
+                .toList(),
+          ),
+      ],
+      educations: [
+        for (final education in educations.take(sideLevel.maxEducations))
+          CvEducationEntity(
+            degree: _clean(education.degree),
+            institution: _clean(education.institution),
+            period: _clean(education.period),
+          ),
+      ],
+    );
+  }
+
+  /// The PDF base fonts only cover Latin-1, so common typographic characters
+  /// are replaced by their plain equivalents to avoid missing-glyph boxes.
+  static String _clean(String text) {
+    return text
+        .replaceAll(RegExp('[\u2010-\u2015\u2212]'), '-')
+        .replaceAll(RegExp('[\u2018\u2019\u201B]'), "'")
+        .replaceAll(RegExp('[\u201C\u201D\u201F]'), '"')
+        .replaceAll('\u2026', '...')
+        .replaceAll(RegExp('[\u2022\u25CF\u25AA]'), '-')
+        .replaceAll(RegExp('[\u00A0\u2007\u202F]'), ' ');
+  }
+
+  /// The detailed overview when it fits [maxLength], otherwise the short one,
+  /// truncated if needed; a complete short text reads better than a cut long one.
+  static String _overviewFor(
+    CvExperienceEntity experience,
+    int maxLength, {
+    required bool useDetailedOverview,
+  }) {
+    final detailedOverview = _clean(experience.detailedOverview).trim();
+    if (useDetailedOverview &&
+        detailedOverview.isNotEmpty &&
+        detailedOverview.length <= maxLength) {
+      return detailedOverview;
+    }
+    return _truncate(experience.overview, maxLength);
+  }
+
+  static String _truncate(String text, int maxLength) {
+    final trimmedText = _clean(text).trim();
+    if (trimmedText.length <= maxLength) return trimmedText;
+    final cutText = trimmedText.substring(0, maxLength - 1);
+    final lastSpaceIndex = cutText.lastIndexOf(' ');
+    final wordSafeText = lastSpaceIndex > maxLength ~/ 2
+        ? cutText.substring(0, lastSpaceIndex)
+        : cutText;
+    return '${wordSafeText.trimRight()}...';
+  }
+
+  @override
+  List<Object?> get props => [
+    fullName,
+    title,
+    summary,
+    photoUrl,
+    photoUrls,
+    contacts,
+    experiences,
+    projects,
+    skillGroups,
+    educations,
+    websiteUrl,
+    hasMoreExperiences,
+  ];
+}

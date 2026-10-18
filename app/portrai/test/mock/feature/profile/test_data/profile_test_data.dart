@@ -75,8 +75,12 @@ ProfileEntity createProfileEntity({List<PublishedAtEntity>? publishedAt}) {
       coordinates: CoordinatesEntity(latitude: 38.3452, longitude: -0.481),
     ),
     languages: const [
-      LanguageEntity(language: 'English', proficiency: 'Fluent'),
-      LanguageEntity(language: 'Spanish', proficiency: 'Intermediate'),
+      LanguageEntity(language: 'English', proficiency: 'Fluent', code: 'en'),
+      LanguageEntity(
+        language: 'Spanish',
+        proficiency: 'Intermediate',
+        code: 'es',
+      ),
     ],
     educations: const [
       EducationEntity(
@@ -165,8 +169,12 @@ ProfileModel createProfileModel({String locale = 'en'}) {
       coordinates: CoordinatesModel(latitude: 38.3452, longitude: -0.481),
     ),
     languages: [
-      LanguageModel(language: 'English', proficiency: 'Fluent'),
-      LanguageModel(language: 'Spanish', proficiency: 'Intermediate'),
+      LanguageModel(language: 'English', proficiency: 'Fluent', code: 'en'),
+      LanguageModel(
+        language: 'Spanish',
+        proficiency: 'Intermediate',
+        code: 'es',
+      ),
     ],
     educations: const [
       EducationModel(

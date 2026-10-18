@@ -1214,5 +1214,165 @@
   "assistantSuggestionContact": "How can I get in touch?",
   "@assistantSuggestionContact": {
     "description": "Suggested question asking how to contact the person"
+  },
+  "cvExportTitle": "Export CV",
+  "@cvExportTitle": {
+    "description": "Title of the CV export screen"
+  },
+  "cvExportIntro": "Turn your portfolio into a one-page PDF CV. Pick a layout, accent and content, check the live preview, then download it.",
+  "@cvExportIntro": {
+    "description": "Short introduction at the top of the CV export screen"
+  },
+  "cvExportTemplateHint": "Choose the layout of your CV",
+  "@cvExportTemplateHint": {
+    "description": "Hint under the template section title"
+  },
+  "cvExportAccentHint": "Used for headings, lines and links",
+  "@cvExportAccentHint": {
+    "description": "Hint under the accent color section title"
+  },
+  "cvExportPhotoSection": "Photo",
+  "@cvExportPhotoSection": {
+    "description": "Title of the section where the user picks the CV photo"
+  },
+  "cvExportPhotoHint": "Pick the photo for your CV",
+  "@cvExportPhotoHint": {
+    "description": "Hint under the photo section title"
+  },
+  "cvExportContentHint": "Choose what is included",
+  "@cvExportContentHint": {
+    "description": "Hint under the content section title"
+  },
+  "cvExportPreviewSection": "Preview",
+  "@cvExportPreviewSection": {
+    "description": "Title of the CV preview section"
+  },
+  "cvExportDownload": "Download CV",
+  "@cvExportDownload": {
+    "description": "Label of the button and header action that downloads the CV as a PDF"
+  },
+  "cvExportTemplateSection": "Template",
+  "@cvExportTemplateSection": {
+    "description": "Title of the CV template selection section"
+  },
+  "cvExportAccentSection": "Accent color",
+  "@cvExportAccentSection": {
+    "description": "Title of the CV accent color selection section"
+  },
+  "cvExportContentSection": "Content",
+  "@cvExportContentSection": {
+    "description": "Title of the section where the user chooses which CV sections to include"
+  },
+  "cvExportIncludePhoto": "Include photo",
+  "@cvExportIncludePhoto": {
+    "description": "Switch label to include the profile photo in the CV"
+  },
+  "cvTemplateSidebar": "Sidebar",
+  "@cvTemplateSidebar": {
+    "description": "Name of the CV template with a tinted side column"
+  },
+  "cvTemplateClassic": "Classic",
+  "@cvTemplateClassic": {
+    "description": "Name of the traditional single column CV template"
+  },
+  "cvTemplateMinimal": "Minimal",
+  "@cvTemplateMinimal": {
+    "description": "Name of the airy minimal CV template"
+  },
+  "cvTemplateBold": "Bold",
+  "@cvTemplateBold": {
+    "description": "Name of the CV template with a colored banner"
+  },
+  "cvTemplateSidebarDescription": "Tinted side column with contacts and skills, experience on the right",
+  "@cvTemplateSidebarDescription": {
+    "description": "One line description of the Sidebar CV template"
+  },
+  "cvTemplateClassicDescription": "Traditional single column with ruled section headings",
+  "@cvTemplateClassicDescription": {
+    "description": "One line description of the Classic CV template"
+  },
+  "cvTemplateMinimalDescription": "Airy single column with small section labels in the margin",
+  "@cvTemplateMinimalDescription": {
+    "description": "One line description of the Minimal CV template"
+  },
+  "cvTemplateBoldDescription": "Colored header banner above a main column and a skills column",
+  "@cvTemplateBoldDescription": {
+    "description": "One line description of the Bold CV template"
+  },
+  "cvAccentTeal": "Teal",
+  "@cvAccentTeal": {
+    "description": "Name of the teal CV accent color"
+  },
+  "cvAccentIndigo": "Indigo",
+  "@cvAccentIndigo": {
+    "description": "Name of the indigo CV accent color"
+  },
+  "cvAccentCrimson": "Crimson",
+  "@cvAccentCrimson": {
+    "description": "Name of the crimson CV accent color"
+  },
+  "cvAccentForest": "Forest",
+  "@cvAccentForest": {
+    "description": "Name of the forest green CV accent color"
+  },
+  "cvAccentCharcoal": "Charcoal",
+  "@cvAccentCharcoal": {
+    "description": "Name of the charcoal CV accent color"
+  },
+  "cvSectionSummary": "Summary",
+  "@cvSectionSummary": {
+    "description": "CV section heading and toggle for the profile summary"
+  },
+  "cvSectionExperience": "Experience",
+  "@cvSectionExperience": {
+    "description": "CV section heading and toggle for work experience"
+  },
+  "cvSectionProjects": "Projects",
+  "@cvSectionProjects": {
+    "description": "CV section heading and toggle for projects"
+  },
+  "cvSectionSkills": "Skills",
+  "@cvSectionSkills": {
+    "description": "CV section heading and toggle for skills"
+  },
+  "cvSectionEducation": "Education",
+  "@cvSectionEducation": {
+    "description": "CV section heading and toggle for education"
+  },
+  "cvSectionLanguages": "Languages",
+  "@cvSectionLanguages": {
+    "description": "CV section heading and toggle for spoken languages"
+  },
+  "cvSectionContact": "Contact",
+  "@cvSectionContact": {
+    "description": "CV sidebar heading for contact details"
+  },
+  "cvSeeMoreOnWebsite": "See all experience and details on my website",
+  "@cvSeeMoreOnWebsite": {
+    "description": "CV line pointing to the portfolio website for the full experience"
+  },
+  "cvWebsiteContact": "Website",
+  "@cvWebsiteContact": {
+    "description": "CV contact link text for the personal website"
+  },
+  "cvPresent": "Present",
+  "@cvPresent": {
+    "description": "Label shown instead of an end date for a current position"
+  },
+  "errorCvDataUnavailable": "Your portfolio data could not be loaded for the CV.",
+  "@errorCvDataUnavailable": {
+    "description": "Error shown when the data needed to build the CV cannot be loaded"
+  },
+  "errorCvPdfGeneration": "The CV could not be created.",
+  "@errorCvPdfGeneration": {
+    "description": "Error shown when the CV PDF cannot be generated"
+  },
+  "errorCvPdfShare": "The CV could not be downloaded.",
+  "@errorCvPdfShare": {
+    "description": "Error shown when the CV PDF cannot be downloaded or shared"
+  },
+  "errorCvUnknown": "Something went wrong while preparing the CV.",
+  "@errorCvUnknown": {
+    "description": "Generic error shown for unexpected CV export problems"
   }
 }
