@@ -22,17 +22,6 @@ class _ControlsWidget extends StatelessWidget {
           hint: context.localizations.cvExportAccentHint,
           child: _AccentPickerWidget(selectedAccent: state.options.accent),
         ),
-        if (state.document.photoUrls.length > 1)
-          _SectionWidget(
-            title: context.localizations.cvExportPhotoSection,
-            hint: context.localizations.cvExportPhotoHint,
-            child: _PhotoPickerWidget(
-              photoUrls: state.document.photoUrls,
-              selectedPhotoUrl:
-                  state.options.photoUrl ?? state.document.photoUrl,
-              isPhotoIncluded: state.options.isPhotoIncluded,
-            ),
-          ),
         _SectionWidget(
           title: context.localizations.cvExportContentSection,
           hint: context.localizations.cvExportContentHint,
@@ -41,6 +30,17 @@ class _ControlsWidget extends StatelessWidget {
             isPhotoIncluded: state.options.isPhotoIncluded,
           ),
         ),
+        if (state.options.isPhotoIncluded &&
+            state.document.photoUrls.length > 1)
+          _SectionWidget(
+            title: context.localizations.cvExportPhotoSection,
+            hint: context.localizations.cvExportPhotoHint,
+            child: _PhotoPickerWidget(
+              photoUrls: state.document.photoUrls,
+              selectedPhotoUrl:
+                  state.options.photoUrl ?? state.document.photoUrl,
+            ),
+          ),
         if (state.failure case final failure?) _FailureWidget(failure: failure),
       ],
     );

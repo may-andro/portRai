@@ -5,12 +5,10 @@ class _PhotoPickerWidget extends StatelessWidget {
   const _PhotoPickerWidget({
     required this.photoUrls,
     required this.selectedPhotoUrl,
-    required this.isPhotoIncluded,
   });
 
   final List<String> photoUrls;
   final String selectedPhotoUrl;
-  final bool isPhotoIncluded;
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +36,25 @@ class _PhotoPickerWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isPhotoIncluded && photoUrl == selectedPhotoUrl
+                      color: photoUrl == selectedPhotoUrl
                           ? context.colorPalette.neutral.grey1.color
                           : Colors.transparent,
                       width: 2,
                     ),
                   ),
-                  child: DSNetworkImageWidget(
-                    url: photoUrl,
-                    shape: BoxShape.circle,
-                    fit: BoxFit.cover,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: context.colorPalette.neutral.grey3.color,
+                    ),
+                    child: Padding(
+                      // Keeps the corners of the whole image inside the circle.
+                      padding: EdgeInsets.all(photoSize * 0.14),
+                      child: DSNetworkImageWidget(
+                        url: photoUrl,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
                 ),
               ),
