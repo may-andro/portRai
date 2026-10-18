@@ -4,37 +4,39 @@ import 'package:portrai/src/feature/project/domain/entity/project_market_entity.
 
 void main() {
   group('CvCountryCode', () {
-    test('should return the same code when the name is localized', () {
-      expect(CvCountryCode.of('Germany'), 'DE');
-      expect(CvCountryCode.of('Alemania'), 'DE');
-      expect(CvCountryCode.of('Duitsland'), 'DE');
+    ProjectMarketEntity market({String? appStore, String? playStore}) {
+      return ProjectMarketEntity(
+        country: 'Alemania',
+        latitude: 0,
+        longitude: 0,
+        appStore: appStore,
+        playStore: playStore,
+      );
+    }
+
+    test('should use the App Store storefront when the link has one', () {
+      final code = CvCountryCode.ofMarket(
+        market(appStore: 'https://apps.apple.com/de/app/x/id1'),
+      );
+
+      expect(code, 'DE');
     });
 
-    test('should return the name when the country is unknown', () {
-      expect(CvCountryCode.of('Atlantis'), 'Atlantis');
+    test('should use the Play Store gl parameter when no App Store link', () {
+      final code = CvCountryCode.ofMarket(
+        market(playStore: 'https://play.google.com/store/apps?id=x&gl=nl'),
+      );
+
+      expect(code, 'NL');
     });
 
-    group('ofMarket', () {
-      ProjectMarketEntity market(String country, {String? appStore}) {
-        return ProjectMarketEntity(
-          country: country,
-          latitude: 0,
-          longitude: 0,
-          appStore: appStore,
-        );
-      }
-
-      test('should use the App Store storefront when the link has one', () {
-        final code = CvCountryCode.ofMarket(
-          market('Anything', appStore: 'https://apps.apple.com/de/app/x/id1'),
-        );
-
-        expect(code, 'DE');
-      });
-
-      test('should fall back to the country name when no App Store link', () {
-        expect(CvCountryCode.ofMarket(market('Spain')), 'ES');
-      });
+    test('should return null when the links carry no country', () {
+      expect(
+        CvCountryCode.ofMarket(
+          market(playStore: 'https://play.google.com/store/apps?id=x'),
+        ),
+        isNull,
+      );
     });
   });
 }

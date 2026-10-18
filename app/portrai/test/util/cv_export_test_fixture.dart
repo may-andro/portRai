@@ -92,8 +92,8 @@ class CvExportTestFixture {
         coordinates: CoordinatesEntity(latitude: 0, longitude: 0),
       ),
       languages: [
-        LanguageEntity(language: 'English', proficiency: 'Fluent'),
-        LanguageEntity(language: 'Spanish', proficiency: 'Native'),
+        LanguageEntity(language: 'English', proficiency: 'Fluent', code: 'en'),
+        LanguageEntity(language: 'Spanish', proficiency: 'Native', code: 'es'),
       ],
       educations: [
         EducationEntity(
@@ -174,8 +174,8 @@ class CvExportTestFixture {
         title: 'Multi Project',
         startDate: DateTime(2021),
         markets: [
-          _market('Germany', playStore: 'https://play.example.com/de'),
-          _market('Spain', playStore: 'https://play.example.com/es'),
+          _market('Germany', playStore: 'https://play.example.com/?gl=de'),
+          _market('Spain', playStore: 'https://play.example.com/?gl=es'),
         ],
       ),
       _project(

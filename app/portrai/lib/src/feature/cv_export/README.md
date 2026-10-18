@@ -16,9 +16,9 @@ PDF CV. Everything runs locally; no data leaves the device and no AI is involved
 - Each experience shows an overview paragraph instead of bullets: the long description when there is room, otherwise the short one. Templates without a separate skills column keep the short one unless everything still fits, so the skills are not trimmed.
 - Ongoing experiences come first, then finished ones by start date; only the first three are shown, followed by a link to the portfolio website
   for the rest.
-- Languages are a contact entry with language codes (for example `EN, ES, NL`) instead of a section.
+- Languages are a contact entry with language codes (for example `EN, ES, NL`) instead of a section. Codes come from the optional `code` field of each language; languages without one are left out.
 - Companies, contacts and projects are hyperlinks; the projects section lists only the
-  projects that have a link, as a compact list of clickable names followed by Web, App Store and Play Store icons. Projects need a store link and are listed once per distinct store listing, with the country code (for example `MediaMarkt DE`) only when the listings differ per country. Deprecated projects are left out.
+  projects that have a link, as a compact list of clickable names followed by Web, App Store and Play Store icons. Projects need a store link and are listed once per distinct store listing, with the country code (for example `MediaMarkt DE`) only when the listings differ per country. The country code is read from the App Store storefront (or Play Store `gl`) in the link, never from the localized country name. Deprecated projects are left out.
 
 ## Getting Started
 

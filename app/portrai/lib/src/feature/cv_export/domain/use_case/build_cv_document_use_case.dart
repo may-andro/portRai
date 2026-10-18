@@ -178,7 +178,7 @@ class BuildCvDocumentUseCase
     final codes = <String>[];
     for (final language in profile.languages) {
       final code = CvLanguageCode.ofLanguage(language);
-      if (!codes.contains(code)) codes.add(code);
+      if (code != null && !codes.contains(code)) codes.add(code);
     }
     return codes;
   }
@@ -235,9 +235,7 @@ class BuildCvDocumentUseCase
     return [
       for (final markets in marketsByStoreLinks.values)
         CvProjectEntity(
-          title: hasSeveralListings
-              ? '${project.title} ${_countryCodesOf(markets)}'
-              : project.title,
+          title: _titleOf(project, markets, hasSeveralListings),
           role: project.role,
           description: project.description,
           technologies: project.technologies,
@@ -246,9 +244,20 @@ class BuildCvDocumentUseCase
     ];
   }
 
+  String _titleOf(
+    ProjectEntity project,
+    List<ProjectMarketEntity> markets,
+    bool hasSeveralListings,
+  ) {
+    final countryCodes = hasSeveralListings ? _countryCodesOf(markets) : '';
+    return countryCodes.isEmpty
+        ? project.title
+        : '${project.title} $countryCodes';
+  }
+
   String _countryCodesOf(List<ProjectMarketEntity> markets) {
     final codes = <String>{
-      for (final market in markets) CvCountryCode.ofMarket(market),
+      for (final market in markets) ?CvCountryCode.ofMarket(market),
     };
     return codes.join('/');
   }
