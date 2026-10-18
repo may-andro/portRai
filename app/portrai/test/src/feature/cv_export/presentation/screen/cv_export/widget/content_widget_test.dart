@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/_bloc.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/widget/content_widget.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../../../../mock/feature/cv_export/presentation/screen/cv_export/bloc/mock_cv_export_bloc.dart';
 import '../../../../../../../util/cv_export_test_fixture.dart';
@@ -11,6 +12,9 @@ import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   setUpAll(() => registerFallbackValue(FakeCvExportEvent()));
+  setUp(() {
+    VisibilityDetectorController.instance.updateInterval = Duration.zero;
+  });
 
   group('CV export ContentWidget', () {
     late MockCvExportBloc bloc;

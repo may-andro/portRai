@@ -71,12 +71,10 @@ class _HeroWidget extends StatelessWidget {
                             ],
                           ),
                         ),
-                        if (isWide)
-                          Icon(
-                            Icons.description_outlined,
-                            size: context.space(factor: 20),
-                            color: Colors.white.withAlpha(200),
-                          ),
+                        DSLottieIllustrationWidget(
+                          illustration: DSLottieIllustration.talentSearch,
+                          width: context.space(factor: isWide ? 28 : 14),
+                        ),
                       ],
                     ),
                   ),

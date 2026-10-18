@@ -199,6 +199,7 @@ DSLottieIllustrationWidget(illustration: DSLottieIllustration.contactUs)
 // Role scenes: developerRole, recruiterRole (header recolored with the brand) and explorerRole
 // techStack: a workstation scene with the stack badges
 // computerWindow: a browser window going from wireframe to code to finished UI
+// talentSearch: a profile card being picked out of a candidate search
 DSLottieIllustrationWidget(illustration: DSLottieIllustration.recruiterRole, width: 200)
 DSLottieBackgroundWidget(illustration: DSLottieIllustration.heroOrbs, colorOverrides: [...])
 DSLoadingWidget(style: DSLoadingStyle.lottie)
