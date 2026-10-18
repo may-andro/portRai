@@ -10,37 +10,48 @@ class _TemplatePickerWidget extends StatelessWidget {
     final palette = context.colorPalette;
 
     return _OptionCardWidget(
-      child: Column(
-        children: [
-          for (final template in CvTemplate.values)
-            ListTile(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: context.space(factor: 2),
+      child: Padding(
+        padding: EdgeInsets.all(context.space(factor: 2)),
+        child: Column(
+          spacing: context.space(factor: 1.5),
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: CupertinoSlidingSegmentedControl<CvTemplate>(
+                groupValue: selectedTemplate,
+                backgroundColor: palette.neutral.grey1.color.withValues(
+                  alpha: 0.18,
+                ),
+                thumbColor: palette.neutral.grey1.color,
+                onValueChanged: (template) {
+                  if (template == null) return;
+                  context.bloc.add(SelectCvTemplateClickEvent(template));
+                },
+                children: {
+                  for (final template in CvTemplate.values)
+                    template: Padding(
+                      padding: EdgeInsets.symmetric(vertical: context.space()),
+                      child: DSTextWidget(
+                        template.label(context),
+                        style: context.typography.labelLarge,
+                        color: template == selectedTemplate
+                            ? palette.inverseSurface
+                            : palette.neutral.grey1,
+                        maxLines: 1,
+                        textOverflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                },
               ),
-              title: DSTextWidget(
-                template.label(context),
-                style: context.typography.titleMedium,
-                color: palette.neutral.grey1,
-              ),
-              subtitle: DSTextWidget(
-                template.description(context),
-                style: context.typography.bodyMedium,
-                color: palette.neutral.grey3,
-              ),
-              trailing: Icon(
-                template == selectedTemplate
-                    ? Icons.check_circle
-                    : Icons.radio_button_unchecked,
-                size: context.iconSize,
-                color: template == selectedTemplate
-                    ? palette.neutral.grey1.color
-                    : palette.neutral.grey3.color,
-              ),
-              onTap: () {
-                context.bloc.add(SelectCvTemplateClickEvent(template));
-              },
             ),
-        ],
+            DSTextWidget(
+              selectedTemplate.description(context),
+              style: context.typography.bodyMedium,
+              color: palette.neutral.grey3,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -24,9 +24,12 @@ void main() {
       );
     });
 
-    Future<void> pumpContent(WidgetTester tester) async {
+    Future<void> pumpContent(
+      WidgetTester tester, {
+      Size size = const Size(1000, 3000),
+    }) async {
       bloc = MockCvExportBloc()..stubState(state);
-      tester.view.physicalSize = const Size(1000, 3000);
+      tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
@@ -85,6 +88,25 @@ void main() {
       await tester.tap(find.text('Download CV'), warnIfMissed: false);
 
       verifyNever(() => bloc.add(const DownloadCvClickEvent()));
+    });
+
+    testWidgets('should show every template without overflow on a phone', (
+      tester,
+    ) async {
+      await pumpContent(tester, size: const Size(360, 900));
+
+      for (final label in ['Sidebar', 'Classic', 'Minimal', 'Bold']) {
+        expect(find.text(label), findsOneWidget);
+      }
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('should show the download action in the header and bottom', (
+      tester,
+    ) async {
+      await pumpContent(tester);
+
+      expect(find.byIcon(Icons.download_rounded), findsNWidgets(2));
     });
   });
 }

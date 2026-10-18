@@ -381,6 +381,26 @@
   "@cvExportTitle": {
     "description": "Title of the CV export screen"
   },
+  "cvExportIntro": "Convierte tu portafolio en un CV en PDF de una página. Elige diseño, color y contenido, revisa la vista previa y descárgalo.",
+  "@cvExportIntro": {
+    "description": "Short introduction at the top of the CV export screen"
+  },
+  "cvExportTemplateHint": "Elige el diseño de tu CV",
+  "@cvExportTemplateHint": {
+    "description": "Hint under the template section title"
+  },
+  "cvExportAccentHint": "Se usa en títulos, líneas y enlaces",
+  "@cvExportAccentHint": {
+    "description": "Hint under the accent color section title"
+  },
+  "cvExportContentHint": "Elige qué se incluye",
+  "@cvExportContentHint": {
+    "description": "Hint under the content section title"
+  },
+  "cvExportPreviewSection": "Vista previa",
+  "@cvExportPreviewSection": {
+    "description": "Title of the CV preview section"
+  },
   "cvExportDownload": "Descargar CV",
   "@cvExportDownload": {
     "description": "Label of the button and header action that downloads the CV as a PDF"

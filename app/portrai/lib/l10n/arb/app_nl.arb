@@ -381,6 +381,26 @@
   "@cvExportTitle": {
     "description": "Title of the CV export screen"
   },
+  "cvExportIntro": "Maak van je portfolio een cv van één pagina als PDF. Kies een opmaak, accent en inhoud, bekijk het voorbeeld en download het.",
+  "@cvExportIntro": {
+    "description": "Short introduction at the top of the CV export screen"
+  },
+  "cvExportTemplateHint": "Kies de opmaak van je cv",
+  "@cvExportTemplateHint": {
+    "description": "Hint under the template section title"
+  },
+  "cvExportAccentHint": "Gebruikt voor koppen, lijnen en links",
+  "@cvExportAccentHint": {
+    "description": "Hint under the accent color section title"
+  },
+  "cvExportContentHint": "Kies wat er wordt opgenomen",
+  "@cvExportContentHint": {
+    "description": "Hint under the content section title"
+  },
+  "cvExportPreviewSection": "Voorbeeld",
+  "@cvExportPreviewSection": {
+    "description": "Title of the CV preview section"
+  },
   "cvExportDownload": "CV downloaden",
   "@cvExportDownload": {
     "description": "Label of the button and header action that downloads the CV as a PDF"

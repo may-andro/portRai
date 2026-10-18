@@ -12,6 +12,7 @@ class PageAppBarWidget extends StatelessWidget {
     required this.title,
     this.backgroundColor,
     this.titleColor,
+    this.actions = const [],
     super.key,
   });
 
@@ -19,11 +20,18 @@ class PageAppBarWidget extends StatelessWidget {
   final Color? backgroundColor;
   final DSColor? titleColor;
 
+  /// Extra actions shown at the end of the bar or header.
+  final List<Widget> actions;
+
   @override
   Widget build(BuildContext context) {
     final chrome = PageChrome.current;
     if (chrome == PageChrome.header) {
-      return const SliverToBoxAdapter(child: PageHeaderWidget());
+      return SliverToBoxAdapter(
+        child: PageHeaderWidget(
+          trailing: actions.isEmpty ? null : Row(children: actions),
+        ),
+      );
     }
 
     final palette = context.colorPalette;
@@ -44,6 +52,7 @@ class PageAppBarWidget extends StatelessWidget {
         maxLines: 1,
       ),
       actions: [
+        ...actions,
         if (chrome == PageChrome.close && Navigator.of(context).canPop())
           Padding(
             padding: EdgeInsets.only(right: context.space()),

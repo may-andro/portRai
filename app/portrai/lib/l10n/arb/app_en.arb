@@ -1219,6 +1219,26 @@
   "@cvExportTitle": {
     "description": "Title of the CV export screen"
   },
+  "cvExportIntro": "Turn your portfolio into a one-page PDF CV. Pick a layout, accent and content, check the live preview, then download it.",
+  "@cvExportIntro": {
+    "description": "Short introduction at the top of the CV export screen"
+  },
+  "cvExportTemplateHint": "Choose the layout of your CV",
+  "@cvExportTemplateHint": {
+    "description": "Hint under the template section title"
+  },
+  "cvExportAccentHint": "Used for headings, lines and links",
+  "@cvExportAccentHint": {
+    "description": "Hint under the accent color section title"
+  },
+  "cvExportContentHint": "Choose what is included",
+  "@cvExportContentHint": {
+    "description": "Hint under the content section title"
+  },
+  "cvExportPreviewSection": "Preview",
+  "@cvExportPreviewSection": {
+    "description": "Title of the CV preview section"
+  },
   "cvExportDownload": "Download CV",
   "@cvExportDownload": {
     "description": "Label of the button and header action that downloads the CV as a PDF"

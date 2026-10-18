@@ -1,7 +1,7 @@
 part of 'content_widget.dart';
 
-class _DownloadButtonWidget extends StatelessWidget {
-  const _DownloadButtonWidget({required this.state});
+class _DownloadBarWidget extends StatelessWidget {
+  const _DownloadBarWidget({required this.state});
 
   final CvExportLoadedState state;
 

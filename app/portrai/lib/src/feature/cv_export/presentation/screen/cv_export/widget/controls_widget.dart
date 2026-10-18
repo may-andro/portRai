@@ -8,16 +8,27 @@ class _ControlsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionTitleWidget(context.localizations.cvExportTemplateSection),
-        _TemplatePickerWidget(selectedTemplate: state.options.template),
-        _SectionTitleWidget(context.localizations.cvExportAccentSection),
-        _AccentPickerWidget(selectedAccent: state.options.accent),
-        _SectionTitleWidget(context.localizations.cvExportContentSection),
-        _SectionPickerWidget(
-          selectedSections: state.options.sections,
-          isPhotoIncluded: state.options.isPhotoIncluded,
+        _SectionWidget(
+          title: context.localizations.cvExportTemplateSection,
+          hint: context.localizations.cvExportTemplateHint,
+          child: _TemplatePickerWidget(
+            selectedTemplate: state.options.template,
+          ),
+        ),
+        _SectionWidget(
+          title: context.localizations.cvExportAccentSection,
+          hint: context.localizations.cvExportAccentHint,
+          child: _AccentPickerWidget(selectedAccent: state.options.accent),
+        ),
+        _SectionWidget(
+          title: context.localizations.cvExportContentSection,
+          hint: context.localizations.cvExportContentHint,
+          child: _SectionPickerWidget(
+            selectedSections: state.options.sections,
+            isPhotoIncluded: state.options.isPhotoIncluded,
+          ),
         ),
         if (state.failure case final failure?) _FailureWidget(failure: failure),
       ],
