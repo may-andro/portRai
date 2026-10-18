@@ -39,6 +39,8 @@ class _HeaderDesktopContentWidget extends StatelessWidget {
               ),
             ),
           ),
+          const DSHorizontalSpacerWidget(2),
+          CvExportButtonWidget(size: context.portfolioIconButtonSize),
         ],
       ),
     );
