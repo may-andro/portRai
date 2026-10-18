@@ -76,9 +76,9 @@ void main() {
         'New Project',
         'Old Project',
       ]);
-      expect(document.projects.first.links.map((link) => link.label), [
-        'Web',
-        'iOS',
+      expect(document.projects.first.links.map((link) => link.type), [
+        CvProjectLinkType.web,
+        CvProjectLinkType.ios,
       ]);
     });
 

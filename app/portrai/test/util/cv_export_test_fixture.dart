@@ -151,6 +151,12 @@ class CvExportTestFixture {
         appStore: 'https://apps.apple.com/app/new',
       ),
       _project(title: 'Unlinked Project', startDate: DateTime(2020)),
+      _project(
+        title: 'Old Deprecated Project',
+        startDate: DateTime(2014),
+        website: 'https://deprecated.example.com',
+        status: 'Deprecated',
+      ),
     ];
   }
 
@@ -210,7 +216,7 @@ class CvExportTestFixture {
             technologies: const ['Flutter', 'Dart', 'Firebase', 'Kotlin'],
             links: [
               CvProjectLinkEntity(
-                label: 'Web',
+                type: CvProjectLinkType.web,
                 url: 'https://project$index.example.com',
               ),
             ],
@@ -309,6 +315,7 @@ class CvExportTestFixture {
     required DateTime startDate,
     String? website,
     String? appStore,
+    String status = 'completed',
   }) {
     return ProjectEntity(
       title: title,
@@ -316,7 +323,7 @@ class CvExportTestFixture {
       longDescription: '',
       technologies: const ['Flutter'],
       category: 'mobile',
-      status: 'completed',
+      status: status,
       startDate: startDate,
       endDate: null,
       image: '',

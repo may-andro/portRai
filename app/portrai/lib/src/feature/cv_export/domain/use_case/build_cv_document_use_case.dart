@@ -4,6 +4,7 @@ import 'package:portrai/src/feature/cv_export/domain/entity/_entity.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
 import 'package:portrai/src/feature/project/project.dart';
 import 'package:use_case/use_case.dart';
 
@@ -134,17 +135,9 @@ class BuildCvDocumentUseCase
           ),
       ],
       websiteUrl: _websiteUrlOf(profile),
-      // Only projects that can be opened are listed on the CV.
       projects: [
         for (final project in sortedProjects)
-          if (_projectLinksOf(project).isNotEmpty)
-            CvProjectEntity(
-              title: project.title,
-              role: project.role,
-              description: project.description,
-              technologies: project.technologies,
-              links: _projectLinksOf(project),
-            ),
+          if (!_isDeprecated(project)) ..._projectEntriesOf(project),
       ],
       skillGroups: [
         for (final expertise in expertiseList)
@@ -207,26 +200,50 @@ class BuildCvDocumentUseCase
     return null;
   }
 
-  /// The valid website and store links of a project, without duplicates.
-  List<CvProjectLinkEntity> _projectLinksOf(ProjectEntity project) {
-    final links = <CvProjectLinkEntity>[];
-    void add(String label, String? candidate) {
-      final url = _validUrl(candidate);
-      if (url != null && links.every((link) => link.url != url)) {
-        links.add(CvProjectLinkEntity(label: label, url: url));
-      }
-    }
+  bool _isDeprecated(ProjectEntity project) {
+    return project.status.trim().toLowerCase() == 'deprecated';
+  }
 
-    for (final market in project.markets) {
-      add('Web', market.website);
+  /// One entry per market that has links. A project offered in several
+  /// markets gets the country code appended to its title.
+  List<CvProjectEntity> _projectEntriesOf(ProjectEntity project) {
+    final entries = <CvProjectEntity>[];
+    final marketsWithLinks = <(ProjectMarketEntity, List<CvProjectLinkEntity>)>[
+      for (final market in project.markets)
+        if (_marketLinksOf(market).isNotEmpty) (market, _marketLinksOf(market)),
+    ];
+    for (final (market, links) in marketsWithLinks) {
+      final title = marketsWithLinks.length == 1
+          ? project.title
+          : '${project.title} ${CvCountryCode.of(market.country)}';
+      final isDuplicate = entries.any(
+        (entry) => entry.title == title && entry.links == links,
+      );
+      if (isDuplicate) continue;
+      entries.add(
+        CvProjectEntity(
+          title: title,
+          role: project.role,
+          description: project.description,
+          technologies: project.technologies,
+          links: links,
+        ),
+      );
     }
-    for (final market in project.markets) {
-      add('iOS', market.appStore);
-    }
-    for (final market in project.markets) {
-      add('Android', market.playStore);
-    }
-    return links;
+    return entries;
+  }
+
+  /// The valid website and store links of a market.
+  List<CvProjectLinkEntity> _marketLinksOf(ProjectMarketEntity market) {
+    return [
+      for (final (type, candidate) in [
+        (CvProjectLinkType.web, market.website),
+        (CvProjectLinkType.ios, market.appStore),
+        (CvProjectLinkType.android, market.playStore),
+      ])
+        if (_validUrl(candidate) case final url?)
+          CvProjectLinkEntity(type: type, url: url),
+    ];
   }
 
   List<String> _highlightsOf(ExperienceEntity experience) {

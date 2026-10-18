@@ -210,11 +210,10 @@ class CvPdfBlocks {
                   padding: pdf_widgets.EdgeInsets.only(left: _style.scaled(4)),
                   child: _link(
                     link.url,
-                    pdf_widgets.Text(
-                      link.label,
-                      style: _style
-                          .text(size: 7.5, color: _style.accent)
-                          .copyWith(decoration: underline),
+                    pdf_widgets.SvgImage(
+                      svg: CvContactIcons.linkSvgOf(link.type, _style.accent),
+                      width: _style.scaled(9),
+                      height: _style.scaled(9),
                     ),
                   ),
                 ),
