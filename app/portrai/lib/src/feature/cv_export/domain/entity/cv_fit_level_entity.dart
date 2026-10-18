@@ -12,7 +12,6 @@ class CvFitLevelEntity extends Equatable {
     required this.maxSkillGroups,
     required this.maxSkillsPerGroup,
     required this.maxEducations,
-    required this.maxLanguages,
     required this.maxSummaryLength,
     required this.maxProjectDescriptionLength,
     required this.fontScale,
@@ -27,7 +26,6 @@ class CvFitLevelEntity extends Equatable {
       maxSkillGroups: 6,
       maxSkillsPerGroup: 8,
       maxEducations: 2,
-      maxLanguages: 4,
       maxSummaryLength: 400,
       maxProjectDescriptionLength: 180,
       fontScale: 1,
@@ -40,7 +38,6 @@ class CvFitLevelEntity extends Equatable {
       maxSkillGroups: 6,
       maxSkillsPerGroup: 7,
       maxEducations: 2,
-      maxLanguages: 4,
       maxSummaryLength: 320,
       maxProjectDescriptionLength: 150,
       fontScale: 1,
@@ -53,7 +50,6 @@ class CvFitLevelEntity extends Equatable {
       maxSkillGroups: 5,
       maxSkillsPerGroup: 6,
       maxEducations: 2,
-      maxLanguages: 3,
       maxSummaryLength: 260,
       maxProjectDescriptionLength: 120,
       fontScale: 0.95,
@@ -66,7 +62,6 @@ class CvFitLevelEntity extends Equatable {
       maxSkillGroups: 4,
       maxSkillsPerGroup: 6,
       maxEducations: 2,
-      maxLanguages: 3,
       maxSummaryLength: 220,
       maxProjectDescriptionLength: 100,
       fontScale: 0.92,
@@ -79,7 +74,6 @@ class CvFitLevelEntity extends Equatable {
       maxSkillGroups: 4,
       maxSkillsPerGroup: 5,
       maxEducations: 1,
-      maxLanguages: 3,
       maxSummaryLength: 180,
       maxProjectDescriptionLength: 80,
       fontScale: 0.9,
@@ -92,7 +86,6 @@ class CvFitLevelEntity extends Equatable {
       maxSkillGroups: 3,
       maxSkillsPerGroup: 4,
       maxEducations: 1,
-      maxLanguages: 2,
       maxSummaryLength: 140,
       maxProjectDescriptionLength: 60,
       fontScale: 0.85,
@@ -106,7 +99,6 @@ class CvFitLevelEntity extends Equatable {
   final int maxSkillGroups;
   final int maxSkillsPerGroup;
   final int maxEducations;
-  final int maxLanguages;
   final int maxSummaryLength;
   final int maxProjectDescriptionLength;
 
@@ -122,7 +114,6 @@ class CvFitLevelEntity extends Equatable {
     maxSkillGroups,
     maxSkillsPerGroup,
     maxEducations,
-    maxLanguages,
     maxSummaryLength,
     maxProjectDescriptionLength,
     fontScale,

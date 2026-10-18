@@ -45,7 +45,7 @@ class MinimalCvPdfTemplate extends CvPdfTemplate {
                     spacing: style.scaled(14),
                     runSpacing: style.scaled(2),
                     children: [
-                      for (final contact in document.contacts)
+                      for (final contact in blocks.contacts)
                         blocks.contact(contact, color: CvPdfStyle.muted),
                     ],
                   ),
@@ -100,18 +100,6 @@ class MinimalCvPdfTemplate extends CvPdfTemplate {
               children: [
                 for (final education in document.educations)
                   blocks.education(education),
-              ],
-            ),
-          ),
-        if (input.isShown(CvSection.languages) && document.languages.isNotEmpty)
-          _row(
-            style,
-            labels.languagesHeading,
-            pdf_widgets.Wrap(
-              spacing: style.scaled(16),
-              children: [
-                for (final language in document.languages)
-                  blocks.language(language),
               ],
             ),
           ),

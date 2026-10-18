@@ -7,7 +7,7 @@ export 'cv_education_entity.dart';
 export 'cv_experience_entity.dart';
 export 'cv_fit_level_entity.dart';
 export 'cv_labels_entity.dart';
-export 'cv_language_entity.dart';
+export 'cv_language_code.dart';
 export 'cv_options_entity.dart';
 export 'cv_project_entity.dart';
 export 'cv_project_link_entity.dart';

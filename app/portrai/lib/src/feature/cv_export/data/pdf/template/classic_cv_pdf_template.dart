@@ -57,7 +57,7 @@ class ClassicCvPdfTemplate extends CvPdfTemplate {
                     spacing: style.scaled(12),
                     runSpacing: style.scaled(2),
                     children: [
-                      for (final contact in document.contacts)
+                      for (final contact in blocks.contacts)
                         blocks.contact(contact),
                     ],
                   ),
@@ -91,17 +91,6 @@ class ClassicCvPdfTemplate extends CvPdfTemplate {
           _heading(style, labels.educationHeading),
           for (final education in document.educations)
             blocks.education(education),
-        ],
-        if (input.isShown(CvSection.languages) &&
-            document.languages.isNotEmpty) ...[
-          _heading(style, labels.languagesHeading),
-          pdf_widgets.Wrap(
-            spacing: style.scaled(16),
-            children: [
-              for (final language in document.languages)
-                blocks.language(language),
-            ],
-          ),
         ],
       ],
     );

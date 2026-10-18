@@ -49,11 +49,7 @@ void main() {
     });
 
     test('should replace typographic characters when the text has them', () {
-      const original = CvLanguageEntity(
-        name: 'Dutch \u2013 NL',
-        proficiency: 'Native\u2019s',
-      );
-      const withLanguage = CvDocumentEntity(
+      const withTypography = CvDocumentEntity(
         fullName: 'Ada \u2014 Lovelace',
         title: 'Title',
         summary: 'Multi\u2011flavor \u201Cquoted\u201D',
@@ -63,15 +59,12 @@ void main() {
         projects: [],
         skillGroups: [],
         educations: [],
-        languages: [original],
       );
 
-      final fitted = withLanguage.fit(CvFitLevelEntity.levels.first);
+      final fitted = withTypography.fit(CvFitLevelEntity.levels.first);
 
       expect(fitted.fullName, 'Ada - Lovelace');
       expect(fitted.summary, 'Multi-flavor "quoted"');
-      expect(fitted.languages.single.name, 'Dutch - NL');
-      expect(fitted.languages.single.proficiency, "Native's");
     });
   });
 }

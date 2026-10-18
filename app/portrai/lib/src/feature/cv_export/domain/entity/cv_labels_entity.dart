@@ -10,7 +10,6 @@ class CvLabelsEntity extends Equatable {
     required this.projectsHeading,
     required this.skillsHeading,
     required this.educationHeading,
-    required this.languagesHeading,
     required this.contactHeading,
     required this.moreExperienceLabel,
   });
@@ -22,7 +21,6 @@ class CvLabelsEntity extends Equatable {
   final String projectsHeading;
   final String skillsHeading;
   final String educationHeading;
-  final String languagesHeading;
   final String contactHeading;
   final String moreExperienceLabel;
 
@@ -35,7 +33,6 @@ class CvLabelsEntity extends Equatable {
     projectsHeading,
     skillsHeading,
     educationHeading,
-    languagesHeading,
     contactHeading,
     moreExperienceLabel,
   ];

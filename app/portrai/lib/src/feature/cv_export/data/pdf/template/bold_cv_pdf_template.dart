@@ -53,7 +53,7 @@ class BoldCvPdfTemplate extends CvPdfTemplate {
                       spacing: style.scaled(14),
                       runSpacing: style.scaled(2),
                       children: [
-                        for (final contact in document.contacts)
+                        for (final contact in blocks.contacts)
                           blocks.contact(contact, color: CvPdfStyle.white),
                       ],
                     ),
@@ -112,12 +112,6 @@ class BoldCvPdfTemplate extends CvPdfTemplate {
                     _heading(style, labels.educationHeading),
                     for (final education in document.educations)
                       blocks.education(education),
-                  ],
-                  if (input.isShown(CvSection.languages) &&
-                      document.languages.isNotEmpty) ...[
-                    _heading(style, labels.languagesHeading),
-                    for (final language in document.languages)
-                      blocks.language(language),
                   ],
                 ],
               ),

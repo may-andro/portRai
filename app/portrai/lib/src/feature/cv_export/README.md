@@ -15,6 +15,7 @@ PDF CV. Everything runs locally; no data leaves the device and no AI is involved
   shrunk until it fits.
 - Only the last three experiences are shown, followed by a link to the portfolio website
   for the rest.
+- Languages are a contact entry with language codes (for example `EN, ES, NL`) instead of a section.
 - Companies, contacts and projects are hyperlinks; the projects section lists only the
   projects that have a link, as a compact list of clickable names followed by Web, App Store and Play Store icons. Projects offered in several markets get one entry per market (for example `MediaMarkt DE`), and deprecated projects are left out.
 

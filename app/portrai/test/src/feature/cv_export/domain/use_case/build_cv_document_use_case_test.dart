@@ -89,8 +89,18 @@ void main() {
         CvContactType.email,
         CvContactType.phone,
         CvContactType.location,
+        CvContactType.languages,
         CvContactType.github,
       ]);
+    });
+
+    test('should list the languages as codes in one contact', () async {
+      final document = await build();
+
+      final languagesContact = document.contacts.singleWhere(
+        (contact) => contact.type == CvContactType.languages,
+      );
+      expect(languagesContact.text, 'EN, ES');
     });
 
     test('should link the website and the companies', () async {

@@ -58,6 +58,15 @@ class CvPdfBlocks {
     );
   }
 
+  /// The contact entries; the languages entry follows the languages section
+  /// toggle.
+  List<CvContactEntity> get contacts => [
+    for (final contact in input.document.contacts)
+      if (contact.type != CvContactType.languages ||
+          input.isShown(CvSection.languages))
+        contact,
+  ];
+
   pdf_widgets.Widget contact(
     CvContactEntity contact, {
     PdfColor color = CvPdfStyle.ink,
@@ -300,29 +309,6 @@ class CvPdfBlocks {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  pdf_widgets.Widget language(
-    CvLanguageEntity language, {
-    PdfColor color = CvPdfStyle.ink,
-  }) {
-    return pdf_widgets.Padding(
-      padding: pdf_widgets.EdgeInsets.only(bottom: _style.scaled(2)),
-      child: pdf_widgets.RichText(
-        text: pdf_widgets.TextSpan(
-          children: [
-            pdf_widgets.TextSpan(
-              text: language.name,
-              style: _style.text(size: 8.5, isBold: true, color: color),
-            ),
-            pdf_widgets.TextSpan(
-              text: '  ${language.proficiency}',
-              style: _style.text(size: 8.5, color: color),
-            ),
-          ],
-        ),
       ),
     );
   }

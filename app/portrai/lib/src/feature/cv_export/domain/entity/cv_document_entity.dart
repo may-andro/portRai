@@ -3,7 +3,6 @@ import 'package:portrai/src/feature/cv_export/domain/entity/cv_contact_entity.da
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_education_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_experience_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_fit_level_entity.dart';
-import 'package:portrai/src/feature/cv_export/domain/entity/cv_language_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_skill_group_entity.dart';
 
@@ -18,7 +17,6 @@ class CvDocumentEntity extends Equatable {
     required this.projects,
     required this.skillGroups,
     required this.educations,
-    required this.languages,
     this.websiteUrl,
     this.hasMoreExperiences = false,
   });
@@ -32,7 +30,6 @@ class CvDocumentEntity extends Equatable {
   final List<CvProjectEntity> projects;
   final List<CvSkillGroupEntity> skillGroups;
   final List<CvEducationEntity> educations;
-  final List<CvLanguageEntity> languages;
 
   /// The portfolio website with the full experience and details.
   final String? websiteUrl;
@@ -107,13 +104,6 @@ class CvDocumentEntity extends Equatable {
             period: _clean(education.period),
           ),
       ],
-      languages: [
-        for (final language in languages.take(level.maxLanguages))
-          CvLanguageEntity(
-            name: _clean(language.name),
-            proficiency: _clean(language.proficiency),
-          ),
-      ],
     );
   }
 
@@ -151,7 +141,6 @@ class CvDocumentEntity extends Equatable {
     projects,
     skillGroups,
     educations,
-    languages,
     websiteUrl,
     hasMoreExperiences,
   ];

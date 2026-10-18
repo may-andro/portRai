@@ -49,7 +49,6 @@ extension CvLabelsContextExtension on BuildContext {
       projectsHeading: localizations.cvSectionProjects,
       skillsHeading: localizations.cvSectionSkills,
       educationHeading: localizations.cvSectionEducation,
-      languagesHeading: localizations.cvSectionLanguages,
       contactHeading: localizations.cvSectionContact,
       moreExperienceLabel: localizations.cvSeeMoreOnWebsite,
     );

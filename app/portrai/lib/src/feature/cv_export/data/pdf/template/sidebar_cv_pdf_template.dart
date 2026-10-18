@@ -82,7 +82,7 @@ class SidebarCvPdfTemplate extends CvPdfTemplate {
           pdf_widgets.SizedBox(height: style.scaled(6)),
         ],
         _heading(style, labels.contactHeading),
-        for (final contact in document.contacts)
+        for (final contact in blocks.contacts)
           pdf_widgets.Padding(
             padding: pdf_widgets.EdgeInsets.only(bottom: style.scaled(3)),
             child: blocks.contact(contact),
@@ -91,11 +91,6 @@ class SidebarCvPdfTemplate extends CvPdfTemplate {
             document.skillGroups.isNotEmpty) ...[
           _heading(style, labels.skillsHeading),
           for (final group in document.skillGroups) blocks.skillGroup(group),
-        ],
-        if (input.isShown(CvSection.languages) &&
-            document.languages.isNotEmpty) ...[
-          _heading(style, labels.languagesHeading),
-          for (final language in document.languages) blocks.language(language),
         ],
         if (input.isShown(CvSection.education) &&
             document.educations.isNotEmpty) ...[

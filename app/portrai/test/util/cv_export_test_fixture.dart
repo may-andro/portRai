@@ -3,7 +3,6 @@ import 'package:portrai/src/feature/cv_export/domain/entity/cv_document_entity.d
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_education_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_experience_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_labels_entity.dart';
-import 'package:portrai/src/feature/cv_export/domain/entity/cv_language_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_project_link_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/cv_skill_group_entity.dart';
@@ -35,7 +34,6 @@ class CvExportTestFixture {
     projectsHeading: 'Projects',
     skillsHeading: 'Skills',
     educationHeading: 'Education',
-    languagesHeading: 'Languages',
     contactHeading: 'Contact',
     moreExperienceLabel: 'See all experience on my website',
   );
@@ -246,12 +244,6 @@ class CvExportTestFixture {
           period: '2019',
         ),
       ],
-      languages: const [
-        CvLanguageEntity(name: 'English', proficiency: 'Fluent'),
-        CvLanguageEntity(name: 'Spanish', proficiency: 'Native'),
-        CvLanguageEntity(name: 'Dutch', proficiency: 'Basic'),
-        CvLanguageEntity(name: 'French', proficiency: 'Basic'),
-      ],
     );
   }
 
@@ -278,7 +270,6 @@ class CvExportTestFixture {
         CvSkillGroupEntity(title: 'Mobile', skills: ['Flutter']),
       ],
       educations: const [],
-      languages: const [],
     );
   }
 

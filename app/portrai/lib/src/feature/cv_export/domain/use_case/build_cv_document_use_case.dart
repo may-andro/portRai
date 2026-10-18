@@ -112,6 +112,11 @@ class BuildCvDocumentUseCase
           ),
         if (location.isNotEmpty)
           CvContactEntity(text: location, type: CvContactType.location),
+        if (_languageCodesOf(profile) case final codes when codes.isNotEmpty)
+          CvContactEntity(
+            text: codes.join(', '),
+            type: CvContactType.languages,
+          ),
         for (final socialLink in profile.socialLinks.take(_maxSocialLinks))
           CvContactEntity(
             text: socialLink.url.replaceFirst(
@@ -161,14 +166,16 @@ class BuildCvDocumentUseCase
             ].where((part) => part.trim().isNotEmpty).join(' - '),
           ),
       ],
-      languages: [
-        for (final language in profile.languages)
-          CvLanguageEntity(
-            name: language.language,
-            proficiency: language.proficiency,
-          ),
-      ],
     );
+  }
+
+  List<String> _languageCodesOf(ProfileEntity profile) {
+    final codes = <String>[];
+    for (final language in profile.languages) {
+      final code = CvLanguageCode.of(language.language);
+      if (!codes.contains(code)) codes.add(code);
+    }
+    return codes;
   }
 
   CvContactType _contactTypeOf(String url) {

@@ -82,7 +82,6 @@ void main() {
             projectsHeading: 'Projects',
             skillsHeading: 'Skills',
             educationHeading: 'Education',
-            languagesHeading: 'Languages',
             contactHeading: 'Contact',
             moreExperienceLabel: 'See all experience on my website',
           ),
