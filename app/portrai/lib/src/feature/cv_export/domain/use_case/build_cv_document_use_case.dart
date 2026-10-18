@@ -248,7 +248,7 @@ class BuildCvDocumentUseCase
 
   String _countryCodesOf(List<ProjectMarketEntity> markets) {
     final codes = <String>{
-      for (final market in markets) CvCountryCode.of(market.country),
+      for (final market in markets) CvCountryCode.ofMarket(market),
     };
     return codes.join('/');
   }

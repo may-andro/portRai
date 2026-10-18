@@ -1,3 +1,5 @@
+import 'package:portrai/src/feature/project/domain/entity/project_market_entity.dart';
+
 /// Short codes for the country names found in the (localized) portfolio data.
 class CvCountryCode {
   const CvCountryCode._();
@@ -40,6 +42,20 @@ class CvCountryCode {
     'turkije': 'TR',
     'turquía': 'TR',
   };
+
+  static final RegExp _appStoreCountry = RegExp(
+    r'apps\.apple\.com/([a-z]{2})/',
+    caseSensitive: false,
+  );
+
+  /// The code of [market]: the storefront in its App Store link, which does
+  /// not depend on the portfolio language, else the localized country name.
+  static String ofMarket(ProjectMarketEntity market) {
+    final storefront = market.appStore == null
+        ? null
+        : _appStoreCountry.firstMatch(market.appStore!)?.group(1);
+    return storefront?.toUpperCase() ?? of(market.country);
+  }
 
   /// The code of [countryName], or the name itself when it is unknown.
   static String of(String countryName) {
