@@ -6,15 +6,14 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
 import 'package:portrai/src/feature/cv_export/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/_bloc.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:printing/printing.dart';
 import 'package:use_case/use_case.dart';
 part 'accent_picker_widget.dart';
 part 'controls_widget.dart';
-part 'download_bar_widget.dart';
+part 'download_button_widget.dart';
 part 'failure_widget.dart';
-part 'header_action_widget.dart';
-part 'intro_widget.dart';
+part 'hero_widget.dart';
 part 'option_card_widget.dart';
 part 'preview_widget.dart';
 part 'section_widget.dart';
@@ -26,7 +25,7 @@ class ContentWidget extends StatelessWidget {
 
   final CvExportLoadedState state;
 
-  static const double _maxContentWidth = 1200;
+  static const double maxContentWidth = 1200;
 
   @override
   Widget build(BuildContext context) {
@@ -41,56 +40,50 @@ class ContentWidget extends StatelessWidget {
       ),
     );
 
-    return Column(
+    return Stack(
       children: [
-        Expanded(
-          child: CustomScrollView(
-            slivers: [
-              PageAppBarWidget(
-                title: context.localizations.cvExportTitle,
-                actions: [_HeaderActionWidget(state: state)],
-              ),
-              SliverToBoxAdapter(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: _maxContentWidth,
+        CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(child: _HeroWidget()),
+            SliverToBoxAdapter(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: maxContentWidth),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.space(factor: 2),
+                      context.space(factor: 3),
+                      context.space(factor: 2),
+                      context.space(factor: 14),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.space(factor: 2),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const _IntroWidget(),
-                          if (context.isDesktop)
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: context.space(factor: 45),
-                                  child: controls,
-                                ),
-                                SizedBox(width: context.space(factor: 3)),
-                                Expanded(child: preview),
-                              ],
-                            )
-                          else ...[
-                            preview,
-                            controls,
-                          ],
-                        ],
-                      ),
-                    ),
+                    child: context.isDesktop
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: context.space(factor: 45),
+                                child: controls,
+                              ),
+                              SizedBox(width: context.space(factor: 3)),
+                              Expanded(child: preview),
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [preview, controls],
+                          ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        _DownloadBarWidget(state: state),
+        Positioned(
+          right: context.space(factor: 2),
+          bottom: context.space(factor: 2),
+          child: SafeArea(child: _DownloadButtonWidget(state: state)),
+        ),
       ],
     );
   }

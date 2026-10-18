@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Logo header shown at the top of desktop screens.
 class PageHeaderWidget extends StatelessWidget {
-  const PageHeaderWidget({this.trailing, super.key});
-
-  /// Optional action shown at the end of the header.
-  final Widget? trailing;
+  const PageHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +19,6 @@ class PageHeaderWidget extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          if (trailing case final trailing?) ...[const Spacer(), trailing],
         ],
       ),
     );

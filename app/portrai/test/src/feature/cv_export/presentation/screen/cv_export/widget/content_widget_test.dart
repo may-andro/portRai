@@ -73,7 +73,7 @@ void main() {
     ) async {
       await pumpContent(tester);
 
-      await tester.tap(find.widgetWithText(SwitchListTile, 'Skills'));
+      await tester.tap(find.widgetWithText(FilterChip, 'Skills'));
 
       verify(
         () => bloc.add(const ToggleCvSectionClickEvent(CvSection.skills)),
@@ -101,12 +101,12 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('should show the download action in the header and bottom', (
+    testWidgets('should show the download button in the corner', (
       tester,
     ) async {
       await pumpContent(tester);
 
-      expect(find.byIcon(Icons.download_rounded), findsNWidgets(2));
+      expect(find.text('Download CV'), findsOneWidget);
     });
   });
 }
