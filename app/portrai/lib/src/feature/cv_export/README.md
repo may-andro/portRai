@@ -43,7 +43,8 @@ use the short description, and switch to the long one only when the whole CV sti
   `gl` parameter in the link.
 - Languages are one contact entry of ISO codes (for example `EN, ES, NL`) taken from the `code`
   field of each language.
-- Companies, contacts and projects are hyperlinks; contacts have icons.
+- Companies, contacts and projects are hyperlinks; every contact has an icon. GitHub and LinkedIn
+  contacts are shown as `GitHub` and `LinkedIn`, a personal website as the localized `Website`.
 
 ## Structure
 

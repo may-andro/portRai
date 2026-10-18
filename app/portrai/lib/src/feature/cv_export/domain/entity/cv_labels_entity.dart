@@ -12,6 +12,7 @@ class CvLabelsEntity extends Equatable {
     required this.educationHeading,
     required this.contactHeading,
     required this.moreExperienceLabel,
+    required this.websiteLabel,
   });
 
   final String localeCode;
@@ -23,6 +24,7 @@ class CvLabelsEntity extends Equatable {
   final String educationHeading;
   final String contactHeading;
   final String moreExperienceLabel;
+  final String websiteLabel;
 
   @override
   List<Object?> get props => [
@@ -35,5 +37,6 @@ class CvLabelsEntity extends Equatable {
     educationHeading,
     contactHeading,
     moreExperienceLabel,
+    websiteLabel,
   ];
 }

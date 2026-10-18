@@ -1307,6 +1307,10 @@
   "@cvSeeMoreOnWebsite": {
     "description": "CV line pointing to the portfolio website for the full experience"
   },
+  "cvWebsiteContact": "Website",
+  "@cvWebsiteContact": {
+    "description": "CV contact link text for the personal website"
+  },
   "cvPresent": "Present",
   "@cvPresent": {
     "description": "Label shown instead of an end date for a current position"

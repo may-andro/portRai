@@ -36,6 +36,7 @@ class CvExportTestFixture {
     educationHeading: 'Education',
     contactHeading: 'Contact',
     moreExperienceLabel: 'See all experience on my website',
+    websiteLabel: 'Website',
   );
 
   static ProfileEntity profile() {

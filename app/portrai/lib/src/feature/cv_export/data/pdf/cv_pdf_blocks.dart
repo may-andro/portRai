@@ -97,7 +97,7 @@ class CvPdfBlocks {
         ),
         pdf_widgets.SizedBox(width: _style.scaled(4)),
         pdf_widgets.Text(
-          contact.text,
+          _contactTextOf(contact),
           style: _style.text(size: size, color: color),
         ),
       ],
@@ -106,6 +106,17 @@ class CvPdfBlocks {
     return url == null
         ? text
         : pdf_widgets.UrlLink(destination: url, child: text);
+  }
+
+  /// Social and website links show a short name; other contacts show their text.
+  String _contactTextOf(CvContactEntity contact) {
+    return switch (contact.type) {
+      CvContactType.github => 'GitHub',
+      CvContactType.linkedin => 'LinkedIn',
+      CvContactType.website when contact.url?.startsWith('http') ?? false =>
+        input.labels.websiteLabel,
+      _ => contact.text,
+    };
   }
 
   pdf_widgets.Widget summary({
