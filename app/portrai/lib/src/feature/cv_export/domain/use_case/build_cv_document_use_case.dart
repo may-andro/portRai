@@ -211,45 +211,57 @@ class BuildCvDocumentUseCase
     return project.status.trim().toLowerCase() == 'deprecated';
   }
 
-  /// One entry per market that has links. A project offered in several
-  /// markets gets the country code appended to its title.
+  /// One entry per distinct store listing, so markets sharing the same app
+  /// produce a single entry. Projects without a store link are left out. The
+  /// country codes are appended to the title only when the project has
+  /// several distinct listings.
   List<CvProjectEntity> _projectEntriesOf(ProjectEntity project) {
-    final entries = <CvProjectEntity>[];
-    final marketsWithLinks = <(ProjectMarketEntity, List<CvProjectLinkEntity>)>[
-      for (final market in project.markets)
-        if (_marketLinksOf(market).isNotEmpty) (market, _marketLinksOf(market)),
-    ];
-    for (final (market, links) in marketsWithLinks) {
-      final title = marketsWithLinks.length == 1
-          ? project.title
-          : '${project.title} ${CvCountryCode.of(market.country)}';
-      final isDuplicate = entries.any(
-        (entry) => entry.title == title && entry.links == links,
-      );
-      if (isDuplicate) continue;
-      entries.add(
+    final marketsByStoreLinks = <String, List<ProjectMarketEntity>>{};
+    for (final market in project.markets) {
+      final appStore = _validUrl(market.appStore);
+      final playStore = _validUrl(market.playStore);
+      if (appStore == null && playStore == null) continue;
+      marketsByStoreLinks
+          .putIfAbsent('$appStore|$playStore', () => [])
+          .add(market);
+    }
+
+    final hasSeveralListings = marketsByStoreLinks.length > 1;
+    return [
+      for (final markets in marketsByStoreLinks.values)
         CvProjectEntity(
-          title: title,
+          title: hasSeveralListings
+              ? '${project.title} ${_countryCodesOf(markets)}'
+              : project.title,
           role: project.role,
           description: project.description,
           technologies: project.technologies,
-          links: links,
+          links: _linksOf(markets),
         ),
-      );
-    }
-    return entries;
+    ];
   }
 
-  /// The valid website and store links of a market.
-  List<CvProjectLinkEntity> _marketLinksOf(ProjectMarketEntity market) {
+  String _countryCodesOf(List<ProjectMarketEntity> markets) {
+    final codes = <String>{
+      for (final market in markets) CvCountryCode.of(market.country),
+    };
+    return codes.join('/');
+  }
+
+  /// The first website of the markets followed by their shared store links.
+  List<CvProjectLinkEntity> _linksOf(List<ProjectMarketEntity> markets) {
+    final website = markets
+        .map((market) => _validUrl(market.website))
+        .whereType<String>()
+        .firstOrNull;
+    final market = markets.first;
     return [
-      for (final (type, candidate) in [
-        (CvProjectLinkType.web, market.website),
-        (CvProjectLinkType.ios, market.appStore),
-        (CvProjectLinkType.android, market.playStore),
+      for (final (type, url) in [
+        (CvProjectLinkType.web, website),
+        (CvProjectLinkType.ios, _validUrl(market.appStore)),
+        (CvProjectLinkType.android, _validUrl(market.playStore)),
       ])
-        if (_validUrl(candidate) case final url?)
-          CvProjectLinkEntity(type: type, url: url),
+        if (url != null) CvProjectLinkEntity(type: type, url: url),
     ];
   }
 

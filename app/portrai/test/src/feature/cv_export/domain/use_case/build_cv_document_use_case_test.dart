@@ -55,7 +55,7 @@ void main() {
 
     Future<CvDocumentEntity> build() async => (await useCase()).right;
 
-    test('should order experiences and projects most recent first', () async {
+    test('should order experiences most recent first', () async {
       final document = await build();
 
       expect(document.experiences.map((experience) => experience.company), [
@@ -63,23 +63,50 @@ void main() {
         'Middle Company',
         'Old Company',
       ]);
-      expect(document.projects.map((project) => project.title), [
-        'New Project',
-        'Old Project',
-      ]);
     });
 
-    test('should only list projects that have a link', () async {
+    test(
+      'should list only non-deprecated projects that have a store link',
+      () async {
+        final document = await build();
+
+        expect(document.projects.map((project) => project.title), [
+          'New Project',
+          'Shared Project',
+          'Multi Project DE',
+          'Multi Project ES',
+          'Old Project',
+        ]);
+      },
+    );
+
+    test(
+      'should add the country only when the store links differ per country',
+      () async {
+        final document = await build();
+        final titles = document.projects.map((project) => project.title);
+
+        expect(titles, contains('Shared Project'));
+        expect(titles, isNot(contains('Multi Project')));
+        expect(titles, contains('Multi Project DE'));
+      },
+    );
+
+    test('should order the links as website then stores', () async {
       final document = await build();
 
-      expect(document.projects.map((project) => project.title), [
-        'New Project',
-        'Old Project',
-      ]);
       expect(document.projects.first.links.map((link) => link.type), [
         CvProjectLinkType.web,
         CvProjectLinkType.ios,
       ]);
+      expect(
+        document.projects
+            .singleWhere((project) => project.title == 'Shared Project')
+            .links
+            .first
+            .url,
+        'https://shared.example.com',
+      );
     });
 
     test('should give each contact the type matching its icon', () async {

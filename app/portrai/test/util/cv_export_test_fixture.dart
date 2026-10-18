@@ -140,22 +140,68 @@ class CvExportTestFixture {
       _project(
         title: 'Old Project',
         startDate: DateTime(2016),
-        website: 'https://old.example.com',
+        markets: [_market('ES', playStore: 'https://play.example.com/old')],
       ),
       _project(
         title: 'New Project',
         startDate: DateTime(2023),
-        website: 'https://new.example.com',
-        appStore: 'https://apps.apple.com/app/new',
+        markets: [
+          _market(
+            'ES',
+            website: 'https://new.example.com',
+            appStore: 'https://apps.apple.com/app/new',
+          ),
+        ],
       ),
-      _project(title: 'Unlinked Project', startDate: DateTime(2020)),
+      _project(
+        title: 'Shared Project',
+        startDate: DateTime(2022),
+        markets: [
+          _market('Germany', appStore: 'https://apps.example.com/shared'),
+          _market(
+            'Austria',
+            website: 'https://shared.example.com',
+            appStore: 'https://apps.example.com/shared',
+          ),
+        ],
+      ),
+      _project(
+        title: 'Multi Project',
+        startDate: DateTime(2021),
+        markets: [
+          _market('Germany', playStore: 'https://play.example.com/de'),
+          _market('Spain', playStore: 'https://play.example.com/es'),
+        ],
+      ),
+      _project(
+        title: 'Web Only Project',
+        startDate: DateTime(2020),
+        markets: [_market('ES', website: 'https://web.example.com')],
+      ),
+      _project(title: 'Unlinked Project', startDate: DateTime(2019)),
       _project(
         title: 'Old Deprecated Project',
         startDate: DateTime(2014),
-        website: 'https://deprecated.example.com',
         status: 'Deprecated',
+        markets: [_market('ES', playStore: 'https://play.example.com/dep')],
       ),
     ];
+  }
+
+  static ProjectMarketEntity _market(
+    String country, {
+    String? website,
+    String? appStore,
+    String? playStore,
+  }) {
+    return ProjectMarketEntity(
+      country: country,
+      latitude: 0,
+      longitude: 0,
+      website: website,
+      appStore: appStore,
+      playStore: playStore,
+    );
   }
 
   static List<ExpertiseEntity> expertise() {
@@ -304,8 +350,7 @@ class CvExportTestFixture {
   static ProjectEntity _project({
     required String title,
     required DateTime startDate,
-    String? website,
-    String? appStore,
+    List<ProjectMarketEntity> markets = const [],
     String status = 'completed',
   }) {
     return ProjectEntity(
@@ -322,16 +367,7 @@ class CvExportTestFixture {
       achievements: const [],
       teamSize: 3,
       role: 'Lead',
-      markets: [
-        if (website != null || appStore != null)
-          ProjectMarketEntity(
-            country: 'ES',
-            latitude: 0,
-            longitude: 0,
-            website: website,
-            appStore: appStore,
-          ),
-      ],
+      markets: markets,
       id: title,
     );
   }

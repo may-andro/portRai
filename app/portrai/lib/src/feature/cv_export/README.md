@@ -17,7 +17,7 @@ PDF CV. Everything runs locally; no data leaves the device and no AI is involved
   for the rest.
 - Languages are a contact entry with language codes (for example `EN, ES, NL`) instead of a section.
 - Companies, contacts and projects are hyperlinks; the projects section lists only the
-  projects that have a link, as a compact list of clickable names followed by Web, App Store and Play Store icons. Projects offered in several markets get one entry per market (for example `MediaMarkt DE`), and deprecated projects are left out.
+  projects that have a link, as a compact list of clickable names followed by Web, App Store and Play Store icons. Projects need a store link and are listed once per distinct store listing, with the country code (for example `MediaMarkt DE`) only when the listings differ per country. Deprecated projects are left out.
 
 ## Getting Started
 
