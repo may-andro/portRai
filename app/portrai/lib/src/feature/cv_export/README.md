@@ -1,44 +1,70 @@
 # CV Export
 
-The `cv_export` feature turns the portfolio data into a single-page, recruiter-friendly
-PDF CV. Everything runs locally; no data leaves the device and no AI is involved.
+The `cv_export` feature turns the portfolio data into a single-page PDF CV. It runs
+locally on mobile, desktop and web: no data leaves the device and no AI is involved.
 
 ## Features
 
 - Four templates: Sidebar, Classic, Minimal and Bold.
-- Five accent colors and a toggle for each content section.
-- Optional profile photo, off by default.
-- Live preview and download/share on mobile, desktop and web.
-- Guaranteed single page: the renderer searches a gradual ladder of content levels for the fullest one that fits,
-  then enlarges the type as far as it still fits.
-- Fills the page: the full content is first rendered with enlarged type (up to 1.4x) and
-  shrunk until it fits.
-- Each experience shows an overview paragraph instead of bullets: the long description when there is room, otherwise the short one. Templates without a separate skills column keep the short one unless everything still fits, so the skills are not trimmed.
-- Ongoing experiences come first, then finished ones by start date; only the first three are shown, followed by a link to the portfolio website
-  for the rest.
-- Languages are a contact entry with language codes (for example `EN, ES, NL`) instead of a section. Codes come from the optional `code` field of each language; languages without one are left out.
-- Companies, contacts and projects are hyperlinks; the projects section lists only the
-  projects that have a link, as a compact list of clickable names followed by Web, App Store and Play Store icons. Projects need a store link and are listed once per distinct store listing, with the country code (for example `MediaMarkt DE`) only when the listings differ per country. The country code is read from the App Store storefront (or Play Store `gl`) in the link, never from the localized country name. Deprecated projects are left out.
+- Five accent colors: teal, indigo, crimson, forest and charcoal.
+- Six sections that can be switched on or off: summary, experience, projects, skills, education
+  and languages.
+- Optional profile photo with an accent-colored border (off by default).
+- Live preview, then download (web, desktop) or share (mobile).
+- Every CV is exactly one page and uses as much of it as possible.
+
+## How It Works
+
+1. `BuildCvDocumentUseCase` composes the profile, experiences, projects and expertise into a
+   `CvDocumentEntity`.
+2. `GenerateCvPdfUseCase` renders that document for a `CvOptionsEntity` (template, accent,
+   sections, photo) through `CvPdfRenderer`.
+3. `ShareCvPdfUseCase` hands the bytes to the platform (save/share dialog, browser download).
+
+### Fitting the page
+
+`CvFitLevelEntity` defines a ladder of 32 content levels, from full content to compact. The
+renderer binary-searches the ladder for the fullest level that still fits on one page, then enlarges
+the font in small steps (up to 1.4x) while it still fits. It yields to the UI between renders.
+
+Templates with a separate skills column (Sidebar, Bold) fit that column independently of the
+main column and use the long experience description. Single-column templates (Classic, Minimal)
+use the short description, and switch to the long one only when the whole CV still fits.
+
+### Content rules
+
+- Experience: ongoing entries first, then finished ones by start date (newest first). Only the
+  first three are shown, followed by a link to the portfolio website.
+- Each experience shows an overview paragraph (short or long description).
+- Projects: non-deprecated projects with an App Store or Play Store link, one entry per distinct
+  store listing. Each entry links to the website, App Store and Play Store with matching icons.
+- When a project has several distinct listings, the title gets the country codes of its markets.
+  The code is read from the App Store storefront (`apps.apple.com/<code>/`) or the Play Store
+  `gl` parameter in the link.
+- Languages are one contact entry of ISO codes (for example `EN, ES, NL`) taken from the `code`
+  field of each language.
+- Companies, contacts and projects are hyperlinks; contacts have icons.
+
+## Structure
+
+- `domain/`: entities, `BuildCvDocumentUseCase`, `GenerateCvPdfUseCase`, `ShareCvPdfUseCase`.
+- `data/pdf/`: `CvPdfRenderer`, the shared blocks in `cv_pdf_blocks.dart`, contact icons, the
+  photo loader and one file per template in `template/`.
+- `presentation/`: the export screen (bloc, tracking delegate, widgets), the route and the
+  `CvExportButtonWidget` shown in the portfolio header.
 
 ## Getting Started
 
-Register `CvExportModuleConfigurator` in `module_configurators.dart`. The portfolio header
-shows `CvExportButtonWidget`, which opens the `CvExportModuleRoute.cvExport` screen.
-Import `cv_export.dart` from consumers, not private feature barrels.
+Register `CvExportModuleConfigurator` in `module_configurators.dart`. The portfolio header shows
+`CvExportButtonWidget`, which opens the `CvExportModuleRoute.cvExport` screen. Import
+`cv_export.dart` from consumers, not private feature barrels.
 
-## Usage
+## Technical Notes
 
-`BuildCvDocumentUseCase` composes the profile, experiences, projects and expertise into a
-`CvDocumentEntity`. `GenerateCvPdfUseCase` renders it for a `CvOptionsEntity` and
-`ShareCvPdfUseCase` hands the bytes to the platform (save/share dialog, browser download).
-
-## Key Concepts
-
-- `CvDocumentEntity.fit(CvFitLevelEntity)` trims content; most recent items are kept first.
-- Templates live in `data/pdf/template/` and share building blocks from `cv_pdf_blocks.dart`.
-- PDFs use the base-14 fonts, so text is normalized to Latin-1 (typographic dashes and
-  quotes become plain ones); non-Latin scripts are not supported.
-- The photo is fetched over HTTP and silently omitted when unavailable (for example, CORS on web).
+- PDFs use the base-14 fonts, so text is normalized to Latin-1 (typographic dashes and quotes
+  become plain ones). Non-Latin scripts are not supported.
+- The photo is downloaded over HTTP from the profile image URL. If the download fails, the CV is
+  rendered without it.
 
 ## Dependencies
 
