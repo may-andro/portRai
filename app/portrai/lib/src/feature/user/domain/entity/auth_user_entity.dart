@@ -1,4 +1,4 @@
-import 'package:portrai/src/feature/user/user.dart';
+import 'package:portrai/src/feature/user/domain/entity/user_entity.dart';
 
 /// A user signed in with an account. [id] is the account's uid, which keys
 /// that user's own data.

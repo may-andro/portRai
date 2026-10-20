@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/auth/domain/_domain.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 import '../../../../../mock/feature/auth/domain/repository/mock_auth_repository.dart';
 

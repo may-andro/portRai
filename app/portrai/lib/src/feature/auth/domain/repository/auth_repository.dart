@@ -1,4 +1,4 @@
-import 'package:portrai/src/feature/auth/domain/entity/_entity.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 abstract class AuthRepository {
   Future<void> signIn({required String email, required String password});

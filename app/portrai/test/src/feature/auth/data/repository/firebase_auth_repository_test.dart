@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/data/_data.dart';
 import 'package:portrai/src/feature/auth/domain/_domain.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 import '../../../../../mock/feature/auth/data/repository/mock_fb_auth_controller.dart';
 import '../../../../../mock/feature/auth/data/repository/mock_user.dart';

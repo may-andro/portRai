@@ -149,8 +149,8 @@ successful sign-in returns to that location. Only in-app paths are followed; any
 the start page. Without a registered guard, protected routes open the start page. Other features
 read the signed-in user through `GetSignedInUserUseCase`, which waits for a restored session on
 app start. It returns an `AuthUserEntity` with the account id and email. `AuthUserEntity` and
-`GuestUserEntity` both extend `UserEntity` from the `user` feature, which also saves the guest's
-role on the device through `GetGuestUserUseCase` and `SaveGuestUserUseCase`.
+`GuestUserEntity` both live in the `user` feature and extend its `UserEntity`. `user` also saves
+the guest's role on the device through `GetGuestUserUseCase` and `SaveGuestUserUseCase`.
 
 ### Remote Assistant
 

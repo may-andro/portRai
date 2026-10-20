@@ -2,6 +2,7 @@ import 'package:firebase/firebase.dart' as firebase;
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/auth/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/auth/domain/_domain.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 @Register(as: AuthRepository)
 class FirebaseAuthRepository implements AuthRepository {

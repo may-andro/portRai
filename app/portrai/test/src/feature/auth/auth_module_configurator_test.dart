@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/auth.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:use_case/use_case.dart';
 
