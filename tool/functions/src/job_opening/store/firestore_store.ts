@@ -1,0 +1,46 @@
+import type { Firestore } from 'firebase-admin/firestore';
+
+import type { MatchedJobOpening } from '../job_opening.js';
+import type { ReadCollection } from '../skill/portfolio_skills.js';
+import { toJobOpeningDocument } from './job_opening_document.js';
+
+export function firestoreReadCollection(db: Firestore): ReadCollection {
+  return async (name) => {
+    const snapshot = await db.collection(name).get();
+    return snapshot.docs.map((document) => document.data());
+  };
+}
+
+/** Ids of the users whose `jobSearch.enabled` is true. */
+export async function listJobSearchUserIds(db: Firestore): Promise<string[]> {
+  const snapshot = await db
+    .collection('users')
+    .where('jobSearch.enabled', '==', true)
+    .select()
+    .get();
+  return snapshot.docs.map((document) => document.id);
+}
+
+/**
+ * Writes the openings under the user. An opening seen again replaces its
+ * document, which also pushes its expiry back.
+ */
+export async function writeJobOpenings(
+  db: Firestore,
+  userId: string,
+  openings: MatchedJobOpening[],
+  now: Date,
+): Promise<void> {
+  const collection = db
+    .collection('users')
+    .doc(userId)
+    .collection('job_openings');
+  const writer = db.bulkWriter();
+  for (const opening of openings) {
+    void writer.set(
+      collection.doc(opening.dedupeKey),
+      toJobOpeningDocument(opening, now),
+    );
+  }
+  await writer.close();
+}
