@@ -65,6 +65,12 @@ initialization or App Check. Both staging and production activate App Check.
 It also does not gate AI requests: the owning app feature must enforce its rollout
 flag, user preference, and cloud-processing consent before calling the AI controller.
 
+`aiUseLimitedUseAppCheckTokens` (default `true`) enables App Check replay protection
+for Firebase AI Logic: every AI request carries a fresh limited-use token instead of the
+cached one. Each request therefore costs one attestation (Play Integrity, App Attest or
+reCAPTCHA Enterprise call), which counts against those providers' quotas. The backend
+only rejects missing or replayed tokens once App Check enforcement is on for Firebase AI Logic.
+
 ### Firebase AI Logic Setup
 
 1. Open **Firebase Console > Firebase AI Logic** in the existing Firebase project

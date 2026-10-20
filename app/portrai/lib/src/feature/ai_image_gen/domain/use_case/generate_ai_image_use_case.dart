@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/ai_image_gen/domain/exception/_exception.dar
 import 'package:portrai/src/feature/ai_image_gen/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/ai_image_gen/domain/repository/_repository.dart';
 import 'package:portrai/src/feature/ai_image_gen/domain/use_case/resolve_ai_image_request_settings_use_case.dart';
+import 'package:portrai/src/feature/ai_rate_limit/ai_rate_limit.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:use_case/use_case.dart';
 
@@ -27,6 +28,10 @@ class AiImageSourceFailure extends GenerateAiImageFailure {
 
 class AiImageGenerationFailure extends GenerateAiImageFailure {
   const AiImageGenerationFailure({super.cause});
+}
+
+class AiImageQuotaExceededFailure extends GenerateAiImageFailure {
+  const AiImageQuotaExceededFailure({super.cause});
 }
 
 class AiImageUnknownFailure extends GenerateAiImageFailure {
@@ -61,11 +66,13 @@ class GenerateAiImageUseCase
     this._isFeatureEnabledUseCase,
     this._repository,
     this._resolveRequestSettingsUseCase,
+    this._consumeAiRequestQuotaUseCase,
   );
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final AiImageRepository _repository;
   final ResolveAiImageRequestSettingsUseCase _resolveRequestSettingsUseCase;
+  final ConsumeAiRequestQuotaUseCase _consumeAiRequestQuotaUseCase;
 
   @protected
   @override
@@ -85,6 +92,23 @@ class GenerateAiImageUseCase
     }
 
     final requestSettings = (await _resolveRequestSettingsUseCase()).right;
+    final cachedImage = await _repository.getCachedAiImage(
+      sourceImageUrl: param.sourceImageUrl,
+      prompt: requestSettings.prompt,
+      model: requestSettings.model,
+    );
+    if (cachedImage != null) return Right(cachedImage);
+
+    // Only a billable generation uses the AI budget, never a cached image. An
+    // unreadable request log does not block generation.
+    final consumeAiRequestQuotaEither = await _consumeAiRequestQuotaUseCase();
+    if (consumeAiRequestQuotaEither.isLeft &&
+        consumeAiRequestQuotaEither.left is AiRequestQuotaExceededFailure) {
+      return Left(
+        AiImageQuotaExceededFailure(cause: consumeAiRequestQuotaEither.left),
+      );
+    }
+
     final image = await _repository.generateAiImage(
       sourceImageUrl: param.sourceImageUrl,
       prompt: requestSettings.prompt,

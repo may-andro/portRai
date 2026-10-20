@@ -93,5 +93,34 @@ void main() {
         );
       },
     );
+
+    test(
+      'should return the cached image when getCachedAiImage finds a match',
+      () async {
+        cache.stubGet(
+          AiImageModel(key: 'key', mimeType: 'image/png', bytes: bytes),
+        );
+
+        final cachedImage = await repository.getCachedAiImage(
+          sourceImageUrl: 'https://example.com/a.png',
+          prompt: 'Draw',
+          model: 'model',
+        );
+
+        expect(cachedImage, AiImageEntity(bytes: bytes, mimeType: 'image/png'));
+      },
+    );
+
+    test('should return null when getCachedAiImage finds no match', () async {
+      cache.stubGet(null);
+
+      final cachedImage = await repository.getCachedAiImage(
+        sourceImageUrl: 'https://example.com/a.png',
+        prompt: 'Draw',
+        model: 'model',
+      );
+
+      expect(cachedImage, isNull);
+    });
   });
 }
