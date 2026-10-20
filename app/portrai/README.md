@@ -85,6 +85,7 @@ lib/
 │   ├── feature/             # Feature modules (data/domain/presentation per feature)
 │   │   ├── experience/      # Work experience feature
 │   │   ├── expertise/       # Expertise showcase
+│   │   ├── ai_rate_limit/   # Per-install Firebase AI request budget
 │   │   ├── assistant/       # Shared portfolio context and conversation UI
 │   │   ├── local_assistant/ # On-device inference, model lifecycle and settings
 │   │   ├── remote_assistant/ # Flag-gated cloud inference and independent chat session
@@ -123,6 +124,20 @@ app, with the shared configurator first. Neither provider depends on the other.
 The local assistant uses the `/assistant` route, `feature_ai_assistant` rollout key,
 and `assistant_enabled_cache` preference key.
 There is no automatic cloud fallback or transfer of conversation history between providers.
+
+### AI Request Limit
+
+`ai_rate_limit` exposes `ConsumeAiRequestQuotaUseCase`, which reserves one Firebase AI
+request from a per-install budget before a billable call. `AskRemotePortfolioQuestionUseCase`
+calls it for every question; `FirebaseAiImageRepository` calls it only after a cache miss and a
+successful source download. The budget comes from the `aiRateLimit` map of the `app_config`
+document (`maxRequestsPerMinute`, default 10; `maxRequestsPerDay`, default 100; `0` blocks AI
+requests). Only an exhausted budget blocks a request; an unreadable request log does not.
+The log lives in local preferences, so clearing app data or changing the device clock resets it.
+The Firebase AI Logic per-user quota remains the server-side limit.
+
+The remote assistant model comes from the `aiAssistantModel` field of the same document,
+falling back to `RemoteAssistantRequestLimits.model`.
 
 ### Remote Assistant
 

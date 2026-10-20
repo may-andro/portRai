@@ -30,6 +30,13 @@ class FirebaseAiImageRepository implements AiImageRepository {
   final _runningRequestsByKey = <String, Future<AiImageEntity>>{};
 
   @override
+  Future<AiImageEntity?> getCachedAiImage({
+    required String sourceImageUrl,
+    required String prompt,
+    required String model,
+  }) => _readCache(_cacheKey(sourceImageUrl, prompt, model));
+
+  @override
   Future<AiImageEntity> generateAiImage({
     required String sourceImageUrl,
     required String prompt,

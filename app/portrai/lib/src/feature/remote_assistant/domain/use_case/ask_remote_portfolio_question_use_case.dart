@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/ai_rate_limit/ai_rate_limit.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
@@ -32,6 +33,7 @@ class AskRemotePortfolioQuestionParams {
 }
 
 abstract final class RemoteAssistantRequestLimits {
+  /// Default when the app config sets no `aiAssistantModel`.
   static const model = 'gemini-3.8-flash';
   static const maxOutputTokens = 4096;
   static const temperature = 0.3;
@@ -61,10 +63,12 @@ class AskRemotePortfolioQuestionUseCase
   AskRemotePortfolioQuestionUseCase(
     this._repository,
     this._isRemoteAssistantSupportedUseCase,
+    this._consumeAiRequestQuotaUseCase,
   );
 
   final RemoteAssistantRepository _repository;
   final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
+  final ConsumeAiRequestQuotaUseCase _consumeAiRequestQuotaUseCase;
 
   @protected
   @override
@@ -77,6 +81,15 @@ class AskRemotePortfolioQuestionUseCase
     }
     if (!_isValid(params)) {
       return const Left(RemoteAssistantInvalidInputFailure());
+    }
+    final consumeAiRequestQuotaEither = await _consumeAiRequestQuotaUseCase();
+    // Only a used-up budget blocks the question; an unreadable request log
+    // does not, and the backend quota still applies.
+    if (consumeAiRequestQuotaEither.isLeft &&
+        consumeAiRequestQuotaEither.left is AiRequestQuotaExceededFailure) {
+      return Left(
+        RemoteAssistantQuotaFailure(cause: consumeAiRequestQuotaEither.left),
+      );
     }
     await _repository.answer(
       question: params.question,

@@ -22,7 +22,10 @@ void main() {
       appConfigCache = MockAppConfigCache();
       repository = CacheAppConfigRepositoryImpl(
         appConfigCache,
-        const PortraiAppConfigMapper(AiImageAppConfigMapper()),
+        const PortraiAppConfigMapper(
+          AiImageAppConfigMapper(),
+          AiRateLimitAppConfigMapper(),
+        ),
       );
     });
 

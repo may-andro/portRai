@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assi
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/reset_remote_assistant_session_use_case.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../mock/feature/ai_rate_limit/domain/use_case/mock_consume_ai_request_quota_use_case.dart';
 import '../../../../../mock/feature/remote_assistant/domain/repository/mock_remote_assistant_repository.dart';
 import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
@@ -16,6 +17,7 @@ AskRemotePortfolioQuestionUseCase _createAskUseCase(
 ) => AskRemotePortfolioQuestionUseCase(
   repository,
   MockIsRemoteAssistantSupportedUseCase()..stubCall(const Right(true)),
+  MockConsumeAiRequestQuotaUseCase()..stubCall(const Right(null)),
 );
 
 void main() {

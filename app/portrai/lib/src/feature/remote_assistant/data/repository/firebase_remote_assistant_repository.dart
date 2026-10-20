@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase/firebase.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
@@ -11,7 +12,11 @@ import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_
 
 @RegisterSingleton(as: RemoteAssistantRepository, disposeMethodName: 'close')
 class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
-  FirebaseRemoteAssistantRepository(this._aiController, this._isFeatureEnabled);
+  FirebaseRemoteAssistantRepository(
+    this._aiController,
+    this._isFeatureEnabled,
+    this._appConfig,
+  );
 
   static const _systemInstruction =
       'You are a portfolio question-answering assistant for Mayank Rai. '
@@ -24,6 +29,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
 
   final FbAiController _aiController;
   final IsFeatureEnabledUseCase _isFeatureEnabled;
+  final PortraiAppConfigEntity _appConfig;
 
   FbAiTextModel? _model;
   String? _modelSystemPrompt;
@@ -109,7 +115,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
 
     if (_model != null && _modelSystemPrompt != systemPrompt) _closeModel();
     final model = _model ??= _aiController.createTextModel(
-      model: RemoteAssistantRequestLimits.model,
+      model: _modelId,
       generationConfig: GenerationConfig(
         temperature: RemoteAssistantRequestLimits.temperature,
         maxOutputTokens: RemoteAssistantRequestLimits.maxOutputTokens,
@@ -130,6 +136,14 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
       generation: generation,
       onDelta: onDelta,
     );
+  }
+
+  /// The app config wins over the built-in default, read per model creation.
+  String get _modelId {
+    final configured = _appConfig.aiAssistantModel?.trim();
+    return configured == null || configured.isEmpty
+        ? RemoteAssistantRequestLimits.model
+        : configured;
   }
 
   static bool _isValidRequest(

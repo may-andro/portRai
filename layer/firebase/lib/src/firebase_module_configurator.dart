@@ -30,6 +30,7 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
     required this.storageBucketUrl,
     this.aiBackend = FbAiBackend.googleAI,
     this.aiLocation = 'global',
+    this.aiUseLimitedUseAppCheckTokens = true,
   });
 
   final bool isFirebaseEnabled;
@@ -38,6 +39,11 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
   final String storageBucketUrl;
   final FbAiBackend aiBackend;
   final String aiLocation;
+
+  /// Replay protection: every AI request carries a fresh single-use App Check
+  /// token. Costs one attestation per request; enforcement itself is enabled
+  /// for Firebase AI Logic in the console.
+  final bool aiUseLimitedUseAppCheckTokens;
 
   @override
   FutureOr<void> preDependenciesSetup(ServiceLocator serviceLocator) async {
@@ -86,9 +92,12 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
   void _injectAi(ServiceLocator serviceLocator) {
     serviceLocator.registerSingleton(
       () => switch (aiBackend) {
-        FbAiBackend.googleAI => FirebaseAI.googleAI(),
+        FbAiBackend.googleAI => FirebaseAI.googleAI(
+          useLimitedUseAppCheckTokens: aiUseLimitedUseAppCheckTokens,
+        ),
         FbAiBackend.agentPlatform => FirebaseAI.agentPlatform(
           location: aiLocation,
+          useLimitedUseAppCheckTokens: aiUseLimitedUseAppCheckTokens,
         ),
       },
     );

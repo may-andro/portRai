@@ -33,7 +33,10 @@ void main() {
         firestoreController,
         buildConfig,
         cacheDelegateRepository,
-        const PortraiAppConfigMapper(AiImageAppConfigMapper()),
+        const PortraiAppConfigMapper(
+          AiImageAppConfigMapper(),
+          AiRateLimitAppConfigMapper(),
+        ),
         logReporter,
       );
     });

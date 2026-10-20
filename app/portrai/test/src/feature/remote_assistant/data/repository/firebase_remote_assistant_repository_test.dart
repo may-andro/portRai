@@ -4,6 +4,7 @@ import 'package:fake_async/fake_async.dart';
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag_definition.dart';
 import 'package:portrai/src/feature/feature_flag/domain/use_case/is_feature_enabled_use_case.dart';
@@ -15,6 +16,7 @@ import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_
 import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../mock/feature/ai_rate_limit/domain/use_case/mock_consume_ai_request_quota_use_case.dart';
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../mock/feature/project/test_data/project_test_data.dart';
@@ -33,6 +35,7 @@ typedef _Harness = ({
 _Harness _buildHarness({
   Either<IsFeatureEnabledFailure, bool>? flagResult,
   Stream<String>? responseStream,
+  String? aiAssistantModel,
 }) {
   final aiController = MockFbAiController();
   final model = MockFbAiTextModel();
@@ -57,6 +60,10 @@ _Harness _buildHarness({
     repository: FirebaseRemoteAssistantRepository(
       aiController,
       isFeatureEnabled,
+      PortraiAppConfigEntity(
+        minimumRequiredAppVersion: '1.0.0',
+        aiAssistantModel: aiAssistantModel,
+      ),
     ),
     aiController: aiController,
     model: model,
@@ -86,6 +93,31 @@ void main() {
     registerFallbackValue((String _) {});
   });
 
+  for (final (configured, expected) in [
+    (null, RemoteAssistantRequestLimits.model),
+    ('  ', RemoteAssistantRequestLimits.model),
+    (' gemini-configured ', 'gemini-configured'),
+  ]) {
+    test(
+      'should create the model from the app config when it sets $configured',
+      () async {
+        final harness = _buildHarness(aiAssistantModel: configured);
+        addTearDown(harness.repository.close);
+
+        await _answer(harness.repository);
+
+        verify(
+          () => harness.aiController.createTextModel(
+            model: expected,
+            generationConfig: any(named: 'generationConfig'),
+            systemInstruction: any(named: 'systemInstruction'),
+            safetySettings: any(named: 'safetySettings'),
+          ),
+        ).called(1);
+      },
+    );
+  }
+
   test(
     'should connect Firebase deltas to official surfaces when sending a portfolio question',
     () async {
@@ -107,6 +139,7 @@ void main() {
         askRemotePortfolioQuestionUseCase: AskRemotePortfolioQuestionUseCase(
           harness.repository,
           MockIsRemoteAssistantSupportedUseCase()..stubCall(const Right(true)),
+          MockConsumeAiRequestQuotaUseCase()..stubCall(const Right(null)),
         ),
         question: 'What projects use Flutter?',
         portfolioContext: 'Verified portfolio context',
@@ -165,6 +198,7 @@ void main() {
         askRemotePortfolioQuestionUseCase: AskRemotePortfolioQuestionUseCase(
           harness.repository,
           MockIsRemoteAssistantSupportedUseCase()..stubCall(const Right(true)),
+          MockConsumeAiRequestQuotaUseCase()..stubCall(const Right(null)),
         ),
         question: 'Question',
         portfolioContext: 'Context',
@@ -286,6 +320,7 @@ void main() {
               harness.repository,
               MockIsRemoteAssistantSupportedUseCase()
                 ..stubCall(const Right(true)),
+              MockConsumeAiRequestQuotaUseCase()..stubCall(const Right(null)),
             )(
               AskRemotePortfolioQuestionParams(
                 question: 'Which projects use Flutter?',

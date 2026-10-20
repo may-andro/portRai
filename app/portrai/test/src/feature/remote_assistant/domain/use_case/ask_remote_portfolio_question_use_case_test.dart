@@ -1,11 +1,13 @@
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/ai_rate_limit/ai_rate_limit.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../mock/feature/ai_rate_limit/domain/use_case/mock_consume_ai_request_quota_use_case.dart';
 import '../../../../../mock/feature/remote_assistant/domain/repository/mock_remote_assistant_repository.dart';
 import '../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 
@@ -14,9 +16,12 @@ void _ignoreDelta(String _) {}
 AskRemotePortfolioQuestionUseCase _createAskUseCase(
   MockRemoteAssistantRepository repository, {
   bool platformSupported = true,
+  Either<ConsumeAiRequestQuotaFailure, void> consumeAiRequestQuotaEither =
+      const Right(null),
 }) => AskRemotePortfolioQuestionUseCase(
   repository,
   MockIsRemoteAssistantSupportedUseCase()..stubCall(Right(platformSupported)),
+  MockConsumeAiRequestQuotaUseCase()..stubCall(consumeAiRequestQuotaEither),
 );
 
 AssistantMessageEntity _message(String text, {required bool isUser}) =>
@@ -259,6 +264,66 @@ void main() {
         params.toString(),
         'AskRemotePortfolioQuestionParams(metadata only)',
       );
+    },
+  );
+
+  test(
+    'should return a quota failure without asking when the AI budget is used up',
+    () async {
+      final repository = MockRemoteAssistantRepository()..stubAnswer();
+
+      final askRemotePortfolioQuestionEither =
+          await _createAskUseCase(
+            repository,
+            consumeAiRequestQuotaEither: const Left(
+              AiRequestQuotaExceededFailure(),
+            ),
+          )(
+            const AskRemotePortfolioQuestionParams(
+              question: 'What projects use Flutter?',
+              portfolioContext: 'Project portfolio',
+              history: [],
+              onDelta: _ignoreDelta,
+            ),
+          );
+
+      expect(
+        askRemotePortfolioQuestionEither.left,
+        isA<RemoteAssistantQuotaFailure>(),
+      );
+      verifyNever(
+        () => repository.answer(
+          question: any(named: 'question'),
+          portfolioContext: any(named: 'portfolioContext'),
+          history: any(named: 'history'),
+          onDelta: any(named: 'onDelta'),
+          systemPrompt: any(named: 'systemPrompt'),
+        ),
+      );
+    },
+  );
+
+  test(
+    'should still ask the question when the AI request log cannot be read',
+    () async {
+      final repository = MockRemoteAssistantRepository()..stubAnswer();
+
+      final askRemotePortfolioQuestionEither =
+          await _createAskUseCase(
+            repository,
+            consumeAiRequestQuotaEither: const Left(
+              AiRequestQuotaCacheFailure(),
+            ),
+          )(
+            const AskRemotePortfolioQuestionParams(
+              question: 'What projects use Flutter?',
+              portfolioContext: 'Project portfolio',
+              history: [],
+              onDelta: _ignoreDelta,
+            ),
+          );
+
+      expect(askRemotePortfolioQuestionEither.isRight, isTrue);
     },
   );
 }
