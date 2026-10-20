@@ -119,5 +119,36 @@ void main() {
         expect(find.text('Home'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'should open the location with its query parameters when goLocation '
+      'is called',
+      (tester) async {
+        final router = GoRouter(
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => TextButton(
+                onPressed: () => context.goLocation('/details?tab=open'),
+                child: const Text('Go to details'),
+              ),
+            ),
+            GoRoute(
+              path: '/details',
+              builder: (context, state) =>
+                  Text('Tab ${context.routeQueryParameters['tab']}'),
+            ),
+          ],
+        );
+        addTearDown(router.dispose);
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Go to details'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Tab open'), findsOneWidget);
+      },
+    );
   });
 }

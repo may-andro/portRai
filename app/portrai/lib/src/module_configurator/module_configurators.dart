@@ -11,6 +11,7 @@ import 'package:portrai/src/feature/ai_rate_limit/ai_rate_limit.dart';
 import 'package:portrai/src/feature/app_config/app_config_module_configurator.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/auth/auth.dart';
 import 'package:portrai/src/feature/connectivity/connectivity_module_configurator.dart';
 import 'package:portrai/src/feature/cv_export/cv_export_module_configurator.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
@@ -64,6 +65,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   layer_ff.FeatureFlagModuleConfigurator(appId: 'portrai'),
   AppFeatureFlagModuleConfigurator(),
   ExternalAppHandlerModuleConfigurator(),
+  AuthModuleConfigurator(),
   ForceUpdateModuleConfigurator(),
   ConnectivityModuleConfigurator(),
   LocaleModuleConfigurator(),

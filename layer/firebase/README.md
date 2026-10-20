@@ -281,25 +281,24 @@ app use cases should map these exceptions to their domain `Failure` types.
 
 ### Firebase Auth
 
+Inject `FbAuthController` into the app feature's repository. It wraps email and
+password sign-in and throws the typed `AuthException` subclasses from
+`auth_exception.dart`. The barrel exports Firebase's `User`, the type returned
+by `currentUser` and `authStateChanges`.
+
 ```dart
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:module_injector/module_injector.dart';
+import 'package:firebase/firebase.dart';
 
-class AuthService {
-  final FirebaseAuth _auth = serviceLocator<FirebaseAuth>();
-
-  Future<UserCredential> signIn(String email, String password) async {
-    return await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-  }
-
-  Future<void> signOut() async {
-    await _auth.signOut();
-  }
-
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+Future<String?> signInAndGetUserId(
+  FbAuthController controller, {
+  required String email,
+  required String password,
+}) async {
+  await controller.signIn(email: email, password: password);
+  // The first event is the restored session; `currentUser` can still be null
+  // right after app start.
+  final User? user = await controller.authStateChanges.first;
+  return user?.uid;
 }
 ```
 

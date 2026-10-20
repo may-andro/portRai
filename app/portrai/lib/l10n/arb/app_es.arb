@@ -536,5 +536,15 @@
   "errorCvUnknown": "Algo salió mal al preparar el CV.",
   "@errorCvUnknown": {
     "description": "Generic error shown for unexpected CV export problems"
-  }
+  },
+  "signInTitle": "Iniciar sesión",
+  "signInDescription": "Inicia sesión para abrir la parte privada de la aplicación.",
+  "signInEmailLabel": "Correo electrónico",
+  "signInPasswordLabel": "Contraseña",
+  "signInButton": "Iniciar sesión",
+  "errorSignInMissingCredentials": "Introduce tu correo electrónico y contraseña",
+  "errorSignInInvalidCredentials": "Correo electrónico o contraseña incorrectos",
+  "errorSignInTooManyRequests": "Demasiados intentos. Inténtalo de nuevo más tarde",
+  "errorSignInNetwork": "No se puede iniciar sesión. Comprueba tu conexión a internet",
+  "errorSignInUnknown": "No se pudo iniciar sesión. Inténtalo de nuevo"
 }

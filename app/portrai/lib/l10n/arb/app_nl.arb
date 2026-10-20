@@ -536,5 +536,15 @@
   "errorCvUnknown": "Er ging iets mis bij het voorbereiden van het cv.",
   "@errorCvUnknown": {
     "description": "Generic error shown for unexpected CV export problems"
-  }
+  },
+  "signInTitle": "Inloggen",
+  "signInDescription": "Log in om het privégedeelte van de app te openen.",
+  "signInEmailLabel": "E-mail",
+  "signInPasswordLabel": "Wachtwoord",
+  "signInButton": "Inloggen",
+  "errorSignInMissingCredentials": "Vul je e-mailadres en wachtwoord in",
+  "errorSignInInvalidCredentials": "Onjuist e-mailadres of wachtwoord",
+  "errorSignInTooManyRequests": "Te veel pogingen. Probeer het later opnieuw",
+  "errorSignInNetwork": "Kan niet inloggen. Controleer je internetverbinding",
+  "errorSignInUnknown": "Inloggen mislukt. Probeer het opnieuw"
 }

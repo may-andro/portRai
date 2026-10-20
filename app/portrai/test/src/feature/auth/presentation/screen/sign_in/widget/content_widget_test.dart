@@ -1,0 +1,57 @@
+import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/_bloc.dart';
+import 'package:portrai/src/feature/auth/presentation/screen/sign_in/widget/_widget.dart';
+
+import '../../../../../../../mock/feature/auth/presentation/screen/sign_in/bloc/mock_sign_in_bloc.dart';
+import '../../../../../../../util/test_wrapper_widget.dart';
+
+void main() {
+  Future<MockSignInBloc> pumpContent(
+    WidgetTester tester,
+    SignInState state,
+  ) async {
+    final bloc = MockSignInBloc()..stubState(state);
+    addTearDown(bloc.close);
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: BlocProvider<SignInBloc>.value(
+          value: bloc,
+          child: const ContentWidget(),
+        ),
+      ),
+    );
+    return bloc;
+  }
+
+  testWidgets('should dispatch the entered credentials when sign in is '
+      'tapped', (tester) async {
+    final bloc = await pumpContent(tester, const SignInState());
+
+    final textFields = find.byType(TextFormField);
+    await tester.enterText(textFields.at(0), 'owner@example.com');
+    await tester.enterText(textFields.at(1), 'secret');
+    await tester.tap(find.byType(DSButtonWidget));
+    await tester.pump();
+
+    verify(
+      () => bloc.add(
+        const SignInClickEvent(email: 'owner@example.com', password: 'secret'),
+      ),
+    ).called(1);
+  });
+
+  testWidgets('should disable the form when signing in', (tester) async {
+    await pumpContent(tester, const SignInState(isSigningIn: true));
+
+    final textFields = tester.widgetList<DSTextFieldWidget>(
+      find.byType(DSTextFieldWidget),
+    );
+    expect(textFields.every((textField) => !textField.enabled), isTrue);
+    final button = tester.widget<DSButtonWidget>(find.byType(DSButtonWidget));
+    expect(button.isLoading, isTrue);
+    expect(button.isDisabled, isTrue);
+  });
+}
