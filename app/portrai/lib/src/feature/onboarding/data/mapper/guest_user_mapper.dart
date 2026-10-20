@@ -4,16 +4,16 @@ import 'package:portrai/src/feature/onboarding/data/model/_model.dart';
 import 'package:portrai/src/feature/onboarding/domain/entity/_entity.dart';
 
 @register
-class UserMapper implements BiMapper<UserModel, UserEntity> {
-  const UserMapper();
+class GuestUserMapper implements BiMapper<GuestUserModel, GuestUserEntity> {
+  const GuestUserMapper();
 
   @override
-  UserEntity to(UserModel from) {
+  GuestUserEntity to(GuestUserModel from) {
     final role = UserRole.values.asNameMap()[from.role];
     if (role == null) throw FormatException('Unknown user role: ${from.role}');
-    return UserEntity(role: role);
+    return GuestUserEntity(role: role);
   }
 
   @override
-  UserModel from(UserEntity to) => UserModel(role: to.role.name);
+  GuestUserModel from(GuestUserEntity to) => GuestUserModel(role: to.role.name);
 }

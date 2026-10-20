@@ -12,7 +12,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
@@ -90,8 +90,8 @@ Portfolio summary.
       platformSupport,
       openUrl,
       tracking,
-      MockGetUserUseCase()
-        ..stubCall(userRole == null ? null : UserEntity(role: userRole)),
+      MockGetGuestUserUseCase()
+        ..stubCall(userRole == null ? null : GuestUserEntity(role: userRole)),
     );
     addTearDown(bloc.close);
     return bloc;

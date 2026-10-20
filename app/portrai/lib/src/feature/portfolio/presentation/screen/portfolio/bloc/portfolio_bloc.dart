@@ -19,7 +19,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     this._trackingDelegate,
     this._isFeatureEnabledUseCase,
     this._isLocalAssistantSupportedUseCase,
-    this._getUserUseCase,
+    this._getGuestUserUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
@@ -34,7 +34,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
   final PortfolioTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
-  final GetUserUseCase _getUserUseCase;
+  final GetGuestUserUseCase _getGuestUserUseCase;
   int _availabilityRevision = 0;
 
   Future<void> _mapLoadPortfolioEventToState(
@@ -45,7 +45,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     try {
       final result = await _getPortfolioUseCase();
       if (result.isRight) {
-        final userEither = await _getUserUseCase();
+        final userEither = await _getGuestUserUseCase();
         emit(
           LoadedState(
             portfolio: result.right,

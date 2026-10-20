@@ -27,7 +27,7 @@ import '../mock/feature/local_assistant/domain/use_case/mock_prepare_local_assis
 import '../mock/feature/local_assistant/domain/use_case/mock_reset_local_assistant_session_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
-import '../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
+import '../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
@@ -101,7 +101,7 @@ class AssistantTestFixture {
       remoteSupport,
       MockOpenExternalUrlUseCase(),
       remoteTracking,
-      MockGetUserUseCase()..stubCall(null),
+      MockGetGuestUserUseCase()..stubCall(null),
     );
     addTearDown(() async {
       await local.close();

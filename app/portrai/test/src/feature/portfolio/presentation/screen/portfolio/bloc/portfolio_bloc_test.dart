@@ -11,7 +11,7 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/tracking/mock_portfolio_tracking_delegate.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
@@ -24,18 +24,18 @@ void main() {
     late MockPortfolioTrackingDelegate trackingDelegate;
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
-    late MockGetUserUseCase getUserUseCase;
+    late MockGetGuestUserUseCase getGuestUserUseCase;
 
     PortfolioBloc buildBloc() => PortfolioBloc(
       getPortfolioUseCase,
       trackingDelegate,
       isFeatureEnabledUseCase,
       local,
-      getUserUseCase,
+      getGuestUserUseCase,
     );
 
     setUp(() {
-      getUserUseCase = MockGetUserUseCase()..stubCall(null);
+      getGuestUserUseCase = MockGetGuestUserUseCase()..stubCall(null);
       getPortfolioUseCase = MockGetPortfolioUseCase();
       trackingDelegate = MockPortfolioTrackingDelegate();
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase()
@@ -148,7 +148,9 @@ void main() {
         getPortfolioUseCase.stubCall(
           Right<GetPortfolioFailure, PortfolioEntity>(portfolio),
         );
-        getUserUseCase.stubCall(const UserEntity(role: UserRole.developer));
+        getGuestUserUseCase.stubCall(
+          const GuestUserEntity(role: UserRole.developer),
+        );
       },
       build: buildBloc,
       act: (bloc) => bloc.add(const LoadPortfolioEvent()),

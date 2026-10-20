@@ -2,10 +2,10 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/onboarding/data/cache/_cache.dart';
 import 'package:portrai/src/feature/onboarding/data/model/_model.dart';
 
-class MockUserCache extends Mock implements UserCache {}
+class MockGuestUserCache extends Mock implements GuestUserCache {}
 
-extension MockUserCacheStub on MockUserCache {
-  void stubGet(UserModel? userModel) {
+extension MockGuestUserCacheStub on MockGuestUserCache {
+  void stubGet(GuestUserModel? userModel) {
     when(get).thenAnswer((_) async => userModel);
   }
 

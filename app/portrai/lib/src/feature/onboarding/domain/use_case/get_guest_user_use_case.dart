@@ -7,15 +7,16 @@ import 'package:portrai/src/feature/onboarding/domain/repository/_repository.dar
 import 'package:use_case/use_case.dart';
 
 @register
-class GetUserUseCase extends BaseNoParamUseCase<UserEntity?, NoFailure> {
-  GetUserUseCase(this._repository);
+class GetGuestUserUseCase
+    extends BaseNoParamUseCase<GuestUserEntity?, NoFailure> {
+  GetGuestUserUseCase(this._repository);
 
-  final UserRepository _repository;
+  final GuestUserRepository _repository;
 
   @protected
   @override
-  FutureOr<Either<NoFailure, UserEntity?>> execute() async =>
-      Right(await _repository.getUser());
+  FutureOr<Either<NoFailure, GuestUserEntity?>> execute() async =>
+      Right(await _repository.getGuestUser());
 
   @protected
   @override

@@ -4,15 +4,15 @@ import 'package:portrai/src/feature/onboarding/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/onboarding/domain/entity/_entity.dart';
 import 'package:portrai/src/feature/onboarding/domain/repository/_repository.dart';
 
-@Register(as: UserRepository)
-class UserRepositoryImpl implements UserRepository {
-  UserRepositoryImpl(this._cache, this._mapper);
+@Register(as: GuestUserRepository)
+class GuestUserRepositoryImpl implements GuestUserRepository {
+  GuestUserRepositoryImpl(this._cache, this._mapper);
 
-  final UserCache _cache;
-  final UserMapper _mapper;
+  final GuestUserCache _cache;
+  final GuestUserMapper _mapper;
 
   @override
-  Future<UserEntity?> getUser() async {
+  Future<GuestUserEntity?> getGuestUser() async {
     try {
       final userModel = await _cache.get();
       return userModel == null ? null : _mapper.to(userModel);
@@ -22,7 +22,7 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> saveUser(UserEntity user) async {
+  Future<void> saveGuestUser(GuestUserEntity user) async {
     await _cache.put(_mapper.from(user));
   }
 }

@@ -24,7 +24,7 @@ class RemoteAssistantBloc
     this._isRemoteAssistantSupportedUseCase,
     this._openExternalUrlUseCase,
     this._trackingDelegate,
-    this._getUserUseCase,
+    this._getGuestUserUseCase,
   ) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
     on<RemoteAssistantInitializedEvent>(
@@ -48,7 +48,7 @@ class RemoteAssistantBloc
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   final RemoteAssistantTrackingDelegate _trackingDelegate;
-  final GetUserUseCase _getUserUseCase;
+  final GetGuestUserUseCase _getGuestUserUseCase;
   int _controlRevision = 0;
   int _requestRevision = 0;
   final Set<AssistantGenuiController> _genuiControllers = {};
@@ -179,7 +179,7 @@ class RemoteAssistantBloc
     if (!await _checkFlag(emit, revision) || revision != _controlRevision) {
       return;
     }
-    final userEither = await _getUserUseCase();
+    final userEither = await _getGuestUserUseCase();
     if (emit.isDone || revision != _controlRevision) return;
     emit(
       state.copyWith(

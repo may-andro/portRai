@@ -12,19 +12,19 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_user_use_case.dart';
+import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
 
 void main() {
   group('SettingBloc', () {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
-    late MockGetUserUseCase getUserUseCase;
+    late MockGetGuestUserUseCase getGuestUserUseCase;
 
     SettingBloc buildBloc() => SettingBloc(
       isFeatureEnabledUseCase,
       BuildConfig(buildEnvironment: BuildEnvironment.prod),
       local,
-      getUserUseCase,
+      getGuestUserUseCase,
     );
 
     setUp(() {
@@ -41,7 +41,7 @@ void main() {
           definition: OnboardingFeatureFlags.roleOnboarding,
           result: const Right(false),
         );
-      getUserUseCase = MockGetUserUseCase()..stubCall(null);
+      getGuestUserUseCase = MockGetGuestUserUseCase()..stubCall(null);
       local = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
     });
 
@@ -143,7 +143,7 @@ void main() {
         isFeatureEnabledUseCase,
         BuildConfig(buildEnvironment: BuildEnvironment.staging),
         local,
-        getUserUseCase,
+        getGuestUserUseCase,
       ),
       act: (bloc) => bloc.add(const LoadSettingsEvent()),
       expect: () => const [
@@ -219,7 +219,9 @@ void main() {
             definition: OnboardingFeatureFlags.roleOnboarding,
             result: const Right(true),
           );
-        getUserUseCase.stubCall(const UserEntity(role: UserRole.recruiter));
+        getGuestUserUseCase.stubCall(
+          const GuestUserEntity(role: UserRole.recruiter),
+        );
       },
       build: buildBloc,
       act: (bloc) => bloc.add(const LoadSettingsEvent()),
@@ -239,7 +241,9 @@ void main() {
           definition: SettingFeatureFlags.languageSelector,
           result: const Right(false),
         );
-        getUserUseCase.stubCall(const UserEntity(role: UserRole.developer));
+        getGuestUserUseCase.stubCall(
+          const GuestUserEntity(role: UserRole.developer),
+        );
       },
       build: buildBloc,
       act: (bloc) => bloc.add(const LoadSettingsEvent()),

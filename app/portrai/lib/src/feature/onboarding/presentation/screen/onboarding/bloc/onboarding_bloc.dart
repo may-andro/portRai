@@ -7,13 +7,13 @@ import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/tr
 
 @register
 class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
-  OnboardingBloc(this._saveUserUseCase, this._trackingDelegate)
+  OnboardingBloc(this._saveGuestUserUseCase, this._trackingDelegate)
     : super(const OnboardingState()) {
     on<OnboardingStartedEvent>(_mapOnboardingStartedEventToState);
     on<RoleSelectedClickEvent>(_mapRoleSelectedClickEventToState);
   }
 
-  final SaveUserUseCase _saveUserUseCase;
+  final SaveGuestUserUseCase _saveGuestUserUseCase;
   final OnboardingTrackingDelegate _trackingDelegate;
 
   void _mapOnboardingStartedEventToState(
@@ -32,9 +32,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     _trackingDelegate.trackRoleSelection(event.role.name);
     emit(OnboardingState(selectedRole: event.role));
 
-    final saveUserEither = await _saveUserUseCase(UserEntity(role: event.role));
-    if (saveUserEither.isLeft) {
-      emit(OnboardingState(failure: saveUserEither.left));
+    final saveGuestUserEither = await _saveGuestUserUseCase(
+      GuestUserEntity(role: event.role),
+    );
+    if (saveGuestUserEither.isLeft) {
+      emit(OnboardingState(failure: saveGuestUserEither.left));
       return;
     }
     emit(OnboardingState(selectedRole: event.role, isCompleted: true));
