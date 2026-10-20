@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/_domain.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_event.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 @register
 class SettingBloc extends Bloc<SettingEvent, SettingState> {
@@ -17,7 +18,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     this._isFeatureEnabledUseCase,
     this._buildConfig,
     this._isLocalAssistantSupportedUseCase,
-    this._getUserUseCase,
+    this._getGuestUserUseCase,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
@@ -25,7 +26,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final BuildConfig _buildConfig;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
-  final GetUserUseCase _getUserUseCase;
+  final GetGuestUserUseCase _getGuestUserUseCase;
   int _loadRevision = 0;
 
   Future<void> _mapLoadSettingsEventToState(
@@ -65,7 +66,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       OnboardingFeatureFlags.roleOnboarding,
     );
     if (onboarding.isRight && onboarding.right) {
-      final user = await _getUserUseCase();
+      final user = await _getGuestUserUseCase();
       userRole = user.isRight ? user.right?.role : null;
     }
     if (emit.isDone || revision != _loadRevision) return;

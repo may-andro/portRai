@@ -5,12 +5,12 @@ import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_event.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/tracking/_tracking.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 @RegisterSingleton(disposeMethodName: 'close')
@@ -24,7 +24,7 @@ class RemoteAssistantBloc
     this._isRemoteAssistantSupportedUseCase,
     this._openExternalUrlUseCase,
     this._trackingDelegate,
-    this._getUserUseCase,
+    this._getGuestUserUseCase,
   ) : super(const RemoteAssistantState()) {
     on<RemoteAssistantStartedEvent>(_mapRemoteAssistantStartedEventToState);
     on<RemoteAssistantInitializedEvent>(
@@ -48,7 +48,7 @@ class RemoteAssistantBloc
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsRemoteAssistantSupportedUseCase _isRemoteAssistantSupportedUseCase;
   final RemoteAssistantTrackingDelegate _trackingDelegate;
-  final GetUserUseCase _getUserUseCase;
+  final GetGuestUserUseCase _getGuestUserUseCase;
   int _controlRevision = 0;
   int _requestRevision = 0;
   final Set<AssistantGenuiController> _genuiControllers = {};
@@ -179,7 +179,7 @@ class RemoteAssistantBloc
     if (!await _checkFlag(emit, revision) || revision != _controlRevision) {
       return;
     }
-    final userEither = await _getUserUseCase();
+    final userEither = await _getGuestUserUseCase();
     if (emit.isDone || revision != _controlRevision) return;
     emit(
       state.copyWith(

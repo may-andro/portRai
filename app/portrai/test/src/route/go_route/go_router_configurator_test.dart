@@ -160,6 +160,93 @@ void main() {
       },
     );
 
+    group('requiresAuth', () {
+      MockModuleRouteController buildController({
+        ModuleRouteRedirect? authRedirect,
+      }) {
+        final controller = MockModuleRouteController();
+        when(() => controller.redirects).thenReturn(const []);
+        when(() => controller.authRedirect).thenReturn(authRedirect);
+        when(() => controller.allRoutes).thenReturn([
+          ModuleRoute(
+            name: 'home',
+            path: '/',
+            builder: (_, _, _) => const Scaffold(body: Text('Home')),
+          ),
+          ModuleRoute(
+            name: 'sign_in',
+            path: '/sign-in',
+            builder: (_, _, _) => const Scaffold(body: Text('Sign in')),
+          ),
+          ModuleRoute(
+            name: 'private',
+            path: '/private',
+            requiresAuth: true,
+            builder: (_, _, _) => const Scaffold(body: Text('Private')),
+          ),
+        ]);
+        return controller;
+      }
+
+      Future<GoRouter> pumpRouter(
+        WidgetTester tester,
+        MockModuleRouteController controller,
+      ) async {
+        final router = GoRouterConfigurator(controller, const []).router;
+        addTearDown(router.dispose);
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+        return router;
+      }
+
+      testWidgets('should open the route when the auth redirect allows it', (
+        tester,
+      ) async {
+        final router = await pumpRouter(
+          tester,
+          buildController(authRedirect: (_, _) => null),
+        );
+
+        router.go('/private');
+        await tester.pumpAndSettle();
+
+        expect(find.text('Private'), findsOneWidget);
+      });
+
+      testWidgets(
+        'should follow the auth redirect when it returns a location',
+        (tester) async {
+          Uri? guardedUri;
+          final router = await pumpRouter(
+            tester,
+            buildController(
+              authRedirect: (_, requestedUri) {
+                guardedUri = requestedUri;
+                return '/sign-in';
+              },
+            ),
+          );
+
+          router.go('/private?tab=open');
+          await tester.pumpAndSettle();
+
+          expect(find.text('Sign in'), findsOneWidget);
+          expect(guardedUri, Uri.parse('/private?tab=open'));
+        },
+      );
+
+      testWidgets('should fall back to the start page when no auth redirect is '
+          'registered', (tester) async {
+        final router = await pumpRouter(tester, buildController());
+
+        router.go('/private');
+        await tester.pumpAndSettle();
+
+        expect(find.text('Home'), findsOneWidget);
+        expect(find.text('Private'), findsNothing);
+      });
+    });
+
     testWidgets(
       'should build the route not found screen when navigation fails',
       (tester) async {

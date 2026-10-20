@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
@@ -17,6 +16,7 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/project.dart';
 import 'package:portrai/src/feature/service/service.dart';
 import 'package:portrai/src/feature/testimonial/testimonial.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:tracking/tracking.dart';
 
 sealed class SectionWidget extends StatelessWidget {

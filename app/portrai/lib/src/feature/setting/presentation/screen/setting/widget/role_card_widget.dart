@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:portrai/src/route/route.dart';
 
 class RoleCardWidget extends StatelessWidget {

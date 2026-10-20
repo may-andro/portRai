@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/onboarding/domain/feature_flag/_feature_flag.dart';
-import 'package:portrai/src/feature/onboarding/domain/use_case/get_user_use_case.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 sealed class ShouldShowOnboardingFailure extends BasicFailure {
@@ -22,11 +22,11 @@ class ShouldShowOnboardingUseCase
     extends BaseNoParamUseCase<bool, ShouldShowOnboardingFailure> {
   ShouldShowOnboardingUseCase(
     this._isFeatureEnabledUseCase,
-    this._getUserUseCase,
+    this._getGuestUserUseCase,
   );
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
-  final GetUserUseCase _getUserUseCase;
+  final GetGuestUserUseCase _getGuestUserUseCase;
 
   @protected
   @override
@@ -41,7 +41,7 @@ class ShouldShowOnboardingUseCase
     }
     if (!isEnabledEither.right) return const Right(false);
 
-    final userEither = await _getUserUseCase();
+    final userEither = await _getGuestUserUseCase();
     if (userEither.isLeft) {
       return Left(ShouldShowOnboardingUnknownFailure(cause: userEither.left));
     }

@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/onboarding/domain/_domain.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/bloc/_bloc.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/widget/content_widget.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_save_user_use_case.dart';
 import '../../../../../../../mock/feature/onboarding/presentation/screen/onboarding/tracking/mock_onboarding_tracking_delegate.dart';
+import '../../../../../../../mock/feature/user/domain/use_case/mock_save_guest_user_use_case.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   group('ContentWidget', () {
-    late MockSaveUserUseCase saveUserUseCase;
+    late MockSaveGuestUserUseCase saveGuestUserUseCase;
 
     setUp(() {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
-      saveUserUseCase = MockSaveUserUseCase();
+      saveGuestUserUseCase = MockSaveGuestUserUseCase();
       for (final role in UserRole.values) {
-        saveUserUseCase.stubCall(UserEntity(role: role), const Right(null));
+        saveGuestUserUseCase.stubCall(
+          GuestUserEntity(role: role),
+          const Right(null),
+        );
       }
     });
 
@@ -30,7 +33,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       final bloc = OnboardingBloc(
-        saveUserUseCase,
+        saveGuestUserUseCase,
         MockOnboardingTrackingDelegate(),
       );
       addTearDown(bloc.close);
@@ -71,7 +74,9 @@ void main() {
       await tester.pump();
 
       verify(
-        () => saveUserUseCase(const UserEntity(role: UserRole.recruiter)),
+        () => saveGuestUserUseCase(
+          const GuestUserEntity(role: UserRole.recruiter),
+        ),
       ).called(1);
     });
   });

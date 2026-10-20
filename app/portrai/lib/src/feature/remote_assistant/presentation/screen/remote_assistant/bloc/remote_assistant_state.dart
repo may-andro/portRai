@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 enum RemoteAssistantStatus { loading, unavailable, ready }

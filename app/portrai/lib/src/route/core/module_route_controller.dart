@@ -18,6 +18,7 @@ class ModuleRouteController {
 
   final List<ModuleRoute> _routes = [];
   final List<ModuleRouteRedirect> _redirects = [];
+  ModuleRouteRedirect? _authRedirect;
 
   void register(ModuleRoute moduleRoute) {
     if (_routes.contains(moduleRoute)) {
@@ -38,6 +39,23 @@ class ModuleRouteController {
 
   List<ModuleRouteRedirect> get redirects => List.unmodifiable(_redirects);
 
+  /// Guards every route with [ModuleRoute.requiresAuth]. Only one can be
+  /// registered.
+  void registerAuthRedirect(ModuleRouteRedirect redirect) {
+    if (_authRedirect != null) {
+      _logReporter.error(
+        'Auth redirect is already registered',
+        stacktrace: StackTrace.current,
+        error: _AuthRedirectRegisteredException(),
+        tag: 'ModuleRouteController',
+      );
+      return;
+    }
+    _authRedirect = redirect;
+  }
+
+  ModuleRouteRedirect? get authRedirect => _authRedirect;
+
   List<ModuleRoute> get allRoutes => List.unmodifiable(_routes);
 }
 
@@ -45,5 +63,12 @@ class _ModuleRouteRegisteredException implements AppException {
   @override
   String toString() {
     return '_ModuleRouteRegisteredException: The ModuleRoute is already registered';
+  }
+}
+
+class _AuthRedirectRegisteredException implements AppException {
+  @override
+  String toString() {
+    return '_AuthRedirectRegisteredException: The auth redirect is already registered';
   }
 }

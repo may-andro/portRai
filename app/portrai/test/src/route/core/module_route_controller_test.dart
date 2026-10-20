@@ -38,6 +38,39 @@ void main() {
       expect(controller.redirects, [firstRedirect, secondRedirect]);
     });
 
+    test('should expose the auth redirect when one is registered', () {
+      String? authRedirect(BuildContext context, Uri requestedUri) =>
+          '/sign-in';
+
+      controller.registerAuthRedirect(authRedirect);
+
+      expect(controller.authRedirect, authRedirect);
+    });
+
+    test(
+      'should keep the first auth redirect when a second one is registered',
+      () {
+        String? firstAuthRedirect(BuildContext context, Uri requestedUri) =>
+            null;
+        String? secondAuthRedirect(BuildContext context, Uri requestedUri) =>
+            '/other';
+
+        controller
+          ..registerAuthRedirect(firstAuthRedirect)
+          ..registerAuthRedirect(secondAuthRedirect);
+
+        expect(controller.authRedirect, firstAuthRedirect);
+        verify(
+          () => logReporter.error(
+            any<String>(),
+            stacktrace: any<StackTrace>(named: 'stacktrace'),
+            error: any<Object>(named: 'error'),
+            tag: 'ModuleRouteController',
+          ),
+        ).called(1);
+      },
+    );
+
     test('should register a route when a new route is added', () {
       controller.register(route);
 

@@ -1,25 +1,25 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/onboarding/domain/_domain.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/bloc/_bloc.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_save_user_use_case.dart';
 import '../../../../../../../mock/feature/onboarding/presentation/screen/onboarding/tracking/mock_onboarding_tracking_delegate.dart';
+import '../../../../../../../mock/feature/user/domain/use_case/mock_save_guest_user_use_case.dart';
 
 void main() {
   group('OnboardingBloc', () {
-    late MockSaveUserUseCase saveUserUseCase;
+    late MockSaveGuestUserUseCase saveGuestUserUseCase;
     late MockOnboardingTrackingDelegate trackingDelegate;
 
     setUp(() {
-      saveUserUseCase = MockSaveUserUseCase();
+      saveGuestUserUseCase = MockSaveGuestUserUseCase();
       trackingDelegate = MockOnboardingTrackingDelegate();
     });
 
     OnboardingBloc buildBloc() =>
-        OnboardingBloc(saveUserUseCase, trackingDelegate);
+        OnboardingBloc(saveGuestUserUseCase, trackingDelegate);
 
     blocTest<OnboardingBloc, OnboardingState>(
       'should track the screen view when started',
@@ -31,8 +31,8 @@ void main() {
 
     blocTest<OnboardingBloc, OnboardingState>(
       'should save the role and complete when a role is selected',
-      setUp: () => saveUserUseCase.stubCall(
-        const UserEntity(role: UserRole.developer),
+      setUp: () => saveGuestUserUseCase.stubCall(
+        const GuestUserEntity(role: UserRole.developer),
         const Right(null),
       ),
       build: buildBloc,
@@ -46,22 +46,24 @@ void main() {
           () => trackingDelegate.trackRoleSelection('developer'),
         ).called(1);
         verify(
-          () => saveUserUseCase(const UserEntity(role: UserRole.developer)),
+          () => saveGuestUserUseCase(
+            const GuestUserEntity(role: UserRole.developer),
+          ),
         ).called(1);
       },
     );
 
     blocTest<OnboardingBloc, OnboardingState>(
       'should emit a failure when saving the role fails',
-      setUp: () => saveUserUseCase.stubCall(
-        const UserEntity(role: UserRole.recruiter),
-        const Left(SaveUserUnknownFailure()),
+      setUp: () => saveGuestUserUseCase.stubCall(
+        const GuestUserEntity(role: UserRole.recruiter),
+        const Left(SaveGuestUserUnknownFailure()),
       ),
       build: buildBloc,
       act: (bloc) => bloc.add(const RoleSelectedClickEvent(UserRole.recruiter)),
       expect: () => const [
         OnboardingState(selectedRole: UserRole.recruiter),
-        OnboardingState(failure: SaveUserUnknownFailure()),
+        OnboardingState(failure: SaveGuestUserUnknownFailure()),
       ],
     );
   });

@@ -13,6 +13,7 @@ export 'package:firebase_ai/firebase_ai.dart'
         ThinkingConfig,
         ThinkingLevel;
 export 'package:firebase_analytics/firebase_analytics.dart';
+export 'package:firebase_auth/firebase_auth.dart' show User;
 export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_remote_config/firebase_remote_config.dart';
 

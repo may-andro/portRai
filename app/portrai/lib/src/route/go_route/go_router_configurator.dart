@@ -7,6 +7,8 @@ import 'package:portrai/src/route/route.dart';
 class GoRouterConfigurator {
   const GoRouterConfigurator(this._controller, this.navigationObservers);
 
+  static const _initialLocation = '/';
+
   final ModuleRouteController _controller;
   final List<NavigatorObserver> navigationObservers;
 
@@ -28,11 +30,10 @@ class GoRouterConfigurator {
       routes: route.children.map(_convertModuleRoute).toList(),
       redirect: route.requiresAuth
           ? (context, state) {
-              // TODO(auth): Replace with your actual authentication logic
-              const isAuthenticated = false; // Example placeholder
-              if (!isAuthenticated) {
-                return '/login'; // Update to your login route
-              }
+              final authRedirect = _controller.authRedirect;
+              // Without a registered guard, fail closed to the start page.
+              if (authRedirect == null) return _initialLocation;
+              return authRedirect(context, state.uri);
             }
           : null,
     );
@@ -47,7 +48,7 @@ class GoRouterConfigurator {
 
     return GoRouter(
       navigatorKey: createRootNavigatorKey(),
-      initialLocation: '/',
+      initialLocation: _initialLocation,
       routes: allRoutes,
       redirect: (context, state) async {
         for (final redirect in _controller.redirects) {

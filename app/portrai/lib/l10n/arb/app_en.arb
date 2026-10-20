@@ -1374,5 +1374,45 @@
   "errorCvUnknown": "Something went wrong while preparing the CV.",
   "@errorCvUnknown": {
     "description": "Generic error shown for unexpected CV export problems"
+  },
+  "signInTitle": "Sign in",
+  "@signInTitle": {
+    "description": "Title of the sign-in screen"
+  },
+  "signInDescription": "Sign in to open the private part of the app.",
+  "@signInDescription": {
+    "description": "Explains why the sign-in screen is shown"
+  },
+  "signInEmailLabel": "Email",
+  "@signInEmailLabel": {
+    "description": "Label of the email field on the sign-in screen"
+  },
+  "signInPasswordLabel": "Password",
+  "@signInPasswordLabel": {
+    "description": "Label of the password field on the sign-in screen"
+  },
+  "signInButton": "Sign in",
+  "@signInButton": {
+    "description": "Button that submits the sign-in form"
+  },
+  "errorSignInMissingCredentials": "Enter your email and password",
+  "@errorSignInMissingCredentials": {
+    "description": "Error shown when the email or password field is empty"
+  },
+  "errorSignInInvalidCredentials": "Incorrect email or password",
+  "@errorSignInInvalidCredentials": {
+    "description": "Error shown when the email or password is wrong, or the account does not exist"
+  },
+  "errorSignInTooManyRequests": "Too many attempts. Please try again later",
+  "@errorSignInTooManyRequests": {
+    "description": "Error shown when Firebase blocks sign-in after too many attempts"
+  },
+  "errorSignInNetwork": "Can't sign in. Check your internet connection",
+  "@errorSignInNetwork": {
+    "description": "Error shown when sign-in fails because of the network"
+  },
+  "errorSignInUnknown": "Sign-in failed. Please try again",
+  "@errorSignInUnknown": {
+    "description": "Error shown for unexpected sign-in problems"
   }
 }

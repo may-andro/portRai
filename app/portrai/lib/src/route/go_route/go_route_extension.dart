@@ -14,6 +14,14 @@ extension GoRouteExtension on BuildContext {
   /// Replaces the navigation stack with [route].
   void goScreen(ModuleRouteInfo route) => goNamed(route.name);
 
+  /// Replaces the navigation stack with the in-app [location], e.g. a path
+  /// carried in a query parameter.
+  void goLocation(String location) => go(location);
+
+  /// Query parameters of the route that built this context.
+  Map<String, String> get routeQueryParameters =>
+      GoRouterState.of(this).uri.queryParameters;
+
   void pushScreen(
     ModuleRouteInfo route, {
     Map<String, String> pathParameters = const <String, String>{},

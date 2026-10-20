@@ -3,9 +3,8 @@ import 'dart:ui';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/onboarding/domain/_domain.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/bloc/_bloc.dart';
-import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/extension/_extension.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 part 'background_widget.dart';
 part 'header_widget.dart';

@@ -139,6 +139,19 @@ The Firebase AI Logic per-user quota remains the server-side limit.
 The remote assistant model comes from the `aiAssistantModel` field of the same document,
 falling back to `RemoteAssistantRequestLimits.model`.
 
+### Sign-In
+
+`auth` provides email and password sign-in through Firebase Auth. There is no sign-up: accounts
+are created in the Firebase console. A `ModuleRoute` with `requiresAuth: true` is guarded by the
+redirect that `AuthModuleConfigurator` registers via `ModuleRouteController.registerAuthRedirect`.
+When nobody is signed in, the guard opens `/sign-in?redirect=<requested location>`, and a
+successful sign-in returns to that location. Only in-app paths are followed; anything else opens
+the start page. Without a registered guard, protected routes open the start page. Other features
+read the signed-in user through `GetSignedInUserUseCase`, which waits for a restored session on
+app start. It returns an `AuthUserEntity` with the account id and email. `AuthUserEntity` and
+`GuestUserEntity` both live in the `user` feature and extend its `UserEntity`. `user` also saves
+the guest's role on the device through `GetGuestUserUseCase` and `SaveGuestUserUseCase`.
+
 ### Remote Assistant
 
 The remote screen uses `/remote-assistant` and the independent, default-off
