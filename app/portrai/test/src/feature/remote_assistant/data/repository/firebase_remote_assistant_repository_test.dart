@@ -8,12 +8,12 @@ import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/feature_flag/domain/entity/app_feature_flag_definition.dart';
 import 'package:portrai/src/feature/feature_flag/domain/use_case/is_feature_enabled_use_case.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/remote_assistant/data/repository/firebase_remote_assistant_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/controller/remote_assistant_genui_controller_extension.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/ai_rate_limit/domain/use_case/mock_consume_ai_request_quota_use_case.dart';

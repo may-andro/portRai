@@ -4,19 +4,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
 import '../../../../../../../mock/feature/remote_assistant/presentation/screen/remote_assistant/tracking/mock_remote_assistant_tracking_delegate.dart';
+import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 
 void main() {
   const genuiResponse = '''

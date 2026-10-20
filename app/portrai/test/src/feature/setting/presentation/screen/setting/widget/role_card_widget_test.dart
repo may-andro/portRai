@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 import '../../../../../../../util/test_wrapper_widget.dart';
 

@@ -1,6 +1,6 @@
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 extension UserRoleSummaryExtension on UserRole? {
   /// Picks the professional summary variant for the role. The switch is

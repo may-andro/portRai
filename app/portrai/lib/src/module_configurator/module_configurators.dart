@@ -31,6 +31,7 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/service/service.dart';
 import 'package:portrai/src/feature/setting/setting.dart';
 import 'package:portrai/src/feature/testimonial/testimonial.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:portrai/src/module_configurator/app_module_configurator.dart';
 import 'package:portrai/src/route/route_module_configurator.dart';
 import 'package:portrai/src/utility/utility_module_configurator.dart';
@@ -65,6 +66,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   layer_ff.FeatureFlagModuleConfigurator(appId: 'portrai'),
   AppFeatureFlagModuleConfigurator(),
   ExternalAppHandlerModuleConfigurator(),
+  UserModuleConfigurator(),
   AuthModuleConfigurator(),
   ForceUpdateModuleConfigurator(),
   ConnectivityModuleConfigurator(),

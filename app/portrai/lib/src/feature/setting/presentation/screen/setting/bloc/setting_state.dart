@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 sealed class SettingState extends Equatable {
   const SettingState();

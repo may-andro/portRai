@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/onboarding/domain/_domain.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
-import '../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
+import '../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 
 void main() {
   group('ShouldShowOnboardingUseCase', () {

@@ -18,7 +18,7 @@ import 'package:portrai/src/route/observer/route_observer_widget.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
+import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 import '../../../../../../../util/assistant_test_fixture.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';

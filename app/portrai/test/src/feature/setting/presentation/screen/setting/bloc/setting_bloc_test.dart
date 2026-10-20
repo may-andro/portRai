@@ -8,11 +8,12 @@ import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
-import '../../../../../../../mock/feature/onboarding/domain/use_case/mock_get_guest_user_use_case.dart';
+import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 
 void main() {
   group('SettingBloc', () {

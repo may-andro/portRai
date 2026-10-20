@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/_domain.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_event.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
+import 'package:portrai/src/feature/user/user.dart';
 
 @register
 class SettingBloc extends Bloc<SettingEvent, SettingState> {

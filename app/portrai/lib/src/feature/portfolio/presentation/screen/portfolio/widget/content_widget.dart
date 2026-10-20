@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
-import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/feature/user/user.dart';
 import 'package:tracking/tracking.dart';
 
 class ContentWidget extends StatelessWidget {
