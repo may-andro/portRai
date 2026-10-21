@@ -1,7 +1,15 @@
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 
-/** The model every function calls. It matches the app's assistant. */
-export const geminiModel = 'gemini-3.8-flash';
+/**
+ * The model every function calls. `gemini-3.8-flash` was throttled
+ * (429 RESOURCE_EXHAUSTED) on the shared `global` capacity for minutes at a
+ * time, while this model answered every call.
+ */
+export const geminiModel = 'gemini-2.5-flash';
+
+// Gemini 2.5 sets thinking with a token budget, not a thinking level. A small
+// budget is enough to compare a job with a skill list.
+const thinkingBudget = 1024;
 
 /** The Agent Platform (formerly Vertex AI) location of the model. */
 export const geminiLocation = 'global';
@@ -48,7 +56,7 @@ export function createGeminiGenerateJson(project: string): GenerateJson {
         maxOutputTokens: request.maxOutputTokens,
         responseMimeType: 'application/json',
         responseJsonSchema: request.responseJsonSchema,
-        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+        thinkingConfig: { thinkingBudget },
         abortSignal: AbortSignal.timeout(callTimeoutMs),
       },
     });
