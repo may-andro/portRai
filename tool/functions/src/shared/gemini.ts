@@ -1,14 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
 
-/**
- * The model every function calls. `gemini-3.8-flash` was throttled
- * (429 RESOURCE_EXHAUSTED) on the shared `global` capacity for minutes at a
- * time, while this model answered every call.
- */
+/** The model every function calls. */
 export const geminiModel = 'gemini-2.5-flash';
 
-// Gemini 2.5 sets thinking with a token budget, not a thinking level. A small
-// budget is enough to compare a job with a skill list.
+// Gemini 2.5 sets thinking with a token budget, not a thinking level.
 const thinkingBudget = 1024;
 
 /** The Agent Platform (formerly Vertex AI) location of the model. */
