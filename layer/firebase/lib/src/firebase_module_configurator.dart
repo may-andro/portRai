@@ -53,20 +53,22 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
   @override
   FutureOr<void> postDependenciesSetup(ServiceLocator serviceLocator) async {
     final appCheckController = serviceLocator.get<FbAppCheckController>();
+    // App Check goes first so later requests carry its token.
     await appCheckController.initialiseAppCheck(webSiteKey: appCheckWebSiteKey);
 
-    // set up crashlytics
     final crashlyticsController = serviceLocator.get<FbCrashlyticsController>();
-    await crashlyticsController.setCrashlyticsEnabled(isFirebaseEnabled);
-    await crashlyticsController.logMessage('App Started');
-
-    // remote config
     final rcController = serviceLocator.get<FbRemoteConfigController>();
-    await rcController.initialiseRemoteConfig(defaultConfigsMap: const {});
-
-    // analytics
     final analyticsController = serviceLocator.get<FbAnalyticsController>();
-    await analyticsController.enableFirebaseAnalytics(isFirebaseEnabled);
+    await Future.wait([
+      _setUpCrashlytics(crashlyticsController),
+      rcController.initialiseRemoteConfig(defaultConfigsMap: const {}),
+      analyticsController.enableFirebaseAnalytics(isFirebaseEnabled),
+    ]);
+  }
+
+  Future<void> _setUpCrashlytics(FbCrashlyticsController controller) async {
+    await controller.setCrashlyticsEnabled(isFirebaseEnabled);
+    await controller.logMessage('App Started');
   }
 
   @override

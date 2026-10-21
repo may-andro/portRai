@@ -52,10 +52,24 @@ class GetPortfolioUseCase
   @protected
   @override
   FutureOr<Either<GetPortfolioFailure, PortfolioEntity>> execute() async {
-    // Fetch profile data - this is critical, fail if it fails
-    final profileResult = await _getProfileUseCase();
+    // The sections are independent, so they are fetched concurrently.
+    final (
+      profileResult,
+      expertiseResult,
+      projectsResult,
+      servicesResult,
+      experiencesResult,
+      testimonialsResult,
+    ) = await (
+      Future.value(_getProfileUseCase()),
+      Future.value(_allExpertiseUseCase()),
+      Future.value(_getProjectsUseCase()),
+      Future.value(_getServicesUseCase()),
+      Future.value(_getExperiencesUseCase()),
+      Future.value(_getTestimonialsUseCase()),
+    ).wait;
 
-    // If profile fetch fails, return the failure immediately
+    // Profile data is critical, fail if it fails
     final ProfileEntity profile;
     if (profileResult.isLeft) {
       return Left(GetPortfolioNotFoundFailure(cause: profileResult.left));
@@ -63,8 +77,7 @@ class GetPortfolioUseCase
       profile = profileResult.right;
     }
 
-    // Fetch all expertise - optional, use empty list on failure
-    final expertiseResult = await _allExpertiseUseCase();
+    // Expertise is optional, use empty list on failure
     final expertises = expertiseResult.fold((failure) {
       _logReporter.debug(
         'Failed to fetch expertise for portfolio, using empty list',
@@ -74,8 +87,7 @@ class GetPortfolioUseCase
       return <ExpertiseEntity>[];
     }, (expertises) => expertises);
 
-    // Fetch all projects - optional, use empty list on failure
-    final projectsResult = await _getProjectsUseCase();
+    // Projects are optional, use empty list on failure
     final projects = projectsResult.fold((failure) {
       _logReporter.debug(
         'Failed to fetch projects for portfolio, using empty list',
@@ -85,8 +97,7 @@ class GetPortfolioUseCase
       return <ProjectEntity>[];
     }, (projects) => projects);
 
-    // Fetch all services - optional, use empty list on failure
-    final servicesResult = await _getServicesUseCase();
+    // Services are optional, use empty list on failure
     final services = servicesResult.fold((failure) {
       _logReporter.debug(
         'Failed to fetch services for portfolio, using empty list',
@@ -96,8 +107,7 @@ class GetPortfolioUseCase
       return <ServiceEntity>[];
     }, (services) => services);
 
-    // Fetch all experiences - optional, use empty list on failure
-    final experiencesResult = await _getExperiencesUseCase();
+    // Experiences are optional, use empty list on failure
     final experiences = experiencesResult.fold((failure) {
       _logReporter.debug(
         'Failed to fetch experiences for portfolio, using empty list',
@@ -107,8 +117,7 @@ class GetPortfolioUseCase
       return <ExperienceEntity>[];
     }, (experiences) => experiences);
 
-    // Fetch all testimonials - optional, use empty list on failure
-    final testimonialsResult = await _getTestimonialsUseCase();
+    // Testimonials are optional, use empty list on failure
     final testimonials = testimonialsResult.fold((failure) {
       _logReporter.debug(
         'Failed to fetch testimonials for portfolio, using empty list',
