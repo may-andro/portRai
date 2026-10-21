@@ -108,14 +108,26 @@ A user takes part when their document has job search turned on:
 ```jsonc
 // users/{uid}
 {
-  "jobSearch": { "enabled": true },
+  "jobSearch": {
+    "enabled": true,
+    "updatedAt": "<timestamp>", // when job search was last turned on or off
+  },
 }
 ```
+
+| Field                 | Type      | Read by the function | Description                              |
+| --------------------- | --------- | -------------------- | ---------------------------------------- |
+| `jobSearch.enabled`   | boolean   | Yes                  | Whether the weekly run includes the user |
+| `jobSearch.updatedAt` | timestamp | No                   | When `enabled` last changed              |
+
+`jobSearch` holds settings the user controls. Anything the function reports back, such as its
+last run, belongs outside this map, so Firestore rules can let the user change `jobSearch` while
+only the server writes the rest.
 
 No user document exists until job search is turned on, and a run with no such users skips the
 feeds. To turn it on, create the document in the Firebase console: in the `users` collection,
 add a document whose ID is the user's UID from Authentication, with a map field `jobSearch`
-holding the boolean `enabled` set to `true`.
+holding the boolean `enabled` set to `true` and the timestamp `updatedAt` set to now.
 
 Each opening is stored at `users/{uid}/job_openings/{dedupeKey}`. The key is a hash of the
 normalized company and title, so the same job keeps one document across feeds and weeks.
