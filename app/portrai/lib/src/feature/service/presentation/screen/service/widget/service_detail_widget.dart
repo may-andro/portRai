@@ -186,9 +186,11 @@ class _ServiceDetailWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _RevealWidget(
-          child: _DetailQuoteBandWidget(
-            detail: service.detail,
-            imageUrl: service.image,
+          child: DSOffscreenPauseWidget(
+            child: _DetailQuoteBandWidget(
+              detail: service.detail,
+              imageUrl: service.image,
+            ),
           ),
         ),
         for (final (sectionIndex, section) in sections.indexed)

@@ -1,5 +1,6 @@
 export 'button/button.dart';
 export 'container/ds_card_widget.dart';
+export 'container/ds_offscreen_pause_widget.dart';
 export 'container/ds_responsive_container_widget.dart';
 export 'container/ds_visibility_detector_widget.dart';
 export 'divider/ds_horizontal_divider_widget.dart';

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:design_system/src/component/atom/container/ds_visibility_detector_widget.dart';
 import 'package:design_system/src/design_system/design_system.dart';
 import 'package:design_system/src/extension/build_context_extension.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +50,21 @@ class _DSFestiveBackdropWidgetState extends State<DSFestiveBackdropWidget>
     duration: widget.duration,
   )..repeat();
 
+  final _visibilityKey = UniqueKey();
+  bool _isOnScreen = true;
+
+  // Stops the loop while none of the widget is on screen, so it stops
+  // requesting frames once it is scrolled away.
+  void _onVisibilityChanged(double visiblePercentage) {
+    if (!mounted) return;
+    _isOnScreen = visiblePercentage > 0;
+    if (!_isOnScreen) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
+
   late List<_Particle> _particles = _generate();
 
   List<_Particle> _generate() {
@@ -70,9 +86,8 @@ class _DSFestiveBackdropWidgetState extends State<DSFestiveBackdropWidget>
   void didUpdateWidget(covariant DSFestiveBackdropWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.duration != widget.duration) {
-      _controller
-        ..duration = widget.duration
-        ..repeat();
+      _controller.duration = widget.duration;
+      if (_isOnScreen) _controller.repeat();
     }
     if (oldWidget.particleCount != widget.particleCount) {
       _particles = _generate();
@@ -89,34 +104,38 @@ class _DSFestiveBackdropWidgetState extends State<DSFestiveBackdropWidget>
   Widget build(BuildContext context) {
     final designSystem = widget.designSystem ?? context.theme.designSystem;
     final primary = context.colorPalette.brand.primary.color;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        if (widget.shape == DSFestiveBackdropShape.circle)
-          DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [primary, primary.withAlpha(50)],
+    return DSVisibilityDetectorWidget(
+      key: _visibilityKey,
+      onVisibilityChanged: _onVisibilityChanged,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (widget.shape == DSFestiveBackdropShape.circle)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [primary, primary.withAlpha(50)],
+                ),
+              ),
+            ),
+          Opacity(
+            opacity: widget.effectOpacity,
+            child: RepaintBoundary(
+              child: CustomPaint(
+                painter: _FestivePainter(
+                  rectangular: widget.shape == DSFestiveBackdropShape.rectangle,
+                  effect: _effectFor(designSystem),
+                  particles: _particles,
+                  repaint: _controller,
+                ),
               ),
             ),
           ),
-        Opacity(
-          opacity: widget.effectOpacity,
-          child: RepaintBoundary(
-            child: CustomPaint(
-              painter: _FestivePainter(
-                rectangular: widget.shape == DSFestiveBackdropShape.rectangle,
-                effect: _effectFor(designSystem),
-                particles: _particles,
-                repaint: _controller,
-              ),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

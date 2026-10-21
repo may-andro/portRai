@@ -57,6 +57,10 @@ void main() {
         await tester.pump(const Duration(seconds: 3));
 
         expect(find.text('A polished portfolio app'), findsOneWidget);
+        // The page builds sections lazily, so the tabs below the intro are
+        // built once scrolled to.
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -600));
+        await tester.pump();
         expect(find.text('Overview'), findsWidgets);
         verify(
           () => bloc.add(const SuccessContentViewVisibleEvent()),

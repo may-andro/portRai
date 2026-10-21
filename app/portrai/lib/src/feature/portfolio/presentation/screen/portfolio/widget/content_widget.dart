@@ -101,7 +101,6 @@ class _SuccessWidgetState extends State<_SuccessWidget>
               context,
             ).copyWith(scrollbars: false, overscroll: false),
             physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
             slivers: [
               HeaderWidget(
                 sections: _scrollableSections,
