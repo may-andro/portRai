@@ -1612,5 +1612,13 @@
         "example": "Remotive"
       }
     }
+  },
+  "jobSearchStatusActive": "Active · Next search on Monday",
+  "@jobSearchStatusActive": {
+    "description": "Status of the weekly job search when it is on"
+  },
+  "jobSearchStatusPaused": "Paused · No new searches",
+  "@jobSearchStatusPaused": {
+    "description": "Status of the weekly job search when it is off"
   }
 }

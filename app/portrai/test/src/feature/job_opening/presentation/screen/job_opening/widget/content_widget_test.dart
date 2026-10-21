@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -137,5 +139,31 @@ void main() {
         .onRetryClicked!();
 
     verify(() => bloc.add(const JobOpeningRetryClickEvent())).called(1);
+  });
+
+  testWidgets('should fit long skill names without overflowing on a phone', (
+    tester,
+  ) async {
+    const longSkill = 'Code Generation (build_runner, json_serializable)';
+    await pumpContent(
+      tester,
+      JobOpeningState(
+        id: 'job-1',
+        status: JobOpeningStatus.loaded,
+        jobOpening: jobOpeningEntityFixture(
+          matchedSkills: [
+            longSkill,
+            'Monorepo (Melos / Workspaces)',
+            for (var index = 0; index < 20; index++) 'Skill $index',
+          ],
+        ),
+      ),
+    );
+    setUpAnimatedPage(tester, size: const Size(375, 4000));
+    await pumpAnimations(tester);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text(longSkill), findsOneWidget);
+    expect(find.text('22'), findsOneWidget);
   });
 }

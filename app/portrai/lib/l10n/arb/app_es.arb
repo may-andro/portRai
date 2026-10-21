@@ -584,5 +584,7 @@
   "jobOpeningFitPossible": "Encaje posible",
   "jobOpeningSkillsTitle": "Habilidades",
   "jobOpeningApplyTitle": "¿Listo para postular?",
-  "jobOpeningApplyDescription": "Este empleo está publicado en {source}. Al postular se abre su página allí."
+  "jobOpeningApplyDescription": "Este empleo está publicado en {source}. Al postular se abre su página allí.",
+  "jobSearchStatusActive": "Activa · Próxima búsqueda el lunes",
+  "jobSearchStatusPaused": "En pausa · Sin búsquedas nuevas"
 }

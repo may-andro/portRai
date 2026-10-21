@@ -259,4 +259,23 @@ void main() {
     expect(first.dy, second.dy);
     expect(second.dx, greaterThan(first.dx));
   });
+
+  for (final (isEnabled, status) in [
+    (true, 'Active · Next search on Monday'),
+    (false, 'Paused · No new searches'),
+  ]) {
+    testWidgets('should show "$status" when job search is '
+        '${isEnabled ? 'on' : 'off'}', (tester) async {
+      await pumpContent(
+        tester,
+        JobOpeningsState(
+          status: JobOpeningsStatus.loaded,
+          isJobSearchEnabled: isEnabled,
+        ),
+      );
+
+      expect(find.text(status), findsOneWidget);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isEnabled);
+    });
+  }
 }

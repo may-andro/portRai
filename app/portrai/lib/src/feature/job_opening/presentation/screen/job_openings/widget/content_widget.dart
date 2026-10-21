@@ -15,10 +15,10 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 
-part 'control_card_widget.dart';
 part 'grid_widget.dart';
 part 'hero_widget.dart';
 part 'job_opening_card_widget.dart';
+part 'job_search_widget.dart';
 part 'status_widget.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -39,7 +39,14 @@ class ContentWidget extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.only(bottom: context.space(factor: 6)),
                 child: JobOpeningPageColumnWidget(
-                  child: _bodyFor(context, state),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: context.space(factor: 4),
+                    children: [
+                      _JobSearchWidget(state: state),
+                      _bodyFor(context, state),
+                    ],
+                  ),
                 ),
               ),
             ),

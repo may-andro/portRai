@@ -20,25 +20,10 @@ class _HeroWidget extends StatelessWidget {
               const Positioned.fill(child: JobOpeningHeroBackgroundWidget()),
               JobOpeningPageColumnWidget(
                 verticalPadding: context.space(factor: isWide ? 7 : 4),
-                child: isWide
-                    ? Row(
-                        spacing: context.space(factor: 5),
-                        children: [
-                          Expanded(child: _HeroCopyWidget(state: state)),
-                          SizedBox(
-                            width: 400,
-                            child: _ControlCardWidget(state: state),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        spacing: context.space(factor: 3),
-                        children: [
-                          _HeroCopyWidget(state: state),
-                          _ControlCardWidget(state: state),
-                        ],
-                      ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: _HeroCopyWidget(state: state),
+                ),
               ),
             ],
           ),
