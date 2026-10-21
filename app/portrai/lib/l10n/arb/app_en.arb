@@ -1641,9 +1641,9 @@
   "@signInHighlightDevices": {
     "description": "Sign-in highlight about devices"
   },
-  "signInHighlightSecure": "Protected sign-in with Firebase",
-  "@signInHighlightSecure": {
-    "description": "Sign-in highlight about security"
+  "signInHighlightStaySignedIn": "Stay signed in on this device",
+  "@signInHighlightStaySignedIn": {
+    "description": "Sign-in highlight about staying signed in"
   },
   "signInNoSignUp": "Accounts are created by the site owner. There is no sign-up.",
   "@signInNoSignUp": {
