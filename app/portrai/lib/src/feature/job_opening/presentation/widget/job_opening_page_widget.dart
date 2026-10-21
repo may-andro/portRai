@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
@@ -235,20 +237,69 @@ class JobOpeningBandWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
     return ColoredBox(
-      color: isAlternate
-          ? Color.alphaBlend(
-              palette.accent.color.withAlpha(22),
-              palette.background.color,
-            )
-          : palette.background.color,
+      color: context.jobOpeningBandColor(isAlternate: isAlternate),
       child: JobOpeningPageColumnWidget(
-        verticalPadding: context.space(factor: context.isMobile ? 4 : 6),
+        verticalPadding: context.jobOpeningBandVerticalPadding,
         child: child,
       ),
     );
   }
+}
+
+/// [JobOpeningBandWidget] for a [sliver], so a long list in a band is built
+/// lazily as it scrolls into view.
+class JobOpeningBandSliverWidget extends StatelessWidget {
+  const JobOpeningBandSliverWidget({
+    super.key,
+    required this.sliver,
+    this.isAlternate = false,
+  });
+
+  final Widget sliver;
+  final bool isAlternate;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedSliver(
+      decoration: BoxDecoration(
+        color: context.jobOpeningBandColor(isAlternate: isAlternate),
+      ),
+      sliver: SliverLayoutBuilder(
+        builder: (context, constraints) {
+          final pagePadding = context.jobOpeningHorizontalPadding;
+          final contentWidth = min(
+            constraints.crossAxisExtent - pagePadding * 2,
+            jobOpeningMaxContentWidth,
+          );
+          return SliverPadding(
+            padding: EdgeInsets.symmetric(
+              horizontal: max(
+                pagePadding,
+                (constraints.crossAxisExtent - contentWidth) / 2,
+              ),
+              vertical: context.jobOpeningBandVerticalPadding,
+            ),
+            sliver: sliver,
+          );
+        },
+      ),
+    );
+  }
+}
+
+extension on BuildContext {
+  Color jobOpeningBandColor({required bool isAlternate}) {
+    final palette = colorPalette;
+    return isAlternate
+        ? Color.alphaBlend(
+            palette.accent.color.withAlpha(22),
+            palette.background.color,
+          )
+        : palette.background.color;
+  }
+
+  double get jobOpeningBandVerticalPadding => space(factor: isMobile ? 4 : 6);
 }
 
 /// A section heading with an icon badge, shared by the page bands.

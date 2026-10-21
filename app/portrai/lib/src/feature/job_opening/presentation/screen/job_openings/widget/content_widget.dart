@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
+import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/route/_route.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/job_opening_screen.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/_bloc.dart';
@@ -40,19 +41,23 @@ class ContentWidget extends StatelessWidget {
                 child: _JobSearchWidget(state: state),
               ),
             ),
-            SliverToBoxAdapter(
-              child: JobOpeningBandWidget(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: context.space(factor: 2.5),
-                  children: [
-                    JobOpeningSectionTitleWidget(
-                      title: context.localizations.jobOpeningsMatchesTitle,
-                      icon: Icons.work_outline_rounded,
+            // A sliver, so only the cards in view are built.
+            JobOpeningBandSliverWidget(
+              sliver: SliverMainAxisGroup(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: context.space(factor: 2.5),
+                      ),
+                      child: JobOpeningSectionTitleWidget(
+                        title: context.localizations.jobOpeningsMatchesTitle,
+                        icon: Icons.work_outline_rounded,
+                      ),
                     ),
-                    _bodyFor(context, state),
-                  ],
-                ),
+                  ),
+                  _bodyFor(context, state),
+                ],
               ),
             ),
             if (state.profile case final profile?)
@@ -65,16 +70,20 @@ class ContentWidget extends StatelessWidget {
 
   Widget _bodyFor(BuildContext context, JobOpeningsState state) {
     return switch (state.status) {
-      JobOpeningsStatus.loading => const _LoadingWidget(),
-      JobOpeningsStatus.failed => DSErrorCardWidget(
-        message: state.loadFailure == null
-            ? null
-            : FailureTranslator.translate(context, state.loadFailure!),
-        onRetryClicked: () =>
-            context.bloc.add(const JobOpeningsRetryClickEvent()),
+      JobOpeningsStatus.loading => const SliverToBoxAdapter(
+        child: _LoadingWidget(),
+      ),
+      JobOpeningsStatus.failed => SliverToBoxAdapter(
+        child: DSErrorCardWidget(
+          message: state.loadFailure == null
+              ? null
+              : FailureTranslator.translate(context, state.loadFailure!),
+          onRetryClicked: () =>
+              context.bloc.add(const JobOpeningsRetryClickEvent()),
+        ),
       ),
       JobOpeningsStatus.loaded when state.jobOpenings.isEmpty =>
-        const _EmptyWidget(),
+        const SliverToBoxAdapter(child: _EmptyWidget()),
       JobOpeningsStatus.loaded => _GridWidget(jobOpenings: state.jobOpenings),
     };
   }

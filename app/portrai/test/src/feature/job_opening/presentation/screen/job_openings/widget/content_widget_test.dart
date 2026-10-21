@@ -318,4 +318,47 @@ void main() {
     expect(find.text('Posted yesterday'), findsOneWidget);
     expect(find.text('Posted 12 days ago'), findsOneWidget);
   });
+
+  testWidgets('should highlight contract and freelance openings', (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          jobOpeningEntityFixture(
+            id: '1',
+            title: 'Android Engineer (Contract)',
+          ),
+          jobOpeningEntityFixture(
+            id: '2',
+            title: 'Flutter Developer',
+            jobTypes: ['freelance'],
+          ),
+          jobOpeningEntityFixture(id: '3'),
+        ],
+      ),
+    );
+
+    expect(find.text('Contract'), findsOneWidget);
+    expect(find.text('Freelance'), findsOneWidget);
+  });
+
+  testWidgets('should build only the cards in view when there are many '
+      'openings', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          for (var index = 0; index < 60; index++)
+            jobOpeningEntityFixture(id: '$index', title: 'Opening $index'),
+        ],
+      ),
+    );
+
+    expect(find.text('Opening 0'), findsOneWidget);
+    expect(find.text('Opening 59'), findsNothing);
+  });
 }

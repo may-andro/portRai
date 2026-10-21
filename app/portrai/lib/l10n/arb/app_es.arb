@@ -605,5 +605,7 @@
   "errorCvTailoringUnavailable": "Adaptar un CV no está disponible ahora mismo.",
   "errorCvTailoringQuota": "Has alcanzado el límite de CV a medida. Inténtalo más tarde.",
   "errorCvTailoringNetwork": "No se pudo adaptar el CV. Comprueba tu conexión e inténtalo de nuevo.",
-  "errorCvTailoringUnknown": "Algo salió mal al adaptar tu CV. Inténtalo de nuevo."
+  "errorCvTailoringUnknown": "Algo salió mal al adaptar tu CV. Inténtalo de nuevo.",
+  "jobOpeningEngagementContract": "Contrato",
+  "jobOpeningEngagementFreelance": "Freelance"
 }

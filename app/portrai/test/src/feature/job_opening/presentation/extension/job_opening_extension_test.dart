@@ -46,4 +46,32 @@ void main() {
       );
     });
   });
+
+  group('engagement', () {
+    for (final (title, jobTypes, engagement) in [
+      ('Senior Android Engineer', ['full_time'], null),
+      (
+        'Senior Android Engineer (Contract)',
+        <String>[],
+        JobOpeningEngagement.contract,
+      ),
+      ('Android Engineer', ['Contractor'], JobOpeningEngagement.contract),
+      ('Flutter Developer', ['freelance'], JobOpeningEngagement.freelance),
+      (
+        'Mobile Engineer (Freelancer)',
+        <String>[],
+        JobOpeningEngagement.freelance,
+      ),
+      ('Smart Contract Engineer', ['full_time'], null),
+    ]) {
+      test('should read "$title" with $jobTypes as $engagement', () {
+        final jobOpening = jobOpeningEntityFixture(
+          title: title,
+          jobTypes: jobTypes,
+        );
+
+        expect(jobOpening.engagement, engagement);
+      });
+    }
+  });
 }

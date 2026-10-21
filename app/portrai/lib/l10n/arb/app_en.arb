@@ -1702,5 +1702,13 @@
   "errorCvTailoringUnknown": "Something went wrong while tailoring your CV. Try again.",
   "@errorCvTailoringUnknown": {
     "description": "Unexpected tailoring failure"
+  },
+  "jobOpeningEngagementContract": "Contract",
+  "@jobOpeningEngagementContract": {
+    "description": "Chip on a job opening card for contract work"
+  },
+  "jobOpeningEngagementFreelance": "Freelance",
+  "@jobOpeningEngagementFreelance": {
+    "description": "Chip on a job opening card for freelance work"
   }
 }

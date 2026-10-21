@@ -3,6 +3,12 @@ part of 'content_widget.dart';
 // Room for the hover lift so it isn't clipped.
 const _hoverLift = 8.0;
 
+/// Cards beyond these are already below the first screen, so they appear
+/// without the staggered entrance.
+const _animatedCardCount = 9;
+
+/// The openings in rows of equal height, built lazily as rows scroll into
+/// view.
 class _GridWidget extends StatelessWidget {
   const _GridWidget({required this.jobOpenings});
 
@@ -12,27 +18,25 @@ class _GridWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = context.space(factor: 2);
 
-    return LayoutBuilder(
+    return SliverLayoutBuilder(
       builder: (context, constraints) {
-        final columns = _columnsFor(constraints.maxWidth);
-        return Padding(
+        final columns = _columnsFor(constraints.crossAxisExtent);
+        final rowCount = (jobOpenings.length / columns).ceil();
+        return SliverPadding(
           padding: const EdgeInsets.only(top: _hoverLift),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: spacing,
-            children: [
-              for (var start = 0; start < jobOpenings.length; start += columns)
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: spacing,
-                    children: [
-                      for (var column = 0; column < columns; column++)
-                        Expanded(child: _cellAt(start + column)),
-                    ],
-                  ),
-                ),
-            ],
+          sliver: SliverList.separated(
+            itemCount: rowCount,
+            separatorBuilder: (_, _) => SizedBox(height: spacing),
+            itemBuilder: (context, row) => IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: spacing,
+                children: [
+                  for (var column = 0; column < columns; column++)
+                    Expanded(child: _cellAt(row * columns + column)),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -42,8 +46,10 @@ class _GridWidget extends StatelessWidget {
   Widget _cellAt(int index) {
     if (index >= jobOpenings.length) return const SizedBox.shrink();
 
+    final card = _JobOpeningCardWidget(jobOpening: jobOpenings[index]);
+    if (index >= _animatedCardCount) return card;
     final delay = (100 + index * 80).ms;
-    return _JobOpeningCardWidget(jobOpening: jobOpenings[index])
+    return card
         .animate()
         .slideY(
           begin: 0.2,
