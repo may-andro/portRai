@@ -306,7 +306,7 @@ Future<String?> signInAndGetUserId(
 
 App features inject `FbFirestoreController`, which validates paths and throws the
 typed `FirestoreException` subclasses from `firestore_exception.dart`. Collection
-paths may point at subcollections, such as `users/{uid}/job_openings`.
+paths may point at subcollections, such as `parents/{parentId}/children`.
 
 - `getCollectionQuerySnapshot(path, documentIdField: 'id')` adds each document's
   ID to its map under the given key, for data that does not store its own ID.
@@ -317,15 +317,23 @@ paths may point at subcollections, such as `users/{uid}/job_openings`.
 ```dart
 import 'package:firebase/firebase.dart';
 
-Future<void> setJobSearch(
+Future<List<Map<String, dynamic>>> getChildren(
   FbFirestoreController controller, {
-  required String userId,
+  required String parentId,
+}) => controller.getCollectionQuerySnapshot(
+  'parents/$parentId/children',
+  documentIdField: 'id',
+);
+
+Future<void> setPreference(
+  FbFirestoreController controller, {
+  required String documentId,
   required bool enabled,
 }) => controller.mergeDocumentInCollection(
-  collectionPath: 'users',
-  documentPath: userId,
+  collectionPath: 'preferences',
+  documentPath: documentId,
   data: {
-    'jobSearch': {
+    'settings': {
       'enabled': enabled,
       'updatedAt': FieldValue.serverTimestamp(),
     },

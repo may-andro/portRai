@@ -3,14 +3,14 @@ import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const collectionPath = 'users/owner-uid/job_openings';
+  const collectionPath = 'parents/parent-1/children';
 
   group('getCollectionQuerySnapshot', () {
     test('should add each document ID under the given field when '
         'documentIdField is set', () async {
       final firestore = FakeFirebaseFirestore();
-      await firestore.collection(collectionPath).doc('job-1').set({
-        'title': 'Flutter Developer',
+      await firestore.collection(collectionPath).doc('child-1').set({
+        'name': 'First child',
       });
       final controller = FbFirestoreController(firestore);
 
@@ -20,7 +20,7 @@ void main() {
       );
 
       expect(documents, [
-        {'title': 'Flutter Developer', 'id': 'job-1'},
+        {'name': 'First child', 'id': 'child-1'},
       ]);
     });
 
@@ -28,8 +28,8 @@ void main() {
       'should return the data only when documentIdField is not set',
       () async {
         final firestore = FakeFirebaseFirestore();
-        await firestore.collection(collectionPath).doc('job-1').set({
-          'title': 'Flutter Developer',
+        await firestore.collection(collectionPath).doc('child-1').set({
+          'name': 'First child',
         });
         final controller = FbFirestoreController(firestore);
 
@@ -38,7 +38,7 @@ void main() {
         );
 
         expect(documents, [
-          {'title': 'Flutter Developer'},
+          {'name': 'First child'},
         ]);
       },
     );
@@ -50,39 +50,39 @@ void main() {
       final controller = FbFirestoreController(firestore);
 
       await controller.mergeDocumentInCollection(
-        collectionPath: 'users',
-        documentPath: 'owner-uid',
+        collectionPath: 'preferences',
+        documentPath: 'preference-1',
         data: {
-          'jobSearch': {'enabled': true},
+          'settings': {'enabled': true},
         },
       );
 
-      final snapshot = await firestore.doc('users/owner-uid').get();
+      final snapshot = await firestore.doc('preferences/preference-1').get();
       expect(snapshot.data(), {
-        'jobSearch': {'enabled': true},
+        'settings': {'enabled': true},
       });
     });
 
     test('should keep the other fields, nested ones included, when the '
         'document exists', () async {
       final firestore = FakeFirebaseFirestore();
-      await firestore.doc('users/owner-uid').set({
-        'jobSearch': {'enabled': true, 'note': 'kept'},
+      await firestore.doc('preferences/preference-1').set({
+        'settings': {'enabled': true, 'note': 'kept'},
         'other': 'kept',
       });
       final controller = FbFirestoreController(firestore);
 
       await controller.mergeDocumentInCollection(
-        collectionPath: 'users',
-        documentPath: 'owner-uid',
+        collectionPath: 'preferences',
+        documentPath: 'preference-1',
         data: {
-          'jobSearch': {'enabled': false},
+          'settings': {'enabled': false},
         },
       );
 
-      final snapshot = await firestore.doc('users/owner-uid').get();
+      final snapshot = await firestore.doc('preferences/preference-1').get();
       expect(snapshot.data(), {
-        'jobSearch': {'enabled': false, 'note': 'kept'},
+        'settings': {'enabled': false, 'note': 'kept'},
         'other': 'kept',
       });
     });
@@ -92,8 +92,8 @@ void main() {
 
       expect(
         () => controller.mergeDocumentInCollection(
-          collectionPath: 'users',
-          documentPath: 'owner-uid',
+          collectionPath: 'preferences',
+          documentPath: 'preference-1',
           data: {},
         ),
         throwsA(isA<FirestoreException>()),

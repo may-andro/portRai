@@ -29,8 +29,8 @@ class FbFirestoreController {
   }
 
   /// Queries [collectionPath], which may be a subcollection path such as
-  /// `users/{uid}/job_openings`. When [documentIdField] is set, each map also
-  /// holds its document ID under that key.
+  /// `parents/{parentId}/children`. When [documentIdField] is set, each map
+  /// also holds its document ID under that key.
   Future<List<Map<String, dynamic>>> getCollectionQuerySnapshot(
     String collectionPath, {
     String? documentIdField,
