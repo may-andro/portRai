@@ -145,7 +145,8 @@ falling back to `RemoteAssistantRequestLimits.model`.
 are created in the Firebase console. A `ModuleRoute` with `requiresAuth: true` is guarded by the
 redirect that `AuthModuleConfigurator` registers via `ModuleRouteController.registerAuthRedirect`.
 When nobody is signed in, the guard opens `/sign-in?redirect=<requested location>`, and a
-successful sign-in returns to that location. Only in-app paths are followed; anything else opens
+successful sign-in replaces the sign-in page with that location, without a new browser history
+entry, so Back returns to the page before sign-in. Only in-app paths are followed; anything else opens
 the start page. Without a registered guard, protected routes open the start page. Other features
 read the signed-in user through `GetSignedInUserUseCase`, which waits for a restored session on
 app start. It returns an `AuthUserEntity` with the account id and email. `AuthUserEntity` and

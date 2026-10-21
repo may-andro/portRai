@@ -26,7 +26,9 @@ class SignInScreen extends StatelessWidget {
             previous.failure != current.failure,
         listener: (context, state) {
           if (state.isSignedIn) {
-            context.goLocation(redirectLocation);
+            // Sign-in leaves the stack, so Back returns to where the user
+            // came from instead of to this page.
+            context.replaceLocation(redirectLocation);
             return;
           }
           if (state.failure case final failure?) {

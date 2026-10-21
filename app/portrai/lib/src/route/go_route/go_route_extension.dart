@@ -18,6 +18,12 @@ extension GoRouteExtension on BuildContext {
   /// carried in a query parameter.
   void goLocation(String location) => go(location);
 
+  /// Replaces the current page with the in-app [location] without adding a
+  /// browser history entry, so Back skips the page being left, such as a
+  /// sign-in page once signed in.
+  void replaceLocation(String location) =>
+      Router.neglect(this, () => pushReplacement(location));
+
   /// Query parameters of the route that built this context.
   Map<String, String> get routeQueryParameters =>
       GoRouterState.of(this).uri.queryParameters;
