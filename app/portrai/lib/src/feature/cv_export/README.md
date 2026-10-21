@@ -48,7 +48,10 @@ includes the company, for example `Ada_Lovelace_Acme_CV.pdf`. Opening the route 
 
 `CvFitLevelEntity` defines a ladder of 32 content levels, from full content to compact. The
 renderer binary-searches the ladder for the fullest level that still fits on one page, then enlarges
-the font in small steps (up to 1.4x) while it still fits. It yields to the UI between renders.
+the font in small steps (up to 1.4x) while it still fits. The search only lays the page out,
+which is enough to count pages, and yields to the UI between layouts; the PDF is painted and
+encoded once, for the chosen layout. `PrintingCvPdfRepository` keeps the last layout
+(`CvPdfLayout`), so changing only the accent renders once without a new search.
 
 Templates with a separate skills column (Sidebar, Bold) fit that column independently of the
 main column and use the long experience description. Single-column templates (Classic, Minimal)
