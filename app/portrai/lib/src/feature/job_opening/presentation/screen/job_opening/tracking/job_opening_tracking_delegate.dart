@@ -18,4 +18,13 @@ class JobOpeningTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
+
+  void trackGenerateInsightsClick(String sourceName) {
+    trackEvent(
+      Tracking(
+        name: 'generate_insights',
+        action: ClickAction(label: sourceName),
+      ),
+    );
+  }
 }

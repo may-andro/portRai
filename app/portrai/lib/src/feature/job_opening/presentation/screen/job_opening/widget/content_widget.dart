@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:genui/genui.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
@@ -14,6 +16,7 @@ import 'package:portrai/src/widget/page_chrome_widget.dart';
 
 part 'apply_band_widget.dart';
 part 'hero_widget.dart';
+part 'insights_widget.dart';
 part 'reasons_widget.dart';
 part 'section_widget.dart';
 part 'skills_widget.dart';
@@ -33,7 +36,12 @@ class ContentWidget extends StatelessWidget {
           slivers: switch (state.status) {
             JobOpeningStatus.loaded => [
               SliverToBoxAdapter(
-                child: _DetailsWidget(jobOpening: state.jobOpening!),
+                child: _DetailsWidget(
+                  jobOpening: state.jobOpening!,
+                  hasInsights:
+                      state.insightsStatus !=
+                      JobOpeningInsightsStatus.unavailable,
+                ),
               ),
               if (state.profile case final profile?)
                 SliverToBoxAdapter(child: FooterWidget(profile: profile)),
@@ -79,9 +87,10 @@ class ContentWidget extends StatelessWidget {
 }
 
 class _DetailsWidget extends StatelessWidget {
-  const _DetailsWidget({required this.jobOpening});
+  const _DetailsWidget({required this.jobOpening, required this.hasInsights});
 
   final JobOpeningEntity jobOpening;
+  final bool hasInsights;
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +110,12 @@ class _DetailsWidget extends StatelessWidget {
           title: localizations.jobOpeningSkillsTitle,
           icon: Icons.code_rounded,
           child: _SkillsWidget(jobOpening: jobOpening),
+        ),
+      if (hasInsights)
+        (
+          title: localizations.jobOpeningInsightsTitle,
+          icon: Icons.auto_awesome_rounded,
+          child: const _InsightsWidget(),
         ),
       (
         title: localizations.jobOpeningDescriptionTitle,
