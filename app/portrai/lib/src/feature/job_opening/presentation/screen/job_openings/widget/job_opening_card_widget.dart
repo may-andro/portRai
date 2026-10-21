@@ -43,6 +43,7 @@ class _JobOpeningCardWidget extends StatelessWidget {
                 _ArrowWidget(isHovering: isHovering),
               ],
             ),
+            JobOpeningPostedWidget(jobOpening: jobOpening),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: context.space(factor: 0.5),
@@ -86,10 +87,7 @@ class _JobOpeningCardWidget extends StatelessWidget {
                 ),
                 Expanded(
                   child: DSTextWidget(
-                    context.localizations.jobOpeningSourceAndDate(
-                      jobOpening.sourceName,
-                      jobOpening.formattedPublishedAt(context),
-                    ),
+                    jobOpening.sourceName,
                     style: context.typography.labelMedium,
                     color: palette.neutral.grey7,
                     maxLines: 1,

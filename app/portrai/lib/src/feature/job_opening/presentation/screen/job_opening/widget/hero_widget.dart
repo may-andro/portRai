@@ -97,6 +97,7 @@ class _HeroCopyWidget extends StatelessWidget {
               spacing: context.space(),
               runSpacing: context.space(),
               children: [
+                JobOpeningPostedWidget(jobOpening: jobOpening),
                 JobOpeningPillWidget(
                   icon: Icons.public_rounded,
                   label: jobOpening.sourceName,
@@ -107,7 +108,7 @@ class _HeroCopyWidget extends StatelessWidget {
                 ),
                 for (final jobType in jobOpening.jobTypes)
                   JobOpeningPillWidget(
-                    icon: Icons.schedule_rounded,
+                    icon: Icons.work_history_outlined,
                     label: jobType.formattedJobType,
                   ),
               ],

@@ -559,7 +559,6 @@
   "jobSearchToggleDescription": "Zoek elke maandag naar nieuwe passende vacatures",
   "jobOpeningsEmpty": "Op dit moment geen passende vacatures. Elke maandag worden nieuwe gezocht.",
   "jobOpeningScore": "{score}% match",
-  "jobOpeningSourceAndDate": "{source} · {date}",
   "jobOpeningTitle": "Vacature",
   "jobOpeningApply": "Solliciteer via {source}",
   "jobOpeningReasonsTitle": "Waarom het past",
@@ -590,5 +589,6 @@
   "jobOpeningsMatchesTitle": "Jouw matches",
   "signInWelcomeTitle": "Welkom terug",
   "signInWelcomeDescription": "Jouw privéruimte in het portfolio, alleen voor jouw account.",
-  "signInNoSignUp": "Accounts worden aangemaakt door de eigenaar van de site. Registreren is niet mogelijk."
+  "signInNoSignUp": "Accounts worden aangemaakt door de eigenaar van de site. Registreren is niet mogelijk.",
+  "jobOpeningPostedAgo": "{days, plural, =0{Vandaag geplaatst} =1{Gisteren geplaatst} other{{days} dagen geleden geplaatst}}"
 }

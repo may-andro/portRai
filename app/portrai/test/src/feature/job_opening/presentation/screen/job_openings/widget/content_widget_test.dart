@@ -63,7 +63,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Acme · Europe'), findsOneWidget);
-    expect(find.text('Remotive · Oct 17, 2026'), findsOneWidget);
+    expect(find.text('Remotive'), findsOneWidget);
   });
 
   testWidgets('should summarize the matches in the hero when loaded', (
@@ -288,5 +288,34 @@ void main() {
     expect(loader.style, DSLoadingStyle.lottie);
     // A tenth of the shortest side of the 1440 x 2400 test window.
     expect(loader.size, 144);
+  });
+
+  testWidgets('should show how long ago each opening was posted', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          jobOpeningEntityFixture(id: '1', title: 'First', publishedAt: now),
+          jobOpeningEntityFixture(
+            id: '2',
+            title: 'Second',
+            publishedAt: now.subtract(const Duration(days: 1)),
+          ),
+          jobOpeningEntityFixture(
+            id: '3',
+            title: 'Third',
+            publishedAt: now.subtract(const Duration(days: 12)),
+          ),
+        ],
+      ),
+    );
+
+    expect(find.text('Posted today'), findsOneWidget);
+    expect(find.text('Posted yesterday'), findsOneWidget);
+    expect(find.text('Posted 12 days ago'), findsOneWidget);
   });
 }
