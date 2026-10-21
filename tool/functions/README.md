@@ -144,13 +144,14 @@ A job found again replaces its document, which also moves `expiresAt` back.
 
 #### Expiry
 
-Firestore deletes expired openings through a TTL policy on `expiresAt`. Create it once:
+Firestore deletes expired openings through a TTL policy on `expiresAt`. Create it once, with
+`PROJECT_ID` set as in [Getting Started](#getting-started):
 
 ```bash
 gcloud firestore fields ttls update expiresAt \
   --collection-group=job_openings \
   --enable-ttl \
-  --project=portrai-96f2b
+  --project="$PROJECT_ID"
 ```
 
 TTL deletion usually runs within a day of `expiresAt`, so expired openings can stay readable
@@ -158,10 +159,17 @@ for a short time.
 
 ## Getting Started
 
+The commands below read the project ID from `PROJECT_ID`. Set it first:
+
+```bash
+export PROJECT_ID=<your-firebase-project-id>
+```
+
 ### Requirements
 
 - Node.js 22. The `volta` field in `package.json` pins it for Volta users.
-- The Firebase project `portrai-96f2b` on the Blaze plan, with the Cloud Scheduler API on.
+- A Firebase project on the Blaze plan, with the Cloud Scheduler API on. `.firebaserc` sets the
+  project the Firebase CLI deploys to.
 - The Agent Platform API (`aiplatform.googleapis.com`) on, and the role
   `roles/aiplatform.user` for the service account the function runs as. Without both, every
   score fails and the run writes nothing. See [Gemini access](#gemini-access).
@@ -174,9 +182,9 @@ Scheduled functions run as the default compute service account unless one is set
 API and grant the role once:
 
 ```bash
-gcloud services enable aiplatform.googleapis.com --project=portrai-96f2b
-PROJECT_NUMBER=$(gcloud projects describe portrai-96f2b --format='value(projectNumber)')
-gcloud projects add-iam-policy-binding portrai-96f2b \
+gcloud services enable aiplatform.googleapis.com --project="$PROJECT_ID"
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
   --role=roles/aiplatform.user
 ```
