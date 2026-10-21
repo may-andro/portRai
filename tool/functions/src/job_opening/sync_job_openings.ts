@@ -1,6 +1,8 @@
 import { settleAll } from '../shared/settle_all.js';
+import { withTimeLimit } from '../shared/time_limit.js';
 import type { JobFeed } from './feed/job_feed.js';
 import type {
+  JobFit,
   JobOpening,
   MatchedJobOpening,
   PortfolioProfile,
@@ -15,7 +17,10 @@ import type { JobScorer } from './score/job_scorer.js';
 /** Openings scoring below this are not stored. */
 export const minJobFitScore = 60;
 
-/** Bounds the Gemini calls of one run; the best keyword matches go first. */
+/**
+ * Bounds the Gemini calls of one run; the best keyword matches go first.
+ * Openings with a stored fit from an earlier run do not count.
+ */
 export const maxScoredOpenings = 120;
 
 /** Openings posted longer ago than this are dropped before matching. */
@@ -26,11 +31,15 @@ const dayMs = 24 * 60 * 60 * 1000;
 // Two at a time keeps Gemini from throttling the run.
 const scoringConcurrency = 2;
 
+/** A feed still running after this long counts as failed. */
+export const feedTimeLimitMs = 4 * 60 * 1000;
+
 /**
- * Scoring stops starting new openings after this long, so slow retries cannot
- * run into the function's 15-minute timeout. Skipped openings count as failed.
+ * Scoring stops starting new openings this long after the run starts. A call
+ * already running can take 150 s more, which still leaves time for the writes
+ * before the function's 15-minute timeout. Skipped openings count as failed.
  */
-export const scoringTimeLimitMs = 10 * 60 * 1000;
+export const scoringDeadlineMs = 11 * 60 * 1000;
 
 export interface SyncLogger {
   info(message: string, data?: object): void;
@@ -44,6 +53,9 @@ export interface SyncDependencies {
   /** The regions to keep jobs for; empty keeps every region. */
   loadRegions(profile: PortfolioProfile): Promise<Set<Region>>;
   scorer: JobScorer;
+  /** The fits stored by earlier runs for [fitKeys], by key. */
+  loadJobFits(fitKeys: string[]): Promise<Map<string, JobFit>>;
+  saveJobFits(fits: Map<string, JobFit>, now: Date): Promise<void>;
   writeJobOpenings(
     userId: string,
     openings: ScoredJobOpening[],
@@ -63,7 +75,10 @@ export interface SyncResult {
   /** Openings dropped as a kind of role the portfolio does not hold. */
   otherRoleCount: number;
   matchedCount: number;
+  /** Openings Gemini scored in this run. */
   scoredCount: number;
+  /** Openings that reused a fit stored by an earlier run. */
+  reusedScoreCount: number;
   failedScoreCount: number;
   keptCount: number;
   failedSources: string[];
@@ -72,7 +87,8 @@ export interface SyncResult {
 /**
  * Searches every feed for the portfolio's role terms, drops openings older
  * than [maxJobAgeDays], keeps those that match the portfolio's skills or
- * roles, scores them with the [JobScorer] and writes the ones scoring at
+ * roles, scores them with the [JobScorer], reusing fits stored by earlier
+ * runs, and writes the ones scoring at
  * least [minJobFitScore] for each user with job search on. A feed or score
  * that fails is skipped; the run fails only when every feed or every score
  * fails.
@@ -81,6 +97,7 @@ export async function syncJobOpenings(
   dependencies: SyncDependencies,
 ): Promise<SyncResult> {
   const { feeds, logger } = dependencies;
+  const startedAt = dependencies.now();
   const userIds = await dependencies.listUserIds();
   if (userIds.length === 0) {
     logger.info('No users have job search on; skipping the feeds');
@@ -92,6 +109,7 @@ export async function syncJobOpenings(
       otherRoleCount: 0,
       matchedCount: 0,
       scoredCount: 0,
+      reusedScoreCount: 0,
       failedScoreCount: 0,
       keptCount: 0,
       failedSources: [],
@@ -109,6 +127,7 @@ export async function syncJobOpenings(
       otherRoleCount: 0,
       matchedCount: 0,
       scoredCount: 0,
+      reusedScoreCount: 0,
       failedScoreCount: 0,
       keptCount: 0,
       failedSources: [],
@@ -118,7 +137,13 @@ export async function syncJobOpenings(
   const query = { terms: profile.searchTerms };
   logger.info('Searching the job feeds', { terms: query.terms });
   const feedResults = await Promise.allSettled(
-    feeds.map((feed) => feed.fetchJobs(query)),
+    feeds.map((feed) =>
+      withTimeLimit(
+        feed.fetchJobs(query),
+        feedTimeLimitMs,
+        `Timed out after ${feedTimeLimitMs / 1000} s`,
+      ),
+    ),
   );
   const openings: JobOpening[] = [];
   const failedSources: string[] = [];
@@ -185,21 +210,45 @@ export async function syncJobOpenings(
       : [];
   });
 
-  const candidates = [...matched]
+  const ranked = [...matched]
     .sort(byBestKeywordMatch)
-    .slice(0, maxScoredOpenings);
-  if (candidates.length < matched.length) {
-    logger.info('Scoring only the best keyword matches', {
-      matched: matched.length,
-      scored: candidates.length,
-    });
-  }
-  const { scored, failedCount } = await scoreOpenings(
-    candidates.map(({ isRoleMatch: _, ...opening }) => opening),
+    .map(({ isRoleMatch: _, ...opening }): MatchedJobOpening => opening);
+  const fitKeys = ranked.map((opening) =>
+    dependencies.scorer.fitKey(opening, profile),
+  );
+  const storedFits = await loadStoredFits(fitKeys, dependencies);
+  const reused: ScoredJobOpening[] = [];
+  const unscored: FitCandidate[] = [];
+  ranked.forEach((opening, index) => {
+    const fitKey = fitKeys[index];
+    const fit = storedFits.get(fitKey);
+    if (fit === undefined) {
+      unscored.push({ opening, fitKey });
+    } else {
+      reused.push(withFit(opening, fit));
+    }
+  });
+
+  const candidates = unscored.slice(0, maxScoredOpenings);
+  logger.info('Scoring job openings', {
+    matched: matched.length,
+    reused: reused.length,
+    toScore: candidates.length,
+    skipped: unscored.length - candidates.length,
+  });
+  const { scored, fits, failedCount } = await scoreOpenings(
+    candidates,
     profile,
+    startedAt.getTime() + scoringDeadlineMs,
     dependencies,
   );
-  const kept = scored.filter((opening) => opening.score >= minJobFitScore);
+  if (reused.length === 0 && candidates.length > 0 && scored.length === 0) {
+    throw new Error(`Every job score failed (${failedCount} openings)`);
+  }
+  await saveNewFits(fits, dependencies);
+  const kept = [...reused, ...scored].filter(
+    (opening) => opening.score >= minJobFitScore,
+  );
 
   const now = dependencies.now();
   for (const userId of userIds) {
@@ -218,27 +267,42 @@ export async function syncJobOpenings(
     otherRoleCount: inRegion.length - relevant.length,
     matchedCount: matched.length,
     scoredCount: scored.length,
+    reusedScoreCount: reused.length,
     failedScoreCount: failedCount,
     keptCount: kept.length,
     failedSources,
   };
 }
 
+interface FitCandidate {
+  opening: MatchedJobOpening;
+  fitKey: string;
+}
+
 async function scoreOpenings(
-  openings: MatchedJobOpening[],
+  candidates: FitCandidate[],
   profile: PortfolioProfile,
+  deadline: number,
   { scorer, logger, now }: SyncDependencies,
-): Promise<{ scored: ScoredJobOpening[]; failedCount: number }> {
-  const deadline = now().getTime() + scoringTimeLimitMs;
-  const results = await settleAll(openings, scoringConcurrency, (opening) => {
-    if (now().getTime() >= deadline) {
-      throw new Error('Skipped: the scoring time limit was reached');
-    }
-    return scorer.score(opening, profile);
-  });
+): Promise<{
+  scored: ScoredJobOpening[];
+  fits: Map<string, JobFit>;
+  failedCount: number;
+}> {
+  const results = await settleAll(
+    candidates,
+    scoringConcurrency,
+    ({ opening }) => {
+      if (now().getTime() >= deadline) {
+        throw new Error('Skipped: the scoring time limit was reached');
+      }
+      return scorer.score(opening, profile);
+    },
+  );
   const scored: ScoredJobOpening[] = [];
+  const fits = new Map<string, JobFit>();
   results.forEach((result, index) => {
-    const opening = openings[index];
+    const { opening, fitKey } = candidates[index];
     if (result.status === 'rejected') {
       logger.warn('Scoring a job opening failed', {
         dedupeKey: opening.dedupeKey,
@@ -246,22 +310,49 @@ async function scoreOpenings(
       });
       return;
     }
-    const fit = result.value;
-    scored.push({
-      ...opening,
-      // Gemini also finds skills the job names differently, such as Compose
-      // for Jetpack Compose. Both lists hold portfolio spellings only.
-      matchedSkills: mergeSkills(opening.matchedSkills, fit.matchedSkills),
-      score: fit.score,
-      missingSkills: fit.missingSkills,
-      reasons: fit.reasons,
-    });
+    scored.push(withFit(opening, result.value));
+    fits.set(fitKey, result.value);
   });
-  const failedCount = openings.length - scored.length;
-  if (openings.length > 0 && failedCount === openings.length) {
-    throw new Error(`Every job score failed (${failedCount} openings)`);
+  return { scored, fits, failedCount: candidates.length - scored.length };
+}
+
+/** No stored fits when reading them fails, so every opening is scored. */
+async function loadStoredFits(
+  fitKeys: string[],
+  { loadJobFits, logger }: SyncDependencies,
+): Promise<Map<string, JobFit>> {
+  if (fitKeys.length === 0) return new Map();
+  try {
+    return await loadJobFits(fitKeys);
+  } catch (error) {
+    logger.warn('Reading stored job fits failed', { error: String(error) });
+    return new Map();
   }
-  return { scored, failedCount };
+}
+
+/** A failed save only costs the next run new Gemini calls. */
+async function saveNewFits(
+  fits: Map<string, JobFit>,
+  { saveJobFits, logger, now }: SyncDependencies,
+): Promise<void> {
+  if (fits.size === 0) return;
+  try {
+    await saveJobFits(fits, now());
+  } catch (error) {
+    logger.warn('Storing job fits failed', { error: String(error) });
+  }
+}
+
+function withFit(opening: MatchedJobOpening, fit: JobFit): ScoredJobOpening {
+  return {
+    ...opening,
+    // Gemini also finds skills the job names differently, such as Compose
+    // for Jetpack Compose. Both lists hold portfolio spellings only.
+    matchedSkills: mergeSkills(opening.matchedSkills, fit.matchedSkills),
+    score: fit.score,
+    missingSkills: fit.missingSkills,
+    reasons: fit.reasons,
+  };
 }
 
 type CandidateOpening = MatchedJobOpening & { isRoleMatch: boolean };

@@ -47,4 +47,36 @@ describe('GeminiJobScorer', () => {
       ),
     ).rejects.toThrow('HTTP 503');
   });
+
+  describe('fitKey', () => {
+    const scorer = new GeminiJobScorer(vi.fn());
+    const opening = {
+      ...jobOpening(),
+      dedupeKey: 'key',
+      matchedSkills: ['Flutter'],
+    };
+
+    it('should be the same when the request is the same', () => {
+      expect(scorer.fitKey(opening, portfolioProfile())).toBe(
+        scorer.fitKey(
+          { ...opening, matchedSkills: [], url: 'https://example.com/job' },
+          portfolioProfile(),
+        ),
+      );
+    });
+
+    it('should change when the job or the portfolio changes', () => {
+      const key = scorer.fitKey(opening, portfolioProfile());
+
+      expect(
+        scorer.fitKey(
+          { ...opening, description: 'Now with Kotlin.' },
+          portfolioProfile(),
+        ),
+      ).not.toBe(key);
+      expect(
+        scorer.fitKey(opening, portfolioProfile({ yearsOfExperience: 11 })),
+      ).not.toBe(key);
+    });
+  });
 });
