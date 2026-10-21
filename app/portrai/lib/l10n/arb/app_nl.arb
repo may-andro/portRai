@@ -587,5 +587,11 @@
   "jobOpeningApplyDescription": "Deze vacature staat op {source}. Solliciteren opent de pagina daar.",
   "jobSearchStatusActive": "Actief · Volgende zoektocht op maandag",
   "jobSearchStatusPaused": "Gepauzeerd · Geen nieuwe zoektochten",
-  "jobOpeningsMatchesTitle": "Jouw matches"
+  "jobOpeningsMatchesTitle": "Jouw matches",
+  "signInWelcomeTitle": "Welkom terug",
+  "signInWelcomeDescription": "Jouw privéruimte in het portfolio, alleen voor jouw account.",
+  "signInHighlightPrivate": "Privé voor je account",
+  "signInHighlightDevices": "Hetzelfde account op elk apparaat",
+  "signInHighlightSecure": "Beveiligd inloggen met Firebase",
+  "signInNoSignUp": "Accounts worden aangemaakt door de eigenaar van de site. Registreren is niet mogelijk."
 }

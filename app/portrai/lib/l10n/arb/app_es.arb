@@ -587,5 +587,11 @@
   "jobOpeningApplyDescription": "Este empleo está publicado en {source}. Al postular se abre su página allí.",
   "jobSearchStatusActive": "Activa · Próxima búsqueda el lunes",
   "jobSearchStatusPaused": "En pausa · Sin búsquedas nuevas",
-  "jobOpeningsMatchesTitle": "Tus coincidencias"
+  "jobOpeningsMatchesTitle": "Tus coincidencias",
+  "signInWelcomeTitle": "Bienvenido de nuevo",
+  "signInWelcomeDescription": "Tu espacio privado en el portfolio, reservado solo para tu cuenta.",
+  "signInHighlightPrivate": "Privado para tu cuenta",
+  "signInHighlightDevices": "La misma cuenta en todos tus dispositivos",
+  "signInHighlightSecure": "Inicio de sesión protegido con Firebase",
+  "signInNoSignUp": "Las cuentas las crea el propietario del sitio. No hay registro."
 }

@@ -7,7 +7,12 @@ class _LoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: context.space(factor: 6)),
-      child: Center(child: DSLoadingWidget(size: context.space(factor: 6))),
+      child: Center(
+        child: DSLoadingWidget(
+          style: DSLoadingStyle.lottie,
+          size: context.space(factor: 10),
+        ),
+      ),
     );
   }
 }

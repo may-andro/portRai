@@ -41,7 +41,10 @@ class ContentWidget extends StatelessWidget {
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
-                  child: DSLoadingWidget(size: context.space(factor: 6)),
+                  child: DSLoadingWidget(
+                    style: DSLoadingStyle.lottie,
+                    size: context.space(factor: 10),
+                  ),
                 ),
               ),
             ],
