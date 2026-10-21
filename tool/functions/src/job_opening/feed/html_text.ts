@@ -14,18 +14,19 @@ const namedEntities: Record<string, string> = {
  * list breaks, and caps its length so documents stay small.
  */
 export function htmlToText(html: string): string {
-  const text = html
-    .replace(/<\s*(script|style)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, ' ')
-    .replace(/<\s*br\s*\/?>/gi, '\n')
-    .replace(/<\s*\/\s*(p|div|li|h[1-6]|ul|ol)\s*>/gi, '\n')
-    .replace(/<\s*li[^>]*>/gi, '- ')
-    // Inline formatting sits inside words and sentences, so it leaves no gap.
-    .replace(
-      /<\s*\/?\s*(a|abbr|b|code|em|i|mark|small|span|strong|sub|sup|u)\b[^>]*>/gi,
-      '',
-    )
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, decodeEntity)
+  const text = decodeHtmlEntities(
+    html
+      .replace(/<\s*(script|style)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, ' ')
+      .replace(/<\s*br\s*\/?>/gi, '\n')
+      .replace(/<\s*\/\s*(p|div|li|h[1-6]|ul|ol)\s*>/gi, '\n')
+      .replace(/<\s*li[^>]*>/gi, '- ')
+      // Inline formatting sits inside words and sentences, so it leaves no gap.
+      .replace(
+        /<\s*\/?\s*(a|abbr|b|code|em|i|mark|small|span|strong|sub|sup|u)\b[^>]*>/gi,
+        '',
+      )
+      .replace(/<[^>]*>/g, ' '),
+  )
     .replace(/[ \t\f\v]+/g, ' ')
     .replace(/ *\n */g, '\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -33,6 +34,14 @@ export function htmlToText(html: string): string {
   return text.length <= maxDescriptionLength
     ? text
     : `${text.slice(0, maxDescriptionLength).trimEnd()}…`;
+}
+
+/**
+ * Decodes named and numeric HTML entities, such as `&lt;p&gt;` in HTML that a
+ * feed escapes before sending.
+ */
+export function decodeHtmlEntities(text: string): string {
+  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, decodeEntity);
 }
 
 function decodeEntity(entity: string, name: string): string {

@@ -11,9 +11,16 @@ import {
 import { createGeminiGenerateJson } from '../shared/gemini.js';
 import { GeminiJobPostExtractor } from './extract/job_post_extractor.js';
 import { ArbeitnowFeed } from './feed/arbeitnow_feed.js';
+import { AshbyFeed } from './feed/ashby_feed.js';
+import {
+  type BoardErrorHandler,
+  loadCompanyBoards,
+} from './feed/company_board.js';
+import { GreenhouseFeed } from './feed/greenhouse_feed.js';
 import { HackerNewsFeed } from './feed/hacker_news_feed.js';
 import { HimalayasFeed } from './feed/himalayas_feed.js';
 import { JobicyFeed } from './feed/jobicy_feed.js';
+import { LeverFeed } from './feed/lever_feed.js';
 import { RemoteOkFeed } from './feed/remoteok_feed.js';
 import { RemotiveFeed } from './feed/remotive_feed.js';
 import { loadPortfolioProfile } from './profile/portfolio_profile.js';
@@ -41,10 +48,24 @@ export const fetchJobOpenings = onSchedule(
   async () => {
     const db = getFirestore();
     const generateJson = createGeminiGenerateJson(projectId());
+    const readDocument = firestoreReadDocument(db);
+    const boards = await loadCompanyBoards(readDocument);
+    const boardsOf = (system: string) =>
+      boards.filter((board) => board.system === system);
+    const onBoardError: BoardErrorHandler = (board, error) =>
+      logger.warn('A company board failed', {
+        system: board.system,
+        slug: board.slug,
+        error: String(error),
+      });
     const result = await syncJobOpenings({
-      // Earlier feeds win when two list the same job; the searchable feeds
-      // with the richest data come first.
+      // Earlier feeds win when two list the same job. The company boards come
+      // first, as they link to the employer's own posting; then the
+      // searchable feeds with the richest data.
       feeds: [
+        new GreenhouseFeed(fetchJson, boardsOf('greenhouse'), onBoardError),
+        new LeverFeed(fetchJson, boardsOf('lever'), onBoardError),
+        new AshbyFeed(fetchJson, boardsOf('ashby'), onBoardError),
         new HimalayasFeed(fetchJson),
         new RemotiveFeed(fetchJson),
         new RemoteOkFeed(fetchJson),
@@ -53,7 +74,7 @@ export const fetchJobOpenings = onSchedule(
         new ArbeitnowFeed(fetchJson),
       ],
       listUserIds: () => listJobSearchUserIds(db),
-      loadProfile: () => loadPortfolioProfile(firestoreReadDocument(db)),
+      loadProfile: () => loadPortfolioProfile(readDocument),
       scorer: new GeminiJobScorer(generateJson),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),
