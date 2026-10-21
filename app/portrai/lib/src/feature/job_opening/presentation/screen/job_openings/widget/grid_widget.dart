@@ -8,15 +8,31 @@ const _hoverLift = 8.0;
 const _animatedCardCount = 9;
 
 /// The openings in rows of equal height, built lazily as rows scroll into
-/// view.
-class _GridWidget extends StatelessWidget {
+/// view. The first cards play a staggered entrance once; rows rebuilt when
+/// scrolled back into view appear as they are.
+class _GridWidget extends StatefulWidget {
   const _GridWidget({required this.jobOpenings});
 
   final List<JobOpeningEntity> jobOpenings;
 
   @override
+  State<_GridWidget> createState() => _GridWidgetState();
+}
+
+class _GridWidgetState extends State<_GridWidget> {
+  /// Set after the first frame, so only the first build animates.
+  bool _hasEntered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _hasEntered = true);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final spacing = context.space(factor: 2);
+    final jobOpenings = widget.jobOpenings;
 
     return SliverLayoutBuilder(
       builder: (context, constraints) {
@@ -44,13 +60,15 @@ class _GridWidget extends StatelessWidget {
   }
 
   Widget _cellAt(int index) {
+    final jobOpenings = widget.jobOpenings;
     if (index >= jobOpenings.length) return const SizedBox.shrink();
 
-    final card = _JobOpeningCardWidget(jobOpening: jobOpenings[index]);
-    if (index >= _animatedCardCount) return card;
-    final delay = (100 + index * 80).ms;
-    return card
-        .animate()
+    // Every card keeps the same wrapper, so a rebuild never remounts one;
+    // cards that should not play start at the end of the entrance.
+    final isPlaying = !_hasEntered && index < _animatedCardCount;
+    final delay = (100 + min(index, _animatedCardCount) * 80).ms;
+    return _JobOpeningCardWidget(jobOpening: jobOpenings[index])
+        .animate(autoPlay: isPlaying, value: isPlaying ? null : 1)
         .slideY(
           begin: 0.2,
           duration: 400.ms,

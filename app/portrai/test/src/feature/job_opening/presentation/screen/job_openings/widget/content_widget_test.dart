@@ -361,4 +361,40 @@ void main() {
     expect(find.text('Opening 0'), findsOneWidget);
     expect(find.text('Opening 59'), findsNothing);
   });
+
+  testWidgets('should not replay the entrance when scrolling back up', (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          for (var index = 0; index < 60; index++)
+            jobOpeningEntityFixture(id: '$index', title: 'Opening $index'),
+        ],
+      ),
+    );
+    final scrollable = find.byType(Scrollable).first;
+    await tester.drag(scrollable, const Offset(0, -20000));
+    await pumpAnimations(tester);
+    expect(find.text('Opening 0'), findsNothing);
+
+    await tester.scrollUntilVisible(
+      find.text('Opening 0'),
+      -500,
+      scrollable: scrollable,
+    );
+
+    final fade = tester.widget<FadeTransition>(
+      find
+          .ancestor(
+            of: find.text('Opening 0'),
+            matching: find.byType(FadeTransition),
+          )
+          .first,
+    );
+    expect(fade.opacity.value, 1);
+    await pumpAnimations(tester);
+  });
 }

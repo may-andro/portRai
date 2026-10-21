@@ -80,62 +80,68 @@ class _JobOpeningHeroBackgroundWidgetState
     final shapeSize = context.isMobile ? 220.0 : 360.0;
 
     return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, _) {
-          final drift = (_controller.value - 0.5) * 24;
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              DSFloatingShapesBackgroundWidget(
-                color: palette.accent.color.withAlpha(60),
-              ),
-              Positioned(
-                right: context.isMobile ? -90 : 40,
-                bottom: context.isMobile ? -120 : -170,
-                child: Transform.translate(
-                  offset: Offset(-drift * 0.5, drift * 0.4),
-                  child: Container(
-                    width: shapeSize * 1.4,
-                    height: shapeSize * 1.4,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: palette.accent.color.withAlpha(55),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DSFloatingShapesBackgroundWidget(
+            color: palette.accent.color.withAlpha(60),
+          ),
+          // Only the drifting shapes are rebuilt on each frame.
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              final drift = (_controller.value - 0.5) * 24;
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned(
+                    right: context.isMobile ? -90 : 40,
+                    bottom: context.isMobile ? -120 : -170,
+                    child: Transform.translate(
+                      offset: Offset(-drift * 0.5, drift * 0.4),
+                      child: Container(
+                        width: shapeSize * 1.4,
+                        height: shapeSize * 1.4,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: palette.accent.color.withAlpha(55),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                right: context.isMobile ? 20 : shapeSize * 0.9,
-                top: context.isMobile ? 40 : 60,
-                child: Transform.translate(
-                  offset: Offset(0, drift * 0.6),
-                  child: Icon(
-                    Icons.add_rounded,
-                    size: context.isMobile ? 22 : 30,
-                    color: palette.accent.color.withAlpha(150),
+                  Positioned(
+                    right: context.isMobile ? 20 : shapeSize * 0.9,
+                    top: context.isMobile ? 40 : 60,
+                    child: Transform.translate(
+                      offset: Offset(0, drift * 0.6),
+                      child: Icon(
+                        Icons.add_rounded,
+                        size: context.isMobile ? 22 : 30,
+                        color: palette.accent.color.withAlpha(150),
+                      ),
+                    ),
                   ),
-                ),
+                ],
+              );
+            },
+          ),
+          // Fades the shapes out towards the copy, so the hero meets the
+          // page header without an edge.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  palette.background.color,
+                  palette.background.color.withAlpha(210),
+                  palette.background.color.withAlpha(20),
+                ],
+                stops: const [0, 0.55, 1],
               ),
-              // Fades the shapes out towards the copy, so the hero meets the
-              // page header without an edge.
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      palette.background.color,
-                      palette.background.color.withAlpha(210),
-                      palette.background.color.withAlpha(20),
-                    ],
-                    stops: const [0, 0.55, 1],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }

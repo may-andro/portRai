@@ -26,45 +26,67 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
-      builder: (context, state) {
-        return CustomScrollView(
-          scrollBehavior: ScrollConfiguration.of(
-            context,
-          ).copyWith(scrollbars: false, overscroll: false),
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(child: _HeroWidget(state: state)),
-            SliverToBoxAdapter(
-              child: JobOpeningBandWidget(
-                isAlternate: true,
-                child: _JobSearchWidget(state: state),
-              ),
+    // Each section rebuilds only for its own part of the state, so loading
+    // the job search setting or the footer does not rebuild the list.
+    return CustomScrollView(
+      scrollBehavior: ScrollConfiguration.of(
+        context,
+      ).copyWith(scrollbars: false, overscroll: false),
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
+          buildWhen: (previous, current) =>
+              previous.status != current.status ||
+              previous.jobOpenings != current.jobOpenings,
+          builder: (context, state) =>
+              SliverToBoxAdapter(child: _HeroWidget(state: state)),
+        ),
+        BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
+          buildWhen: (previous, current) =>
+              previous.isJobSearchEnabled != current.isJobSearchEnabled ||
+              previous.isUpdatingJobSearch != current.isUpdatingJobSearch ||
+              previous.isSigningOut != current.isSigningOut ||
+              previous.isSignedOut != current.isSignedOut,
+          builder: (context, state) => SliverToBoxAdapter(
+            child: JobOpeningBandWidget(
+              isAlternate: true,
+              child: _JobSearchWidget(state: state),
             ),
-            // A sliver, so only the cards in view are built.
-            JobOpeningBandSliverWidget(
-              sliver: SliverMainAxisGroup(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        bottom: context.space(factor: 2.5),
-                      ),
-                      child: JobOpeningSectionTitleWidget(
-                        title: context.localizations.jobOpeningsMatchesTitle,
-                        icon: Icons.work_outline_rounded,
-                      ),
-                    ),
+          ),
+        ),
+        // A sliver, so only the cards in view are built.
+        JobOpeningBandSliverWidget(
+          sliver: SliverMainAxisGroup(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: context.space(factor: 2.5)),
+                  child: JobOpeningSectionTitleWidget(
+                    title: context.localizations.jobOpeningsMatchesTitle,
+                    icon: Icons.work_outline_rounded,
                   ),
-                  _bodyFor(context, state),
-                ],
+                ),
               ),
+              BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
+                buildWhen: (previous, current) =>
+                    previous.status != current.status ||
+                    previous.jobOpenings != current.jobOpenings ||
+                    previous.loadFailure != current.loadFailure,
+                builder: _bodyFor,
+              ),
+            ],
+          ),
+        ),
+        BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
+          buildWhen: (previous, current) => previous.profile != current.profile,
+          builder: (context, state) => switch (state.profile) {
+            final profile? => SliverToBoxAdapter(
+              child: FooterWidget(profile: profile),
             ),
-            if (state.profile case final profile?)
-              SliverToBoxAdapter(child: FooterWidget(profile: profile)),
-          ],
-        );
-      },
+            null => const SliverToBoxAdapter(),
+          },
+        ),
+      ],
     );
   }
 
