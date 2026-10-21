@@ -17,3 +17,14 @@ class CvPdfShareException implements Exception {
   @override
   String toString() => 'CvPdfShareException: $message';
 }
+
+/// The tailoring response could not be read.
+class CvTailoringResponseException implements Exception {
+  const CvTailoringResponseException(this.message, {this.cause});
+
+  final String message;
+  final Object? cause;
+
+  @override
+  String toString() => 'CvTailoringResponseException: $message';
+}

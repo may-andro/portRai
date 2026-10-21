@@ -596,5 +596,14 @@
   "jobOpeningInsightsPromptDescription": "Zie met welke sterke punten je opent, welke gespreksonderwerpen je kunt verwachten en hoe je je cv op deze baan afstemt.",
   "jobOpeningInsightsGenerate": "Advies ophalen",
   "jobOpeningInsightsRegenerate": "Opnieuw genereren",
-  "jobOpeningInsightsGenerating": "Je advies wordt voorbereid…"
+  "jobOpeningInsightsGenerating": "Je advies wordt voorbereid…",
+  "jobOpeningTailoredCv": "Cv op maat",
+  "cvExportTailoring": "Je cv wordt afgestemd op deze baan…",
+  "cvExportTailoredFor": "Afgestemd op {title} bij {company}",
+  "cvExportTailoredDescription": "De samenvatting is herschreven voor deze baan en de meest relevante projecten en vaardigheden staan vooraan. Je ervaring en gegevens blijven gelijk.",
+  "cvExportTailoringFailed": "Je standaard-cv wordt getoond",
+  "errorCvTailoringUnavailable": "Een cv op maat is nu niet beschikbaar.",
+  "errorCvTailoringQuota": "Je hebt de limiet voor cv's op maat bereikt. Probeer het later opnieuw.",
+  "errorCvTailoringNetwork": "Het cv kon niet worden afgestemd. Controleer je verbinding en probeer het opnieuw.",
+  "errorCvTailoringUnknown": "Er ging iets mis bij het afstemmen van je cv. Probeer het opnieuw."
 }

@@ -9,12 +9,15 @@ abstract class CvExportEvent extends Equatable {
 }
 
 class LoadCvExportEvent extends CvExportEvent {
-  const LoadCvExportEvent(this.labels);
+  const LoadCvExportEvent(this.labels, {this.tailoringTarget});
 
   final CvLabelsEntity labels;
 
+  /// The job to tailor the CV for, or null for the standard CV.
+  final CvTailoringTargetEntity? tailoringTarget;
+
   @override
-  List<Object?> get props => [labels];
+  List<Object?> get props => [labels, tailoringTarget];
 }
 
 class SelectCvTemplateClickEvent extends CvExportEvent {

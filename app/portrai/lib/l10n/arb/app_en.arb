@@ -1656,5 +1656,51 @@
   "jobOpeningInsightsGenerating": "Preparing your insights…",
   "@jobOpeningInsightsGenerating": {
     "description": "Shown while the job opening insights are generated"
+  },
+  "jobOpeningTailoredCv": "Tailored CV",
+  "@jobOpeningTailoredCv": {
+    "description": "Button on a job opening that opens a CV tailored for the job"
+  },
+  "cvExportTailoring": "Tailoring your CV for this job…",
+  "@cvExportTailoring": {
+    "description": "Shown while the CV is tailored for a job"
+  },
+  "cvExportTailoredFor": "Tailored for {title} at {company}",
+  "@cvExportTailoredFor": {
+    "description": "Banner title on a CV tailored for a job",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Senior Flutter Developer"
+      },
+      "company": {
+        "type": "String",
+        "example": "Acme"
+      }
+    }
+  },
+  "cvExportTailoredDescription": "The summary is rewritten for this job and the most relevant projects and skills come first. Your experience and details are unchanged.",
+  "@cvExportTailoredDescription": {
+    "description": "Explains what tailoring changed in the CV"
+  },
+  "cvExportTailoringFailed": "Showing your standard CV",
+  "@cvExportTailoringFailed": {
+    "description": "Banner title when the CV could not be tailored"
+  },
+  "errorCvTailoringUnavailable": "Tailoring a CV is not available right now.",
+  "@errorCvTailoringUnavailable": {
+    "description": "The CV could not be tailored because the feature is off or unsupported"
+  },
+  "errorCvTailoringQuota": "You have reached the limit for tailored CVs. Try again later.",
+  "@errorCvTailoringQuota": {
+    "description": "The AI request budget is used up"
+  },
+  "errorCvTailoringNetwork": "The CV could not be tailored. Check your connection and try again.",
+  "@errorCvTailoringNetwork": {
+    "description": "Tailoring failed because of the network or a timeout"
+  },
+  "errorCvTailoringUnknown": "Something went wrong while tailoring your CV. Try again.",
+  "@errorCvTailoringUnknown": {
+    "description": "Unexpected tailoring failure"
   }
 }

@@ -13,4 +13,6 @@ export 'cv_project_entity.dart';
 export 'cv_project_link_entity.dart';
 export 'cv_section.dart';
 export 'cv_skill_group_entity.dart';
+export 'cv_tailoring_entity.dart';
+export 'cv_tailoring_target_entity.dart';
 export 'cv_template.dart';

@@ -6,6 +6,7 @@ import 'package:genui/genui.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
@@ -41,6 +42,7 @@ class ContentWidget extends StatelessWidget {
                   hasInsights:
                       state.insightsStatus !=
                       JobOpeningInsightsStatus.unavailable,
+                  isTailoredCvAvailable: state.isTailoredCvAvailable,
                 ),
               ),
               if (state.profile case final profile?)
@@ -87,10 +89,15 @@ class ContentWidget extends StatelessWidget {
 }
 
 class _DetailsWidget extends StatelessWidget {
-  const _DetailsWidget({required this.jobOpening, required this.hasInsights});
+  const _DetailsWidget({
+    required this.jobOpening,
+    required this.hasInsights,
+    required this.isTailoredCvAvailable,
+  });
 
   final JobOpeningEntity jobOpening;
   final bool hasInsights;
+  final bool isTailoredCvAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +141,10 @@ class _DetailsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _HeroWidget(jobOpening: jobOpening),
+        _HeroWidget(
+          jobOpening: jobOpening,
+          isTailoredCvAvailable: isTailoredCvAvailable,
+        ),
         for (final (sectionIndex, section) in sections.indexed)
           _SectionWidget(
             title: section.title,

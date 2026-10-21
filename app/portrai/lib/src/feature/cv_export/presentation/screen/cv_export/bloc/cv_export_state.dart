@@ -16,7 +16,12 @@ class CvExportInitialState extends CvExportState {
 }
 
 class CvExportLoadingState extends CvExportState {
-  const CvExportLoadingState();
+  const CvExportLoadingState({this.isTailoring = false});
+
+  final bool isTailoring;
+
+  @override
+  List<Object?> get props => [isTailoring];
 }
 
 class CvExportLoadedState extends CvExportState {
@@ -29,6 +34,8 @@ class CvExportLoadedState extends CvExportState {
     this.isGenerating = false,
     this.isDownloading = false,
     this.failure,
+    this.tailoringTarget,
+    this.tailoringFailure,
   });
 
   final CvDocumentEntity document;
@@ -43,6 +50,12 @@ class CvExportLoadedState extends CvExportState {
   final bool isGenerating;
   final bool isDownloading;
   final Failure? failure;
+
+  /// The job [document] is tailored for; null for the standard CV.
+  final CvTailoringTargetEntity? tailoringTarget;
+
+  /// Why the CV could not be tailored; [document] is the standard CV then.
+  final Failure? tailoringFailure;
 
   CvExportLoadedState copyWith({
     CvOptionsEntity? options,
@@ -62,6 +75,8 @@ class CvExportLoadedState extends CvExportState {
       isGenerating: isGenerating ?? this.isGenerating,
       isDownloading: isDownloading ?? this.isDownloading,
       failure: clearFailure ? null : (failure ?? this.failure),
+      tailoringTarget: tailoringTarget,
+      tailoringFailure: tailoringFailure,
     );
   }
 
@@ -74,6 +89,8 @@ class CvExportLoadedState extends CvExportState {
     isGenerating,
     isDownloading,
     failure,
+    tailoringTarget,
+    tailoringFailure,
   ];
 }
 

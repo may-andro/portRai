@@ -1,9 +1,13 @@
 part of 'content_widget.dart';
 
 class _HeroWidget extends StatelessWidget {
-  const _HeroWidget({required this.jobOpening});
+  const _HeroWidget({
+    required this.jobOpening,
+    required this.isTailoredCvAvailable,
+  });
 
   final JobOpeningEntity jobOpening;
+  final bool isTailoredCvAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,10 @@ class _HeroWidget extends StatelessWidget {
                         spacing: context.space(factor: 5),
                         children: [
                           Expanded(
-                            child: _HeroCopyWidget(jobOpening: jobOpening),
+                            child: _HeroCopyWidget(
+                              jobOpening: jobOpening,
+                              isTailoredCvAvailable: isTailoredCvAvailable,
+                            ),
                           ),
                           _ScoreBadgeWidget(
                             score: jobOpening.score,
@@ -42,7 +49,10 @@ class _HeroWidget extends StatelessWidget {
                             score: jobOpening.score,
                             size: scoreSize,
                           ),
-                          _HeroCopyWidget(jobOpening: jobOpening),
+                          _HeroCopyWidget(
+                            jobOpening: jobOpening,
+                            isTailoredCvAvailable: isTailoredCvAvailable,
+                          ),
                         ],
                       ),
               ),
@@ -55,9 +65,15 @@ class _HeroWidget extends StatelessWidget {
 }
 
 class _HeroCopyWidget extends StatelessWidget {
-  const _HeroCopyWidget({required this.jobOpening});
+  const _HeroCopyWidget({
+    required this.jobOpening,
+    required this.isTailoredCvAvailable,
+  });
 
   final JobOpeningEntity jobOpening;
+
+  /// Shows a button that opens a CV tailored for the job next to Apply.
+  final bool isTailoredCvAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +131,34 @@ class _HeroCopyWidget extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.only(top: context.space()),
-              child: DSButtonWidget(
-                label: context.localizations.jobOpeningApply(
-                  jobOpening.sourceName,
-                ),
-                icon: Icons.arrow_outward_rounded,
-                iconDirection: DSButtonIconDirection.right,
-                isExpanded: false,
-                onPressed: () => context.bloc.add(const ApplyClickEvent()),
+              child: Wrap(
+                spacing: context.space(factor: 1.5),
+                runSpacing: context.space(factor: 1.5),
+                children: [
+                  DSButtonWidget(
+                    label: context.localizations.jobOpeningApply(
+                      jobOpening.sourceName,
+                    ),
+                    icon: Icons.arrow_outward_rounded,
+                    iconDirection: DSButtonIconDirection.right,
+                    isExpanded: false,
+                    onPressed: () => context.bloc.add(const ApplyClickEvent()),
+                  ),
+                  if (isTailoredCvAvailable)
+                    DSButtonWidget(
+                      label: context.localizations.jobOpeningTailoredCv,
+                      icon: Icons.description_outlined,
+                      variant: DSButtonVariant.secondary,
+                      isExpanded: false,
+                      onPressed: () {
+                        context.bloc.add(const TailoredCvClickEvent());
+                        CvExportScreen.navigate(
+                          context,
+                          tailoringTarget: jobOpening.toCvTailoringTarget(),
+                        );
+                      },
+                    ),
+                ],
               ),
             ),
           ],

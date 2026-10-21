@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
+import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/controller/job_opening_insights_genui_controller_extension.dart';
@@ -20,11 +21,13 @@ class JobOpeningBloc extends Bloc<JobOpeningEvent, JobOpeningState> {
     this._getAssistantContextUseCase,
     this._askRemotePortfolioQuestionUseCase,
     this._resetRemoteAssistantSessionUseCase,
+    this._isCvTailoringAvailableUseCase,
     this._trackingDelegate,
   ) : super(const JobOpeningState()) {
     on<JobOpeningStartedEvent>(_mapJobOpeningStartedEventToState);
     on<JobOpeningRetryClickEvent>(_mapJobOpeningRetryClickEventToState);
     on<ApplyClickEvent>(_mapApplyClickEventToState);
+    on<TailoredCvClickEvent>(_mapTailoredCvClickEventToState);
     on<GenerateInsightsClickEvent>(_mapGenerateInsightsClickEventToState);
   }
 
@@ -36,6 +39,7 @@ class JobOpeningBloc extends Bloc<JobOpeningEvent, JobOpeningState> {
   final GetAssistantContextUseCase _getAssistantContextUseCase;
   final AskRemotePortfolioQuestionUseCase _askRemotePortfolioQuestionUseCase;
   final ResetRemoteAssistantSessionUseCase _resetRemoteAssistantSessionUseCase;
+  final IsCvTailoringAvailableUseCase _isCvTailoringAvailableUseCase;
   final JobOpeningTrackingDelegate _trackingDelegate;
 
   Future<void> _mapJobOpeningStartedEventToState(
@@ -72,6 +76,15 @@ class JobOpeningBloc extends Bloc<JobOpeningEvent, JobOpeningState> {
     if (openExternalUrlEither.isLeft) {
       emit(state.copyWith(applyFailure: openExternalUrlEither.left));
     }
+  }
+
+  void _mapTailoredCvClickEventToState(
+    TailoredCvClickEvent event,
+    Emitter<JobOpeningState> emit,
+  ) {
+    final jobOpening = state.jobOpening;
+    if (jobOpening == null) return;
+    _trackingDelegate.trackTailoredCvClick(jobOpening.sourceName);
   }
 
   Future<void> _mapGenerateInsightsClickEventToState(
@@ -166,11 +179,21 @@ class JobOpeningBloc extends Bloc<JobOpeningEvent, JobOpeningState> {
         jobOpening: jobOpeningEither.right,
       ),
     );
-    if (state.insightsStatus != JobOpeningInsightsStatus.unavailable) return;
-    final isInsightsAvailableEither =
-        await _isJobOpeningInsightsAvailableUseCase();
-    if (isInsightsAvailableEither.isRight && isInsightsAvailableEither.right) {
-      emit(state.copyWith(insightsStatus: JobOpeningInsightsStatus.idle));
+    if (state.insightsStatus == JobOpeningInsightsStatus.unavailable) {
+      final isInsightsAvailableEither =
+          await _isJobOpeningInsightsAvailableUseCase();
+      if (isInsightsAvailableEither.isRight &&
+          isInsightsAvailableEither.right) {
+        emit(state.copyWith(insightsStatus: JobOpeningInsightsStatus.idle));
+      }
+    }
+    if (!state.isTailoredCvAvailable) {
+      final isCvTailoringAvailableEither =
+          await _isCvTailoringAvailableUseCase();
+      if (isCvTailoringAvailableEither.isRight &&
+          isCvTailoringAvailableEither.right) {
+        emit(state.copyWith(isTailoredCvAvailable: true));
+      }
     }
   }
 
