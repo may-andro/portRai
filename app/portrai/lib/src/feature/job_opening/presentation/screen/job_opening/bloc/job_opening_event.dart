@@ -25,3 +25,7 @@ final class JobOpeningRetryClickEvent extends JobOpeningEvent {
 final class ApplyClickEvent extends JobOpeningEvent {
   const ApplyClickEvent();
 }
+
+final class GenerateInsightsClickEvent extends JobOpeningEvent {
+  const GenerateInsightsClickEvent();
+}

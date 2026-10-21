@@ -8,6 +8,8 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/widget/_widget.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
+import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
 import '../../../../../../../mock/feature/job_opening/presentation/screen/job_opening/bloc/mock_job_opening_bloc.dart';
@@ -192,5 +194,89 @@ void main() {
 
     expect(find.text('Posted 3 days ago'), findsOneWidget);
     expect(find.text(DateFormat.yMMMd('en').format(posted)), findsOneWidget);
+  });
+
+  JobOpeningState insightsState(
+    JobOpeningInsightsStatus insightsStatus, {
+    Failure? insightsFailure,
+  }) => JobOpeningState(
+    id: 'job-1',
+    status: JobOpeningStatus.loaded,
+    jobOpening: jobOpeningEntityFixture(),
+    insightsStatus: insightsStatus,
+    insightsFailure: insightsFailure,
+  );
+
+  testWidgets('should hide the insights section when insights are '
+      'unavailable', (tester) async {
+    await pumpContent(
+      tester,
+      insightsState(JobOpeningInsightsStatus.unavailable),
+    );
+
+    expect(find.text('Prepare for this role'), findsNothing);
+    expect(find.text('Get insights'), findsNothing);
+  });
+
+  testWidgets('should dispatch the insights request when get insights is '
+      'tapped', (tester) async {
+    final bloc = await pumpContent(
+      tester,
+      insightsState(JobOpeningInsightsStatus.idle),
+    );
+
+    expect(find.text('Prepare for this role'), findsOneWidget);
+    expect(find.text('Get tailored insights'), findsOneWidget);
+    final button = find.text('Get insights');
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pump();
+
+    verify(() => bloc.add(const GenerateInsightsClickEvent())).called(1);
+  });
+
+  testWidgets('should show progress instead of the button while '
+      'generating', (tester) async {
+    await pumpContent(
+      tester,
+      insightsState(JobOpeningInsightsStatus.generating),
+    );
+
+    expect(find.text('Preparing your insights…'), findsOneWidget);
+    expect(find.text('Get insights'), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is DSLoadingWidget && widget.style == DSLoadingStyle.lottie,
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('should offer to generate again once ready', (tester) async {
+    await pumpContent(tester, insightsState(JobOpeningInsightsStatus.ready));
+
+    expect(find.text('Generate again'), findsOneWidget);
+  });
+
+  testWidgets('should explain the failure and retry when insights '
+      'failed', (tester) async {
+    final bloc = await pumpContent(
+      tester,
+      insightsState(
+        JobOpeningInsightsStatus.failed,
+        insightsFailure: const RemoteAssistantQuotaFailure(),
+      ),
+    );
+
+    final errorCard = find.byType(DSErrorCardWidget);
+    expect(errorCard, findsOneWidget);
+    await tester.ensureVisible(errorCard);
+    await tester.tap(
+      find.descendant(of: errorCard, matching: find.byType(DSButtonWidget)),
+    );
+    await tester.pump();
+
+    verify(() => bloc.add(const GenerateInsightsClickEvent())).called(1);
   });
 }

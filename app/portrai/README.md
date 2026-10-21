@@ -164,6 +164,13 @@ a sign-out button. `/job-openings/:id` shows one opening: its score, Gemini's re
 missing skills, the description, and an Apply button that opens the job page on its board. Both
 routes set `requiresAuth`, so they ask for sign-in first.
 
+With the `feature_job_opening_insights` and `feature_remote_assistant` flags on, on web, Android
+and iOS, the opening also offers "Prepare for this role". On request it sends the opening and the
+portfolio through `AskRemotePortfolioQuestionUseCase`, which uses one request from the AI quota,
+and renders the answer as a generated surface from the assistant catalog: the strengths to lead
+with, likely interview topics and how to angle the CV. Nothing is stored; leaving the page
+cancels a request still running.
+
 The data is private to the signed-in user and is read straight from Firestore, with no cache or
 bundled fallback:
 
@@ -348,6 +355,7 @@ Feature flags are managed through Firebase Remote Config:
 - `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
 - `feature_remote_assistant_generative_ui` (default off) enables parsed, read-only design-system text and card surfaces in remote answers
 - `feature_job_openings` (default off) shows the Job openings card in Settings
+- `feature_job_opening_insights` (default off) offers generated preparation insights on a job opening; it also needs `feature_remote_assistant`
 
 ## Dependencies
 

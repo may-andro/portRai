@@ -590,5 +590,11 @@
   "signInWelcomeTitle": "Welkom terug",
   "signInWelcomeDescription": "Jouw privéruimte in het portfolio, alleen voor jouw account.",
   "signInNoSignUp": "Accounts worden aangemaakt door de eigenaar van de site. Registreren is niet mogelijk.",
-  "jobOpeningPostedAgo": "{days, plural, =0{Vandaag geplaatst} =1{Gisteren geplaatst} other{{days} dagen geleden geplaatst}}"
+  "jobOpeningPostedAgo": "{days, plural, =0{Vandaag geplaatst} =1{Gisteren geplaatst} other{{days} dagen geleden geplaatst}}",
+  "jobOpeningInsightsTitle": "Bereid je voor op deze rol",
+  "jobOpeningInsightsPromptTitle": "Krijg advies op maat",
+  "jobOpeningInsightsPromptDescription": "Zie met welke sterke punten je opent, welke gespreksonderwerpen je kunt verwachten en hoe je je cv op deze baan afstemt.",
+  "jobOpeningInsightsGenerate": "Advies ophalen",
+  "jobOpeningInsightsRegenerate": "Opnieuw genereren",
+  "jobOpeningInsightsGenerating": "Je advies wordt voorbereid…"
 }

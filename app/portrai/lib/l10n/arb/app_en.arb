@@ -1632,5 +1632,29 @@
         "example": "3"
       }
     }
+  },
+  "jobOpeningInsightsTitle": "Prepare for this role",
+  "@jobOpeningInsightsTitle": {
+    "description": "Title of the generated insights section on a job opening"
+  },
+  "jobOpeningInsightsPromptTitle": "Get tailored insights",
+  "@jobOpeningInsightsPromptTitle": {
+    "description": "Heading of the card that offers to generate insights for a job opening"
+  },
+  "jobOpeningInsightsPromptDescription": "See the strengths to lead with, the interview topics to expect and how to angle your CV for this job.",
+  "@jobOpeningInsightsPromptDescription": {
+    "description": "Explains what the generated job opening insights cover"
+  },
+  "jobOpeningInsightsGenerate": "Get insights",
+  "@jobOpeningInsightsGenerate": {
+    "description": "Button that generates insights for a job opening"
+  },
+  "jobOpeningInsightsRegenerate": "Generate again",
+  "@jobOpeningInsightsRegenerate": {
+    "description": "Button that generates the job opening insights again"
+  },
+  "jobOpeningInsightsGenerating": "Preparing your insights…",
+  "@jobOpeningInsightsGenerating": {
+    "description": "Shown while the job opening insights are generated"
   }
 }

@@ -590,5 +590,11 @@
   "signInWelcomeTitle": "Bienvenido de nuevo",
   "signInWelcomeDescription": "Tu espacio privado en el portfolio, reservado solo para tu cuenta.",
   "signInNoSignUp": "Las cuentas las crea el propietario del sitio. No hay registro.",
-  "jobOpeningPostedAgo": "{days, plural, =0{Publicado hoy} =1{Publicado ayer} other{Publicado hace {days} días}}"
+  "jobOpeningPostedAgo": "{days, plural, =0{Publicado hoy} =1{Publicado ayer} other{Publicado hace {days} días}}",
+  "jobOpeningInsightsTitle": "Prepárate para este puesto",
+  "jobOpeningInsightsPromptTitle": "Obtén consejos a medida",
+  "jobOpeningInsightsPromptDescription": "Descubre qué fortalezas destacar, qué temas esperar en la entrevista y cómo orientar tu CV para este empleo.",
+  "jobOpeningInsightsGenerate": "Obtener consejos",
+  "jobOpeningInsightsRegenerate": "Generar de nuevo",
+  "jobOpeningInsightsGenerating": "Preparando tus consejos…"
 }

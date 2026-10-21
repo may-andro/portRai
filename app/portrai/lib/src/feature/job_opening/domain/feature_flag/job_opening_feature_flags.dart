@@ -11,5 +11,14 @@ abstract final class JobOpeningFeatureFlags {
         "signed-in owner's matched job openings",
   );
 
-  static const all = [jobOpenings];
+  static const insights = AppFeatureFlagDefinition(
+    key: 'feature_job_opening_insights',
+    defaultValue: false,
+    displayName: 'Job Opening Insights',
+    description:
+        'Offers generated insights on a job opening: the strengths to lead '
+        'with, likely interview topics and how to angle the CV',
+  );
+
+  static const all = [jobOpenings, insights];
 }
