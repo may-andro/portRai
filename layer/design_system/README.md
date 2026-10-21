@@ -201,6 +201,7 @@ DSLottieIllustrationWidget(illustration: DSLottieIllustration.contactUs)
 // computerWindow: a browser window going from wireframe to code to finished UI
 // talentSearch: a profile card being picked out of a candidate search
 // signIn: a phone showing a profile card, with turning gears beside it
+// binoculars: a person looking out through binoculars
 DSLottieIllustrationWidget(illustration: DSLottieIllustration.recruiterRole, width: 200)
 DSLottieBackgroundWidget(illustration: DSLottieIllustration.heroOrbs, colorOverrides: [...])
 DSLoadingWidget(style: DSLoadingStyle.lottie)

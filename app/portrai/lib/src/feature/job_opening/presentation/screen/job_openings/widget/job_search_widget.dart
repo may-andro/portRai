@@ -13,11 +13,22 @@ class _JobSearchWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: context.space(),
           children: [
-            if (state.isJobSearchEnabled case final isEnabled?)
-              _JobSearchCardWidget(
-                isEnabled: isEnabled,
-                isUpdating: state.isUpdatingJobSearch,
-              ),
+            // The setting loads after the page opens; its card grows in
+            // instead of pushing the page down at once.
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topCenter,
+              child: switch (state.isJobSearchEnabled) {
+                final isEnabled? => RepaintBoundary(
+                  child: _JobSearchCardWidget(
+                    isEnabled: isEnabled,
+                    isUpdating: state.isUpdatingJobSearch,
+                  ),
+                ),
+                null => const SizedBox(width: double.infinity),
+              },
+            ),
             Align(
               alignment: AlignmentDirectional.centerEnd,
               child: DSButtonWidget(

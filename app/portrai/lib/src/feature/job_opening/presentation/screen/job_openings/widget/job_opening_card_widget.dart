@@ -11,6 +11,9 @@ class _JobOpeningCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final textColor = palette.surface.onSurface;
+    // Contract and freelance work stands out in its own color.
+    final engagement = jobOpening.engagement;
+    final highlight = palette.semantic.info;
     final skills = jobOpening.matchedSkills;
     final hiddenSkillCount = skills.length - _maxSkillTags;
     final companyAndLocation = [
@@ -20,8 +23,15 @@ class _JobOpeningCardWidget extends StatelessWidget {
 
     return DSSpotlightCardWidget(
       glowColor: JobFitTier.of(jobOpening.score).color(context),
-      fillColor: textColor,
-      background: ColoredBox(color: palette.surface.surfaceContainer.color),
+      fillColor: engagement == null ? textColor : highlight,
+      background: ColoredBox(
+        color: engagement == null
+            ? palette.surface.surfaceContainer.color
+            : Color.alphaBlend(
+                highlight.color.withAlpha(30),
+                palette.surface.surfaceContainer.color,
+              ),
+      ),
       padding: EdgeInsets.all(context.space(factor: 2.5)),
       onTap: () {
         context.bloc.add(const JobOpeningClickEvent());
@@ -43,7 +53,15 @@ class _JobOpeningCardWidget extends StatelessWidget {
                 _ArrowWidget(isHovering: isHovering),
               ],
             ),
-            JobOpeningPostedWidget(jobOpening: jobOpening),
+            Wrap(
+              spacing: context.space(),
+              runSpacing: context.space(),
+              children: [
+                JobOpeningPostedWidget(jobOpening: jobOpening),
+                if (engagement != null)
+                  _EngagementChipWidget(engagement: engagement),
+              ],
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: context.space(factor: 0.5),
@@ -99,6 +117,48 @@ class _JobOpeningCardWidget extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Names contract or freelance work in the card's highlight color.
+class _EngagementChipWidget extends StatelessWidget {
+  const _EngagementChipWidget({required this.engagement});
+
+  final JobOpeningEngagement engagement;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = context.colorPalette.semantic.info;
+    final localizations = context.localizations;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.space(factor: 1.25),
+        vertical: context.space(factor: 0.5),
+      ),
+      decoration: BoxDecoration(
+        color: color.color.withAlpha(36),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: color.color.withAlpha(110)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: context.space(factor: 0.5),
+        children: [
+          Icon(Icons.handshake_outlined, size: 16, color: color.color),
+          DSTextWidget(
+            switch (engagement) {
+              JobOpeningEngagement.contract =>
+                localizations.jobOpeningEngagementContract,
+              JobOpeningEngagement.freelance =>
+                localizations.jobOpeningEngagementFreelance,
+            },
+            style: context.typography.emphasizedLabelLarge,
+            color: color,
+          ),
+        ],
+      ),
     );
   }
 }

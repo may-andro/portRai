@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
@@ -78,62 +80,68 @@ class _JobOpeningHeroBackgroundWidgetState
     final shapeSize = context.isMobile ? 220.0 : 360.0;
 
     return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, _) {
-          final drift = (_controller.value - 0.5) * 24;
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              DSFloatingShapesBackgroundWidget(
-                color: palette.accent.color.withAlpha(60),
-              ),
-              Positioned(
-                right: context.isMobile ? -90 : 40,
-                bottom: context.isMobile ? -120 : -170,
-                child: Transform.translate(
-                  offset: Offset(-drift * 0.5, drift * 0.4),
-                  child: Container(
-                    width: shapeSize * 1.4,
-                    height: shapeSize * 1.4,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: palette.accent.color.withAlpha(55),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DSFloatingShapesBackgroundWidget(
+            color: palette.accent.color.withAlpha(60),
+          ),
+          // Only the drifting shapes are rebuilt on each frame.
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              final drift = (_controller.value - 0.5) * 24;
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned(
+                    right: context.isMobile ? -90 : 40,
+                    bottom: context.isMobile ? -120 : -170,
+                    child: Transform.translate(
+                      offset: Offset(-drift * 0.5, drift * 0.4),
+                      child: Container(
+                        width: shapeSize * 1.4,
+                        height: shapeSize * 1.4,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: palette.accent.color.withAlpha(55),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                right: context.isMobile ? 20 : shapeSize * 0.9,
-                top: context.isMobile ? 40 : 60,
-                child: Transform.translate(
-                  offset: Offset(0, drift * 0.6),
-                  child: Icon(
-                    Icons.add_rounded,
-                    size: context.isMobile ? 22 : 30,
-                    color: palette.accent.color.withAlpha(150),
+                  Positioned(
+                    right: context.isMobile ? 20 : shapeSize * 0.9,
+                    top: context.isMobile ? 40 : 60,
+                    child: Transform.translate(
+                      offset: Offset(0, drift * 0.6),
+                      child: Icon(
+                        Icons.add_rounded,
+                        size: context.isMobile ? 22 : 30,
+                        color: palette.accent.color.withAlpha(150),
+                      ),
+                    ),
                   ),
-                ),
+                ],
+              );
+            },
+          ),
+          // Fades the shapes out towards the copy, so the hero meets the
+          // page header without an edge.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  palette.background.color,
+                  palette.background.color.withAlpha(210),
+                  palette.background.color.withAlpha(20),
+                ],
+                stops: const [0, 0.55, 1],
               ),
-              // Fades the shapes out towards the copy, so the hero meets the
-              // page header without an edge.
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      palette.background.color,
-                      palette.background.color.withAlpha(210),
-                      palette.background.color.withAlpha(20),
-                    ],
-                    stops: const [0, 0.55, 1],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -235,20 +243,69 @@ class JobOpeningBandWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
     return ColoredBox(
-      color: isAlternate
-          ? Color.alphaBlend(
-              palette.accent.color.withAlpha(22),
-              palette.background.color,
-            )
-          : palette.background.color,
+      color: context.jobOpeningBandColor(isAlternate: isAlternate),
       child: JobOpeningPageColumnWidget(
-        verticalPadding: context.space(factor: context.isMobile ? 4 : 6),
+        verticalPadding: context.jobOpeningBandVerticalPadding,
         child: child,
       ),
     );
   }
+}
+
+/// [JobOpeningBandWidget] for a [sliver], so a long list in a band is built
+/// lazily as it scrolls into view.
+class JobOpeningBandSliverWidget extends StatelessWidget {
+  const JobOpeningBandSliverWidget({
+    super.key,
+    required this.sliver,
+    this.isAlternate = false,
+  });
+
+  final Widget sliver;
+  final bool isAlternate;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedSliver(
+      decoration: BoxDecoration(
+        color: context.jobOpeningBandColor(isAlternate: isAlternate),
+      ),
+      sliver: SliverLayoutBuilder(
+        builder: (context, constraints) {
+          final pagePadding = context.jobOpeningHorizontalPadding;
+          final contentWidth = min(
+            constraints.crossAxisExtent - pagePadding * 2,
+            jobOpeningMaxContentWidth,
+          );
+          return SliverPadding(
+            padding: EdgeInsets.symmetric(
+              horizontal: max(
+                pagePadding,
+                (constraints.crossAxisExtent - contentWidth) / 2,
+              ),
+              vertical: context.jobOpeningBandVerticalPadding,
+            ),
+            sliver: sliver,
+          );
+        },
+      ),
+    );
+  }
+}
+
+extension on BuildContext {
+  Color jobOpeningBandColor({required bool isAlternate}) {
+    final palette = colorPalette;
+    return isAlternate
+        ? Color.alphaBlend(
+            palette.accent.color.withAlpha(22),
+            palette.background.color,
+          )
+        : palette.background.color;
+  }
+
+  double get jobOpeningBandVerticalPadding => space(factor: isMobile ? 4 : 6);
 }
 
 /// A section heading with an icon badge, shared by the page bands.

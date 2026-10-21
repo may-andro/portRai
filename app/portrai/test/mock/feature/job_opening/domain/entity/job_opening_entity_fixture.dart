@@ -10,6 +10,7 @@ JobOpeningEntity jobOpeningEntityFixture({
   List<String> missingSkills = const ['GraphQL'],
   List<String> reasons = const ['The core stack is Flutter.'],
   DateTime? publishedAt,
+  List<String> jobTypes = const ['full_time'],
 }) => JobOpeningEntity(
   id: id,
   sourceName: 'Remotive',
@@ -18,7 +19,7 @@ JobOpeningEntity jobOpeningEntityFixture({
   url: Uri.parse('https://remotive.com/remote-jobs/software-development/1'),
   location: location,
   tags: const ['flutter'],
-  jobTypes: const ['full_time'],
+  jobTypes: jobTypes,
   description: 'Build mobile apps with Flutter.',
   score: score,
   matchedSkills: matchedSkills,

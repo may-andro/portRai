@@ -1,5 +1,7 @@
 part of 'content_widget.dart';
 
+/// The page title and summary, with a person looking out through
+/// binoculars beside it on wide screens and above it on phones.
 class _HeroWidget extends StatelessWidget {
   const _HeroWidget({required this.state});
 
@@ -9,24 +11,36 @@ class _HeroWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final isWide = !context.isMobile;
+    final illustration = RepaintBoundary(
+      child: DSLottieIllustrationWidget(
+        illustration: DSLottieIllustration.binoculars,
+        width: context.space(factor: isWide ? 26 : 24),
+      ),
+    );
+    final copy = _HeroCopyWidget(state: state);
 
     return ColoredBox(
       color: palette.background.color,
       child: PageChromeWidget(
         closeColor: palette.neutral.grey10.color,
-        child: ClipRect(
-          child: Stack(
-            children: [
-              const Positioned.fill(child: JobOpeningHeroBackgroundWidget()),
-              JobOpeningPageColumnWidget(
-                verticalPadding: context.space(factor: isWide ? 7 : 4),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: _HeroCopyWidget(state: state),
+        child: JobOpeningPageColumnWidget(
+          verticalPadding: context.space(factor: isWide ? 5 : 3),
+          child: isWide
+              ? Row(
+                  spacing: context.space(factor: 4),
+                  children: [
+                    Expanded(child: copy),
+                    illustration,
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: context.space(factor: 2),
+                  children: [
+                    Center(child: illustration),
+                    copy,
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );

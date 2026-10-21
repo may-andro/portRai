@@ -6,6 +6,14 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 /// Openings posted this many days ago or less count as new.
 const jobOpeningNewForDays = 3;
 
+/// Work that is not a regular position.
+enum JobOpeningEngagement { contract, freelance }
+
+final _freelancePattern = RegExp(r'\bfreelanc(e|er|ers|ing)\b');
+
+// "Smart contract" names a blockchain skill, not the kind of engagement.
+final _contractPattern = RegExp(r'(?<!smart )\bcontract(or|ors|ing)?\b');
+
 extension JobOpeningExtension on JobOpeningEntity {
   String formattedPublishedAt(BuildContext context) => DateFormat.yMMMd(
     Localizations.localeOf(context).toString(),
@@ -25,6 +33,15 @@ extension JobOpeningExtension on JobOpeningEntity {
   }
 
   bool isNew(DateTime now) => daysSincePosted(now) <= jobOpeningNewForDays;
+
+  /// Freelance or contract work, read from the job types and the title, such
+  /// as `Senior Android Engineer (Contract)`; null for a regular position.
+  JobOpeningEngagement? get engagement {
+    final text = [...jobTypes, title].join(' ').toLowerCase();
+    if (_freelancePattern.hasMatch(text)) return JobOpeningEngagement.freelance;
+    if (_contractPattern.hasMatch(text)) return JobOpeningEngagement.contract;
+    return null;
+  }
 
   /// The job to tailor a CV for.
   CvTailoringTargetEntity toCvTailoringTarget() => CvTailoringTargetEntity(
