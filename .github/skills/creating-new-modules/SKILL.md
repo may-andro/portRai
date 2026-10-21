@@ -18,6 +18,11 @@ functionality is an app feature, not a new layer.
   functionality (screens, feature-specific domain/data logic). See the architecture-conventions
   skill for the internal `data/domain/presentation` layout.
 
+Layers are feature-independent. Their API names, doc comments, README examples and tests never
+mention an app feature or its data (collections, fields, business terms); use neutral
+placeholders instead. When a feature needs a new layer capability, add it in generic terms and
+keep the feature-specific usage in the feature. See the content rules in `readme-conventions`.
+
 ## A. Creating a new layer package
 
 1. Create the directory and standard skeleton:

@@ -145,12 +145,37 @@ falling back to `RemoteAssistantRequestLimits.model`.
 are created in the Firebase console. A `ModuleRoute` with `requiresAuth: true` is guarded by the
 redirect that `AuthModuleConfigurator` registers via `ModuleRouteController.registerAuthRedirect`.
 When nobody is signed in, the guard opens `/sign-in?redirect=<requested location>`, and a
-successful sign-in returns to that location. Only in-app paths are followed; anything else opens
+successful sign-in replaces the sign-in page with that location, without a new browser history
+entry, so Back returns to the page before sign-in. Only in-app paths are followed; anything else opens
 the start page. Without a registered guard, protected routes open the start page. Other features
 read the signed-in user through `GetSignedInUserUseCase`, which waits for a restored session on
 app start. It returns an `AuthUserEntity` with the account id and email. `AuthUserEntity` and
 `GuestUserEntity` both live in the `user` feature and extend its `UserEntity`. `user` also saves
 the guest's role on the device through `GetGuestUserUseCase` and `SaveGuestUserUseCase`.
+Signing out goes through `SignOutUseCase`.
+
+### Job Openings
+
+`job_opening` shows the remote jobs that the weekly Cloud Function in
+[`tool/functions`](../../tool/functions/README.md) matched to the portfolio and scored with Gemini.
+The `feature_job_openings` flag (default off) shows a Job openings card in Settings. It opens
+`/job-openings`, a list sorted by score and then by date, with the "Weekly job search" switch and
+a sign-out button. `/job-openings/:id` shows one opening: its score, Gemini's reasons, matched and
+missing skills, the description, and an Apply button that opens the job page on its board. Both
+routes set `requiresAuth`, so they ask for sign-in first.
+
+The data is private to the signed-in user and is read straight from Firestore, with no cache or
+bundled fallback:
+
+| Path                              | Access | Content                                        |
+| --------------------------------- | ------ | ---------------------------------------------- |
+| `users/{uid}/job_openings/{id}`   | Read   | Openings written by the function               |
+| `users/{uid}.jobSearch.enabled`   | Write  | The switch; the function runs only for `true`  |
+| `users/{uid}.jobSearch.updatedAt` | Write  | Set to the server time when the switch changes |
+
+The switch merges into `users/{uid}`, so other fields on that document are kept. Each opening
+shows its job board's name and links to its page there, as the boards' terms require. Openings
+expire 14 days after the last run that found them.
 
 ### Remote Assistant
 
@@ -322,6 +347,7 @@ Feature flags are managed through Firebase Remote Config:
 - `feature_ai_assistant` (default off) shows the on-device AI assistant in Settings and on the portfolio when turned on
 - `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
 - `feature_remote_assistant_generative_ui` (default off) enables parsed, read-only design-system text and card surfaces in remote answers
+- `feature_job_openings` (default off) shows the Job openings card in Settings
 
 ## Dependencies
 

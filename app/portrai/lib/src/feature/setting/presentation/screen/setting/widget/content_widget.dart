@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/developer_menu_screen.dart';
+import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
@@ -53,6 +54,12 @@ class ContentWidget extends StatelessWidget {
                           title: context.localizations.assistantTitle,
                         ),
                         const LocalAssistantCardWidget(),
+                      ],
+                      if (state.isJobOpeningsEnabled) ...[
+                        SectionTitleWidget(
+                          title: context.localizations.jobOpeningsSection,
+                        ),
+                        const JobOpeningsCardWidget(),
                       ],
                       if (state.isDevMenuEnabled) ...[
                         const DSVerticalSpacerWidget(3),

@@ -32,6 +32,15 @@ class FirebaseAuthRepository implements AuthRepository {
     }
   }
 
+  @override
+  Future<void> signOut() async {
+    try {
+      await _authController.signOut();
+    } catch (error, stackTrace) {
+      throw _toAuthException(error, stackTrace);
+    }
+  }
+
   static AuthException _toAuthException(Object error, StackTrace stackTrace) =>
       switch (error) {
         firebase.WrongPasswordException() ||

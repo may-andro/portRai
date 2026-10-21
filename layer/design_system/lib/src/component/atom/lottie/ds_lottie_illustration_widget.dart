@@ -21,7 +21,8 @@ enum DSLottieIllustration {
   explorerRole(1),
   techStack(1),
   computerWindow(1),
-  talentSearch(1);
+  talentSearch(1),
+  signIn(1);
 
   const DSLottieIllustration(this.aspectRatio);
 
@@ -71,6 +72,7 @@ enum DSLottieIllustration {
       case DSLottieIllustration.techStack:
       case DSLottieIllustration.computerWindow:
       case DSLottieIllustration.talentSearch:
+      case DSLottieIllustration.signIn:
         return const [];
     }
   }
@@ -107,6 +109,8 @@ enum DSLottieIllustration {
         return Assets.lottie.computerWindow;
       case DSLottieIllustration.talentSearch:
         return Assets.lottie.talentSearch;
+      case DSLottieIllustration.signIn:
+        return Assets.lottie.signIn;
     }
   }
 }

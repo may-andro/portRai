@@ -30,4 +30,12 @@ extension MockAuthRepositoryStub on MockAuthRepository {
   void stubGetSignedInUserThrows(Object error) {
     when(getSignedInUser).thenThrow(error);
   }
+
+  void stubSignOut() {
+    when(signOut).thenAnswer((_) async {});
+  }
+
+  void stubSignOutThrows(Object error) {
+    when(signOut).thenThrow(error);
+  }
 }

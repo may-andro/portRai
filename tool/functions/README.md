@@ -131,9 +131,11 @@ last run, belongs outside this map, so Firestore rules can let the user change `
 only the server writes the rest.
 
 No user document exists until job search is turned on, and a run with no such users skips the
-feeds. To turn it on, create the document in the Firebase console: in the `users` collection,
-add a document whose ID is the user's UID from Authentication, with a map field `jobSearch`
-holding the boolean `enabled` set to `true` and the timestamp `updatedAt` set to now.
+feeds. The app's "Weekly job search" switch on the Job openings screen writes both fields (see
+the [app README](../../app/portrai/README.md#job-openings)). Without the app, create the document
+in the Firebase console: in the `users` collection, add a document whose ID is the user's UID from
+Authentication, with a map field `jobSearch` holding the boolean `enabled` set to `true` and the
+timestamp `updatedAt` set to now.
 
 Each opening is stored at `users/{uid}/job_openings/{dedupeKey}`. The key is a hash of the
 normalized company and title, so the same job keeps one document across feeds and weeks.
@@ -219,10 +221,9 @@ done
 The deploy lets the account start the function from Cloud Scheduler, so it needs no other
 role. Deploying needs permission to act as the account, which project Owners have.
 
-Check that the model is offered in the `global` location before the first run, and that it has
-capacity: newer models on the shared `global` capacity can answer most calls with
-`429 RESOURCE_EXHAUSTED` even after retries, which is why the function uses `gemini-2.5-flash`.
-A quick check is a few calls in a row from Cloud Shell, which should all return `200`:
+Before changing the model, check that it is offered in the `global` location and has capacity
+there. A model with little shared capacity answers most calls with `429 RESOURCE_EXHAUSTED`, even
+after retries. A few calls in a row from Cloud Shell should all return `200`:
 
 ```bash
 for attempt in 1 2 3 4 5; do curl -s -o /dev/null -w "%{http_code} " -X POST \

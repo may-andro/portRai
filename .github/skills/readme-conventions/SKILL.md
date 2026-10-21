@@ -1,5 +1,5 @@
 ---
-description: 'Structure and style conventions for README.md files in this repo (root workspace, layer packages, and apps), so new/edited READMEs stay consistent with each other. Use when writing or editing any README.md under layer/, app/, or the workspace root.'
+description: 'Structure, style and content conventions for README.md files in this repo (root workspace, layer packages, apps and tools), plus the content rules that also apply to code comments, so docs stay consistent and factual. Use when writing or editing any README.md under layer/, app/, tool/, or the workspace root, or when writing doc or code comments.'
 ---
 
 # README Conventions
@@ -25,6 +25,33 @@ rewrite of an unrelated README.
 - Link to sibling docs with relative paths (e.g. `[module_injector](../module_injector/README.md)`).
 - Keep a single H1 title matching the package/app name in Title Case (e.g. `# Log Reporter`, not
   the raw package identifier `log_reporter`).
+
+## Content rules for READMEs and code comments
+These apply to every README and to doc and code comments in any language.
+
+- **No circumstantial details.** Describe what the code does and why the design holds in
+  general, not the story of how it got there. Leave out incidents, debugging sessions, live-run
+  numbers, "X was failing so we switched to Y", and dates of decisions; those belong in commit
+  messages and PR descriptions.
+
+  ```ts
+  // ❌ Wrong
+  /** `gemini-3.8-flash` was throttled for minutes, while this model answered every call. */
+  // ✅ Correct
+  /** The model every function calls. */
+  ```
+- **Shared code stays generic.** A layer (`layer/*`) or a shared module (such as
+  `tool/functions/src/shared/`) never names an app feature, its collections, fields or business
+  terms, in its README, comments, examples or tests. Use neutral placeholders such as
+  `parents/{parentId}/children`, `items` or `settings`. Feature-specific examples belong in the
+  feature's own docs.
+
+  ```dart
+  // ❌ Wrong, in layer/firebase
+  /// Paths may point at subcollections, such as `users/{uid}/job_openings`.
+  // ✅ Correct
+  /// Paths may point at subcollections, such as `parents/{parentId}/children`.
+  ```
 
 ## Layer README template (`layer/<name>/README.md`)
 

@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// Clients get only what the app needs. Server code (Cloud Functions, the
+// export/import tool) uses service accounts, which these rules do not apply to.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedInAs(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // The user may set `enabled`; `updatedAt` must be the server time.
+    function isValidJobSearch(jobSearch) {
+      return jobSearch is map
+        && jobSearch.keys().hasOnly(['enabled', 'updatedAt'])
+        && jobSearch.enabled is bool
+        && jobSearch.updatedAt == request.time;
+    }
+
+    // Portfolio content, one document per locale. Public, read-only.
+    match /profile/{locale} {
+      allow get: if true;
+    }
+    match /experiences/{locale} {
+      allow get: if true;
+    }
+    match /expertise/{locale} {
+      allow get: if true;
+    }
+    match /projects/{locale} {
+      allow get: if true;
+    }
+    match /services/{locale} {
+      allow get: if true;
+    }
+    match /testimonials/{locale} {
+      allow get: if true;
+    }
+    match /app_config/{configId} {
+      allow get: if true;
+    }
+
+    // Private to each signed-in user. The user may change only `jobSearch`.
+    match /users/{userId} {
+      allow get: if isSignedInAs(userId);
+      allow create: if isSignedInAs(userId)
+        && request.resource.data.keys().hasOnly(['jobSearch'])
+        && isValidJobSearch(request.resource.data.jobSearch);
+      allow update: if isSignedInAs(userId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['jobSearch'])
+        && isValidJobSearch(request.resource.data.jobSearch);
+
+      // Written by the job openings function only.
+      match /job_openings/{jobOpeningId} {
+        allow read: if isSignedInAs(userId);
+      }
+    }
+  }
+}

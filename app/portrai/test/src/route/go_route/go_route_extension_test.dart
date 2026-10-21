@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -148,6 +150,41 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Tab open'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'should replace the current page so back skips it when replaceLocation '
+      'is called',
+      (tester) async {
+        final router = GoRouter(
+          routes: [
+            GoRoute(path: '/', builder: (_, _) => const Text('Home')),
+            GoRoute(
+              path: '/gate',
+              builder: (context, state) => TextButton(
+                onPressed: () => context.replaceLocation('/details'),
+                child: const Text('Continue'),
+              ),
+            ),
+            GoRoute(path: '/details', builder: (_, _) => const Text('Details')),
+          ],
+        );
+        addTearDown(router.dispose);
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+        unawaited(router.push('/gate'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Continue'));
+        await tester.pumpAndSettle();
+        expect(find.text('Details'), findsOneWidget);
+
+        router.pop();
+        await tester.pumpAndSettle();
+
+        expect(find.text('Home'), findsOneWidget);
+        expect(find.text('Continue'), findsNothing);
       },
     );
   });

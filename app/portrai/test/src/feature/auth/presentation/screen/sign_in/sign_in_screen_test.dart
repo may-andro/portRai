@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -64,5 +66,40 @@ void main() {
     );
 
     expect(find.text('Home'), findsOneWidget);
+  });
+
+  testWidgets('should go back to the page before sign-in when back is '
+      'pressed after signing in', (tester) async {
+    final bloc = MockSignInBloc();
+    whenListen(
+      bloc,
+      Stream.value(const SignInState(isSignedIn: true)),
+      initialState: const SignInState(),
+    );
+    await appServiceLocator.reset();
+    addTearDown(appServiceLocator.reset);
+    appServiceLocator.registerFactory<SignInBloc>(() => bloc);
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (_, _) => const Text('Settings')),
+        GoRoute(path: '/sign-in', builder: (_, _) => const SignInScreen()),
+        GoRoute(path: '/private', builder: (_, _) => const Text('Private')),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      TestWidgetWrapper(routerConfig: router, child: const SizedBox()),
+    );
+    await tester.pumpAndSettle();
+
+    unawaited(router.push('/sign-in?redirect=%2Fprivate'));
+    await tester.pumpAndSettle();
+    expect(find.text('Private'), findsOneWidget);
+
+    router.pop();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.byType(SignInScreen), findsNothing);
   });
 }

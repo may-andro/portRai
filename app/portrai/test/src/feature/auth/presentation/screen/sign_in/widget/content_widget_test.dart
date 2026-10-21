@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/_bloc.
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/widget/_widget.dart';
 
 import '../../../../../../../mock/feature/auth/presentation/screen/sign_in/bloc/mock_sign_in_bloc.dart';
+import '../../../../../../../util/animated_page_test_util.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -13,6 +14,7 @@ void main() {
     WidgetTester tester,
     SignInState state,
   ) async {
+    setUpAnimatedPage(tester);
     final bloc = MockSignInBloc()..stubState(state);
     addTearDown(bloc.close);
     await tester.pumpWidget(
@@ -23,6 +25,7 @@ void main() {
         ),
       ),
     );
+    await pumpAnimations(tester);
     return bloc;
   }
 
@@ -53,5 +56,32 @@ void main() {
     final button = tester.widget<DSButtonWidget>(find.byType(DSButtonWidget));
     expect(button.isLoading, isTrue);
     expect(button.isDisabled, isTrue);
+  });
+
+  testWidgets('should welcome the user beside the form on a desktop', (
+    tester,
+  ) async {
+    await pumpContent(tester, const SignInState());
+
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(
+      find.text('Accounts are created by the site owner. There is no sign-up.'),
+      findsOneWidget,
+    );
+    final welcome = tester.getTopLeft(find.text('Welcome back'));
+    final email = tester.getTopLeft(find.text('Email'));
+    expect(welcome.dx, lessThan(email.dx));
+  });
+
+  testWidgets('should show the welcome panel above the form on a phone', (
+    tester,
+  ) async {
+    await pumpContent(tester, const SignInState());
+    setUpAnimatedPage(tester, size: const Size(390, 1400));
+    await pumpAnimations(tester);
+
+    final welcome = tester.getTopLeft(find.text('Welcome back'));
+    final email = tester.getTopLeft(find.text('Email'));
+    expect(welcome.dy, lessThan(email.dy));
   });
 }

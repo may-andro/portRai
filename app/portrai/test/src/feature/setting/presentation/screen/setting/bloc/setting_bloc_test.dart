@@ -3,6 +3,7 @@ import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
@@ -40,6 +41,10 @@ void main() {
         )
         ..stubCall(
           definition: OnboardingFeatureFlags.roleOnboarding,
+          result: const Right(false),
+        )
+        ..stubCall(
+          definition: JobOpeningFeatureFlags.jobOpenings,
           result: const Right(false),
         );
       getGuestUserUseCase = MockGetGuestUserUseCase()..stubCall(null);
@@ -253,5 +258,32 @@ void main() {
         SettingLoadedState(isLanguageSelectorEnabled: false),
       ],
     );
+
+    for (final isJobOpeningsEnabled in [false, true]) {
+      blocTest<SettingBloc, SettingState>(
+        'should show the job openings card only when its flag is on, when '
+        'the flag is $isJobOpeningsEnabled',
+        setUp: () {
+          isFeatureEnabledUseCase
+            ..stubCall(
+              definition: SettingFeatureFlags.languageSelector,
+              result: const Right(false),
+            )
+            ..stubCall(
+              definition: JobOpeningFeatureFlags.jobOpenings,
+              result: Right(isJobOpeningsEnabled),
+            );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(const LoadSettingsEvent()),
+        expect: () => [
+          const SettingLoadingState(),
+          SettingLoadedState(
+            isLanguageSelectorEnabled: false,
+            isJobOpeningsEnabled: isJobOpeningsEnabled,
+          ),
+        ],
+      );
+    }
   });
 }

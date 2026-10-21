@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
@@ -17,6 +18,28 @@ void main() {
   tearDown(() => appServiceLocator.reset());
 
   group('Setting ContentWidget', () {
+    for (final isJobOpeningsEnabled in [true, false]) {
+      testWidgets('should show the job openings card only when its flag is '
+          'on, when the flag is $isJobOpeningsEnabled', (tester) async {
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: ContentWidget(
+              state: SettingLoadedState(
+                isLanguageSelectorEnabled: false,
+                isJobOpeningsEnabled: isJobOpeningsEnabled,
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(
+          find.byType(JobOpeningsCardWidget),
+          isJobOpeningsEnabled ? findsOneWidget : findsNothing,
+        );
+      });
+    }
+
     testWidgets('should show the AI section when the feature flag is on', (
       tester,
     ) async {

@@ -21,12 +21,14 @@ class SettingLoadedState extends SettingState {
     required this.isLanguageSelectorEnabled,
     this.isDevMenuEnabled = false,
     this.isLocalAssistantAvailable = false,
+    this.isJobOpeningsEnabled = false,
     this.userRole,
   });
 
   final bool isLanguageSelectorEnabled;
   final bool isDevMenuEnabled;
   final bool isLocalAssistantAvailable;
+  final bool isJobOpeningsEnabled;
   final UserRole? userRole;
 
   @override
@@ -34,6 +36,7 @@ class SettingLoadedState extends SettingState {
     isLanguageSelectorEnabled,
     isDevMenuEnabled,
     isLocalAssistantAvailable,
+    isJobOpeningsEnabled,
     userRole,
   ];
 }

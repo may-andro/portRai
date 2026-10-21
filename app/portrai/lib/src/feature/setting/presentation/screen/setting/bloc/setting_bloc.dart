@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
@@ -61,6 +62,11 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       }
     }
 
+    final jobOpenings = await _isFeatureEnabledUseCase(
+      JobOpeningFeatureFlags.jobOpenings,
+    );
+    final isJobOpeningsEnabled = jobOpenings.isRight && jobOpenings.right;
+
     UserRole? userRole;
     final onboarding = await _isFeatureEnabledUseCase(
       OnboardingFeatureFlags.roleOnboarding,
@@ -75,6 +81,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         isLanguageSelectorEnabled: isLanguageSelectorEnabled,
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
         isLocalAssistantAvailable: isLocalAssistantAvailable,
+        isJobOpeningsEnabled: isJobOpeningsEnabled,
         userRole: userRole,
       ),
     );

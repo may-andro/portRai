@@ -123,5 +123,25 @@ void main() {
         throwsA(isA<AuthUnknownException>()),
       );
     });
+
+    test('should sign out through the controller when signing out', () async {
+      authController.stubSignOut();
+
+      await repository.signOut();
+
+      verify(authController.signOut).called(1);
+    });
+
+    test('should throw a network auth exception when signing out fails '
+        'without a connection', () async {
+      authController.stubSignOutThrows(
+        const firebase.NetworkRequestFailedException(),
+      );
+
+      await expectLater(
+        repository.signOut(),
+        throwsA(isA<AuthNetworkException>()),
+      );
+    });
   });
 }
