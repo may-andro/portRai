@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 
@@ -32,6 +33,8 @@ class ContentWidget extends StatelessWidget {
               SliverToBoxAdapter(
                 child: _DetailsWidget(jobOpening: state.jobOpening!),
               ),
+              if (state.profile case final profile?)
+                SliverToBoxAdapter(child: FooterWidget(profile: profile)),
             ],
             JobOpeningStatus.loading => [
               PageAppBarWidget(title: context.localizations.jobOpeningTitle),

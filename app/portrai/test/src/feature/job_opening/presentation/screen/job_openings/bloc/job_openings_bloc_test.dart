@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/auth.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/_bloc.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/auth/domain/use_case/mock_sign_out_use_case.dart';
@@ -12,6 +13,8 @@ import '../../../../../../../mock/feature/job_opening/domain/use_case/mock_get_j
 import '../../../../../../../mock/feature/job_opening/domain/use_case/mock_is_job_search_enabled_use_case.dart';
 import '../../../../../../../mock/feature/job_opening/domain/use_case/mock_set_job_search_enabled_use_case.dart';
 import '../../../../../../../mock/feature/job_opening/presentation/screen/job_openings/tracking/mock_job_openings_tracking_delegate.dart';
+import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
+import '../../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
 
 void main() {
   group('JobOpeningsBloc', () {
@@ -19,6 +22,7 @@ void main() {
     late MockIsJobSearchEnabledUseCase isJobSearchEnabledUseCase;
     late MockSetJobSearchEnabledUseCase setJobSearchEnabledUseCase;
     late MockSignOutUseCase signOutUseCase;
+    late MockGetProfileUseCase getProfileUseCase;
     late MockJobOpeningsTrackingDelegate trackingDelegate;
 
     final jobOpening = jobOpeningEntityFixture();
@@ -30,6 +34,8 @@ void main() {
         ..stubCall(const Right(true));
       setJobSearchEnabledUseCase = MockSetJobSearchEnabledUseCase();
       signOutUseCase = MockSignOutUseCase();
+      getProfileUseCase = MockGetProfileUseCase()
+        ..stubCall(const Left(ProfileNetworkFailure()));
       trackingDelegate = MockJobOpeningsTrackingDelegate();
     });
 
@@ -38,6 +44,7 @@ void main() {
       isJobSearchEnabledUseCase,
       setJobSearchEnabledUseCase,
       signOutUseCase,
+      getProfileUseCase,
       trackingDelegate,
     );
 
@@ -209,6 +216,23 @@ void main() {
       expect: () => const <JobOpeningsState>[],
       verify: (_) =>
           verify(() => trackingDelegate.trackJobOpeningClick()).called(1),
+    );
+
+    final profile = createProfileEntity();
+    blocTest<JobOpeningsBloc, JobOpeningsState>(
+      'should add the profile for the footer after the page content',
+      setUp: () => getProfileUseCase.stubCall(Right(profile)),
+      build: buildBloc,
+      act: (bloc) => bloc.add(const JobOpeningsStartedEvent()),
+      skip: 3,
+      expect: () => [
+        JobOpeningsState(
+          status: JobOpeningsStatus.loaded,
+          jobOpenings: [jobOpening],
+          isJobSearchEnabled: true,
+          profile: profile,
+        ),
+      ],
     );
   });
 }

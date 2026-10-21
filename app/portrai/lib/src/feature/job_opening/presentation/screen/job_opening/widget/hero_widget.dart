@@ -154,11 +154,7 @@ class _ScoreBadgeWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: palette.surface.surfaceContainerLow.color.withAlpha(235),
                 boxShadow: [
-                  BoxShadow(
-                    color: tierColor.withAlpha(45),
-                    blurRadius: 40,
-                    spreadRadius: 4,
-                  ),
+                  BoxShadow(color: tierColor.withAlpha(36), blurRadius: 24),
                 ],
               ),
               child: JobFitScoreWidget(score: score, size: size),

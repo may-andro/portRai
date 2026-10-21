@@ -33,12 +33,10 @@ class _SkillsWidget extends StatelessWidget {
         children: groups,
       );
     }
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: context.space(factor: 2),
-        children: [for (final group in groups) Expanded(child: group)],
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: context.space(factor: 2),
+      children: [for (final group in groups) Expanded(child: group)],
     );
   }
 }

@@ -48,7 +48,8 @@ class JobOpeningPageColumnWidget extends StatelessWidget {
 }
 
 /// The slowly drifting shapes behind a page hero, fading into the
-/// background towards the copy.
+/// background towards the copy. Nothing reaches past its top edge, so it
+/// lines up with the page header.
 class JobOpeningHeroBackgroundWidget extends StatefulWidget {
   const JobOpeningHeroBackgroundWidget({super.key});
 
@@ -88,8 +89,8 @@ class _JobOpeningHeroBackgroundWidgetState
                 color: palette.accent.color.withAlpha(60),
               ),
               Positioned(
-                right: context.isMobile ? -80 : 40,
-                top: context.isMobile ? -60 : -120,
+                right: context.isMobile ? -90 : 40,
+                bottom: context.isMobile ? -120 : -170,
                 child: Transform.translate(
                   offset: Offset(-drift * 0.5, drift * 0.4),
                   child: Container(
@@ -97,44 +98,36 @@ class _JobOpeningHeroBackgroundWidgetState
                     height: shapeSize * 1.4,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          palette.accent.color.withAlpha(46),
-                          palette.accent.color.withAlpha(0),
-                        ],
+                      border: Border.all(
+                        color: palette.accent.color.withAlpha(55),
                       ),
                     ),
                   ),
                 ),
               ),
               Positioned(
-                left: context.isMobile ? -120 : -60,
-                bottom: context.isMobile ? -140 : -200,
+                right: context.isMobile ? 20 : shapeSize * 0.9,
+                top: context.isMobile ? 40 : 60,
                 child: Transform.translate(
-                  offset: Offset(drift * 0.4, -drift * 0.3),
-                  child: Container(
-                    width: shapeSize * 1.2,
-                    height: shapeSize * 1.2,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: palette.brand.primary.color.withAlpha(50),
-                      ),
-                    ),
+                  offset: Offset(0, drift * 0.6),
+                  child: Icon(
+                    Icons.add_rounded,
+                    size: context.isMobile ? 22 : 30,
+                    color: palette.accent.color.withAlpha(150),
                   ),
                 ),
               ),
+              // Fades the shapes out towards the copy, so the hero meets the
+              // page header without an edge.
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
                     colors: [
                       palette.background.color,
-                      palette.background.color.withAlpha(150),
-                      palette.background.color.withAlpha(30),
+                      palette.background.color.withAlpha(210),
+                      palette.background.color.withAlpha(20),
                     ],
-                    stops: const [0, 0.45, 1],
+                    stops: const [0, 0.55, 1],
                   ),
                 ),
               ),
