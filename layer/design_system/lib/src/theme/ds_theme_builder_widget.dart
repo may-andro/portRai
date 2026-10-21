@@ -1,9 +1,10 @@
 import 'package:design_system/src/design_system/design_system.dart';
+import 'package:design_system/src/extension/ds_theme_extension.dart';
 import 'package:design_system/src/theme/ds_theme.dart';
 import 'package:design_system/src/theme/ds_theme_widget.dart';
 import 'package:flutter/material.dart';
 
-class DSThemeBuilderWidget extends StatelessWidget {
+class DSThemeBuilderWidget extends StatefulWidget {
   const DSThemeBuilderWidget({
     super.key,
     required this.designSystem,
@@ -16,34 +17,49 @@ class DSThemeBuilderWidget extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return _TextScaleClampWidget(
-      builder: (textScale) {
-        final theme = DSTheme(
-          brightness: brightness,
-          designSystem: designSystem,
-        );
-        return DSThemeWidget(dsTheme: theme, child: child);
-      },
-    );
-  }
+  State<DSThemeBuilderWidget> createState() => _DSThemeBuilderWidgetState();
 }
 
-class _TextScaleClampWidget extends StatelessWidget {
-  const _TextScaleClampWidget({required this.builder});
+class _DSThemeBuilderWidgetState extends State<DSThemeBuilderWidget> {
+  late DSTheme _dsTheme;
+  late ThemeData _themeData;
 
-  final Widget Function(TextScaler textScaler) builder;
+  @override
+  void initState() {
+    super.initState();
+    _updateTheme();
+  }
+
+  @override
+  void didUpdateWidget(covariant DSThemeBuilderWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.brightness != widget.brightness ||
+        oldWidget.designSystem != widget.designSystem) {
+      _updateTheme();
+    }
+  }
+
+  // Building ThemeData runs ColorScheme.fromSeed, so it is only rebuilt when
+  // the brightness or the design system changes.
+  void _updateTheme() {
+    _dsTheme = DSTheme(
+      brightness: widget.brightness,
+      designSystem: widget.designSystem,
+    );
+    _themeData = _dsTheme.theme;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final mediaQueryData = MediaQuery.of(context);
-    final constrainedTextScaleFactor = mediaQueryData.textScaler.clamp(
+    // The theme subtree is created here, so a MediaQuery change that rebuilds
+    // only the clamping wrapper reuses it instead of rebuilding the app.
+    return MediaQuery.withClampedTextScaling(
       minScaleFactor: 0.75,
       maxScaleFactor: 1.5,
-    );
-    return MediaQuery(
-      data: mediaQueryData.copyWith(textScaler: constrainedTextScaleFactor),
-      child: builder(constrainedTextScaleFactor),
+      child: DSThemeWidget(
+        dsTheme: _dsTheme,
+        child: AnimatedTheme(data: _themeData, child: widget.child),
+      ),
     );
   }
 }

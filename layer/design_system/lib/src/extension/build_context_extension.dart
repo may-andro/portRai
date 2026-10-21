@@ -28,25 +28,25 @@ extension BuildContextExtension on BuildContext {
     return factor * (theme.dimen.grid.value + deviceFactor) * textScaleFactor;
   }
 
-  double get screenHeight => MediaQuery.of(this).size.height;
+  double get screenHeight => MediaQuery.sizeOf(this).height;
 
-  double get screenWidth => MediaQuery.of(this).size.width;
+  double get screenWidth => MediaQuery.sizeOf(this).width;
 
-  Size get size => MediaQuery.of(this).size;
+  Size get size => MediaQuery.sizeOf(this);
 
   double get width => size.width;
 
   double get height => size.height;
 
-  EdgeInsets get viewPadding => MediaQuery.of(this).viewPadding;
+  EdgeInsets get viewPadding => MediaQuery.viewPaddingOf(this);
 
   double get shortestSide => size.shortestSide;
 
-  Brightness get platformBrightness => MediaQuery.of(this).platformBrightness;
+  Brightness get platformBrightness => MediaQuery.platformBrightnessOf(this);
 
   bool get isDarkMode => platformBrightness == Brightness.dark;
 
-  double get textScaleFactor => MediaQuery.of(this).textScaler.scale(10) / 10;
+  double get textScaleFactor => MediaQuery.textScalerOf(this).scale(10) / 10;
 
   bool get isMobile => deviceResolution.isMobile;
 

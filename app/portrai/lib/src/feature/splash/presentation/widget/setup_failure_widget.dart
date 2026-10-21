@@ -129,7 +129,7 @@ class _SetupFailureWidgetState extends State<SetupFailureWidget> {
 
 extension on BuildContext {
   Color get color {
-    return MediaQuery.of(this).platformBrightness == Brightness.light
+    return MediaQuery.platformBrightnessOf(this) == Brightness.light
         ? const Color(0xFF121212)
         : const Color(0xFFFFFFFF);
   }
