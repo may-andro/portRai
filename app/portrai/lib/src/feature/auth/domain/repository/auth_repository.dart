@@ -6,4 +6,6 @@ abstract class AuthRepository {
   /// The signed-in user, or null when nobody is signed in. Waits for a
   /// restored session on app start instead of reporting it as signed out.
   Future<AuthUserEntity?> getSignedInUser();
+
+  Future<void> signOut();
 }

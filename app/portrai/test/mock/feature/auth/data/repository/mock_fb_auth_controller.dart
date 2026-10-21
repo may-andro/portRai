@@ -29,6 +29,16 @@ extension MockFbAuthControllerStub on MockFbAuthController {
     when(() => authStateChanges).thenAnswer((_) => Stream.fromIterable(users));
   }
 
+  /// Stubs `signOut()` to complete.
+  void stubSignOut() {
+    when(signOut).thenAnswer((_) async {});
+  }
+
+  /// Stubs `signOut()` to throw [error].
+  void stubSignOutThrows(Object error) {
+    when(signOut).thenThrow(error);
+  }
+
   /// Stubs `authStateChanges` to emit [error].
   void stubAuthStateChangesThrows(Object error) {
     when(() => authStateChanges).thenAnswer((_) => Stream.error(error));
