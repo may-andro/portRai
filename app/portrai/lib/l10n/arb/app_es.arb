@@ -559,7 +559,6 @@
   "jobSearchToggleDescription": "Busca nuevos empleos que encajen cada lunes",
   "jobOpeningsEmpty": "No hay empleos que encajen ahora mismo. Cada lunes se buscan nuevos.",
   "jobOpeningScore": "{score}% de encaje",
-  "jobOpeningSourceAndDate": "{source} · {date}",
   "jobOpeningTitle": "Oferta de empleo",
   "jobOpeningApply": "Postular en {source}",
   "jobOpeningReasonsTitle": "Por qué encaja",
@@ -590,5 +589,6 @@
   "jobOpeningsMatchesTitle": "Tus coincidencias",
   "signInWelcomeTitle": "Bienvenido de nuevo",
   "signInWelcomeDescription": "Tu espacio privado en el portfolio, reservado solo para tu cuenta.",
-  "signInNoSignUp": "Las cuentas las crea el propietario del sitio. No hay registro."
+  "signInNoSignUp": "Las cuentas las crea el propietario del sitio. No hay registro.",
+  "jobOpeningPostedAgo": "{days, plural, =0{Publicado hoy} =1{Publicado ayer} other{Publicado hace {days} días}}"
 }

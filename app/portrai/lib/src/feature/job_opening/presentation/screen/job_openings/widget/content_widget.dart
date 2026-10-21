@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
-import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/route/_route.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/job_opening_screen.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/_bloc.dart';

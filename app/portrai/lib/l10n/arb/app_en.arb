@@ -1469,20 +1469,6 @@
       }
     }
   },
-  "jobOpeningSourceAndDate": "{source} · {date}",
-  "@jobOpeningSourceAndDate": {
-    "description": "The job board a job came from and when it was published",
-    "placeholders": {
-      "source": {
-        "type": "String",
-        "example": "Remotive"
-      },
-      "date": {
-        "type": "String",
-        "example": "Oct 17, 2026"
-      }
-    }
-  },
   "jobOpeningTitle": "Job opening",
   "@jobOpeningTitle": {
     "description": "Title of the job opening detail screen"
@@ -1636,5 +1622,15 @@
   "signInNoSignUp": "Accounts are created by the site owner. There is no sign-up.",
   "@signInNoSignUp": {
     "description": "Note under the sign-in form"
+  },
+  "jobOpeningPostedAgo": "{days, plural, =0{Posted today} =1{Posted yesterday} other{Posted {days} days ago}}",
+  "@jobOpeningPostedAgo": {
+    "description": "How long ago a job opening was posted, in days",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -175,5 +176,21 @@ void main() {
     expect(loader.style, DSLoadingStyle.lottie);
     // A tenth of the shortest side of the 1440 x 2400 test window.
     expect(loader.size, 144);
+  });
+
+  testWidgets('should show how long ago the opening was posted next to its '
+      'date', (tester) async {
+    final posted = DateTime.now().subtract(const Duration(days: 3));
+    await pumpContent(
+      tester,
+      JobOpeningState(
+        id: 'job-1',
+        status: JobOpeningStatus.loaded,
+        jobOpening: jobOpeningEntityFixture(publishedAt: posted),
+      ),
+    );
+
+    expect(find.text('Posted 3 days ago'), findsOneWidget);
+    expect(find.text(DateFormat.yMMMd('en').format(posted)), findsOneWidget);
   });
 }
