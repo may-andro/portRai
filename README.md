@@ -47,7 +47,8 @@ port-rai/
 │   └── use_case/     # Business logic use cases
 └── tool/             # Development and automation tools
     ├── portrai_analyzer/# Custom lint rules
-    └── firestore_export_import/# Firestore data management CLI
+    ├── firestore_export_import/# Firestore data management CLI
+    └── functions/    # Cloud Functions, one folder per feature
 ```
 
 ### Dependency Flow
@@ -92,6 +93,7 @@ Foundation Layers (design_system, core, module_injector)
 
 - **[portrai_analyzer](tool/portrai_analyzer/readme.md)**: Custom Dart analyzer plugin enforcing workspace rules
 - **[firestore_export_import](tool/firestore_export_import/README.md)**: CLI for Firestore data import/export
+- **[functions](tool/functions/README.md)**: Cloud Functions, including the weekly job openings sync
 
 ## Getting Started
 
@@ -297,7 +299,8 @@ port-rai/
 │   └── use_case/            # Business logic
 ├── tool/
 │   ├── portrai_analyzer/    # Custom lint rules
-│   └── firestore_export_import/  # Firestore CLI
+│   ├── firestore_export_import/  # Firestore CLI
+│   └── functions/           # Cloud Functions
 ├── pubspec.yaml             # Workspace configuration
 ├── analysis_options.yaml    # Lint rules
 └── melos.yaml              # Melos configuration

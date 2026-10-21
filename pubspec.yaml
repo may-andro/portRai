@@ -293,8 +293,18 @@ melos:
         echo "All collections uploaded successfully!"
       description: Upload all collections (experiences, services, profile, projects, expertise, testimonials) from .data/ to Firestore
     # Deploy scripts for firebase
+    functions_check:
+      run: |
+        set -e
+        cd tool/functions
+        npm ci
+        npm run check
+      description: Format check, type check and test the Cloud Functions in tool/functions
     deploy_functions:
       run: |
-        cd tool/firebase_function/functions
-        firebase deploy --only functions
-      description: Deploy firebase functions
+        set -e
+        cd tool/functions
+        npm ci
+        npm run check
+        firebase deploy --only functions:portrai
+      description: Check and deploy the portrai Cloud Functions codebase from tool/functions
