@@ -4,7 +4,7 @@ import {
   jobFitPrompt,
   parseJobFit,
 } from '../../../src/job_opening/score/job_fit.js';
-import { jobOpening } from '../fixture.js';
+import { jobOpening, portfolioProfile } from '../fixture.js';
 
 const skills = ['Flutter', 'Dart', 'Firebase'];
 
@@ -90,13 +90,16 @@ describe('parseJobFit', () => {
 });
 
 describe('jobFitPrompt', () => {
-  it('should hold the skills and the job fields but not the source links', () => {
+  it('should hold the portfolio skills, roles and experience and the job fields but not the source links', () => {
     const opening = { ...jobOpening(), dedupeKey: 'key', matchedSkills: [] };
+    const profile = portfolioProfile();
 
-    const prompt = JSON.parse(jobFitPrompt(opening, skills));
+    const prompt = JSON.parse(jobFitPrompt(opening, profile));
 
     expect(prompt).toEqual({
-      portfolioSkills: skills,
+      portfolioSkills: profile.skills,
+      portfolioRoles: profile.roles,
+      yearsOfExperience: 10,
       job: {
         title: opening.title,
         company: opening.company,

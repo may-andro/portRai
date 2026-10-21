@@ -29,4 +29,12 @@ describe('htmlToText', () => {
     expect(text).toHaveLength(5_001);
     expect(text.endsWith('…')).toBe(true);
   });
+
+  it('should not add spaces where inline tags close next to punctuation', () => {
+    expect(
+      htmlToText(
+        '<p>Use <b>Flutter</b>, <em>Dart</em>. See <a href="x">docs</a>!</p>',
+      ),
+    ).toBe('Use Flutter, Dart. See docs!');
+  });
 });

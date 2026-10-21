@@ -13,7 +13,7 @@ import {
   type SyncDependencies,
   syncJobOpenings,
 } from '../../src/job_opening/sync_job_openings.js';
-import { jobOpening } from './fixture.js';
+import { jobOpening, portfolioProfile } from './fixture.js';
 
 function feed(source: JobSource, result: JobOpening[] | Error): JobFeed {
   return {
@@ -45,7 +45,7 @@ function dependencies(
   return {
     feeds: [feed('remotive', [jobOpening()])],
     listUserIds: vi.fn().mockResolvedValue(['owner-uid']),
-    loadSkills: vi.fn().mockResolvedValue(['Flutter', 'Dart', 'Firebase']),
+    loadProfile: vi.fn().mockResolvedValue(portfolioProfile()),
     scorer: scorer(),
     writeJobOpenings: vi.fn().mockResolvedValue(undefined),
     now: () => new Date('2026-10-19T04:00:00Z'),
@@ -71,6 +71,7 @@ describe('syncJobOpenings', () => {
     expect(result).toEqual({
       userCount: 2,
       fetchedCount: 2,
+      staleCount: 0,
       matchedCount: 1,
       scoredCount: 1,
       failedScoreCount: 0,
@@ -124,7 +125,9 @@ describe('syncJobOpenings', () => {
     const remotive = feed('remotive', [jobOpening()]);
     const deps = dependencies({
       feeds: [remotive],
-      loadSkills: vi.fn().mockResolvedValue([]),
+      loadProfile: vi
+        .fn()
+        .mockResolvedValue(portfolioProfile({ skills: [], searchTerms: [] })),
     });
 
     await syncJobOpenings(deps);
@@ -185,9 +188,11 @@ describe('syncJobOpenings', () => {
 
   it('should add the skills Gemini found when the keywords missed them', async () => {
     const deps = dependencies({
-      loadSkills: vi
-        .fn()
-        .mockResolvedValue(['Flutter', 'Dart', 'Firebase', 'Kotlin']),
+      loadProfile: vi.fn().mockResolvedValue(
+        portfolioProfile({
+          skills: ['Flutter', 'Dart', 'Firebase', 'Kotlin'],
+        }),
+      ),
       scorer: scorer(async () => fit({ matchedSkills: ['Dart', 'Kotlin'] })),
     });
 
@@ -316,6 +321,126 @@ describe('syncJobOpenings', () => {
       expect.objectContaining({
         error: 'Error: Skipped: the scoring time limit was reached',
       }),
+    );
+  });
+
+  it('should search every feed for the portfolio role terms', async () => {
+    const remotive = feed('remotive', [jobOpening()]);
+    const deps = dependencies({ feeds: [remotive] });
+
+    await syncJobOpenings(deps);
+
+    expect(remotive.fetchJobs).toHaveBeenCalledWith({
+      terms: ['Flutter', 'Android'],
+    });
+  });
+
+  it('should drop openings posted more than 30 days ago', async () => {
+    const now = new Date('2026-10-19T04:00:00Z');
+    const deps = dependencies({
+      now: () => now,
+      feeds: [
+        feed('remotive', [
+          jobOpening({
+            sourceId: 'fresh',
+            title: 'Fresh Flutter Developer',
+            publishedAt: new Date(now.getTime() - 30 * 24 * 3600 * 1000),
+          }),
+          jobOpening({
+            sourceId: 'stale',
+            title: 'Old Flutter Developer',
+            publishedAt: new Date(now.getTime() - 31 * 24 * 3600 * 1000),
+          }),
+        ]),
+      ],
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({ fetchedCount: 2, staleCount: 1 });
+    const openings = vi.mocked(deps.writeJobOpenings).mock.calls[0][1];
+    expect(openings.map((opening) => opening.title)).toEqual([
+      'Fresh Flutter Developer',
+    ]);
+  });
+
+  it('should drop openings the source has already expired', async () => {
+    const deps = dependencies({
+      feeds: [
+        feed('himalayas', [
+          jobOpening({ expiresAt: new Date('2026-10-18T00:00:00Z') }),
+        ]),
+      ],
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({ staleCount: 1, matchedCount: 0 });
+  });
+
+  it('should keep an opening whose title names a role even with few skills', async () => {
+    const deps = dependencies({
+      feeds: [
+        feed('remotive', [
+          jobOpening({
+            title: 'Senior Android Engineer',
+            tags: [],
+            description: 'Build apps.',
+          }),
+          jobOpening({
+            sourceId: '2',
+            title: 'Backend Engineer',
+            tags: [],
+            description: 'Build services.',
+          }),
+        ]),
+      ],
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result.matchedCount).toBe(1);
+    const scoredTitles = vi
+      .mocked(deps.scorer.score)
+      .mock.calls.map(([opening]) => opening.title);
+    expect(scoredTitles).toEqual(['Senior Android Engineer']);
+  });
+
+  it('should score role matches before skill-only matches', async () => {
+    const deps = dependencies({
+      feeds: [
+        feed('remotive', [
+          jobOpening({
+            sourceId: '1',
+            title: 'Platform Engineer',
+            tags: ['flutter', 'dart'],
+            description: 'Flutter, Dart and Firebase.',
+          }),
+          jobOpening({
+            sourceId: '2',
+            title: 'Flutter Developer',
+            tags: [],
+            description: 'Apps.',
+          }),
+        ]),
+      ],
+    });
+
+    await syncJobOpenings(deps);
+
+    const scoredTitles = vi
+      .mocked(deps.scorer.score)
+      .mock.calls.map(([opening]) => opening.title);
+    expect(scoredTitles[0]).toBe('Flutter Developer');
+  });
+
+  it('should hand the whole portfolio profile to the scorer', async () => {
+    const deps = dependencies();
+
+    await syncJobOpenings(deps);
+
+    expect(vi.mocked(deps.scorer.score).mock.calls[0][1]).toEqual(
+      portfolioProfile(),
     );
   });
 });

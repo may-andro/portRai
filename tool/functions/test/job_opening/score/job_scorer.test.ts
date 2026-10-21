@@ -5,7 +5,7 @@ import {
   jobFitSchema,
 } from '../../../src/job_opening/score/job_fit.js';
 import { GeminiJobScorer } from '../../../src/job_opening/score/job_scorer.js';
-import { jobOpening } from '../fixture.js';
+import { jobOpening, portfolioProfile } from '../fixture.js';
 
 describe('GeminiJobScorer', () => {
   it('should send the trusted instruction apart from the job text and parse the reply', async () => {
@@ -23,9 +23,10 @@ describe('GeminiJobScorer', () => {
       matchedSkills: ['Flutter'],
     };
 
-    const fit = await new GeminiJobScorer(generateJson).score(opening, [
-      'Flutter',
-    ]);
+    const fit = await new GeminiJobScorer(generateJson).score(
+      opening,
+      portfolioProfile({ skills: ['Flutter'] }),
+    );
 
     expect(fit.score).toBe(77);
     const [request] = generateJson.mock.calls[0];
@@ -40,7 +41,10 @@ describe('GeminiJobScorer', () => {
     const opening = { ...jobOpening(), dedupeKey: 'key', matchedSkills: [] };
 
     await expect(
-      new GeminiJobScorer(generateJson).score(opening, ['Flutter']),
+      new GeminiJobScorer(generateJson).score(
+        opening,
+        portfolioProfile({ skills: ['Flutter'] }),
+      ),
     ).rejects.toThrow('HTTP 503');
   });
 });
