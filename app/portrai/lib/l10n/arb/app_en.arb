@@ -1633,18 +1633,6 @@
   "@signInWelcomeDescription": {
     "description": "Description under the sign-in title"
   },
-  "signInHighlightPrivate": "Private to your account",
-  "@signInHighlightPrivate": {
-    "description": "Sign-in highlight about privacy"
-  },
-  "signInHighlightDevices": "The same account on every device",
-  "@signInHighlightDevices": {
-    "description": "Sign-in highlight about devices"
-  },
-  "signInHighlightStaySignedIn": "Stay signed in on this device",
-  "@signInHighlightStaySignedIn": {
-    "description": "Sign-in highlight about staying signed in"
-  },
   "signInNoSignUp": "Accounts are created by the site owner. There is no sign-up.",
   "@signInNoSignUp": {
     "description": "Note under the sign-in form"

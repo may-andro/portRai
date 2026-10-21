@@ -590,8 +590,5 @@
   "jobOpeningsMatchesTitle": "Jouw matches",
   "signInWelcomeTitle": "Welkom terug",
   "signInWelcomeDescription": "Jouw privéruimte in het portfolio, alleen voor jouw account.",
-  "signInHighlightPrivate": "Privé voor je account",
-  "signInHighlightDevices": "Hetzelfde account op elk apparaat",
-  "signInHighlightStaySignedIn": "Blijf ingelogd op dit apparaat",
   "signInNoSignUp": "Accounts worden aangemaakt door de eigenaar van de site. Registreren is niet mogelijk."
 }

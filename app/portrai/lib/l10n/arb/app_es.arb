@@ -590,8 +590,5 @@
   "jobOpeningsMatchesTitle": "Tus coincidencias",
   "signInWelcomeTitle": "Bienvenido de nuevo",
   "signInWelcomeDescription": "Tu espacio privado en el portfolio, reservado solo para tu cuenta.",
-  "signInHighlightPrivate": "Privado para tu cuenta",
-  "signInHighlightDevices": "La misma cuenta en todos tus dispositivos",
-  "signInHighlightStaySignedIn": "Mantén la sesión iniciada en este dispositivo",
   "signInNoSignUp": "Las cuentas las crea el propietario del sitio. No hay registro."
 }

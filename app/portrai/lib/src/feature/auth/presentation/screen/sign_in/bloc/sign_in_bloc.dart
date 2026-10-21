@@ -4,23 +4,32 @@ import 'package:portrai/src/feature/auth/domain/_domain.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/sign_in_event.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/sign_in_state.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/tracking/_tracking.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 
 @register
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
-  SignInBloc(this._signInUseCase, this._trackingDelegate)
-    : super(const SignInState()) {
+  SignInBloc(
+    this._signInUseCase,
+    this._getProfileUseCase,
+    this._trackingDelegate,
+  ) : super(const SignInState()) {
     on<SignInStartedEvent>(_mapSignInStartedEventToState);
     on<SignInClickEvent>(_mapSignInClickEventToState);
   }
 
   final SignInUseCase _signInUseCase;
+  final GetProfileUseCase _getProfileUseCase;
   final SignInTrackingDelegate _trackingDelegate;
 
-  void _mapSignInStartedEventToState(
+  Future<void> _mapSignInStartedEventToState(
     SignInStartedEvent event,
     Emitter<SignInState> emit,
-  ) {
+  ) async {
     _trackingDelegate.trackScreenView();
+    final profileEither = await _getProfileUseCase();
+    if (profileEither.isRight) {
+      emit(state.copyWith(profile: profileEither.right));
+    }
   }
 
   Future<void> _mapSignInClickEventToState(
@@ -30,15 +39,15 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     if (state.isSigningIn || state.isSignedIn) return;
 
     _trackingDelegate.trackSignInClick();
-    emit(const SignInState(isSigningIn: true));
+    emit(state.copyWith(isSigningIn: true, clearFailure: true));
 
     final signInEither = await _signInUseCase(
       SignInParam(email: event.email, password: event.password),
     );
     if (signInEither.isLeft) {
-      emit(SignInState(failure: signInEither.left));
+      emit(state.copyWith(isSigningIn: false, failure: signInEither.left));
       return;
     }
-    emit(const SignInState(isSignedIn: true));
+    emit(state.copyWith(isSigningIn: false, isSignedIn: true));
   }
 }

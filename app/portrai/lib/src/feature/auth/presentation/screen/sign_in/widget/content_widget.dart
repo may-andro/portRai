@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/_bloc.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:portrai/src/widget/page_header_widget.dart';
 
@@ -13,7 +12,8 @@ part 'visual_panel_widget.dart';
 const _formMaxWidth = 400.0;
 
 /// A split screen on desktop, with the visual panel beside the sign-in form.
-/// Phones and tablets show the form first and the panel after it.
+/// Phones and tablets show the form first and the panel after it, as a
+/// full-width band. The profile footer closes the page.
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
@@ -61,19 +61,9 @@ class ContentWidget extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(
+                            const Expanded(
                               flex: 5,
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                  context.space(factor: 2),
-                                  0,
-                                  context.space(factor: 2),
-                                  context.space(factor: 2),
-                                ),
-                                child: const _VisualPanelWidget(
-                                  isCompact: false,
-                                ),
-                              ),
+                              child: _VisualPanelWidget(isCompact: false),
                             ),
                             Expanded(flex: 4, child: form),
                           ],
@@ -89,19 +79,18 @@ class ContentWidget extends StatelessWidget {
                     children: [
                       header,
                       form,
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          context.space(factor: 2),
-                          0,
-                          context.space(factor: 2),
-                          context.space(factor: 2) +
-                              MediaQuery.paddingOf(context).bottom,
-                        ),
-                        child: const _VisualPanelWidget(isCompact: true),
-                      ),
+                      const _VisualPanelWidget(isCompact: true),
                     ],
                   ),
                 ),
+              SliverToBoxAdapter(
+                child: BlocSelector<SignInBloc, SignInState, ProfileEntity?>(
+                  selector: (state) => state.profile,
+                  builder: (context, profile) => profile == null
+                      ? SizedBox(height: MediaQuery.paddingOf(context).bottom)
+                      : FooterWidget(profile: profile),
+                ),
+              ),
             ],
           ),
           if (chrome == PageChrome.close && Navigator.of(context).canPop())

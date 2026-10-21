@@ -58,15 +58,30 @@ void main() {
     expect(button.isDisabled, isTrue);
   });
 
-  testWidgets('should welcome the user with highlights and the no sign-up '
-      'note on a desktop', (tester) async {
+  testWidgets('should welcome the user beside the form on a desktop', (
+    tester,
+  ) async {
     await pumpContent(tester, const SignInState());
 
     expect(find.text('Welcome back'), findsOneWidget);
-    expect(find.text('Private to your account'), findsOneWidget);
     expect(
       find.text('Accounts are created by the site owner. There is no sign-up.'),
       findsOneWidget,
     );
+    final welcome = tester.getTopLeft(find.text('Welcome back'));
+    final email = tester.getTopLeft(find.text('Email'));
+    expect(welcome.dx, lessThan(email.dx));
+  });
+
+  testWidgets('should show the form before the welcome panel on a phone', (
+    tester,
+  ) async {
+    await pumpContent(tester, const SignInState());
+    setUpAnimatedPage(tester, size: const Size(390, 1400));
+    await pumpAnimations(tester);
+
+    final welcome = tester.getTopLeft(find.text('Welcome back'));
+    final email = tester.getTopLeft(find.text('Email'));
+    expect(email.dy, lessThan(welcome.dy));
   });
 }
