@@ -30,8 +30,17 @@ export function toJobOpeningDocument(opening: ScoredJobOpening, now: Date) {
     reasons: opening.reasons,
     publishedAt: Timestamp.fromDate(opening.publishedAt),
     fetchedAt: Timestamp.fromDate(now),
-    expiresAt: Timestamp.fromDate(
-      new Date(now.getTime() + jobOpeningLifetimeDays * dayMs),
-    ),
+    expiresAt: Timestamp.fromDate(expiryFor(opening, now)),
   };
+}
+
+/**
+ * [jobOpeningLifetimeDays] after the run, or earlier when the source says the
+ * job stops being listed sooner.
+ */
+function expiryFor(opening: ScoredJobOpening, now: Date): Date {
+  const lifetimeEnd = new Date(now.getTime() + jobOpeningLifetimeDays * dayMs);
+  return opening.expiresAt !== undefined && opening.expiresAt < lifetimeEnd
+    ? opening.expiresAt
+    : lifetimeEnd;
 }

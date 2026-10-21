@@ -19,6 +19,11 @@ export function htmlToText(html: string): string {
     .replace(/<\s*br\s*\/?>/gi, '\n')
     .replace(/<\s*\/\s*(p|div|li|h[1-6]|ul|ol)\s*>/gi, '\n')
     .replace(/<\s*li[^>]*>/gi, '- ')
+    // Inline formatting sits inside words and sentences, so it leaves no gap.
+    .replace(
+      /<\s*\/?\s*(a|abbr|b|code|em|i|mark|small|span|strong|sub|sup|u)\b[^>]*>/gi,
+      '',
+    )
     .replace(/<[^>]*>/g, ' ')
     .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, decodeEntity)
     .replace(/[ \t\f\v]+/g, ' ')

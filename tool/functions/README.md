@@ -31,49 +31,72 @@ with the others.
 
 ## Job openings
 
-`fetchJobOpenings` collects remote job openings, scores how well each fits the portfolio's
-skills with Gemini and stores the good fits for each user who has job search turned on.
+`fetchJobOpenings` searches remote job boards for the portfolio's roles, scores how well each
+recent job fits the portfolio with Gemini and stores the good fits for each user who has job
+search turned on.
 
 ### Features
 
 - Runs every Monday at 06:00 Europe/Amsterdam in `europe-west3`.
-- Reads remote jobs from two public feeds: Remotive and Arbeitnow.
+- Derives search terms, such as Flutter, Android and Mobile, from the portfolio's roles.
+- Searches Himalayas and Jobicy for those terms and reads the latest jobs from Remotive,
+  Remote OK and Arbeitnow.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
   across feeds.
-- Keeps a job when at least two portfolio skills appear in its title, tags or description.
-- Scores up to 50 of those jobs from 0 to 100 with Gemini and keeps the ones scoring 60 or more.
+- Drops jobs posted more than 30 days ago, and jobs their source has already expired.
+- Keeps a job when its title names a portfolio role term, or when at least two portfolio skills
+  appear in its title, tags or description.
+- Scores up to 120 of those jobs from 0 to 100 with Gemini against the skills, roles and years of
+  experience, and keeps the ones scoring 60 or more.
 - Writes the kept jobs to `users/{uid}/job_openings/{dedupeKey}` for every user whose
   `jobSearch.enabled` is `true`.
 - Lets openings expire 14 days after the last run that found them.
 
 ### How it works
 
-#### Portfolio skills
+#### Portfolio profile
 
-The skills come from the same Firestore documents the app reads, in English only, since both
-feeds publish mostly in English. Each collection holds one document per locale with the items in
-one array:
+The search reads the same Firestore documents the app reads, in English only, since the feeds
+publish mostly in English. Each collection holds one document per locale with the items in one
+array:
 
-| Document         | Field                        |
-| ---------------- | ---------------------------- |
-| `expertise/en`   | `experties[].skills[].name`  |
-| `projects/en`    | `projects[].technologies`    |
-| `experiences/en` | `experiences[].technologies` |
+| Document         | Fields                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------- |
+| `profile/en`     | `profile.currentRole`, `profile.title`, `profile.subtitle`, `profile.yearsOfExperience` |
+| `experiences/en` | `experiences[].position`, `experiences[].technologies`                                  |
+| `expertise/en`   | `experties[].skills[].name`                                                             |
+| `projects/en`    | `projects[].technologies`                                                               |
 
-Duplicates are dropped ignoring case. A skill matches only as a whole term, so `Java` does not
+The roles are the current role, the title, the subtitle and every past position. The search
+terms are the words of those roles without seniority and generic job words, such as Senior,
+Lead, Developer or Engineer, most frequent first and at most four. For example, `Tech Lead -
+Flutter Developer` and `Senior Android Developer` give `Flutter` and `Android`.
+
+Skill duplicates are dropped ignoring case. A skill or role term matches only as a whole term, so `Java` does not
 match `JavaScript`, while `C++`, `.NET` and `Node.js` still match. Skills of one or two
 characters, such as `Go` or `R`, count only when they appear in the title or tags.
 
 #### Feeds
 
-| Feed                                                      | Request                                              | Kept                     | Terms                                                                                                                              |
-| --------------------------------------------------------- | ---------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| [Remotive](https://remotive.com/api-documentation)        | `GET /api/remote-jobs?category=software-development` | Every job                | Link to the job's Remotive URL, name Remotive as the source, don't pass jobs to other job sites, request at most a few times a day |
-| [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api) | `GET /api/job-board-api?page=1..5`                   | Jobs with `remote: true` | Don't abuse the free API, link back to the site                                                                                    |
+| Feed                                                      | Request                                                        | Kept                     | Terms                                                                                                                                                            |
+| --------------------------------------------------------- | -------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Himalayas](https://himalayas.app/api)                    | `GET /jobs/api/search?q={term}&sort=recent&page=1..3` per term | Every job                | Apply through the job's `applicationLink` unchanged, show Himalayas as the source with a link, don't pass jobs to other job boards, remove jobs once they expire |
+| [Remotive](https://remotive.com/api-documentation)        | `GET /api/remote-jobs?category=software-development`           | Every job                | Link to the job's Remotive URL, name Remotive as the source, don't pass jobs to other job sites, request at most a few times a day                               |
+| [Remote OK](https://remoteok.com/api)                     | `GET /api`                                                     | Every job                | Link back to the job's Remote OK URL and mention Remote OK as the source; don't use its logo                                                                     |
+| [Jobicy](https://jobicy.com/jobs-rss-feed)                | `GET /api/v2/remote-jobs?count=50&tag={term}` per term         | Every job                | Credit Jobicy with a link to the source, and send apply buttons to the original job URL                                                                          |
+| [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api) | `GET /api/job-board-api?page=1..5`                             | Jobs with `remote: true` | Don't abuse the free API, link back to the site                                                                                                                  |
 
 Every stored opening keeps the source's job `url` and `sourceName`, which the app must show
-with the job. Remotive's free API returns only its 10 most recent jobs, which arrive 24 hours
-after they are posted on Remotive.
+with the job. Earlier feeds in the table win when two list the same job. Remotive's free API
+returns only its 10 most recent jobs, which arrive 24 hours after they are posted on Remotive.
+A request whose connection fails, or that is answered with `429` or a `5xx` status, is tried
+once more after two seconds.
+
+#### Freshness
+
+Jobs posted more than 30 days ago are dropped before matching, so stale postings are never
+scored or stored. A stored opening expires 14 days after the last run that found it, or earlier
+when its source gives an earlier expiry, as Himalayas does.
 
 If one feed fails, the run continues with the others and logs a warning. The run fails only
 when every feed fails. The function does not retry, so a failed run waits for the next Monday.
@@ -82,7 +105,7 @@ when every feed fails. The function does not retry, so a failed run waits for th
 
 Keyword matching is a cheap first filter. Gemini (`gemini-2.5-flash` through the Agent
 Platform, formerly Vertex AI, in the `global` location) then reads each matched job with the
-portfolio skills and replies with JSON:
+portfolio's skills, roles and years of experience and replies with JSON:
 
 | Field           | Kept as                                                                          |
 | --------------- | -------------------------------------------------------------------------------- |
@@ -93,8 +116,8 @@ portfolio skills and replies with JSON:
 
 - **Threshold:** openings scoring below 60 are not stored. 80 or more means the job's core
   stack is in the portfolio.
-- **Cost:** a run scores at most the 50 best keyword matches, ranked by matched skills and then
-  by date, 2 at a time.
+- **Cost:** a run scores at most the 120 best matches, role-title matches first, then by matched
+  skills and then by date, 2 at a time.
 - **Retries:** a throttled (`429`), timed-out or server-error (`5xx`) call is retried up to 3
   times, after about 5, 10 and 20 seconds. Each attempt gets 45 seconds and each opening 150 seconds in total.
   Scoring stops starting new openings after 10 minutes, so the run ends before the function's

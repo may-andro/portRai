@@ -1,5 +1,6 @@
 /** Where a job opening was found. */
-export type JobSource = 'remotive' | 'arbeitnow';
+export type JobSource =
+  'himalayas' | 'remotive' | 'remoteok' | 'jobicy' | 'arbeitnow';
 
 /** A job opening in the one shape every feed is mapped to. */
 export interface JobOpening {
@@ -17,6 +18,18 @@ export interface JobOpening {
   /** Plain text, without the source's HTML. */
   description: string;
   publishedAt: Date;
+  /** When the source stops listing the job, for sources that say. */
+  expiresAt?: Date;
+}
+
+/** What the job search knows about the portfolio owner. */
+export interface PortfolioProfile {
+  skills: string[];
+  /** The current role, the headline title and past positions. */
+  roles: string[];
+  /** Words from the roles to search the job boards for, such as Flutter. */
+  searchTerms: string[];
+  yearsOfExperience: number | null;
 }
 
 /** A job opening that matched enough of the portfolio skills to be kept. */

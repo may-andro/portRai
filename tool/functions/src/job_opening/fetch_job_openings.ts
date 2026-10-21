@@ -10,9 +10,12 @@ import {
 } from '../shared/function_options.js';
 import { createGeminiGenerateJson } from '../shared/gemini.js';
 import { ArbeitnowFeed } from './feed/arbeitnow_feed.js';
+import { HimalayasFeed } from './feed/himalayas_feed.js';
+import { JobicyFeed } from './feed/jobicy_feed.js';
+import { RemoteOkFeed } from './feed/remoteok_feed.js';
 import { RemotiveFeed } from './feed/remotive_feed.js';
+import { loadPortfolioProfile } from './profile/portfolio_profile.js';
 import { GeminiJobScorer } from './score/job_scorer.js';
-import { loadPortfolioSkills } from './skill/portfolio_skills.js';
 import {
   firestoreReadDocument,
   listJobSearchUserIds,
@@ -36,10 +39,17 @@ export const fetchJobOpenings = onSchedule(
   async () => {
     const db = getFirestore();
     const result = await syncJobOpenings({
-      // Remotive comes first, so it keeps a job both feeds list.
-      feeds: [new RemotiveFeed(fetchJson), new ArbeitnowFeed(fetchJson)],
+      // Earlier feeds win when two list the same job; the searchable feeds
+      // with the richest data come first.
+      feeds: [
+        new HimalayasFeed(fetchJson),
+        new RemotiveFeed(fetchJson),
+        new RemoteOkFeed(fetchJson),
+        new JobicyFeed(fetchJson),
+        new ArbeitnowFeed(fetchJson),
+      ],
       listUserIds: () => listJobSearchUserIds(db),
-      loadSkills: () => loadPortfolioSkills(firestoreReadDocument(db)),
+      loadProfile: () => loadPortfolioProfile(firestoreReadDocument(db)),
       scorer: new GeminiJobScorer(createGeminiGenerateJson(projectId())),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),

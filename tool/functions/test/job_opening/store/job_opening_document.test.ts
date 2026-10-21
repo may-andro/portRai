@@ -32,4 +32,21 @@ describe('toJobOpeningDocument', () => {
     });
     expect(document).not.toHaveProperty('dedupeKey');
   });
+
+  it('should expire when the source does when that is sooner', () => {
+    const now = new Date('2026-10-19T04:00:00Z');
+    const sourceExpiry = new Date('2026-10-25T00:00:00Z');
+    const opening = {
+      ...jobOpening({ expiresAt: sourceExpiry }),
+      dedupeKey: 'key',
+      matchedSkills: [],
+      score: 70,
+      missingSkills: [],
+      reasons: [],
+    };
+
+    expect(toJobOpeningDocument(opening, now).expiresAt).toEqual(
+      Timestamp.fromDate(sourceExpiry),
+    );
+  });
 });

@@ -23,7 +23,7 @@ export class SkillMatcher {
   ) {
     this.patterns = skills.map((skill) => ({
       skill,
-      pattern: skillPattern(skill),
+      pattern: termPattern(skill),
       isShort: skill.trim().length <= shortSkillLength,
     }));
   }
@@ -45,12 +45,12 @@ export class SkillMatcher {
 }
 
 /**
- * Matches the skill as a whole term. Letters and digits may not touch it on
- * either side, so `Java` does not match `JavaScript`, while terms with
- * symbols such as `C++`, `.NET` or `Node.js` still match.
+ * Matches [term] as a whole term in lowercase text. Letters and digits may
+ * not touch it on either side, so `Java` does not match `JavaScript`, while
+ * terms with symbols such as `C++`, `.NET` or `Node.js` still match.
  */
-function skillPattern(skill: string): RegExp {
-  const escaped = skill
+export function termPattern(term: string): RegExp {
+  const escaped = term
     .trim()
     .toLowerCase()
     .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
