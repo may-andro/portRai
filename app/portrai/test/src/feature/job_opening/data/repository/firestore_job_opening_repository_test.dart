@@ -63,7 +63,7 @@ void main() {
         () => logReporter.error(
           any(),
           tag: any(named: 'tag'),
-          error: any(named: 'error'),
+          error: any<Object?>(named: 'error'),
           stacktrace: any(named: 'stacktrace'),
         ),
       ).called(1);
@@ -71,19 +71,23 @@ void main() {
 
     for (final (firestoreException, exceptionMatcher) in [
       (
-        FirestorePermissionDeniedException('read', Object(), StackTrace.empty),
+        const FirestorePermissionDeniedException(
+          'read',
+          Object(),
+          StackTrace.empty,
+        ),
         isA<JobOpeningPermissionDeniedException>(),
       ),
       (
-        FirestoreNetworkException(Object(), StackTrace.empty),
+        const FirestoreNetworkException(Object(), StackTrace.empty),
         isA<JobOpeningNetworkException>(),
       ),
       (
-        FirestoreTimeoutException('read', Object(), StackTrace.empty),
+        const FirestoreTimeoutException('read', Object(), StackTrace.empty),
         isA<JobOpeningNetworkException>(),
       ),
       (
-        FirestoreUnknownException(Object(), StackTrace.empty),
+        const FirestoreUnknownException(Object(), StackTrace.empty),
         isA<JobOpeningUnknownException>(),
       ),
     ]) {
@@ -121,7 +125,11 @@ void main() {
 
     test('should throw not found when the opening does not exist', () async {
       firestoreController.stubGetDocumentFromCollectionThrows(
-        FirestoreDocumentNotFoundException('path', Object(), StackTrace.empty),
+        const FirestoreDocumentNotFoundException(
+          'path',
+          Object(),
+          StackTrace.empty,
+        ),
       );
 
       await expectLater(
@@ -145,7 +153,7 @@ void main() {
       'should report job search off when the user has no document',
       () async {
         firestoreController.stubGetDocumentFromCollectionThrows(
-          FirestoreDocumentNotFoundException(
+          const FirestoreDocumentNotFoundException(
             'path',
             Object(),
             StackTrace.empty,
@@ -191,7 +199,7 @@ void main() {
       'should throw permission denied when the rules refuse the write',
       () async {
         firestoreController.stubMergeDocumentInCollectionThrows(
-          FirestorePermissionDeniedException(
+          const FirestorePermissionDeniedException(
             'write',
             Object(),
             StackTrace.empty,

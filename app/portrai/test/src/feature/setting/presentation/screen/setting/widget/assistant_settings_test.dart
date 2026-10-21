@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
@@ -43,6 +44,10 @@ void main() {
       )
       ..stubCall(
         definition: OnboardingFeatureFlags.roleOnboarding,
+        result: const Right(false),
+      )
+      ..stubCall(
+        definition: JobOpeningFeatureFlags.jobOpenings,
         result: const Right(false),
       );
     appServiceLocator.registerFactory<SettingBloc>(

@@ -131,9 +131,11 @@ last run, belongs outside this map, so Firestore rules can let the user change `
 only the server writes the rest.
 
 No user document exists until job search is turned on, and a run with no such users skips the
-feeds. To turn it on, create the document in the Firebase console: in the `users` collection,
-add a document whose ID is the user's UID from Authentication, with a map field `jobSearch`
-holding the boolean `enabled` set to `true` and the timestamp `updatedAt` set to now.
+feeds. The app's "Weekly job search" switch on the Job openings screen writes both fields (see
+the [app README](../../app/portrai/README.md#job-openings)). Without the app, create the document
+in the Firebase console: in the `users` collection, add a document whose ID is the user's UID from
+Authentication, with a map field `jobSearch` holding the boolean `enabled` set to `true` and the
+timestamp `updatedAt` set to now.
 
 Each opening is stored at `users/{uid}/job_openings/{dedupeKey}`. The key is a hash of the
 normalized company and title, so the same job keeps one document across feeds and weeks.

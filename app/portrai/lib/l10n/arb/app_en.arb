@@ -1414,5 +1414,139 @@
   "errorSignInUnknown": "Sign-in failed. Please try again",
   "@errorSignInUnknown": {
     "description": "Error shown for unexpected sign-in problems"
+  },
+  "signOutButton": "Sign out",
+  "@signOutButton": {
+    "description": "Button that signs the owner out"
+  },
+  "errorSignOutNetwork": "Can't sign out. Check your internet connection",
+  "@errorSignOutNetwork": {
+    "description": "Error shown when sign-out fails because of the network"
+  },
+  "errorSignOutUnknown": "Sign-out failed. Please try again",
+  "@errorSignOutUnknown": {
+    "description": "Error shown for unexpected sign-out problems"
+  },
+  "jobOpeningsSection": "Career",
+  "@jobOpeningsSection": {
+    "description": "Settings section title above the job openings card"
+  },
+  "jobOpeningsCardTitle": "Job openings",
+  "@jobOpeningsCardTitle": {
+    "description": "Title of the Settings card that opens the job openings"
+  },
+  "jobOpeningsCardDescription": "Remote jobs matched to your portfolio each week",
+  "@jobOpeningsCardDescription": {
+    "description": "Subtitle of the Settings card that opens the job openings"
+  },
+  "jobOpeningsTitle": "Job openings",
+  "@jobOpeningsTitle": {
+    "description": "Title of the job openings list screen"
+  },
+  "jobOpeningsDescription": "Remote jobs that fit your portfolio skills. New ones are found every Monday, scored by Gemini and kept for 14 days.",
+  "@jobOpeningsDescription": {
+    "description": "Explanation at the top of the job openings list screen"
+  },
+  "jobSearchToggleTitle": "Weekly job search",
+  "@jobSearchToggleTitle": {
+    "description": "Title of the switch that turns the weekly job search on or off"
+  },
+  "jobSearchToggleDescription": "Look for new matching jobs every Monday",
+  "@jobSearchToggleDescription": {
+    "description": "Description of the weekly job search switch"
+  },
+  "jobOpeningsEmpty": "No matching jobs right now. New ones are found every Monday.",
+  "@jobOpeningsEmpty": {
+    "description": "Shown when the job openings list is empty"
+  },
+  "jobOpeningScore": "{score}% fit",
+  "@jobOpeningScore": {
+    "description": "How well a job fits the portfolio, from 0 to 100",
+    "placeholders": {
+      "score": {
+        "type": "int",
+        "example": "82"
+      }
+    }
+  },
+  "jobOpeningSourceAndDate": "{source} · {date}",
+  "@jobOpeningSourceAndDate": {
+    "description": "The job board a job came from and when it was published",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Remotive"
+      },
+      "date": {
+        "type": "String",
+        "example": "Oct 17, 2026"
+      }
+    }
+  },
+  "jobOpeningTitle": "Job opening",
+  "@jobOpeningTitle": {
+    "description": "Title of the job opening detail screen"
+  },
+  "jobOpeningApply": "Apply on {source}",
+  "@jobOpeningApply": {
+    "description": "Button that opens the job page on its job board",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Remotive"
+      }
+    }
+  },
+  "jobOpeningReasonsTitle": "Why it fits",
+  "@jobOpeningReasonsTitle": {
+    "description": "Section title for Gemini's reasons behind the score"
+  },
+  "jobOpeningMatchedSkillsTitle": "Your matching skills",
+  "@jobOpeningMatchedSkillsTitle": {
+    "description": "Section title for portfolio skills the job needs"
+  },
+  "jobOpeningMissingSkillsTitle": "Skills the job also asks for",
+  "@jobOpeningMissingSkillsTitle": {
+    "description": "Section title for skills the job asks for that are not in the portfolio"
+  },
+  "jobOpeningDescriptionTitle": "Description",
+  "@jobOpeningDescriptionTitle": {
+    "description": "Section title for the job description"
+  },
+  "errorJobOpeningsSignedOut": "Sign in again to see your job openings",
+  "@errorJobOpeningsSignedOut": {
+    "description": "Error shown when the session ended while viewing job openings"
+  },
+  "errorJobOpeningsPermissionDenied": "You don't have access to these job openings",
+  "@errorJobOpeningsPermissionDenied": {
+    "description": "Error shown when Firestore rules refuse to read the job openings"
+  },
+  "errorJobOpeningsNetwork": "Can't load job openings. Check your internet connection",
+  "@errorJobOpeningsNetwork": {
+    "description": "Error shown when job openings fail to load because of the network"
+  },
+  "errorJobOpeningsUnknown": "Can't load job openings. Please try again",
+  "@errorJobOpeningsUnknown": {
+    "description": "Error shown for unexpected problems loading job openings"
+  },
+  "errorJobOpeningNotFound": "This job opening is no longer available",
+  "@errorJobOpeningNotFound": {
+    "description": "Error shown when a job opening expired or does not exist"
+  },
+  "errorJobSearchUnavailable": "Can't read your job search setting",
+  "@errorJobSearchUnavailable": {
+    "description": "Error for when the weekly job search setting cannot be read"
+  },
+  "errorJobSearchPermissionDenied": "You can't change this job search setting",
+  "@errorJobSearchPermissionDenied": {
+    "description": "Error shown when Firestore rules refuse to save the job search setting"
+  },
+  "errorJobSearchNetwork": "Can't update job search. Check your internet connection",
+  "@errorJobSearchNetwork": {
+    "description": "Error shown when saving the job search setting fails because of the network"
+  },
+  "errorJobSearchUnknown": "Can't update job search. Please try again",
+  "@errorJobSearchUnknown": {
+    "description": "Error shown for unexpected problems saving the job search setting"
   }
 }

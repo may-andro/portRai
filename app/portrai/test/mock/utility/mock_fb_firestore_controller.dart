@@ -17,4 +17,48 @@ extension MockFbFirestoreControllerStub on MockFbFirestoreController {
   void stubGetDocumentFromCollectionThrows(Object error) {
     when(() => getDocumentFromCollection(any(), any())).thenThrow(error);
   }
+
+  /// Stubs `getCollectionQuerySnapshot(collectionPath, documentIdField:)` to
+  /// return [documents].
+  void stubGetCollectionQuerySnapshot(List<Map<String, dynamic>> documents) {
+    when(
+      () => getCollectionQuerySnapshot(
+        any(),
+        documentIdField: any(named: 'documentIdField'),
+      ),
+    ).thenAnswer((_) async => documents);
+  }
+
+  /// Stubs `getCollectionQuerySnapshot(collectionPath, documentIdField:)` to
+  /// throw [error].
+  void stubGetCollectionQuerySnapshotThrows(Object error) {
+    when(
+      () => getCollectionQuerySnapshot(
+        any(),
+        documentIdField: any(named: 'documentIdField'),
+      ),
+    ).thenThrow(error);
+  }
+
+  /// Stubs `mergeDocumentInCollection(...)` to complete.
+  void stubMergeDocumentInCollection() {
+    when(
+      () => mergeDocumentInCollection(
+        collectionPath: any(named: 'collectionPath'),
+        documentPath: any(named: 'documentPath'),
+        data: any(named: 'data'),
+      ),
+    ).thenAnswer((_) async {});
+  }
+
+  /// Stubs `mergeDocumentInCollection(...)` to throw [error].
+  void stubMergeDocumentInCollectionThrows(Object error) {
+    when(
+      () => mergeDocumentInCollection(
+        collectionPath: any(named: 'collectionPath'),
+        documentPath: any(named: 'documentPath'),
+        data: any(named: 'data'),
+      ),
+    ).thenThrow(error);
+  }
 }
