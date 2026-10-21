@@ -1,6 +1,6 @@
 part of 'content_widget.dart';
 
-/// A gradient panel with a dot grid, an animated code window and frosted
+/// A gradient panel with a dot grid, the sign-in animation and frosted
 /// highlight chips drifting around it, above the welcome copy.
 class _VisualPanelWidget extends StatefulWidget {
   const _VisualPanelWidget({required this.isCompact});
@@ -71,8 +71,8 @@ class _VisualPanelWidgetState extends State<_VisualPanelWidget>
         child: child,
       ),
       child: DSLottieIllustrationWidget(
-        illustration: DSLottieIllustration.computerWindow,
-        width: isCompact ? 110 : 320,
+        illustration: DSLottieIllustration.signIn,
+        width: isCompact ? 140 : 300,
       ),
     );
 
@@ -175,9 +175,9 @@ class _IllustrationStageWidget extends StatelessWidget {
 
   // Corners of the stage, clear of the illustration in the middle.
   static const _chipAlignments = [
-    Alignment(-1, -0.95),
-    Alignment(1, -0.55),
-    Alignment(0.6, 1),
+    Alignment.topLeft,
+    Alignment.topRight,
+    Alignment.bottomRight,
   ];
 
   @override

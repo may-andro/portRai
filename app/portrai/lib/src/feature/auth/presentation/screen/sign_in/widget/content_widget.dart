@@ -12,8 +12,8 @@ part 'visual_panel_widget.dart';
 
 const _formMaxWidth = 400.0;
 
-/// A split screen: an animated visual panel beside the sign-in form on wide
-/// screens, and a banner above the form on phones.
+/// A split screen on desktop, with the visual panel beside the sign-in form.
+/// Phones and tablets show the form first and the panel after it.
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
@@ -21,14 +21,14 @@ class ContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final chrome = PageChrome.current;
-    final isWide = !context.isMobile;
-    final topInset = MediaQuery.paddingOf(context).top;
+    // Side by side only on desktop; phones and tablets put the form first.
+    final isSideBySide = context.isDesktop;
 
     final form = Center(
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: context.space(factor: 3),
-          vertical: context.space(factor: isWide ? 6 : 3),
+          vertical: context.space(factor: isSideBySide ? 6 : 3),
         ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: _formMaxWidth),
@@ -36,6 +36,10 @@ class ContentWidget extends StatelessWidget {
         ),
       ),
     );
+    // The logo sits top-left across the whole page, as on every screen.
+    final header = chrome == PageChrome.header
+        ? const PageHeaderWidget()
+        : SizedBox(height: MediaQuery.paddingOf(context).top);
 
     return ColoredBox(
       color: palette.background.color,
@@ -46,29 +50,32 @@ class ContentWidget extends StatelessWidget {
               context,
             ).copyWith(scrollbars: false, overscroll: false),
             slivers: [
-              if (isWide)
+              if (isSideBySide)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      header,
                       Expanded(
-                        flex: 5,
-                        child: Padding(
-                          padding: EdgeInsets.all(context.space(factor: 2)),
-                          child: const _VisualPanelWidget(isCompact: false),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: Column(
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (chrome == PageChrome.header)
-                              const PageHeaderWidget()
-                            else
-                              SizedBox(height: topInset),
-                            Expanded(child: form),
+                            Expanded(
+                              flex: 5,
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  context.space(factor: 2),
+                                  0,
+                                  context.space(factor: 2),
+                                  context.space(factor: 2),
+                                ),
+                                child: const _VisualPanelWidget(
+                                  isCompact: false,
+                                ),
+                              ),
+                            ),
+                            Expanded(flex: 4, child: form),
                           ],
                         ),
                       ),
@@ -80,17 +87,18 @@ class ContentWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (chrome == PageChrome.header)
-                        const PageHeaderWidget()
-                      else
-                        SizedBox(height: topInset),
+                      header,
+                      form,
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.space(factor: 2),
+                        padding: EdgeInsets.fromLTRB(
+                          context.space(factor: 2),
+                          0,
+                          context.space(factor: 2),
+                          context.space(factor: 2) +
+                              MediaQuery.paddingOf(context).bottom,
                         ),
                         child: const _VisualPanelWidget(isCompact: true),
                       ),
-                      form,
                     ],
                   ),
                 ),
