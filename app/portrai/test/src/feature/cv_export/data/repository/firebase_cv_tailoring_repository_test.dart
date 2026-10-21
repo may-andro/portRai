@@ -48,6 +48,7 @@ void main() {
             minimumRequiredAppVersion: '1.0.0',
             aiAssistantModel: model,
           ),
+          const CvTailoringMapper(),
         );
 
     void stubResponse(String response) {
@@ -62,7 +63,7 @@ void main() {
           'summary': 'Flutter engineer.',
           'projectOrder': [2, 0],
           'skillGroupOrder': [1],
-          'prioritizedSkills': ['Skill 3', 4],
+          'prioritizedSkills': ['Skill 3'],
         }),
       );
 
@@ -118,6 +119,20 @@ void main() {
         throwsA(isA<CvTailoringResponseException>()),
       );
       verify(() => textModel.close()).called(1);
+    });
+
+    test('should throw when a value has the wrong type', () async {
+      stubResponse(
+        jsonEncode({
+          'summary': 'Summary.',
+          'projectOrder': ['first'],
+        }),
+      );
+
+      await expectLater(
+        buildRepository().tailor(document: document, target: target),
+        throwsA(isA<CvTailoringResponseException>()),
+      );
     });
 
     test('should throw when the summary is missing', () async {

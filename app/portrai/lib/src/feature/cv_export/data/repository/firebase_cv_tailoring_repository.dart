@@ -4,13 +4,19 @@ import 'dart:convert';
 import 'package:firebase/firebase.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/app_config/app_config.dart';
+import 'package:portrai/src/feature/cv_export/data/mapper/_mapper.dart';
+import 'package:portrai/src/feature/cv_export/data/model/_model.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/cv_export/domain/repository/_repository.dart';
 
 @Register(as: CvTailoringRepository)
 class FirebaseCvTailoringRepository implements CvTailoringRepository {
-  FirebaseCvTailoringRepository(this._aiController, this._appConfig);
+  FirebaseCvTailoringRepository(
+    this._aiController,
+    this._appConfig,
+    this._mapper,
+  );
 
   /// Used when the app config sets no `aiAssistantModel`.
   static const _defaultModel = 'gemini-3.8-flash';
@@ -53,6 +59,7 @@ class FirebaseCvTailoringRepository implements CvTailoringRepository {
 
   final FbAiController _aiController;
   final PortraiAppConfigEntity _appConfig;
+  final CvTailoringMapper _mapper;
 
   @override
   Future<CvTailoringEntity> tailor({
@@ -75,7 +82,7 @@ class FirebaseCvTailoringRepository implements CvTailoringRepository {
       final response = await model
           .generateText([Content.text(_prompt(document, target))])
           .timeout(_requestTimeout);
-      return _parse(response);
+      return _mapper.map(_parse(response));
     } finally {
       model.close();
     }
@@ -131,31 +138,14 @@ class FirebaseCvTailoringRepository implements CvTailoringRepository {
     });
   }
 
-  static CvTailoringEntity _parse(String response) {
-    final Object? decoded;
+  static CvTailoringModel _parse(String response) {
     try {
-      decoded = jsonDecode(response);
-    } on FormatException catch (error) {
-      throw CvTailoringResponseException('Invalid JSON', cause: error);
+      return CvTailoringModel.fromJson(
+        jsonDecode(response) as Map<String, dynamic>,
+      );
+    } on Object catch (error) {
+      // Malformed JSON, a missing summary or a value of the wrong type.
+      throw CvTailoringResponseException('Invalid response', cause: error);
     }
-    if (decoded is! Map<String, dynamic> || decoded['summary'] is! String) {
-      throw const CvTailoringResponseException('Missing summary');
-    }
-    return CvTailoringEntity(
-      summary: decoded['summary'] as String,
-      projectOrder: _intsOf(decoded['projectOrder']),
-      skillGroupOrder: _intsOf(decoded['skillGroupOrder']),
-      prioritizedSkills: [
-        if (decoded['prioritizedSkills'] case final List<dynamic> skills)
-          for (final skill in skills)
-            if (skill is String) skill,
-      ],
-    );
   }
-
-  static List<int> _intsOf(Object? value) => [
-    if (value case final List<dynamic> items)
-      for (final item in items)
-        if (item is num) item.toInt(),
-  ];
 }

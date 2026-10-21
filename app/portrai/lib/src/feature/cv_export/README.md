@@ -33,7 +33,7 @@ locally on mobile, desktop and web. Only a tailored CV sends data to a cloud AI 
 2. Reserves one request with `ConsumeAiRequestQuotaUseCase`.
 3. Asks `CvTailoringRepository` for a `CvTailoringEntity`. `FirebaseCvTailoringRepository`
    sends the CV and the job as JSON data to the app config's `aiAssistantModel` and reads a
-   JSON response with a fixed schema.
+   JSON response with a fixed schema into `CvTailoringModel`.
 4. Applies it: the summary is replaced when it is non-empty and at most 700 characters;
    projects and skill groups are reordered by index, and the named skills move to the front of
    their group. Unknown or repeated indexes are skipped and nothing is dropped or duplicated.
@@ -78,6 +78,8 @@ use the short description, and switch to the long one only when the whole CV sti
   `TailorCvDocumentUseCase`, `IsCvTailoringAvailableUseCase`, `GenerateCvPdfUseCase`,
   `ShareCvPdfUseCase`.
 - `data/repository/`: `PrintingCvPdfRepository` and `FirebaseCvTailoringRepository`.
+- `data/model/` and `data/mapper/`: `CvTailoringModel` reads the tailoring JSON response and
+  `CvTailoringMapper` maps it to `CvTailoringEntity`.
 - `data/pdf/`: `CvPdfRenderer`, the shared blocks in `cv_pdf_blocks.dart`, contact icons, the
   photo loader and one file per template in `template/`.
 - `presentation/`: the export screen (bloc, tracking delegate, widgets) and its route.
