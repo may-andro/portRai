@@ -94,7 +94,11 @@ portfolio skills and replies with JSON:
 - **Threshold:** openings scoring below 60 are not stored. 80 or more means the job's core
   stack is in the portfolio.
 - **Cost:** a run scores at most the 50 best keyword matches, ranked by matched skills and then
-  by date, 4 at a time. Each call has a 30-second deadline and is not retried.
+  by date, 2 at a time.
+- **Retries:** a throttled (`429`), timed-out or server-error (`5xx`) call is retried up to 3
+  times, after about 5, 10 and 20 seconds. Each attempt gets 45 seconds and each opening 150 seconds in total.
+  Scoring stops starting new openings after 10 minutes, so the run ends before the function's
+  15-minute timeout; skipped openings count as failed.
 - **Untrusted text:** job descriptions come from public job boards. The instructions go in the
   system instruction and the job only in the prompt, as data. The reply is validated, so the
   model cannot add skills the portfolio lacks or return an unbounded text.

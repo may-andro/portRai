@@ -9,6 +9,7 @@ import type {
 import type { JobScorer } from '../../src/job_opening/score/job_scorer.js';
 import {
   maxScoredOpenings,
+  scoringTimeLimitMs,
   type SyncDependencies,
   syncJobOpenings,
 } from '../../src/job_opening/sync_job_openings.js';
@@ -279,6 +280,42 @@ describe('syncJobOpenings', () => {
       'owner-uid',
       [],
       expect.any(Date),
+    );
+  });
+
+  it('should skip the remaining openings when scoring reaches the time limit', async () => {
+    const start = new Date('2026-10-19T04:00:00Z').getTime();
+    let clock = start;
+    const deps = dependencies({
+      feeds: [
+        feed('remotive', [
+          jobOpening({ sourceId: '1', title: 'Flutter Developer 1' }),
+          jobOpening({ sourceId: '2', title: 'Flutter Developer 2' }),
+          jobOpening({ sourceId: '3', title: 'Flutter Developer 3' }),
+        ]),
+      ],
+      now: () => new Date(clock),
+      // Two openings score at once; the first to finish uses up the time.
+      scorer: scorer(async () => {
+        await Promise.resolve();
+        clock = start + scoringTimeLimitMs;
+        return fit();
+      }),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({
+      scoredCount: 2,
+      failedScoreCount: 1,
+      keptCount: 2,
+    });
+    expect(deps.scorer.score).toHaveBeenCalledTimes(2);
+    expect(deps.logger.warn).toHaveBeenCalledWith(
+      'Scoring a job opening failed',
+      expect.objectContaining({
+        error: 'Error: Skipped: the scoring time limit was reached',
+      }),
     );
   });
 });
