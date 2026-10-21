@@ -29,6 +29,8 @@ import { GeminiJobScorer } from './score/job_scorer.js';
 import {
   firestoreReadDocument,
   listJobSearchUserIds,
+  loadJobFits,
+  saveJobFits,
   writeJobOpenings,
 } from './store/firestore_store.js';
 import { syncJobOpenings } from './sync_job_openings.js';
@@ -41,7 +43,8 @@ export const fetchJobOpenings = onSchedule(
     region: functionRegion,
     // Only allowed to read and write Firestore and to call Gemini.
     serviceAccount: serviceAccountEmail('job-openings'),
-    // Feeds, then at most 10 minutes of Gemini scoring, then the writes.
+    // Feeds for at most 4 minutes, Gemini scoring until 11 minutes into the
+    // run, then the writes.
     timeoutSeconds: 900,
     memory: '512MiB',
     retryCount: 0,
@@ -78,6 +81,8 @@ export const fetchJobOpenings = onSchedule(
       loadProfile: () => loadPortfolioProfile(readDocument),
       loadRegions: (profile) => loadRegions(readDocument, profile.country),
       scorer: new GeminiJobScorer(generateJson),
+      loadJobFits: (fitKeys) => loadJobFits(db, fitKeys),
+      saveJobFits: (fits, now) => saveJobFits(db, fits, now),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),
       now: () => new Date(),

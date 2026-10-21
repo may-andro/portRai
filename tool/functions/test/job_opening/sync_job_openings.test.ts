@@ -8,8 +8,9 @@ import type {
 } from '../../src/job_opening/job_opening.js';
 import type { JobScorer } from '../../src/job_opening/score/job_scorer.js';
 import {
+  feedTimeLimitMs,
   maxScoredOpenings,
-  scoringTimeLimitMs,
+  scoringDeadlineMs,
   type SyncDependencies,
   syncJobOpenings,
 } from '../../src/job_opening/sync_job_openings.js';
@@ -36,7 +37,10 @@ function fit(overrides: Partial<JobFit> = {}): JobFit {
 }
 
 function scorer(score: JobScorer['score'] = async () => fit()): JobScorer {
-  return { score: vi.fn(score) };
+  return {
+    score: vi.fn(score),
+    fitKey: vi.fn((opening) => `fit-${opening.dedupeKey}`),
+  };
 }
 
 function dependencies(
@@ -48,6 +52,8 @@ function dependencies(
     loadProfile: vi.fn().mockResolvedValue(portfolioProfile()),
     loadRegions: vi.fn().mockResolvedValue(new Set()),
     scorer: scorer(),
+    loadJobFits: vi.fn().mockResolvedValue(new Map()),
+    saveJobFits: vi.fn().mockResolvedValue(undefined),
     writeJobOpenings: vi.fn().mockResolvedValue(undefined),
     now: () => new Date('2026-10-19T04:00:00Z'),
     logger: { info: vi.fn(), warn: vi.fn() },
@@ -77,6 +83,7 @@ describe('syncJobOpenings', () => {
       otherRoleCount: 0,
       matchedCount: 1,
       scoredCount: 1,
+      reusedScoreCount: 0,
       failedScoreCount: 0,
       keptCount: 1,
       failedSources: [],
@@ -306,7 +313,7 @@ describe('syncJobOpenings', () => {
       // Two openings score at once; the first to finish uses up the time.
       scorer: scorer(async () => {
         await Promise.resolve();
-        clock = start + scoringTimeLimitMs;
+        clock = start + scoringDeadlineMs;
         return fit();
       }),
     });
@@ -469,5 +476,176 @@ describe('syncJobOpenings', () => {
       scoredCount: 1,
     });
     expect(deps.scorer.score).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reuse a stored fit instead of scoring the opening again', async () => {
+    const storedFit = fit({ score: 72, reasons: ['Scored last week.'] });
+    const deps = dependencies({
+      loadJobFits: vi.fn(
+        async (keys: string[]) => new Map(keys.map((key) => [key, storedFit])),
+      ),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({
+      scoredCount: 0,
+      reusedScoreCount: 1,
+      keptCount: 1,
+    });
+    expect(deps.scorer.score).not.toHaveBeenCalled();
+    expect(deps.saveJobFits).not.toHaveBeenCalled();
+    const [, openings] = vi.mocked(deps.writeJobOpenings).mock.calls[0];
+    expect(openings[0]).toMatchObject({
+      score: 72,
+      reasons: ['Scored last week.'],
+    });
+  });
+
+  it('should store each new fit under its fit key', async () => {
+    const deps = dependencies();
+
+    await syncJobOpenings(deps);
+
+    expect(deps.saveJobFits).toHaveBeenCalledWith(
+      new Map([[expect.stringMatching(/^fit-/), fit()]]),
+      expect.any(Date),
+    );
+  });
+
+  it('should not count reused fits towards the scoring limit', async () => {
+    const reusedCount = 5;
+    const many = Array.from(
+      { length: maxScoredOpenings + reusedCount },
+      (_, index) =>
+        jobOpening({
+          sourceId: String(index),
+          title: `Flutter Developer ${index}`,
+          // The first opening matches the fewest skills.
+          tags: index === 0 ? [] : ['flutter', 'dart'],
+          description:
+            index === 0 ? 'Flutter and Dart.' : 'Flutter, Dart, Firebase.',
+        }),
+    );
+    const deps = dependencies({
+      feeds: [feed('remotive', many)],
+      // Fits are stored for the best matches, which are asked for first.
+      loadJobFits: vi.fn(
+        async (keys: string[]) =>
+          new Map(keys.slice(0, reusedCount).map((key) => [key, fit()])),
+      ),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({
+      scoredCount: maxScoredOpenings,
+      reusedScoreCount: reusedCount,
+    });
+    const scoredTitles = vi
+      .mocked(deps.scorer.score)
+      .mock.calls.map(([opening]) => opening.title);
+    expect(scoredTitles).toContain('Flutter Developer 0');
+  });
+
+  it('should score every opening when reading the stored fits fails', async () => {
+    const deps = dependencies({
+      loadJobFits: vi.fn().mockRejectedValue(new Error('unavailable')),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({ scoredCount: 1, reusedScoreCount: 0 });
+    expect(deps.logger.warn).toHaveBeenCalledWith(
+      'Reading stored job fits failed',
+      { error: 'Error: unavailable' },
+    );
+  });
+
+  it('should still write the openings when storing the fits fails', async () => {
+    const deps = dependencies({
+      saveJobFits: vi.fn().mockRejectedValue(new Error('unavailable')),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result.keptCount).toBe(1);
+    expect(deps.writeJobOpenings).toHaveBeenCalled();
+    expect(deps.logger.warn).toHaveBeenCalledWith('Storing job fits failed', {
+      error: 'Error: unavailable',
+    });
+  });
+
+  it('should write the reused fits when every new score fails', async () => {
+    const deps = dependencies({
+      feeds: [
+        feed('remotive', [
+          jobOpening({ sourceId: '1', title: 'Flutter Developer 1' }),
+          jobOpening({ sourceId: '2', title: 'Flutter Developer 2' }),
+        ]),
+      ],
+      loadJobFits: vi.fn(async (keys: string[]) => new Map([[keys[0], fit()]])),
+      scorer: scorer(async () => {
+        throw new Error('HTTP 503');
+      }),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({
+      reusedScoreCount: 1,
+      failedScoreCount: 1,
+      keptCount: 1,
+    });
+  });
+
+  it('should count a feed that runs past the time limit as failed', async () => {
+    vi.useFakeTimers();
+    try {
+      const deps = dependencies({
+        feeds: [
+          feed('remotive', [jobOpening()]),
+          { source: 'himalayas', fetchJobs: () => new Promise(() => {}) },
+        ],
+      });
+
+      const sync = syncJobOpenings(deps);
+      await vi.advanceTimersByTimeAsync(feedTimeLimitMs);
+      const result = await sync;
+
+      expect(result).toMatchObject({
+        failedSources: ['himalayas'],
+        keptCount: 1,
+      });
+      expect(deps.logger.warn).toHaveBeenCalledWith('A job feed failed', {
+        source: 'himalayas',
+        error: `Error: Timed out after ${feedTimeLimitMs / 1000} s`,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('should count the scoring deadline from the start of the run', async () => {
+    const start = new Date('2026-10-19T04:00:00Z').getTime();
+    let clock = start;
+    const deps = dependencies({
+      now: () => new Date(clock),
+      // The feeds use up the whole run.
+      feeds: [
+        {
+          source: 'remotive',
+          fetchJobs: async () => {
+            clock = start + scoringDeadlineMs;
+            return [jobOpening({ publishedAt: new Date(start) })];
+          },
+        },
+      ],
+    });
+
+    await expect(syncJobOpenings(deps)).rejects.toThrow(
+      'Every job score failed (1 openings)',
+    );
+    expect(deps.scorer.score).not.toHaveBeenCalled();
   });
 });

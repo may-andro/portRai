@@ -147,8 +147,8 @@ Jobs posted more than 30 days ago are dropped before matching, so stale postings
 scored or stored. A stored opening expires 14 days after the last run that found it, or earlier
 when its source gives an earlier expiry, as Himalayas does.
 
-If one feed fails, the run continues with the others and logs a warning. The run fails only
-when every feed fails. The function does not retry, so a failed run waits for the next Monday.
+If one feed fails, or is still running after 4 minutes, the run continues with the others and
+logs a warning. The run fails only when every feed fails. The function does not retry, so a failed run waits for the next Monday.
 
 #### Region and role
 
@@ -189,17 +189,23 @@ portfolio's skills, roles and years of experience and replies with JSON:
   stack is in the portfolio.
 - **Cost:** a run scores at most the 120 best matches, role-title matches first, then by matched
   skills and then by date, 2 at a time.
+- **Reuse:** each fit is stored under a hash of the model, the instructions and the prompt (see
+  [Stored fits](#stored-fits)). A matched job whose request is unchanged since an earlier run
+  reuses that fit without a Gemini call and does not count towards the 120. A change to the job's
+  text or to the portfolio's skills, roles or years of experience changes the hash, so the job is
+  scored again.
 - **Retries:** a throttled (`429`), timed-out or server-error (`5xx`) call is retried up to 3
   times, after about 5, 10 and 20 seconds. Each attempt gets 45 seconds and each opening 150 seconds in total.
-  Scoring stops starting new openings after 10 minutes, so the run ends before the function's
-  15-minute timeout; skipped openings count as failed.
+  Scoring stops starting new openings 11 minutes after the run starts, so the run ends before
+  the function's 15-minute timeout; skipped openings count as failed.
 - **Untrusted text:** job descriptions come from public job boards. The instructions go in the
   system instruction and the job only in the prompt, as data. The reply is validated, so the
   model cannot add skills the portfolio lacks or return an unbounded text.
 - **Data sent:** the portfolio skills and the job's title, company, location, types, tags and
   description. No user data is sent.
 - **Failures:** a job whose score fails is skipped with a warning. The run fails without
-  writing when every score fails, which usually means the API or permission is not set up.
+  writing when every score fails and no stored fit was reused, which usually means the API or
+  permission is not set up.
 
 #### Firestore data
 
@@ -256,6 +262,22 @@ normalized company and title, so the same job keeps one document across feeds an
 
 A job found again replaces its document, which also moves `expiresAt` back.
 
+#### Stored fits
+
+Each new fit is stored at `job_fits/{fitKey}`, whether or not the job scored high enough to be
+kept. Only the function reads and writes this collection; the Firestore rules give clients no
+access to it.
+
+| Field           | Type      | Description                     |
+| --------------- | --------- | ------------------------------- |
+| `score`         | number    | Gemini's fit score, 0 to 100    |
+| `matchedSkills` | string[]  | As Gemini returned them         |
+| `missingSkills` | string[]  | As Gemini returned them         |
+| `reasons`       | string[]  | As Gemini returned them         |
+| `expiresAt`     | timestamp | When it was scored plus 30 days |
+
+Jobs older than 30 days are dropped before scoring, so a fit is not needed for longer.
+
 #### Expiry
 
 Firestore deletes expired openings through a TTL policy on `expiresAt`. Create it once, with
@@ -264,6 +286,15 @@ Firestore deletes expired openings through a TTL policy on `expiresAt`. Create i
 ```bash
 gcloud firestore fields ttls update expiresAt \
   --collection-group=job_openings \
+  --enable-ttl \
+  --project="$PROJECT_ID"
+```
+
+Stored fits expire the same way, through a TTL policy on the `job_fits` collection group:
+
+```bash
+gcloud firestore fields ttls update expiresAt \
+  --collection-group=job_fits \
   --enable-ttl \
   --project="$PROJECT_ID"
 ```
