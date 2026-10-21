@@ -9,7 +9,9 @@ import {
   serviceAccountEmail,
 } from '../shared/function_options.js';
 import { createGeminiGenerateJson } from '../shared/gemini.js';
+import { GeminiJobPostExtractor } from './extract/job_post_extractor.js';
 import { ArbeitnowFeed } from './feed/arbeitnow_feed.js';
+import { HackerNewsFeed } from './feed/hacker_news_feed.js';
 import { HimalayasFeed } from './feed/himalayas_feed.js';
 import { JobicyFeed } from './feed/jobicy_feed.js';
 import { RemoteOkFeed } from './feed/remoteok_feed.js';
@@ -38,6 +40,7 @@ export const fetchJobOpenings = onSchedule(
   },
   async () => {
     const db = getFirestore();
+    const generateJson = createGeminiGenerateJson(projectId());
     const result = await syncJobOpenings({
       // Earlier feeds win when two list the same job; the searchable feeds
       // with the richest data come first.
@@ -46,11 +49,12 @@ export const fetchJobOpenings = onSchedule(
         new RemotiveFeed(fetchJson),
         new RemoteOkFeed(fetchJson),
         new JobicyFeed(fetchJson),
+        new HackerNewsFeed(fetchJson, new GeminiJobPostExtractor(generateJson)),
         new ArbeitnowFeed(fetchJson),
       ],
       listUserIds: () => listJobSearchUserIds(db),
       loadProfile: () => loadPortfolioProfile(firestoreReadDocument(db)),
-      scorer: new GeminiJobScorer(createGeminiGenerateJson(projectId())),
+      scorer: new GeminiJobScorer(generateJson),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),
       now: () => new Date(),

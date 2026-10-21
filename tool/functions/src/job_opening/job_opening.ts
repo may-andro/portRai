@@ -1,6 +1,6 @@
 /** Where a job opening was found. */
 export type JobSource =
-  'himalayas' | 'remotive' | 'remoteok' | 'jobicy' | 'arbeitnow';
+  'himalayas' | 'remotive' | 'remoteok' | 'jobicy' | 'hackernews' | 'arbeitnow';
 
 /** A job opening in the one shape every feed is mapped to. */
 export interface JobOpening {
