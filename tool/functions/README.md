@@ -11,7 +11,7 @@ Cloud Functions for PortRai, written in TypeScript and deployed as the `portrai`
 ```
 src/
   index.ts          # initializes Firebase and exports every function
-  shared/           # code any feature can use: HTTP JSON, JSON parsing, the region
+  shared/           # code any feature can use: HTTP JSON, JSON parsing, Gemini, the region
   job_opening/      # one folder per feature, with its function in fetch_job_openings.ts
 test/               # mirrors src/
 ```
@@ -31,8 +31,8 @@ with the others.
 
 ## Job openings
 
-`fetchJobOpenings` collects remote job openings that match the portfolio's skills and stores
-them for each user who has job search turned on.
+`fetchJobOpenings` collects remote job openings, scores how well each fits the portfolio's
+skills with Gemini and stores the good fits for each user who has job search turned on.
 
 ### Features
 
@@ -41,7 +41,8 @@ them for each user who has job search turned on.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
   across feeds.
 - Keeps a job when at least two portfolio skills appear in its title, tags or description.
-- Writes the matches to `users/{uid}/job_openings/{dedupeKey}` for every user whose
+- Scores up to 50 of those jobs from 0 to 100 with Gemini and keeps the ones scoring 60 or more.
+- Writes the kept jobs to `users/{uid}/job_openings/{dedupeKey}` for every user whose
   `jobSearch.enabled` is `true`.
 - Lets openings expire 14 days after the last run that found them.
 
@@ -75,6 +76,31 @@ after they are posted on Remotive.
 If one feed fails, the run continues with the others and logs a warning. The run fails only
 when every feed fails. The function does not retry, so a failed run waits for the next Monday.
 
+#### Scoring
+
+Keyword matching is a cheap first filter. Gemini (`gemini-3.8-flash` through the Agent
+Platform, formerly Vertex AI, in the `global` location) then reads each matched job with the
+portfolio skills and replies with JSON:
+
+| Field           | Kept as                                                                          |
+| --------------- | -------------------------------------------------------------------------------- |
+| `score`         | An integer from 0 to 100, rounded and clamped                                    |
+| `matchedSkills` | Only portfolio skills, in their portfolio spelling, added to the keyword matches |
+| `missingSkills` | At most 8 skills the job asks for that the portfolio lacks                       |
+| `reasons`       | At most 3 sentences of up to 300 characters                                      |
+
+- **Threshold:** openings scoring below 60 are not stored. 80 or more means the job's core
+  stack is in the portfolio.
+- **Cost:** a run scores at most the 50 best keyword matches, ranked by matched skills and then
+  by date, 4 at a time. Each call has a 30-second deadline and is not retried.
+- **Untrusted text:** job descriptions come from public job boards. The instructions go in the
+  system instruction and the job only in the prompt, as data. The reply is validated, so the
+  model cannot add skills the portfolio lacks or return an unbounded text.
+- **Data sent:** the portfolio skills and the job's title, company, location, types, tags and
+  description. No user data is sent.
+- **Failures:** a job whose score fails is skipped with a warning. The run fails without
+  writing when every score fails, which usually means the API or permission is not set up.
+
 #### Firestore data
 
 A user takes part when their document has job search turned on:
@@ -82,14 +108,26 @@ A user takes part when their document has job search turned on:
 ```jsonc
 // users/{uid}
 {
-  "jobSearch": { "enabled": true },
+  "jobSearch": {
+    "enabled": true,
+    "updatedAt": "<timestamp>", // when job search was last turned on or off
+  },
 }
 ```
+
+| Field                 | Type      | Read by the function | Description                              |
+| --------------------- | --------- | -------------------- | ---------------------------------------- |
+| `jobSearch.enabled`   | boolean   | Yes                  | Whether the weekly run includes the user |
+| `jobSearch.updatedAt` | timestamp | No                   | When `enabled` last changed              |
+
+`jobSearch` holds settings the user controls. Anything the function reports back, such as its
+last run, belongs outside this map, so Firestore rules can let the user change `jobSearch` while
+only the server writes the rest.
 
 No user document exists until job search is turned on, and a run with no such users skips the
 feeds. To turn it on, create the document in the Firebase console: in the `users` collection,
 add a document whose ID is the user's UID from Authentication, with a map field `jobSearch`
-holding the boolean `enabled` set to `true`.
+holding the boolean `enabled` set to `true` and the timestamp `updatedAt` set to now.
 
 Each opening is stored at `users/{uid}/job_openings/{dedupeKey}`. The key is a hash of the
 normalized company and title, so the same job keeps one document across feeds and weeks.
@@ -106,7 +144,10 @@ normalized company and title, so the same job keeps one document across feeds an
 | `tags`          | string[]       | Tags from the source                       |
 | `jobTypes`      | string[]       | Employment types from the source           |
 | `description`   | string         | Plain text, at most 5,000 characters       |
-| `matchedSkills` | string[]       | Portfolio skills found in the job          |
+| `matchedSkills` | string[]       | Portfolio skills the job needs             |
+| `score`         | number         | Gemini's fit score, 60 to 100              |
+| `missingSkills` | string[]       | Skills the job asks for that are missing   |
+| `reasons`       | string[]       | Gemini's short explanation of the score    |
 | `publishedAt`   | timestamp      | When the source published the job          |
 | `fetchedAt`     | timestamp      | When this run stored it                    |
 | `expiresAt`     | timestamp      | `fetchedAt` plus 14 days                   |
@@ -115,13 +156,14 @@ A job found again replaces its document, which also moves `expiresAt` back.
 
 #### Expiry
 
-Firestore deletes expired openings through a TTL policy on `expiresAt`. Create it once:
+Firestore deletes expired openings through a TTL policy on `expiresAt`. Create it once, with
+`PROJECT_ID` set as in [Getting Started](#getting-started):
 
 ```bash
 gcloud firestore fields ttls update expiresAt \
   --collection-group=job_openings \
   --enable-ttl \
-  --project=portrai-96f2b
+  --project="$PROJECT_ID"
 ```
 
 TTL deletion usually runs within a day of `expiresAt`, so expired openings can stay readable
@@ -129,11 +171,50 @@ for a short time.
 
 ## Getting Started
 
+The commands below read the project ID from `PROJECT_ID`. Set it first:
+
+```bash
+export PROJECT_ID=<your-firebase-project-id>
+```
+
 ### Requirements
 
 - Node.js 22. The `volta` field in `package.json` pins it for Volta users.
-- The Firebase project `portrai-96f2b` on the Blaze plan, with the Cloud Scheduler API on.
+- A Firebase project on the Blaze plan, with the Cloud Scheduler API on. `.firebaserc` sets the
+  project the Firebase CLI deploys to.
+- The Agent Platform API (`aiplatform.googleapis.com`) on, and the `job-openings` service
+  account with its two roles. See [Service account](#service-account).
 - The Firebase CLI, signed in to an account that can deploy to the project.
+
+### Service account
+
+The function runs as its own service account, `job-openings`, which may only read and write
+Firestore and call Gemini. It calls Gemini as that account, so there is no API key to store.
+The code builds the account's full email from the project it is deployed to.
+
+Enable the API, create the account and grant its two roles once:
+
+```bash
+gcloud services enable aiplatform.googleapis.com --project="$PROJECT_ID"
+gcloud iam service-accounts create job-openings \
+  --display-name="Job openings function" --project="$PROJECT_ID"
+for role in roles/aiplatform.user roles/datastore.user; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="$role"
+done
+```
+
+| Role                    | Console name                            | Needed for                    |
+| ----------------------- | --------------------------------------- | ----------------------------- |
+| `roles/aiplatform.user` | Vertex AI User (or Agent Platform User) | Calling Gemini                |
+| `roles/datastore.user`  | Cloud Datastore User                    | Reading and writing Firestore |
+
+The deploy lets the account start the function from Cloud Scheduler, so it needs no other
+role. Deploying needs permission to act as the account, which project Owners have.
+
+Check that the model is offered in the `global` location before the first run. Changing the
+model or location means changing `src/shared/gemini.ts` and deploying again.
 
 ### Development
 
