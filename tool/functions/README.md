@@ -80,7 +80,7 @@ when every feed fails. The function does not retry, so a failed run waits for th
 
 #### Scoring
 
-Keyword matching is a cheap first filter. Gemini (`gemini-3.8-flash` through the Agent
+Keyword matching is a cheap first filter. Gemini (`gemini-2.5-flash` through the Agent
 Platform, formerly Vertex AI, in the `global` location) then reads each matched job with the
 portfolio skills and replies with JSON:
 
@@ -219,8 +219,21 @@ done
 The deploy lets the account start the function from Cloud Scheduler, so it needs no other
 role. Deploying needs permission to act as the account, which project Owners have.
 
-Check that the model is offered in the `global` location before the first run. Changing the
-model or location means changing `src/shared/gemini.ts` and deploying again.
+Check that the model is offered in the `global` location before the first run, and that it has
+capacity: newer models on the shared `global` capacity can answer most calls with
+`429 RESOURCE_EXHAUSTED` even after retries, which is why the function uses `gemini-2.5-flash`.
+A quick check is a few calls in a row from Cloud Shell, which should all return `200`:
+
+```bash
+for attempt in 1 2 3 4 5; do curl -s -o /dev/null -w "%{http_code} " -X POST \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  -H "Content-Type: application/json" \
+  "https://aiplatform.googleapis.com/v1/projects/$PROJECT_ID/locations/global/publishers/google/models/gemini-2.5-flash:generateContent" \
+  -d '{"contents":[{"role":"user","parts":[{"text":"Reply OK"}]}]}'; done; echo
+```
+
+Changing the model or location means changing `src/shared/gemini.ts` and deploying again. Gemini
+2.5 models take a `thinkingBudget`, while Gemini 3 models take a `thinkingLevel`.
 
 ### Development
 
