@@ -28,8 +28,12 @@ class FbFirestoreController {
     }
   }
 
+  /// Queries [collectionPath], which may be a subcollection path such as
+  /// `users/{uid}/job_openings`. When [documentIdField] is set, each map also
+  /// holds its document ID under that key.
   Future<List<Map<String, dynamic>>> getCollectionQuerySnapshot(
     String collectionPath, {
+    String? documentIdField,
     String? field,
     Object? isEqualTo,
     Object? isLessThan,
@@ -106,7 +110,13 @@ class FbFirestoreController {
       final queryData = await query.get();
       final snapshots = queryData.docs.where((doc) => doc.exists);
 
-      return snapshots.map((snapshot) => snapshot.data()).toList();
+      return snapshots
+          .map(
+            (snapshot) => documentIdField == null
+                ? snapshot.data()
+                : {...snapshot.data(), documentIdField: snapshot.id},
+          )
+          .toList();
     } catch (error, stackTrace) {
       if (error is FirestoreException) {
         rethrow;
@@ -144,6 +154,38 @@ class FbFirestoreController {
         error,
         stackTrace,
         'adding document to collection: $collectionPath/$documentPath',
+      );
+    }
+  }
+
+  /// Writes [data] into the document, creating it when it does not exist.
+  /// Fields not in [data] are kept, nested maps included, unlike
+  /// [addDocumentToCollection], which replaces the whole document.
+  Future<void> mergeDocumentInCollection({
+    required String collectionPath,
+    required String documentPath,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      if (collectionPath.isEmpty) {
+        throw ArgumentError('Collection path cannot be empty');
+      }
+      if (documentPath.isEmpty) {
+        throw ArgumentError('Document path cannot be empty');
+      }
+      if (data.isEmpty) {
+        throw ArgumentError('Data cannot be empty');
+      }
+
+      await _firebaseFirestore
+          .collection(collectionPath)
+          .doc(documentPath)
+          .set(data, SetOptions(merge: true));
+    } catch (error, stackTrace) {
+      throw handleFirestoreException(
+        error,
+        stackTrace,
+        'merging document in collection: $collectionPath/$documentPath',
       );
     }
   }

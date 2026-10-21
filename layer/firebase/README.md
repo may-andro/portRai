@@ -304,6 +304,37 @@ Future<String?> signInAndGetUserId(
 
 ### Cloud Firestore
 
+App features inject `FbFirestoreController`, which validates paths and throws the
+typed `FirestoreException` subclasses from `firestore_exception.dart`. Collection
+paths may point at subcollections, such as `users/{uid}/job_openings`.
+
+- `getCollectionQuerySnapshot(path, documentIdField: 'id')` adds each document's
+  ID to its map under the given key, for data that does not store its own ID.
+- `mergeDocumentInCollection` creates the document or merges fields into it,
+  keeping fields that are not written, nested maps included.
+  `addDocumentToCollection` replaces the whole document instead.
+
+```dart
+import 'package:firebase/firebase.dart';
+
+Future<void> setJobSearch(
+  FbFirestoreController controller, {
+  required String userId,
+  required bool enabled,
+}) => controller.mergeDocumentInCollection(
+  collectionPath: 'users',
+  documentPath: userId,
+  data: {
+    'jobSearch': {
+      'enabled': enabled,
+      'updatedAt': FieldValue.serverTimestamp(),
+    },
+  },
+);
+```
+
+Direct `FirebaseFirestore` access, for code outside the app features:
+
 ```dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:module_injector/module_injector.dart';
