@@ -25,3 +25,21 @@ export interface MatchedJobOpening extends JobOpening {
   dedupeKey: string;
   matchedSkills: string[];
 }
+
+/** Gemini's view of how well an opening fits the portfolio. */
+export interface JobFit {
+  /** 0 to 100. */
+  score: number;
+  /** Portfolio skills the job needs, in their portfolio spelling. */
+  matchedSkills: string[];
+  /** Skills the job asks for that the portfolio lacks. */
+  missingSkills: string[];
+  reasons: string[];
+}
+
+/** A matched opening with its fit, ready to store. */
+export interface ScoredJobOpening extends MatchedJobOpening {
+  score: number;
+  missingSkills: string[];
+  reasons: string[];
+}

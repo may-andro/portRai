@@ -11,7 +11,7 @@ Cloud Functions for PortRai, written in TypeScript and deployed as the `portrai`
 ```
 src/
   index.ts          # initializes Firebase and exports every function
-  shared/           # code any feature can use: HTTP JSON, JSON parsing, the region
+  shared/           # code any feature can use: HTTP JSON, JSON parsing, Gemini, the region
   job_opening/      # one folder per feature, with its function in fetch_job_openings.ts
 test/               # mirrors src/
 ```
@@ -31,8 +31,8 @@ with the others.
 
 ## Job openings
 
-`fetchJobOpenings` collects remote job openings that match the portfolio's skills and stores
-them for each user who has job search turned on.
+`fetchJobOpenings` collects remote job openings, scores how well each fits the portfolio's
+skills with Gemini and stores the good fits for each user who has job search turned on.
 
 ### Features
 
@@ -41,7 +41,8 @@ them for each user who has job search turned on.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
   across feeds.
 - Keeps a job when at least two portfolio skills appear in its title, tags or description.
-- Writes the matches to `users/{uid}/job_openings/{dedupeKey}` for every user whose
+- Scores up to 50 of those jobs from 0 to 100 with Gemini and keeps the ones scoring 60 or more.
+- Writes the kept jobs to `users/{uid}/job_openings/{dedupeKey}` for every user whose
   `jobSearch.enabled` is `true`.
 - Lets openings expire 14 days after the last run that found them.
 
@@ -75,6 +76,31 @@ after they are posted on Remotive.
 If one feed fails, the run continues with the others and logs a warning. The run fails only
 when every feed fails. The function does not retry, so a failed run waits for the next Monday.
 
+#### Scoring
+
+Keyword matching is a cheap first filter. Gemini (`gemini-3.8-flash` through the Agent
+Platform, formerly Vertex AI, in the `global` location) then reads each matched job with the
+portfolio skills and replies with JSON:
+
+| Field           | Kept as                                                                          |
+| --------------- | -------------------------------------------------------------------------------- |
+| `score`         | An integer from 0 to 100, rounded and clamped                                    |
+| `matchedSkills` | Only portfolio skills, in their portfolio spelling, added to the keyword matches |
+| `missingSkills` | At most 8 skills the job asks for that the portfolio lacks                       |
+| `reasons`       | At most 3 sentences of up to 300 characters                                      |
+
+- **Threshold:** openings scoring below 60 are not stored. 80 or more means the job's core
+  stack is in the portfolio.
+- **Cost:** a run scores at most the 50 best keyword matches, ranked by matched skills and then
+  by date, 4 at a time. Each call has a 30-second deadline and is not retried.
+- **Untrusted text:** job descriptions come from public job boards. The instructions go in the
+  system instruction and the job only in the prompt, as data. The reply is validated, so the
+  model cannot add skills the portfolio lacks or return an unbounded text.
+- **Data sent:** the portfolio skills and the job's title, company, location, types, tags and
+  description. No user data is sent.
+- **Failures:** a job whose score fails is skipped with a warning. The run fails without
+  writing when every score fails, which usually means the API or permission is not set up.
+
 #### Firestore data
 
 A user takes part when their document has job search turned on:
@@ -106,7 +132,10 @@ normalized company and title, so the same job keeps one document across feeds an
 | `tags`          | string[]       | Tags from the source                       |
 | `jobTypes`      | string[]       | Employment types from the source           |
 | `description`   | string         | Plain text, at most 5,000 characters       |
-| `matchedSkills` | string[]       | Portfolio skills found in the job          |
+| `matchedSkills` | string[]       | Portfolio skills the job needs             |
+| `score`         | number         | Gemini's fit score, 60 to 100              |
+| `missingSkills` | string[]       | Skills the job asks for that are missing   |
+| `reasons`       | string[]       | Gemini's short explanation of the score    |
 | `publishedAt`   | timestamp      | When the source published the job          |
 | `fetchedAt`     | timestamp      | When this run stored it                    |
 | `expiresAt`     | timestamp      | `fetchedAt` plus 14 days                   |
@@ -133,7 +162,27 @@ for a short time.
 
 - Node.js 22. The `volta` field in `package.json` pins it for Volta users.
 - The Firebase project `portrai-96f2b` on the Blaze plan, with the Cloud Scheduler API on.
+- The Agent Platform API (`aiplatform.googleapis.com`) on, and the role
+  `roles/aiplatform.user` for the service account the function runs as. Without both, every
+  score fails and the run writes nothing. See [Gemini access](#gemini-access).
 - The Firebase CLI, signed in to an account that can deploy to the project.
+
+### Gemini access
+
+The function calls Gemini as its runtime service account, so there is no API key to store.
+Scheduled functions run as the default compute service account unless one is set. Enable the
+API and grant the role once:
+
+```bash
+gcloud services enable aiplatform.googleapis.com --project=portrai-96f2b
+PROJECT_NUMBER=$(gcloud projects describe portrai-96f2b --format='value(projectNumber)')
+gcloud projects add-iam-policy-binding portrai-96f2b \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role=roles/aiplatform.user
+```
+
+Check that the model is offered in the `global` location before the first run. Changing the
+model or location means changing `src/shared/gemini.ts` and deploying again.
 
 ### Development
 

@@ -1,6 +1,6 @@
 import type { Firestore } from 'firebase-admin/firestore';
 
-import type { MatchedJobOpening } from '../job_opening.js';
+import type { ScoredJobOpening } from '../job_opening.js';
 import type { ReadCollection } from '../skill/portfolio_skills.js';
 import { toJobOpeningDocument } from './job_opening_document.js';
 
@@ -28,7 +28,7 @@ export async function listJobSearchUserIds(db: Firestore): Promise<string[]> {
 export async function writeJobOpenings(
   db: Firestore,
   userId: string,
-  openings: MatchedJobOpening[],
+  openings: ScoredJobOpening[],
   now: Date,
 ): Promise<void> {
   const collection = db

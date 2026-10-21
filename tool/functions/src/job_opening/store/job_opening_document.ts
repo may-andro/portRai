@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
-import type { MatchedJobOpening } from '../job_opening.js';
+import type { ScoredJobOpening } from '../job_opening.js';
 
 /** Openings are kept this long after the run that last saw them. */
 export const jobOpeningLifetimeDays = 14;
@@ -12,7 +12,7 @@ const dayMs = 24 * 60 * 60 * 1000;
  * `expiresAt` drives the TTL policy that deletes openings no run has seen for
  * [jobOpeningLifetimeDays].
  */
-export function toJobOpeningDocument(opening: MatchedJobOpening, now: Date) {
+export function toJobOpeningDocument(opening: ScoredJobOpening, now: Date) {
   return {
     source: opening.source,
     sourceName: opening.sourceName,
@@ -25,6 +25,9 @@ export function toJobOpeningDocument(opening: MatchedJobOpening, now: Date) {
     jobTypes: opening.jobTypes,
     description: opening.description,
     matchedSkills: opening.matchedSkills,
+    score: opening.score,
+    missingSkills: opening.missingSkills,
+    reasons: opening.reasons,
     publishedAt: Timestamp.fromDate(opening.publishedAt),
     fetchedAt: Timestamp.fromDate(now),
     expiresAt: Timestamp.fromDate(
