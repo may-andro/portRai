@@ -50,13 +50,15 @@ skills with Gemini and stores the good fits for each user who has job search tur
 
 #### Portfolio skills
 
-The skills come from the same Firestore collections the app reads, in every locale:
+The skills come from the same Firestore documents the app reads, in English only, since both
+feeds publish mostly in English. Each collection holds one document per locale with the items in
+one array:
 
-| Collection    | Field           |
-| ------------- | --------------- |
-| `expertise`   | `skills[].name` |
-| `projects`    | `technologies`  |
-| `experiences` | `technologies`  |
+| Document         | Field                        |
+| ---------------- | ---------------------------- |
+| `expertise/en`   | `experties[].skills[].name`  |
+| `projects/en`    | `projects[].technologies`    |
+| `experiences/en` | `experiences[].technologies` |
 
 Duplicates are dropped ignoring case. A skill matches only as a whole term, so `Java` does not
 match `JavaScript`, while `C++`, `.NET` and `Node.js` still match. Skills of one or two

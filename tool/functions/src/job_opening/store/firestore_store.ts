@@ -1,13 +1,13 @@
 import type { Firestore } from 'firebase-admin/firestore';
 
 import type { ScoredJobOpening } from '../job_opening.js';
-import type { ReadCollection } from '../skill/portfolio_skills.js';
+import type { ReadDocument } from '../skill/portfolio_skills.js';
 import { toJobOpeningDocument } from './job_opening_document.js';
 
-export function firestoreReadCollection(db: Firestore): ReadCollection {
-  return async (name) => {
-    const snapshot = await db.collection(name).get();
-    return snapshot.docs.map((document) => document.data());
+export function firestoreReadDocument(db: Firestore): ReadDocument {
+  return async (collection, documentId) => {
+    const snapshot = await db.collection(collection).doc(documentId).get();
+    return snapshot.data() ?? null;
   };
 }
 

@@ -14,7 +14,7 @@ import { RemotiveFeed } from './feed/remotive_feed.js';
 import { GeminiJobScorer } from './score/job_scorer.js';
 import { loadPortfolioSkills } from './skill/portfolio_skills.js';
 import {
-  firestoreReadCollection,
+  firestoreReadDocument,
   listJobSearchUserIds,
   writeJobOpenings,
 } from './store/firestore_store.js';
@@ -39,7 +39,7 @@ export const fetchJobOpenings = onSchedule(
       // Remotive comes first, so it keeps a job both feeds list.
       feeds: [new RemotiveFeed(fetchJson), new ArbeitnowFeed(fetchJson)],
       listUserIds: () => listJobSearchUserIds(db),
-      loadSkills: () => loadPortfolioSkills(firestoreReadCollection(db)),
+      loadSkills: () => loadPortfolioSkills(firestoreReadDocument(db)),
       scorer: new GeminiJobScorer(createGeminiGenerateJson(projectId())),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),

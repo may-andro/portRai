@@ -1,33 +1,49 @@
 import { isRecord, stringList, stringOrNull } from '../../shared/json_value.js';
 
-/** Reads every document of a top-level collection as plain data. */
-export type ReadCollection = (name: string) => Promise<unknown[]>;
+/** Reads one document as plain data, or null when it does not exist. */
+export type ReadDocument = (
+  collection: string,
+  documentId: string,
+) => Promise<unknown>;
+
+/**
+ * The portfolio locale the skills come from. Both job feeds publish mostly in
+ * English, and translated skill names would only add noise.
+ */
+export const skillLocale = 'en';
 
 /**
  * Collects the portfolio's skills: expertise skill names plus the
- * technologies listed on projects and experiences. Every locale is read and
- * duplicates are dropped ignoring case, keeping the first spelling.
+ * technologies listed on projects and experiences.
+ *
+ * Each collection holds one document per locale, such as `projects/en`, with
+ * the items in one array field, the same documents the app reads. Duplicates
+ * are dropped ignoring case, keeping the first spelling.
  */
 export async function loadPortfolioSkills(
-  readCollection: ReadCollection,
+  readDocument: ReadDocument,
 ): Promise<string[]> {
   const [expertise, projects, experiences] = await Promise.all([
-    readCollection('expertise'),
-    readCollection('projects'),
-    readCollection('experiences'),
+    readDocument('expertise', skillLocale),
+    readDocument('projects', skillLocale),
+    readDocument('experiences', skillLocale),
   ]);
 
   const skills = [
-    ...expertise.flatMap((document) =>
-      isRecord(document) && Array.isArray(document.skills)
-        ? document.skills.flatMap((skill) => {
+    // The app's expertise documents spell the field `experties`.
+    ...items(expertise, 'experties').flatMap((item) =>
+      Array.isArray(item.skills)
+        ? item.skills.flatMap((skill) => {
             const name = isRecord(skill) ? stringOrNull(skill.name) : null;
             return name ? [name] : [];
           })
         : [],
     ),
-    ...[...projects, ...experiences].flatMap((document) =>
-      isRecord(document) ? stringList(document.technologies) : [],
+    ...items(projects, 'projects').flatMap((item) =>
+      stringList(item.technologies),
+    ),
+    ...items(experiences, 'experiences').flatMap((item) =>
+      stringList(item.technologies),
     ),
   ];
 
@@ -37,4 +53,10 @@ export async function loadPortfolioSkills(
     if (!byLowerCase.has(key)) byLowerCase.set(key, skill);
   }
   return [...byLowerCase.values()];
+}
+
+/** The items in [field] of a locale document. */
+function items(document: unknown, field: string): Record<string, unknown>[] {
+  const list = isRecord(document) ? document[field] : undefined;
+  return Array.isArray(list) ? list.filter(isRecord) : [];
 }
