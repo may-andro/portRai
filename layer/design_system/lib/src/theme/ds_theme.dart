@@ -37,4 +37,15 @@ final class DSTheme {
   DSTypography get typography => _typography;
 
   DSDimen get dimen => _dimen;
+
+  // Palettes, typography and dimensions all derive from these two fields.
+  @override
+  bool operator ==(Object other) {
+    return other is DSTheme &&
+        other.brightness == brightness &&
+        other.designSystem == designSystem;
+  }
+
+  @override
+  int get hashCode => Object.hash(brightness, designSystem);
 }

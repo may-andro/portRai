@@ -14,8 +14,128 @@ class _TestWidget extends StatelessWidget {
   }
 }
 
+class _BuildCountingWidget extends StatelessWidget {
+  const _BuildCountingWidget({required this.onBuild});
+
+  final ValueChanged<double> onBuild;
+
+  @override
+  Widget build(BuildContext context) {
+    context.theme;
+    onBuild(context.space());
+    return const SizedBox.shrink();
+  }
+}
+
+Widget _themedApp({
+  required MediaQueryData mediaQueryData,
+  Brightness brightness = Brightness.light,
+  required Widget child,
+}) {
+  return MediaQuery(
+    data: mediaQueryData,
+    child: DSThemeBuilderWidget(
+      brightness: brightness,
+      designSystem: DesignSystem.beltane,
+      child: child,
+    ),
+  );
+}
+
 void main() {
+  group(DSTheme, () {
+    test('should be equal when brightness and design system match', () {
+      final theme = DSTheme(
+        brightness: Brightness.dark,
+        designSystem: DesignSystem.beltane,
+      );
+
+      expect(
+        theme,
+        DSTheme(
+          brightness: Brightness.dark,
+          designSystem: DesignSystem.beltane,
+        ),
+      );
+      expect(
+        theme,
+        isNot(
+          DSTheme(
+            brightness: Brightness.light,
+            designSystem: DesignSystem.beltane,
+          ),
+        ),
+      );
+    });
+  });
+
   group(DSThemeBuilderWidget, () {
+    testWidgets('should not rebuild theme dependants when view insets change', (
+      WidgetTester tester,
+    ) async {
+      var buildCount = 0;
+      final child = _BuildCountingWidget(onBuild: (_) => buildCount++);
+      const mediaQueryData = MediaQueryData(size: Size(400, 800));
+
+      await tester.pumpWidget(
+        _themedApp(mediaQueryData: mediaQueryData, child: child),
+      );
+      await tester.pumpWidget(
+        _themedApp(
+          mediaQueryData: mediaQueryData.copyWith(
+            viewInsets: const EdgeInsets.only(bottom: 300),
+          ),
+          child: child,
+        ),
+      );
+
+      expect(buildCount, 1);
+    });
+
+    testWidgets('should rebuild theme dependants when text scale changes', (
+      WidgetTester tester,
+    ) async {
+      final spaces = <double>[];
+      final child = _BuildCountingWidget(onBuild: spaces.add);
+      const mediaQueryData = MediaQueryData(size: Size(400, 800));
+
+      await tester.pumpWidget(
+        _themedApp(mediaQueryData: mediaQueryData, child: child),
+      );
+      await tester.pumpWidget(
+        _themedApp(
+          mediaQueryData: mediaQueryData.copyWith(
+            textScaler: const TextScaler.linear(3),
+          ),
+          child: child,
+        ),
+      );
+
+      expect(spaces, hasLength(2));
+      expect(spaces.last, spaces.first * 1.5);
+    });
+
+    testWidgets('should rebuild theme dependants when brightness changes', (
+      WidgetTester tester,
+    ) async {
+      var buildCount = 0;
+      final child = _BuildCountingWidget(onBuild: (_) => buildCount++);
+      const mediaQueryData = MediaQueryData(size: Size(400, 800));
+
+      await tester.pumpWidget(
+        _themedApp(mediaQueryData: mediaQueryData, child: child),
+      );
+      await tester.pumpWidget(
+        _themedApp(
+          mediaQueryData: mediaQueryData,
+          brightness: Brightness.dark,
+          child: child,
+        ),
+      );
+
+      expect(buildCount, 2);
+    });
+
     testWidgets('should able to access $DSTheme via $DSThemeBuilderWidget', (
       WidgetTester tester,
     ) async {
