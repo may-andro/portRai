@@ -21,13 +21,13 @@ export class LeverFeed implements JobFeed {
 
   constructor(
     private readonly fetchJson: FetchJson,
-    private readonly boards: CompanyBoard[],
+    private readonly loadBoards: () => Promise<CompanyBoard[]>,
     private readonly onBoardError?: BoardErrorHandler,
   ) {}
 
-  fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
+  async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
     return fetchCompanyBoards(
-      this.boards,
+      await this.loadBoards(),
       query,
       (board) => this.listPostings(board),
       this.onBoardError,
@@ -54,6 +54,7 @@ export class LeverFeed implements JobFeed {
           isRemote:
             posting.workplaceType === 'remote' ||
             remotePattern.test(location ?? ''),
+          publishedAt: parseDate(posting.createdAt),
           toJobOpening: () =>
             Promise.resolve(toJobOpening(board, posting, title, location)),
         },

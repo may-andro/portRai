@@ -17,18 +17,20 @@ export const skillLocale = 'en';
  * technologies listed on projects and experiences.
  *
  * Each collection holds one document per locale, such as `projects/en`, with
- * the items in one array field, the same documents the app reads. Duplicates
- * are dropped ignoring case, keeping the first spelling.
+ * the items in one array field, the same documents the app reads. The
+ * documents are passed in as read, so a caller that also needs one of them
+ * reads it once. Duplicates are dropped ignoring case, keeping the first
+ * spelling.
  */
-export async function loadPortfolioSkills(
-  readDocument: ReadDocument,
-): Promise<string[]> {
-  const [expertise, projects, experiences] = await Promise.all([
-    readDocument('expertise', skillLocale),
-    readDocument('projects', skillLocale),
-    readDocument('experiences', skillLocale),
-  ]);
-
+export function portfolioSkills({
+  expertise,
+  projects,
+  experiences,
+}: {
+  expertise: unknown;
+  projects: unknown;
+  experiences: unknown;
+}): string[] {
   const skills = [
     // The app's expertise documents spell the field `experties`.
     ...items(expertise, 'experties').flatMap((item) =>

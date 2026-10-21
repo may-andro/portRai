@@ -14,7 +14,7 @@ import { ArbeitnowFeed } from './feed/arbeitnow_feed.js';
 import { AshbyFeed } from './feed/ashby_feed.js';
 import {
   type BoardErrorHandler,
-  loadCompanyBoards,
+  companyBoardsLoader,
 } from './feed/company_board.js';
 import { GreenhouseFeed } from './feed/greenhouse_feed.js';
 import { HackerNewsFeed } from './feed/hacker_news_feed.js';
@@ -53,9 +53,9 @@ export const fetchJobOpenings = onSchedule(
     const db = getFirestore();
     const generateJson = createGeminiGenerateJson(projectId());
     const readDocument = firestoreReadDocument(db);
-    const boards = await loadCompanyBoards(readDocument);
-    const boardsOf = (system: string) =>
-      boards.filter((board) => board.system === system);
+    // The board feeds read the company list when they start, alongside the
+    // other feeds.
+    const loadBoards = companyBoardsLoader(readDocument);
     const onBoardError: BoardErrorHandler = (board, error) =>
       logger.warn('A company board failed', {
         system: board.system,
@@ -67,9 +67,13 @@ export const fetchJobOpenings = onSchedule(
       // first, as they link to the employer's own posting; then the
       // searchable feeds with the richest data.
       feeds: [
-        new GreenhouseFeed(fetchJson, boardsOf('greenhouse'), onBoardError),
-        new LeverFeed(fetchJson, boardsOf('lever'), onBoardError),
-        new AshbyFeed(fetchJson, boardsOf('ashby'), onBoardError),
+        new GreenhouseFeed(
+          fetchJson,
+          () => loadBoards('greenhouse'),
+          onBoardError,
+        ),
+        new LeverFeed(fetchJson, () => loadBoards('lever'), onBoardError),
+        new AshbyFeed(fetchJson, () => loadBoards('ashby'), onBoardError),
         new HimalayasFeed(fetchJson),
         new RemotiveFeed(fetchJson),
         new RemoteOkFeed(fetchJson),

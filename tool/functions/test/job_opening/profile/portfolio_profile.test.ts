@@ -4,6 +4,7 @@ import {
   loadPortfolioProfile,
   roleSearchTerms,
 } from '../../../src/job_opening/profile/portfolio_profile.js';
+import type { ReadDocument } from '../../../src/job_opening/skill/portfolio_skills.js';
 
 describe('roleSearchTerms', () => {
   it('should keep the kind of work, most frequent first, without generic words', () => {
@@ -74,6 +75,18 @@ describe('loadPortfolioProfile', () => {
       yearsOfExperience: 10,
       country: 'Spain',
     });
+  });
+
+  it('should read each English document once', async () => {
+    const readDocument = vi.fn<ReadDocument>(async () => null);
+
+    await loadPortfolioProfile(readDocument);
+
+    expect(
+      readDocument.mock.calls
+        .map(([collection, documentId]) => `${collection}/${documentId}`)
+        .sort(),
+    ).toEqual(['experiences/en', 'expertise/en', 'profile/en', 'projects/en']);
   });
 
   it('should return empty roles and no experience when the documents are missing', async () => {

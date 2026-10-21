@@ -25,13 +25,13 @@ export class AshbyFeed implements JobFeed {
 
   constructor(
     private readonly fetchJson: FetchJson,
-    private readonly boards: CompanyBoard[],
+    private readonly loadBoards: () => Promise<CompanyBoard[]>,
     private readonly onBoardError?: BoardErrorHandler,
   ) {}
 
-  fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
+  async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
     return fetchCompanyBoards(
-      this.boards,
+      await this.loadBoards(),
       query,
       (board) => this.listPostings(board),
       this.onBoardError,
@@ -57,6 +57,7 @@ export class AshbyFeed implements JobFeed {
           isRemote:
             job.workplaceType === 'Remote' ||
             remotePattern.test(location ?? ''),
+          publishedAt: parseDate(job.publishedAt),
           toJobOpening: () =>
             Promise.resolve(toJobOpening(board, job, title, location)),
         },

@@ -44,7 +44,8 @@ search turned on.
   Arbeitnow, and lets Gemini read the roles out of matching posts in Hacker News "Who is
   hiring?" threads.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
-  across feeds.
+  across feeds. Jobs a feed can already tell are too old, in another region or another kind of
+  role are dropped before their description is read.
 - Drops jobs posted more than 30 days ago, and jobs their source has already expired.
 - Drops jobs limited to regions other than the preferred ones, by default the region of the
   portfolio's country, and jobs that are another kind of role, such as a product manager for a
@@ -83,23 +84,27 @@ characters, such as `Go` or `R`, count only when they appear in the title or tag
 
 #### Feeds
 
-| Feed                                                                | Request                                                                                                                                 | Kept                                                                       | Terms                                                                                                                                                            |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Greenhouse](https://developers.greenhouse.io/job-board.html)       | `GET /v1/boards/{slug}/jobs` per company, then `GET /v1/boards/{slug}/jobs/{id}` per kept job                                           | Remote jobs whose title names a term, up to 10 per company                 | Public job board API; every opening links to the company's posting                                                                                               |
-| [Lever](https://github.com/lever/postings-api)                      | `GET /v0/postings/{slug}?mode=json` per company                                                                                         | Remote jobs whose title names a term, up to 10 per company                 | Public postings API; every opening links to the company's posting                                                                                                |
-| [Ashby](https://developers.ashbyhq.com/docs/public-job-posting-api) | `GET /posting-api/job-board/{slug}` per company                                                                                         | Remote jobs whose title names a term, up to 10 per company                 | Public job posting API; every opening links to the company's posting                                                                                             |
-| [Himalayas](https://himalayas.app/api)                              | `GET /jobs/api/search?q={term}&sort=recent&page=1..3` per term                                                                          | Every job                                                                  | Apply through the job's `applicationLink` unchanged, show Himalayas as the source with a link, don't pass jobs to other job boards, remove jobs once they expire |
-| [Remotive](https://remotive.com/api-documentation)                  | `GET /api/remote-jobs?category=software-development`                                                                                    | Every job                                                                  | Link to the job's Remotive URL, name Remotive as the source, don't pass jobs to other job sites, request at most a few times a day                               |
-| [Remote OK](https://remoteok.com/api)                               | `GET /api`                                                                                                                              | Every job                                                                  | Link back to the job's Remote OK URL and mention Remote OK as the source; don't use its logo                                                                     |
-| [Jobicy](https://jobicy.com/jobs-rss-feed)                          | `GET /api/v2/remote-jobs?count=50&tag={term}` per term                                                                                  | Every job                                                                  | Credit Jobicy with a link to the source, and send apply buttons to the original job URL                                                                          |
-| [Hacker News](https://hn.algolia.com/api)                           | `GET /api/v1/search_by_date?tags=story,author_whoishiring`, then `GET /api/v1/items/{thread}` for the latest 2 "Who is hiring?" threads | Remote roles Gemini reads out of posts that mention a term and remote work | Public API; every opening links to its post on Hacker News                                                                                                       |
-| [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api)           | `GET /api/job-board-api?page=1..5`                                                                                                      | Jobs with `remote: true`                                                   | Don't abuse the free API, link back to the site                                                                                                                  |
+| Feed                                                                | Request                                                                                                                                 | Kept                                                                                                                         | Terms                                                                                                                                                            |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Greenhouse](https://developers.greenhouse.io/job-board.html)       | `GET /v1/boards/{slug}/jobs` per company, then `GET /v1/boards/{slug}/jobs/{id}` per kept job                                           | Recent remote jobs whose title names a term, in a preferred region and of the portfolio's kind of role, up to 10 per company | Public job board API; every opening links to the company's posting                                                                                               |
+| [Lever](https://github.com/lever/postings-api)                      | `GET /v0/postings/{slug}?mode=json` per company                                                                                         | As Greenhouse                                                                                                                | Public postings API; every opening links to the company's posting                                                                                                |
+| [Ashby](https://developers.ashbyhq.com/docs/public-job-posting-api) | `GET /posting-api/job-board/{slug}` per company                                                                                         | As Greenhouse                                                                                                                | Public job posting API; every opening links to the company's posting                                                                                             |
+| [Himalayas](https://himalayas.app/api)                              | `GET /jobs/api/search?q={term}&sort=recent&page=1..3` per term                                                                          | Every job                                                                                                                    | Apply through the job's `applicationLink` unchanged, show Himalayas as the source with a link, don't pass jobs to other job boards, remove jobs once they expire |
+| [Remotive](https://remotive.com/api-documentation)                  | `GET /api/remote-jobs?category=software-development`                                                                                    | Every job                                                                                                                    | Link to the job's Remotive URL, name Remotive as the source, don't pass jobs to other job sites, request at most a few times a day                               |
+| [Remote OK](https://remoteok.com/api)                               | `GET /api`                                                                                                                              | Every job                                                                                                                    | Link back to the job's Remote OK URL and mention Remote OK as the source; don't use its logo                                                                     |
+| [Jobicy](https://jobicy.com/jobs-rss-feed)                          | `GET /api/v2/remote-jobs?count=50&tag={term}` per term                                                                                  | Every job                                                                                                                    | Credit Jobicy with a link to the source, and send apply buttons to the original job URL                                                                          |
+| [Hacker News](https://hn.algolia.com/api)                           | `GET /api/v1/search_by_date?tags=story,author_whoishiring`, then `GET /api/v1/items/{thread}` for the latest 2 "Who is hiring?" threads | Remote roles Gemini reads out of posts from the last 30 days that mention a term and remote work                             | Public API; every opening links to its post on Hacker News                                                                                                       |
+| [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api)           | `GET /api/job-board-api?page=1..5`                                                                                                      | Jobs with `remote: true`                                                                                                     | Don't abuse the free API, link back to the site                                                                                                                  |
 
 Every stored opening keeps the source's job `url` and `sourceName`, which the app must show
 with the job. Earlier feeds in the table win when two list the same job. Remotive's free API
 returns only its 10 most recent jobs, which arrive 24 hours after they are posted on Remotive.
 A request whose connection fails, or that is answered with `429` or a `5xx` status, is tried
 once more after two seconds.
+
+Himalayas and Jobicy search two terms at a time. When a later page of a term fails, Himalayas and
+Arbeitnow keep the pages read before it; a feed fails only when it reads nothing, that is when
+the first page of every term, or Arbeitnow's first page, fails.
 
 #### Company boards
 
@@ -117,25 +122,30 @@ reads; the owner edits it in the Firebase console:
 }
 ```
 
-`system` is `greenhouse`, `lever` or `ashby`, `slug` is the board's name in its URL, such as
+The board feeds read this document when they start. `system` is `greenhouse`, `lever` or `ashby`, `slug` is the board's name in its URL, such as
 `reddit` in `job-boards.greenhouse.io/reddit`, and `name` is shown as the opening's source.
 Without the document, a built-in list of about 30 companies with mobile engineering roles is
 used (`defaultCompanyBoards` in `src/job_opening/feed/company_board.ts`); an empty `boards` list
 turns the company boards off. Entries with another system or without a slug are skipped.
 
-A job counts as remote when its location or workplace type says so. Companies often post one
-job once per location, so postings with the same title become one opening that lists every
-location. Four boards are read at a time; a board that fails, such as a misspelled slug, is
-logged with its slug and skipped.
+A job counts as remote when its location or workplace type says so. Postings that are not remote,
+whose title names no search term, that were published more than 30 days ago or without a date,
+or that the [region and role](#region-and-role) filters drop are skipped before the limit of 10
+per company is applied, so they never take a place; for Greenhouse, only the postings left are
+read in full. Companies often post one job once per location, so the postings with the same
+title that are left become one opening that lists their locations. Up to four boards are read at
+a time, and the next board starts as soon as one finishes; a board that fails, such as a
+misspelled slug, is logged with its slug and skipped.
 
 #### Hacker News posts
 
-"Who is hiring?" posts are free text, so the function reads them in two steps. First it keeps the
-top-level posts of the latest two threads that mention a search term and the word remote, at
-most 40, newest first. Then Gemini lists the roles each post offers, with title, company,
+"Who is hiring?" posts are free text, so the function reads them in two steps. First it reads the
+latest two threads at the same time and keeps the top-level posts from the last 30 days that
+mention a search term and the word remote, at most 40, newest first. Then Gemini lists the roles each post offers, with title, company,
 location and whether remote work is allowed; only remote roles are kept. The post is sent as
-data apart from the instructions, and the reply is validated: at most five roles, each with a
-title and a company, and capped texts.
+data apart from the instructions, with thinking turned off, since the roles are copied from the
+post. The reply is validated: at most five roles, each with a title and a company, and capped
+texts.
 
 Each opening links to its post on Hacker News, which holds the company's own application
 details. Links inside a post are never followed or stored, so no address comes from the model.
@@ -144,7 +154,9 @@ A post whose roles cannot be read is skipped; the source fails only when every p
 #### Freshness
 
 Jobs posted more than 30 days ago are dropped before matching, so stale postings are never
-scored or stored. A stored opening expires 14 days after the last run that found it, or earlier
+scored or stored. Feeds that know a job's date drop it already while reading, before its
+description is converted or, for Greenhouse and Hacker News, before its details are read or
+Gemini is called. A stored opening expires 14 days after the last run that found it, or earlier
 when its source gives an earlier expiry, as Himalayas does.
 
 If one feed fails, or is still running after 4 minutes, the run continues with the others and
@@ -170,7 +182,9 @@ marketing, sales or recruiter, are dropped unless they also name an engineering 
 reason to drop a job, so a portfolio with a designer role keeps designer jobs.
 
 Both filters run before keyword matching, so no Gemini call goes to a job that cannot be taken.
-The run logs how many jobs each one dropped.
+The regions are read before the feeds start, so the feeds that know a job's title and location
+apply the same filters while reading; the run applies them again to every job the feeds return
+and logs how many each one dropped there. Jobs a feed already skipped are not in those counts.
 
 #### Scoring
 
@@ -188,7 +202,8 @@ portfolio's skills, roles and years of experience and replies with JSON:
 - **Threshold:** openings scoring below 60 are not stored. 80 or more means the job's core
   stack is in the portfolio.
 - **Cost:** a run scores at most the 120 best matches, role-title matches first, then by matched
-  skills and then by date, 2 at a time.
+  skills and then by date, 2 at a time. Gemini may think with up to 1,024 tokens before
+  replying to each.
 - **Reuse:** each fit is stored under a hash of the model, the instructions and the prompt (see
   [Stored fits](#stored-fits)). A matched job whose request is unchanged since an earlier run
   reuses that fit without a Gemini call and does not count towards the 120. A change to the job's
@@ -359,7 +374,8 @@ for attempt in 1 2 3 4 5; do curl -s -o /dev/null -w "%{http_code} " -X POST \
 ```
 
 Changing the model or location means changing `src/shared/gemini.ts` and deploying again. Gemini
-2.5 models take a `thinkingBudget`, while Gemini 3 models take a `thinkingLevel`.
+2.5 models take a `thinkingBudget`, which each request sets, while Gemini 3 models take a
+`thinkingLevel`.
 
 ### Development
 
