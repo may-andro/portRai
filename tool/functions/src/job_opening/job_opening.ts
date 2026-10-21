@@ -38,6 +38,8 @@ export interface PortfolioProfile {
   /** Words from the roles to search the job boards for, such as Flutter. */
   searchTerms: string[];
   yearsOfExperience: number | null;
+  /** Where the portfolio owner lives, such as Spain. */
+  country: string | null;
 }
 
 /** A job opening that matched enough of the portfolio skills to be kept. */

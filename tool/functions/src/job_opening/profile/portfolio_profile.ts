@@ -55,7 +55,8 @@ const genericRoleWords = new Set([
 
 /**
  * Reads what the job search uses from the portfolio: the skills, the current
- * role, headline title and past positions, and the years of experience.
+ * role, headline title and past positions, the years of experience and the
+ * country.
  */
 export async function loadPortfolioProfile(
   readDocument: ReadDocument,
@@ -89,6 +90,7 @@ export async function loadPortfolioProfile(
     }),
   );
   const years = profile.yearsOfExperience;
+  const location = isRecord(profile.location) ? profile.location : {};
 
   return {
     skills,
@@ -98,6 +100,7 @@ export async function loadPortfolioProfile(
       typeof years === 'number' && Number.isFinite(years) && years >= 0
         ? years
         : null,
+    country: stringOrNull(location.country),
   };
 }
 

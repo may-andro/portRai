@@ -28,6 +28,7 @@ export function portfolioProfile(
     roles: ['Tech Lead - Flutter Developer', 'Senior Android Developer'],
     searchTerms: ['Flutter', 'Android'],
     yearsOfExperience: 10,
+    country: 'Spain',
     ...overrides,
   };
 }

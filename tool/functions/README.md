@@ -46,6 +46,9 @@ search turned on.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
   across feeds.
 - Drops jobs posted more than 30 days ago, and jobs their source has already expired.
+- Drops jobs limited to regions other than the preferred ones, by default the region of the
+  portfolio's country, and jobs that are another kind of role, such as a product manager for a
+  mobile app.
 - Keeps a job when its title names a portfolio role term, or when at least two portfolio skills
   appear in its title, tags or description.
 - Scores up to 120 of those jobs from 0 to 100 with Gemini against the skills, roles and years of
@@ -146,6 +149,28 @@ when its source gives an earlier expiry, as Himalayas does.
 
 If one feed fails, the run continues with the others and logs a warning. The run fails only
 when every feed fails. The function does not retry, so a failed run waits for the next Monday.
+
+#### Region and role
+
+Many remote jobs can only be taken from some countries, such as `Remote - USA`. The preferred
+regions are `europe`, `north_america`, `latin_america`, `asia_pacific` and
+`middle_east_africa`. They come from the `regions` list of the `job_search/settings` document,
+which only the function reads, for example `{ "regions": ["europe"] }`. Without that document
+the region of the portfolio's `profile.location.country` is used, and when the country is not
+known, every region is kept.
+
+A job's location is matched against region, country, state and city names, and time zones such
+as `CET` or `EST`. A job is dropped only when its location names other regions alone. A job
+without a location, with a worldwide one such as `Anywhere`, with a long list such as `+70 more`
+or with a location that names no known place is kept, and scoring judges it.
+
+Titles that name a role other than building software, such as product manager, designer,
+marketing, sales or recruiter, are dropped unless they also name an engineering role, such as
+`Engineering Manager, Mobile`. A word that one of the portfolio's own roles uses is never a
+reason to drop a job, so a portfolio with a designer role keeps designer jobs.
+
+Both filters run before keyword matching, so no Gemini call goes to a job that cannot be taken.
+The run logs how many jobs each one dropped.
 
 #### Scoring
 
