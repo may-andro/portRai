@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
@@ -30,6 +32,30 @@ void main() {
     late MockGetTestimonialsUseCase getTestimonialsUseCase;
     late MockLogReporter logReporter;
     late GetPortfolioUseCase useCase;
+
+    void stubOptionalSections() {
+      getAllExpertiseUseCase.stubCall(
+        Right<GetAllExpertiseFailure, List<ExpertiseEntity>>(
+          portfolio.expertises,
+        ),
+      );
+      getProjectsUseCase.stubCall(
+        Right<GetProjectsFailure, List<ProjectEntity>>(portfolio.projects),
+      );
+      getServicesUseCase.stubCall(
+        Right<GetServicesFailure, List<ServiceEntity>>(portfolio.services),
+      );
+      getExperiencesUseCase.stubCall(
+        Right<GetExperiencesFailure, List<ExperienceEntity>>(
+          portfolio.experiences,
+        ),
+      );
+      getTestimonialsUseCase.stubCall(
+        Right<GetTestimonialsFailure, List<TestimonialEntity>>(
+          portfolio.testimonials,
+        ),
+      );
+    }
 
     setUp(() {
       getProfileUseCase = MockGetProfileUseCase();
@@ -65,27 +91,7 @@ void main() {
         getProfileUseCase.stubCall(
           Right<GetProfileFailure, ProfileEntity>(portfolio.profile),
         );
-        getAllExpertiseUseCase.stubCall(
-          Right<GetAllExpertiseFailure, List<ExpertiseEntity>>(
-            portfolio.expertises,
-          ),
-        );
-        getProjectsUseCase.stubCall(
-          Right<GetProjectsFailure, List<ProjectEntity>>(portfolio.projects),
-        );
-        getServicesUseCase.stubCall(
-          Right<GetServicesFailure, List<ServiceEntity>>(portfolio.services),
-        );
-        getExperiencesUseCase.stubCall(
-          Right<GetExperiencesFailure, List<ExperienceEntity>>(
-            portfolio.experiences,
-          ),
-        );
-        getTestimonialsUseCase.stubCall(
-          Right<GetTestimonialsFailure, List<TestimonialEntity>>(
-            portfolio.testimonials,
-          ),
-        );
+        stubOptionalSections();
 
         final result = await useCase();
 
@@ -101,11 +107,36 @@ void main() {
         getProfileUseCase.stubCall(
           const Left<GetProfileFailure, ProfileEntity>(failure),
         );
+        stubOptionalSections();
 
         final result = await useCase();
 
         expect(result.left, isA<GetPortfolioNotFoundFailure>());
         expect(result.left.cause, same(failure));
+      },
+    );
+
+    test(
+      'should start every section fetch before the profile completes',
+      () async {
+        final profileCompleter =
+            Completer<Either<GetProfileFailure, ProfileEntity>>();
+        when(
+          () => getProfileUseCase(),
+        ).thenAnswer((_) => profileCompleter.future);
+        stubOptionalSections();
+
+        final result = useCase();
+        await Future<void>.delayed(Duration.zero);
+
+        verify(() => getAllExpertiseUseCase()).called(1);
+        verify(() => getProjectsUseCase()).called(1);
+        verify(() => getServicesUseCase()).called(1);
+        verify(() => getExperiencesUseCase()).called(1);
+        verify(() => getTestimonialsUseCase()).called(1);
+
+        profileCompleter.complete(Right(portfolio.profile));
+        expect((await result).right, portfolio);
       },
     );
 
