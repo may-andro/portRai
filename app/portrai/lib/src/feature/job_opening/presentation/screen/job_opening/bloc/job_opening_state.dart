@@ -22,6 +22,7 @@ class JobOpeningState extends Equatable {
     this.insightsController,
     this.insightsSurfaceIds = const [],
     this.insightsFailure,
+    this.isTailoredCvAvailable = false,
   });
 
   final String id;
@@ -46,6 +47,9 @@ class JobOpeningState extends Equatable {
   /// Why the insights could not be generated, shown in place of them.
   final Failure? insightsFailure;
 
+  /// Whether a CV tailored for the opening can be created.
+  final bool isTailoredCvAvailable;
+
   JobOpeningState copyWith({
     String? id,
     JobOpeningStatus? status,
@@ -61,6 +65,7 @@ class JobOpeningState extends Equatable {
     List<String>? insightsSurfaceIds,
     Failure? insightsFailure,
     bool clearInsightsFailure = false,
+    bool? isTailoredCvAvailable,
   }) {
     return JobOpeningState(
       id: id ?? this.id,
@@ -79,6 +84,8 @@ class JobOpeningState extends Equatable {
       insightsFailure: clearInsightsFailure
           ? null
           : insightsFailure ?? this.insightsFailure,
+      isTailoredCvAvailable:
+          isTailoredCvAvailable ?? this.isTailoredCvAvailable,
     );
   }
 
@@ -94,5 +101,6 @@ class JobOpeningState extends Equatable {
     insightsController,
     insightsSurfaceIds,
     insightsFailure,
+    isTailoredCvAvailable,
   ];
 }

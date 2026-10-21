@@ -22,6 +22,7 @@ part 'photo_picker_widget.dart';
 part 'preview_widget.dart';
 part 'section_widget.dart';
 part 'section_picker_widget.dart';
+part 'tailoring_banner_widget.dart';
 part 'template_picker_widget.dart';
 
 extension on BuildContext {
@@ -80,12 +81,18 @@ class ContentWidget extends StatelessWidget {
                 context.space(factor: 14),
               ),
               sliver: SliverToBoxAdapter(
-                child: DSResponsiveWidthContainerWidget(
-                  xsBuilder: stackedBody,
-                  sBuilder: stackedBody,
-                  mBuilder: stackedBody,
-                  lBuilder: sideBySideBody,
-                  xlBuilder: sideBySideBody,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _TailoringBannerWidget(state: state),
+                    DSResponsiveWidthContainerWidget(
+                      xsBuilder: stackedBody,
+                      sBuilder: stackedBody,
+                      mBuilder: stackedBody,
+                      lBuilder: sideBySideBody,
+                      xlBuilder: sideBySideBody,
+                    ),
+                  ],
                 ),
               ),
             ),

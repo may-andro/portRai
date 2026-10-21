@@ -26,6 +26,10 @@ final class ApplyClickEvent extends JobOpeningEvent {
   const ApplyClickEvent();
 }
 
+final class TailoredCvClickEvent extends JobOpeningEvent {
+  const TailoredCvClickEvent();
+}
+
 final class GenerateInsightsClickEvent extends JobOpeningEvent {
   const GenerateInsightsClickEvent();
 }

@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/widgets.dart';
+import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 
 /// Openings posted this many days ago or less count as new.
@@ -24,6 +25,14 @@ extension JobOpeningExtension on JobOpeningEntity {
   }
 
   bool isNew(DateTime now) => daysSincePosted(now) <= jobOpeningNewForDays;
+
+  /// The job to tailor a CV for.
+  CvTailoringTargetEntity toCvTailoringTarget() => CvTailoringTargetEntity(
+    title: title,
+    company: company,
+    description: description,
+    skills: [...matchedSkills, ...missingSkills],
+  );
 }
 
 extension JobTypeExtension on String {

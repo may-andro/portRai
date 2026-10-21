@@ -13,6 +13,22 @@ import 'package:portrai/src/feature/cv_export/data/pdf/template/sidebar_cv_pdf_t
 import 'package:portrai/src/feature/cv_export/domain/entity/_entity.dart';
 import 'package:portrai/src/feature/cv_export/domain/exception/_exception.dart';
 
+/// The content and font scale chosen to fill one page. It depends on
+/// everything but the accent, so a new accent reuses it.
+class CvPdfLayout {
+  const CvPdfLayout({required this.document, required this.fontScale});
+
+  final CvDocumentEntity document;
+  final double fontScale;
+}
+
+class CvPdfRendering {
+  const CvPdfRendering({required this.pdfBytes, required this.layout});
+
+  final Uint8List pdfBytes;
+  final CvPdfLayout layout;
+}
+
 /// Renders a [CvDocumentEntity] with the selected template, trimming the
 /// content step by step until it fits a single A4 page.
 @register
@@ -30,47 +46,70 @@ class CvPdfRenderer {
     };
   }
 
-  Future<Uint8List> render({
+  /// Renders [layout] when given, otherwise searches for the fullest layout
+  /// that fits one page first.
+  ///
+  /// The search only lays pages out, which is enough to count them; painting
+  /// and encoding the PDF happen once, for the chosen layout.
+  Future<CvPdfRendering> render({
     required CvDocumentEntity document,
     required CvOptionsEntity options,
     required CvLabelsEntity labels,
     required Uint8List? photoBytes,
+    CvPdfLayout? layout,
   }) async {
     final template = _templateOf(options.template);
     final dateFormat = await _createDateFormat(labels.localeCode);
     final validPhotoBytes = _isRenderableImage(photoBytes) ? photoBytes : null;
 
+    pdf_widgets.Document layOut(CvPdfLayout layout) {
+      final input = CvPdfInput(
+        document: layout.document,
+        options: options,
+        labels: labels,
+        style: template.createStyle(
+          accentArgb: options.accent.argb,
+          fontScale: layout.fontScale,
+        ),
+        photo: validPhotoBytes,
+        dateFormat: dateFormat,
+      );
+      return pdf_widgets.Document(
+        title: document.fullName,
+        author: document.fullName,
+      )..addPage(template.build(input));
+    }
+
+    final chosenLayout =
+        layout ??
+        await _fullestLayout(
+          document: document,
+          template: template,
+          layOut: layOut,
+        );
+    final pdfBytes = await layOut(chosenLayout).save();
+    return CvPdfRendering(pdfBytes: pdfBytes, layout: chosenLayout);
+  }
+
+  Future<CvPdfLayout> _fullestLayout({
+    required CvDocumentEntity document,
+    required CvPdfTemplate template,
+    required pdf_widgets.Document Function(CvPdfLayout layout) layOut,
+  }) async {
     Object? lastError;
-    Future<Uint8List?> tryRender(
-      CvDocumentEntity fittedDocument,
-      double fontScale,
-    ) async {
-      // Lets the UI repaint between the expensive renders (no isolates on web).
+    Future<bool> fits(CvDocumentEntity fittedDocument, double fontScale) async {
+      // Lets the UI repaint between the layouts (no isolates on web).
       await Future<void>.delayed(Duration.zero);
       try {
-        final input = CvPdfInput(
-          document: fittedDocument,
-          options: options,
-          labels: labels,
-          style: template.createStyle(
-            accentArgb: options.accent.argb,
-            fontScale: fontScale,
-          ),
-          photo: validPhotoBytes,
-          dateFormat: dateFormat,
+        final pdfDocument = layOut(
+          CvPdfLayout(document: fittedDocument, fontScale: fontScale),
         );
-        final pdfDocument = pdf_widgets.Document(
-          title: document.fullName,
-          author: document.fullName,
-        )..addPage(template.build(input));
-        final pdfBytes = await pdfDocument.save();
-        return pdfDocument.document.pdfPageList.pages.length == 1
-            ? pdfBytes
-            : null;
+        // MultiPage lays its content out when the page is added.
+        return pdfDocument.document.pdfPageList.pages.length == 1;
       } on Exception catch (exception) {
         // A layout that cannot fit the page throws: treat it as not fitting.
         lastError = exception;
-        return null;
+        return false;
       }
     }
 
@@ -81,18 +120,17 @@ class CvPdfRenderer {
     final mostCompactLevel = levels.last;
 
     // The fullest index in [0, count) that fits, or null when none does.
-    Future<({int index, Uint8List pdfBytes})?> fullestFit(
+    Future<int?> fullestFit(
       int count,
-      Future<Uint8List?> Function(int index) attempt,
+      Future<bool> Function(int index) attempt,
     ) async {
-      ({int index, Uint8List pdfBytes})? fullest;
+      int? fullest;
       var low = 0;
       var high = count - 1;
       while (low <= high) {
         final middle = (low + high) ~/ 2;
-        final pdfBytes = await attempt(middle);
-        if (pdfBytes != null) {
-          fullest = (index: middle, pdfBytes: pdfBytes);
+        if (await attempt(middle)) {
+          fullest = middle;
           high = middle - 1;
         } else {
           low = middle + 1;
@@ -101,72 +139,69 @@ class CvPdfRenderer {
       return fullest;
     }
 
-    Future<Uint8List> enlarged(
+    Future<CvPdfLayout> enlarged(
       CvDocumentEntity fittedDocument,
       CvFitLevelEntity level,
-      Uint8List fallbackPdfBytes,
     ) async {
       final fontScales = _enlargedFontScales(level);
-      final enlargedFit = await fullestFit(
+      final enlargedIndex = await fullestFit(
         fontScales.length,
-        (index) => tryRender(fittedDocument, fontScales[index]),
+        (index) => fits(fittedDocument, fontScales[index]),
       );
-      return enlargedFit?.pdfBytes ?? fallbackPdfBytes;
+      return CvPdfLayout(
+        document: fittedDocument,
+        fontScale: enlargedIndex == null
+            ? level.fontScale
+            : fontScales[enlargedIndex],
+      );
     }
 
     if (template.hasSkillsColumn) {
-      final contentFit = await fullestFit(
+      final contentIndex = await fullestFit(
         levels.length,
-        (index) => tryRender(
+        (index) => fits(
           document.fit(levels[index], skillsLevel: mostCompactLevel),
           levels[index].fontScale,
         ),
       );
-      if (contentFit != null) {
-        final contentLevel = levels[contentFit.index];
-        final skillsFit = await fullestFit(
+      if (contentIndex != null) {
+        final contentLevel = levels[contentIndex];
+        final skillsIndex = await fullestFit(
           levels.length,
-          (index) => tryRender(
+          (index) => fits(
             document.fit(contentLevel, skillsLevel: levels[index]),
             contentLevel.fontScale,
           ),
         );
-        final skillsLevel = levels[skillsFit?.index ?? levels.length - 1];
+        final skillsLevel = levels[skillsIndex ?? levels.length - 1];
         return await enlarged(
           document.fit(contentLevel, skillsLevel: skillsLevel),
           contentLevel,
-          skillsFit?.pdfBytes ?? contentFit.pdfBytes,
         );
       }
     } else {
       // Everything shares one flow: keep the short overviews so the skills are
       // not trimmed, and only use the detailed ones when all of it still fits.
-      final contentFit = await fullestFit(
+      final contentIndex = await fullestFit(
         levels.length,
-        (index) => tryRender(
+        (index) => fits(
           document.fit(levels[index], useDetailedOverview: false),
           levels[index].fontScale,
         ),
       );
-      if (contentFit != null) {
-        final contentLevel = levels[contentFit.index];
+      if (contentIndex != null) {
+        final contentLevel = levels[contentIndex];
         var fittedDocument = document.fit(
           contentLevel,
           useDetailedOverview: false,
         );
-        var fittingPdfBytes = contentFit.pdfBytes;
-        if (contentFit.index == 0) {
+        if (contentIndex == 0) {
           final detailedDocument = document.fit(contentLevel);
-          final detailedPdfBytes = await tryRender(
-            detailedDocument,
-            contentLevel.fontScale,
-          );
-          if (detailedPdfBytes != null) {
+          if (await fits(detailedDocument, contentLevel.fontScale)) {
             fittedDocument = detailedDocument;
-            fittingPdfBytes = detailedPdfBytes;
           }
         }
-        return await enlarged(fittedDocument, contentLevel, fittingPdfBytes);
+        return await enlarged(fittedDocument, contentLevel);
       }
     }
     throw CvPdfGenerationException(

@@ -19,12 +19,12 @@ void main() {
     for (final template in CvTemplate.values) {
       test('should render a single page when the ${template.name} template '
           'gets more content than fits', () async {
-        final pdfBytes = await renderer.render(
+        final pdfBytes = (await renderer.render(
           document: CvExportTestFixture.heavyDocument(),
           options: CvOptionsEntity(template: template),
           labels: CvExportTestFixture.labels,
           photoBytes: null,
-        );
+        )).pdfBytes;
 
         expect(latin1.decode(pdfBytes.sublist(0, 4)), '%PDF');
         expect(pageCountOf(pdfBytes), 1);
@@ -32,24 +32,63 @@ void main() {
 
       test('should render a single page when the ${template.name} template '
           'gets little content', () async {
-        final pdfBytes = await renderer.render(
+        final pdfBytes = (await renderer.render(
           document: CvExportTestFixture.lightDocument(),
           options: CvOptionsEntity(template: template),
           labels: CvExportTestFixture.labels,
           photoBytes: null,
-        );
+        )).pdfBytes;
 
         expect(pageCountOf(pdfBytes), 1);
       });
     }
 
+    test('should render the given layout without searching again', () async {
+      final document = CvExportTestFixture.heavyDocument();
+      final first = await renderer.render(
+        document: document,
+        options: const CvOptionsEntity(),
+        labels: CvExportTestFixture.labels,
+        photoBytes: null,
+      );
+
+      final second = await renderer.render(
+        document: document,
+        options: const CvOptionsEntity(accent: CvAccent.crimson),
+        labels: CvExportTestFixture.labels,
+        photoBytes: null,
+        layout: first.layout,
+      );
+
+      expect(second.layout, same(first.layout));
+      expect(pageCountOf(second.pdfBytes), 1);
+      expect(second.pdfBytes, isNot(first.pdfBytes));
+    });
+
+    test('should choose a fuller layout for less content', () async {
+      final heavy = await renderer.render(
+        document: CvExportTestFixture.heavyDocument(),
+        options: const CvOptionsEntity(),
+        labels: CvExportTestFixture.labels,
+        photoBytes: null,
+      );
+      final light = await renderer.render(
+        document: CvExportTestFixture.lightDocument(),
+        options: const CvOptionsEntity(),
+        labels: CvExportTestFixture.labels,
+        photoBytes: null,
+      );
+
+      expect(light.layout.fontScale, greaterThan(heavy.layout.fontScale));
+    });
+
     test('should render when every section is hidden', () async {
-      final pdfBytes = await renderer.render(
+      final pdfBytes = (await renderer.render(
         document: CvExportTestFixture.heavyDocument(),
         options: const CvOptionsEntity(sections: {}),
         labels: CvExportTestFixture.labels,
         photoBytes: null,
-      );
+      )).pdfBytes;
 
       expect(pageCountOf(pdfBytes), 1);
     });
@@ -57,12 +96,12 @@ void main() {
     test(
       'should render without the photo when the photo is not an image',
       () async {
-        final pdfBytes = await renderer.render(
+        final pdfBytes = (await renderer.render(
           document: CvExportTestFixture.lightDocument(),
           options: const CvOptionsEntity(isPhotoIncluded: true),
           labels: CvExportTestFixture.labels,
           photoBytes: Uint8List.fromList([1, 2, 3]),
-        );
+        )).pdfBytes;
 
         expect(pageCountOf(pdfBytes), 1);
       },
@@ -71,7 +110,7 @@ void main() {
     test(
       'should fall back to english dates when the locale is unknown',
       () async {
-        final pdfBytes = await renderer.render(
+        final pdfBytes = (await renderer.render(
           document: CvExportTestFixture.lightDocument(),
           options: const CvOptionsEntity(),
           labels: const CvLabelsEntity(
@@ -87,7 +126,7 @@ void main() {
             websiteLabel: 'Website',
           ),
           photoBytes: null,
-        );
+        )).pdfBytes;
 
         expect(pageCountOf(pdfBytes), 1);
       },

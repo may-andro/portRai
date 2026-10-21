@@ -21,5 +21,25 @@ void main() {
 
       expect(latin1.decode(pdfBytes.sublist(0, 4)), '%PDF');
     });
+
+    test('should render the new accent when only the accent '
+        'changes', () async {
+      final repository = PrintingCvPdfRepository(CvPhotoLoader());
+      final document = CvExportTestFixture.heavyDocument();
+
+      final tealPdfBytes = await repository.generatePdf(
+        document: document,
+        options: const CvOptionsEntity(),
+        labels: CvExportTestFixture.labels,
+      );
+      final crimsonPdfBytes = await repository.generatePdf(
+        document: document,
+        options: const CvOptionsEntity(accent: CvAccent.crimson),
+        labels: CvExportTestFixture.labels,
+      );
+
+      expect(latin1.decode(crimsonPdfBytes.sublist(0, 4)), '%PDF');
+      expect(crimsonPdfBytes, isNot(tealPdfBytes));
+    });
   });
 }

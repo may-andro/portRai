@@ -279,4 +279,32 @@ void main() {
 
     verify(() => bloc.add(const GenerateInsightsClickEvent())).called(1);
   });
+
+  testWidgets('should offer a tailored CV next to apply when '
+      'available', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningState(
+        id: 'job-1',
+        status: JobOpeningStatus.loaded,
+        jobOpening: jobOpeningEntityFixture(),
+        isTailoredCvAvailable: true,
+      ),
+    );
+
+    expect(find.text('Tailored CV'), findsOneWidget);
+  });
+
+  testWidgets('should hide the tailored CV when unavailable', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningState(
+        id: 'job-1',
+        status: JobOpeningStatus.loaded,
+        jobOpening: jobOpeningEntityFixture(),
+      ),
+    );
+
+    expect(find.text('Tailored CV'), findsNothing);
+  });
 }

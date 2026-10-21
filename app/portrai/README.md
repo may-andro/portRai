@@ -171,6 +171,11 @@ and renders the answer as a generated surface from the assistant catalog: the st
 with, likely interview topics and how to angle the CV. Nothing is stored; leaving the page
 cancels a request still running.
 
+With the `feature_tailored_cv` flag on, on web, Android and iOS, the opening's hero also shows
+a "Tailored CV" button. It opens the CV export with the job, which rewrites the summary and puts
+the most relevant projects and skills first (see the
+[cv_export README](lib/src/feature/cv_export/README.md#tailoring-for-a-job)).
+
 The data is private to the signed-in user and is read straight from Firestore, with no cache or
 bundled fallback:
 
@@ -355,6 +360,7 @@ Feature flags are managed through Firebase Remote Config:
 - `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
 - `feature_remote_assistant_generative_ui` (default off) enables parsed, read-only design-system text and card surfaces in remote answers
 - `feature_job_openings` (default off) shows the Job openings card in Settings
+- `feature_tailored_cv` (default off) adds a Tailored CV button on a job opening that opens the CV export tailored for the job
 - `feature_job_opening_insights` (default off) offers generated preparation insights on a job opening; it also needs `feature_remote_assistant`
 
 ## Dependencies

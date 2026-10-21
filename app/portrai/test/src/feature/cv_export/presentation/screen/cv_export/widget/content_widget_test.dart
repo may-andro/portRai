@@ -112,5 +112,53 @@ void main() {
 
       expect(find.text('Download CV'), findsOneWidget);
     });
+
+    testWidgets('should say which job a tailored CV is for', (tester) async {
+      state = CvExportLoadedState(
+        document: CvExportTestFixture.lightDocument(),
+        options: const CvOptionsEntity(),
+        labels: CvExportTestFixture.labels,
+        tailoringTarget: const CvTailoringTargetEntity(
+          title: 'Senior Flutter Developer',
+          company: 'Acme',
+          description: '',
+        ),
+      );
+      await pumpContent(tester);
+
+      expect(
+        find.text('Tailored for Senior Flutter Developer at Acme'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should explain the standard CV when tailoring failed', (
+      tester,
+    ) async {
+      state = CvExportLoadedState(
+        document: CvExportTestFixture.lightDocument(),
+        options: const CvOptionsEntity(),
+        labels: CvExportTestFixture.labels,
+        tailoringFailure: const CvTailoringQuotaFailure(),
+      );
+      await pumpContent(tester);
+
+      expect(find.text('Showing your standard CV'), findsOneWidget);
+      expect(
+        find.text(
+          'You have reached the limit for tailored CVs. Try again later.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should show no tailoring banner for the standard CV', (
+      tester,
+    ) async {
+      await pumpContent(tester);
+
+      expect(find.textContaining('Tailored for'), findsNothing);
+      expect(find.text('Showing your standard CV'), findsNothing);
+    });
   });
 }

@@ -13,31 +13,34 @@ class _RenderRequest {
     required this.options,
     required this.labels,
     required this.photoBytes,
+    required this.layout,
   });
 
   final CvDocumentEntity document;
   final CvOptionsEntity options;
   final CvLabelsEntity labels;
   final Uint8List? photoBytes;
+  final CvPdfLayout? layout;
 }
 
 class _RenderOutcome {
-  const _RenderOutcome({this.pdfBytes, this.errorMessage});
+  const _RenderOutcome({this.rendering, this.errorMessage});
 
-  final Uint8List? pdfBytes;
+  final CvPdfRendering? rendering;
   final String? errorMessage;
 }
 
 /// Runs on a background isolate so the many fit renders do not block the UI.
 Future<_RenderOutcome> _renderInBackground(_RenderRequest request) async {
   try {
-    final pdfBytes = await CvPdfRenderer().render(
+    final rendering = await CvPdfRenderer().render(
       document: request.document,
       options: request.options,
       labels: request.labels,
       photoBytes: request.photoBytes,
+      layout: request.layout,
     );
-    return _RenderOutcome(pdfBytes: pdfBytes);
+    return _RenderOutcome(rendering: rendering);
   } on CvPdfGenerationException catch (exception) {
     return _RenderOutcome(errorMessage: exception.message);
   }
@@ -51,6 +54,11 @@ class PrintingCvPdfRepository implements CvPdfRepository {
   String? _cachedPhotoUrl;
   Uint8List? _cachedPhotoBytes;
 
+  /// The last layout and what it was fitted for. Only the accent can change
+  /// without a new layout, as it does not change any size.
+  Object? _cachedLayoutKey;
+  CvPdfLayout? _cachedLayout;
+
   @override
   Future<Uint8List> generatePdf({
     required CvDocumentEntity document,
@@ -60,6 +68,12 @@ class PrintingCvPdfRepository implements CvPdfRepository {
     final photoBytes = options.isPhotoIncluded
         ? await _photoBytesOf(options.photoUrl ?? document.photoUrl)
         : null;
+    final layoutKey = (
+      document,
+      options.copyWith(accent: CvAccent.values.first),
+      labels,
+      photoBytes != null,
+    );
     // On the web there are no isolates: compute then runs on the main thread.
     final outcome = await compute(
       _renderInBackground,
@@ -68,15 +82,18 @@ class PrintingCvPdfRepository implements CvPdfRepository {
         options: options,
         labels: labels,
         photoBytes: photoBytes,
+        layout: layoutKey == _cachedLayoutKey ? _cachedLayout : null,
       ),
     );
-    final pdfBytes = outcome.pdfBytes;
-    if (pdfBytes == null) {
+    final rendering = outcome.rendering;
+    if (rendering == null) {
       throw CvPdfGenerationException(
         outcome.errorMessage ?? 'The CV could not be rendered.',
       );
     }
-    return pdfBytes;
+    _cachedLayoutKey = layoutKey;
+    _cachedLayout = rendering.layout;
+    return rendering.pdfBytes;
   }
 
   /// The photo is downloaded once and reused by every later render.

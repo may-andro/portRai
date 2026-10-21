@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
 import 'package:portrai/src/feature/cv_export/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/cv_export/presentation/route/cv_export_module_route.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/_bloc.dart';
@@ -11,11 +12,18 @@ import 'package:portrai/src/route/go_route/go_route_extension.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
 
 class CvExportScreen extends StatelessWidget {
-  const CvExportScreen({super.key});
+  const CvExportScreen({super.key, this.tailoringTarget});
 
-  static void navigate(BuildContext context) {
-    context.pushScreen(CvExportModuleRoute.cvExport);
+  /// Opens the CV, tailored for [tailoringTarget] when given.
+  static void navigate(
+    BuildContext context, {
+    CvTailoringTargetEntity? tailoringTarget,
+  }) {
+    context.pushScreen(CvExportModuleRoute.cvExport, extra: tailoringTarget);
   }
+
+  /// The job to tailor the CV for, or null for the standard CV.
+  final CvTailoringTargetEntity? tailoringTarget;
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +34,15 @@ class CvExportScreen extends StatelessWidget {
       body: BlocProvider(
         create: (_) {
           return appServiceLocator.get<CvExportBloc>()
-            ..add(LoadCvExportEvent(labels));
+            ..add(LoadCvExportEvent(labels, tailoringTarget: tailoringTarget));
         },
         child: BlocBuilder<CvExportBloc, CvExportState>(
           builder: (context, state) {
             switch (state) {
               case CvExportInitialState():
-              case CvExportLoadingState():
                 return const _LoadingStateWidget();
+              case CvExportLoadingState(:final isTailoring):
+                return _LoadingStateWidget(isTailoring: isTailoring);
               case final CvExportLoadedState state:
                 return ContentWidget(state: state);
               case CvExportErrorState(:final failure):
@@ -54,12 +63,27 @@ class CvExportScreen extends StatelessWidget {
 }
 
 class _LoadingStateWidget extends StatelessWidget {
-  const _LoadingStateWidget();
+  const _LoadingStateWidget({this.isTailoring = false});
+
+  final bool isTailoring;
 
   @override
   Widget build(BuildContext context) {
     return _MessageBodyWidget(
-      child: DSLoadingWidget(size: context.space(factor: 5)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: context.space(factor: 2),
+        children: [
+          DSLoadingWidget(size: context.space(factor: 5)),
+          if (isTailoring)
+            DSTextWidget(
+              context.localizations.cvExportTailoring,
+              style: context.typography.bodyMedium,
+              color: context.colorPalette.neutral.grey7,
+              textAlign: TextAlign.center,
+            ),
+        ],
+      ),
     );
   }
 }

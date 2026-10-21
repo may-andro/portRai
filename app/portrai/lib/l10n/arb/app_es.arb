@@ -596,5 +596,14 @@
   "jobOpeningInsightsPromptDescription": "Descubre qué fortalezas destacar, qué temas esperar en la entrevista y cómo orientar tu CV para este empleo.",
   "jobOpeningInsightsGenerate": "Obtener consejos",
   "jobOpeningInsightsRegenerate": "Generar de nuevo",
-  "jobOpeningInsightsGenerating": "Preparando tus consejos…"
+  "jobOpeningInsightsGenerating": "Preparando tus consejos…",
+  "jobOpeningTailoredCv": "CV a medida",
+  "cvExportTailoring": "Adaptando tu CV a este empleo…",
+  "cvExportTailoredFor": "Adaptado para {title} en {company}",
+  "cvExportTailoredDescription": "El resumen se ha reescrito para este empleo y los proyectos y habilidades más relevantes aparecen primero. Tu experiencia y tus datos no cambian.",
+  "cvExportTailoringFailed": "Se muestra tu CV estándar",
+  "errorCvTailoringUnavailable": "Adaptar un CV no está disponible ahora mismo.",
+  "errorCvTailoringQuota": "Has alcanzado el límite de CV a medida. Inténtalo más tarde.",
+  "errorCvTailoringNetwork": "No se pudo adaptar el CV. Comprueba tu conexión e inténtalo de nuevo.",
+  "errorCvTailoringUnknown": "Algo salió mal al adaptar tu CV. Inténtalo de nuevo."
 }

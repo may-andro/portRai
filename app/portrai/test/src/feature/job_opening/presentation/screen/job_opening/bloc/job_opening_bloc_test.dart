@@ -12,6 +12,7 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
+import '../../../../../../../mock/feature/cv_export/domain/use_case/mock_is_cv_tailoring_available_use_case.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
@@ -58,6 +59,7 @@ void main() {
     askRemotePortfolioQuestionUseCase;
     late MockResetRemoteAssistantSessionUseCase
     resetRemoteAssistantSessionUseCase;
+    late MockIsCvTailoringAvailableUseCase isCvTailoringAvailableUseCase;
     late MockJobOpeningTrackingDelegate trackingDelegate;
 
     final jobOpening = jobOpeningEntityFixture();
@@ -79,6 +81,8 @@ void main() {
           MockAskRemotePortfolioQuestionUseCase();
       resetRemoteAssistantSessionUseCase =
           MockResetRemoteAssistantSessionUseCase()..stubCall(const Right(null));
+      isCvTailoringAvailableUseCase = MockIsCvTailoringAvailableUseCase()
+        ..stubCall(const Right(false));
       trackingDelegate = MockJobOpeningTrackingDelegate();
     });
 
@@ -90,6 +94,7 @@ void main() {
       getAssistantContextUseCase,
       askRemotePortfolioQuestionUseCase,
       resetRemoteAssistantSessionUseCase,
+      isCvTailoringAvailableUseCase,
       trackingDelegate,
     );
 
@@ -243,6 +248,38 @@ void main() {
           insightsStatus: JobOpeningInsightsStatus.idle,
         ),
       ],
+    );
+
+    blocTest<JobOpeningBloc, JobOpeningState>(
+      'should offer a tailored CV when tailoring is available',
+      setUp: () => isCvTailoringAvailableUseCase.stubCall(const Right(true)),
+      build: buildBloc,
+      act: (bloc) => bloc.add(const JobOpeningStartedEvent(id: 'job-1')),
+      skip: 2,
+      expect: () => [
+        JobOpeningState(
+          id: 'job-1',
+          status: JobOpeningStatus.loaded,
+          jobOpening: jobOpening,
+          isTailoredCvAvailable: true,
+        ),
+      ],
+    );
+
+    blocTest<JobOpeningBloc, JobOpeningState>(
+      'should track the tailored CV click with the job board',
+      seed: () => JobOpeningState(
+        id: 'job-1',
+        status: JobOpeningStatus.loaded,
+        jobOpening: jobOpening,
+        isTailoredCvAvailable: true,
+      ),
+      build: buildBloc,
+      act: (bloc) => bloc.add(const TailoredCvClickEvent()),
+      expect: () => const <JobOpeningState>[],
+      verify: (_) => verify(
+        () => trackingDelegate.trackTailoredCvClick('Remotive'),
+      ).called(1),
     );
 
     blocTest<JobOpeningBloc, JobOpeningState>(

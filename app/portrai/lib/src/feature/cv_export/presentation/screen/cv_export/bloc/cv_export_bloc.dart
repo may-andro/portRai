@@ -6,11 +6,13 @@ import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/cv_export_event.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/cv_export_state.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/tracking/_tracking.dart';
+import 'package:use_case/use_case.dart';
 
 @register
 class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
   CvExportBloc(
     this._buildCvDocumentUseCase,
+    this._tailorCvDocumentUseCase,
     this._generateCvPdfUseCase,
     this._shareCvPdfUseCase,
     this._trackingDelegate,
@@ -27,6 +29,7 @@ class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
   static const String _fileNameSuffix = 'CV.pdf';
 
   final BuildCvDocumentUseCase _buildCvDocumentUseCase;
+  final TailorCvDocumentUseCase _tailorCvDocumentUseCase;
   final GenerateCvPdfUseCase _generateCvPdfUseCase;
   final ShareCvPdfUseCase _shareCvPdfUseCase;
   final CvExportTrackingDelegate _trackingDelegate;
@@ -45,10 +48,28 @@ class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
       return;
     }
 
+    var document = documentEither.right;
+    final tailoringTarget = event.tailoringTarget;
+    Failure? tailoringFailure;
+    if (tailoringTarget != null) {
+      _trackingDelegate.trackViewEvent('cv_export_tailored');
+      emit(const CvExportLoadingState(isTailoring: true));
+      final tailoredDocumentEither = await _tailorCvDocumentUseCase(
+        TailorCvDocumentParam(document: document, target: tailoringTarget),
+      );
+      if (tailoredDocumentEither.isLeft) {
+        tailoringFailure = tailoredDocumentEither.left;
+      } else {
+        document = tailoredDocumentEither.right;
+      }
+    }
+
     final loadedState = CvExportLoadedState(
-      document: documentEither.right,
+      document: document,
       options: const CvOptionsEntity(),
       labels: event.labels,
+      tailoringTarget: tailoringFailure == null ? tailoringTarget : null,
+      tailoringFailure: tailoringFailure,
     );
     emit(loadedState);
     await _generatePdf(loadedState, emit);
@@ -127,7 +148,10 @@ class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
     final shareEither = await _shareCvPdfUseCase(
       ShareCvPdfParam(
         pdfBytes: currentState.pdfBytes!,
-        fileName: _fileNameOf(currentState.document),
+        fileName: _fileNameOf(
+          currentState.document,
+          currentState.tailoringTarget,
+        ),
       ),
     );
     if (emit.isDone || state is! CvExportLoadedState) return;
@@ -185,11 +209,20 @@ class CvExportBloc extends Bloc<CvExportEvent, CvExportState> {
     );
   }
 
-  String _fileNameOf(CvDocumentEntity document) {
-    final namePart = document.fullName
-        .trim()
-        .replaceAll(RegExp(r'\s+'), '_')
-        .replaceAll(RegExp(r'[^A-Za-z0-9_\-]'), '');
+  /// For example `Jane_Doe_CV.pdf`, or `Jane_Doe_Acme_CV.pdf` when tailored.
+  String _fileNameOf(
+    CvDocumentEntity document,
+    CvTailoringTargetEntity? tailoringTarget,
+  ) {
+    final namePart = [
+      document.fullName,
+      ?tailoringTarget?.company,
+    ].map(_fileNamePartOf).where((part) => part.isNotEmpty).join('_');
     return namePart.isEmpty ? _fileNameSuffix : '${namePart}_$_fileNameSuffix';
   }
+
+  static String _fileNamePartOf(String text) => text
+      .trim()
+      .replaceAll(RegExp(r'\s+'), '_')
+      .replaceAll(RegExp(r'[^A-Za-z0-9_\-]'), '');
 }

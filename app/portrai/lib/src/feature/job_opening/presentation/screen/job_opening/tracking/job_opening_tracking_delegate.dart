@@ -19,6 +19,15 @@ class JobOpeningTrackingDelegate extends ScreenTrackingDelegate {
     );
   }
 
+  void trackTailoredCvClick(String sourceName) {
+    trackEvent(
+      Tracking(
+        name: 'tailored_cv',
+        action: ClickAction(label: sourceName),
+      ),
+    );
+  }
+
   void trackGenerateInsightsClick(String sourceName) {
     trackEvent(
       Tracking(
