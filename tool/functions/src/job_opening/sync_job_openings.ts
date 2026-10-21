@@ -15,7 +15,14 @@ export const minJobFitScore = 60;
 /** Bounds the Gemini calls of one run; the best keyword matches go first. */
 export const maxScoredOpenings = 50;
 
-const scoringConcurrency = 4;
+// Two at a time keeps Gemini from throttling the run.
+const scoringConcurrency = 2;
+
+/**
+ * Scoring stops starting new openings after this long, so slow retries cannot
+ * run into the function's 15-minute timeout. Skipped openings count as failed.
+ */
+export const scoringTimeLimitMs = 10 * 60 * 1000;
 
 export interface SyncLogger {
   info(message: string, data?: object): void;
@@ -129,8 +136,7 @@ export async function syncJobOpenings(
   const { scored, failedCount } = await scoreOpenings(
     candidates,
     skills,
-    dependencies.scorer,
-    logger,
+    dependencies,
   );
   const kept = scored.filter((opening) => opening.score >= minJobFitScore);
 
@@ -157,12 +163,15 @@ export async function syncJobOpenings(
 async function scoreOpenings(
   openings: MatchedJobOpening[],
   skills: string[],
-  scorer: JobScorer,
-  logger: SyncLogger,
+  { scorer, logger, now }: SyncDependencies,
 ): Promise<{ scored: ScoredJobOpening[]; failedCount: number }> {
-  const results = await settleAll(openings, scoringConcurrency, (opening) =>
-    scorer.score(opening, skills),
-  );
+  const deadline = now().getTime() + scoringTimeLimitMs;
+  const results = await settleAll(openings, scoringConcurrency, (opening) => {
+    if (now().getTime() >= deadline) {
+      throw new Error('Skipped: the scoring time limit was reached');
+    }
+    return scorer.score(opening, skills);
+  });
   const scored: ScoredJobOpening[] = [];
   results.forEach((result, index) => {
     const opening = openings[index];

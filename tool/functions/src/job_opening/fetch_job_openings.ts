@@ -28,7 +28,7 @@ export const fetchJobOpenings = onSchedule(
     region: functionRegion,
     // Only allowed to read and write Firestore and to call Gemini.
     serviceAccount: serviceAccountEmail('job-openings'),
-    // Feeds plus up to 50 Gemini calls, 4 at a time, each with a 30 s deadline.
+    // Feeds, then at most 10 minutes of Gemini scoring, then the writes.
     timeoutSeconds: 900,
     memory: '512MiB',
     retryCount: 0,
