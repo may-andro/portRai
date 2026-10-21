@@ -44,6 +44,7 @@ describe('loadPortfolioProfile', () => {
           subtitle: 'Mobile Architecture Specialist',
           currentRole: 'Tech Lead - Flutter Developer',
           yearsOfExperience: 10,
+          location: { city: 'Alicante', country: 'Spain' },
         },
       },
       'experiences/en': {
@@ -71,6 +72,7 @@ describe('loadPortfolioProfile', () => {
       ],
       searchTerms: ['Flutter', 'Android', 'Mobile'],
       yearsOfExperience: 10,
+      country: 'Spain',
     });
   });
 
@@ -82,6 +84,7 @@ describe('loadPortfolioProfile', () => {
       roles: [],
       searchTerms: [],
       yearsOfExperience: null,
+      country: null,
     });
   });
 });

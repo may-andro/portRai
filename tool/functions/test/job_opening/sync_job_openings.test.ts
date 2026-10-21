@@ -46,6 +46,7 @@ function dependencies(
     feeds: [feed('remotive', [jobOpening()])],
     listUserIds: vi.fn().mockResolvedValue(['owner-uid']),
     loadProfile: vi.fn().mockResolvedValue(portfolioProfile()),
+    loadRegions: vi.fn().mockResolvedValue(new Set()),
     scorer: scorer(),
     writeJobOpenings: vi.fn().mockResolvedValue(undefined),
     now: () => new Date('2026-10-19T04:00:00Z'),
@@ -72,6 +73,8 @@ describe('syncJobOpenings', () => {
       userCount: 2,
       fetchedCount: 2,
       staleCount: 0,
+      otherRegionCount: 0,
+      otherRoleCount: 0,
       matchedCount: 1,
       scoredCount: 1,
       failedScoreCount: 0,
@@ -442,5 +445,29 @@ describe('syncJobOpenings', () => {
     expect(vi.mocked(deps.scorer.score).mock.calls[0][1]).toEqual(
       portfolioProfile(),
     );
+  });
+
+  it('should drop openings from other regions and other kinds of role before scoring', async () => {
+    const deps = dependencies({
+      feeds: [
+        feed('greenhouse', [
+          jobOpening({ title: 'Flutter Developer', location: 'Remote - USA' }),
+          jobOpening({ title: 'Flutter Developer', location: 'Remote Spain' }),
+          jobOpening({ title: 'Product Manager, Flutter', location: 'Remote' }),
+        ]),
+      ],
+      loadRegions: vi.fn().mockResolvedValue(new Set(['europe'])),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(deps.loadRegions).toHaveBeenCalledWith(portfolioProfile());
+    expect(result).toMatchObject({
+      fetchedCount: 3,
+      otherRegionCount: 1,
+      otherRoleCount: 1,
+      scoredCount: 1,
+    });
+    expect(deps.scorer.score).toHaveBeenCalledTimes(1);
   });
 });

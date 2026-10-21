@@ -7,6 +7,8 @@ import type {
   ScoredJobOpening,
 } from './job_opening.js';
 import { dedupeJobOpenings } from './match/dedupe.js';
+import { isLocationInRegions, type Region } from './match/region_filter.js';
+import { isPortfolioKindOfRole } from './match/role_filter.js';
 import { SkillMatcher, termPattern } from './match/skill_matcher.js';
 import type { JobScorer } from './score/job_scorer.js';
 
@@ -39,6 +41,8 @@ export interface SyncDependencies {
   feeds: JobFeed[];
   listUserIds(): Promise<string[]>;
   loadProfile(): Promise<PortfolioProfile>;
+  /** The regions to keep jobs for; empty keeps every region. */
+  loadRegions(profile: PortfolioProfile): Promise<Set<Region>>;
   scorer: JobScorer;
   writeJobOpenings(
     userId: string,
@@ -54,6 +58,10 @@ export interface SyncResult {
   fetchedCount: number;
   /** Openings dropped as older than [maxJobAgeDays] or expired. */
   staleCount: number;
+  /** Openings dropped as limited to regions other than the preferred ones. */
+  otherRegionCount: number;
+  /** Openings dropped as a kind of role the portfolio does not hold. */
+  otherRoleCount: number;
   matchedCount: number;
   scoredCount: number;
   failedScoreCount: number;
@@ -80,6 +88,8 @@ export async function syncJobOpenings(
       userCount: 0,
       fetchedCount: 0,
       staleCount: 0,
+      otherRegionCount: 0,
+      otherRoleCount: 0,
       matchedCount: 0,
       scoredCount: 0,
       failedScoreCount: 0,
@@ -95,6 +105,8 @@ export async function syncJobOpenings(
       userCount: userIds.length,
       fetchedCount: 0,
       staleCount: 0,
+      otherRegionCount: 0,
+      otherRoleCount: 0,
       matchedCount: 0,
       scoredCount: 0,
       failedScoreCount: 0,
@@ -144,11 +156,27 @@ export async function syncJobOpenings(
     });
   }
 
+  // Before matching, so no scoring goes to jobs that cannot be taken from
+  // the preferred regions or that are another kind of role, such as a
+  // product manager for a mobile app.
+  const regions = await dependencies.loadRegions(profile);
+  const inRegion = fresh.filter((opening) =>
+    isLocationInRegions(opening.location, regions),
+  );
+  const relevant = inRegion.filter((opening) =>
+    isPortfolioKindOfRole(opening.title, profile.roles),
+  );
+  logger.info('Filtered job openings by region and role', {
+    regions: [...regions],
+    otherRegion: fresh.length - inRegion.length,
+    otherRole: inRegion.length - relevant.length,
+  });
+
   // An opening qualifies with enough matching skills, or when its title names
   // one of the portfolio's roles, such as "Senior Flutter Engineer".
   const matcher = new SkillMatcher(profile.skills);
   const rolePatterns = profile.searchTerms.map((term) => termPattern(term));
-  const matched = dedupeJobOpenings(fresh).flatMap((opening) => {
+  const matched = dedupeJobOpenings(relevant).flatMap((opening) => {
     const matchedSkills = matcher.matchedSkills(opening);
     const title = opening.title.toLowerCase();
     const isRoleMatch = rolePatterns.some((pattern) => pattern.test(title));
@@ -186,6 +214,8 @@ export async function syncJobOpenings(
     userCount: userIds.length,
     fetchedCount: openings.length,
     staleCount: openings.length - fresh.length,
+    otherRegionCount: fresh.length - inRegion.length,
+    otherRoleCount: inRegion.length - relevant.length,
     matchedCount: matched.length,
     scoredCount: scored.length,
     failedScoreCount: failedCount,

@@ -23,6 +23,7 @@ import { JobicyFeed } from './feed/jobicy_feed.js';
 import { LeverFeed } from './feed/lever_feed.js';
 import { RemoteOkFeed } from './feed/remoteok_feed.js';
 import { RemotiveFeed } from './feed/remotive_feed.js';
+import { loadRegions } from './match/region_filter.js';
 import { loadPortfolioProfile } from './profile/portfolio_profile.js';
 import { GeminiJobScorer } from './score/job_scorer.js';
 import {
@@ -75,6 +76,7 @@ export const fetchJobOpenings = onSchedule(
       ],
       listUserIds: () => listJobSearchUserIds(db),
       loadProfile: () => loadPortfolioProfile(readDocument),
+      loadRegions: (profile) => loadRegions(readDocument, profile.country),
       scorer: new GeminiJobScorer(generateJson),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),
