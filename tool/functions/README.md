@@ -39,8 +39,9 @@ search turned on.
 
 - Runs every Monday at 06:00 Europe/Amsterdam in `europe-west3`.
 - Derives search terms, such as Flutter, Android and Mobile, from the portfolio's roles.
-- Searches Himalayas and Jobicy for those terms and reads the latest jobs from Remotive,
-  Remote OK and Arbeitnow.
+- Searches Himalayas and Jobicy for those terms, reads the latest jobs from Remotive, Remote OK
+  and Arbeitnow, and lets Gemini read the roles out of matching posts in Hacker News "Who is
+  hiring?" threads.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
   across feeds.
 - Drops jobs posted more than 30 days ago, and jobs their source has already expired.
@@ -78,19 +79,33 @@ characters, such as `Go` or `R`, count only when they appear in the title or tag
 
 #### Feeds
 
-| Feed                                                      | Request                                                        | Kept                     | Terms                                                                                                                                                            |
-| --------------------------------------------------------- | -------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Himalayas](https://himalayas.app/api)                    | `GET /jobs/api/search?q={term}&sort=recent&page=1..3` per term | Every job                | Apply through the job's `applicationLink` unchanged, show Himalayas as the source with a link, don't pass jobs to other job boards, remove jobs once they expire |
-| [Remotive](https://remotive.com/api-documentation)        | `GET /api/remote-jobs?category=software-development`           | Every job                | Link to the job's Remotive URL, name Remotive as the source, don't pass jobs to other job sites, request at most a few times a day                               |
-| [Remote OK](https://remoteok.com/api)                     | `GET /api`                                                     | Every job                | Link back to the job's Remote OK URL and mention Remote OK as the source; don't use its logo                                                                     |
-| [Jobicy](https://jobicy.com/jobs-rss-feed)                | `GET /api/v2/remote-jobs?count=50&tag={term}` per term         | Every job                | Credit Jobicy with a link to the source, and send apply buttons to the original job URL                                                                          |
-| [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api) | `GET /api/job-board-api?page=1..5`                             | Jobs with `remote: true` | Don't abuse the free API, link back to the site                                                                                                                  |
+| Feed                                                      | Request                                                                                                                                 | Kept                                                                       | Terms                                                                                                                                                            |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Himalayas](https://himalayas.app/api)                    | `GET /jobs/api/search?q={term}&sort=recent&page=1..3` per term                                                                          | Every job                                                                  | Apply through the job's `applicationLink` unchanged, show Himalayas as the source with a link, don't pass jobs to other job boards, remove jobs once they expire |
+| [Remotive](https://remotive.com/api-documentation)        | `GET /api/remote-jobs?category=software-development`                                                                                    | Every job                                                                  | Link to the job's Remotive URL, name Remotive as the source, don't pass jobs to other job sites, request at most a few times a day                               |
+| [Remote OK](https://remoteok.com/api)                     | `GET /api`                                                                                                                              | Every job                                                                  | Link back to the job's Remote OK URL and mention Remote OK as the source; don't use its logo                                                                     |
+| [Jobicy](https://jobicy.com/jobs-rss-feed)                | `GET /api/v2/remote-jobs?count=50&tag={term}` per term                                                                                  | Every job                                                                  | Credit Jobicy with a link to the source, and send apply buttons to the original job URL                                                                          |
+| [Hacker News](https://hn.algolia.com/api)                 | `GET /api/v1/search_by_date?tags=story,author_whoishiring`, then `GET /api/v1/items/{thread}` for the latest 2 "Who is hiring?" threads | Remote roles Gemini reads out of posts that mention a term and remote work | Public API; every opening links to its post on Hacker News                                                                                                       |
+| [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api) | `GET /api/job-board-api?page=1..5`                                                                                                      | Jobs with `remote: true`                                                   | Don't abuse the free API, link back to the site                                                                                                                  |
 
 Every stored opening keeps the source's job `url` and `sourceName`, which the app must show
 with the job. Earlier feeds in the table win when two list the same job. Remotive's free API
 returns only its 10 most recent jobs, which arrive 24 hours after they are posted on Remotive.
 A request whose connection fails, or that is answered with `429` or a `5xx` status, is tried
 once more after two seconds.
+
+#### Hacker News posts
+
+"Who is hiring?" posts are free text, so the function reads them in two steps. First it keeps the
+top-level posts of the latest two threads that mention a search term and the word remote, at
+most 40, newest first. Then Gemini lists the roles each post offers, with title, company,
+location and whether remote work is allowed; only remote roles are kept. The post is sent as
+data apart from the instructions, and the reply is validated: at most five roles, each with a
+title and a company, and capped texts.
+
+Each opening links to its post on Hacker News, which holds the company's own application
+details. Links inside a post are never followed or stored, so no address comes from the model.
+A post whose roles cannot be read is skipped; the source fails only when every post fails.
 
 #### Freshness
 
