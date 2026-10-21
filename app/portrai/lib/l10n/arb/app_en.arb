@@ -1443,7 +1443,7 @@
   "@jobOpeningsTitle": {
     "description": "Title of the job openings list screen"
   },
-  "jobOpeningsDescription": "Remote jobs that fit your portfolio skills. New ones are found every Monday, scored by Gemini and kept for 14 days.",
+  "jobOpeningsDescription": "Remote jobs that fit your portfolio skills. New ones are found every Monday, scored for how well they fit and kept for 14 days.",
   "@jobOpeningsDescription": {
     "description": "Explanation at the top of the job openings list screen"
   },

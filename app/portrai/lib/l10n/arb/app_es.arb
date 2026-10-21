@@ -554,7 +554,7 @@
   "jobOpeningsCardTitle": "Ofertas de empleo",
   "jobOpeningsCardDescription": "Empleos remotos que encajan con tu portfolio cada semana",
   "jobOpeningsTitle": "Ofertas de empleo",
-  "jobOpeningsDescription": "Empleos remotos que encajan con las habilidades de tu portfolio. Cada lunes se buscan nuevos, Gemini los puntúa y se guardan 14 días.",
+  "jobOpeningsDescription": "Empleos remotos que encajan con las habilidades de tu portfolio. Cada lunes se buscan nuevos, se puntúa cuánto encajan y se guardan 14 días.",
   "jobSearchToggleTitle": "Búsqueda semanal de empleo",
   "jobSearchToggleDescription": "Busca nuevos empleos que encajen cada lunes",
   "jobOpeningsEmpty": "No hay empleos que encajen ahora mismo. Cada lunes se buscan nuevos.",
