@@ -170,24 +170,36 @@ export PROJECT_ID=<your-firebase-project-id>
 - Node.js 22. The `volta` field in `package.json` pins it for Volta users.
 - A Firebase project on the Blaze plan, with the Cloud Scheduler API on. `.firebaserc` sets the
   project the Firebase CLI deploys to.
-- The Agent Platform API (`aiplatform.googleapis.com`) on, and the role
-  `roles/aiplatform.user` for the service account the function runs as. Without both, every
-  score fails and the run writes nothing. See [Gemini access](#gemini-access).
+- The Agent Platform API (`aiplatform.googleapis.com`) on, and the `job-openings` service
+  account with its two roles. See [Service account](#service-account).
 - The Firebase CLI, signed in to an account that can deploy to the project.
 
-### Gemini access
+### Service account
 
-The function calls Gemini as its runtime service account, so there is no API key to store.
-Scheduled functions run as the default compute service account unless one is set. Enable the
-API and grant the role once:
+The function runs as its own service account, `job-openings`, which may only read and write
+Firestore and call Gemini. It calls Gemini as that account, so there is no API key to store.
+The code builds the account's full email from the project it is deployed to.
+
+Enable the API, create the account and grant its two roles once:
 
 ```bash
 gcloud services enable aiplatform.googleapis.com --project="$PROJECT_ID"
-PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
-gcloud projects add-iam-policy-binding "$PROJECT_ID" \
-  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
-  --role=roles/aiplatform.user
+gcloud iam service-accounts create job-openings \
+  --display-name="Job openings function" --project="$PROJECT_ID"
+for role in roles/aiplatform.user roles/datastore.user; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="$role"
+done
 ```
+
+| Role                    | Console name                            | Needed for                    |
+| ----------------------- | --------------------------------------- | ----------------------------- |
+| `roles/aiplatform.user` | Vertex AI User (or Agent Platform User) | Calling Gemini                |
+| `roles/datastore.user`  | Cloud Datastore User                    | Reading and writing Firestore |
+
+The deploy lets the account start the function from Cloud Scheduler, so it needs no other
+role. Deploying needs permission to act as the account, which project Owners have.
 
 Check that the model is offered in the `global` location before the first run. Changing the
 model or location means changing `src/shared/gemini.ts` and deploying again.
