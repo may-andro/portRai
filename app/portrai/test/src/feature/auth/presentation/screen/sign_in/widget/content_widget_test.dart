@@ -73,7 +73,7 @@ void main() {
     expect(welcome.dx, lessThan(email.dx));
   });
 
-  testWidgets('should show the form before the welcome panel on a phone', (
+  testWidgets('should show the welcome panel above the form on a phone', (
     tester,
   ) async {
     await pumpContent(tester, const SignInState());
@@ -82,6 +82,6 @@ void main() {
 
     final welcome = tester.getTopLeft(find.text('Welcome back'));
     final email = tester.getTopLeft(find.text('Email'));
-    expect(email.dy, lessThan(welcome.dy));
+    expect(welcome.dy, lessThan(email.dy));
   });
 }

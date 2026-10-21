@@ -1,11 +1,11 @@
 part of 'content_widget.dart';
 
-/// A full-bleed gradient panel with a dot grid and the floating sign-in
-/// animation above the welcome copy.
+/// The welcome panel: a deep gradient with translucent waves rolling across
+/// its lower part, the welcome copy and the floating sign-in animation.
 class _VisualPanelWidget extends StatefulWidget {
   const _VisualPanelWidget({required this.isCompact});
 
-  /// The shorter band for phones and tablets.
+  /// The shorter band above the form on phones and tablets.
   final bool isCompact;
 
   @override
@@ -14,14 +14,14 @@ class _VisualPanelWidget extends StatefulWidget {
 
 class _VisualPanelWidgetState extends State<_VisualPanelWidget>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _floatController = AnimationController(
+  late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 6),
-  )..repeat(reverse: true);
+    duration: const Duration(seconds: 10),
+  )..repeat();
 
   @override
   void dispose() {
-    _floatController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -31,42 +31,57 @@ class _VisualPanelWidgetState extends State<_VisualPanelWidget>
     final localizations = context.localizations;
     final isCompact = widget.isCompact;
     final accent = palette.accent.color;
-    final base = palette.surface.surfaceContainerHigh.color;
-    final start = Color.alphaBlend(accent.withAlpha(40), base);
-    final end = Color.alphaBlend(accent.withAlpha(150), base);
-    final onPanel = palette.neutral.grey10;
+    // A deep panel in both themes: the dark surface in dark mode, the
+    // inverse (dark) surface in light mode.
+    final isDarkTheme = palette.background.color.computeLuminance() < 0.5;
+    final base = isDarkTheme
+        ? palette.surface.surfaceContainerLow.color
+        : palette.surface.inverseSurface.color;
+    final onPanel = isDarkTheme
+        ? palette.neutral.grey10
+        : palette.surface.onInverseSurface;
 
-    final copy = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      spacing: context.space(),
-      children: [
-        DSTextWidget(
-          localizations.signInWelcomeTitle,
-          style: isCompact
-              ? context.typography.emphasizedHeadlineSmall
-              : context.typography.emphasizedDisplaySmall,
-          color: onPanel,
-        ),
-        DSTextWidget(
-          localizations.signInWelcomeDescription,
-          style: isCompact
-              ? context.typography.bodyMedium
-              : context.typography.bodyLarge,
-          color: onPanel,
-        ),
-      ],
-    );
+    final copy =
+        Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              spacing: context.space(),
+              children: [
+                Container(
+                  width: context.space(factor: 5),
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: accent,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                DSTextWidget(
+                  localizations.signInWelcomeTitle,
+                  style: isCompact
+                      ? context.typography.emphasizedHeadlineMedium
+                      : context.typography.emphasizedDisplayMedium,
+                  color: onPanel,
+                ),
+                DSTextWidget(
+                  localizations.signInWelcomeDescription,
+                  style: context.typography.bodyLarge,
+                  color: onPanel,
+                ),
+              ],
+            )
+            .animate()
+            .fadeIn(duration: 500.ms)
+            .slideY(begin: 0.1, curve: Curves.easeOutCubic);
 
     final illustration = AnimatedBuilder(
-      animation: _floatController,
+      animation: _controller,
       builder: (context, child) => Transform.translate(
-        offset: Offset(0, (_floatController.value - 0.5) * 14),
+        offset: Offset(0, sin(_controller.value * 2 * pi) * 8),
         child: child,
       ),
       child: DSLottieIllustrationWidget(
         illustration: DSLottieIllustration.signIn,
-        width: isCompact ? 150 : 380,
+        width: isCompact ? 140 : 380,
       ),
     );
 
@@ -74,37 +89,31 @@ class _VisualPanelWidgetState extends State<_VisualPanelWidget>
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [start, Color.lerp(start, end, 0.5)!, end],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [base, Color.alphaBlend(accent.withAlpha(70), base)],
           ),
         ),
         child: Stack(
           children: [
             Positioned.fill(
-              child: CustomPaint(
-                painter: _DotGridPainter(color: onPanel.color.withAlpha(28)),
-              ),
-            ),
-            Positioned(
-              top: -120,
-              right: -80,
-              child: _GlowWidget(size: 360, color: accent.withAlpha(120)),
-            ),
-            Positioned(
-              bottom: -140,
-              left: -100,
-              child: _GlowWidget(
-                size: 380,
-                color: palette.brand.primary.color.withAlpha(70),
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: _WavesPainter(
+                    animation: _controller,
+                    colors: [
+                      accent.withAlpha(45),
+                      accent.withAlpha(75),
+                      accent.withAlpha(120),
+                    ],
+                  ),
+                ),
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: isCompact
-                    ? context.space(factor: 3)
-                    : context.space(factor: 6),
-                vertical: context.space(factor: isCompact ? 4 : 6),
+                horizontal: context.space(factor: isCompact ? 3 : 7),
+                vertical: context.space(factor: isCompact ? 4 : 8),
               ),
               child: isCompact
                   ? Row(
@@ -117,54 +126,46 @@ class _VisualPanelWidgetState extends State<_VisualPanelWidget>
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(child: Center(child: illustration)),
                         copy,
+                        Expanded(child: Center(child: illustration)),
                       ],
                     ),
             ),
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms);
-  }
-}
-
-class _GlowWidget extends StatelessWidget {
-  const _GlowWidget({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(colors: [color, color.withAlpha(0)]),
-      ),
     );
   }
 }
 
-class _DotGridPainter extends CustomPainter {
-  const _DotGridPainter({required this.color});
+/// Three translucent sine waves filling the lower part of the panel, each
+/// rolling sideways at its own speed.
+class _WavesPainter extends CustomPainter {
+  _WavesPainter({required this.animation, required this.colors})
+    : super(repaint: animation);
 
-  final Color color;
-
-  static const _spacing = 22.0;
+  final Animation<double> animation;
+  final List<Color> colors;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final dot = Paint()..color = color;
-    for (var y = _spacing / 2; y < size.height; y += _spacing) {
-      for (var x = _spacing / 2; x < size.width; x += _spacing) {
-        canvas.drawCircle(Offset(x, y), 1.2, dot);
+    for (final (waveIndex, color) in colors.indexed) {
+      final phase = animation.value * 2 * pi * (waveIndex + 1);
+      final baseline = size.height * (0.62 + waveIndex * 0.1);
+      final amplitude = size.height * (0.04 - waveIndex * 0.008);
+      final wavelength = size.width * (1.1 - waveIndex * 0.2);
+      final path = Path()..moveTo(0, size.height);
+      for (var x = 0.0; x <= size.width; x += 4) {
+        final y = baseline + sin(x / wavelength * 2 * pi + phase) * amplitude;
+        path.lineTo(x, y);
       }
+      path
+        ..lineTo(size.width, size.height)
+        ..close();
+      canvas.drawPath(path, Paint()..color = color);
     }
   }
 
   @override
-  bool shouldRepaint(_DotGridPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(_WavesPainter oldDelegate) => oldDelegate.colors != colors;
 }

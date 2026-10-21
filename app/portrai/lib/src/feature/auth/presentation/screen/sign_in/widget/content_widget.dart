@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
@@ -11,9 +13,9 @@ part 'visual_panel_widget.dart';
 
 const _formMaxWidth = 400.0;
 
-/// A split screen on desktop, with the visual panel beside the sign-in form.
-/// Phones and tablets show the form first and the panel after it, as a
-/// full-width band. The profile footer closes the page.
+/// A split screen on desktop, with the full-height welcome panel beside the
+/// sign-in form. Phones and tablets show the panel as a full-width band
+/// above the form. The profile footer closes the page.
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
@@ -21,7 +23,7 @@ class ContentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final chrome = PageChrome.current;
-    // Side by side only on desktop; phones and tablets put the form first.
+    // Side by side only on desktop; phones and tablets stack the panel first.
     final isSideBySide = context.isDesktop;
 
     final form = Center(
@@ -51,24 +53,23 @@ class ContentWidget extends StatelessWidget {
             ).copyWith(scrollbars: false, overscroll: false),
             slivers: [
               if (isSideBySide)
+                // The panel runs the full height; the logo sits on its
+                // top-left corner, where it is on every screen.
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  child: Stack(
                     children: [
-                      header,
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Expanded(
-                              flex: 5,
-                              child: _VisualPanelWidget(isCompact: false),
-                            ),
-                            Expanded(flex: 4, child: form),
-                          ],
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Expanded(
+                            flex: 5,
+                            child: _VisualPanelWidget(isCompact: false),
+                          ),
+                          Expanded(flex: 4, child: form),
+                        ],
                       ),
+                      Positioned(top: 0, left: 0, right: 0, child: header),
                     ],
                   ),
                 )
@@ -78,8 +79,8 @@ class ContentWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       header,
-                      form,
                       const _VisualPanelWidget(isCompact: true),
+                      form,
                     ],
                   ),
                 ),
