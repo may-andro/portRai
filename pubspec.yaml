@@ -308,3 +308,18 @@ melos:
         npm run check
         firebase deploy --only functions:portrai
       description: Check and deploy the portrai Cloud Functions codebase from tool/functions
+    firestore_rules_check:
+      run: |
+        set -e
+        cd tool/firestore
+        npm ci
+        npm run check
+      description: Format check, type check and test the Firestore security rules on the emulator
+    deploy_firestore_rules:
+      run: |
+        set -e
+        cd tool/firestore
+        npm ci
+        npm run check
+        npx firebase deploy --only firestore:rules
+      description: Check and deploy the Firestore security rules from tool/firestore

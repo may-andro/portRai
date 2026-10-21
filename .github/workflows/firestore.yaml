@@ -1,0 +1,41 @@
+name: firestore
+
+on:
+  pull_request:
+    paths:
+      - 'tool/firestore/**'
+      - '.github/workflows/firestore.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Format, Type Check & Rules Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tool/firestore
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tool/firestore/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check
+        run: npm run check

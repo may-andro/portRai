@@ -48,6 +48,7 @@ port-rai/
 └── tool/             # Development and automation tools
     ├── portrai_analyzer/# Custom lint rules
     ├── firestore_export_import/# Firestore data management CLI
+    ├── firestore/    # Firestore security rules and their emulator tests
     └── functions/    # Cloud Functions, one folder per feature
 ```
 
@@ -93,6 +94,7 @@ Foundation Layers (design_system, core, module_injector)
 
 - **[portrai_analyzer](tool/portrai_analyzer/readme.md)**: Custom Dart analyzer plugin enforcing workspace rules
 - **[firestore_export_import](tool/firestore_export_import/README.md)**: CLI for Firestore data import/export
+- **[firestore](tool/firestore/README.md)**: Firestore security rules and their emulator tests
 - **[functions](tool/functions/README.md)**: Cloud Functions, including the weekly job openings sync
 
 ## Getting Started
@@ -229,6 +231,7 @@ melos deploy_widgetbook         # Deploy storybook to Firebase Hosting
 melos deploy_privacy_policy     # Deploy privacy policy page
 melos deploy_terms_and_conditions  # Deploy terms & conditions page
 melos deploy_functions          # Deploy Firebase Cloud Functions
+melos deploy_firestore_rules    # Test and deploy the Firestore security rules
 ```
 
 ### Firestore Data Management
@@ -300,6 +303,7 @@ port-rai/
 ├── tool/
 │   ├── portrai_analyzer/    # Custom lint rules
 │   ├── firestore_export_import/  # Firestore CLI
+│   ├── firestore/           # Firestore security rules
 │   └── functions/           # Cloud Functions
 ├── pubspec.yaml             # Workspace configuration
 ├── analysis_options.yaml    # Lint rules
