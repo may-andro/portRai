@@ -10,7 +10,7 @@ class _LoadingWidget extends StatelessWidget {
       child: Center(
         child: DSLoadingWidget(
           style: DSLoadingStyle.lottie,
-          size: context.space(factor: 10),
+          size: max(context.shortestSide * 0.1, context.space(factor: 2)),
         ),
       ),
     );

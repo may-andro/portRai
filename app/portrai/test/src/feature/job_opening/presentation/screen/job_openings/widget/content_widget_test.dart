@@ -279,4 +279,14 @@ void main() {
       expect(tester.widget<Switch>(find.byType(Switch)).value, isEnabled);
     });
   }
+
+  testWidgets('should show the Lottie loader at the app-wide size while '
+      'loading', (tester) async {
+    await pumpContent(tester, const JobOpeningsState());
+
+    final loader = tester.widget<DSLoadingWidget>(find.byType(DSLoadingWidget));
+    expect(loader.style, DSLoadingStyle.lottie);
+    // A tenth of the shortest side of the 1440 x 2400 test window.
+    expect(loader.size, 144);
+  });
 }

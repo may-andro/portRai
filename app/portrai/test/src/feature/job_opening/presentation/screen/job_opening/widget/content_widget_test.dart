@@ -166,4 +166,14 @@ void main() {
     expect(find.text(longSkill), findsOneWidget);
     expect(find.text('22'), findsOneWidget);
   });
+
+  testWidgets('should show the Lottie loader at the app-wide size while '
+      'loading', (tester) async {
+    await pumpContent(tester, const JobOpeningState(id: 'job-1'));
+
+    final loader = tester.widget<DSLoadingWidget>(find.byType(DSLoadingWidget));
+    expect(loader.style, DSLoadingStyle.lottie);
+    // A tenth of the shortest side of the 1440 x 2400 test window.
+    expect(loader.size, 144);
+  });
 }

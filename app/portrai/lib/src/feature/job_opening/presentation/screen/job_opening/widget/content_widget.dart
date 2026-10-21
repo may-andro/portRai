@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
@@ -43,7 +45,10 @@ class ContentWidget extends StatelessWidget {
                 child: Center(
                   child: DSLoadingWidget(
                     style: DSLoadingStyle.lottie,
-                    size: context.space(factor: 10),
+                    size: max(
+                      context.shortestSide * 0.1,
+                      context.space(factor: 2),
+                    ),
                   ),
                 ),
               ),
