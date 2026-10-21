@@ -28,6 +28,10 @@ class $AssetsImageGen {
 class $AssetsLottieGen {
   const $AssetsLottieGen();
 
+  /// File path: assets/lottie/binoculars.json
+  LottieGenImage get binoculars =>
+      const LottieGenImage('assets/lottie/binoculars.json');
+
   /// File path: assets/lottie/computer_window.json
   LottieGenImage get computerWindow =>
       const LottieGenImage('assets/lottie/computer_window.json');
@@ -119,6 +123,7 @@ class $AssetsLottieGen {
 
   /// List of all assets
   List<LottieGenImage> get values => [
+    binoculars,
     computerWindow,
     contactUs,
     developerRole,
