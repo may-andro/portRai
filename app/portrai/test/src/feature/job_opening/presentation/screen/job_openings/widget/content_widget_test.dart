@@ -81,6 +81,7 @@ void main() {
     );
 
     expect(find.text('2 matches'), findsOneWidget);
+    expect(find.text('Your matches'), findsOneWidget);
     expect(find.text('Best fit 91%'), findsOneWidget);
     expect(find.text('Updated Oct 19, 2026'), findsOneWidget);
   });

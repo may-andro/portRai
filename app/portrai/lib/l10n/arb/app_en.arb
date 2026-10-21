@@ -1620,5 +1620,9 @@
   "jobSearchStatusPaused": "Paused · No new searches",
   "@jobSearchStatusPaused": {
     "description": "Status of the weekly job search when it is off"
+  },
+  "jobOpeningsMatchesTitle": "Your matches",
+  "@jobOpeningsMatchesTitle": {
+    "description": "Section title above the job opening cards"
   }
 }

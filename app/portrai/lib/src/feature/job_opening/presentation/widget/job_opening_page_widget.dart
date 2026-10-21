@@ -220,3 +220,75 @@ class JobOpeningPillWidget extends StatelessWidget {
     );
   }
 }
+
+/// A full-width page band. Consecutive bands alternate [isAlternate] so each
+/// section stands apart, as on the other portfolio pages.
+class JobOpeningBandWidget extends StatelessWidget {
+  const JobOpeningBandWidget({
+    super.key,
+    required this.child,
+    this.isAlternate = false,
+  });
+
+  final Widget child;
+  final bool isAlternate;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    return ColoredBox(
+      color: isAlternate
+          ? Color.alphaBlend(
+              palette.accent.color.withAlpha(22),
+              palette.background.color,
+            )
+          : palette.background.color,
+      child: JobOpeningPageColumnWidget(
+        verticalPadding: context.space(factor: context.isMobile ? 4 : 6),
+        child: child,
+      ),
+    );
+  }
+}
+
+/// A section heading with an icon badge, shared by the page bands.
+class JobOpeningSectionTitleWidget extends StatelessWidget {
+  const JobOpeningSectionTitleWidget({
+    super.key,
+    required this.title,
+    required this.icon,
+  });
+
+  final String title;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.colorPalette;
+    final accent = palette.accent.color;
+    return Row(
+      spacing: context.space(factor: 1.25),
+      children: [
+        Container(
+          padding: EdgeInsets.all(context.space()),
+          decoration: BoxDecoration(
+            color: accent.withAlpha(36),
+            borderRadius: BorderRadius.circular(
+              context.dimen.radiusLevel1.value,
+            ),
+          ),
+          child: Icon(icon, size: 24, color: accent),
+        ),
+        Flexible(
+          child: DSTextWidget(
+            title,
+            style: context.isMobile
+                ? context.typography.emphasizedHeadlineSmall
+                : context.typography.emphasizedHeadlineMedium,
+            color: palette.neutral.grey10,
+          ),
+        ),
+      ],
+    );
+  }
+}

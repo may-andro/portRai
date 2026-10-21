@@ -586,5 +586,6 @@
   "jobOpeningApplyTitle": "Klaar om te solliciteren?",
   "jobOpeningApplyDescription": "Deze vacature staat op {source}. Solliciteren opent de pagina daar.",
   "jobSearchStatusActive": "Actief · Volgende zoektocht op maandag",
-  "jobSearchStatusPaused": "Gepauzeerd · Geen nieuwe zoektochten"
+  "jobSearchStatusPaused": "Gepauzeerd · Geen nieuwe zoektochten",
+  "jobOpeningsMatchesTitle": "Jouw matches"
 }

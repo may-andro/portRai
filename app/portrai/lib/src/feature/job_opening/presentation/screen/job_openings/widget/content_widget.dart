@@ -36,17 +36,23 @@ class ContentWidget extends StatelessWidget {
           slivers: [
             SliverToBoxAdapter(child: _HeroWidget(state: state)),
             SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: context.space(factor: 6)),
-                child: JobOpeningPageColumnWidget(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: context.space(factor: 4),
-                    children: [
-                      _JobSearchWidget(state: state),
-                      _bodyFor(context, state),
-                    ],
-                  ),
+              child: JobOpeningBandWidget(
+                isAlternate: true,
+                child: _JobSearchWidget(state: state),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: JobOpeningBandWidget(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: context.space(factor: 2.5),
+                  children: [
+                    JobOpeningSectionTitleWidget(
+                      title: context.localizations.jobOpeningsMatchesTitle,
+                      icon: Icons.work_outline_rounded,
+                    ),
+                    _bodyFor(context, state),
+                  ],
                 ),
               ),
             ),
