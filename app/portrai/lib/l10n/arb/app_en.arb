@@ -1548,5 +1548,69 @@
   "errorJobSearchUnknown": "Can't update job search. Please try again",
   "@errorJobSearchUnknown": {
     "description": "Error shown for unexpected problems saving the job search setting"
+  },
+  "jobOpeningsMatchCount": "{count, plural, =1{1 match} other{{count} matches}}",
+  "@jobOpeningsMatchCount": {
+    "description": "Number of job openings in the list",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "jobOpeningsBestFit": "Best fit {score}%",
+  "@jobOpeningsBestFit": {
+    "description": "The highest fit score among the job openings",
+    "placeholders": {
+      "score": {
+        "type": "int",
+        "example": "86"
+      }
+    }
+  },
+  "jobOpeningsUpdatedOn": "Updated {date}",
+  "@jobOpeningsUpdatedOn": {
+    "description": "When the job openings were last refreshed",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Oct 19, 2026"
+      }
+    }
+  },
+  "jobOpeningFitLabel": "fit",
+  "@jobOpeningFitLabel": {
+    "description": "Label under the fit score number"
+  },
+  "jobOpeningFitStrong": "Strong fit",
+  "@jobOpeningFitStrong": {
+    "description": "Label for a fit score of 80 or more"
+  },
+  "jobOpeningFitGood": "Good fit",
+  "@jobOpeningFitGood": {
+    "description": "Label for a fit score from 70 to 79"
+  },
+  "jobOpeningFitPossible": "Possible fit",
+  "@jobOpeningFitPossible": {
+    "description": "Label for a fit score below 70"
+  },
+  "jobOpeningSkillsTitle": "Skills",
+  "@jobOpeningSkillsTitle": {
+    "description": "Section title for matched and missing skills"
+  },
+  "jobOpeningApplyTitle": "Ready to apply?",
+  "@jobOpeningApplyTitle": {
+    "description": "Title of the closing apply section on a job opening"
+  },
+  "jobOpeningApplyDescription": "This job is listed on {source}. Applying opens its page there.",
+  "@jobOpeningApplyDescription": {
+    "description": "Explains where the Apply button leads",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Remotive"
+      }
+    }
   }
 }

@@ -574,5 +574,15 @@
   "errorJobSearchUnavailable": "Kan je instelling voor vacaturezoeken niet lezen",
   "errorJobSearchPermissionDenied": "Je kunt deze instelling voor vacaturezoeken niet wijzigen",
   "errorJobSearchNetwork": "Kan vacaturezoeken niet bijwerken. Controleer je internetverbinding",
-  "errorJobSearchUnknown": "Kan vacaturezoeken niet bijwerken. Probeer het opnieuw"
+  "errorJobSearchUnknown": "Kan vacaturezoeken niet bijwerken. Probeer het opnieuw",
+  "jobOpeningsMatchCount": "{count, plural, =1{1 match} other{{count} matches}}",
+  "jobOpeningsBestFit": "Beste match {score}%",
+  "jobOpeningsUpdatedOn": "Bijgewerkt op {date}",
+  "jobOpeningFitLabel": "match",
+  "jobOpeningFitStrong": "Sterke match",
+  "jobOpeningFitGood": "Goede match",
+  "jobOpeningFitPossible": "Mogelijke match",
+  "jobOpeningSkillsTitle": "Vaardigheden",
+  "jobOpeningApplyTitle": "Klaar om te solliciteren?",
+  "jobOpeningApplyDescription": "Deze vacature staat op {source}. Solliciteren opent de pagina daar."
 }

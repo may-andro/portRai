@@ -574,5 +574,15 @@
   "errorJobSearchUnavailable": "No se puede leer tu ajuste de búsqueda de empleo",
   "errorJobSearchPermissionDenied": "No puedes cambiar este ajuste de búsqueda de empleo",
   "errorJobSearchNetwork": "No se puede actualizar la búsqueda. Comprueba tu conexión a internet",
-  "errorJobSearchUnknown": "No se puede actualizar la búsqueda. Inténtalo de nuevo"
+  "errorJobSearchUnknown": "No se puede actualizar la búsqueda. Inténtalo de nuevo",
+  "jobOpeningsMatchCount": "{count, plural, =1{1 coincidencia} other{{count} coincidencias}}",
+  "jobOpeningsBestFit": "Mejor encaje {score}%",
+  "jobOpeningsUpdatedOn": "Actualizado el {date}",
+  "jobOpeningFitLabel": "encaje",
+  "jobOpeningFitStrong": "Encaje alto",
+  "jobOpeningFitGood": "Buen encaje",
+  "jobOpeningFitPossible": "Encaje posible",
+  "jobOpeningSkillsTitle": "Habilidades",
+  "jobOpeningApplyTitle": "¿Listo para postular?",
+  "jobOpeningApplyDescription": "Este empleo está publicado en {source}. Al postular se abre su página allí."
 }
