@@ -20,8 +20,8 @@ void main() {
     }
 
     testWidgets(
-      'should show the actions in the logo header when the platform shows '
-      'the header',
+      'should show the actions at the end of the logo header when the '
+      'platform shows the header',
       (tester) async {
         await pumpAppBar(tester);
 
@@ -32,6 +32,14 @@ void main() {
           ),
           findsOneWidget,
         );
+        final screenWidth =
+            tester.view.physicalSize.width / tester.view.devicePixelRatio;
+        final headerRight = tester
+            .getTopRight(find.byType(PageHeaderWidget))
+            .dx;
+        final actionRight = tester.getTopRight(find.byIcon(Icons.refresh)).dx;
+        expect(headerRight, screenWidth);
+        expect(actionRight, greaterThan(screenWidth * 0.9));
       },
       variant: TargetPlatformVariant.only(TargetPlatform.macOS),
     );
