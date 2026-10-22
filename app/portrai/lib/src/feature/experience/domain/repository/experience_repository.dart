@@ -5,5 +5,5 @@ abstract class ExperienceRepository {
 
   Future<List<ExperienceEntity>> getExperiences();
 
-  Future<void> cacheExperience(ExperienceEntity experience);
+  Future<void> cacheExperiences(List<ExperienceEntity> experiences);
 }

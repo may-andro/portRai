@@ -17,8 +17,8 @@ class BuildConfigExpertiseRepositoryImpl implements ExpertiseRepository {
   final ExpertiseRepository _assetDelegateRepository;
 
   @override
-  Future<void> cacheExpertise(ExpertiseEntity expert) {
-    return _delegateRepository.cacheExpertise(expert);
+  Future<void> cacheAllExpertise(List<ExpertiseEntity> expertiseList) {
+    return _delegateRepository.cacheAllExpertise(expertiseList);
   }
 
   @override

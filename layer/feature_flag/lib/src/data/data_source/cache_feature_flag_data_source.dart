@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:feature_flag/src/data/cache/feature_flag_cache.dart';
 import 'package:feature_flag/src/data/data_source/feature_flag_data_source.dart';
 import 'package:feature_flag/src/feature_flag.dart';
@@ -43,7 +41,7 @@ class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
         )
         .toList();
 
-    await _cacheFlags(resolved);
+    await _featureFlagCache.putAll(resolved);
     return resolved;
   }
 
@@ -72,10 +70,5 @@ class CacheFeatureFlagDataSource implements FeatureFlagDataSource {
       return _featureFlagCache.putOverride(featureFlag);
     }
     return _featureFlagCache.put(featureFlag);
-  }
-
-  Future<void> _cacheFlags(List<FeatureFlag> flags) async {
-    if (flags.isEmpty) return;
-    await Future.wait(flags.map((flag) => _featureFlagCache.put(flag)));
   }
 }

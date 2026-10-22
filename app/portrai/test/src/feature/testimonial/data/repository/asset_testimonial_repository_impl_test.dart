@@ -86,11 +86,9 @@ void main() {
 
         expect(result, testimonials);
         verify(() => cacheDelegateRepository.getTestimonials()).called(1);
-        for (final testimonial in testimonials) {
-          verifyNever(
-            () => cacheDelegateRepository.cacheTestimonial(testimonial),
-          );
-        }
+        verifyNever(
+          () => cacheDelegateRepository.cacheTestimonials(testimonials),
+        );
       },
     );
 
@@ -100,18 +98,14 @@ void main() {
         cacheDelegateRepository.stubGetTestimonialsThrows(
           const TestimonialNotFoundException(),
         );
-        for (final testimonial in testimonials) {
-          cacheDelegateRepository.stubCacheTestimonial(testimonial);
-        }
+        cacheDelegateRepository.stubCacheTestimonials(testimonials);
 
         final result = await repository.getTestimonials();
 
         expect(result, testimonials);
-        for (final testimonial in testimonials) {
-          verify(
-            () => cacheDelegateRepository.cacheTestimonial(testimonial),
-          ).called(1);
-        }
+        verify(
+          () => cacheDelegateRepository.cacheTestimonials(testimonials),
+        ).called(1);
       },
     );
 
@@ -123,9 +117,7 @@ void main() {
           id: testimonial.id,
           error: const TestimonialNotFoundException(),
         );
-        for (final item in testimonials) {
-          cacheDelegateRepository.stubCacheTestimonial(item);
-        }
+        cacheDelegateRepository.stubCacheTestimonials(testimonials);
 
         final result = await repository.getTestimonial(testimonial.id);
 
@@ -145,9 +137,7 @@ void main() {
         cacheDelegateRepository.stubGetTestimonialsThrows(
           const TestimonialCacheException(cause: 'db down'),
         );
-        for (final testimonial in testimonials) {
-          cacheDelegateRepository.stubCacheTestimonial(testimonial);
-        }
+        cacheDelegateRepository.stubCacheTestimonials(testimonials);
 
         final result = await repository.getTestimonials();
 
@@ -168,8 +158,8 @@ void main() {
         cacheDelegateRepository.stubGetTestimonialsThrows(
           const TestimonialNotFoundException(),
         );
-        cacheDelegateRepository.stubCacheTestimonialThrows(
-          testimonial: testimonials.first,
+        cacheDelegateRepository.stubCacheTestimonialsThrows(
+          testimonials: testimonials,
           error: Exception('cache write failed'),
         );
 

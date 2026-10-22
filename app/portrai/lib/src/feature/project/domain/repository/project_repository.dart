@@ -5,5 +5,5 @@ abstract class ProjectRepository {
 
   Future<ProjectEntity> getProject(String id);
 
-  Future<void> cacheProject(ProjectEntity project);
+  Future<void> cacheProjects(List<ProjectEntity> projects);
 }

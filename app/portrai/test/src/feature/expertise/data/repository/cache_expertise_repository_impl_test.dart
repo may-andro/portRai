@@ -9,7 +9,6 @@ import 'package:portrai/src/feature/expertise/data/repository/cache_expertise_re
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
 import '../../../../../mock/feature/expertise/data/cache/mock_expertise_cache.dart';
-import '../../../../../mock/feature/expertise/data/model/fake_expertise_model.dart';
 
 void main() {
   const localeCode = 'es';
@@ -29,7 +28,7 @@ void main() {
     late CacheExpertiseRepositoryImpl repository;
 
     setUpAll(() {
-      registerFallbackValue(FakeExpertiseModel());
+      registerFallbackValue(<ExpertiseModel>[]);
     });
 
     setUp(() {
@@ -44,13 +43,14 @@ void main() {
     test(
       'should cache expertise with the mapped locale when caching succeeds',
       () async {
-        expertiseCache.stubPut();
+        expertiseCache.stubPutAll();
 
-        await repository.cacheExpertise(expertise);
+        await repository.cacheAllExpertise([expertise]);
 
         final capturedModel =
-            verify(() => expertiseCache.put(captureAny())).captured.single
-                as ExpertiseModel;
+            (verify(() => expertiseCache.putAll(captureAny())).captured.single
+                    as Iterable<ExpertiseModel>)
+                .single;
         expect(capturedModel.image, expertise.image);
         expect(capturedModel.title, expertise.title);
         expect(capturedModel.skills.map((s) => s.name), expertise.skillNames);
@@ -62,10 +62,10 @@ void main() {
       'should throw a cache exception when the database is not initialised while caching expertise',
       () {
         final error = DBNotInitialisedException(cause: Exception('db'));
-        expertiseCache.stubPutThrows(error);
+        expertiseCache.stubPutAllThrows(error);
 
         expect(
-          () => repository.cacheExpertise(expertise),
+          () => repository.cacheAllExpertise([expertise]),
           throwsA(
             isA<ExpertiseCacheException>().having(
               (exception) => exception.cause,

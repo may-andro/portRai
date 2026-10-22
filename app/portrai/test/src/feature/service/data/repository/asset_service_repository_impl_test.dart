@@ -92,7 +92,7 @@ void main() {
 
         expect(await repository.getServices(), const [service]);
         verify(() => cacheRepository.getServices()).called(1);
-        verifyNever(() => cacheRepository.cacheService(service));
+        verifyNever(() => cacheRepository.cacheServices([service]));
       },
     );
 
@@ -100,11 +100,11 @@ void main() {
       'should load services from assets and cache them when the cache is empty',
       () async {
         cacheRepository.stubGetServicesThrows(const ServiceNotFoundException());
-        cacheRepository.stubCacheService(service);
+        cacheRepository.stubCacheServices([service]);
 
         expect(await repository.getServices(), const [service]);
         verify(() => cacheRepository.getServices()).called(1);
-        verify(() => cacheRepository.cacheService(service)).called(1);
+        verify(() => cacheRepository.cacheServices([service])).called(1);
       },
     );
 
@@ -112,7 +112,7 @@ void main() {
       'should log the cache error and still load services from assets when reading the cache fails',
       () async {
         cacheRepository.stubGetServicesThrows(const ServiceCacheException());
-        cacheRepository.stubCacheService(service);
+        cacheRepository.stubCacheServices([service]);
 
         await repository.getServices();
 
@@ -149,10 +149,9 @@ void main() {
       'should continue returning services when caching the loaded assets fails',
       () async {
         cacheRepository.stubGetServicesThrows(const ServiceNotFoundException());
-        cacheRepository.stubCacheServiceThrows(
+        cacheRepository.stubCacheServicesThrows([
           service,
-          const ServiceCacheException(),
-        );
+        ], const ServiceCacheException());
 
         expect(await repository.getServices(), const [service]);
         verify(

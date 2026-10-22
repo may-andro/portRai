@@ -5,12 +5,12 @@ import 'package:portrai/src/feature/service/data/model/service_model.dart';
 class MockServiceCache extends Mock implements ServiceCache {}
 
 extension MockServiceCacheStub on MockServiceCache {
-  void stubPut() {
-    when(() => put(any())).thenAnswer((_) async {});
+  void stubPutAll() {
+    when(() => putAll(any())).thenAnswer((_) async {});
   }
 
-  void stubPutThrows(Object error) {
-    when(() => put(any())).thenThrow(error);
+  void stubPutAllThrows(Object error) {
+    when(() => putAll(any())).thenThrow(error);
   }
 
   void stubQuery(List<ServiceModel> services) {

@@ -4,15 +4,15 @@ import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 class MockExpertiseRepository extends Mock implements ExpertiseRepository {}
 
 extension MockExpertiseRepositoryStub on MockExpertiseRepository {
-  void stubCacheExpertise(ExpertiseEntity expertise) {
-    when(() => cacheExpertise(expertise)).thenAnswer((_) async {});
+  void stubCacheAllExpertise(List<ExpertiseEntity> expertiseList) {
+    when(() => cacheAllExpertise(expertiseList)).thenAnswer((_) async {});
   }
 
-  void stubCacheExpertiseThrows({
-    required ExpertiseEntity expertise,
+  void stubCacheAllExpertiseThrows({
+    required List<ExpertiseEntity> expertiseList,
     required Object error,
   }) {
-    when(() => cacheExpertise(expertise)).thenThrow(error);
+    when(() => cacheAllExpertise(expertiseList)).thenThrow(error);
   }
 
   void stubGetAllExpertise(List<ExpertiseEntity> expertiseList) {

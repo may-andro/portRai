@@ -14,9 +14,9 @@ class CacheServiceRepositoryImpl implements ServiceRepository {
   final AppLocale _appLocale;
 
   @override
-  Future<void> cacheService(ServiceEntity expert) async {
+  Future<void> cacheServices(List<ServiceEntity> services) async {
     try {
-      return await _serviceCache.put(_mapper.from(expert));
+      return await _serviceCache.putAll(services.map(_mapper.from));
     } on DBNotInitialisedException catch (e, stackTrace) {
       throw ServiceCacheException(
         cause: 'Database not initialized: $e',

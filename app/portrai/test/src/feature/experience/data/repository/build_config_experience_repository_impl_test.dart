@@ -70,12 +70,12 @@ void main() {
       test(
         'should delegate cache writes to the selected source when requested',
         () async {
-          selected.stubCacheExperience(experience);
+          selected.stubCacheExperiences([experience]);
 
-          await repository.cacheExperience(experience);
+          await repository.cacheExperiences([experience]);
 
-          verify(() => selected.cacheExperience(experience)).called(1);
-          verifyNever(() => unselected.cacheExperience(experience));
+          verify(() => selected.cacheExperiences([experience])).called(1);
+          verifyNever(() => unselected.cacheExperiences([experience]));
         },
       );
     });

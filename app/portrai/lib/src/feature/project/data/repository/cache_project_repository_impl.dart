@@ -14,9 +14,9 @@ class CacheProjectRepositoryImpl implements ProjectRepository {
   final AppLocale _appLocale;
 
   @override
-  Future<void> cacheProject(ProjectEntity project) async {
+  Future<void> cacheProjects(List<ProjectEntity> projects) async {
     try {
-      return await _projectCache.put(_mapper.from(project));
+      return await _projectCache.putAll(projects.map(_mapper.from));
     } on DBNotInitialisedException catch (e, stackTrace) {
       throw ProjectCacheException(
         cause: 'Database not initialized: $e',
@@ -24,7 +24,7 @@ class CacheProjectRepositoryImpl implements ProjectRepository {
       );
     } catch (e, stackTrace) {
       throw ProjectCacheException(
-        cause: 'Unexpected error while caching project: $e',
+        cause: 'Unexpected error while caching projects: $e',
         stackTrace: stackTrace,
       );
     }

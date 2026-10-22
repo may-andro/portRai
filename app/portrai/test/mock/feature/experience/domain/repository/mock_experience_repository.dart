@@ -4,8 +4,8 @@ import 'package:portrai/src/feature/experience/domain/_domain.dart';
 class MockExperienceRepository extends Mock implements ExperienceRepository {}
 
 extension MockExperienceRepositoryStub on MockExperienceRepository {
-  void stubCacheExperience(ExperienceEntity experience) {
-    when(() => cacheExperience(experience)).thenAnswer((_) async {});
+  void stubCacheExperiences(List<ExperienceEntity> experiences) {
+    when(() => cacheExperiences(experiences)).thenAnswer((_) async {});
   }
 
   void stubGetExperience({

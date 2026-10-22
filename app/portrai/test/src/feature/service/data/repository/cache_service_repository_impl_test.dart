@@ -29,7 +29,7 @@ void main() {
     late CacheServiceRepositoryImpl repository;
 
     setUpAll(() {
-      registerFallbackValue(model);
+      registerFallbackValue(<ServiceModel>[]);
     });
 
     setUp(() {
@@ -42,22 +42,22 @@ void main() {
     });
 
     test('should cache a service when the cache write succeeds', () async {
-      cache.stubPut();
+      cache.stubPutAll();
 
-      await repository.cacheService(service);
+      await repository.cacheServices([service]);
 
-      verify(() => cache.put(any())).called(1);
+      verify(() => cache.putAll(any())).called(1);
     });
 
     test(
       'should throw a cache exception when the cache database is not initialised while writing',
       () {
-        cache.stubPutThrows(
+        cache.stubPutAllThrows(
           const DBNotInitialisedException(cause: 'database not ready'),
         );
 
         expect(
-          () => repository.cacheService(service),
+          () => repository.cacheServices([service]),
           throwsA(isA<ServiceCacheException>()),
         );
       },

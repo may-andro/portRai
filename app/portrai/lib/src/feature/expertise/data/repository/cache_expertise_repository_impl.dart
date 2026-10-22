@@ -18,10 +18,10 @@ class CacheExpertiseRepositoryImpl implements ExpertiseRepository {
   final AppLocale _appLocale;
 
   @override
-  Future<void> cacheExpertise(ExpertiseEntity expert) async {
+  Future<void> cacheAllExpertise(List<ExpertiseEntity> expertiseList) async {
     try {
       // Mapper already includes current locale
-      return await _expertiseCache.put(_mapper.from(expert));
+      return await _expertiseCache.putAll(expertiseList.map(_mapper.from));
     } on DBNotInitialisedException catch (e, stackTrace) {
       throw ExpertiseCacheException(
         cause: 'Database not initialized: $e',

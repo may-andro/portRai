@@ -17,8 +17,8 @@ class BuildConfigServiceRepositoryImpl implements ServiceRepository {
   final ServiceRepository _demoDelegateRepository;
 
   @override
-  Future<void> cacheService(ServiceEntity expert) {
-    return _delegateRepository.cacheService(expert);
+  Future<void> cacheServices(List<ServiceEntity> services) {
+    return _delegateRepository.cacheServices(services);
   }
 
   @override

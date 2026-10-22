@@ -18,9 +18,9 @@ class CacheTestimonialRepositoryImpl implements TestimonialRepository {
   final AppLocale _appLocale;
 
   @override
-  Future<void> cacheTestimonial(TestimonialEntity testimonial) async {
+  Future<void> cacheTestimonials(List<TestimonialEntity> testimonials) async {
     try {
-      return await _testimonialCache.put(_mapper.from(testimonial));
+      return await _testimonialCache.putAll(testimonials.map(_mapper.from));
     } on DBNotInitialisedException catch (e, stackTrace) {
       throw TestimonialCacheException(
         cause: 'Database not initialized: $e',
@@ -28,7 +28,7 @@ class CacheTestimonialRepositoryImpl implements TestimonialRepository {
       );
     } catch (e, stackTrace) {
       throw TestimonialCacheException(
-        cause: 'Unexpected error while caching testimonial: $e',
+        cause: 'Unexpected error while caching testimonials: $e',
         stackTrace: stackTrace,
       );
     }

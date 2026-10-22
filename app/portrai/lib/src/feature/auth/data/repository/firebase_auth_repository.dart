@@ -4,12 +4,14 @@ import 'package:portrai/src/feature/auth/data/mapper/_mapper.dart';
 import 'package:portrai/src/feature/auth/domain/_domain.dart';
 import 'package:portrai/src/feature/user/user.dart';
 
-@Register(as: AuthRepository)
+// A singleton, so the restored session is awaited only once per app run.
+@RegisterSingleton(as: AuthRepository)
 class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository(this._authController, this._userMapper);
 
   final firebase.FbAuthController _authController;
   final AuthUserMapper _userMapper;
+  bool _hasReceivedFirstAuthState = false;
 
   @override
   Future<void> signIn({required String email, required String password}) async {
@@ -24,8 +26,12 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<AuthUserEntity?> getSignedInUser() async {
     try {
       // The first event is the restored session, unlike `currentUser`, which
-      // is still null right after start.
-      final user = await _authController.authStateChanges.first;
+      // is still null right after start. Once it has arrived, `currentUser`
+      // is up to date.
+      final user = _hasReceivedFirstAuthState
+          ? _authController.currentUser
+          : await _authController.authStateChanges.first;
+      _hasReceivedFirstAuthState = true;
       return user == null ? null : _userMapper.map(user);
     } catch (error, stackTrace) {
       throw _toAuthException(error, stackTrace);

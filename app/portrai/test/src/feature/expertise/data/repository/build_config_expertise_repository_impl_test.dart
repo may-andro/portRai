@@ -50,12 +50,12 @@ void main() {
       test(
         'should delegate cache writes to the selected source when requested',
         () async {
-          selected.stubCacheExpertise(expertise);
+          selected.stubCacheAllExpertise([expertise]);
 
-          await repository.cacheExpertise(expertise);
+          await repository.cacheAllExpertise([expertise]);
 
-          verify(() => selected.cacheExpertise(expertise)).called(1);
-          verifyNever(() => unselected.cacheExpertise(expertise));
+          verify(() => selected.cacheAllExpertise([expertise])).called(1);
+          verifyNever(() => unselected.cacheAllExpertise([expertise]));
         },
       );
     });

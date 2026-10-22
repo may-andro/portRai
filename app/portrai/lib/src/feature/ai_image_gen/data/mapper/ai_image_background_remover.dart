@@ -145,13 +145,9 @@ Future<void> clearBackdrop(
     seed(y * width + width - 1);
   }
 
+  // Counted inline: awaiting a helper per pixel would cost an asynchronous
+  // hop for every pixel instead of one per slice.
   var budget = _pixelsPerSlice;
-  Future<void> tick() async {
-    if (--budget > 0) return;
-    budget = _pixelsPerSlice;
-    await Future<void>.delayed(Duration.zero);
-  }
-
   while (top > 0) {
     final pixel = stack[--top];
     final x = pixel % width;
@@ -159,7 +155,10 @@ Future<void> clearBackdrop(
     if (x < width - 1) seed(pixel + 1);
     if (pixel >= width) seed(pixel - width);
     if (pixel < total - width) seed(pixel + width);
-    await tick();
+    if (--budget == 0) {
+      budget = _pixelsPerSlice;
+      await Future<void>.delayed(Duration.zero);
+    }
   }
 
   bool touchesBackdrop(int x, int y) {

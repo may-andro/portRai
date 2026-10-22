@@ -28,8 +28,8 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
   static const _tag = 'AssetProjectRepositoryImpl';
 
   @override
-  Future<void> cacheProject(ProjectEntity project) {
-    return _cacheDelegateRepository.cacheProject(project);
+  Future<void> cacheProjects(List<ProjectEntity> projects) {
+    return _cacheDelegateRepository.cacheProjects(projects);
   }
 
   @override
@@ -133,9 +133,7 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
 
   Future<void> _cacheProjectsSafely(List<ProjectEntity> projectList) async {
     try {
-      for (final project in projectList) {
-        await cacheProject(project);
-      }
+      await cacheProjects(projectList);
     } catch (_) {
       _logReporter.error(
         'Failed to cache projects from assets, continuing without caching.',

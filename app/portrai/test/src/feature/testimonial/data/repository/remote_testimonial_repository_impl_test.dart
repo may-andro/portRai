@@ -73,9 +73,7 @@ void main() {
           const TestimonialNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final testimonial in testimonials) {
-          cacheDelegateRepository.stubCacheTestimonial(testimonial);
-        }
+        cacheDelegateRepository.stubCacheTestimonials(testimonials);
 
         final result = await repository.getTestimonials();
 
@@ -86,11 +84,9 @@ void main() {
             localeCode,
           ),
         ).called(1);
-        for (final testimonial in testimonials) {
-          verify(
-            () => cacheDelegateRepository.cacheTestimonial(testimonial),
-          ).called(1);
-        }
+        verify(
+          () => cacheDelegateRepository.cacheTestimonials(testimonials),
+        ).called(1);
       },
     );
 
@@ -103,9 +99,7 @@ void main() {
           error: const TestimonialNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final item in testimonials) {
-          cacheDelegateRepository.stubCacheTestimonial(item);
-        }
+        cacheDelegateRepository.stubCacheTestimonials(testimonials);
 
         final result = await repository.getTestimonial(testimonial.id);
 
@@ -126,9 +120,7 @@ void main() {
           const TestimonialCacheException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final testimonial in testimonials) {
-          cacheDelegateRepository.stubCacheTestimonial(testimonial);
-        }
+        cacheDelegateRepository.stubCacheTestimonials(testimonials);
 
         final result = await repository.getTestimonials();
 
@@ -149,8 +141,8 @@ void main() {
           const TestimonialNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        cacheDelegateRepository.stubCacheTestimonialThrows(
-          testimonial: testimonials.first,
+        cacheDelegateRepository.stubCacheTestimonialsThrows(
+          testimonials: testimonials,
           error: Exception('cache write failed'),
         );
 
