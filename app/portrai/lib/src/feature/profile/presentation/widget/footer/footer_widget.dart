@@ -53,6 +53,7 @@ class _LoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DSLoadingWidget(
+      style: DSLoadingStyle.lottie,
       size: max(context.shortestSide * 0.1, context.space(factor: 2)),
     );
   }
