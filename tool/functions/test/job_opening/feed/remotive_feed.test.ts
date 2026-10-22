@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { RemotiveFeed } from '../../../src/job_opening/feed/remotive_feed.js';
+import { searchQuery } from '../fixture.js';
 
 const remotiveJob = {
   id: 2091158,
@@ -18,7 +19,7 @@ describe('RemotiveFeed', () => {
   it('should request the software development category', async () => {
     const fetchJson = vi.fn().mockResolvedValue({ jobs: [] });
 
-    await new RemotiveFeed(fetchJson).fetchJobs();
+    await new RemotiveFeed(fetchJson).fetchJobs(searchQuery());
 
     expect(fetchJson).toHaveBeenCalledWith(
       'https://remotive.com/api/remote-jobs?category=software-development',
@@ -30,7 +31,7 @@ describe('RemotiveFeed', () => {
       vi.fn().mockResolvedValue({ jobs: [remotiveJob] }),
     );
 
-    const openings = await feed.fetchJobs();
+    const openings = await feed.fetchJobs(searchQuery());
 
     expect(openings).toEqual([
       {
@@ -59,7 +60,30 @@ describe('RemotiveFeed', () => {
       }),
     );
 
-    expect(await feed.fetchJobs()).toEqual([]);
+    expect(await feed.fetchJobs(searchQuery())).toEqual([]);
+  });
+
+  it('should drop jobs the query does not keep', async () => {
+    const feed = new RemotiveFeed(
+      vi.fn().mockResolvedValue({
+        jobs: [
+          remotiveJob,
+          { ...remotiveJob, id: 2, publication_date: '2026-08-01T10:00:00' },
+          { ...remotiveJob, id: 3, candidate_required_location: 'USA' },
+          { ...remotiveJob, id: 4, title: 'Flutter Content Writer' },
+        ],
+      }),
+    );
+
+    const openings = await feed.fetchJobs(
+      searchQuery({
+        publishedAfter: new Date('2026-09-21T00:00:00Z'),
+        regions: new Set(['europe']),
+        roles: ['Senior Flutter Developer'],
+      }),
+    );
+
+    expect(openings.map((opening) => opening.sourceId)).toEqual(['2091158']);
   });
 
   it('should throw when the response has no jobs list', async () => {
@@ -67,7 +91,7 @@ describe('RemotiveFeed', () => {
       vi.fn().mockResolvedValue({ error: 'blocked' }),
     );
 
-    await expect(feed.fetchJobs()).rejects.toThrow(
+    await expect(feed.fetchJobs(searchQuery())).rejects.toThrow(
       'Remotive response has no jobs list',
     );
   });

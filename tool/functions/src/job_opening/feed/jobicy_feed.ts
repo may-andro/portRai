@@ -1,11 +1,16 @@
 import type { FetchJson } from '../../shared/fetch_json.js';
 import { isRecord, stringList, stringOrNull } from '../../shared/json_value.js';
+import { settleAll } from '../../shared/settle_all.js';
 import type { JobOpening } from '../job_opening.js';
 import { htmlToText } from './html_text.js';
-import type { JobFeed, JobSearchQuery } from './job_feed.js';
+import { isWantedJob, type JobFeed, type JobSearchQuery } from './job_feed.js';
+
+/** Tags requested at the same time. */
+const termConcurrency = 2;
 
 /**
- * Remote jobs from Jobicy's public API, by tag, for each search term.
+ * Remote jobs from Jobicy's public API, by tag, for each search term. A tag
+ * that fails is skipped; the feed fails only when every tag fails.
  *
  * Jobicy's terms: credit Jobicy with a direct link to the source, and send
  * every apply button to the original job URL from the feed. Every opening
@@ -22,26 +27,39 @@ export class JobicyFeed implements JobFeed {
   ) {}
 
   async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
-    const openings: JobOpening[] = [];
-    for (const term of query.terms) {
-      const body = await this.fetchJson(
-        `${JobicyFeed.url}?count=${this.jobsPerTerm}&tag=${encodeURIComponent(term.toLowerCase())}`,
-      );
-      if (!isRecord(body)) {
-        throw new Error(`Jobicy tag "${term}" returned no object`);
-      }
-      // A tag without jobs comes back without a jobs list.
-      const jobs = Array.isArray(body.jobs) ? body.jobs : [];
-      for (const job of jobs) {
-        const opening = toJobOpening(job);
-        if (opening !== null) openings.push(opening);
-      }
+    const results = await settleAll(query.terms, termConcurrency, (term) =>
+      this.readTag(term),
+    );
+    const rejected = results.find(
+      (result): result is PromiseRejectedResult => result.status === 'rejected',
+    );
+    if (rejected && results.every((result) => result.status === 'rejected')) {
+      throw rejected.reason;
     }
-    return openings;
+    return results.flatMap((result) =>
+      result.status === 'fulfilled'
+        ? result.value.flatMap((job) => {
+            const opening = toJobOpening(job, query);
+            return opening === null ? [] : [opening];
+          })
+        : [],
+    );
+  }
+
+  private async readTag(term: string): Promise<unknown[]> {
+    const body = await this.fetchJson(
+      `${JobicyFeed.url}?count=${this.jobsPerTerm}&tag=${encodeURIComponent(term.toLowerCase())}`,
+    );
+    if (!isRecord(body)) {
+      throw new Error(`Jobicy tag "${term}" returned no object`);
+    }
+    // A tag without jobs comes back without a jobs list.
+    return Array.isArray(body.jobs) ? body.jobs : [];
   }
 }
 
-function toJobOpening(job: unknown): JobOpening | null {
+/** The opening for [job], or null when it is invalid or [query] drops it. */
+function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   if (!isRecord(job)) return null;
   const id = typeof job.id === 'number' ? String(job.id) : stringOrNull(job.id);
   const title = stringOrNull(job.jobTitle);
@@ -49,6 +67,8 @@ function toJobOpening(job: unknown): JobOpening | null {
   const url = stringOrNull(job.url);
   const publishedAt = parseDate(job.pubDate);
   if (!id || !title || !company || !url || !publishedAt) return null;
+  const location = stringOrNull(job.jobGeo);
+  if (!isWantedJob(query, { title, location, publishedAt })) return null;
 
   const level = stringOrNull(job.jobLevel);
   return {
@@ -58,7 +78,7 @@ function toJobOpening(job: unknown): JobOpening | null {
     title,
     company,
     url,
-    location: stringOrNull(job.jobGeo),
+    location,
     tags: [...(level ? [level] : []), ...stringList(job.jobIndustry)],
     jobTypes: stringList(job.jobType),
     description: htmlToText(

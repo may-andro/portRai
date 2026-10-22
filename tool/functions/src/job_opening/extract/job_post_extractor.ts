@@ -6,8 +6,11 @@ const maxTitleLength = 120;
 const maxCompanyLength = 80;
 const maxLocationLength = 120;
 
-// Leaves room for the model's thinking tokens, which count towards the limit.
 const maxOutputTokens = 4096;
+
+// Copying names out of a post needs no reasoning, and thinking only adds
+// time and tokens.
+const thinkingBudget = 0;
 
 /** One role a free-text job post offers. */
 export interface ExtractedRole {
@@ -114,6 +117,7 @@ export class GeminiJobPostExtractor implements JobPostExtractor {
       prompt: jobPostPrompt(post, searchTerms),
       responseJsonSchema: jobPostSchema,
       maxOutputTokens,
+      thinkingBudget,
     });
     return parseExtractedRoles(text);
   }

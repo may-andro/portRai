@@ -2,7 +2,7 @@ import type { FetchJson } from '../../shared/fetch_json.js';
 import { isRecord, stringList, stringOrNull } from '../../shared/json_value.js';
 import type { JobOpening } from '../job_opening.js';
 import { htmlToText } from './html_text.js';
-import type { JobFeed } from './job_feed.js';
+import { isWantedJob, type JobFeed, type JobSearchQuery } from './job_feed.js';
 
 /**
  * Remote software jobs from Remotive's public API.
@@ -20,19 +20,20 @@ export class RemotiveFeed implements JobFeed {
 
   constructor(private readonly fetchJson: FetchJson) {}
 
-  async fetchJobs(): Promise<JobOpening[]> {
+  async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
     const body = await this.fetchJson(RemotiveFeed.url);
     if (!isRecord(body) || !Array.isArray(body.jobs)) {
       throw new Error('Remotive response has no jobs list');
     }
     return body.jobs.flatMap((job) => {
-      const opening = toJobOpening(job);
+      const opening = toJobOpening(job, query);
       return opening === null ? [] : [opening];
     });
   }
 }
 
-function toJobOpening(job: unknown): JobOpening | null {
+/** The opening for [job], or null when it is invalid or [query] drops it. */
+function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   if (!isRecord(job)) return null;
   const id = typeof job.id === 'number' ? String(job.id) : stringOrNull(job.id);
   const title = stringOrNull(job.title);
@@ -40,6 +41,8 @@ function toJobOpening(job: unknown): JobOpening | null {
   const url = stringOrNull(job.url);
   const publishedAt = parsePublicationDate(job.publication_date);
   if (!id || !title || !company || !url || !publishedAt) return null;
+  const location = stringOrNull(job.candidate_required_location);
+  if (!isWantedJob(query, { title, location, publishedAt })) return null;
 
   const jobType = stringOrNull(job.job_type);
   return {
@@ -49,7 +52,7 @@ function toJobOpening(job: unknown): JobOpening | null {
     title,
     company,
     url,
-    location: stringOrNull(job.candidate_required_location),
+    location,
     tags: stringList(job.tags),
     jobTypes: jobType ? [jobType] : [],
     description: htmlToText(

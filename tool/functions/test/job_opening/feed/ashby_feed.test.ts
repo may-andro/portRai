@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { AshbyFeed } from '../../../src/job_opening/feed/ashby_feed.js';
+import { searchQuery } from '../fixture.js';
 
 const board = { system: 'ashby' as const, slug: 'ramp', name: 'Ramp' };
 
@@ -24,9 +25,9 @@ describe('AshbyFeed', () => {
   it('should map a posting with a remote location', async () => {
     const fetchJson = vi.fn().mockResolvedValue({ jobs: [job] });
 
-    const openings = await new AshbyFeed(fetchJson, [board]).fetchJobs({
-      terms: ['Android'],
-    });
+    const openings = await new AshbyFeed(fetchJson, async () => [
+      board,
+    ]).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(fetchJson).toHaveBeenCalledWith(
       'https://api.ashbyhq.com/posting-api/job-board/ramp',
@@ -56,9 +57,9 @@ describe('AshbyFeed', () => {
       ],
     });
 
-    const openings = await new AshbyFeed(fetchJson, [board]).fetchJobs({
-      terms: ['Android'],
-    });
+    const openings = await new AshbyFeed(fetchJson, async () => [
+      board,
+    ]).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(openings).toEqual([]);
   });
@@ -75,9 +76,9 @@ describe('AshbyFeed', () => {
       ],
     });
 
-    const openings = await new AshbyFeed(fetchJson, [board]).fetchJobs({
-      terms: ['Android'],
-    });
+    const openings = await new AshbyFeed(fetchJson, async () => [
+      board,
+    ]).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(openings.map((opening) => opening.location)).toEqual(['Europe']);
   });

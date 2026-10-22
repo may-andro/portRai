@@ -16,6 +16,9 @@ import {
 // Leaves room for the model's thinking tokens, which count towards the limit.
 const maxOutputTokens = 4096;
 
+// Weighing a job against the portfolio benefits from some reasoning.
+const thinkingBudget = 1024;
+
 export interface JobScorer {
   score(opening: MatchedJobOpening, profile: PortfolioProfile): Promise<JobFit>;
   /**
@@ -38,6 +41,7 @@ export class GeminiJobScorer implements JobScorer {
       prompt: jobFitPrompt(opening, profile),
       responseJsonSchema: jobFitSchema,
       maxOutputTokens,
+      thinkingBudget,
     });
     return parseJobFit(text, profile.skills);
   }
