@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/_blo
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
+import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
 import '../../../../../../../mock/feature/profile/domain/use_case/mock_open_email_use_case.dart';
 import '../../../../../../../mock/feature/profile/presentation/screen/profile/bloc/mock_profile_bloc.dart';
 import '../../../../../../../mock/feature/profile/presentation/widget/footer/tracking/mock_footer_tracking_delegate.dart';
@@ -82,6 +83,7 @@ void main() {
           addTearDown(appServiceLocator.reset);
           appServiceLocator.registerFactory<FooterBloc>(
             () => FooterBloc(
+              MockGetProfileUseCase(),
               MockOpenExternalUrlUseCase(),
               MockOpenEmailUseCase(),
               MockFooterTrackingDelegate(),

@@ -11,9 +11,10 @@ sealed class FooterEvent extends Equatable {
 }
 
 final class LoadDataEvent extends FooterEvent {
-  const LoadDataEvent({required this.profile});
+  const LoadDataEvent({this.profile});
 
-  final ProfileEntity profile;
+  /// The profile to show; loaded by the bloc when null.
+  final ProfileEntity? profile;
 
   @override
   List<Object?> get props => [profile];
