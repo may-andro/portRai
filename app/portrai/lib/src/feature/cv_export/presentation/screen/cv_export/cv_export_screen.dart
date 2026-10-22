@@ -74,7 +74,10 @@ class _LoadingStateWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: context.space(factor: 2),
         children: [
-          DSLoadingWidget(size: context.space(factor: 5)),
+          DSLoadingWidget(
+            style: DSLoadingStyle.lottie,
+            size: context.space(factor: 5),
+          ),
           if (isTailoring)
             DSTextWidget(
               context.localizations.cvExportTailoring,
