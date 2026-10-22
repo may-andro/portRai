@@ -1,9 +1,6 @@
 import 'dart:ui';
 
 import 'package:core/core.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
-
-import '../../profile/test_data/profile_test_data.dart';
 
 AppLocale createEnglishLocale() => AppLocale('en');
 
@@ -16,5 +13,3 @@ List<Locale> createSupportedLocales() => const [
   Locale('nl'),
   Locale('es'),
 ];
-
-ProfileEntity createLocaleProfile() => createProfileEntity();

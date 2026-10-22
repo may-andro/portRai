@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/locale/domain/_domain.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/_bloc.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/widget/content_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/locale/presentation/screen/locale_selection/bloc/mock_locale_selection_bloc.dart';
 import '../../../../../../../mock/feature/locale/test_data/locale_test_data.dart';
@@ -131,30 +132,47 @@ void main() {
       },
     );
 
-    testWidgets('should not render the footer when loaded in dialog mode', (
-      tester,
-    ) async {
-      final bloc = MockLocaleSelectionBloc()
-        ..stubState(
-          LocaleSelectionStateFactory.loaded(
-            supportedLocales: createSupportedLocales(),
-            appLocale: createEnglishLocale(),
-            profile: createLocaleProfile(),
-          ),
-        );
+    for (final isDialog in [false, true]) {
+      testWidgets(
+        'should ${isDialog ? 'show the languages without' : 'scroll the '
+                  'languages followed by'} the footer when loaded '
+        '${isDialog ? 'in' : 'outside'} a dialog',
+        (tester) async {
+          final bloc = MockLocaleSelectionBloc()
+            ..stubState(
+              LocaleSelectionStateFactory.loaded(
+                supportedLocales: createSupportedLocales(),
+                appLocale: createEnglishLocale(),
+              ),
+            );
 
-      await tester.pumpWidget(
-        TestWidgetWrapper(
-          child: BlocProvider<LocaleSelectionBloc>.value(
-            value: bloc,
-            child: const ContentWidget(isDialog: true),
-          ),
-        ),
+          await tester.pumpWidget(
+            TestWidgetWrapper(
+              child: ScreenFooterProviderWidget(
+                footer: const Text('footer'),
+                child: BlocProvider<LocaleSelectionBloc>.value(
+                  value: bloc,
+                  child: ContentWidget(isDialog: isDialog),
+                ),
+              ),
+            ),
+          );
+          await tester.pump();
+
+          final scrollView = find.byType(CustomScrollView);
+          expect(
+            find.descendant(
+              of: scrollView,
+              matching: find.byType(RadioGroup<Locale>),
+            ),
+            isDialog ? findsNothing : findsOneWidget,
+          );
+          expect(find.byType(RadioGroup<Locale>), findsOneWidget);
+          expect(find.text('footer'), isDialog ? findsNothing : findsOneWidget);
+          expect(find.byType(FooterWidget), findsNothing);
+        },
       );
-      await tester.pump();
-
-      expect(find.byType(FooterWidget), findsNothing);
-    });
+    }
 
     testWidgets(
       'should dispatch an update event when a different locale option is tapped',
