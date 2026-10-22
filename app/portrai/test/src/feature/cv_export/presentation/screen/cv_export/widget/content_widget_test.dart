@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -28,23 +30,33 @@ void main() {
       );
     });
 
-    Future<void> pumpContent(
-      WidgetTester tester, {
+    Future<void> pumpChild(
+      WidgetTester tester,
+      Widget child, {
       Size size = const Size(1000, 3000),
+      CvExportState? blocState,
     }) async {
-      bloc = MockCvExportBloc()..stubState(state);
+      bloc = MockCvExportBloc()..stubState(blocState ?? state);
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         TestWidgetWrapper(
-          child: BlocProvider<CvExportBloc>.value(
-            value: bloc,
-            child: ContentWidget(state: state),
-          ),
+          child: BlocProvider<CvExportBloc>.value(value: bloc, child: child),
         ),
       );
       await tester.pump();
+    }
+
+    Future<void> pumpContent(
+      WidgetTester tester, {
+      Size size = const Size(1000, 3000),
+    }) async {
+      await pumpChild(
+        tester,
+        CustomScrollView(slivers: [ContentWidget(state: state)]),
+        size: size,
+      );
     }
 
     testWidgets(
@@ -87,7 +99,7 @@ void main() {
     testWidgets('should not dispatch download when no pdf is ready', (
       tester,
     ) async {
-      await pumpContent(tester);
+      await pumpChild(tester, const DownloadButtonWidget());
 
       await tester.tap(find.text('Download CV'), warnIfMissed: false);
 
@@ -105,12 +117,41 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('should show the download button in the corner', (
+    testWidgets('should show the download button when the CV is loaded', (
       tester,
     ) async {
-      await pumpContent(tester);
+      await pumpChild(tester, const DownloadButtonWidget());
 
       expect(find.text('Download CV'), findsOneWidget);
+    });
+
+    testWidgets(
+      'should dispatch download when the button is tapped and the pdf is ready',
+      (tester) async {
+        state = CvExportLoadedState(
+          document: CvExportTestFixture.lightDocument(),
+          options: const CvOptionsEntity(),
+          labels: CvExportTestFixture.labels,
+          pdfBytes: Uint8List(1),
+        );
+        await pumpChild(tester, const DownloadButtonWidget());
+
+        await tester.tap(find.text('Download CV'));
+
+        verify(() => bloc.add(const DownloadCvClickEvent())).called(1);
+      },
+    );
+
+    testWidgets('should hide the download button when the CV is not loaded', (
+      tester,
+    ) async {
+      await pumpChild(
+        tester,
+        const DownloadButtonWidget(),
+        blocState: const CvExportInitialState(),
+      );
+
+      expect(find.text('Download CV'), findsNothing);
     });
 
     testWidgets('should say which job a tailored CV is for', (tester) async {

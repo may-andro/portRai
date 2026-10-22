@@ -39,7 +39,8 @@ class CvExportScreen extends StatelessWidget {
           return appServiceLocator.get<CvExportBloc>()..add(loadEvent);
         },
         child: Builder(
-          builder: (context) =>
+          builder: (context) => Stack(
+            children: [
               ScreenContentWidget<CvExportBloc, CvExportState>(
                 buildWhen: (previous, current) => previous != current,
                 contentOf: (state) => switch (state) {
@@ -54,11 +55,17 @@ class CvExportScreen extends StatelessWidget {
                     failure,
                     onRetry: () => context.bloc.add(loadEvent),
                   ),
-                  final CvExportLoadedState state => ScreenLoadedContent(
-                    ContentWidget(state: state),
-                  ),
+                  final CvExportLoadedState state =>
+                    ScreenLoadedContent.slivers([ContentWidget(state: state)]),
                 },
               ),
+              Positioned(
+                right: context.space(factor: 2),
+                bottom: context.space(factor: 2),
+                child: const SafeArea(child: DownloadButtonWidget()),
+              ),
+            ],
+          ),
         ),
       ),
     );

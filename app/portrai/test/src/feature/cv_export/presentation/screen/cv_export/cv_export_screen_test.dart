@@ -6,7 +6,9 @@ import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/_bloc.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/cv_export_screen.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/widget/content_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 import 'package:use_case/use_case.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -35,7 +37,14 @@ void main() {
       tester.view.physicalSize = const Size(1000, 3000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      await tester.pumpWidget(const TestWidgetWrapper(child: CvExportScreen()));
+      await tester.pumpWidget(
+        const TestWidgetWrapper(
+          child: ScreenFooterProviderWidget(
+            footer: Text('footer'),
+            child: CvExportScreen(),
+          ),
+        ),
+      );
       await tester.pump();
     }
 
@@ -92,19 +101,39 @@ void main() {
       verify(() => bloc.add(any(that: isA<LoadCvExportEvent>()))).called(2);
     });
 
-    testWidgets('should show the CV content when loading succeeds', (
+    testWidgets(
+      'should scroll the CV content followed by the footer when loading '
+      'succeeds',
+      (tester) async {
+        await pumpScreen(
+          tester,
+          CvExportLoadedState(
+            document: CvExportTestFixture.lightDocument(),
+            options: const CvOptionsEntity(),
+            labels: CvExportTestFixture.labels,
+          ),
+        );
+
+        final scrollView = find.byType(CustomScrollView);
+        expect(
+          find.descendant(of: scrollView, matching: find.byType(ContentWidget)),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(of: scrollView, matching: find.text('footer')),
+          findsOneWidget,
+        );
+        expect(find.byType(FooterWidget), findsNothing);
+        expect(find.text('Download CV'), findsOneWidget);
+      },
+    );
+
+    testWidgets('should hide the download button when loading fails', (
       tester,
     ) async {
-      await pumpScreen(
-        tester,
-        CvExportLoadedState(
-          document: CvExportTestFixture.lightDocument(),
-          options: const CvOptionsEntity(),
-          labels: CvExportTestFixture.labels,
-        ),
-      );
+      await pumpScreen(tester, const CvExportErrorState(UnknownFailure()));
 
-      expect(find.byType(ContentWidget), findsOneWidget);
+      expect(find.text('Download CV'), findsNothing);
     });
   });
 }

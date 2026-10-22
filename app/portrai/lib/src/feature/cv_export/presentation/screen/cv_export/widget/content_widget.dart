@@ -42,6 +42,8 @@ extension on BuildContext {
   }
 }
 
+/// The loaded CV as a sliver: the hero, then the preview and its controls,
+/// with room at the bottom for [DownloadButtonWidget].
 class ContentWidget extends StatelessWidget {
   const ContentWidget({required this.state, super.key});
 
@@ -68,40 +70,31 @@ class ContentWidget extends StatelessWidget {
       ],
     );
 
-    return Stack(
-      children: [
-        CustomScrollView(
-          slivers: [
-            const SliverToBoxAdapter(child: _HeroWidget()),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                context.horizontalPadding,
-                context.space(factor: 3),
-                context.horizontalPadding,
-                context.space(factor: 14),
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _TailoringBannerWidget(state: state),
-                    DSResponsiveWidthContainerWidget(
-                      xsBuilder: stackedBody,
-                      sBuilder: stackedBody,
-                      mBuilder: stackedBody,
-                      lBuilder: sideBySideBody,
-                      xlBuilder: sideBySideBody,
-                    ),
-                  ],
+    return SliverMainAxisGroup(
+      slivers: [
+        const SliverToBoxAdapter(child: _HeroWidget()),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            context.horizontalPadding,
+            context.space(factor: 3),
+            context.horizontalPadding,
+            context.space(factor: 14),
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _TailoringBannerWidget(state: state),
+                DSResponsiveWidthContainerWidget(
+                  xsBuilder: stackedBody,
+                  sBuilder: stackedBody,
+                  mBuilder: stackedBody,
+                  lBuilder: sideBySideBody,
+                  xlBuilder: sideBySideBody,
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-        Positioned(
-          right: context.space(factor: 2),
-          bottom: context.space(factor: 2),
-          child: SafeArea(child: _DownloadButtonWidget(state: state)),
+          ),
         ),
       ],
     );
