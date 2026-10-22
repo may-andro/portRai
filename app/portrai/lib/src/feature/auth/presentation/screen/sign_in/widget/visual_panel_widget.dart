@@ -111,9 +111,14 @@ class _VisualPanelWidgetState extends State<_VisualPanelWidget>
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.space(factor: isCompact ? 3 : 7),
-                vertical: context.space(factor: isCompact ? 4 : 8),
+              // The copy starts where the logo does.
+              padding: EdgeInsets.fromLTRB(
+                PageHeaderWidget.horizontalPadding(context),
+                context.space(factor: isCompact ? 4 : 8),
+                isCompact
+                    ? PageHeaderWidget.horizontalPadding(context)
+                    : context.space(factor: 7),
+                context.space(factor: isCompact ? 4 : 8),
               ),
               child: isCompact
                   ? Row(

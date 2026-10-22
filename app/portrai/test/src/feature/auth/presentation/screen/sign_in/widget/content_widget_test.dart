@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/_bloc.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/widget/_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/auth/presentation/screen/sign_in/bloc/mock_sign_in_bloc.dart';
@@ -14,9 +15,10 @@ import '../../../../../../../util/test_wrapper_widget.dart';
 void main() {
   Future<MockSignInBloc> pumpContent(
     WidgetTester tester,
-    SignInState state,
-  ) async {
-    setUpAnimatedPage(tester);
+    SignInState state, {
+    Size size = const Size(1440, 2400),
+  }) async {
+    setUpAnimatedPage(tester, size: size);
     final bloc = MockSignInBloc()..stubState(state);
     addTearDown(bloc.close);
     await tester.pumpWidget(
@@ -144,4 +146,45 @@ void main() {
     );
     expect(find.byType(FooterWidget), findsNothing);
   });
+
+  double logoLeft(WidgetTester tester) {
+    return tester
+        .getTopLeft(
+          find.descendant(
+            of: find.byType(PageHeaderWidget),
+            matching: find.byType(Image),
+          ),
+        )
+        .dx;
+  }
+
+  testWidgets(
+    'should start the welcome text where the logo starts when shown side by '
+    'side',
+    (tester) async {
+      await pumpContent(tester, const SignInState());
+
+      expect(tester.getTopLeft(find.text('Welcome back')).dx, logoLeft(tester));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should start the welcome text and the form where the logo starts when '
+    'stacked',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(400, 1600),
+      );
+
+      expect(tester.getTopLeft(find.text('Welcome back')).dx, logoLeft(tester));
+      expect(
+        tester.getTopLeft(find.byType(TextFormField).first).dx,
+        logoLeft(tester),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
 }

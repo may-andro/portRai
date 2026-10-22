@@ -28,12 +28,12 @@ class ContentWidget extends StatelessWidget {
 
     final form = Center(
       child: Padding(
-        // Side by side, the form fills half the page, so the page padding
-        // would be too wide.
+        // Stacked, the form lines up with the logo; side by side it is
+        // centred in its half of the page.
         padding: EdgeInsets.symmetric(
           horizontal: isSideBySide
               ? context.space(factor: 3)
-              : context.screenHorizontalPadding.left,
+              : PageHeaderWidget.horizontalPadding(context),
           vertical: context.space(factor: isSideBySide ? 6 : 3),
         ),
         child: ConstrainedBox(
