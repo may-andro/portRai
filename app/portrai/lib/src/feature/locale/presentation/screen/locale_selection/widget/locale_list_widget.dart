@@ -94,7 +94,8 @@ class _LocaleLoadingStateWidget extends StatelessWidget {
       width: size,
       height: size,
       child: DSLoadingWidget(
-        size: size,
+        style: DSLoadingStyle.lottie,
+        size: size / 2,
         color: context.colorPalette.onBackground,
       ),
     );
