@@ -101,7 +101,10 @@ A screen whose bloc has loading, error and loaded states renders them with
 `_LoadingWidget`/`_ErrorWidget`. It shows `DSLoadingWidget` or a translated
 `DSErrorCardWidget`, reports each content's impression once, and rebuilds only when the state
 type changes unless `buildWhen` is given. Report the impression as a
-`ViewStateVisibleEvent(content.trackingLabel)`.
+`ViewStateVisibleEvent(content.trackingLabel)`. Give `ScreenErrorContent` an `onRetry` when the
+screen can reload, and omit `impressionPrefix`/`onContentVisible` on screens without impression
+tracking. Pass `buildWhen: (previous, current) => previous != current` when a loaded state can
+follow another loaded state with new data.
 
 ```dart
 return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
