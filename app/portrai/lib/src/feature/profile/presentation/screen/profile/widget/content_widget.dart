@@ -8,7 +8,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
-import 'package:portrai/src/feature/profile/presentation/widget/_widget.dart';
 import 'package:portrai/src/widget/page_band_widget.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
@@ -32,9 +31,12 @@ class ContentWidget extends StatelessWidget {
       contentOf: (state) => switch (state) {
         LoadingState() => const ScreenLoadingContent(),
         ErrorState(:final failure) => ScreenErrorContent(failure),
-        LoadedState(:final profile, :final workPlaces) => ScreenLoadedContent(
-          _BodyWidget(profile: profile, workPlaces: workPlaces),
-        ),
+        LoadedState(:final profile, :final workPlaces) =>
+          ScreenLoadedContent.slivers([
+            SliverToBoxAdapter(
+              child: _BodyWidget(profile: profile, workPlaces: workPlaces),
+            ),
+          ]),
       },
       onContentVisible: (content) =>
           context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
