@@ -10,10 +10,6 @@ class ProfileTrackingDelegate extends ScreenTrackingDelegate {
   ProfileTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
-
   void trackExternalLinkClick(String url) {
     trackEvent(
       Tracking(

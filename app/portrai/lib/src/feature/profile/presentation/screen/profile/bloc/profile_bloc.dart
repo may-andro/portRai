@@ -8,9 +8,12 @@ import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/pro
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/profile_state.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/tracking/_tracking.dart';
 import 'package:portrai/src/feature/project/project.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
+class ProfileBloc extends Bloc<ProfileEvent, ProfileState>
+    with ScreenTrackingBlocMixin<ProfileEvent, ProfileState> {
   ProfileBloc(
     this._getProfileUseCase,
     this._getProjectsUseCase,
@@ -19,14 +22,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) : super(const LoadingState()) {
     on<LoadProfileEvent>(_mapLoadProfileEventToState);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
-    on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
+    trackScreenViewOn<ScreenVisibleEvent>();
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final GetProfileUseCase _getProfileUseCase;
   final GetProjectsUseCase _getProjectsUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final ProfileTrackingDelegate _trackingDelegate;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   FutureOr<void> _mapLoadProfileEventToState(
     LoadProfileEvent event,
@@ -79,20 +85,5 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     if (eitherResult.isRight) {
       _trackingDelegate.trackExternalLinkClick(event.label);
     }
-  }
-
-  // Tracking Events
-  FutureOr<void> _mapScreenVisibleEventToState(
-    ScreenVisibleEvent event,
-    Emitter<ProfileState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<ProfileState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }

@@ -33,22 +33,6 @@ void main() {
       expect(tracking.parameters['area'], 'profile');
     });
 
-    test(
-      'should send a view_impression event when trackViewEvent is called',
-      () {
-        delegate.trackViewEvent('profile_success_content_view');
-
-        final tracking =
-            verify(
-                  () => trackingReporter.sendTrackingEvent(captureAny()),
-                ).captured.single
-                as Tracking;
-
-        expect(tracking.parameters['event'], 'view_impression');
-        expect(tracking.parameters['label'], 'profile_success_content_view');
-      },
-    );
-
     test('should send a click event when trackExternalLinkClick is called', () {
       delegate.trackExternalLinkClick('Github');
 
