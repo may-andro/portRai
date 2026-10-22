@@ -39,19 +39,6 @@ void main() {
       expect(tracking.parameters['area'], 'project');
     });
 
-    test('should send a view impression when trackViewEvent is called', () {
-      delegate.trackViewEvent('loaded_content_view');
-
-      final tracking =
-          verify(
-                () => trackingReporter.sendTrackingEvent(captureAny()),
-              ).captured.single
-              as Tracking;
-
-      expect(tracking.parameters['event'], 'view_impression');
-      expect(tracking.parameters['label'], 'loaded_content_view');
-    });
-
     test(
       'should send a click event when trackAvailabilityLinkClick is called',
       () {

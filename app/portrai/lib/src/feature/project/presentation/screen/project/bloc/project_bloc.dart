@@ -7,14 +7,17 @@ import 'package:portrai/src/feature/project/presentation/screen/project/bloc/pro
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/project_state.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/extension/_extension.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
+class ProjectBloc extends Bloc<ProjectEvent, ProjectState>
+    with ScreenTrackingBlocMixin<ProjectEvent, ProjectState> {
   ProjectBloc(this._openExternalUrlUseCase, this._trackingDelegate)
     : super(const LoadingState()) {
-    on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
+    trackScreenViewOn<ScreenVisibleEvent>();
     on<LoadProjectEvent>(_mapLoadProjectEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
     on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
     on<HeaderTabClickEvent>(_mapHeaderTabClickEventToState);
@@ -23,25 +26,14 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final ProjectTrackingDelegate _trackingDelegate;
 
-  FutureOr<void> _mapScreenVisibleEventToState(
-    ScreenVisibleEvent event,
-    Emitter<ProjectState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   FutureOr<void> _mapLoadProjectEventToState(
     LoadProjectEvent event,
     Emitter<ProjectState> emit,
   ) {
     emit(LoadedState(project: event.project, sections: event.project.sections));
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<ProjectState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 
   FutureOr<void> _mapOpenExternalUrlEventToState(
