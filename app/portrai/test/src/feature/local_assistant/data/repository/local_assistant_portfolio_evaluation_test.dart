@@ -33,8 +33,9 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 
-// Runs the assistant over the real portfolio in assets/dashboard. Those files
-// are git-ignored, so the test is skipped where they are absent, such as CI.
+// Runs the assistant over the portfolio in assets/dashboard. Those files are
+// git-ignored, so the test is skipped where they are absent. CI creates them
+// from the templates, so expectations come from the loaded portfolio.
 // The portfolio is parsed with each feature's own models and mappers, the
 // same path the app's asset repositories take.
 // It checks which questions are answered directly and what the model would
@@ -176,7 +177,8 @@ void main() {
             .testimonial
             .substring(0, 30),
         'Give me the resume link': portfolio.profile.resume.url,
-        'Does he have any certifications?': 'none listed',
+        'Does he have any certifications?':
+            portfolio.profile.certifications.firstOrNull?.name ?? 'none listed',
         'What is his level in GraphQL?': 'GraphQL',
         'Where does he live?': portfolio.profile.location.city,
       };
