@@ -25,8 +25,8 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
   static const _tag = 'RemoteTestimonialRepositoryImpl';
 
   @override
-  Future<void> cacheTestimonial(TestimonialEntity testimonial) {
-    return _cacheDelegateRepository.cacheTestimonial(testimonial);
+  Future<void> cacheTestimonials(List<TestimonialEntity> testimonials) {
+    return _cacheDelegateRepository.cacheTestimonials(testimonials);
   }
 
   @override
@@ -156,9 +156,7 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
     List<TestimonialEntity> testimonials,
   ) async {
     try {
-      for (final testimonial in testimonials) {
-        await cacheTestimonial(testimonial);
-      }
+      await cacheTestimonials(testimonials);
     } catch (_) {
       _logReporter.error(
         'Failed to cache testimonials from remote, continuing without caching.',

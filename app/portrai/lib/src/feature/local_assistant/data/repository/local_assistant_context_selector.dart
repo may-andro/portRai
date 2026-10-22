@@ -8,24 +8,20 @@ class LocalAssistantContextSelector {
       'Portfolio facts (selected for this question). Quote dates and '
       'durations exactly as written; never calculate or invent them.';
 
+  /// Selects the facts of the decoded [portfolio] that are relevant to
+  /// [question], within [maxBytes] of UTF-8.
   String select(
-    String portfolioContext,
+    Map<String, dynamic> portfolio,
     String question, {
     String? previousQuestion,
     int maxBytes = maxContextBytes,
   }) {
-    final decoded = jsonDecode(portfolioContext);
-    if (decoded is! Map<String, dynamic>) {
-      throw const FormatException(
-        'Assistant context must be a portfolio object.',
-      );
-    }
     final terms = _terms(question);
-    final countryTerms = _countryTerms(decoded);
+    final countryTerms = _countryTerms(portfolio);
     final previousTerms = _terms(previousQuestion ?? '');
     final asksTechnologyDuration =
         terms.intersection(_durationTerms).isNotEmpty &&
-        terms.intersection(_technologyTerms(decoded)).isNotEmpty;
+        terms.intersection(_technologyTerms(portfolio)).isNotEmpty;
     final facts = <({String text, int score, int order})>[];
 
     void addFacts(Object? value, String path, int sourceScore) {
@@ -59,7 +55,7 @@ class LocalAssistantContextSelector {
       }
     }
 
-    for (final section in decoded.entries) {
+    for (final section in portfolio.entries) {
       if (section.key == 'overview') {
         // Precomputed rankings: only relevant to career questions, and then
         // more useful than any individual record.
@@ -143,7 +139,7 @@ class LocalAssistantContextSelector {
     if (experiences is! List) return const {};
     return {
       for (final item in experiences.whereType<Map<String, dynamic>>())
-        ..._terms('${item['location']}'.replaceAll(RegExp(r'\[.*?\]'), '')),
+        ..._terms('${item['location']}'.replaceAll(_bracketedNote, '')),
       'country',
       'countries',
     };
@@ -169,16 +165,20 @@ class LocalAssistantContextSelector {
     };
   }
 
-  static bool _mentionsYear(Set<String> terms) =>
-      terms.any((term) => RegExp(r'^(19|20)\d{2}$').hasMatch(term));
+  static final _bracketedNote = RegExp(r'\[.*?\]');
+  static final _year = RegExp(r'^(19|20)\d{2}$');
+  static final _camelCaseBoundary = RegExp(r'([a-z])([A-Z])');
+  static final _word = RegExp(r'[\p{L}\p{N}]+', unicode: true);
+
+  static bool _mentionsYear(Set<String> terms) => terms.any(_year.hasMatch);
 
   static Set<String> _terms(String text) {
     // Split camelCase field names too, so "date" matches "startDate".
     final spaced = text.replaceAllMapped(
-      RegExp(r'([a-z])([A-Z])'),
+      _camelCaseBoundary,
       (match) => '${match[1]} ${match[2]}',
     );
-    final terms = RegExp(r'[\p{L}\p{N}]+', unicode: true)
+    final terms = _word
         .allMatches(spaced.toLowerCase())
         .map((match) => match.group(0)!)
         .where((word) => word.length > 1 && !_stopWords.contains(word))

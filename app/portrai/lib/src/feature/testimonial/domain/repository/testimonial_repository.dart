@@ -5,5 +5,5 @@ abstract class TestimonialRepository {
 
   Future<List<TestimonialEntity>> getTestimonials();
 
-  Future<void> cacheTestimonial(TestimonialEntity testimonial);
+  Future<void> cacheTestimonials(List<TestimonialEntity> testimonials);
 }

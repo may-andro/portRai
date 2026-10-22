@@ -62,9 +62,7 @@ void main() {
           const ProjectNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final project in projects) {
-          cacheDelegateRepository.stubCacheProject(project);
-        }
+        cacheDelegateRepository.stubCacheProjects(projects);
 
         final result = await repository.getProjects();
 
@@ -75,9 +73,7 @@ void main() {
             localeCode,
           ),
         ).called(1);
-        for (final project in projects) {
-          verify(() => cacheDelegateRepository.cacheProject(project)).called(1);
-        }
+        verify(() => cacheDelegateRepository.cacheProjects(projects)).called(1);
       },
     );
 
@@ -90,9 +86,7 @@ void main() {
           error: const ProjectNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final item in projects) {
-          cacheDelegateRepository.stubCacheProject(item);
-        }
+        cacheDelegateRepository.stubCacheProjects(projects);
 
         final result = await repository.getProject(project.id);
 
@@ -113,9 +107,7 @@ void main() {
           const ProjectCacheException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final project in projects) {
-          cacheDelegateRepository.stubCacheProject(project);
-        }
+        cacheDelegateRepository.stubCacheProjects(projects);
 
         final result = await repository.getProjects();
 
@@ -136,8 +128,8 @@ void main() {
           const ProjectNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        cacheDelegateRepository.stubCacheProjectThrows(
-          project: projects.first,
+        cacheDelegateRepository.stubCacheProjectsThrows(
+          projects: projects,
           error: Exception('cache write failed'),
         );
 

@@ -57,7 +57,7 @@ void main() {
       'should load services from Firestore and cache them when the cache is empty',
       () async {
         cacheRepository.stubGetServicesThrows(const ServiceNotFoundException());
-        cacheRepository.stubCacheService(service);
+        cacheRepository.stubCacheServices([service]);
         firestoreController.stubGetDocumentFromCollection({
           'services': [
             {
@@ -73,7 +73,7 @@ void main() {
         verify(
           () => firestoreController.getDocumentFromCollection('services', 'en'),
         ).called(1);
-        verify(() => cacheRepository.cacheService(service)).called(1);
+        verify(() => cacheRepository.cacheServices([service])).called(1);
       },
     );
 
@@ -81,7 +81,7 @@ void main() {
       'should log the cache error and still load services from Firestore when reading the cache fails',
       () async {
         cacheRepository.stubGetServicesThrows(const ServiceCacheException());
-        cacheRepository.stubCacheService(service);
+        cacheRepository.stubCacheServices([service]);
         firestoreController.stubGetDocumentFromCollection({
           'services': [
             {
@@ -168,10 +168,9 @@ void main() {
       'should continue returning services when caching the loaded Firestore data fails',
       () async {
         cacheRepository.stubGetServicesThrows(const ServiceNotFoundException());
-        cacheRepository.stubCacheServiceThrows(
+        cacheRepository.stubCacheServicesThrows([
           service,
-          const ServiceCacheException(),
-        );
+        ], const ServiceCacheException());
         firestoreController.stubGetDocumentFromCollection({
           'services': [
             {

@@ -17,8 +17,8 @@ class BuildConfigExperienceRepositoryImpl implements ExperienceRepository {
   final ExperienceRepository _demoDelegateRepository;
 
   @override
-  Future<void> cacheExperience(ExperienceEntity experience) {
-    return _delegateRepository.cacheExperience(experience);
+  Future<void> cacheExperiences(List<ExperienceEntity> experiences) {
+    return _delegateRepository.cacheExperiences(experiences);
   }
 
   @override

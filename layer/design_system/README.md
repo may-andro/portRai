@@ -99,6 +99,7 @@ import 'package:design_system/design_system.dart';
 | `DSLoadingWidget` | Animated staggered-dots loading indicator |
 | `DSResponsiveContainerWidget` | Builder that switches on `mobile / tablet / desktop` |
 | `DSVisibilityDetectorWidget` | Fires a callback when the widget enters/leaves the viewport |
+| `DSOffscreenPauseWidget` | Pauses the animations below it while none of it is on screen |
 
 #### Molecules
 

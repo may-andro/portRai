@@ -342,7 +342,63 @@ describe('syncJobOpenings', () => {
 
     expect(remotive.fetchJobs).toHaveBeenCalledWith({
       terms: ['Flutter', 'Android'],
+      publishedAfter: new Date('2026-09-19T04:00:00Z'),
+      regions: new Set(),
+      roles: portfolioProfile().roles,
     });
+  });
+
+  it('should pass the preferred regions to the feeds', async () => {
+    const remotive = feed('remotive', [jobOpening()]);
+    const deps = dependencies({
+      feeds: [remotive],
+      loadRegions: vi.fn().mockResolvedValue(new Set(['europe'])),
+    });
+
+    await syncJobOpenings(deps);
+
+    expect(vi.mocked(remotive.fetchJobs).mock.calls[0][0].regions).toEqual(
+      new Set(['europe']),
+    );
+  });
+
+  it('should read the users and the portfolio at the same time', async () => {
+    let finishUsers: (userIds: string[]) => void = () => {};
+    const deps = dependencies({
+      listUserIds: vi.fn(
+        () =>
+          new Promise<string[]>((resolve) => {
+            finishUsers = resolve;
+          }),
+      ),
+    });
+
+    const syncing = syncJobOpenings(deps);
+    await vi.waitFor(() => expect(deps.loadProfile).toHaveBeenCalled());
+    finishUsers(['owner-uid']);
+
+    expect((await syncing).keptCount).toBe(1);
+  });
+
+  it("should write every user's openings at the same time", async () => {
+    const pendingWrites: Array<() => void> = [];
+    const deps = dependencies({
+      listUserIds: vi.fn().mockResolvedValue(['owner-uid', 'other-uid']),
+      writeJobOpenings: vi.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            pendingWrites.push(resolve);
+          }),
+      ),
+    });
+
+    const syncing = syncJobOpenings(deps);
+    await vi.waitFor(() =>
+      expect(deps.writeJobOpenings).toHaveBeenCalledTimes(2),
+    );
+    for (const finishWrite of pendingWrites) finishWrite();
+
+    expect((await syncing).userCount).toBe(2);
   });
 
   it('should drop openings posted more than 30 days ago', async () => {

@@ -1,16 +1,9 @@
-import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tracking/src/model/model.dart';
 import 'package:tracking/src/reporter/reporter.dart';
 
-class MockFbAnalyticsController extends Mock implements FbAnalyticsController {
-  void mockSendLogEvent() {
-    when(
-      () => sendLogEvent(any(), parameters: any(named: 'parameters')),
-    ).thenAnswer((_) async {});
-  }
-}
+import '../../_mock/mock_fb_analytics_controller.dart';
 
 void main() {
   group(FirebaseTrackingReporter, () {

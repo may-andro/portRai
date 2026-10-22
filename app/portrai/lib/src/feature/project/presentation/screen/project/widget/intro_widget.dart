@@ -22,70 +22,72 @@ class IntroWidget extends StatelessWidget {
     const base = Color(0xFF0E1726);
     final start = Color.lerp(base, palette.brand.primary.color, 0.3)!;
     final end = Color.lerp(base, palette.brand.tertiary.color, 0.25)!;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 900;
-        final stage = _StageWidget(project: project, isWide: isWide);
-        final story = _StoryWidget(project: project, isWide: isWide);
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [start, end],
+    return DSOffscreenPauseWidget(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= 900;
+          final stage = _StageWidget(project: project, isWide: isWide);
+          final story = _StoryWidget(project: project, isWide: isWide);
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [start, end],
+              ),
             ),
-          ),
-          child: ClipRect(
-            child: Stack(
-              children: [
-                _BlobWidget(
-                  color: palette.brand.primary.color,
-                  alignment: const Alignment(-1, -0.9),
-                  driftX: 60,
-                  driftY: 40,
-                  seconds: 9,
-                ),
-                _BlobWidget(
-                  color: palette.brand.tertiary.color,
-                  alignment: const Alignment(1, 0.9),
-                  driftX: -70,
-                  driftY: -30,
-                  seconds: 11,
-                ),
-                _BlobWidget(
-                  color: palette.brand.secondary.color,
-                  alignment: const Alignment(0.2, -1.2),
-                  driftX: 50,
-                  driftY: 50,
-                  seconds: 13,
-                ),
-                const Positioned.fill(child: _GridWidget()),
-                PageChromeWidget(
-                  closeColor: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: pageHorizontalInset(context),
-                      vertical: context.space(factor: isWide ? 8 : 4),
-                    ),
-                    child: isWide
-                        ? Row(
-                            spacing: context.space(factor: 6),
-                            children: [
-                              Expanded(flex: 6, child: story),
-                              Expanded(flex: 4, child: stage),
-                            ],
-                          )
-                        : Column(
-                            spacing: context.space(factor: 4),
-                            children: [stage, story],
-                          ),
+            child: ClipRect(
+              child: Stack(
+                children: [
+                  _BlobWidget(
+                    color: palette.brand.primary.color,
+                    alignment: const Alignment(-1, -0.9),
+                    driftX: 60,
+                    driftY: 40,
+                    seconds: 9,
                   ),
-                ),
-              ],
+                  _BlobWidget(
+                    color: palette.brand.tertiary.color,
+                    alignment: const Alignment(1, 0.9),
+                    driftX: -70,
+                    driftY: -30,
+                    seconds: 11,
+                  ),
+                  _BlobWidget(
+                    color: palette.brand.secondary.color,
+                    alignment: const Alignment(0.2, -1.2),
+                    driftX: 50,
+                    driftY: 50,
+                    seconds: 13,
+                  ),
+                  const Positioned.fill(child: _GridWidget()),
+                  PageChromeWidget(
+                    closeColor: Colors.white,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: pageHorizontalInset(context),
+                        vertical: context.space(factor: isWide ? 8 : 4),
+                      ),
+                      child: isWide
+                          ? Row(
+                              spacing: context.space(factor: 6),
+                              children: [
+                                Expanded(flex: 6, child: story),
+                                Expanded(flex: 4, child: stage),
+                              ],
+                            )
+                          : Column(
+                              spacing: context.space(factor: 4),
+                              children: [stage, story],
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ).animate().fadeIn(duration: 600.ms);
-      },
+          ).animate().fadeIn(duration: 600.ms);
+        },
+      ),
     );
   }
 }

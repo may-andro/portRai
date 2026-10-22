@@ -38,83 +38,85 @@ class ProjectImageBackdropWidget extends StatelessWidget {
     final accent = palette.brand.primary.color;
     final secondary = palette.brand.tertiary.color;
     final size = context.isDesktop ? 520.0 : 300.0;
-    return IgnorePointer(
-      child: ClipRect(
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Transform.translate(
-            offset: Offset(size * 0.25, 0),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: SweepGradient(
-                            colors: [
-                              accent.withAlpha(0),
-                              accent.withAlpha(70),
-                              secondary.withAlpha(0),
-                              secondary.withAlpha(70),
-                              accent.withAlpha(0),
+    return DSOffscreenPauseWidget(
+      child: IgnorePointer(
+        child: ClipRect(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Transform.translate(
+              offset: Offset(size * 0.25, 0),
+              child: SizedBox(
+                width: size,
+                height: size,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: SweepGradient(
+                              colors: [
+                                accent.withAlpha(0),
+                                accent.withAlpha(70),
+                                secondary.withAlpha(0),
+                                secondary.withAlpha(70),
+                                accent.withAlpha(0),
+                              ],
+                            ),
+                          ),
+                        )
+                        .animate(onPlay: (controller) => controller.repeat())
+                        .rotate(duration: 24.seconds),
+                    Container(
+                      width: size * 0.9,
+                      height: size * 0.9,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: palette.surface.surface.color,
+                      ),
+                    ),
+                    Container(
+                          width: size * 0.5,
+                          height: size * 0.5,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(size * 0.12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: accent.withAlpha(50),
+                                blurRadius: 60,
+                                spreadRadius: 8,
+                              ),
                             ],
                           ),
-                        ),
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .rotate(duration: 24.seconds),
-                  Container(
-                    width: size * 0.9,
-                    height: size * 0.9,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: palette.surface.surface.color,
-                    ),
-                  ),
-                  Container(
-                        width: size * 0.5,
-                        height: size * 0.5,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(size * 0.12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: accent.withAlpha(50),
-                              blurRadius: 60,
-                              spreadRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: Opacity(
-                          opacity: 0.16,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(size * 0.12),
-                            child: DSNetworkImageWidget(
-                              url: imageUrl,
-                              fit: BoxFit.contain,
+                          child: Opacity(
+                            opacity: 0.16,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(size * 0.12),
+                              child: DSNetworkImageWidget(
+                                url: imageUrl,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
+                        )
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
+                        .rotate(
+                          begin: -0.025,
+                          end: 0.025,
+                          duration: 6.seconds,
+                          curve: Curves.easeInOut,
+                        )
+                        .moveY(
+                          begin: -12,
+                          end: 12,
+                          duration: 4.seconds,
+                          curve: Curves.easeInOut,
                         ),
-                      )
-                      .animate(
-                        onPlay: (controller) =>
-                            controller.repeat(reverse: true),
-                      )
-                      .rotate(
-                        begin: -0.025,
-                        end: 0.025,
-                        duration: 6.seconds,
-                        curve: Curves.easeInOut,
-                      )
-                      .moveY(
-                        begin: -12,
-                        end: 12,
-                        duration: 4.seconds,
-                        curve: Curves.easeInOut,
-                      ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

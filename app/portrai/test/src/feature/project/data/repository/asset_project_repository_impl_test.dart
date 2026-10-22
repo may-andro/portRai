@@ -75,9 +75,7 @@ void main() {
 
         expect(result, projects);
         verify(() => cacheDelegateRepository.getProjects()).called(1);
-        for (final project in projects) {
-          verifyNever(() => cacheDelegateRepository.cacheProject(project));
-        }
+        verifyNever(() => cacheDelegateRepository.cacheProjects(projects));
       },
     );
 
@@ -87,16 +85,12 @@ void main() {
         cacheDelegateRepository.stubGetProjectsThrows(
           const ProjectNotFoundException(),
         );
-        for (final project in projects) {
-          cacheDelegateRepository.stubCacheProject(project);
-        }
+        cacheDelegateRepository.stubCacheProjects(projects);
 
         final result = await repository.getProjects();
 
         expect(result, projects);
-        for (final project in projects) {
-          verify(() => cacheDelegateRepository.cacheProject(project)).called(1);
-        }
+        verify(() => cacheDelegateRepository.cacheProjects(projects)).called(1);
       },
     );
 
@@ -108,9 +102,7 @@ void main() {
           id: project.id,
           error: const ProjectNotFoundException(),
         );
-        for (final item in projects) {
-          cacheDelegateRepository.stubCacheProject(item);
-        }
+        cacheDelegateRepository.stubCacheProjects(projects);
 
         final result = await repository.getProject(project.id);
 
@@ -130,9 +122,7 @@ void main() {
         cacheDelegateRepository.stubGetProjectsThrows(
           const ProjectCacheException(cause: 'db down'),
         );
-        for (final project in projects) {
-          cacheDelegateRepository.stubCacheProject(project);
-        }
+        cacheDelegateRepository.stubCacheProjects(projects);
 
         final result = await repository.getProjects();
 
@@ -153,8 +143,8 @@ void main() {
         cacheDelegateRepository.stubGetProjectsThrows(
           const ProjectNotFoundException(),
         );
-        cacheDelegateRepository.stubCacheProjectThrows(
-          project: projects.first,
+        cacheDelegateRepository.stubCacheProjectsThrows(
+          projects: projects,
           error: Exception('cache write failed'),
         );
 

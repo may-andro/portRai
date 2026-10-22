@@ -8,45 +8,47 @@ class _HeaderWidget extends StatelessWidget {
     final onSurface = context.colorPalette.surface.onSurface;
     final primary = context.colorPalette.brand.primary;
 
-    return Column(
-      spacing: context.space(),
-      children: [
-        _FloatingWidget(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: primary.color.withAlpha(90),
-                  blurRadius: 32,
-                  spreadRadius: 4,
-                ),
-              ],
-            ),
-            child: DSCircularLogoWidget(
-              size: context.space(factor: context.isMobile ? 8 : 10),
+    return DSOffscreenPauseWidget(
+      child: Column(
+        spacing: context.space(),
+        children: [
+          _FloatingWidget(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: primary.color.withAlpha(90),
+                    blurRadius: 32,
+                    spreadRadius: 4,
+                  ),
+                ],
+              ),
+              child: DSCircularLogoWidget(
+                size: context.space(factor: context.isMobile ? 8 : 10),
+              ),
             ),
           ),
-        ),
-        DSTextWidget(
-          context.localizations.onboardingTitle,
-          style: context.isMobile
-              ? context.typography.emphasizedHeadlineMedium
-              : context.typography.emphasizedDisplaySmall,
-          color: onSurface,
-          textAlign: TextAlign.center,
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: DSTextWidget(
-            context.localizations.onboardingSubtitle,
-            style: context.typography.bodyLarge,
-            color: context.colorPalette.surface.onSurfaceVariant,
+          DSTextWidget(
+            context.localizations.onboardingTitle,
+            style: context.isMobile
+                ? context.typography.emphasizedHeadlineMedium
+                : context.typography.emphasizedDisplaySmall,
+            color: onSurface,
             textAlign: TextAlign.center,
           ),
-        ),
-      ],
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.1, end: 0);
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: DSTextWidget(
+              context.localizations.onboardingSubtitle,
+              style: context.typography.bodyLarge,
+              color: context.colorPalette.surface.onSurfaceVariant,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.1, end: 0),
+    );
   }
 }
 

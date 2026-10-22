@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 typedef AssistantLocation = ({double latitude, double longitude});
 
-/// Coordinates present in the portfolio context, the only places the model may map.
-List<AssistantLocation> assistantLocationsFrom(String portfolioContext) {
+/// Coordinates present in the decoded portfolio context, the only places the
+/// model may map.
+List<AssistantLocation> assistantLocationsFrom(Object? portfolio) {
   final locations = <AssistantLocation>[];
   void visit(Object? node) {
     if (node is Map) {
@@ -21,10 +20,6 @@ List<AssistantLocation> assistantLocationsFrom(String portfolioContext) {
     }
   }
 
-  try {
-    visit(jsonDecode(portfolioContext));
-  } on FormatException {
-    return const [];
-  }
+  visit(portfolio);
   return locations;
 }

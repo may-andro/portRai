@@ -143,6 +143,11 @@ class UserDBCache extends DBCache<User> {
 // Usage — defaults to SQLite under the hood
 final userCache = UserDBCache();
 await userCache.put(User(id: 1, name: 'John', email: 'john@example.com'));
+// Stores several records in one transaction: all of them or none.
+await userCache.putAll([
+  User(id: 2, name: 'Jane', email: 'jane@example.com'),
+  User(id: 3, name: 'Max', email: 'max@example.com'),
+]);
 final users = await userCache.getAll();
 final user = await userCache.get(conditions: {'id': 1});
 ```

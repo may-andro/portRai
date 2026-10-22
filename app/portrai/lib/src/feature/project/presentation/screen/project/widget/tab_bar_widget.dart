@@ -51,35 +51,25 @@ class _PersistentTabBarHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: AnimatedContainer(
-          duration: 200.ms,
-          curve: Curves.easeOut,
-          decoration: BoxDecoration(
-            color: palette.background.color.withAlpha(
-              overlapsContent ? 220 : 255,
-            ),
-          ),
-          // Painted on top so the 1px line doesn't take up layout space.
-          foregroundDecoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: overlapsContent
-                    ? palette.neutral.grey3.color
-                    : Colors.transparent,
-              ),
-            ),
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: _TabBarWidget(
-              sections: sections,
-              tabController: tabController,
-            ),
+    return AnimatedContainer(
+      duration: 200.ms,
+      curve: Curves.easeOut,
+      decoration: BoxDecoration(
+        color: palette.background.color.withAlpha(overlapsContent ? 245 : 255),
+      ),
+      // Painted on top so the 1px line doesn't take up layout space.
+      foregroundDecoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: overlapsContent
+                ? palette.neutral.grey3.color
+                : Colors.transparent,
           ),
         ),
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: _TabBarWidget(sections: sections, tabController: tabController),
       ),
     );
   }

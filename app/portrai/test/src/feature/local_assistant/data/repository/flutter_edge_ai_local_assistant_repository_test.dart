@@ -162,4 +162,106 @@ void main() {
       expect(instruction, contains('1 year and 9 months'));
     },
   );
+
+  group('portfolio context', () {
+    Future<
+      ({
+        FlutterEdgeAiLocalAssistantRepository repository,
+        MockInferenceChat chat,
+      })
+    >
+    prepareRepository() async {
+      final model = MockInferenceModel();
+      final chat = MockInferenceChat();
+      when(
+        () => model.createChat(temperature: 0.2, maxOutputTokens: 16),
+      ).thenAnswer((_) async => chat);
+      when(
+        () => model.createChat(
+          systemInstruction: any(named: 'systemInstruction'),
+          temperature: any(named: 'temperature'),
+          topK: 40,
+          maxOutputTokens: 512,
+        ),
+      ).thenAnswer((_) async => chat);
+      when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
+      when(
+        () => chat.generateChatResponse(),
+      ).thenAnswer((_) async => const TextResponse('Ready'));
+      when(() => chat.close()).thenAnswer((_) async {});
+      when(() => model.close()).thenAnswer((_) async {});
+      final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
+        (_) async => model,
+      );
+      addTearDown(repository.dispose);
+      await repository.prepareModel(onProgress: (_) {});
+      return (repository: repository, chat: chat);
+    }
+
+    test(
+      'should answer contact questions directly when the context is reused',
+      () async {
+        final (:repository, :chat) = await prepareRepository();
+        final portfolioContext = jsonEncode({
+          'profile': {'name': 'Mayank Rai', 'email': 'm@x.com', 'phone': '1'},
+        });
+
+        final emailAnswer = await repository.answer(
+          question: 'What is his email?',
+          portfolioContext: portfolioContext,
+        );
+        final phoneAnswer = await repository.answer(
+          question: 'What is his phone number?',
+          portfolioContext: portfolioContext,
+        );
+
+        expect(emailAnswer, contains('m@x.com'));
+        expect(phoneAnswer, contains('1'));
+        // Only the readiness check reached the model.
+        verify(() => chat.addQueryChunk(any())).called(1);
+      },
+    );
+
+    test(
+      'should throw a format exception when the context is not a portfolio object and the model is needed',
+      () async {
+        final (:repository, chat: _) = await prepareRepository();
+
+        await expectLater(
+          repository.answer(
+            question: 'What happened at Stuart?',
+            portfolioContext: 'Name: Mayank Rai',
+          ),
+          throwsFormatException,
+        );
+      },
+    );
+
+    test(
+      'should select facts from the new context when the context changes',
+      () async {
+        final (:repository, :chat) = await prepareRepository();
+        String contextFor(String company) => jsonEncode({
+          'experiences': [
+            {'company': company, 'startDate': '2022-07-01'},
+          ],
+        });
+
+        await repository.answer(
+          question: 'What happened at Stuart?',
+          portfolioContext: contextFor('Stuart'),
+        );
+        await repository.answer(
+          question: 'What happened at Initech?',
+          portfolioContext: contextFor('Initech'),
+        );
+
+        final message =
+            verify(() => chat.addQueryChunk(captureAny())).captured.last
+                as Message;
+        expect(message.text, contains('Initech'));
+        expect(message.text, isNot(contains('Stuart')));
+      },
+    );
+  });
 }

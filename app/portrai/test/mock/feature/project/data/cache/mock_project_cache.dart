@@ -19,12 +19,12 @@ extension MockProjectCacheStub on MockProjectCache {
     when(() => get(conditions: conditions)).thenThrow(error);
   }
 
-  void stubPut() {
-    when(() => put(any())).thenAnswer((_) async => true);
+  void stubPutAll() {
+    when(() => putAll(any())).thenAnswer((_) async {});
   }
 
-  void stubPutThrows(Object error) {
-    when(() => put(any())).thenThrow(error);
+  void stubPutAllThrows(Object error) {
+    when(() => putAll(any())).thenThrow(error);
   }
 
   void stubQuery({

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
@@ -77,7 +79,7 @@ Future<String> _selectFor(String question, {String? previous}) async {
     );
   final context = (await GetAssistantContextUseCase(getPortfolio)()).right;
   return LocalAssistantContextSelector().select(
-    context,
+    jsonDecode(context) as Map<String, dynamic>,
     question,
     previousQuestion: previous,
   );

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tracking/src/model/model.dart';
 import 'package:tracking/src/reporter/reporter.dart';
@@ -30,6 +32,21 @@ void main() {
         reporter.sendTrackingEvent(ScreenViewTracking(area: SplashArea()));
 
         expect(reporter.sentTrackingEvents?.length, equals(2));
+      });
+
+      test('should keep only the most recent events when over the limit', () {
+        final boundedReporter = LocalTrackingReporter(maxEvents: 2);
+        final latestEvent = ScreenViewTracking(area: SplashArea());
+
+        boundedReporter.sendTrackingEvent(AppStartTracking());
+        // Distinct timestamps, so no event replaces another.
+        sleep(const Duration(milliseconds: 1));
+        boundedReporter.sendTrackingEvent(AppStartTracking());
+        sleep(const Duration(milliseconds: 1));
+        boundedReporter.sendTrackingEvent(latestEvent);
+
+        expect(boundedReporter.sentTrackingEvents?.length, equals(2));
+        expect(boundedReporter.sentTrackingEvents?.values.last, latestEvent);
       });
     });
   });

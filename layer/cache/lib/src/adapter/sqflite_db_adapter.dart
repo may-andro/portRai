@@ -59,6 +59,26 @@ class SqfliteDbAdapter implements DbAdapter {
   }
 
   @override
+  Future<void> upsertAll(List<Map<String, dynamic>> records) async {
+    if (records.isEmpty) return;
+    final db = _requireDb();
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+      for (final values in records) {
+        batch.insert(
+          _schema.tableName,
+          values,
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      await batch.commit(noResult: true);
+    });
+    for (final values in records) {
+      _watchController.add(DbCacheEvent(value: values, deleted: false));
+    }
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> findAll() {
     final db = _requireDb();
     return db.transaction<List<Map<String, dynamic>>>((txn) {

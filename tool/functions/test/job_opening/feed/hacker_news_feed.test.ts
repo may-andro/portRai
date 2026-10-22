@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { JobPostExtractor } from '../../../src/job_opening/extract/job_post_extractor.js';
 import { HackerNewsFeed } from '../../../src/job_opening/feed/hacker_news_feed.js';
+import { searchQuery } from '../fixture.js';
 
 const threads = {
   hits: [
@@ -44,7 +45,7 @@ describe('HackerNewsFeed', () => {
     const fetchJson = fetchJsonFor([flexibitsPost]);
 
     const openings = await new HackerNewsFeed(fetchJson, extractor()).fetchJobs(
-      { terms: ['Android'] },
+      searchQuery({ terms: ['Android'] }),
     );
 
     expect(fetchJson.mock.calls.map(([url]) => url)).toEqual([
@@ -91,7 +92,7 @@ describe('HackerNewsFeed', () => {
         },
       ]),
       postExtractor,
-    ).fetchJobs({ terms: ['Android'] });
+    ).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(postExtractor.extractRoles).toHaveBeenCalledTimes(1);
   });
@@ -107,7 +108,7 @@ describe('HackerNewsFeed', () => {
           isRemote: false,
         },
       ]),
-    ).fetchJobs({ terms: ['Android'] });
+    ).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(openings).toEqual([]);
   });
@@ -129,7 +130,7 @@ describe('HackerNewsFeed', () => {
           },
         ];
       }),
-    ).fetchJobs({ terms: ['Android'] });
+    ).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(openings.map((opening) => opening.company)).toEqual(['Flexibits']);
   });
@@ -141,15 +142,78 @@ describe('HackerNewsFeed', () => {
         extractor(async () => {
           throw new Error('PERMISSION_DENIED');
         }),
-      ).fetchJobs({ terms: ['Android'] }),
+      ).fetchJobs(searchQuery({ terms: ['Android'] })),
     ).rejects.toThrow('Reading every Hacker News post failed (1)');
+  });
+
+  it('should not read posts published before the query allows', async () => {
+    const postExtractor = extractor();
+    await new HackerNewsFeed(
+      fetchJsonFor([
+        flexibitsPost,
+        {
+          id: 6,
+          created_at: '2026-09-01T09:00:00.000Z',
+          text: 'Older | Android Engineer | Remote',
+        },
+      ]),
+      postExtractor,
+    ).fetchJobs(
+      searchQuery({
+        terms: ['Android'],
+        publishedAfter: new Date('2026-09-21T00:00:00Z'),
+      }),
+    );
+
+    expect(postExtractor.extractRoles).toHaveBeenCalledTimes(1);
+    expect(postExtractor.extractRoles).toHaveBeenCalledWith(
+      expect.stringContaining('Flexibits'),
+      ['Android'],
+    );
+  });
+
+  it('should request the threads at the same time', async () => {
+    const pendingThreads: Array<() => void> = [];
+    const fetchJson = vi.fn((url: string) =>
+      url === HackerNewsFeed.threadsUrl
+        ? Promise.resolve({
+            hits: [
+              {
+                objectID: '100',
+                title: 'Ask HN: Who is hiring? (October 2026)',
+              },
+              {
+                objectID: '90',
+                title: 'Ask HN: Who is hiring? (September 2026)',
+              },
+            ],
+          })
+        : new Promise((resolve) => {
+            pendingThreads.push(() => resolve(thread([flexibitsPost])));
+          }),
+    );
+
+    const fetching = new HackerNewsFeed(fetchJson, extractor()).fetchJobs(
+      searchQuery({ terms: ['Android'] }),
+    );
+    await vi.waitFor(() => expect(fetchJson).toHaveBeenCalledTimes(3));
+    for (const finishThread of pendingThreads) finishThread();
+
+    expect(await fetching).toHaveLength(2);
+    expect(fetchJson.mock.calls.map(([url]) => url)).toEqual([
+      HackerNewsFeed.threadsUrl,
+      'https://hn.algolia.com/api/v1/items/100',
+      'https://hn.algolia.com/api/v1/items/90',
+    ]);
   });
 
   it('should not call the network when there are no search terms', async () => {
     const fetchJson = fetchJsonFor([flexibitsPost]);
 
     expect(
-      await new HackerNewsFeed(fetchJson, extractor()).fetchJobs({ terms: [] }),
+      await new HackerNewsFeed(fetchJson, extractor()).fetchJobs(
+        searchQuery({ terms: [] }),
+      ),
     ).toEqual([]);
     expect(fetchJson).not.toHaveBeenCalled();
   });

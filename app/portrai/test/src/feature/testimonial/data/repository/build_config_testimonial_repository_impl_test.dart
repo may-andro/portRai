@@ -57,12 +57,12 @@ void main() {
       test(
         'should delegate testimonial cache writes to the selected source when requested',
         () async {
-          selected.stubCacheTestimonial(testimonial);
+          selected.stubCacheTestimonials([testimonial]);
 
-          await repository.cacheTestimonial(testimonial);
+          await repository.cacheTestimonials([testimonial]);
 
-          verify(() => selected.cacheTestimonial(testimonial)).called(1);
-          verifyNever(() => unselected.cacheTestimonial(testimonial));
+          verify(() => selected.cacheTestimonials([testimonial])).called(1);
+          verifyNever(() => unselected.cacheTestimonials([testimonial]));
         },
       );
     });

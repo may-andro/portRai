@@ -5,12 +5,12 @@ import 'package:portrai/src/feature/expertise/data/model/expertise_model.dart';
 class MockExpertiseCache extends Mock implements ExpertiseCache {}
 
 extension MockExpertiseCacheStub on MockExpertiseCache {
-  void stubPut() {
-    when(() => put(any())).thenAnswer((_) async {});
+  void stubPutAll() {
+    when(() => putAll(any())).thenAnswer((_) async {});
   }
 
-  void stubPutThrows(Object error) {
-    when(() => put(any())).thenThrow(error);
+  void stubPutAllThrows(Object error) {
+    when(() => putAll(any())).thenThrow(error);
   }
 
   void stubQuery({

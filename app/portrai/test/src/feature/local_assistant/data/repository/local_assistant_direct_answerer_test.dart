@@ -5,22 +5,29 @@ import 'package:portrai/src/feature/local_assistant/data/repository/local_assist
 
 void main() {
   final answerer = LocalAssistantDirectAnswerer(
-    jsonEncode({
-      'profile': {'name': 'Mayank Rai', 'email': 'm@x.com', 'phone': '123'},
-      'overview': [
-        'Total time worked per country, overlapping roles counted once: Spain: 6 years and 10 months (A, B); India: 4 years (C, D).',
-        'Career overview: 8 roles at 7 different companies.',
-        'Longest role: Initech, 2 years.',
-        'Shortest role: Acme, 2 months.',
-        'First role (earliest start): Acme, July 2015.',
-        'Current role: Lead at Initech since April 2024.',
-        'Time using each technology across all roles, overlapping roles counted once (technologies listed on the roles): Flutter: 5 years and 2 months; Android: 4 years.',
-        'Career gaps: none, there is no month without a role. Job changes: 3.',
-        'Leadership roles: Tech Lead at Initech.',
-        'Spoken languages (2): English (Fluent), Spanish (Proficient). No other spoken languages are listed.',
-        'Experience per city, with time worked and roles: Hyderabad: 2 years and 11 months in 2 roles (C (Dev), D (Lead)); Pune: 2 years and 1 month in 1 role (E (Junior)).',
-      ],
-    }),
+    jsonDecode(
+          jsonEncode({
+            'profile': {
+              'name': 'Mayank Rai',
+              'email': 'm@x.com',
+              'phone': '123',
+            },
+            'overview': [
+              'Total time worked per country, overlapping roles counted once: Spain: 6 years and 10 months (A, B); India: 4 years (C, D).',
+              'Career overview: 8 roles at 7 different companies.',
+              'Longest role: Initech, 2 years.',
+              'Shortest role: Acme, 2 months.',
+              'First role (earliest start): Acme, July 2015.',
+              'Current role: Lead at Initech since April 2024.',
+              'Time using each technology across all roles, overlapping roles counted once (technologies listed on the roles): Flutter: 5 years and 2 months; Android: 4 years.',
+              'Career gaps: none, there is no month without a role. Job changes: 3.',
+              'Leadership roles: Tech Lead at Initech.',
+              'Spoken languages (2): English (Fluent), Spanish (Proficient). No other spoken languages are listed.',
+              'Experience per city, with time worked and roles: Hyderabad: 2 years and 11 months in 2 roles (C (Dev), D (Lead)); Pune: 2 years and 1 month in 1 role (E (Junior)).',
+            ],
+          }),
+        )
+        as Map<String, dynamic>,
   );
 
   test('should return the email when asked for email', () {

@@ -21,12 +21,14 @@ class IntroWidget extends StatelessWidget {
     const base = Color(0xFF0E1726);
     final start = Color.lerp(base, palette.brand.primary.color, 0.25)!;
     final end = Color.lerp(base, palette.brand.tertiary.color, 0.2)!;
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Judge by the card's own width, not the device, so it never gets squeezed.
-        final isMobile = constraints.maxWidth < 760;
-        return _buildHero(context, isMobile, start, end);
-      },
+    return DSOffscreenPauseWidget(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Judge by the card's own width, not the device, so it never gets squeezed.
+          final isMobile = constraints.maxWidth < 760;
+          return _buildHero(context, isMobile, start, end);
+        },
+      ),
     );
   }
 

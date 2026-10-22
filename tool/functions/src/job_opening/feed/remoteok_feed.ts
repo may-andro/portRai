@@ -2,7 +2,7 @@ import type { FetchJson } from '../../shared/fetch_json.js';
 import { isRecord, stringList, stringOrNull } from '../../shared/json_value.js';
 import type { JobOpening } from '../job_opening.js';
 import { htmlToText } from './html_text.js';
-import type { JobFeed } from './job_feed.js';
+import { isWantedJob, type JobFeed, type JobSearchQuery } from './job_feed.js';
 
 /**
  * The latest remote jobs from the Remote OK API, which cannot search.
@@ -18,20 +18,21 @@ export class RemoteOkFeed implements JobFeed {
 
   constructor(private readonly fetchJson: FetchJson) {}
 
-  async fetchJobs(): Promise<JobOpening[]> {
+  async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
     const body = await this.fetchJson(RemoteOkFeed.url);
     if (!Array.isArray(body)) {
       throw new Error('Remote OK response is not a list');
     }
     // The first entry is the API's legal notice, which has no job fields.
     return body.flatMap((job) => {
-      const opening = toJobOpening(job);
+      const opening = toJobOpening(job, query);
       return opening === null ? [] : [opening];
     });
   }
 }
 
-function toJobOpening(job: unknown): JobOpening | null {
+/** The opening for [job], or null when it is invalid or [query] drops it. */
+function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   if (!isRecord(job)) return null;
   const id = stringOrNull(job.id);
   const title = stringOrNull(job.position);
@@ -39,6 +40,8 @@ function toJobOpening(job: unknown): JobOpening | null {
   const url = stringOrNull(job.url);
   const publishedAt = parseDate(job.date);
   if (!id || !title || !company || !url || !publishedAt) return null;
+  const location = stringOrNull(job.location);
+  if (!isWantedJob(query, { title, location, publishedAt })) return null;
 
   return {
     source: 'remoteok',
@@ -47,7 +50,7 @@ function toJobOpening(job: unknown): JobOpening | null {
     title,
     company,
     url,
-    location: stringOrNull(job.location),
+    location,
     tags: stringList(job.tags),
     jobTypes: [],
     description: htmlToText(

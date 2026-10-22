@@ -22,7 +22,7 @@ void main() {
     late CacheProjectRepositoryImpl repository;
 
     setUpAll(() {
-      registerFallbackValue(model);
+      registerFallbackValue(<ProjectModel>[]);
     });
 
     setUp(() {
@@ -83,25 +83,26 @@ void main() {
     );
 
     test('should cache the mapped project when caching succeeds', () async {
-      projectCache.stubPut();
+      projectCache.stubPutAll();
 
-      await repository.cacheProject(project);
+      await repository.cacheProjects([project]);
 
       final captured =
-          verify(() => projectCache.put(captureAny())).captured.single
-              as ProjectModel;
+          (verify(() => projectCache.putAll(captureAny())).captured.single
+                  as Iterable<ProjectModel>)
+              .single;
       expect(captured.toJson(), model.toJson());
     });
 
     test(
       'should throw a cache exception when the database is unavailable while caching',
       () {
-        projectCache.stubPutThrows(
+        projectCache.stubPutAllThrows(
           DBNotInitialisedException(cause: Exception('db init failed')),
         );
 
         expect(
-          () => repository.cacheProject(project),
+          () => repository.cacheProjects([project]),
           throwsA(isA<ProjectCacheException>()),
         );
       },

@@ -11,6 +11,7 @@ void main() {
   setUpAll(() {
     // Register fallback value for FeatureFlag when using any() matchers
     registerFallbackValue(const FeatureFlag(key: 'fake', isEnabled: false));
+    registerFallbackValue(<FeatureFlag>[]);
   });
 
   group('CacheFeatureFlagDataSource', () {
@@ -26,6 +27,7 @@ void main() {
         mockCache,
       );
       when(() => mockCache.put(any())).thenAnswer((_) async {});
+      when(() => mockCache.putAll(any())).thenAnswer((_) async {});
     });
 
     group('resolveFeatureFlags', () {
@@ -52,7 +54,7 @@ void main() {
           final result = await dataSource.resolveFeatureFlags(definitions);
 
           expect(result, equals(delegateFlags));
-          verify(() => mockCache.put(delegateFlags.single)).called(1);
+          verify(() => mockCache.putAll(delegateFlags)).called(1);
         },
       );
 
@@ -151,19 +153,23 @@ void main() {
         );
       });
 
-      test('should persist every resolved flag back to the cache', () async {
-        const delegateFlags = [
-          FeatureFlag(key: 'feature_login', isEnabled: true),
-        ];
-        when(() => mockCache.getAll()).thenAnswer((_) async => []);
-        when(
-          () => mockDelegateDataSource.resolveFeatureFlags(definitions),
-        ).thenAnswer((_) async => delegateFlags);
+      test(
+        'should persist every resolved flag in one write when flags resolve',
+        () async {
+          const delegateFlags = [
+            FeatureFlag(key: 'feature_login', isEnabled: true),
+          ];
+          when(() => mockCache.getAll()).thenAnswer((_) async => []);
+          when(
+            () => mockDelegateDataSource.resolveFeatureFlags(definitions),
+          ).thenAnswer((_) async => delegateFlags);
 
-        await dataSource.resolveFeatureFlags(definitions);
+          await dataSource.resolveFeatureFlags(definitions);
 
-        verify(() => mockCache.put(delegateFlags.single)).called(1);
-      });
+          verify(() => mockCache.putAll(delegateFlags)).called(1);
+          verifyNever(() => mockCache.put(any()));
+        },
+      );
     });
 
     group('updateFeatureFlag', () {

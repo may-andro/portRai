@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -282,16 +284,20 @@ void main() {
   test('should extract nested coordinates when reading portfolio context', () {
     expect(
       assistantLocationsFrom(
-        '{"location":{"city":"Oslo","latitude":59.9,"longitude":10.7}}',
+        jsonDecode(
+          '{"location":{"city":"Oslo","latitude":59.9,"longitude":10.7}}',
+        ),
       ),
       [(latitude: 59.9, longitude: 10.7)],
     );
-    expect(assistantLocationsFrom('not json'), isEmpty);
+    expect(assistantLocationsFrom(null), isEmpty);
     expect(
       assistantLocationsFrom(
-        '{"location":{"latitude":1,"longitude":2},'
-        '"experiences":[{"latitude":3.5,"longitude":4.5},'
-        '{"latitude":null,"longitude":null}]}',
+        jsonDecode(
+          '{"location":{"latitude":1,"longitude":2},'
+          '"experiences":[{"latitude":3.5,"longitude":4.5},'
+          '{"latitude":null,"longitude":null}]}',
+        ),
       ),
       [(latitude: 1.0, longitude: 2.0), (latitude: 3.5, longitude: 4.5)],
     );
@@ -605,12 +611,17 @@ void main() {
   test('should derive mailto and tel links when reading the profile', () {
     expect(
       assistantContactLinksFrom(
-        '{"profile":{"email":"me@x.test","phone":"+34 600 111 222"}}',
+        jsonDecode(
+          '{"profile":{"email":"me@x.test","phone":"+34 600 111 222"}}',
+        ),
       ),
       {'mailto:me@x.test', 'tel:+34600111222'},
     );
-    expect(assistantContactLinksFrom('{"profile":{"email":""}}'), isEmpty);
-    expect(assistantContactLinksFrom('not json'), isEmpty);
+    expect(
+      assistantContactLinksFrom(jsonDecode('{"profile":{"email":""}}')),
+      isEmpty,
+    );
+    expect(assistantContactLinksFrom(null), isEmpty);
   });
 
   testWidgets('should open only allowed links when DSContactCard is tapped', (

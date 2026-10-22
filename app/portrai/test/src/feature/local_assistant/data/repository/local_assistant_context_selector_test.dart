@@ -32,7 +32,7 @@ void main() {
       ],
     };
     final selected = LocalAssistantContextSelector().select(
-      jsonEncode(context),
+      _portfolioOf(jsonEncode(context)),
       'Tell me how long was experience in company Stuart?',
     );
 
@@ -74,7 +74,7 @@ void main() {
       final context = (await GetAssistantContextUseCase(getPortfolio)()).right;
 
       final selected = LocalAssistantContextSelector().select(
-        context,
+        _portfolioOf(context),
         'How long was stuart experience?',
       );
 
@@ -143,7 +143,7 @@ void main() {
       final selector = LocalAssistantContextSelector();
 
       final shortest = selector.select(
-        context,
+        _portfolioOf(context),
         'Tell me shortest company experience?',
       );
       final lines = shortest.split('\n');
@@ -163,7 +163,7 @@ void main() {
         ),
       );
       expect(
-        selector.select(context, 'and in 2017?'),
+        selector.select(_portfolioOf(context), 'and in 2017?'),
         contains('chronological order'),
       );
       expect(
@@ -175,11 +175,11 @@ void main() {
         ),
       );
       expect(
-        selector.select(context, 'how long in India?'),
+        selector.select(_portfolioOf(context), 'how long in India?'),
         contains('India: 1 year (Aayuv)'),
       );
       expect(
-        selector.select(context, 'What is his email?'),
+        selector.select(_portfolioOf(context), 'What is his email?'),
         isNot(contains('All roles in chronological order')),
       );
     },
@@ -206,24 +206,29 @@ void main() {
       ('What do testimonials say?', portfolio.testimonials.first.testimonial),
       ('Tell me about Consulting', portfolio.services.first.detail),
     ]) {
-      expect(selector.select(context, question), contains(expected));
+      expect(
+        selector.select(_portfolioOf(context), question),
+        contains(expected),
+      );
     }
   });
 
   test('should retain the company when a follow-up omits its name', () {
     final selected = LocalAssistantContextSelector().select(
-      jsonEncode({
-        'experiences': [
-          {
-            'company': 'Stuart',
-            'achievements': ['Modularized the app'],
-          },
-          {
-            'company': 'Other',
-            'achievements': ['Another launch'],
-          },
-        ],
-      }),
+      _portfolioOf(
+        jsonEncode({
+          'experiences': [
+            {
+              'company': 'Stuart',
+              'achievements': ['Modularized the app'],
+            },
+            {
+              'company': 'Other',
+              'achievements': ['Another launch'],
+            },
+          ],
+        }),
+      ),
       'What were his achievements there?',
       previousQuestion: 'How long did he work at Stuart?',
     );
@@ -236,9 +241,11 @@ void main() {
     'should respect the byte budget when the portfolio contains long text',
     () {
       final selected = LocalAssistantContextSelector().select(
-        jsonEncode({
-          'profile': {'detailedBio': List.filled(20000, 'é').join()},
-        }),
+        _portfolioOf(
+          jsonEncode({
+            'profile': {'detailedBio': List.filled(20000, 'é').join()},
+          }),
+        ),
         'Tell me about his background',
       );
 
@@ -265,7 +272,7 @@ void main() {
     });
 
     final selected = LocalAssistantContextSelector().select(
-      context,
+      _portfolioOf(context),
       'give me playstore link for stuart',
       maxBytes: 200,
     );
@@ -273,3 +280,6 @@ void main() {
     expect(selected, contains('https://p/stuart'));
   });
 }
+
+Map<String, dynamic> _portfolioOf(String portfolioContext) =>
+    jsonDecode(portfolioContext) as Map<String, dynamic>;

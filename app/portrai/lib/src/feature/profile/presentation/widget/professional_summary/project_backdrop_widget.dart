@@ -20,64 +20,66 @@ class _ProjectBackdropWidget extends StatelessWidget {
     final tileHeight = context.space(factor: context.isMobile ? 18 : 26);
     final gap = context.space(factor: 2);
 
-    return IgnorePointer(
-      child: RepaintBoundary(
-        child: ClipRect(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Opacity(
-                opacity: 0.16,
-                child: Transform.rotate(
-                  angle: -0.14,
-                  child: Transform.scale(
-                    scale: 1.5,
-                    child: Row(
-                      spacing: gap,
-                      children: List.generate(columnCount, (column) {
-                        return Expanded(
-                          child: _DriftingColumnWidget(
-                            imageUrls: [
-                              ...imageUrls.skip(column % imageUrls.length),
-                              ...imageUrls.take(column % imageUrls.length),
-                            ],
-                            tileHeight: tileHeight,
-                            gap: gap,
-                            isReversed: column.isOdd,
-                            duration: Duration(seconds: 40 + column * 6),
-                          ),
-                        );
-                      }),
+    return DSOffscreenPauseWidget(
+      child: IgnorePointer(
+        child: RepaintBoundary(
+          child: ClipRect(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Opacity(
+                  opacity: 0.16,
+                  child: Transform.rotate(
+                    angle: -0.14,
+                    child: Transform.scale(
+                      scale: 1.5,
+                      child: Row(
+                        spacing: gap,
+                        children: List.generate(columnCount, (column) {
+                          return Expanded(
+                            child: _DriftingColumnWidget(
+                              imageUrls: [
+                                ...imageUrls.skip(column % imageUrls.length),
+                                ...imageUrls.take(column % imageUrls.length),
+                              ],
+                              tileHeight: tileHeight,
+                              gap: gap,
+                              isReversed: column.isOdd,
+                              duration: Duration(seconds: 40 + column * 6),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ).animate(target: isVisible ? 1 : 0).fadeIn(duration: 600.ms),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        surface.withAlpha(235),
+                        surface.withAlpha(120),
+                        surface.withAlpha(235),
+                      ],
                     ),
                   ),
                 ),
-              ).animate(target: isVisible ? 1 : 0).fadeIn(duration: 600.ms),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      surface.withAlpha(235),
-                      surface.withAlpha(120),
-                      surface.withAlpha(235),
-                    ],
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0.7, 0.4),
+                      radius: 0.9,
+                      colors: [
+                        context.colorPalette.brand.primary.color.withAlpha(60),
+                        Colors.transparent,
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(0.7, 0.4),
-                    radius: 0.9,
-                    colors: [
-                      context.colorPalette.brand.primary.color.withAlpha(60),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

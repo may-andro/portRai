@@ -17,8 +17,8 @@ class BuildConfigTestimonialRepositoryImpl implements TestimonialRepository {
   final TestimonialRepository _demoDelegateRepository;
 
   @override
-  Future<void> cacheTestimonial(TestimonialEntity testimonial) {
-    return _delegateRepository.cacheTestimonial(testimonial);
+  Future<void> cacheTestimonials(List<TestimonialEntity> testimonials) {
+    return _delegateRepository.cacheTestimonials(testimonials);
   }
 
   @override

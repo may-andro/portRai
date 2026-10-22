@@ -82,9 +82,9 @@ abstract class DBCache<T> extends Cache {
 
   /// Column names that form the primary / composite key.
   ///
-  /// When non-empty, [put] will replace any existing record whose values for
-  /// these columns match the new record (upsert semantics).
-  /// Defaults to an empty list (each [put] appends a new row).
+  /// When non-empty, [put] and [putAll] replace any existing record whose
+  /// values for these columns match the new record (upsert semantics).
+  /// Defaults to an empty list (each stored model appends a new row).
   List<String> get primaryKeyColumns => const [];
 
   /// Migration steps applied when [tableVersion] is incremented.
@@ -125,6 +125,23 @@ abstract class DBCache<T> extends Cache {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final values = {...serialize(model), _cacheTimestampKey: timestamp};
     await _adapter.upsert(values);
+    _cacheTimestamp = timestamp;
+  }
+
+  /// Inserts or replaces every model in [models] in a single write and
+  /// records the current timestamp for TTL checks.
+  ///
+  /// Either every model is stored or none is. Does nothing when [models] is
+  /// empty.
+  Future<void> putAll(Iterable<T> models) async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final records = [
+      for (final model in models)
+        {...serialize(model), _cacheTimestampKey: timestamp},
+    ];
+    if (records.isEmpty) return;
+    await _ensureInitialized();
+    await _adapter.upsertAll(records);
     _cacheTimestamp = timestamp;
   }
 

@@ -26,8 +26,8 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
   final LogReporter _logReporter;
 
   @override
-  Future<void> cacheExpertise(ExpertiseEntity expert) {
-    return _cacheDelegateRepository.cacheExpertise(expert);
+  Future<void> cacheAllExpertise(List<ExpertiseEntity> expertiseList) {
+    return _cacheDelegateRepository.cacheAllExpertise(expertiseList);
   }
 
   @override
@@ -108,9 +108,7 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
     List<ExpertiseEntity> expertiseList,
   ) async {
     try {
-      for (final expertise in expertiseList) {
-        await cacheExpertise(expertise);
-      }
+      await cacheAllExpertise(expertiseList);
     } catch (_) {
       _logReporter.error(
         tag: _logTag,

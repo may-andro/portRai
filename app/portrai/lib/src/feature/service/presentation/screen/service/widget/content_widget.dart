@@ -34,7 +34,7 @@ class ContentWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _HeroWidget(service: service),
+              DSOffscreenPauseWidget(child: _HeroWidget(service: service)),
               _ServiceDetailWidget(service: service),
               BlocBuilder<ServiceBloc, ServiceState>(
                 builder: (context, state) {

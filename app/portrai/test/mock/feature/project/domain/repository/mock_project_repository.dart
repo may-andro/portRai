@@ -4,15 +4,15 @@ import 'package:portrai/src/feature/project/domain/_domain.dart';
 class MockProjectRepository extends Mock implements ProjectRepository {}
 
 extension MockProjectRepositoryStub on MockProjectRepository {
-  void stubCacheProject(ProjectEntity project) {
-    when(() => cacheProject(project)).thenAnswer((_) async {});
+  void stubCacheProjects(List<ProjectEntity> projects) {
+    when(() => cacheProjects(projects)).thenAnswer((_) async {});
   }
 
-  void stubCacheProjectThrows({
-    required ProjectEntity project,
+  void stubCacheProjectsThrows({
+    required List<ProjectEntity> projects,
     required Object error,
   }) {
-    when(() => cacheProject(project)).thenThrow(error);
+    when(() => cacheProjects(projects)).thenThrow(error);
   }
 
   void stubGetProject({required String id, required ProjectEntity project}) {

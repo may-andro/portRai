@@ -26,8 +26,8 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
   final LogReporter _logReporter;
 
   @override
-  Future<void> cacheExperience(ExperienceEntity experience) {
-    return _cacheDelegateRepository.cacheExperience(experience);
+  Future<void> cacheExperiences(List<ExperienceEntity> experiences) {
+    return _cacheDelegateRepository.cacheExperiences(experiences);
   }
 
   @override
@@ -148,9 +148,7 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
     List<ExperienceEntity> experiences,
   ) async {
     try {
-      for (final experience in experiences) {
-        await cacheExperience(experience);
-      }
+      await cacheExperiences(experiences);
     } catch (_) {
       _logReporter.error(
         tag: _logTag,

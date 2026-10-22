@@ -105,9 +105,9 @@ void main() {
 
         expect(result, expertiseList);
         verify(() => cacheDelegateRepository.getAllExpertise()).called(1);
-        for (final expertise in expertiseList) {
-          verifyNever(() => cacheDelegateRepository.cacheExpertise(expertise));
-        }
+        verifyNever(
+          () => cacheDelegateRepository.cacheAllExpertise(expertiseList),
+        );
       },
     );
 
@@ -117,18 +117,14 @@ void main() {
         cacheDelegateRepository.stubGetAllExpertiseThrows(
           const ExpertiseNotFoundException(),
         );
-        for (final expertise in expertiseList) {
-          cacheDelegateRepository.stubCacheExpertise(expertise);
-        }
+        cacheDelegateRepository.stubCacheAllExpertise(expertiseList);
 
         final result = await repository.getAllExpertise();
 
         expect(result, expertiseList);
-        for (final expertise in expertiseList) {
-          verify(
-            () => cacheDelegateRepository.cacheExpertise(expertise),
-          ).called(1);
-        }
+        verify(
+          () => cacheDelegateRepository.cacheAllExpertise(expertiseList),
+        ).called(1);
       },
     );
 
@@ -138,9 +134,7 @@ void main() {
         cacheDelegateRepository.stubGetAllExpertiseThrows(
           const ExpertiseCacheException(cause: 'db down'),
         );
-        for (final expertise in expertiseList) {
-          cacheDelegateRepository.stubCacheExpertise(expertise);
-        }
+        cacheDelegateRepository.stubCacheAllExpertise(expertiseList);
 
         final result = await repository.getAllExpertise();
 
@@ -161,8 +155,8 @@ void main() {
         cacheDelegateRepository.stubGetAllExpertiseThrows(
           const ExpertiseNotFoundException(),
         );
-        cacheDelegateRepository.stubCacheExpertiseThrows(
-          expertise: expertiseList.first,
+        cacheDelegateRepository.stubCacheAllExpertiseThrows(
+          expertiseList: expertiseList,
           error: Exception('cache write failed'),
         );
 

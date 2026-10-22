@@ -19,31 +19,33 @@ class ExpertiseOrbitBackdropWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (expertises.isEmpty) return const SizedBox.shrink();
 
-    return IgnorePointer(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: _OrbitBackdropWidget(
-                  color: context.colorPalette.brand.primary.color,
-                  isVisible: isVisible,
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: ValueListenableBuilder<int>(
-                  valueListenable: selection,
-                  builder: (context, index, _) => _OrbitStatsChartWidget(
-                    expertise: expertises[min(index, expertises.length - 1)],
-                    width: min(constraints.maxWidth * 0.3, 360),
+    return DSOffscreenPauseWidget(
+      child: IgnorePointer(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: _OrbitBackdropWidget(
+                    color: context.colorPalette.brand.primary.color,
+                    isVisible: isVisible,
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: selection,
+                    builder: (context, index, _) => _OrbitStatsChartWidget(
+                      expertise: expertises[min(index, expertises.length - 1)],
+                      width: min(constraints.maxWidth * 0.3, 360),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
