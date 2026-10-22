@@ -4,61 +4,31 @@ import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/user/user.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
-class ContentWidget extends StatelessWidget {
+class ContentWidget extends StatefulWidget {
   const ContentWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ScreenContentWidget<PortfolioBloc, PortfolioState>(
-      impressionPrefix: 'portfolio',
-      contentOf: (state) => switch (state) {
-        LoadingState() => const ScreenLoadingContent(),
-        ErrorState(:final failure) => ScreenErrorContent(failure),
-        LoadedState(:final portfolio, :final userRole) => ScreenLoadedContent(
-          _SuccessWidget(portfolio: portfolio, userRole: userRole),
-        ),
-      },
-      onContentVisible: (content) =>
-          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
-    );
-  }
+  State<ContentWidget> createState() => _ContentWidgetState();
 }
 
-class _SuccessWidget extends StatefulWidget {
-  const _SuccessWidget({required this.portfolio, this.userRole});
-
-  final PortfolioEntity portfolio;
-  final UserRole? userRole;
-
-  @override
-  State<_SuccessWidget> createState() => _SuccessWidgetState();
-}
-
-class _SuccessWidgetState extends State<_SuccessWidget>
+class _ContentWidgetState extends State<ContentWidget>
     with TickerProviderStateMixin {
-  late ScrollController _scrollController;
-  late final TabController _tabController;
-  late final List<SectionWidget> _scrollableSections;
+  late final ScrollController _scrollController;
+  _Sections? _sections;
 
   @override
   void initState() {
     super.initState();
-    _scrollableSections = widget.portfolio.sectionsFor(widget.userRole);
     _scrollController = ScrollController()..addListener(_onScroll);
-    _tabController = TabController(
-      length: _scrollableSections.length,
-      vsync: this,
-    );
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _tabController.dispose();
+    _sections?.tabController.dispose();
     super.dispose();
   }
 
@@ -84,35 +54,60 @@ class _SuccessWidgetState extends State<_SuccessWidget>
       },
       child: PrimaryScrollController(
         controller: _scrollController,
-        child: CustomScrollView(
-          controller: _scrollController,
-          scrollBehavior: ScrollConfiguration.of(
-            context,
-          ).copyWith(scrollbars: false, overscroll: false),
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            HeaderWidget(
-              sections: _scrollableSections,
-              tabController: _tabController,
+        child: ScreenContentWidget<PortfolioBloc, PortfolioState>(
+          impressionPrefix: 'portfolio',
+          contentOf: (state) => switch (state) {
+            LoadingState() => const ScreenLoadingContent(),
+            ErrorState(:final failure) => ScreenErrorContent(failure),
+            LoadedState(:final portfolio, :final userRole) => _loadedContent(
+              _sectionsFor(portfolio, userRole),
             ),
-            // Build each portfolio section as SliverToBoxAdapter widgets
-            ..._scrollableSections.map((section) {
-              return SliverToBoxAdapter(child: section);
-            }),
-            SliverToBoxAdapter(
-              child: FooterWidget(profile: widget.portfolio.profile),
-            ),
-          ],
+          },
+          onContentVisible: (content) =>
+              context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
         ),
       ),
     );
   }
 
-  void _scrollToSection(int index) {
-    if (index < 0 || index >= _scrollableSections.length) return;
+  ScreenLoadedContent _loadedContent(_Sections sections) {
+    return ScreenLoadedContent.slivers([
+      HeaderWidget(
+        sections: sections.widgets,
+        tabController: sections.tabController,
+      ),
+      ...sections.widgets.map((section) => SliverToBoxAdapter(child: section)),
+    ], scrollController: _scrollController);
+  }
 
-    final section = _scrollableSections[index];
-    final keyContext = section.sectionKey.currentContext;
+  /// Keeps the sections and their tab controller while the portfolio and role
+  /// stay the same.
+  _Sections _sectionsFor(PortfolioEntity portfolio, UserRole? userRole) {
+    final current = _sections;
+    if (current != null &&
+        current.portfolio == portfolio &&
+        current.userRole == userRole) {
+      return current;
+    }
+    if (current != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => current.tabController.dispose(),
+      );
+    }
+    final widgets = portfolio.sectionsFor(userRole);
+    return _sections = _Sections(
+      portfolio: portfolio,
+      userRole: userRole,
+      widgets: widgets,
+      tabController: TabController(length: widgets.length, vsync: this),
+    );
+  }
+
+  void _scrollToSection(int index) {
+    final sections = _sections?.widgets;
+    if (sections == null || index < 0 || index >= sections.length) return;
+
+    final keyContext = sections[index].sectionKey.currentContext;
 
     if (keyContext != null) {
       Scrollable.ensureVisible(
@@ -124,8 +119,10 @@ class _SuccessWidgetState extends State<_SuccessWidget>
   }
 
   void _onScroll() {
-    for (var i = 0; i < _scrollableSections.length; i++) {
-      final section = _scrollableSections[i];
+    final sections = _sections;
+    if (sections == null) return;
+    for (var i = 0; i < sections.widgets.length; i++) {
+      final section = sections.widgets[i];
       final keyContext = section.sectionKey.currentContext;
       if (keyContext case final BuildContext context) {
         final renderBox = context.findRenderObject() as RenderBox?;
@@ -133,8 +130,8 @@ class _SuccessWidgetState extends State<_SuccessWidget>
           final position = box.localToGlobal(Offset.zero).dy;
           if (position <= context.height / 2 &&
               position >= -box.size.height / 2) {
-            if (_tabController.index != i) {
-              _tabController.animateTo(i);
+            if (sections.tabController.index != i) {
+              sections.tabController.animateTo(i);
               this.context.bloc.add(
                 SectionNavigationEvent(
                   sectionIndex: i,
@@ -149,4 +146,19 @@ class _SuccessWidgetState extends State<_SuccessWidget>
       }
     }
   }
+}
+
+/// The scrollable sections of a loaded portfolio and the tabs that follow them.
+class _Sections {
+  const _Sections({
+    required this.portfolio,
+    required this.userRole,
+    required this.widgets,
+    required this.tabController,
+  });
+
+  final PortfolioEntity portfolio;
+  final UserRole? userRole;
+  final List<SectionWidget> widgets;
+  final TabController tabController;
 }
