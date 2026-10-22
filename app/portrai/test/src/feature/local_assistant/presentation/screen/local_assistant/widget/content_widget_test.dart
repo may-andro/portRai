@@ -1,3 +1,4 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/widget/content_widget.dart';
+import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/bloc/mock_local_assistant_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -78,26 +80,138 @@ void main() {
     },
   );
 
+  testWidgets('should show the loader when the portfolio context is loading', (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      const LocalAssistantState(status: LocalAssistantReady()),
+    );
+
+    expect(find.byType(DSLoadingWidget), findsOneWidget);
+    expect(find.byType(AssistantConversationWidget), findsNothing);
+  });
+
   testWidgets(
-    'should show the existing error when portfolio context cannot load',
+    'should show the error card with retry when portfolio context cannot load',
     (tester) async {
-      await pumpContent(
+      final bloc = await pumpContent(
         tester,
         const LocalAssistantState(isLoadingContext: false, hasError: true),
       );
 
       expect(find.byType(AssistantConversationWidget), findsNothing);
+      expect(find.byType(DSErrorCardWidget), findsOneWidget);
       expect(
         find.text('The assistant could not answer. Please try again.'),
         findsOneWidget,
       );
+      await tester.tap(find.text('Retry'));
+
+      verify(() => bloc.add(const LocalAssistantStartedEvent())).called(1);
+    },
+  );
+
+  testWidgets(
+    'should show the unavailable message without retry when the assistant is '
+    'unavailable',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const LocalAssistantState(
+          status: LocalAssistantUnavailable(),
+          isLoadingContext: false,
+        ),
+      );
+
+      expect(find.byType(DSErrorCardWidget), findsOneWidget);
       expect(
-        find.ancestor(
-          of: find.text('The assistant could not answer. Please try again.'),
-          matching: find.byType(DSTextWidget),
+        find.text(
+          'The on-device assistant is not available on this platform or is '
+          'turned off for this app.',
         ),
         findsOneWidget,
       );
+      expect(find.text('Retry'), findsNothing);
     },
   );
+
+  testWidgets(
+    'should show the error card with retry when availability check fails',
+    (tester) async {
+      final bloc = await pumpContent(
+        tester,
+        const LocalAssistantState(
+          status: LocalAssistantUnavailable(),
+          isLoadingContext: false,
+          hasError: true,
+          failure: UnknownFailure(),
+        ),
+      );
+
+      expect(find.byType(DSErrorCardWidget), findsOneWidget);
+      await tester.tap(find.text('Retry'));
+
+      verify(() => bloc.add(const LocalAssistantStartedEvent())).called(1);
+    },
+  );
+
+  testWidgets(
+    'should show the model error in setup when the model fails to prepare',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const LocalAssistantState(
+          status: LocalAssistantFailed(),
+          isLoadingContext: false,
+          portfolioContext: 'Context',
+        ),
+      );
+
+      expect(find.byType(DSErrorCardWidget), findsNothing);
+      expect(
+        find.text(
+          'Could not prepare the model. Check your connection and try again.',
+        ),
+        findsWidgets,
+      );
+    },
+  );
+
+  testWidgets('should rebuild the chat when a new message arrives', (
+    tester,
+  ) async {
+    const readyState = LocalAssistantState(
+      status: LocalAssistantReady(),
+      isLoadingContext: false,
+      portfolioContext: 'Context',
+    );
+    final bloc = MockLocalAssistantBloc();
+    addTearDown(bloc.close);
+    whenListen(
+      bloc,
+      Stream.fromIterable([
+        readyState.copyWith(
+          messages: const [
+            AssistantMessageEntity(
+              content: AssistantTextResponseEntity(text: 'New answer'),
+              isUser: false,
+            ),
+          ],
+        ),
+      ]),
+      initialState: readyState,
+    );
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: BlocProvider<LocalAssistantBloc>.value(
+          value: bloc,
+          child: const ContentWidget(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('New answer'), findsOneWidget);
+  });
 }
