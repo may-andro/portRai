@@ -83,4 +83,14 @@ describe('GeminiJobPostExtractor', () => {
       post,
     });
   });
+
+  it('should turn thinking off, since the roles are copied from the post', async () => {
+    const generateJson = vi.fn().mockResolvedValue('{"roles": []}');
+
+    await new GeminiJobPostExtractor(generateJson).extractRoles('Acme', [
+      'Flutter',
+    ]);
+
+    expect(generateJson.mock.calls[0][0].thinkingBudget).toBe(0);
+  });
 });

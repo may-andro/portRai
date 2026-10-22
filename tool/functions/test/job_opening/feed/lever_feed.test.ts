@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { LeverFeed } from '../../../src/job_opening/feed/lever_feed.js';
+import { searchQuery } from '../fixture.js';
 
 const board = { system: 'lever' as const, slug: 'qonto', name: 'Qonto' };
 
@@ -33,9 +34,9 @@ describe('LeverFeed', () => {
       },
     ]);
 
-    const openings = await new LeverFeed(fetchJson, [board]).fetchJobs({
-      terms: ['Android'],
-    });
+    const openings = await new LeverFeed(fetchJson, async () => [
+      board,
+    ]).fetchJobs(searchQuery({ terms: ['Android'] }));
 
     expect(fetchJson).toHaveBeenCalledWith(
       'https://api.lever.co/v0/postings/qonto?mode=json',

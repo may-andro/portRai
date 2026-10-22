@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { ArbeitnowFeed } from '../../../src/job_opening/feed/arbeitnow_feed.js';
+import { searchQuery } from '../fixture.js';
 
 function arbeitnowJob(slug: string, remote: boolean) {
   return {
@@ -31,7 +32,7 @@ describe('ArbeitnowFeed', () => {
         ),
     );
 
-    const openings = await feed.fetchJobs();
+    const openings = await feed.fetchJobs(searchQuery());
 
     expect(openings.map((opening) => opening.sourceId)).toEqual(['a']);
     expect(openings[0]).toMatchObject({
@@ -52,7 +53,9 @@ describe('ArbeitnowFeed', () => {
       .mockResolvedValueOnce(page([arbeitnowJob('a', true)], 'page-2'))
       .mockResolvedValueOnce(page([arbeitnowJob('b', true)], null));
 
-    const openings = await new ArbeitnowFeed(fetchJson).fetchJobs();
+    const openings = await new ArbeitnowFeed(fetchJson).fetchJobs(
+      searchQuery(),
+    );
 
     expect(fetchJson.mock.calls).toEqual([
       ['https://www.arbeitnow.com/api/job-board-api?page=1'],
@@ -66,9 +69,47 @@ describe('ArbeitnowFeed', () => {
       .fn()
       .mockResolvedValue(page([arbeitnowJob('a', true)], 'more'));
 
-    await new ArbeitnowFeed(fetchJson, 2).fetchJobs();
+    await new ArbeitnowFeed(fetchJson, 2).fetchJobs(searchQuery());
 
     expect(fetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it('should keep the pages read when a later page fails', async () => {
+    const fetchJson = vi
+      .fn()
+      .mockResolvedValueOnce(page([arbeitnowJob('a', true)], 'page-2'))
+      .mockRejectedValueOnce(new Error('HTTP 503'));
+
+    const openings = await new ArbeitnowFeed(fetchJson).fetchJobs(
+      searchQuery(),
+    );
+
+    expect(openings.map((opening) => opening.sourceId)).toEqual(['a']);
+    expect(fetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it('should drop jobs the query does not keep', async () => {
+    const openings = await new ArbeitnowFeed(
+      vi
+        .fn()
+        .mockResolvedValue(
+          page(
+            [
+              arbeitnowJob('kept', true),
+              { ...arbeitnowJob('old', true), created_at: 1700000000 },
+              { ...arbeitnowJob('us', true), location: 'New York, USA' },
+            ],
+            null,
+          ),
+        ),
+    ).fetchJobs(
+      searchQuery({
+        publishedAfter: new Date('2026-09-01T00:00:00Z'),
+        regions: new Set(['europe']),
+      }),
+    );
+
+    expect(openings.map((opening) => opening.sourceId)).toEqual(['kept']);
   });
 
   it('should throw when a page has no data list', async () => {
@@ -76,7 +117,7 @@ describe('ArbeitnowFeed', () => {
       vi.fn().mockResolvedValue({ message: 'Too many requests' }),
     );
 
-    await expect(feed.fetchJobs()).rejects.toThrow(
+    await expect(feed.fetchJobs(searchQuery())).rejects.toThrow(
       'Arbeitnow page 1 has no data list',
     );
   });

@@ -1,8 +1,9 @@
 import { isRecord, stringOrNull } from '../../shared/json_value.js';
+import { settleAll } from '../../shared/settle_all.js';
 import { termPattern } from '../match/skill_matcher.js';
 import type { ReadDocument } from '../skill/portfolio_skills.js';
 import type { JobOpening } from '../job_opening.js';
-import type { JobSearchQuery } from './job_feed.js';
+import { isWantedJob, type JobSearchQuery } from './job_feed.js';
 
 /** The applicant tracking systems whose public job boards are read. */
 export type BoardSystem = 'greenhouse' | 'lever' | 'ashby';
@@ -102,11 +103,27 @@ export async function loadCompanyBoards(
   });
 }
 
+/**
+ * Reads the company list once, on the first call, and gives each caller the
+ * boards of one system, so the feeds of several systems share one read.
+ */
+export function companyBoardsLoader(
+  readDocument: ReadDocument,
+): (system: BoardSystem) => Promise<CompanyBoard[]> {
+  let boards: Promise<CompanyBoard[]> | undefined;
+  return async (system) => {
+    boards ??= loadCompanyBoards(readDocument);
+    return (await boards).filter((board) => board.system === system);
+  };
+}
+
 /** A posting as read from a board, before it is kept or dropped. */
 export interface BoardPosting {
   title: string;
   location: string | null;
   isRemote: boolean;
+  /** Null when the board gives no valid date; such a posting is dropped. */
+  publishedAt: Date | null;
   toJobOpening(): Promise<JobOpening | null>;
 }
 
@@ -114,10 +131,12 @@ export type BoardErrorHandler = (board: CompanyBoard, error: unknown) => void;
 
 /**
  * Reads [boards] a few at a time and keeps each board's remote postings whose
- * title names a search term, up to [maxOpeningsPerBoard] per board. Boards
- * often post one job once per location, so postings with the same title
- * become one opening listing every location. A board that fails is reported
- * to [onBoardError] and skipped; the feed fails only when every board fails.
+ * title names a search term and that [isWantedJob] keeps for [query], up to
+ * [maxOpeningsPerBoard] per board. Only the postings kept are turned into
+ * openings. Boards often post one job once per location, so postings with
+ * the same title become one opening listing every location. A board that
+ * fails is reported to [onBoardError] and skipped; the feed fails only when
+ * every board fails.
  */
 export async function fetchCompanyBoards(
   boards: CompanyBoard[],
@@ -126,61 +145,57 @@ export async function fetchCompanyBoards(
   onBoardError: BoardErrorHandler = () => {},
 ): Promise<JobOpening[]> {
   const patterns = query.terms.map((term) => termPattern(term));
-  const openings: JobOpening[] = [];
-  let failedCount = 0;
-  let lastError: unknown;
-  for (let start = 0; start < boards.length; start += boardConcurrency) {
-    const batch = boards.slice(start, start + boardConcurrency);
-    const results = await Promise.allSettled(
-      batch.map(async (board) => {
-        const postingsByTitle = new Map<string, BoardPosting[]>();
-        for (const posting of await listPostings(board)) {
-          const title = posting.title.toLowerCase();
-          if (
-            !posting.isRemote ||
-            !patterns.some((pattern) => pattern.test(title))
-          ) {
-            continue;
-          }
-          const key = title.replace(/\s+/g, ' ').trim();
-          postingsByTitle.set(key, [
-            ...(postingsByTitle.get(key) ?? []),
-            posting,
-          ]);
-        }
-        const boardOpenings = await Promise.all(
-          [...postingsByTitle.values()]
-            .slice(0, maxOpeningsPerBoard)
-            .map(async (postings) => {
-              const opening = await postings[0].toJobOpening();
-              const locations = [
-                ...new Set(
-                  postings.flatMap((posting) =>
-                    posting.location ? [posting.location] : [],
-                  ),
-                ),
-              ];
-              return opening && locations.length > 1
-                ? { ...opening, location: locations.join(' · ') }
-                : opening;
-            }),
-        );
-        return boardOpenings.filter(
-          (opening): opening is JobOpening => opening !== null,
-        );
-      }),
-    );
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
-        openings.push(...result.value);
-      } else {
-        failedCount++;
-        lastError = result.reason;
-        onBoardError(batch[index], result.reason);
+  const results = await settleAll(boards, boardConcurrency, async (board) => {
+    const postingsByTitle = new Map<string, BoardPosting[]>();
+    for (const posting of await listPostings(board)) {
+      const title = posting.title.toLowerCase();
+      if (
+        !posting.isRemote ||
+        !patterns.some((pattern) => pattern.test(title)) ||
+        posting.publishedAt === null ||
+        !isWantedJob(query, { ...posting, publishedAt: posting.publishedAt })
+      ) {
+        continue;
       }
-    });
-  }
-  if (boards.length > 0 && failedCount === boards.length) {
+      const key = title.replace(/\s+/g, ' ').trim();
+      postingsByTitle.set(key, [...(postingsByTitle.get(key) ?? []), posting]);
+    }
+    const boardOpenings = await Promise.all(
+      [...postingsByTitle.values()]
+        .slice(0, maxOpeningsPerBoard)
+        .map(async (postings) => {
+          const opening = await postings[0].toJobOpening();
+          const locations = [
+            ...new Set(
+              postings.flatMap((posting) =>
+                posting.location ? [posting.location] : [],
+              ),
+            ),
+          ];
+          return opening && locations.length > 1
+            ? { ...opening, location: locations.join(' · ') }
+            : opening;
+        }),
+    );
+    return boardOpenings.filter(
+      (opening): opening is JobOpening => opening !== null,
+    );
+  });
+
+  const openings: JobOpening[] = [];
+  let lastError: unknown;
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      openings.push(...result.value);
+    } else {
+      lastError = result.reason;
+      onBoardError(boards[index], result.reason);
+    }
+  });
+  if (
+    boards.length > 0 &&
+    results.every((result) => result.status === 'rejected')
+  ) {
     throw new Error(`Every company board failed: ${String(lastError)}`);
   }
   return openings;

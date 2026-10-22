@@ -1,6 +1,6 @@
 import { settleAll } from '../shared/settle_all.js';
 import { withTimeLimit } from '../shared/time_limit.js';
-import type { JobFeed } from './feed/job_feed.js';
+import type { JobFeed, JobSearchQuery } from './feed/job_feed.js';
 import type {
   JobFit,
   JobOpening,
@@ -86,19 +86,23 @@ export interface SyncResult {
 
 /**
  * Searches every feed for the portfolio's role terms, drops openings older
- * than [maxJobAgeDays], keeps those that match the portfolio's skills or
- * roles, scores them with the [JobScorer], reusing fits stored by earlier
- * runs, and writes the ones scoring at
- * least [minJobFitScore] for each user with job search on. A feed or score
- * that fails is skipped; the run fails only when every feed or every score
- * fails.
+ * than [maxJobAgeDays], from other regions or of other kinds of role, keeps
+ * those that match the portfolio's skills or roles, scores them with the
+ * [JobScorer], reusing fits stored by earlier runs, and writes the ones
+ * scoring at least [minJobFitScore] for each user with job search on. Feeds
+ * get the same limits in the query to skip such openings early; the run
+ * applies them again to everything the feeds return. A feed or score that
+ * fails is skipped; the run fails only when every feed or every score fails.
  */
 export async function syncJobOpenings(
   dependencies: SyncDependencies,
 ): Promise<SyncResult> {
   const { feeds, logger } = dependencies;
   const startedAt = dependencies.now();
-  const userIds = await dependencies.listUserIds();
+  const [userIds, profile] = await Promise.all([
+    dependencies.listUserIds(),
+    dependencies.loadProfile(),
+  ]);
   if (userIds.length === 0) {
     logger.info('No users have job search on; skipping the feeds');
     return {
@@ -116,7 +120,6 @@ export async function syncJobOpenings(
     };
   }
 
-  const profile = await dependencies.loadProfile();
   if (profile.skills.length === 0 && profile.searchTerms.length === 0) {
     logger.warn('The portfolio has no skills or roles; nothing can match');
     return {
@@ -134,8 +137,17 @@ export async function syncJobOpenings(
     };
   }
 
-  const query = { terms: profile.searchTerms };
-  logger.info('Searching the job feeds', { terms: query.terms });
+  const regions = await dependencies.loadRegions(profile);
+  const query: JobSearchQuery = {
+    terms: profile.searchTerms,
+    publishedAfter: new Date(startedAt.getTime() - maxJobAgeDays * dayMs),
+    regions,
+    roles: profile.roles,
+  };
+  logger.info('Searching the job feeds', {
+    terms: query.terms,
+    regions: [...regions],
+  });
   const feedResults = await Promise.allSettled(
     feeds.map((feed) =>
       withTimeLimit(
@@ -184,7 +196,6 @@ export async function syncJobOpenings(
   // Before matching, so no scoring goes to jobs that cannot be taken from
   // the preferred regions or that are another kind of role, such as a
   // product manager for a mobile app.
-  const regions = await dependencies.loadRegions(profile);
   const inRegion = fresh.filter((opening) =>
     isLocationInRegions(opening.location, regions),
   );
@@ -251,9 +262,9 @@ export async function syncJobOpenings(
   );
 
   const now = dependencies.now();
-  for (const userId of userIds) {
-    await dependencies.writeJobOpenings(userId, kept, now);
-  }
+  await Promise.all(
+    userIds.map((userId) => dependencies.writeJobOpenings(userId, kept, now)),
+  );
   logger.info('Wrote job openings', {
     users: userIds.length,
     openings: kept.length,

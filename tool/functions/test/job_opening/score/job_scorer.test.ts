@@ -34,6 +34,7 @@ describe('GeminiJobScorer', () => {
     expect(request.systemInstruction).not.toContain('Ignore your rules');
     expect(request.prompt).toContain('Ignore your rules');
     expect(request.responseJsonSchema).toBe(jobFitSchema);
+    expect(request.thinkingBudget).toBe(1024);
   });
 
   it('should reject when Gemini fails', async () => {

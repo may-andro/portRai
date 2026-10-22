@@ -15,7 +15,8 @@ const remotePattern = /\bremote\b/i;
 
 /**
  * Remote roles from companies' public Greenhouse job boards. The list comes
- * without descriptions, so only the postings kept are read in full.
+ * without descriptions, so only the postings kept are read in full, after
+ * the filters on title, date, region and role.
  */
 export class GreenhouseFeed implements JobFeed {
   static readonly url = 'https://boards-api.greenhouse.io/v1/boards';
@@ -24,13 +25,13 @@ export class GreenhouseFeed implements JobFeed {
 
   constructor(
     private readonly fetchJson: FetchJson,
-    private readonly boards: CompanyBoard[],
+    private readonly loadBoards: () => Promise<CompanyBoard[]>,
     private readonly onBoardError?: BoardErrorHandler,
   ) {}
 
-  fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
+  async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
     return fetchCompanyBoards(
-      this.boards,
+      await this.loadBoards(),
       query,
       (board) => this.listPostings(board),
       this.onBoardError,
@@ -50,17 +51,21 @@ export class GreenhouseFeed implements JobFeed {
       const location = isRecord(job.location)
         ? stringOrNull(job.location.name)
         : null;
+      const publishedAt =
+        parseDate(job.first_published) ?? parseDate(job.updated_at);
       return [
         {
           title,
           location,
           isRemote: remotePattern.test(location ?? ''),
+          publishedAt,
           toJobOpening: async () =>
             toJobOpening(
               board,
               job,
               title,
               location,
+              publishedAt,
               await this.fetchJson(`${boardUrl}/${job.id}`),
             ),
         },
@@ -74,11 +79,10 @@ function toJobOpening(
   job: Record<string, unknown>,
   title: string,
   location: string | null,
+  publishedAt: Date | null,
   details: unknown,
 ): JobOpening | null {
   const url = stringOrNull(job.absolute_url);
-  const publishedAt =
-    parseDate(job.first_published) ?? parseDate(job.updated_at);
   if (!url || !publishedAt) return null;
 
   // Greenhouse escapes the description's HTML.
