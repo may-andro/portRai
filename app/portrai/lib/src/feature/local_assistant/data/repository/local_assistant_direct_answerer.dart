@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 /// Answers contact questions and "how long in a city or country" questions
-/// straight from the portfolio JSON built by `GetAssistantContextUseCase`;
-/// every other question is left to the on-device model, which garbles numbers
-/// too often to be trusted with them. Returns null when the model is needed.
+/// straight from the decoded portfolio JSON built by
+/// `GetAssistantContextUseCase`; every other question is left to the
+/// on-device model, which garbles numbers too often to be trusted with them.
+/// Returns null when the model is needed.
 class LocalAssistantDirectAnswerer {
-  LocalAssistantDirectAnswerer(String portfolioContext)
-    : _portfolio = _decode(portfolioContext);
+  const LocalAssistantDirectAnswerer(this._portfolio);
 
   final Map<String, dynamic> _portfolio;
 
@@ -26,6 +24,46 @@ class LocalAssistantDirectAnswerer {
   );
   static final _cityEntry = RegExp(r'^([^:]+): (.+?) in (\d+) roles?\b(.*)$');
   static final _countryEntry = RegExp(r'^([^:]+): (.+?) \((.*)\)$');
+  static final _trailingPeriod = RegExp(r'\.$');
+  static final _enclosingParentheses = RegExp(r'^\s*\(|\)\s*$');
+  static final _longestOrShortest = RegExp(r'\b(longest|shortest)\b');
+  static final _firstRole = RegExp(
+    r'\b(first|earliest)\s+(job|role|position|company)\b',
+  );
+  static final _currentRole = RegExp(
+    r'\b(current|present)\s+(job|role|position|company)\b',
+  );
+  static final _currentWorkplace = RegExp(
+    r'\bwhere does he (work|currently work)\b',
+  );
+  static final _careerGaps = RegExp(
+    r'\bgaps?\b|\bchange jobs?\b|\bjob changes?\b',
+  );
+  static final _leadership = RegExp(r'\b(led|lead|leads|leadership|managed)\b');
+  static final _roleCount = RegExp(
+    r'\bhow many (companies|roles|jobs|employers)\b',
+  );
+  static final _languages = RegExp(r'\b(languages?)\b');
+  static final _languageKnowledge = RegExp(r'\b(speak|spoken|know|how many)\b');
+
+  // Technology and place names come from the portfolio, a small fixed set, so
+  // their patterns are built once and reused across questions.
+  static final _technologyPatterns = <String, RegExp>{};
+  static final _placePatterns = <String, RegExp>{};
+
+  static RegExp _technologyPattern(
+    String technology,
+  ) => _technologyPatterns.putIfAbsent(
+    technology,
+    () => RegExp(
+      '(^|[^a-z0-9])${RegExp.escape(technology.toLowerCase())}(\$|[^a-z0-9+#])',
+    ),
+  );
+
+  static RegExp _placePattern(String place) => _placePatterns.putIfAbsent(
+    place,
+    () => RegExp('\\b${RegExp.escape(place.toLowerCase())}\\b'),
+  );
 
   String? _overviewLine(String prefix) {
     final overview = _portfolio['overview'];
@@ -46,14 +84,12 @@ class LocalAssistantDirectAnswerer {
     if (line == null) return null;
     final body = line
         .substring(line.lastIndexOf('): ') + 3)
-        .replaceFirst(RegExp(r'\.$'), '');
+        .replaceFirst(_trailingPeriod, '');
     for (final entry in body.split('; ')) {
       final parts = entry.split(': ');
       if (parts.length != 2) continue;
       final technology = parts.first.trim();
-      if (RegExp(
-        '(^|[^a-z0-9])${RegExp.escape(technology.toLowerCase())}(\$|[^a-z0-9+#])',
-      ).hasMatch(q)) {
+      if (_technologyPattern(technology).hasMatch(q)) {
         return '$_name has used $technology for ${parts.last} across all '
             'roles, counting overlapping roles once.';
       }
@@ -66,30 +102,28 @@ class LocalAssistantDirectAnswerer {
   // Ready-computed career facts, returned as written so the model cannot
   // garble the numbers. Questions that name a place are left to the model.
   String? _overviewAnswer(String q) {
-    bool isAbout(String pattern) => RegExp(pattern).hasMatch(q);
-    if (isAbout(r'\b(longest|shortest)\b') && !_knownPlaceHint.hasMatch(q)) {
+    bool isAbout(RegExp pattern) => pattern.hasMatch(q);
+    if (isAbout(_longestOrShortest) && !_knownPlaceHint.hasMatch(q)) {
       return _overviewLine(
         q.contains('longest') ? 'Longest role' : 'Shortest role',
       );
     }
-    if (isAbout(r'\b(first|earliest)\s+(job|role|position|company)\b')) {
+    if (isAbout(_firstRole)) {
       return _overviewLine('First role');
     }
-    if (isAbout(r'\b(current|present)\s+(job|role|position|company)\b') ||
-        isAbout(r'\bwhere does he (work|currently work)\b')) {
+    if (isAbout(_currentRole) || isAbout(_currentWorkplace)) {
       return _overviewLine('Current role');
     }
-    if (isAbout(r'\bgaps?\b|\bchange jobs?\b|\bjob changes?\b')) {
+    if (isAbout(_careerGaps)) {
       return _overviewLine('Career gaps');
     }
-    if (isAbout(r'\b(led|lead|leads|leadership|managed)\b')) {
+    if (isAbout(_leadership)) {
       return _overviewLine('Leadership roles');
     }
-    if (isAbout(r'\bhow many (companies|roles|jobs|employers)\b')) {
+    if (isAbout(_roleCount)) {
       return _overviewLine('Career overview');
     }
-    if (isAbout(r'\b(languages?)\b') &&
-        isAbout(r'\b(speak|spoken|know|how many)\b')) {
+    if (isAbout(_languages) && isAbout(_languageKnowledge)) {
       return _overviewLine('Spoken languages');
     }
     return null;
@@ -107,14 +141,12 @@ class LocalAssistantDirectAnswerer {
       }
       final body = line
           .substring(line.indexOf(': ') + 2)
-          .replaceFirst(RegExp(r'\.$'), '');
+          .replaceFirst(_trailingPeriod, '');
       for (final entry in body.split('; ')) {
         final match = (isCity ? _cityEntry : _countryEntry).firstMatch(entry);
         if (match == null) continue;
         final place = match.group(1)!.trim();
-        if (!RegExp(
-          '\\b${RegExp.escape(place.toLowerCase())}\\b',
-        ).hasMatch(q)) {
+        if (!_placePattern(place).hasMatch(q)) {
           continue;
         }
         final duration = match.group(2)!;
@@ -123,7 +155,7 @@ class LocalAssistantDirectAnswerer {
         }
         final count = match.group(3)!;
         final roles = (match.group(4) ?? '')
-            .replaceAll(RegExp(r'^\s*\(|\)\s*$'), '')
+            .replaceAll(_enclosingParentheses, '')
             .trim();
         return '$name worked $duration in $place, across $count '
             '${count == '1' ? 'role' : 'roles'}'
@@ -149,14 +181,5 @@ class LocalAssistantDirectAnswerer {
       return 'You can contact $name by email at $email or by phone at $phone.';
     }
     return null;
-  }
-
-  static Map<String, dynamic> _decode(String source) {
-    try {
-      final decoded = jsonDecode(source);
-      return decoded is Map<String, dynamic> ? decoded : const {};
-    } on FormatException {
-      return const {};
-    }
   }
 }

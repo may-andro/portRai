@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
@@ -12,6 +13,15 @@ import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/tracking/_tracking.dart';
 import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
+
+/// The links, contact links and places the generated UI may show, derived
+/// from [portfolioContext].
+typedef _AllowedContent = ({
+  String portfolioContext,
+  Set<String> urls,
+  Set<String> contactLinks,
+  List<AssistantLocation> locations,
+});
 
 @RegisterSingleton(disposeMethodName: 'close')
 class RemoteAssistantBloc
@@ -57,6 +67,9 @@ class RemoteAssistantBloc
     StreamSubscription<AssistantGenuiResponseException>
   >
   _genuiErrorSubscriptions = {};
+  // What the generated UI may show for the loaded portfolio context. It is
+  // derived once per context and reused by every question.
+  _AllowedContent? _allowedContent;
 
   Future<bool> _checkFlag(
     Emitter<RemoteAssistantState> emit,
@@ -197,6 +210,7 @@ class RemoteAssistantBloc
     emit(state.copyWith(isLoadingContext: true, clearFailure: true));
     final result = await _getAssistantContextUseCase();
     if (emit.isDone || revision != _controlRevision || !state.isReady) return;
+    if (result.isRight) _allowedContentOf(result.right);
     emit(
       result.fold(
         (failure) => state.copyWith(isLoadingContext: false, failure: failure),
@@ -206,6 +220,26 @@ class RemoteAssistantBloc
           clearFailure: true,
         ),
       ),
+    );
+  }
+
+  _AllowedContent _allowedContentOf(String portfolioContext) {
+    final cachedContent = _allowedContent;
+    if (cachedContent != null &&
+        cachedContent.portfolioContext == portfolioContext) {
+      return cachedContent;
+    }
+    Object? portfolio;
+    try {
+      portfolio = jsonDecode(portfolioContext);
+    } on FormatException {
+      portfolio = null;
+    }
+    return _allowedContent = (
+      portfolioContext: portfolioContext,
+      urls: assistantUrlsFrom(portfolioContext),
+      contactLinks: assistantContactLinksFrom(portfolio),
+      locations: assistantLocationsFrom(portfolio),
     );
   }
 
@@ -298,10 +332,11 @@ class RemoteAssistantBloc
     final AssistantGenuiController? genuiController;
     final Either<RemoteAssistantFailure, void> result;
     if (state.isGenerativeUiEnabled) {
+      final allowedContent = _allowedContentOf(state.portfolioContext!);
       final controller = AssistantGenuiController(
-        allowedUrls: assistantUrlsFrom(state.portfolioContext!),
-        allowedContactLinks: assistantContactLinksFrom(state.portfolioContext!),
-        allowedLocations: assistantLocationsFrom(state.portfolioContext!),
+        allowedUrls: allowedContent.urls,
+        allowedContactLinks: allowedContent.contactLinks,
+        allowedLocations: allowedContent.locations,
         onOpenLink: (url) => add(OpenRemoteAssistantLinkClickEvent(url)),
         onAskQuestion: (question) => add(
           SendRemoteAssistantQuestionClickEvent(question, isSuggestion: true),

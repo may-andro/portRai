@@ -86,6 +86,10 @@ class FlutterEdgeAiLocalAssistantRepository
   InferenceChat? _chat;
   String? _previousQuestion;
   CancelToken? _cancelToken;
+  // The last decoded portfolio context and its source. Questions about the
+  // same portfolio reuse it instead of decoding the JSON again.
+  String? _decodedPortfolioSource;
+  Map<String, dynamic>? _decodedPortfolio;
 
   @override
   Future<bool> isEnabled() async => await _enabledCache.get() ?? false;
@@ -220,11 +224,17 @@ class FlutterEdgeAiLocalAssistantRepository
       throw StateError('The on-device model could not be loaded.');
     }
 
+    final portfolio = _decodePortfolio(portfolioContext);
     final direct = LocalAssistantDirectAnswerer(
-      portfolioContext,
+      portfolio ?? const {},
     ).answer(question);
     if (direct != null) {
       return direct;
+    }
+    if (portfolio == null) {
+      throw const FormatException(
+        'Assistant context must be a portfolio object.',
+      );
     }
 
     // A standalone question must not see the previous one: the small model
@@ -254,7 +264,7 @@ class FlutterEdgeAiLocalAssistantRepository
       (0.7, maxBytes < 6000 ? maxBytes : 6000),
     ]) {
       final selectedContext = LocalAssistantContextSelector().select(
-        portfolioContext,
+        portfolio,
         question,
         previousQuestion: previousQuestion == 'none' ? null : previousQuestion,
         maxBytes: bytes,
@@ -307,6 +317,22 @@ class FlutterEdgeAiLocalAssistantRepository
     final response = await chat.generateChatResponse();
     _ensureCurrent(generation);
     return response is TextResponse ? response.token.trim() : '';
+  }
+
+  /// Returns the decoded [portfolioContext], or null when it is not a JSON
+  /// object. The result is kept until a different context is passed.
+  Map<String, dynamic>? _decodePortfolio(String portfolioContext) {
+    if (portfolioContext == _decodedPortfolioSource) return _decodedPortfolio;
+    Map<String, dynamic>? portfolio;
+    try {
+      final decoded = jsonDecode(portfolioContext);
+      if (decoded is Map<String, dynamic>) portfolio = decoded;
+    } on FormatException {
+      portfolio = null;
+    }
+    _decodedPortfolioSource = portfolioContext;
+    _decodedPortfolio = portfolio;
+    return portfolio;
   }
 
   static final _repeatedRun = RegExp(r'(\S)\1{11,}');
