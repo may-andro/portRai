@@ -219,9 +219,9 @@ void main() {
       build: buildBloc,
       act: (bloc) {
         bloc.add(const ScreenVisibleEvent(true));
-        bloc.add(ViewStateVisibleEvent.loading());
-        bloc.add(ViewStateVisibleEvent.success());
-        bloc.add(ViewStateVisibleEvent.error());
+        bloc.add(const ViewStateVisibleEvent('loading_content_view'));
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
+        bloc.add(const ViewStateVisibleEvent('error_content_view'));
       },
       expect: () => const <LocaleSelectionState>[],
       verify: (_) {

@@ -32,12 +32,14 @@ void main() {
         await tester.pump();
 
         expect(find.byType(DSLoadingWidget), findsOneWidget);
-        verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+        ).called(1);
       },
     );
 
     testWidgets(
-      'should render an error message and dispatch the retry event when retry is tapped',
+      'should render an error card and dispatch the load event when retry is tapped',
       (tester) async {
         final bloc = MockLocaleSelectionBloc()
           ..stubState(const ErrorState(failure: GetLocaleUnknownFailure()));
@@ -52,9 +54,11 @@ void main() {
         );
         await tester.pump();
 
-        expect(find.byIcon(Icons.error_outline), findsOneWidget);
+        expect(find.byType(DSErrorCardWidget), findsOneWidget);
         expect(find.text('Failed to load language settings'), findsOneWidget);
-        verify(() => bloc.add(ViewStateVisibleEvent.error())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('error_content_view')),
+        ).called(1);
 
         await tester.tap(find.text('Retry'));
         await tester.pump();
@@ -87,6 +91,43 @@ void main() {
         expect(find.text('Choose Language'), findsOneWidget);
         expect(find.text('🇬🇧 English'), findsOneWidget);
         expect(find.text('🇳🇱 Dutch'), findsOneWidget);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
+        ).called(1);
+      },
+    );
+
+    testWidgets(
+      'should select the new locale when a loaded state follows another loaded state',
+      (tester) async {
+        final englishState = LocaleSelectionStateFactory.loaded(
+          supportedLocales: createSupportedLocales(),
+          appLocale: createEnglishLocale(),
+        );
+        final dutchState = LocaleSelectionStateFactory.loaded(
+          supportedLocales: createSupportedLocales(),
+          appLocale: createDutchLocale(),
+        );
+        final bloc = MockLocaleSelectionBloc()
+          ..stubStateStream(
+            initialState: englishState,
+            states: Stream<LocaleSelectionState>.value(dutchState),
+          );
+
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: BlocProvider<LocaleSelectionBloc>.value(
+              value: bloc,
+              child: const ContentWidget(isDialog: false),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        final radioGroup = tester.widget<RadioGroup<Locale>>(
+          find.byType(RadioGroup<Locale>),
+        );
+        expect(radioGroup.groupValue, const Locale('nl'));
       },
     );
 
