@@ -35,9 +35,9 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.space(factor: 2),
-        vertical: context.space(factor: 2),
+      padding: context.screenHorizontalPadding.copyWith(
+        top: context.space(factor: 2),
+        bottom: context.space(factor: 2),
       ),
       sliver: SliverToBoxAdapter(
         child: Column(
