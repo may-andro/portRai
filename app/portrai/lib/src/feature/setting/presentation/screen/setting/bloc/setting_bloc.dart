@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/_domain.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_event.dart';
@@ -20,6 +21,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     this._buildConfig,
     this._isLocalAssistantSupportedUseCase,
     this._getGuestUserUseCase,
+    this._isPermissionSupportedUseCase,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
   }
@@ -28,6 +30,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   final BuildConfig _buildConfig;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
   final GetGuestUserUseCase _getGuestUserUseCase;
+  final IsPermissionSupportedUseCase _isPermissionSupportedUseCase;
   int _loadRevision = 0;
 
   Future<void> _mapLoadSettingsEventToState(
@@ -75,6 +78,9 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       final user = await _getGuestUserUseCase();
       userRole = user.isRight ? user.right?.role : null;
     }
+    final notificationSupported = await _isPermissionSupportedUseCase(
+      AppPermission.notifications,
+    );
     if (emit.isDone || revision != _loadRevision) return;
     emit(
       SettingLoadedState(
@@ -82,6 +88,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
         isLocalAssistantAvailable: isLocalAssistantAvailable,
         isJobOpeningsEnabled: isJobOpeningsEnabled,
+        isNotificationSettingAvailable:
+            notificationSupported.isRight && notificationSupported.right,
         userRole: userRole,
       ),
     );
