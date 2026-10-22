@@ -50,7 +50,7 @@ class LocalAssistantDirectAnswerer {
     r'\b(current|present|latest)\s+(job|role|position|company|employer)\b|'
     r'\b(where|who) (does|is) he (work|working|employed)\b|'
     r'\b(work|working|employed) (now|today|currently|at the moment)\b|'
-    r'\bemployer\b',
+    r'\bwho employs him\b',
   );
   static final _careerGaps = RegExp(
     r'\bgaps?\b|\bchange jobs?\b|\bjob changes?\b',

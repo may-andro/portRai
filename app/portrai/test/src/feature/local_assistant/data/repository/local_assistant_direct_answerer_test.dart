@@ -198,6 +198,11 @@ void main() {
     expect(answerer.answer('longest job at Initech'), isNull);
   });
 
+  test('should leave an earlier employer to the model', () {
+    expect(answerer.answer('Who was his previous employer?'), isNull);
+    expect(answerer.answer('Which employer came before that?'), isNull);
+  });
+
   test('should leave a longest project to the model', () {
     expect(answerer.answer('What was his longest project?'), isNull);
   });
