@@ -290,6 +290,32 @@ void main() {
     expect(loader.size, 144);
   });
 
+  testWidgets('should show the job search and footer sections while the '
+      'matches load', (tester) async {
+    await pumpContent(tester, const JobOpeningsState());
+
+    expect(find.byType(DSLoadingWidget), findsOneWidget);
+    expect(find.text('Sign out'), findsOneWidget);
+    expect(find.byType(JobFitScoreWidget), findsNothing);
+  });
+
+  testWidgets('should retry when retry is tapped on the error', (tester) async {
+    final bloc = await pumpContent(
+      tester,
+      const JobOpeningsState(status: JobOpeningsStatus.failed),
+    );
+
+    final errorCard = find.byType(DSErrorCardWidget);
+    expect(errorCard, findsOneWidget);
+    await tester.ensureVisible(errorCard);
+    await tester.tap(
+      find.descendant(of: errorCard, matching: find.byType(DSButtonWidget)),
+    );
+    await tester.pump();
+
+    verify(() => bloc.add(const JobOpeningsRetryClickEvent())).called(1);
+  });
+
   testWidgets('should show how long ago each opening was posted', (
     tester,
   ) async {
