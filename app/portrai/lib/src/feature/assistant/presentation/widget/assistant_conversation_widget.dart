@@ -106,7 +106,10 @@ class _AssistantConversationWidgetState
                         if (index == widget.messages.length) {
                           return const Align(
                             alignment: Alignment.centerLeft,
-                            child: DSLoadingWidget(size: 28),
+                            child: DSLoadingWidget(
+                              style: DSLoadingStyle.lottie,
+                              size: 14,
+                            ),
                           );
                         }
                         final message = widget.messages[index];
