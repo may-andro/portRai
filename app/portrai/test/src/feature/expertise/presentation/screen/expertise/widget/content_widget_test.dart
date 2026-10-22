@@ -91,14 +91,18 @@ void main() {
           findsOneWidget,
         );
         await tester.scrollUntilVisible(
-          find.text('footer'),
+          find.text('footer', skipOffstage: false),
           500,
           scrollable: find
               .descendant(of: scrollView, matching: find.byType(Scrollable))
               .first,
         );
         expect(
-          find.descendant(of: scrollView, matching: find.text('footer')),
+          find.descendant(
+            of: scrollView,
+            matching: find.text('footer', skipOffstage: false),
+            skipOffstage: false,
+          ),
           findsOneWidget,
         );
         final lastSliver = tester

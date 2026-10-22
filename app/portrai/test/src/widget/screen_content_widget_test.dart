@@ -270,9 +270,10 @@ void main() {
 
         expect(find.byType(CustomScrollView), findsOneWidget);
         expect(find.text('loaded content'), findsOneWidget);
-        expect(find.text('footer'), findsOneWidget);
+        final footer = find.text('footer', skipOffstage: false);
+        expect(footer, findsOneWidget);
         expect(
-          tester.getTopLeft(find.text('footer')).dy,
+          tester.getTopLeft(footer).dy,
           greaterThan(tester.getTopLeft(find.text('loaded content')).dy),
         );
       },
@@ -287,7 +288,7 @@ void main() {
       );
 
       expect(find.text('loaded content'), findsOneWidget);
-      expect(find.text('footer'), findsNothing);
+      expect(find.text('footer', skipOffstage: false), findsNothing);
     });
 
     testWidgets(
@@ -301,7 +302,7 @@ void main() {
         );
 
         expect(find.text('loaded content'), findsOneWidget);
-        expect(find.text('footer'), findsNothing);
+        expect(find.text('footer', skipOffstage: false), findsNothing);
       },
     );
 
@@ -309,8 +310,83 @@ void main() {
       await pumpWithFooter(tester, const ScreenLoadingContent());
 
       expect(find.byType(DSLoadingWidget), findsOneWidget);
-      expect(find.text('footer'), findsNothing);
+      expect(find.text('footer', skipOffstage: false), findsNothing);
     });
+
+    Future<void> pumpWithSizedFooter(
+      WidgetTester tester, {
+      required double contentHeight,
+    }) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final cubit = MockScreenContentCubit()
+        ..stubStates(const FakeLoadedState());
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ScreenFooterProviderWidget(
+            footer: LayoutBuilder(
+              builder: (context, constraints) => const SizedBox(
+                key: Key('footer'),
+                height: 100,
+                width: double.infinity,
+              ),
+            ),
+            child: BlocProvider<MockScreenContentCubit>.value(
+              value: cubit,
+              child:
+                  ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
+                    contentOf: (_) => ScreenLoadedContent.slivers([
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          key: const Key('content'),
+                          height: contentHeight,
+                        ),
+                      ),
+                    ]),
+                  ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets(
+      'should start the footer below the screen when the content is shorter '
+      'than the screen',
+      (tester) async {
+        await pumpWithSizedFooter(tester, contentHeight: 200);
+        await tester.drag(
+          find.byType(CustomScrollView),
+          const Offset(0, -2000),
+        );
+        await tester.pumpAndSettle();
+
+        final footerTop = tester.getTopLeft(find.byKey(const Key('footer'))).dy;
+        final contentTop = tester
+            .getTopLeft(find.byKey(const Key('content')))
+            .dy;
+        expect(footerTop - contentTop, 800);
+      },
+    );
+
+    testWidgets(
+      'should place the footer right after the content when the content is '
+      'taller than the screen',
+      (tester) async {
+        await pumpWithSizedFooter(tester, contentHeight: 1200);
+        await tester.drag(
+          find.byType(CustomScrollView),
+          const Offset(0, -2000),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          tester.getTopLeft(find.byKey(const Key('footer'))).dy,
+          tester.getBottomLeft(find.byKey(const Key('content'))).dy,
+        );
+      },
+    );
   });
 
   group('ScreenContentSliverWidget', () {
@@ -390,7 +466,7 @@ void main() {
       );
 
       expect(find.text('loaded content'), findsOneWidget);
-      expect(find.text('footer'), findsNothing);
+      expect(find.text('footer', skipOffstage: false), findsNothing);
     });
   });
 }

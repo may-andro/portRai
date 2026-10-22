@@ -159,9 +159,12 @@ void main() {
           ),
           findsOneWidget,
         );
-        await tester.scrollUntilVisible(find.text('footer'), 200);
+        await tester.scrollUntilVisible(
+          find.text('footer', skipOffstage: false),
+          200,
+        );
         expect(
-          tester.getTopLeft(find.text('footer')).dy,
+          tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
           greaterThan(
             tester.getBottomLeft(find.text('Force Blacklist Error')).dy,
           ),

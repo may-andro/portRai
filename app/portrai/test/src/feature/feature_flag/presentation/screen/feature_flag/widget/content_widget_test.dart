@@ -124,9 +124,9 @@ void main() {
           findsOneWidget,
         );
         expect(find.byType(SliverList), findsOneWidget);
-        expect(find.text('footer'), findsOneWidget);
+        expect(find.text('footer', skipOffstage: false), findsOneWidget);
         expect(
-          tester.getTopLeft(find.text('footer')).dy,
+          tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
           greaterThan(
             tester.getBottomLeft(find.text(testimonialsFlag.name)).dy,
           ),

@@ -168,7 +168,10 @@ void main() {
             isDialog ? findsNothing : findsOneWidget,
           );
           expect(find.byType(RadioGroup<Locale>), findsOneWidget);
-          expect(find.text('footer'), isDialog ? findsNothing : findsOneWidget);
+          expect(
+            find.text('footer', skipOffstage: false),
+            isDialog ? findsNothing : findsOneWidget,
+          );
           expect(find.byType(FooterWidget), findsNothing);
         },
       );

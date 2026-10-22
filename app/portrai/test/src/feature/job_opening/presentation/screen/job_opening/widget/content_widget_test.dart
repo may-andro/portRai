@@ -252,9 +252,12 @@ void main() {
       ),
       findsOneWidget,
     );
-    await tester.scrollUntilVisible(find.text('footer'), 200);
+    await tester.scrollUntilVisible(
+      find.text('footer', skipOffstage: false),
+      200,
+    );
     expect(
-      tester.getTopLeft(find.text('footer')).dy,
+      tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
       greaterThan(tester.getBottomLeft(find.text('Apply on Remotive').last).dy),
     );
     expect(find.byType(FooterWidget), findsNothing);
@@ -263,7 +266,7 @@ void main() {
   testWidgets('should show no footer while loading', (tester) async {
     await pumpContent(tester, const JobOpeningState(id: 'job-1'));
 
-    expect(find.text('footer'), findsNothing);
+    expect(find.text('footer', skipOffstage: false), findsNothing);
   });
 
   JobOpeningState insightsState(

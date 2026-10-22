@@ -88,9 +88,9 @@ void main() {
 
         expect(find.byType(CustomScrollView), findsOneWidget);
         expect(find.text('Mayank Rai'), findsWidgets);
-        expect(find.text('footer'), findsOneWidget);
+        expect(find.text('footer', skipOffstage: false), findsOneWidget);
         expect(
-          tester.getTopLeft(find.text('footer')).dy,
+          tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
           greaterThan(tester.getTopLeft(find.text('Mayank Rai').first).dy),
         );
         expect(find.byType(FooterWidget), findsNothing);

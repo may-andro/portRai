@@ -93,11 +93,15 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.descendant(of: scrollView, matching: find.text('footer')),
+          find.descendant(
+            of: scrollView,
+            matching: find.text('footer', skipOffstage: false),
+            skipOffstage: false,
+          ),
           findsOneWidget,
         );
         expect(
-          tester.getTopLeft(find.text('footer')).dy,
+          tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
           greaterThanOrEqualTo(
             tester.getBottomLeft(find.byType(ExpertiseListWidget)).dy,
           ),

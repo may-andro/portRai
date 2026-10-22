@@ -84,7 +84,7 @@ void main() {
       await pumpContent(tester, bloc);
 
       expect(find.byType(DSLoadingWidget), findsOneWidget);
-      expect(find.text('footer'), findsNothing);
+      expect(find.text('footer', skipOffstage: false), findsNothing);
     });
 
     testWidgets(
@@ -102,9 +102,12 @@ void main() {
           ),
           findsOneWidget,
         );
-        await tester.scrollUntilVisible(find.text('footer'), 200);
+        await tester.scrollUntilVisible(
+          find.text('footer', skipOffstage: false),
+          200,
+        );
         expect(
-          tester.getTopLeft(find.text('footer')).dy,
+          tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
           greaterThanOrEqualTo(
             tester.getBottomLeft(find.byType(Placeholder)).dy,
           ),

@@ -120,7 +120,11 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.descendant(of: scrollView, matching: find.text('footer')),
+          find.descendant(
+            of: scrollView,
+            matching: find.text('footer', skipOffstage: false),
+            skipOffstage: false,
+          ),
           findsOneWidget,
         );
         expect(find.byType(FooterWidget), findsNothing);

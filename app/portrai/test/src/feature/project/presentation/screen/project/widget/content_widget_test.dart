@@ -95,7 +95,7 @@ void main() {
         expect(find.byType(CustomScrollView), findsOneWidget);
         expect(find.text('A polished portfolio app'), findsOneWidget);
         await tester.scrollUntilVisible(
-          find.text('footer'),
+          find.text('footer', skipOffstage: false),
           500,
           scrollable: find
               .descendant(
@@ -105,7 +105,7 @@ void main() {
               .first,
         );
         await tester.pump();
-        expect(find.text('footer'), findsOneWidget);
+        expect(find.text('footer', skipOffstage: false), findsOneWidget);
         expect(find.byType(FooterWidget), findsNothing);
       },
     );

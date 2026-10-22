@@ -104,14 +104,14 @@ void main() {
       findsOneWidget,
     );
     await tester.scrollUntilVisible(
-      find.text('footer'),
+      find.text('footer', skipOffstage: false),
       200,
       scrollable: find
           .descendant(of: scrollView, matching: find.byType(Scrollable))
           .first,
     );
     expect(
-      tester.getTopLeft(find.text('footer')).dy,
+      tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
       greaterThan(tester.getBottomLeft(find.byType(DSButtonWidget)).dy),
     );
     expect(find.byType(FooterWidget), findsNothing);
@@ -132,14 +132,14 @@ void main() {
       findsOneWidget,
     );
     await tester.scrollUntilVisible(
-      find.text('footer'),
+      find.text('footer', skipOffstage: false),
       200,
       scrollable: find
           .descendant(of: scrollView, matching: find.byType(Scrollable))
           .first,
     );
     expect(
-      tester.getTopLeft(find.text('footer')).dy,
+      tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
       greaterThan(tester.getBottomLeft(find.byType(DSButtonWidget)).dy),
     );
     expect(find.byType(FooterWidget), findsNothing);
