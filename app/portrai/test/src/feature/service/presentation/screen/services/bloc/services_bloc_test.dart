@@ -86,7 +86,7 @@ void main() {
       build: buildBloc,
       act: (bloc) {
         bloc.add(const ScreenVisibleEvent());
-        bloc.add(ViewStateVisibleEvent.success());
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
       },
       expect: () => const <ServicesState>[],
       verify: (_) {

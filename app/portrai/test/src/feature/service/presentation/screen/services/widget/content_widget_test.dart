@@ -37,16 +37,25 @@ void main() {
       final bloc = await pump(tester, const LoadingState());
 
       expect(find.byType(DSLoadingWidget), findsOneWidget);
-      verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+      verify(
+        () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+      ).called(1);
     });
 
-    testWidgets('should render an error card when loading fails', (
-      tester,
-    ) async {
-      await pump(tester, const ErrorState(failure: ServicesNotFoundFailure()));
+    testWidgets(
+      'should render an error card and track its impression when loading fails',
+      (tester) async {
+        final bloc = await pump(
+          tester,
+          const ErrorState(failure: ServicesNotFoundFailure()),
+        );
 
-      expect(find.byType(DSErrorCardWidget), findsOneWidget);
-    });
+        expect(find.byType(DSErrorCardWidget), findsOneWidget);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('error_content_view')),
+        ).called(1);
+      },
+    );
 
     testWidgets('should render the service list when loading succeeds', (
       tester,
@@ -58,7 +67,9 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(ServiceListWidget), findsOneWidget);
-      verify(() => bloc.add(ViewStateVisibleEvent.success())).called(1);
+      verify(
+        () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
+      ).called(1);
     });
   });
 }
