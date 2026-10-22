@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/cv_export/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
@@ -226,6 +229,45 @@ void main() {
         final result = await useCase();
 
         expect(result.left, isA<CvDataUnavailableFailure>());
+      },
+    );
+
+    test(
+      'should start every fetch when the profile has not completed yet',
+      () async {
+        final profileCompleter =
+            Completer<Either<GetProfileFailure, ProfileEntity>>();
+        when(() => getProfile()).thenAnswer((_) => profileCompleter.future);
+
+        final documentEither = useCase();
+        await Future<void>.delayed(Duration.zero);
+
+        verify(() => getExperiences()).called(1);
+        verify(() => getProjects()).called(1);
+        verify(() => getAllExpertise()).called(1);
+
+        profileCompleter.complete(Right(CvExportTestFixture.profile()));
+        expect((await documentEither).isRight, isTrue);
+      },
+    );
+
+    test(
+      'should report the profile failure when several fetches fail',
+      () async {
+        const profileFailure = ProfileNotFoundFailure();
+        getProfile.stubCall(
+          const Left<GetProfileFailure, ProfileEntity>(profileFailure),
+        );
+        getProjects.stubCall(
+          const Left<GetProjectsFailure, List<ProjectEntity>>(
+            ProjectUnknownFailure(),
+          ),
+        );
+
+        final documentEither = await useCase();
+
+        expect(documentEither.left, isA<CvDataUnavailableFailure>());
+        expect(documentEither.left.cause, profileFailure);
       },
     );
   });

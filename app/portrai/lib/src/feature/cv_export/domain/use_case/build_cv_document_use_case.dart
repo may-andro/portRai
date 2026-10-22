@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/cv_export/domain/entity/_entity.dart';
@@ -49,19 +51,28 @@ class BuildCvDocumentUseCase
   @protected
   @override
   Future<Either<BuildCvDocumentFailure, CvDocumentEntity>> execute() async {
-    final profileEither = await _getProfileUseCase();
+    // The sections are independent, so they are fetched concurrently.
+    final (
+      profileEither,
+      experiencesEither,
+      projectsEither,
+      expertiseEither,
+    ) = await (
+      Future.value(_getProfileUseCase()),
+      Future.value(_getExperiencesUseCase()),
+      Future.value(_getProjectsUseCase()),
+      Future.value(_getAllExpertiseUseCase()),
+    ).wait;
+
     if (profileEither.isLeft) {
       return Left(CvDataUnavailableFailure(cause: profileEither.left));
     }
-    final experiencesEither = await _getExperiencesUseCase();
     if (experiencesEither.isLeft) {
       return Left(CvDataUnavailableFailure(cause: experiencesEither.left));
     }
-    final projectsEither = await _getProjectsUseCase();
     if (projectsEither.isLeft) {
       return Left(CvDataUnavailableFailure(cause: projectsEither.left));
     }
-    final expertiseEither = await _getAllExpertiseUseCase();
     if (expertiseEither.isLeft) {
       return Left(CvDataUnavailableFailure(cause: expertiseEither.left));
     }
