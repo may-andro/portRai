@@ -6,9 +6,12 @@ import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_event.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/developer_menu_state.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
+class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
+    with ScreenTrackingBlocMixin<DeveloperMenuEvent, DeveloperMenuState> {
   DeveloperMenuBloc(
     this._trackingDelegate,
     this._getAssetSourceUseCase,
@@ -23,8 +26,8 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     on<ForceFatalCrashEvent>(_onForceFatalCrash);
     on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
     on<ForceBlacklistErrorEvent>(_onForceBlacklistError);
-    on<ScreenVisibleEvent>(_onScreenVisible);
-    on<ViewStateVisibleEvent>(_onViewStateVisible);
+    trackScreenViewOn<ScreenVisibleEvent>();
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final DeveloperMenuTrackingDelegate _trackingDelegate;
@@ -32,6 +35,9 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
   final UpdateAssetSourceUseCase _updateAssetSourceUseCase;
   final GetAiImageSettingsUseCase _getAiImageSettingsUseCase;
   final UpdateAiImageSettingsUseCase _updateAiImageSettingsUseCase;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   DeveloperMenuLoadedState get _loadedState => switch (state) {
     final DeveloperMenuLoadedState loaded => loaded,
@@ -109,19 +115,5 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState> {
     Emitter<DeveloperMenuState> emit,
   ) {
     // Handle blacklist error
-  }
-
-  void _onScreenVisible(
-    ScreenVisibleEvent event,
-    Emitter<DeveloperMenuState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
-
-  void _onViewStateVisible(
-    ViewStateVisibleEvent event,
-    Emitter<DeveloperMenuState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }
