@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:design_system/src/component/atom/container/ds_visibility_detector_widget.dart';
 import 'package:flutter/material.dart';
 
 /// A decorative, non-interactive background of softly drifting rings, dots,
@@ -32,6 +33,21 @@ class _DSFloatingShapesBackgroundWidgetState
     duration: widget.duration,
   )..repeat();
 
+  final _visibilityKey = UniqueKey();
+  bool _isOnScreen = true;
+
+  // Stops the loop while none of the widget is on screen, so it stops
+  // requesting frames once it is scrolled away.
+  void _onVisibilityChanged(double visiblePercentage) {
+    if (!mounted) return;
+    _isOnScreen = visiblePercentage > 0;
+    if (!_isOnScreen) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
+
   late final List<_Shape> _shapes = _Shape.generate(widget.shapeCount);
 
   @override
@@ -42,11 +58,15 @@ class _DSFloatingShapesBackgroundWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: RepaintBoundary(
-        child: CustomPaint(
-          painter: _ShapesPainter(_shapes, widget.color, _controller),
-          size: Size.infinite,
+    return DSVisibilityDetectorWidget(
+      key: _visibilityKey,
+      onVisibilityChanged: _onVisibilityChanged,
+      child: IgnorePointer(
+        child: RepaintBoundary(
+          child: CustomPaint(
+            painter: _ShapesPainter(_shapes, widget.color, _controller),
+            size: Size.infinite,
+          ),
         ),
       ),
     );

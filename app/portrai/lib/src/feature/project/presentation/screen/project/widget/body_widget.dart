@@ -22,7 +22,6 @@ class _BodyWidget extends StatelessWidget {
         context,
       ).copyWith(scrollbars: false, overscroll: false),
       physics: const BouncingScrollPhysics(),
-      shrinkWrap: true,
       slivers: [
         SliverToBoxAdapter(child: state.introSection.buildWidget(context)),
         SliverToBoxAdapter(child: MetricsWidget(project: state.project)),

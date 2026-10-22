@@ -26,7 +26,6 @@ class _MobileTabletContentWidget extends StatelessWidget {
         context,
       ).copyWith(scrollbars: false, overscroll: false),
       physics: const BouncingScrollPhysics(),
-      shrinkWrap: true,
       slivers: [
         SliverToBoxAdapter(child: IntroSectionWidget(experience: experience)),
         SliverToBoxAdapter(

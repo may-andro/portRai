@@ -192,68 +192,74 @@ class _TimelineNodeWidget extends StatelessWidget {
     final accent = context.colorPalette.brand.primary.color;
     final isCurrent = experience.endDate == null;
 
-    return SizedBox(
-          width: size,
-          height: size,
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              if (isCurrent)
-                Container(
-                      width: size,
-                      height: size,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: accent, width: 2),
-                      ),
-                    )
-                    .animate(onPlay: (controller) => controller.repeat())
-                    .scale(
-                      begin: const Offset(1, 1),
-                      end: const Offset(1.7, 1.7),
-                      duration: 1800.ms,
-                      curve: Curves.easeOut,
-                    )
-                    .fadeOut(duration: 1800.ms, curve: Curves.easeOut),
-              AnimatedContainer(
-                duration: 250.ms,
+    return DSOffscreenPauseWidget(
+      child:
+          SizedBox(
                 width: size,
                 height: size,
-                padding: EdgeInsets.all(size * 0.14),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  border: Border.all(color: accent, width: isHovering ? 3 : 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accent.withAlpha(isHovering ? 130 : 60),
-                      blurRadius: isHovering ? 22 : 10,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    if (isCurrent)
+                      Container(
+                            width: size,
+                            height: size,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: accent, width: 2),
+                            ),
+                          )
+                          .animate(onPlay: (controller) => controller.repeat())
+                          .scale(
+                            begin: const Offset(1, 1),
+                            end: const Offset(1.7, 1.7),
+                            duration: 1800.ms,
+                            curve: Curves.easeOut,
+                          )
+                          .fadeOut(duration: 1800.ms, curve: Curves.easeOut),
+                    AnimatedContainer(
+                      duration: 250.ms,
+                      width: size,
+                      height: size,
+                      padding: EdgeInsets.all(size * 0.14),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        border: Border.all(
+                          color: accent,
+                          width: isHovering ? 3 : 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: accent.withAlpha(isHovering ? 130 : 60),
+                            blurRadius: isHovering ? 22 : 10,
+                          ),
+                        ],
+                      ),
+                      child: AnimatedRotation(
+                        turns: isHovering ? 0.03 : 0,
+                        duration: 300.ms,
+                        curve: Curves.easeOutBack,
+                        child: _ImageWidget(
+                          experience: experience,
+                          size: size,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: AnimatedRotation(
-                  turns: isHovering ? 0.03 : 0,
-                  duration: 300.ms,
-                  curve: Curves.easeOutBack,
-                  child: _ImageWidget(
-                    experience: experience,
-                    size: size,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+              )
+              .animate(target: isVisible ? 1 : 0)
+              .scale(
+                begin: Offset.zero,
+                end: const Offset(1, 1),
+                duration: 600.ms,
+                delay: delay,
+                curve: Curves.elasticOut,
               ),
-            ],
-          ),
-        )
-        .animate(target: isVisible ? 1 : 0)
-        .scale(
-          begin: Offset.zero,
-          end: const Offset(1, 1),
-          duration: 600.ms,
-          delay: delay,
-          curve: Curves.elasticOut,
-        );
+    );
   }
 }
 

@@ -437,96 +437,98 @@ class _LogoBackdropWidget extends StatelessWidget {
     final accent = palette.brand.primary.color;
     final secondary = palette.brand.tertiary.color;
     final size = context.isDesktop ? 520.0 : 320.0;
-    return IgnorePointer(
-      child: ClipRect(
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Transform.translate(
-            offset: Offset(size * 0.3, 0),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  for (final (ringIndex, scale) in [1.0, 0.78, 0.56].indexed)
+    return DSOffscreenPauseWidget(
+      child: IgnorePointer(
+        child: ClipRect(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Transform.translate(
+              offset: Offset(size * 0.3, 0),
+              child: SizedBox(
+                width: size,
+                height: size,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    for (final (ringIndex, scale) in [1.0, 0.78, 0.56].indexed)
+                      Container(
+                            width: size * scale,
+                            height: size * scale,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: accent.withAlpha(36)),
+                            ),
+                          )
+                          .animate(
+                            delay: (ringIndex * 600).ms,
+                            onPlay: (controller) =>
+                                controller.repeat(reverse: true),
+                          )
+                          .scale(
+                            begin: const Offset(0.97, 0.97),
+                            end: const Offset(1.03, 1.03),
+                            duration: 3.seconds,
+                            curve: Curves.easeInOut,
+                          ),
                     Container(
-                          width: size * scale,
-                          height: size * scale,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: accent.withAlpha(36)),
+                      width: size * 0.56,
+                      height: size * 0.56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [accent.withAlpha(34), accent.withAlpha(0)],
+                        ),
+                      ),
+                    ),
+                    SizedBox.expand(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: secondary,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: secondary.withAlpha(140),
+                                    blurRadius: 14,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                        .animate(onPlay: (controller) => controller.repeat())
+                        .rotate(duration: 20.seconds),
+                    Opacity(
+                          opacity: 0.12,
+                          child: ColorFiltered(
+                            colorFilter: const ColorFilter.mode(
+                              Colors.grey,
+                              BlendMode.saturation,
+                            ),
+                            child: DSNetworkImageWidget(
+                              url: imageUrl,
+                              width: size * 0.42,
+                              height: size * 0.42,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         )
                         .animate(
-                          delay: (ringIndex * 600).ms,
                           onPlay: (controller) =>
                               controller.repeat(reverse: true),
                         )
-                        .scale(
-                          begin: const Offset(0.97, 0.97),
-                          end: const Offset(1.03, 1.03),
-                          duration: 3.seconds,
+                        .moveY(
+                          begin: -10,
+                          end: 10,
+                          duration: 4.seconds,
                           curve: Curves.easeInOut,
-                        ),
-                  Container(
-                    width: size * 0.56,
-                    height: size * 0.56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [accent.withAlpha(34), accent.withAlpha(0)],
-                      ),
-                    ),
-                  ),
-                  SizedBox.expand(
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: secondary,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: secondary.withAlpha(140),
-                                  blurRadius: 14,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .rotate(duration: 20.seconds),
-                  Opacity(
-                        opacity: 0.12,
-                        child: ColorFiltered(
-                          colorFilter: const ColorFilter.mode(
-                            Colors.grey,
-                            BlendMode.saturation,
-                          ),
-                          child: DSNetworkImageWidget(
-                            url: imageUrl,
-                            width: size * 0.42,
-                            height: size * 0.42,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      )
-                      .animate(
-                        onPlay: (controller) =>
-                            controller.repeat(reverse: true),
-                      )
-                      .moveY(
-                        begin: -10,
-                        end: 10,
-                        duration: 4.seconds,
-                        curve: Curves.easeInOut,
-                      )
-                      .rotate(begin: -0.01, end: 0.01, duration: 6.seconds),
-                ],
+                        )
+                        .rotate(begin: -0.01, end: 0.01, duration: 6.seconds),
+                  ],
+                ),
               ),
             ),
           ),

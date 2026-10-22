@@ -22,7 +22,11 @@ class _HeroWidget extends StatelessWidget {
         child: ClipRect(
           child: Stack(
             children: [
-              const Positioned.fill(child: JobOpeningHeroBackgroundWidget()),
+              const Positioned.fill(
+                child: DSOffscreenPauseWidget(
+                  child: JobOpeningHeroBackgroundWidget(),
+                ),
+              ),
               JobOpeningPageColumnWidget(
                 verticalPadding: context.space(factor: isWide ? 7 : 4),
                 child: isWide

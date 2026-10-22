@@ -48,54 +48,56 @@ class _HeroWidget extends StatelessWidget {
       ],
     ).animate().fadeIn(duration: 500.ms);
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [context.heroStartColor, context.heroEndColor],
+    return DSOffscreenPauseWidget(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [context.heroStartColor, context.heroEndColor],
+          ),
         ),
-      ),
-      child: ClipRect(
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: DSFloatingShapesBackgroundWidget(
-                color: Colors.white.withAlpha(50),
-              ),
-            ),
-            Positioned.fill(
-              child: _ImageAccentsWidget(
-                imageUrl: expertise.image,
-                opacity: 0.08,
-                tint: Colors.white,
-              ),
-            ),
-            PageChromeWidget(
-              closeColor: Colors.white,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.horizontalPadding,
-                  vertical: context.space(factor: isWide ? 5 : 3),
+        child: ClipRect(
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: DSFloatingShapesBackgroundWidget(
+                  color: Colors.white.withAlpha(50),
                 ),
-                child: isWide
-                    ? Row(
-                        spacing: context.space(factor: 4),
-                        children: [
-                          Expanded(child: text),
-                          _EmblemWidget(imageUrl: expertise.image),
-                        ],
-                      )
-                    : Column(
-                        spacing: context.space(factor: 3),
-                        children: [
-                          _EmblemWidget(imageUrl: expertise.image),
-                          text,
-                        ],
-                      ),
               ),
-            ),
-          ],
+              Positioned.fill(
+                child: _ImageAccentsWidget(
+                  imageUrl: expertise.image,
+                  opacity: 0.08,
+                  tint: Colors.white,
+                ),
+              ),
+              PageChromeWidget(
+                closeColor: Colors.white,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.horizontalPadding,
+                    vertical: context.space(factor: isWide ? 5 : 3),
+                  ),
+                  child: isWide
+                      ? Row(
+                          spacing: context.space(factor: 4),
+                          children: [
+                            Expanded(child: text),
+                            _EmblemWidget(imageUrl: expertise.image),
+                          ],
+                        )
+                      : Column(
+                          spacing: context.space(factor: 3),
+                          children: [
+                            _EmblemWidget(imageUrl: expertise.image),
+                            text,
+                          ],
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

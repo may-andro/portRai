@@ -20,43 +20,45 @@ class _HeroWidget extends StatelessWidget {
       stageWidth: stageWidth,
     );
 
-    return ClipRect(
-      child: Stack(
-        children: [
-          Positioned.fill(child: _HeroBackgroundWidget(isDesktop: isDesktop)),
-          PageChromeWidget(
-            closeColor: context.colorPalette.neutral.grey9.color,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: pageHorizontalInset(context),
-                vertical: context.space(factor: isDesktop ? 6 : 4),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: isDesktop
-                    ? Row(
-                        spacing: context.space(factor: 4),
-                        children: [
-                          Expanded(
-                            child: _HeroTextWidget(
-                              profile: profile,
-                              isDesktop: true,
+    return DSOffscreenPauseWidget(
+      child: ClipRect(
+        child: Stack(
+          children: [
+            Positioned.fill(child: _HeroBackgroundWidget(isDesktop: isDesktop)),
+            PageChromeWidget(
+              closeColor: context.colorPalette.neutral.grey9.color,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: pageHorizontalInset(context),
+                  vertical: context.space(factor: isDesktop ? 6 : 4),
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: isDesktop
+                      ? Row(
+                          spacing: context.space(factor: 4),
+                          children: [
+                            Expanded(
+                              child: _HeroTextWidget(
+                                profile: profile,
+                                isDesktop: true,
+                              ),
                             ),
-                          ),
-                          stage,
-                        ],
-                      )
-                    : Column(
-                        spacing: context.space(factor: 3),
-                        children: [
-                          stage,
-                          _HeroTextWidget(profile: profile, isDesktop: false),
-                        ],
-                      ),
+                            stage,
+                          ],
+                        )
+                      : Column(
+                          spacing: context.space(factor: 3),
+                          children: [
+                            stage,
+                            _HeroTextWidget(profile: profile, isDesktop: false),
+                          ],
+                        ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

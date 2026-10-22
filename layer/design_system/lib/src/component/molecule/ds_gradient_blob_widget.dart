@@ -1,3 +1,4 @@
+import 'package:design_system/src/component/atom/container/ds_offscreen_pause_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -32,20 +33,23 @@ class DSGradientBlobWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            gradient: RadialGradient(colors: colors, radius: 0.8),
-            borderRadius: BorderRadius.circular(size * 0.8),
-          ),
-        )
-        .animate(onPlay: (c) => c.repeat(reverse: true))
-        .scale(
-          begin: scaleBegin,
-          end: scaleEnd,
-          duration: duration,
-          curve: Curves.easeInOut,
-        );
+    return DSOffscreenPauseWidget(
+      child:
+          Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(colors: colors, radius: 0.8),
+                  borderRadius: BorderRadius.circular(size * 0.8),
+                ),
+              )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .scale(
+                begin: scaleBegin,
+                end: scaleEnd,
+                duration: duration,
+                curve: Curves.easeInOut,
+              ),
+    );
   }
 }
