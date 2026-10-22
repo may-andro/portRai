@@ -8,10 +8,13 @@ class PageHeaderWidget extends StatelessWidget {
   /// Shown at the end of the header, after the logo.
   final List<Widget> actions;
 
-  /// Distance from the screen edges to the logo and the actions: the screen
-  /// padding, so the header lines up with the content and the footer.
+  /// Distance from the screen edges to the logo and the actions. On phones
+  /// and tablets it is the screen padding, so the header lines up with the
+  /// content and the footer; on desktop the logo stays near the corner.
   static double horizontalPadding(BuildContext context) {
-    return context.screenHorizontalPadding.left;
+    return context.isDesktop
+        ? context.space(factor: 2)
+        : context.screenHorizontalPadding.left;
   }
 
   /// Height of the header, for content that sits below it when overlaid.

@@ -67,7 +67,6 @@ void main() {
     for (final entry in const {
       'phone': Size(390, 844),
       'tablet': Size(820, 1180),
-      'desktop': Size(1440, 900),
     }.entries) {
       testWidgets('should start the logo at the screen padding when shown on a '
           '${entry.key}', (tester) async {
@@ -91,5 +90,28 @@ void main() {
         );
       }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
     }
+
+    testWidgets('should keep the logo near the corner when shown on desktop', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await pumpAppBar(tester);
+
+      final context = tester.element(find.byType(PageHeaderWidget));
+      expect(
+        tester
+            .getTopLeft(
+              find.descendant(
+                of: find.byType(PageHeaderWidget),
+                matching: find.byType(Image),
+              ),
+            )
+            .dx,
+        context.space(factor: 2),
+      );
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
   });
 }
