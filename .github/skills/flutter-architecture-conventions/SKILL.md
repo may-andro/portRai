@@ -96,24 +96,29 @@ Use `design_system` components whenever an equivalent exists. Render user-facing
 components, and spacers where they fit without changing the screen's behavior or required layout.
 
 ## Screen content states and padding
-A screen whose bloc has loading, error and loaded states renders them with
-`ScreenContentWidget` (`lib/src/widget/screen_content_widget.dart`) instead of its own
-`_LoadingWidget`/`_ErrorWidget`. It shows the lottie `DSLoadingWidget` (the only loading style for
-screen states) or a translated
-`DSErrorCardWidget`, reports each content's impression once, and rebuilds only when the state
-type changes unless `buildWhen` is given. Report the impression as a
-`ViewStateVisibleEvent(content.trackingLabel)`. Give `ScreenErrorContent` an `onRetry` when the
-screen can reload, and omit `impressionPrefix`/`onContentVisible` on screens without impression
-tracking. Pass `buildWhen: (previous, current) => previous != current` when a loaded state can
-follow another loaded state with new data. A single state class with a status enum works too; pass
-a `buildWhen` then. Loading and error always fill the screen on their own; only the loaded content draws the page
-header (such as `PageAppBarWidget`). Pass `ScreenLoadingContent(message:)` to explain a long wait,
-and
-`ScreenErrorContent.message(text)` for errors the feature words itself. For a stateful section
-inside a `CustomScrollView`, use `ScreenContentSliverWidget`, whose loaded child is a sliver.
+Every screen renders its content with `ScreenContentWidget`
+(`lib/src/widget/screen_content_widget.dart`) instead of its own scroll view,
+`_LoadingWidget`/`_ErrorWidget` or footer.
 
-Screens without loading or error states (forms, static pages, routes that receive their data)
-don't need the widget.
+- **Loading and error** fill the screen on their own: the lottie `DSLoadingWidget` (the only
+  loading style for screen states; `ScreenLoadingContent(message:)` explains a long wait) or a
+  translated `DSErrorCardWidget` (`ScreenErrorContent(failure, onRetry:)`, or
+  `ScreenErrorContent.message(text)` for errors the feature words itself).
+- **Loaded content** is `ScreenLoadedContent.slivers([...], scrollController:)`. The widget builds
+  the scroll view and always ends it with the screen footer that the app provides through
+  `ScreenFooterProviderWidget`, so screens never place `FooterWidget` themselves and blocs don't
+  load the profile for it. The page header (such as `PageAppBarWidget`) is one of the slivers.
+  Only content that fills the screen and scrolls itself, such as a chat, uses
+  `ScreenLoadedContent.fullScreen(child)`, which has no footer.
+- **Rebuilds** happen only when the state type changes unless `buildWhen` is given. Pass
+  `(previous, current) => previous != current` when a loaded state can follow another loaded state
+  with new data, `(_, _) => false` when the sections rebuild themselves, and a `buildWhen` for a
+  single state class with a status enum. A screen without loading states always returns loaded
+  content.
+- **Impressions:** report them as `ViewStateVisibleEvent(content.trackingLabel)` with an
+  `impressionPrefix`; omit both on screens without impression tracking.
+- A stateful section inside the screen's slivers uses `ScreenContentSliverWidget`, which never
+  adds a footer.
 
 ```dart
 return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
@@ -121,7 +126,10 @@ return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
   contentOf: (state) => switch (state) {
     LoadingState() => const ScreenLoadingContent(),
     ErrorState(:final failure) => ScreenErrorContent(failure),
-    LoadedState(:final experiences) => ScreenLoadedContent(_SuccessWidget(experiences)),
+    LoadedState(:final experiences) => ScreenLoadedContent.slivers([
+      PageAppBarWidget(title: context.localizations.experiencesTitle),
+      SliverToBoxAdapter(child: ExperienceListWidget(experiences: experiences)),
+    ]),
   },
   onContentVisible: (content) =>
       context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
