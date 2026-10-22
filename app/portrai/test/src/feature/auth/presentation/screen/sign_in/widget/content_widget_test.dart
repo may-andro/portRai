@@ -159,12 +159,23 @@ void main() {
   }
 
   testWidgets(
-    'should start the welcome text where the logo starts when shown side by '
-    'side',
+    'should centre the welcome text under the illustration in the panel when '
+    'shown side by side',
     (tester) async {
       await pumpContent(tester, const SignInState());
 
-      expect(tester.getTopLeft(find.text('Welcome back')).dx, logoLeft(tester));
+      // The panel takes 5 of the 9 columns of the 1440 wide window.
+      const panelCentre = 1440 * 5 / 9 / 2;
+      final illustration = find.byType(DSLottieIllustrationWidget).first;
+      expect(tester.getCenter(illustration).dx, closeTo(panelCentre, 1));
+      expect(
+        tester.getCenter(find.text('Welcome back')).dx,
+        closeTo(panelCentre, 1),
+      );
+      expect(
+        tester.getTopLeft(find.text('Welcome back')).dy,
+        greaterThan(tester.getBottomLeft(illustration).dy),
+      );
     },
     variant: TargetPlatformVariant.only(TargetPlatform.macOS),
   );
@@ -184,6 +195,22 @@ void main() {
         tester.getTopLeft(find.byType(TextFormField).first).dx,
         logoLeft(tester),
       );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should show the side by side layout without overflow when the window is '
+    'short',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(1440, 800),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Welcome back'), findsOneWidget);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.macOS),
   );
