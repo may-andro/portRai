@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/user/user.dart';
+import 'package:use_case/use_case.dart';
 
 sealed class SettingState extends Equatable {
   const SettingState();
@@ -42,10 +43,10 @@ class SettingLoadedState extends SettingState {
 }
 
 class SettingErrorState extends SettingState {
-  const SettingErrorState(this.message);
+  const SettingErrorState(this.failure);
 
-  final String message;
+  final Failure failure;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }

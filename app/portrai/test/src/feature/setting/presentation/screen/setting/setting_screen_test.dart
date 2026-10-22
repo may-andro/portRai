@@ -6,6 +6,8 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/setting_
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import 'package:use_case/use_case.dart';
+
 import '../../../../../../mock/feature/setting/presentation/screen/setting/bloc/mock_setting_bloc.dart';
 import '../../../../../../util/package_info_setup.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
@@ -60,5 +62,43 @@ void main() {
         verify(() => bloc.add(const LoadSettingsEvent())).called(1);
       },
     );
+
+    testWidgets('should render a loading indicator before loading starts', (
+      tester,
+    ) async {
+      final bloc = MockSettingBloc()..stubState(const SettingInitialState());
+      appServiceLocator.registerFactory<SettingBloc>(() => bloc);
+
+      await tester.pumpWidget(const TestWidgetWrapper(child: SettingScreen()));
+      await tester.pump();
+
+      expect(find.byType(DSLoadingWidget), findsOneWidget);
+    });
+
+    testWidgets('should render an error card when loading fails', (
+      tester,
+    ) async {
+      final bloc = MockSettingBloc()
+        ..stubState(const SettingErrorState(UnknownFailure()));
+      appServiceLocator.registerFactory<SettingBloc>(() => bloc);
+
+      await tester.pumpWidget(const TestWidgetWrapper(child: SettingScreen()));
+      await tester.pump();
+
+      expect(find.byType(DSErrorCardWidget), findsOneWidget);
+    });
+
+    testWidgets('should render the settings when loading succeeds', (
+      tester,
+    ) async {
+      final bloc = MockSettingBloc()
+        ..stubState(const SettingLoadedState(isLanguageSelectorEnabled: false));
+      appServiceLocator.registerFactory<SettingBloc>(() => bloc);
+
+      await tester.pumpWidget(const TestWidgetWrapper(child: SettingScreen()));
+      await tester.pump();
+
+      expect(find.byType(ContentWidget), findsOneWidget);
+    });
   });
 }
