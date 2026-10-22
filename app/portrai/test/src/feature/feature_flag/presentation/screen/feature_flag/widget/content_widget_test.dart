@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/widget/_widget.dart';
 
@@ -47,30 +48,38 @@ void main() {
 
         await pumpWidget(tester, bloc);
 
-        verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+        ).called(1);
       },
     );
 
-    testWidgets('should render an error message when the state is error', (
-      tester,
-    ) async {
-      const state = FeatureFlagErrorState('something went wrong');
-      final bloc = MockFeatureFlagBloc()..stubState(state);
+    testWidgets(
+      'should render an error card with the translated failure when the state is error',
+      (tester) async {
+        const state = FeatureFlagErrorState(FeatureFlagsNotFoundFailure());
+        final bloc = MockFeatureFlagBloc()..stubState(state);
 
-      await pumpWidget(tester, bloc);
+        await pumpWidget(tester, bloc);
 
-      expect(find.text('something went wrong'), findsOneWidget);
-    });
+        expect(find.byType(DSErrorCardWidget), findsOneWidget);
+        expect(find.text('No feature flags found'), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'should dispatch error impression event when the error content becomes visible',
       (tester) async {
         final bloc = MockFeatureFlagBloc()
-          ..stubState(const FeatureFlagErrorState('boom'));
+          ..stubState(
+            const FeatureFlagErrorState(FeatureFlagsNotFoundFailure()),
+          );
 
         await pumpWidget(tester, bloc);
 
-        verify(() => bloc.add(ViewStateVisibleEvent.error())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('error_content_view')),
+        ).called(1);
       },
     );
 
@@ -99,7 +108,9 @@ void main() {
 
         await pumpWidget(tester, bloc);
 
-        verify(() => bloc.add(ViewStateVisibleEvent.success())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
+        ).called(1);
       },
     );
 

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
+import 'package:use_case/use_case.dart';
 
 enum FeatureFlagViewMode { list, grid }
 
@@ -69,10 +70,10 @@ class FeatureFlagLoadedState extends FeatureFlagState {
 }
 
 class FeatureFlagErrorState extends FeatureFlagState {
-  const FeatureFlagErrorState(this.message);
+  const FeatureFlagErrorState(this.failure);
 
-  final String message;
+  final Failure failure;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }

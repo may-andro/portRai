@@ -55,7 +55,9 @@ void main() {
         expect(find.byType(DSLoadingWidget), findsOneWidget);
         verify(() => bloc.add(const LoadFeatureFlagEvent())).called(1);
         verify(() => bloc.add(const ScreenVisibleEvent())).called(1);
-        verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+        ).called(1);
       },
     );
 

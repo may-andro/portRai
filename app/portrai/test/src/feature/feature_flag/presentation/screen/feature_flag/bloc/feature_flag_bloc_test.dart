@@ -94,7 +94,7 @@ void main() {
         act: (bloc) => bloc.add(const LoadFeatureFlagEvent()),
         expect: () => [
           const FeatureFlagLoadingState(),
-          const FeatureFlagErrorState('FeatureFlagsNotFoundFailure'),
+          const FeatureFlagErrorState(FeatureFlagsNotFoundFailure()),
         ],
       );
 
@@ -227,7 +227,7 @@ void main() {
         act: (bloc) => bloc.add(const ResetAllFeatureFlagsEvent()),
         expect: () => [
           const FeatureFlagLoadingState(),
-          const FeatureFlagErrorState('FeatureFlagsNotFoundFailure'),
+          const FeatureFlagErrorState(FeatureFlagsNotFoundFailure()),
         ],
       );
     });
@@ -295,13 +295,12 @@ void main() {
       blocTest<FeatureFlagBloc, FeatureFlagState>(
         'should track the visible view state when view content becomes visible',
         build: buildBloc,
-        act: (bloc) => bloc.add(ViewStateVisibleEvent.success()),
+        act: (bloc) =>
+            bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
         expect: () => const <FeatureFlagState>[],
         verify: (_) {
           verify(
-            () => trackingDelegate.trackViewEvent(
-              'feature_flag_loaded_content_view',
-            ),
+            () => trackingDelegate.trackViewEvent('loaded_content_view'),
           ).called(1);
         },
       );

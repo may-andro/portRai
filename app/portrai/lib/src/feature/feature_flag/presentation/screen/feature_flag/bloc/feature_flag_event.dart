@@ -47,18 +47,6 @@ final class ScreenVisibleEvent extends FeatureFlagEvent {
 final class ViewStateVisibleEvent extends FeatureFlagEvent {
   const ViewStateVisibleEvent(this.trackingId);
 
-  factory ViewStateVisibleEvent.loading() {
-    return const ViewStateVisibleEvent('feature_flag_loading_content_view');
-  }
-
-  factory ViewStateVisibleEvent.success() {
-    return const ViewStateVisibleEvent('feature_flag_loaded_content_view');
-  }
-
-  factory ViewStateVisibleEvent.error() {
-    return const ViewStateVisibleEvent('feature_flag_error_content_view');
-  }
-
   final String trackingId;
 
   @override
