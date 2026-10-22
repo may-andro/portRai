@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/project_event.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/project_state.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/extension/_extension.dart';
@@ -11,11 +10,8 @@ import 'package:portrai/src/feature/project/presentation/screen/project/tracking
 
 @register
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
-  ProjectBloc(
-    this._getProfileUseCase,
-    this._openExternalUrlUseCase,
-    this._trackingDelegate,
-  ) : super(const LoadingState()) {
+  ProjectBloc(this._openExternalUrlUseCase, this._trackingDelegate)
+    : super(const LoadingState()) {
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
     on<LoadProjectEvent>(_mapLoadProjectEventToState);
     on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
@@ -24,7 +20,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     on<HeaderTabClickEvent>(_mapHeaderTabClickEventToState);
   }
 
-  final GetProfileUseCase _getProfileUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final ProjectTrackingDelegate _trackingDelegate;
 
@@ -38,16 +33,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   FutureOr<void> _mapLoadProjectEventToState(
     LoadProjectEvent event,
     Emitter<ProjectState> emit,
-  ) async {
-    final eitherProfile = await _getProfileUseCase();
-    final profile = eitherProfile.fold<ProfileEntity?>((_) => null, (p) => p);
-    emit(
-      LoadedState(
-        project: event.project,
-        sections: event.project.sections,
-        profile: profile,
-      ),
-    );
+  ) {
+    emit(LoadedState(project: event.project, sections: event.project.sections));
   }
 
   FutureOr<void> _mapViewStateVisibleEventToState(
