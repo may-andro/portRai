@@ -39,6 +39,10 @@ export const nonEngineeringRoleWords = [
   'people partner',
 ];
 
+const nonEngineeringRolePatterns = nonEngineeringRoleWords.map((word) =>
+  termPattern(word),
+);
+
 /**
  * Whether [title] can be the kind of role the portfolio holds. Titles that
  * name an engineering role are kept; titles naming a non-engineering role are
@@ -51,10 +55,9 @@ export function isPortfolioKindOfRole(
   const lowerTitle = title.toLowerCase();
   if (engineeringPattern.test(lowerTitle)) return true;
   const lowerRoles = roles.map((role) => role.toLowerCase());
-  return !nonEngineeringRoleWords.some((word) => {
-    const pattern = termPattern(word);
-    return (
-      pattern.test(lowerTitle) && !lowerRoles.some((role) => pattern.test(role))
-    );
-  });
+  return !nonEngineeringRolePatterns.some(
+    (pattern) =>
+      pattern.test(lowerTitle) &&
+      !lowerRoles.some((role) => pattern.test(role)),
+  );
 }

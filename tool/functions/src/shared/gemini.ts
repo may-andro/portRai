@@ -3,9 +3,6 @@ import { GoogleGenAI } from '@google/genai';
 /** The model every function calls. */
 export const geminiModel = 'gemini-2.5-flash';
 
-// Gemini 2.5 sets thinking with a token budget, not a thinking level.
-const thinkingBudget = 1024;
-
 /** The Agent Platform (formerly Vertex AI) location of the model. */
 export const geminiLocation = 'global';
 
@@ -23,7 +20,13 @@ export interface JsonRequest {
   systemInstruction: string;
   prompt: string;
   responseJsonSchema: object;
+  /** Counts towards [maxOutputTokens]. */
   maxOutputTokens: number;
+  /**
+   * Tokens the model may think with before replying; 0 turns thinking off.
+   * Gemini 2.5 sets thinking with a token budget, not a thinking level.
+   */
+  thinkingBudget: number;
 }
 
 /** Sends one prompt to Gemini and returns the JSON text of its reply. */
@@ -51,7 +54,7 @@ export function createGeminiGenerateJson(project: string): GenerateJson {
         maxOutputTokens: request.maxOutputTokens,
         responseMimeType: 'application/json',
         responseJsonSchema: request.responseJsonSchema,
-        thinkingConfig: { thinkingBudget },
+        thinkingConfig: { thinkingBudget: request.thinkingBudget },
         abortSignal: AbortSignal.timeout(callTimeoutMs),
       },
     });

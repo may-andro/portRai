@@ -19,8 +19,9 @@ interface HackerNewsPost {
 /**
  * Remote roles from the monthly Hacker News "Who is hiring?" threads.
  *
- * Posts there are free text, so only top-level posts that mention a search
- * term and remote work are read, and a [JobPostExtractor] lists their roles.
+ * Posts there are free text, so only top-level posts published on or after
+ * the query's `publishedAfter` that mention a search term and remote work are
+ * read, and a [JobPostExtractor] lists their roles.
  * Every opening links to its post on Hacker News, which names Hacker News as
  * the source and holds the company's own application details; links inside
  * the text are never followed or stored.
@@ -48,8 +49,9 @@ export class HackerNewsFeed implements JobFeed {
   async fetchJobs(query: JobSearchQuery): Promise<JobOpening[]> {
     if (query.terms.length === 0) return [];
 
-    const posts = (await this.readPosts())
-      .filter((post) => isRelevant(post.text, query.terms))
+    const termPatterns = query.terms.map((term) => termPattern(term));
+    const posts = (await this.readPosts(query.publishedAfter))
+      .filter((post) => isRelevant(post.text, termPatterns))
       .sort(
         (first, second) => second.postedAt.getTime() - first.postedAt.getTime(),
       )
@@ -88,7 +90,8 @@ export class HackerNewsFeed implements JobFeed {
     });
   }
 
-  private async readPosts(): Promise<HackerNewsPost[]> {
+  /** The top-level posts published on or after [publishedAfter]. */
+  private async readPosts(publishedAfter: Date): Promise<HackerNewsPost[]> {
     const search = await this.fetchJson(HackerNewsFeed.threadsUrl);
     if (!isRecord(search) || !Array.isArray(search.hits)) {
       throw new Error('Hacker News search has no hits list');
@@ -102,37 +105,42 @@ export class HackerNewsFeed implements JobFeed {
       })
       .slice(0, this.options.maxThreads);
 
-    const posts: HackerNewsPost[] = [];
-    for (const threadId of threadIds) {
-      const thread = await this.fetchJson(HackerNewsFeed.itemUrl(threadId));
+    const threads = await Promise.all(
+      threadIds.map((threadId) =>
+        this.fetchJson(HackerNewsFeed.itemUrl(threadId)),
+      ),
+    );
+    return threads.flatMap((thread, threadIndex) => {
       if (!isRecord(thread) || !Array.isArray(thread.children)) {
-        throw new Error(`Hacker News thread ${threadId} has no posts`);
+        throw new Error(
+          `Hacker News thread ${threadIds[threadIndex]} has no posts`,
+        );
       }
-      for (const child of thread.children) {
-        const post = toPost(child);
-        if (post !== null) posts.push(post);
-      }
-    }
-    return posts;
+      return thread.children.flatMap((child) => {
+        const post = toPost(child, publishedAfter);
+        return post === null ? [] : [post];
+      });
+    });
   }
 }
 
-function toPost(child: unknown): HackerNewsPost | null {
+function toPost(child: unknown, publishedAfter: Date): HackerNewsPost | null {
   if (!isRecord(child)) return null;
   const id =
     typeof child.id === 'number' ? String(child.id) : stringOrNull(child.id);
   const html = stringOrNull(child.text);
   const postedAt = new Date(stringOrNull(child.created_at) ?? '');
   if (!id || !html || Number.isNaN(postedAt.getTime())) return null;
+  if (postedAt < publishedAfter) return null;
   // Hacker News starts each paragraph with a bare <p> it never closes.
   const text = htmlToText(html.replace(/<p>/gi, '<br>'));
   return { id, text, postedAt };
 }
 
-function isRelevant(text: string, terms: readonly string[]): boolean {
+function isRelevant(text: string, termPatterns: readonly RegExp[]): boolean {
   const lowerText = text.toLowerCase();
   return (
     remotePattern.test(text) &&
-    terms.some((term) => termPattern(term).test(lowerText))
+    termPatterns.some((pattern) => pattern.test(lowerText))
   );
 }

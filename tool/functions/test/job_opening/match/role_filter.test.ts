@@ -1,6 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { isPortfolioKindOfRole } from '../../../src/job_opening/match/role_filter.js';
+import { termPattern } from '../../../src/job_opening/match/skill_matcher.js';
+
+vi.mock(
+  '../../../src/job_opening/match/skill_matcher.js',
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import('../../../src/job_opening/match/skill_matcher.js')
+      >();
+    return { ...original, termPattern: vi.fn(original.termPattern) };
+  },
+);
 
 const roles = ['Tech Lead - Flutter Developer', 'Senior Android Developer'];
 
@@ -17,6 +29,15 @@ describe('isPortfolioKindOfRole', () => {
     ['Senior Performance Marketing Manager, Mobile UA', false],
   ])('should treat %s as the portfolio kind of role: %s', (title, expected) => {
     expect(isPortfolioKindOfRole(title, roles)).toBe(expected);
+  });
+
+  it('should not build patterns for each title', () => {
+    vi.mocked(termPattern).mockClear();
+
+    isPortfolioKindOfRole('Staff Product Manager, Mobile', roles);
+    isPortfolioKindOfRole('Mobile Product Designer', roles);
+
+    expect(termPattern).not.toHaveBeenCalled();
   });
 
   it('should keep a kind of role the portfolio holds', () => {

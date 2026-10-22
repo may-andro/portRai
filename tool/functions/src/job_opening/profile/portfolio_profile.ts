@@ -1,7 +1,7 @@
 import { isRecord, stringOrNull } from '../../shared/json_value.js';
 import type { PortfolioProfile } from '../job_opening.js';
 import {
-  loadPortfolioSkills,
+  portfolioSkills,
   type ReadDocument,
   skillLocale,
 } from '../skill/portfolio_skills.js';
@@ -61,11 +61,18 @@ const genericRoleWords = new Set([
 export async function loadPortfolioProfile(
   readDocument: ReadDocument,
 ): Promise<PortfolioProfile> {
-  const [skills, profileDocument, experiencesDocument] = await Promise.all([
-    loadPortfolioSkills(readDocument),
-    readDocument('profile', skillLocale),
-    readDocument('experiences', skillLocale),
-  ]);
+  const [profileDocument, experiencesDocument, expertise, projects] =
+    await Promise.all([
+      readDocument('profile', skillLocale),
+      readDocument('experiences', skillLocale),
+      readDocument('expertise', skillLocale),
+      readDocument('projects', skillLocale),
+    ]);
+  const skills = portfolioSkills({
+    expertise,
+    projects,
+    experiences: experiencesDocument,
+  });
 
   const profile =
     isRecord(profileDocument) && isRecord(profileDocument.profile)

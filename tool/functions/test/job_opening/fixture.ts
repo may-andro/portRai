@@ -1,3 +1,4 @@
+import type { JobSearchQuery } from '../../src/job_opening/feed/job_feed.js';
 import type {
   JobOpening,
   PortfolioProfile,
@@ -29,6 +30,19 @@ export function portfolioProfile(
     searchTerms: ['Flutter', 'Android'],
     yearsOfExperience: 10,
     country: 'Spain',
+    ...overrides,
+  };
+}
+
+/** A query that keeps every date, region and kind of role. */
+export function searchQuery(
+  overrides: Partial<JobSearchQuery> = {},
+): JobSearchQuery {
+  return {
+    terms: ['Flutter', 'Android'],
+    publishedAfter: new Date(0),
+    regions: new Set(),
+    roles: [],
     ...overrides,
   };
 }
