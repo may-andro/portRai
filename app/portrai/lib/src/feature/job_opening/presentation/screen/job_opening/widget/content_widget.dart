@@ -11,7 +11,6 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
@@ -34,7 +33,6 @@ class ContentWidget extends StatelessWidget {
           previous.status != current.status ||
           previous.jobOpening != current.jobOpening ||
           previous.loadFailure != current.loadFailure ||
-          previous.profile != current.profile ||
           previous.isTailoredCvAvailable != current.isTailoredCvAvailable ||
           (previous.insightsStatus == JobOpeningInsightsStatus.unavailable) !=
               (current.insightsStatus == JobOpeningInsightsStatus.unavailable),
@@ -44,51 +42,17 @@ class ContentWidget extends StatelessWidget {
           state.loadFailure,
           onRetry: () => context.bloc.add(const JobOpeningRetryClickEvent()),
         ),
-        JobOpeningStatus.loaded => ScreenLoadedContent(
-          _LoadedWidget(
-            jobOpening: state.jobOpening!,
-            hasInsights:
-                state.insightsStatus != JobOpeningInsightsStatus.unavailable,
-            isTailoredCvAvailable: state.isTailoredCvAvailable,
-            profile: state.profile,
+        JobOpeningStatus.loaded => ScreenLoadedContent.slivers([
+          SliverToBoxAdapter(
+            child: _DetailsWidget(
+              jobOpening: state.jobOpening!,
+              hasInsights:
+                  state.insightsStatus != JobOpeningInsightsStatus.unavailable,
+              isTailoredCvAvailable: state.isTailoredCvAvailable,
+            ),
           ),
-        ),
+        ]),
       },
-    );
-  }
-}
-
-class _LoadedWidget extends StatelessWidget {
-  const _LoadedWidget({
-    required this.jobOpening,
-    required this.hasInsights,
-    required this.isTailoredCvAvailable,
-    this.profile,
-  });
-
-  final JobOpeningEntity jobOpening;
-  final bool hasInsights;
-  final bool isTailoredCvAvailable;
-  final ProfileEntity? profile;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      scrollBehavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(scrollbars: false, overscroll: false),
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: _DetailsWidget(
-            jobOpening: jobOpening,
-            hasInsights: hasInsights,
-            isTailoredCvAvailable: isTailoredCvAvailable,
-          ),
-        ),
-        if (profile case final profile?)
-          SliverToBoxAdapter(child: FooterWidget(profile: profile)),
-      ],
     );
   }
 }
