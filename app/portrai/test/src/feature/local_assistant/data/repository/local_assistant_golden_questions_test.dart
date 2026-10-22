@@ -108,6 +108,13 @@ void main() {
     'how much experience in hyderabad':
         'Experience per city, with time worked and roles: Hyderabad:',
     'tell me his career summary': 'Career overview: 4 roles at 4 different',
+    'how long did he work at Hooli?':
+        'Hooli: 2 years in 1 role (Senior Flutter Developer, January 2023 to '
+        'December 2024)',
+    'how many years of experience does he have?':
+        'Total professional experience: 9 years (July 2015 to December 2024)',
+    'how long has he used Dart?': 'Dart: 5 years',
+    'does he have any certifications?': 'profile.certifications: none listed',
   };
 
   group('golden questions', () {

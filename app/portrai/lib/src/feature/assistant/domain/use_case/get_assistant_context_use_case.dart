@@ -37,14 +37,16 @@ class GetAssistantContextUseCase
       String list(List<String> items, [int max = 10]) =>
           items.take(max).join(', ');
       String store(Iterable<String?> urls) =>
-          urls.any((u) => u != null && u.trim().isNotEmpty) ? 'yes' : 'no';
+          urls.any((url) => url != null && url.trim().isNotEmpty)
+          ? 'yes'
+          : 'no';
       final profile = portfolio.profile;
       return [
         '${profile.fullName}: ${profile.title}. Email: ${profile.email}. Phone: ${profile.phone}. Based in ${profile.location.city}, ${profile.location.country}.',
         for (final item in portfolio.experiences)
           '${_employmentSummary(item, today)} Location: ${item.location}. ${item.employmentType}. Technologies: ${list(item.technologies)}.',
         for (final item in portfolio.projects)
-          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.markets.map((m) => m.playStore))}. On App Store: ${store(item.markets.map((m) => m.appStore))}. Website: ${store(item.markets.map((m) => m.website))}. GitHub: ${store(item.markets.map((m) => m.github))}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((m) => m.country).join(', ')}.'}',
+          'Project ${item.title} (${item.category}, ${item.status}, ${_date(item.startDate).substring(0, 4)}): ${list(item.technologies, 8)}. On Play Store: ${store(item.markets.map((market) => market.playStore))}. On App Store: ${store(item.markets.map((market) => market.appStore))}. Website: ${store(item.markets.map((market) => market.website))}. GitHub: ${store(item.markets.map((market) => market.github))}.${item.markets.isEmpty ? '' : ' Offered in: ${item.markets.map((market) => market.country).join(', ')}.'}',
         for (final item in portfolio.expertises)
           'Skills in ${item.title}: ${list(item.skillNames, 15)}.',
         for (final item in portfolio.services) 'Service: ${item.title}.',
@@ -180,7 +182,7 @@ class GetAssistantContextUseCase
           for (final item in portfolio.projects)
             {
               'title': item.title,
-              'summary': _projectLinks(item),
+              'links': _projectLinks(item),
               'description': item.description,
               'longDescription': item.longDescription,
               'technologies': item.technologies,
@@ -362,7 +364,7 @@ class GetAssistantContextUseCase
     final dated = [
       for (final item in experiences)
         if (_tenureMonths(item, today) case final months?) (item, months),
-    ]..sort((a, b) => a.$2.compareTo(b.$2));
+    ]..sort((shorter, longer) => shorter.$2.compareTo(longer.$2));
     if (dated.isEmpty) return const [];
 
     String describe((ExperienceEntity, int) entry) =>
@@ -370,7 +372,8 @@ class GetAssistantContextUseCase
         '${_formatMonths(entry.$2)}';
 
     final firstRole = dated.reduce(
-      (a, b) => a.$1.startDate.isBefore(b.$1.startDate) ? a : b,
+      (earlier, later) =>
+          earlier.$1.startDate.isBefore(later.$1.startDate) ? earlier : later,
     );
     final companies = {for (final item in experiences) item.company};
     final current = experiences.where((item) => item.current).toList();
@@ -385,7 +388,10 @@ class GetAssistantContextUseCase
               '${_monthYear(current.first.startDate)}.';
     final ranking = dated.map(describe).join('; ');
     final timeline =
-        ([...dated]..sort((a, b) => a.$1.startDate.compareTo(b.$1.startDate)))
+        ([...dated]..sort(
+              (earlier, later) =>
+                  earlier.$1.startDate.compareTo(later.$1.startDate),
+            ))
             .map((entry) {
               final country = _country(entry.$1.location);
               final text = describe(entry);
@@ -397,19 +403,77 @@ class GetAssistantContextUseCase
     // long lists rather than these.
     return [
       'Career overview: $counts.',
+      ?_totalExperience(experiences, today),
       'Shortest role: ${describe(dated.first)}.',
       'Longest role: ${describe(dated.last)}.',
       'First role (earliest start): ${describe(firstRole)}.',
       ?currentRole,
+      ?_companyTotals(experiences, today),
       ?countries,
       ?_citySummary(experiences, today),
       ?_workModes(experiences),
-      ?_technologyTotals(experiences, today),
       ?_careerGaps(experiences, today),
       ?_leadership(experiences, today),
       'All roles in chronological order, to answer questions about a year or period: $timeline.',
       'All roles from shortest to longest: $ranking.',
+      ?_technologyTotals(experiences, today),
     ];
+  }
+
+  // Overlapping roles count each calendar month once, so the total is the
+  // span actually worked rather than the sum of the roles.
+  static String? _totalExperience(
+    List<ExperienceEntity> experiences,
+    DateTime today,
+  ) {
+    final covered = {for (final item in experiences) ..._monthSet(item, today)};
+    if (covered.isEmpty) return null;
+    final firstMonth = covered.reduce(
+      (earlier, later) => earlier < later ? earlier : later,
+    );
+    final start = DateTime((firstMonth - 1) ~/ 12, (firstMonth - 1) % 12 + 1);
+    final hasCurrentRole = experiences.any((item) => item.current);
+    final end = hasCurrentRole
+        ? 'present'
+        : _monthYear(
+            experiences
+                .map((item) => item.endDate)
+                .whereType<DateTime>()
+                .reduce(
+                  (earlier, later) => earlier.isAfter(later) ? earlier : later,
+                ),
+          );
+    return 'Total professional experience: ${_formatMonths(covered.length)} '
+        '(${_monthYear(start)} to $end), overlapping roles counted once.';
+  }
+
+  // A company with several roles ("how long at X?") needs one total, which
+  // neither the per-role summaries nor a small model can add up reliably.
+  // A single role keeps its own tenure so the total matches the role's line.
+  static String? _companyTotals(
+    List<ExperienceEntity> experiences,
+    DateTime today,
+  ) {
+    final rolesByCompany = <String, List<ExperienceEntity>>{};
+    for (final item in experiences) {
+      if (_tenureMonths(item, today) == null) continue;
+      rolesByCompany.putIfAbsent(item.company, () => []).add(item);
+    }
+    if (rolesByCompany.isEmpty) return null;
+    final entries = rolesByCompany.entries.map((entry) {
+      final roles = entry.value;
+      final months = roles.length == 1
+          ? _tenureMonths(roles.single, today)!
+          : {for (final item in roles) ..._monthSet(item, today)}.length;
+      final described = roles.map(
+        (item) => '${item.position}, ${_range(item)}',
+      );
+      return '${entry.key}: ${_formatMonths(months)} in '
+          '${roles.length} ${roles.length == 1 ? 'role' : 'roles'} '
+          '(${described.join('; ')})';
+    });
+    return 'Time per company, overlapping roles counted once: '
+        '${entries.join('. ')}.';
   }
 
   // Country names in project titles are markets, not spoken languages, so
@@ -460,28 +524,35 @@ class GetAssistantContextUseCase
   }
 
   // Skill durations ("how many years of Flutter?") come from the
-  // technologies listed per role, counting overlapping roles once.
+  // technologies listed per role, counting overlapping roles once. Every
+  // technology is listed, so a question about a rarely used one is answered
+  // from this line instead of being guessed.
   static String? _technologyTotals(
     List<ExperienceEntity> experiences,
     DateTime today,
   ) {
-    final monthsByTech = <String, Set<int>>{};
+    final monthsByTechnology = <String, Set<int>>{};
     for (final item in experiences) {
       final months = _monthSet(item, today);
-      for (final tech in item.technologies) {
-        final name = tech.trim();
+      for (final technology in item.technologies) {
+        final name = technology.trim();
         if (name.isNotEmpty) {
-          monthsByTech.putIfAbsent(name, () => {}).addAll(months);
+          monthsByTechnology.putIfAbsent(name, () => {}).addAll(months);
         }
       }
     }
     final ranked =
-        monthsByTech.entries.where((entry) => entry.value.length >= 12).toList()
-          ..sort((a, b) => b.value.length.compareTo(a.value.length));
+        monthsByTechnology.entries
+            .where((entry) => entry.value.isNotEmpty)
+            .toList()
+          ..sort(
+            (longer, shorter) =>
+                shorter.value.length.compareTo(longer.value.length),
+          );
     if (ranked.isEmpty) return null;
-    final entries = ranked
-        .take(12)
-        .map((entry) => '${entry.key}: ${_formatMonths(entry.value.length)}');
+    final entries = ranked.map(
+      (entry) => '${entry.key}: ${_formatMonths(entry.value.length)}',
+    );
     return 'Time using each technology across all roles, overlapping roles '
         'counted once (technologies listed on the roles): '
         '${entries.join('; ')}.';
@@ -500,7 +571,7 @@ class GetAssistantContextUseCase
       final missing = sorted[index] - sorted[index - 1] - 1;
       if (missing > 0) {
         final first = sorted[index - 1] + 1;
-        final from = DateTime(first ~/ 12, first % 12 == 0 ? 12 : first % 12);
+        final from = DateTime((first - 1) ~/ 12, (first - 1) % 12 + 1);
         gaps.add('${_formatMonths(missing)} starting ${_monthYear(from)}');
       }
     }
@@ -528,25 +599,27 @@ class GetAssistantContextUseCase
     return 'Leadership roles: ${leads.join('; ')}.';
   }
 
-  // Links are written out, with an explicit "not found" for missing ones, so
-  // the model never has to hunt through null fields or guess a URL.
-  static String _projectLinks(ProjectEntity item) {
-    return 'Links for the ${item.title} project.${_marketLinks(item)}';
-  }
-
-  static String _marketLinks(ProjectEntity item) {
+  // Links are written out per market, with an explicit "not found" for
+  // missing ones, so the model never has to hunt through null fields or
+  // guess a URL, and no line is long enough to be cut inside a URL.
+  static List<String> _projectLinks(ProjectEntity item) {
+    if (item.markets.isEmpty) {
+      return [
+        'No store or website links are listed for the ${item.title} project.',
+      ];
+    }
     String link(String label, String? url) =>
-        ' $label: ${url == null || url.trim().isEmpty ? 'not found' : url}.';
+        '$label: ${url == null || url.trim().isEmpty ? 'not found' : url}.';
     return item.markets
         .map(
           (market) =>
-              ' ${market.country}:'
-              '${link('Play Store link', market.playStore)}'
-              '${link('App Store link', market.appStore)}'
-              '${link('Website', market.website)}'
+              'Links for the ${item.title} project in ${market.country}: '
+              '${link('Play Store link', market.playStore)} '
+              '${link('App Store link', market.appStore)} '
+              '${link('Website', market.website)} '
               '${link('GitHub', market.github)}',
         )
-        .join();
+        .toList();
   }
 
   // "Hyderabad, India [Remote]" -> "India".

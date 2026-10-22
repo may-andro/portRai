@@ -44,7 +44,7 @@ void main() {
             );
         addTearDown(repository.dispose);
         await expectLater(
-          repository.answer(question: 'Question', portfolioContext: 'Fixture'),
+          repository.answer(question: 'Question', portfolioContext: '{}'),
           throwsA(isA<LocalAssistantException>()),
         );
         expect(loads, 0);
@@ -81,7 +81,7 @@ void main() {
         throwsA(isA<LocalAssistantPreferenceException>()),
       );
       await expectLater(
-        repository.answer(question: 'Question', portfolioContext: 'Fixture'),
+        repository.answer(question: 'Question', portfolioContext: '{}'),
         throwsA(isA<LocalAssistantCancelledException>()),
       );
     },
@@ -116,7 +116,7 @@ void main() {
       await Future.wait([enable, disable]);
       expect(writes, [true, false]);
       await expectLater(
-        repository.answer(question: 'Question', portfolioContext: 'Fixture'),
+        repository.answer(question: 'Question', portfolioContext: '{}'),
         throwsA(isA<LocalAssistantCancelledException>()),
       );
     },
@@ -143,7 +143,7 @@ void main() {
       addTearDown(repository.dispose);
       final preparation = repository.answer(
         question: 'Question',
-        portfolioContext: 'Fixture',
+        portfolioContext: '{}',
       );
       final assertion = expectLater(
         preparation,
@@ -152,10 +152,7 @@ void main() {
       await pumpEventQueue();
       await repository.resetSession();
       await expectLater(
-        repository.answer(
-          question: 'Another question',
-          portfolioContext: 'Fixture',
-        ),
+        repository.answer(question: 'Another question', portfolioContext: '{}'),
         throwsA(isA<LocalAssistantBusyException>()),
       );
       response.complete(const TextResponse('Ready'));

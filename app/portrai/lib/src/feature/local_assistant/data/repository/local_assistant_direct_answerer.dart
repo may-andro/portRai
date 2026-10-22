@@ -1,68 +1,98 @@
-/// Answers contact questions and "how long in a city or country" questions
-/// straight from the decoded portfolio JSON built by
-/// `GetAssistantContextUseCase`; every other question is left to the
-/// on-device model, which garbles numbers too often to be trusted with them.
-/// Returns null when the model is needed.
+import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_context_selector.dart';
+
+/// Answers contact, tenure and career-overview questions straight from the
+/// decoded portfolio JSON built by `GetAssistantContextUseCase`; every other
+/// question is left to the on-device model, which garbles numbers too often
+/// to be trusted with them. Returns null when the model is needed.
 class LocalAssistantDirectAnswerer {
   const LocalAssistantDirectAnswerer(this._portfolio);
 
   final Map<String, dynamic> _portfolio;
 
   String? answer(String question) {
-    final q = question.toLowerCase();
-    return _contactAnswer(q) ??
-        _placeDurationAnswer(q) ??
-        _technologyDurationAnswer(q) ??
-        _overviewAnswer(q);
+    final normalizedQuestion = question.toLowerCase();
+    return _contactAnswer(normalizedQuestion) ??
+        _placeDurationAnswer(normalizedQuestion) ??
+        _companyDurationAnswer(normalizedQuestion) ??
+        _technologyDurationAnswer(normalizedQuestion) ??
+        _totalExperienceAnswer(normalizedQuestion) ??
+        _overviewAnswer(normalizedQuestion);
   }
 
   static final _durationWords = RegExp(
-    r'\b(how long|how many (years|months)|how much|experience|time|years|months|duration)\b',
+    r'\b(how long|how many (years|months)|how much (time|experience)|years of|months of|duration|tenure|length of)\b',
   );
   static final _otherIntent = RegExp(
-    r'\b(longest|shortest|first|last|current|which|compare|most|least|gap|language|speak)\b',
+    r'\b(longest|shortest|first|last|current|which|compare|most|least|gaps?|languages?|speak)\b',
   );
   static final _cityEntry = RegExp(r'^([^:]+): (.+?) in (\d+) roles?\b(.*)$');
   static final _countryEntry = RegExp(r'^([^:]+): (.+?) \((.*)\)$');
+  static final _companyEntry = RegExp(
+    r'([^:;()]+?): (\d+ (?:years?|months?)(?: and \d+ months?)?) in (\d+) roles? \(([^)]*)\)',
+  );
+  static final _totalExperienceLine = RegExp(
+    r'^Total professional experience: (.+?) \((.+?)\)',
+  );
   static final _trailingPeriod = RegExp(r'\.$');
+  static final _leadingSeparator = RegExp(r'^[\s.]+');
+  static final _spokenLanguages = RegExp(
+    r'^Spoken languages \((\d+)\): (.+?)\.',
+  );
   static final _enclosingParentheses = RegExp(r'^\s*\(|\)\s*$');
   static final _longestOrShortest = RegExp(r'\b(longest|shortest)\b');
+  static final _roleWords = RegExp(
+    r'\b(jobs?|roles?|positions?|company|companies|employers?|employment|tenure|stint|worked|work)\b',
+  );
   static final _firstRole = RegExp(
-    r'\b(first|earliest)\s+(job|role|position|company)\b',
+    r'\b(first|earliest)\s+(job|role|position|company|employer)\b',
   );
   static final _currentRole = RegExp(
-    r'\b(current|present)\s+(job|role|position|company)\b',
-  );
-  static final _currentWorkplace = RegExp(
-    r'\bwhere does he (work|currently work)\b',
+    r'\b(current|present|latest)\s+(job|role|position|company|employer)\b|'
+    r'\b(where|who) (does|is) he (work|working|employed)\b|'
+    r'\b(work|working|employed) (now|today|currently|at the moment)\b|'
+    r'\bemployer\b',
   );
   static final _careerGaps = RegExp(
     r'\bgaps?\b|\bchange jobs?\b|\bjob changes?\b',
   );
-  static final _leadership = RegExp(r'\b(led|lead|leads|leadership|managed)\b');
+  static final _leadership = RegExp(
+    r'\b(led|lead|leads|leading|managed|manages|manage|mentored)\b.*\b(team|teams|people|developers|engineers)\b|'
+    r'\b(team|teams|people|developers|engineers)\b.*\b(led|lead|leads|leading|managed|manages|manage|mentored)\b|'
+    r'\b(leadership|leader)\b',
+  );
   static final _roleCount = RegExp(
     r'\bhow many (companies|roles|jobs|employers)\b',
   );
   static final _languages = RegExp(r'\b(languages?)\b');
-  static final _languageKnowledge = RegExp(r'\b(speak|spoken|know|how many)\b');
+  static final _languageKnowledge = RegExp(
+    r'\b(speak|speaks|spoken|know|knows|how many|fluent|native)\b',
+  );
+  static final _programming = RegExp(
+    r'\b(programming|coding|code|development|technical|scripting|computer|software)\b',
+  );
+  static final _totalExperience = RegExp(
+    r'\b(total|overall)\b.*\bexperience\b|'
+    r'\byears of (professional |work |working )?experience\b|'
+    r'\bhow (many years|long)\b.*\b(experience|working|worked|career|industry)\b',
+  );
+  static final _email = RegExp(r'\be-?mails?\b');
+  static final _phone = RegExp(r'\b(phone|telephone|whatsapp|call)\b');
+  static final _contact = RegExp(r'\b(contact|reach|get in touch|in touch)\b');
+  // A question about something he built, not about reaching him.
+  static final _productWords = RegExp(
+    r'\b(apps?|application|projects?|features?|build|built|develop|developed|screen|form)\b',
+  );
+  static final _knownPlaceHint = RegExp(r'\b(in|at|from|for)\s+[a-z]+');
 
   // Technology and place names come from the portfolio, a small fixed set, so
   // their patterns are built once and reused across questions.
-  static final _technologyPatterns = <String, RegExp>{};
-  static final _placePatterns = <String, RegExp>{};
+  static final _namePatterns = <String, RegExp>{};
 
-  static RegExp _technologyPattern(
-    String technology,
-  ) => _technologyPatterns.putIfAbsent(
-    technology,
+  static RegExp _namePattern(String name) => _namePatterns.putIfAbsent(
+    name,
     () => RegExp(
-      '(^|[^a-z0-9])${RegExp.escape(technology.toLowerCase())}(\$|[^a-z0-9+#])',
+      '(^|[^a-z0-9])${RegExp.escape(name.toLowerCase())}(\$|[^a-z0-9+#])',
     ),
-  );
-
-  static RegExp _placePattern(String place) => _placePatterns.putIfAbsent(
-    place,
-    () => RegExp('\\b${RegExp.escape(place.toLowerCase())}\\b'),
   );
 
   String? _overviewLine(String prefix) {
@@ -76,64 +106,164 @@ class LocalAssistantDirectAnswerer {
 
   String get _name => '${(_portfolio['profile'] as Map?)?['name'] ?? 'He'}';
 
-  // "Flutter: 5 years and 2 months; Android: 4 years" -> the entry named in
-  // the question.
-  String? _technologyDurationAnswer(String q) {
-    if (!_durationWords.hasMatch(q) || _otherIntent.hasMatch(q)) return null;
-    final line = _overviewLine('Time using each technology');
-    if (line == null) return null;
+  bool _namesPortfolioEntity(String normalizedQuestion) =>
+      LocalAssistantContextSelector.mentionsPortfolioName(
+        _portfolio,
+        normalizedQuestion,
+      );
+
+  // "Technology: duration; ..." entries of an overview line, longest name
+  // first so "Android SDK" wins over "Android".
+  List<(String, String)> _entries(String prefix) {
+    final line = _overviewLine(prefix);
+    if (line == null) return const [];
     final body = line
         .substring(line.lastIndexOf('): ') + 3)
         .replaceFirst(_trailingPeriod, '');
+    final entries = <(String, String)>[];
     for (final entry in body.split('; ')) {
       final parts = entry.split(': ');
-      if (parts.length != 2) continue;
-      final technology = parts.first.trim();
-      if (_technologyPattern(technology).hasMatch(q)) {
-        return '$_name has used $technology for ${parts.last} across all '
+      if (parts.length == 2) entries.add((parts.first.trim(), parts.last));
+    }
+    return entries..sort(
+      (longer, shorter) => shorter.$1.length.compareTo(longer.$1.length),
+    );
+  }
+
+  // "Flutter: 5 years and 2 months; Android: 4 years" -> the entry named in
+  // the question.
+  String? _technologyDurationAnswer(String normalizedQuestion) {
+    if (!_durationWords.hasMatch(normalizedQuestion) ||
+        _otherIntent.hasMatch(normalizedQuestion)) {
+      return null;
+    }
+    for (final (technology, duration) in _entries(
+      'Time using each technology',
+    )) {
+      if (_namePattern(technology).hasMatch(normalizedQuestion)) {
+        return '$_name has used $technology for $duration across all '
             'roles, counting overlapping roles once.';
       }
     }
     return null;
   }
 
-  static final _knownPlaceHint = RegExp(r'\b(in|at|from|for)\s+[a-z]+');
-
-  // Ready-computed career facts, returned as written so the model cannot
-  // garble the numbers. Questions that name a place are left to the model.
-  String? _overviewAnswer(String q) {
-    bool isAbout(RegExp pattern) => pattern.hasMatch(q);
-    if (isAbout(_longestOrShortest) && !_knownPlaceHint.hasMatch(q)) {
-      return _overviewLine(
-        q.contains('longest') ? 'Longest role' : 'Shortest role',
-      );
+  // "MediaMarkt Saturn: 3 years and 7 months in 2 roles (...)" -> the company
+  // named in the question, as its full name or its first word.
+  String? _companyDurationAnswer(String normalizedQuestion) {
+    if (!_durationWords.hasMatch(normalizedQuestion) ||
+        _otherIntent.hasMatch(normalizedQuestion)) {
+      return null;
     }
-    if (isAbout(_firstRole)) {
-      return _overviewLine('First role');
-    }
-    if (isAbout(_currentRole) || isAbout(_currentWorkplace)) {
-      return _overviewLine('Current role');
-    }
-    if (isAbout(_careerGaps)) {
-      return _overviewLine('Career gaps');
-    }
-    if (isAbout(_leadership)) {
-      return _overviewLine('Leadership roles');
-    }
-    if (isAbout(_roleCount)) {
-      return _overviewLine('Career overview');
-    }
-    if (isAbout(_languages) && isAbout(_languageKnowledge)) {
-      return _overviewLine('Spoken languages');
+    final line = _overviewLine('Time per company');
+    if (line == null) return null;
+    for (final match in _companyEntry.allMatches(line)) {
+      final company = match.group(1)!.replaceFirst(_leadingSeparator, '');
+      final firstWord = company.split(' ').first;
+      final isNamed =
+          _namePattern(company).hasMatch(normalizedQuestion) ||
+          (firstWord.length >= 4 &&
+              _namePattern(firstWord).hasMatch(normalizedQuestion));
+      if (!isNamed) continue;
+      final duration = match.group(2)!;
+      final count = match.group(3)!;
+      final roles = match.group(4)!;
+      return count == '1'
+          ? '$_name worked at $company for $duration as $roles.'
+          : '$_name worked at $company for $duration across $count roles: '
+                '$roles.';
     }
     return null;
   }
 
-  String? _placeDurationAnswer(String q) {
-    if (!_durationWords.hasMatch(q) || _otherIntent.hasMatch(q)) return null;
+  // "Total professional experience: 10 years (July 2015 to present), ..."
+  // for a question about the whole career rather than a place, company or
+  // technology.
+  String? _totalExperienceAnswer(String normalizedQuestion) {
+    if (!_totalExperience.hasMatch(normalizedQuestion) ||
+        _otherIntent.hasMatch(normalizedQuestion) ||
+        _namesPortfolioEntity(normalizedQuestion) ||
+        _namesPlace(normalizedQuestion)) {
+      return null;
+    }
+    final line = _overviewLine('Total professional experience');
+    if (line == null) return null;
+    final match = _totalExperienceLine.firstMatch(line);
+    if (match == null) return null;
+    return '$_name has ${match.group(1)} of professional experience '
+        '(${match.group(2)}), counting overlapping roles once.';
+  }
+
+  // Ready-computed career facts, returned as written so the model cannot
+  // garble the numbers. Questions that name a place or a company are left to
+  // the model, which sees that record's own facts.
+  String? _overviewAnswer(String normalizedQuestion) {
+    bool isAbout(RegExp pattern) => pattern.hasMatch(normalizedQuestion);
+    if (_namesPortfolioEntity(normalizedQuestion)) return null;
+    if (isAbout(_longestOrShortest) &&
+        isAbout(_roleWords) &&
+        !_knownPlaceHint.hasMatch(normalizedQuestion)) {
+      return _possessive(
+        _overviewLine(
+          normalizedQuestion.contains('longest')
+              ? 'Longest role'
+              : 'Shortest role',
+        ),
+      );
+    }
+    if (isAbout(_firstRole)) {
+      return _possessive(_overviewLine('First role'));
+    }
+    if (isAbout(_currentRole)) {
+      return _possessive(_overviewLine('Current role'));
+    }
+    if (isAbout(_careerGaps)) {
+      return _possessive(_overviewLine('Career gaps'));
+    }
+    if (isAbout(_leadership)) {
+      return _possessive(_overviewLine('Leadership roles'));
+    }
+    if (isAbout(_roleCount)) {
+      return _possessive(_overviewLine('Career overview'));
+    }
+    if (isAbout(_languages) &&
+        isAbout(_languageKnowledge) &&
+        !isAbout(_programming)) {
+      return _spokenLanguagesAnswer();
+    }
+    return null;
+  }
+
+  // "Longest role: X." -> "Mayank Rai's longest role: X."
+  String? _possessive(String? line) {
+    if (line == null || line.isEmpty) return line;
+    return "$_name's ${line[0].toLowerCase()}${line.substring(1)}";
+  }
+
+  // "Spoken languages (2): English (Fluent), Spanish (Proficient). ..." ->
+  // "Mayank Rai speaks 2 languages: English (Fluent), Spanish (Proficient)."
+  String? _spokenLanguagesAnswer() {
+    final line = _overviewLine('Spoken languages');
+    if (line == null) return null;
+    final match = _spokenLanguages.firstMatch(line);
+    if (match == null) return line;
+    final count = match.group(1)!;
+    return '$_name speaks $count ${count == '1' ? 'language' : 'languages'}: '
+        '${match.group(2)}.';
+  }
+
+  bool _namesPlace(String normalizedQuestion) {
+    for (final (place, _) in _places()) {
+      if (_namePattern(place).hasMatch(normalizedQuestion)) return true;
+    }
+    return false;
+  }
+
+  // Every city and country of the overview with its entry, cities first.
+  List<(String, ({bool isCity, RegExpMatch match}))> _places() {
     final overview = _portfolio['overview'];
-    if (overview is! List) return null;
-    final name = _name;
+    if (overview is! List) return const [];
+    final places = <(String, ({bool isCity, RegExpMatch match}))>[];
     for (final line in overview.whereType<String>()) {
       final isCity = line.startsWith('Experience per city');
       if (!isCity && !line.startsWith('Total time worked per country')) {
@@ -145,41 +275,90 @@ class LocalAssistantDirectAnswerer {
       for (final entry in body.split('; ')) {
         final match = (isCity ? _cityEntry : _countryEntry).firstMatch(entry);
         if (match == null) continue;
-        final place = match.group(1)!.trim();
-        if (!_placePattern(place).hasMatch(q)) {
-          continue;
-        }
-        final duration = match.group(2)!;
-        if (!isCity) {
-          return '$name worked $duration in $place (${match.group(3)}).';
-        }
-        final count = match.group(3)!;
-        final roles = (match.group(4) ?? '')
-            .replaceAll(_enclosingParentheses, '')
-            .trim();
-        return '$name worked $duration in $place, across $count '
-            '${count == '1' ? 'role' : 'roles'}'
-            '${roles.isEmpty ? '' : ': $roles'}.';
+        places.add((match.group(1)!.trim(), (isCity: isCity, match: match)));
+      }
+    }
+    return places;
+  }
+
+  String? _placeDurationAnswer(String normalizedQuestion) {
+    if (!_durationWords.hasMatch(normalizedQuestion) ||
+        _otherIntent.hasMatch(normalizedQuestion)) {
+      return null;
+    }
+    final name = _name;
+    for (final (place, (:isCity, :match)) in _places()) {
+      if (!_namePattern(place).hasMatch(normalizedQuestion)) continue;
+      final duration = match.group(2)!;
+      if (!isCity) {
+        return '$name worked $duration in $place (${match.group(3)}).';
+      }
+      final count = match.group(3)!;
+      final roles = (match.group(4) ?? '')
+          .replaceAll(_enclosingParentheses, '')
+          .trim();
+      return '$name worked $duration in $place, across $count '
+          '${count == '1' ? 'role' : 'roles'}'
+          '${roles.isEmpty ? '' : ': $roles'}.';
+    }
+    return null;
+  }
+
+  // Contact details and social links, unless the question is about a
+  // product ("a contact app") or names a company or project ("the GitHub
+  // link for MediaMarkt"), which the model answers from that record.
+  String? _contactAnswer(String normalizedQuestion) {
+    final profile = _portfolio['profile'];
+    if (profile is! Map<String, dynamic>) return null;
+    if (_productWords.hasMatch(normalizedQuestion) ||
+        _namesPortfolioEntity(normalizedQuestion)) {
+      return null;
+    }
+    final name = _name;
+    final email = _text(profile['email']);
+    final phone = _text(profile['phone']);
+    final socialLink = _socialLink(profile, normalizedQuestion);
+    if (socialLink case (final network, final url)) {
+      return "$name's $network: $url";
+    }
+    if (_email.hasMatch(normalizedQuestion) && email != null) {
+      return "$name's email is $email.";
+    }
+    if (_phone.hasMatch(normalizedQuestion) && phone != null) {
+      return "$name's phone number is $phone.";
+    }
+    if (_contact.hasMatch(normalizedQuestion)) {
+      return switch ((email, phone)) {
+        (final email?, final phone?) =>
+          'You can contact $name by email at $email or by phone at $phone.',
+        (final email?, null) => 'You can contact $name by email at $email.',
+        (null, final phone?) => 'You can contact $name by phone at $phone.',
+        _ => null,
+      };
+    }
+    return null;
+  }
+
+  // The social link whose network ("LinkedIn", "GitHub") the question names.
+  (String, String)? _socialLink(
+    Map<String, dynamic> profile,
+    String normalizedQuestion,
+  ) {
+    final links = profile['socialLinks'];
+    if (links is! List) return null;
+    for (final link in links.whereType<Map<String, dynamic>>()) {
+      final network = _text(link['name']);
+      final url = _text(link['url']);
+      if (network == null || url == null) continue;
+      if (_namePattern(network).hasMatch(normalizedQuestion)) {
+        return (network, url);
       }
     }
     return null;
   }
 
-  String? _contactAnswer(String q) {
-    final profile = _portfolio['profile'];
-    if (profile is! Map<String, dynamic>) return null;
-    final name = profile['name'];
-    final email = profile['email'];
-    final phone = profile['phone'];
-    if (q.contains('email') || q.contains('e-mail')) {
-      return "$name's email is $email.";
-    }
-    if (q.contains('phone') || q.contains('number')) {
-      return "$name's phone number is $phone.";
-    }
-    if (q.contains('contact') || q.contains('reach')) {
-      return 'You can contact $name by email at $email or by phone at $phone.';
-    }
-    return null;
+  static String? _text(Object? value) {
+    if (value is! String || value.trim().isEmpty) return null;
+    return value.trim();
   }
 }

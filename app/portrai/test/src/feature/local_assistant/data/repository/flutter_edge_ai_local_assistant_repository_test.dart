@@ -73,7 +73,9 @@ void main() {
       await expectLater(
         repository.answer(
           question: 'Who?',
-          portfolioContext: 'Name: Mayank Rai',
+          portfolioContext: jsonEncode({
+            'profile': {'name': 'Mayank Rai'},
+          }),
         ),
         throwsStateError,
       );
@@ -221,6 +223,63 @@ void main() {
         verify(() => chat.addQueryChunk(any())).called(1);
       },
     );
+
+    test('should answer a computed fact without loading the model', () async {
+      final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
+        (_) => throw StateError('Must not load'),
+      );
+      addTearDown(repository.dispose);
+
+      final answer = await repository.answer(
+        question: 'What is his email?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai', 'email': 'm@x.com'},
+        }),
+      );
+
+      expect(answer, "Mayank Rai's email is m@x.com.");
+    });
+
+    test('should strip markdown from the generated answer', () async {
+      final (:repository, :chat) = await prepareRepository();
+      when(() => chat.generateChatResponse()).thenAnswer(
+        (_) async => const TextResponse(
+          '**Answer:** He built:\n* the MediaMarkt app\n* the Saturn app',
+        ),
+      );
+
+      final answer = await repository.answer(
+        question: 'What did he build?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'MediaMarkt'},
+          ],
+        }),
+      );
+
+      expect(answer, 'He built:\n- the MediaMarkt app\n- the Saturn app');
+    });
+
+    test('should retry once when the answer repeats a phrase', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final answers = [
+        'Mayank Rai Mayank Rai Mayank Rai Mayank Rai Mayank Rai',
+        'He is a Flutter developer.',
+      ];
+      when(
+        () => chat.generateChatResponse(),
+      ).thenAnswer((_) async => TextResponse(answers.removeAt(0)));
+
+      final answer = await repository.answer(
+        question: 'Who is he?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai'},
+        }),
+      );
+
+      expect(answer, 'He is a Flutter developer.');
+      expect(answers, isEmpty);
+    });
 
     test(
       'should throw a format exception when the context is not a portfolio object and the model is needed',

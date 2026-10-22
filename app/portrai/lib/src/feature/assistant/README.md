@@ -257,8 +257,17 @@ parameters stay metadata-only in diagnostics.
 - Explicit model download confirmation, progress, cancellation, keep/delete and retry
   controls remain available from Settings and the setup screen.
 - Installed models load lazily on a question. A readiness inference probes engine support.
-- Questions use deterministic contact/career answers where applicable and otherwise
-  bounded context selection. Missing portfolio facts are not guessed.
+- Contact details, social links, tenure per place, company and technology, total
+  experience and the career overview are answered from the computed context without
+  loading the model, unless the question names a product or another record. Every
+  other question goes to the model with a bounded selection of facts: matching
+  records and digest lines first, employment summaries and the short overview lines
+  after them, long career lists and technology totals only for career questions, and
+  never ids, image URLs or coordinates. Null fields are left out and empty lists are
+  stated as "none listed", so missing portfolio facts are not guessed. A question
+  with a pronoun counts as a follow-up only when it names no company, project,
+  technology or person. Generated text is stripped of markdown, and an answer that
+  loops on a character or phrase is generated once more.
 - Disable and reset invalidate late output and clear follow-up context. Reset retains
   enablement and downloaded files. Invalidating output does not guarantee cancellation
   of native generation; download cancellation waits for cleanup.

@@ -77,7 +77,9 @@ class FlutterEdgeAiLocalAssistantRepository
       'spoken languages line, never from country names. Answer a follow-up for what it asks, not like the '
       'previous question. When asked for a link, copy the URL exactly as '
       'written, and if it says "not found" say that no such link was found. '
-      'Keep answers direct and concise.';
+      'Keep answers direct and concise. Write plain sentences: no markdown, '
+      'no bullet symbols, and never mention field names, paths or brackets '
+      'such as experiences[0].';
 
   Future<void>? _initialization;
   Future<void>? _preparation;
@@ -216,7 +218,19 @@ class FlutterEdgeAiLocalAssistantRepository
     required String portfolioContext,
     required int generation,
   }) async {
-    // The engine is loaded on the first question rather than at startup.
+    final portfolio = _decodePortfolio(portfolioContext);
+    if (portfolio == null) {
+      throw const FormatException(
+        'Assistant context must be a portfolio object.',
+      );
+    }
+    // Facts the app already computed are answered without waiting for the
+    // engine, which is loaded on the first question that needs it.
+    final direct = LocalAssistantDirectAnswerer(portfolio).answer(question);
+    if (direct != null) {
+      return direct;
+    }
+
     await prepareModel(onProgress: (_) {});
     _ensureCurrent(generation);
     final model = _model;
@@ -224,30 +238,20 @@ class FlutterEdgeAiLocalAssistantRepository
       throw StateError('The on-device model could not be loaded.');
     }
 
-    final portfolio = _decodePortfolio(portfolioContext);
-    final direct = LocalAssistantDirectAnswerer(
-      portfolio ?? const {},
-    ).answer(question);
-    if (direct != null) {
-      return direct;
-    }
-    if (portfolio == null) {
-      throw const FormatException(
-        'Assistant context must be a portfolio object.',
-      );
-    }
-
     // A standalone question must not see the previous one: the small model
     // tends to answer that instead.
-    final previousQuestion = _isFollowUp(question)
-        ? (_previousQuestion ?? 'none')
-        : 'none';
+    final previousQuestion =
+        LocalAssistantContextSelector.isFollowUp(portfolio, question)
+        ? _previousQuestion
+        : null;
     // UTF-8 bytes conservatively bound token count. Reserve room for the
     // answer and chat-template tokens rather than silently truncating input.
     // English text averages about 3 bytes per token or more.
     final availableBytes =
         (_maxTokens - 1024) * 2 -
-        utf8.encode('$_systemInstruction$question$previousQuestion').length;
+        utf8
+            .encode('$_systemInstruction$question${previousQuestion ?? ''}')
+            .length;
     if (availableBytes < 512) {
       throw ArgumentError.value(question, 'question', 'Question is too long.');
     }
@@ -266,18 +270,20 @@ class FlutterEdgeAiLocalAssistantRepository
       final selectedContext = LocalAssistantContextSelector().select(
         portfolio,
         question,
-        previousQuestion: previousQuestion == 'none' ? null : previousQuestion,
+        previousQuestion: previousQuestion,
         maxBytes: bytes,
       );
-      answer = await _generate(
-        model,
-        generation: generation,
-        temperature: temperature,
-        text:
-            'Portfolio information:\n$selectedContext\n\n'
-            '${previousQuestion == 'none' ? '' : 'Previous user question: $previousQuestion\n\n'}'
-            'Answer only this question, using only the portfolio '
-            'information above: $question',
+      answer = _cleanAnswer(
+        await _generate(
+          model,
+          generation: generation,
+          temperature: temperature,
+          text:
+              'Portfolio information:\n$selectedContext\n\n'
+              '${previousQuestion == null ? '' : 'Previous user question: $previousQuestion\n\n'}'
+              'Answer only this question, using only the portfolio '
+              'information above: $question',
+        ),
       );
       if (kDebugMode) {
         debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
@@ -336,17 +342,30 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   static final _repeatedRun = RegExp(r'(\S)\1{11,}');
-
-  static bool _isDegenerate(String answer) => _repeatedRun.hasMatch(answer);
-
-  static final _followUpPattern = RegExp(
-    r'\b(else|also|more|that|those|there|it|them|again|another|other)\b|'
-    r'^(and|in|for|what about|how about)\b',
+  // The same two to six words four or more times in a row.
+  static final _repeatedPhrase = RegExp(
+    r'(\b\w+(?:\s+\w+){1,5}\b)(?:\W+\1\b){3,}',
     caseSensitive: false,
   );
 
-  static bool _isFollowUp(String question) =>
-      _followUpPattern.hasMatch(question.trim());
+  static bool _isDegenerate(String answer) =>
+      _repeatedRun.hasMatch(answer) || _repeatedPhrase.hasMatch(answer);
+
+  static final _emphasisMarkers = RegExp(r'\*\*|__');
+  static final _headingMarkers = RegExp(r'^#{1,6}\s+', multiLine: true);
+  static final _bulletMarkers = RegExp(r'^\s*[*•]\s+', multiLine: true);
+  static final _answerLabel = RegExp(r'^(answer|a):\s*', caseSensitive: false);
+  static final _blankLines = RegExp(r'\n{3,}');
+
+  // The chat renders plain text, so markdown the model adds despite the
+  // instruction would show up as literal asterisks.
+  static String _cleanAnswer(String answer) => answer
+      .replaceAll(_emphasisMarkers, '')
+      .replaceAll(_headingMarkers, '')
+      .replaceAll(_bulletMarkers, '- ')
+      .replaceFirst(_answerLabel, '')
+      .replaceAll(_blankLines, '\n\n')
+      .trim();
 
   @override
   Future<void> cancelPreparation() async {
