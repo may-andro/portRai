@@ -7,7 +7,6 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bl
 import 'package:portrai/src/feature/setting/presentation/screen/setting/setting_screen.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
-import 'package:portrai/src/widget/app_version_widget.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
@@ -139,7 +138,7 @@ void main() {
         expect(
           tester.getTopLeft(footer).dy,
           greaterThanOrEqualTo(
-            tester.getBottomLeft(find.byType(AppVersionWidget)).dy,
+            tester.getBottomLeft(find.byType(CustomScrollView)).dy,
           ),
         );
       },
