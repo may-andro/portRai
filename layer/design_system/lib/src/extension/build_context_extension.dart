@@ -4,7 +4,6 @@ import 'package:design_system/src/foundation/foundation.dart';
 import 'package:design_system/src/theme/ds_theme.dart';
 import 'package:design_system/src/theme/ds_theme_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 extension BuildContextExtension on BuildContext {
   DSTheme get theme => DSThemeWidget.of(this);
@@ -89,27 +88,22 @@ extension BuildContextExtension on BuildContext {
   }
 
   double getTextWidth(String text, DSTextStyle textStyle) {
-    final textScaler = MediaQuery.textScalerOf(this);
-    final renderParagraph = RenderParagraph(
-      TextSpan(text: text, style: textStyle.textStyle),
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: textStyle.textStyle),
       textDirection: TextDirection.ltr,
-      textScaler: textScaler,
-    );
-    renderParagraph.layout(const BoxConstraints());
-    return renderParagraph.getMaxIntrinsicWidth(double.infinity);
+      textScaler: MediaQuery.textScalerOf(this),
+    )..layout();
+    final textWidth = textPainter.maxIntrinsicWidth;
+    textPainter.dispose();
+    return textWidth;
   }
 
   double getTextHeight(DSTextStyle textStyle, int lines) {
-    final textScaler = MediaQuery.textScalerOf(this);
-    final renderParagraph = RenderParagraph(
-      TextSpan(text: _stringWithAllAsciiCharCodes, style: textStyle.textStyle),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-      strutStyle: StrutStyle.fromTextStyle(textStyle.textStyle),
-      textScaler: textScaler,
-    );
-    renderParagraph.layout(const BoxConstraints());
-    return renderParagraph.getMaxIntrinsicHeight(double.infinity) * lines;
+    return _singleLineHeightOf(
+          textStyle.textStyle,
+          MediaQuery.textScalerOf(this),
+        ) *
+        lines;
   }
 
   void showSnackBar({required DSSnackBar snackBar}) {
@@ -159,3 +153,37 @@ final _stringWithAllAsciiCharCodes = String.fromCharCodes(
     (index) => _firstPrintableAsciiChar + index,
   ),
 );
+
+const _maximumSingleLineHeights = 64;
+
+/// Single-line text heights by text style and text scaler.
+///
+/// The height of one line does not depend on its text, so it is measured once
+/// per style and scaler, and measured again after the system fonts change.
+final _singleLineHeights = <(TextStyle, TextScaler), double>{};
+
+bool _isListeningToSystemFonts = false;
+
+double _singleLineHeightOf(TextStyle textStyle, TextScaler textScaler) {
+  if (!_isListeningToSystemFonts) {
+    PaintingBinding.instance.systemFonts.addListener(_singleLineHeights.clear);
+    _isListeningToSystemFonts = true;
+  }
+  final cacheKey = (textStyle, textScaler);
+  final cachedHeight = _singleLineHeights[cacheKey];
+  if (cachedHeight != null) return cachedHeight;
+
+  final textPainter = TextPainter(
+    text: TextSpan(text: _stringWithAllAsciiCharCodes, style: textStyle),
+    textDirection: TextDirection.ltr,
+    maxLines: 1,
+    strutStyle: StrutStyle.fromTextStyle(textStyle),
+    textScaler: textScaler,
+  )..layout();
+  final lineHeight = textPainter.height;
+  textPainter.dispose();
+  if (_singleLineHeights.length >= _maximumSingleLineHeights) {
+    _singleLineHeights.clear();
+  }
+  return _singleLineHeights[cacheKey] = lineHeight;
+}

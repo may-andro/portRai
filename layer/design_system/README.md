@@ -119,7 +119,7 @@ import 'package:design_system/design_system.dart';
 | `DSTagWidget` | Rounded skill/category badge in primary-container colours |
 | `DSTextFieldWidget` | Full-featured text field; normal / password types, validation states |
 | `DSTitleDescriptionWidget` | Fixed-height title + description pair for grids and cards |
-| `DSNetworkImageWidget` | Cached network image with auto-retry on reconnect |
+| `DSNetworkImageWidget` | Cached network image, decoded at the size it is shown, with auto-retry on reconnect |
 
 #### Organisms
 

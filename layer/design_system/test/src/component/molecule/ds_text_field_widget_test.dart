@@ -1,7 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import '../../../util/alchemist_utils.dart';
+import '../../../util/test_wrapper_widget.dart';
 
 void main() {
   groupGoldenForBrightnessAndDS(
@@ -59,4 +61,69 @@ void main() {
       ),
     ],
   );
+  group('controller', () {
+    Future<void> pumpTextField(
+      WidgetTester tester,
+      TextEditingController controller,
+    ) {
+      return tester.pumpWidget(
+        TestWidgetWrapper(
+          brightness: Brightness.light,
+          designSystem: DesignSystem.values.first,
+          child: DSTextFieldWidget(controller: controller),
+        ),
+      );
+    }
+
+    TextFormField textFormField(WidgetTester tester) =>
+        tester.widget<TextFormField>(find.byType(TextFormField));
+
+    testWidgets('should not rebuild when a keystroke keeps the field filled', (
+      tester,
+    ) async {
+      final controller = TextEditingController(text: 'a');
+      addTearDown(controller.dispose);
+      await pumpTextField(tester, controller);
+      final filledTextFormField = textFormField(tester);
+
+      controller.text = 'ab';
+      await tester.pump();
+
+      expect(textFormField(tester), same(filledTextFormField));
+    });
+
+    testWidgets('should rebuild when the field becomes empty', (tester) async {
+      final controller = TextEditingController(text: 'a');
+      addTearDown(controller.dispose);
+      await pumpTextField(tester, controller);
+      final filledTextFormField = textFormField(tester);
+
+      controller.clear();
+      await tester.pump();
+
+      expect(textFormField(tester), isNot(same(filledTextFormField)));
+    });
+
+    testWidgets('should follow the new controller when the controller '
+        'changes', (tester) async {
+      final firstController = TextEditingController();
+      final secondController = TextEditingController();
+      addTearDown(firstController.dispose);
+      addTearDown(secondController.dispose);
+      await pumpTextField(tester, firstController);
+      await pumpTextField(tester, secondController);
+      final emptyTextFormField = textFormField(tester);
+
+      firstController.text = 'a';
+      await tester.pump();
+
+      expect(textFormField(tester), same(emptyTextFormField));
+
+      secondController.text = 'a';
+      await tester.pump();
+
+      expect(textFormField(tester), isNot(same(emptyTextFormField)));
+      expect(textFormField(tester).controller, same(secondController));
+    });
+  });
 }

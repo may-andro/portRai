@@ -74,50 +74,52 @@ class _DSTextFieldWidgetState extends State<DSTextFieldWidget> {
 
   TextFieldValidationData? _textFieldValidationData;
 
+  /// Used when [DSTextFieldWidget.controller] is null.
   TextEditingController? _controller;
 
-  VoidCallback? _controllerListener;
+  TextEditingController get _effectiveController =>
+      widget.controller ?? _controller!;
 
   @override
   void initState() {
     super.initState();
     _obscureText = widget.textFieldType == TextFieldType.password;
-    final controller = widget.controller;
-    if (controller case final TextEditingController controller) {
-      if (controller.text.isNotEmpty) {
-        setState(() {
-          _hasContent = true;
-        });
-      }
-      // Store listener reference for proper cleanup
-      _controllerListener = () {
-        if (mounted) {
-          setState(() {
-            _hasContent = controller.text.isNotEmpty;
-          });
-        }
-      };
-      controller.addListener(_controllerListener!);
+    if (widget.controller == null) _controller = TextEditingController();
+    _effectiveController.addListener(_onTextChanged);
+    _hasContent = _effectiveController.text.isNotEmpty;
+  }
+
+  @override
+  void didUpdateWidget(DSTextFieldWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldController = oldWidget.controller;
+    final newController = widget.controller;
+    if (oldController == newController) return;
+
+    (oldController ?? _controller)?.removeListener(_onTextChanged);
+    if (newController == null) {
+      _controller = TextEditingController.fromValue(oldController!.value);
     } else {
-      _controller = TextEditingController()
-        ..addListener(() {
-          if (mounted) {
-            setState(() {
-              _hasContent = _controller!.text.isNotEmpty;
-            });
-          }
-        });
+      _controller?.dispose();
+      _controller = null;
     }
+    _effectiveController.addListener(_onTextChanged);
+    _hasContent = _effectiveController.text.isNotEmpty;
   }
 
   @override
   void dispose() {
-    // Remove listener from external controller
-    if (_controllerListener != null && widget.controller != null) {
-      widget.controller!.removeListener(_controllerListener!);
-    }
+    _effectiveController.removeListener(_onTextChanged);
     _controller?.dispose();
     super.dispose();
+  }
+
+  // Rebuilds only when the field becomes empty or filled, not on every
+  // keystroke or selection change.
+  void _onTextChanged() {
+    final hasContent = _effectiveController.text.isNotEmpty;
+    if (hasContent == _hasContent) return;
+    setState(() => _hasContent = hasContent);
   }
 
   @override
@@ -134,7 +136,7 @@ class _DSTextFieldWidgetState extends State<DSTextFieldWidget> {
           autofillHints: widget.enabled ? widget.autofillHints : null,
           autofocus: widget.autofocus,
           autovalidateMode: widget.autoValidateMode,
-          controller: widget.controller ?? _controller,
+          controller: _effectiveController,
           decoration: decorateInputDecoration(
             hint: widget.hintText,
             suffixIcon: _buildSuffixIcon,

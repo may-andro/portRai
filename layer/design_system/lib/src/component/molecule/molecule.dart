@@ -11,7 +11,7 @@ export 'ds_hoverable_container_widget.dart';
 export 'ds_icon_info_tile_widget.dart';
 export 'ds_info_chip_widget.dart';
 export 'ds_labeled_info_row_widget.dart';
-export 'ds_network_image_widget.dart';
+export 'ds_network_image_widget.dart' show DSNetworkImageWidget;
 export 'ds_position_indicator_widget.dart';
 export 'ds_quote_text_widget.dart';
 export 'ds_skill_card_widget.dart';
