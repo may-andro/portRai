@@ -37,7 +37,7 @@ void main() {
           ),
         ]);
         final configurator = GoRouterConfigurator(controller, const []);
-        final firstRouter = configurator.router;
+        final firstRouter = configurator.createRouter();
         addTearDown(firstRouter.dispose);
 
         await tester.pumpWidget(MaterialApp.router(routerConfig: firstRouter));
@@ -46,7 +46,7 @@ void main() {
         await tester.pumpAndSettle();
         final firstNavigatorKey = rootNavigatorKey;
 
-        final secondRouter = configurator.router;
+        final secondRouter = configurator.createRouter();
         addTearDown(secondRouter.dispose);
         await tester.pumpWidget(MaterialApp.router(routerConfig: secondRouter));
         await tester.pumpAndSettle();
@@ -77,7 +77,10 @@ void main() {
               builder: (_, _, _) => const Scaffold(body: Text('Details')),
             ),
           ]);
-          final router = GoRouterConfigurator(controller, const []).router;
+          final router = GoRouterConfigurator(
+            controller,
+            const [],
+          ).createRouter();
           addTearDown(router.dispose);
 
           await tester.pumpWidget(
@@ -133,7 +136,7 @@ void main() {
             ],
           ),
         ]);
-        final router = configurator.router;
+        final router = configurator.createRouter();
 
         await tester.pumpWidget(
           MaterialApp.router(
@@ -192,7 +195,10 @@ void main() {
         WidgetTester tester,
         MockModuleRouteController controller,
       ) async {
-        final router = GoRouterConfigurator(controller, const []).router;
+        final router = GoRouterConfigurator(
+          controller,
+          const [],
+        ).createRouter();
         addTearDown(router.dispose);
         await tester.pumpWidget(MaterialApp.router(routerConfig: router));
         await tester.pumpAndSettle();
@@ -260,7 +266,7 @@ void main() {
             builder: (_, _, _) => const Scaffold(body: Text('Home')),
           ),
         ]);
-        final router = configurator.router;
+        final router = configurator.createRouter();
 
         await tester.pumpWidget(
           MaterialApp.router(

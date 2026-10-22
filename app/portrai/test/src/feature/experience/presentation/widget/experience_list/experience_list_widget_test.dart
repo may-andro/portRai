@@ -1,3 +1,5 @@
+import 'package:design_system/design_system.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
@@ -122,4 +124,36 @@ void main() {
       },
     );
   }
+
+  testWidgets('should move only the spotlight when the pointer moves over a '
+      'card', (tester) async {
+    await pumpList(tester, sizes['desktop']!);
+    RadialGradient spotlightGradient() => tester
+        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+        .map((decoratedBox) => decoratedBox.decoration)
+        .whereType<BoxDecoration>()
+        .map((decoration) => decoration.gradient)
+        .whereType<RadialGradient>()
+        .first;
+    final cardTitle = find.text('Position 0');
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: tester.getCenter(cardTitle));
+    await tester.pump(const Duration(seconds: 1));
+    final hoveredTitle = tester.widget<DSTextWidget>(
+      find.ancestor(of: cardTitle, matching: find.byType(DSTextWidget)),
+    );
+    final hoveredCenter = spotlightGradient().center;
+
+    await mouse.moveBy(const Offset(40, 10));
+    await tester.pump();
+
+    expect(spotlightGradient().center, isNot(hoveredCenter));
+    expect(
+      tester.widget<DSTextWidget>(
+        find.ancestor(of: cardTitle, matching: find.byType(DSTextWidget)),
+      ),
+      same(hoveredTitle),
+    );
+  });
 }

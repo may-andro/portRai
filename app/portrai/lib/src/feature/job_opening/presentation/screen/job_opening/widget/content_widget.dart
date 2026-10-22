@@ -28,6 +28,16 @@ class ContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<JobOpeningBloc, JobOpeningState>(
+      // Insights update the state many times while they generate; their own
+      // section rebuilds for them, so the page rebuilds only for what it shows.
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.jobOpening != current.jobOpening ||
+          previous.loadFailure != current.loadFailure ||
+          previous.profile != current.profile ||
+          previous.isTailoredCvAvailable != current.isTailoredCvAvailable ||
+          (previous.insightsStatus == JobOpeningInsightsStatus.unavailable) !=
+              (current.insightsStatus == JobOpeningInsightsStatus.unavailable),
       builder: (context, state) {
         return CustomScrollView(
           scrollBehavior: ScrollConfiguration.of(

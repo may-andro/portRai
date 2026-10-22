@@ -39,8 +39,12 @@ class GoRouterConfigurator {
     );
   }
 
-  /// Creates the GoRouter instance with authentication-based redirect logic.
-  GoRouter get router {
+  /// Creates a new GoRouter instance with authentication-based redirect logic.
+  ///
+  /// Each call returns a new router that starts navigation from the initial
+  /// location, so callers keep the router for as long as navigation should
+  /// last.
+  GoRouter createRouter() {
     if (kIsWeb) {
       GoRouter.optionURLReflectsImperativeAPIs = true;
     }

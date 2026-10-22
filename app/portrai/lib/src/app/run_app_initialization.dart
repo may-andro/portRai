@@ -48,6 +48,7 @@ Future<void> runMainApp(DesignSystem designSystem) async {
   final appLocale = appServiceLocator.get<AppLocale>();
   _sendAppInitializationFinishedEvent(appLocale);
   Bloc.observer = appServiceLocator.get<AppBlocObserver>();
+  final routeConfigurator = _routeConfigurator;
 
   runApp(
     LocaleListenerWidget(
@@ -56,7 +57,7 @@ Future<void> runMainApp(DesignSystem designSystem) async {
           appLocale: appLocale,
           buildConfig: appServiceLocator.get<BuildConfig>(),
           designSystem: designSystem,
-          routeConfigurator: _routeConfigurator,
+          routeConfigurator: routeConfigurator,
         );
       },
     ),

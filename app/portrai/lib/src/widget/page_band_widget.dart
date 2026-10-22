@@ -141,9 +141,13 @@ class CountUpWidget extends StatelessWidget {
   final DSTextStyle style;
   final DSColor color;
 
+  /// Splits a value into the text before the number, the number and the text
+  /// after it.
+  static final _numberPattern = RegExp(r'^(\D*?)(\d+(?:\.\d+)?)(.*)$');
+
   @override
   Widget build(BuildContext context) {
-    final match = RegExp(r'^(\D*?)(\d+(?:\.\d+)?)(.*)$').firstMatch(value);
+    final match = _numberPattern.firstMatch(value);
     if (match == null) {
       return DSTextWidget(value, style: style, color: color);
     }

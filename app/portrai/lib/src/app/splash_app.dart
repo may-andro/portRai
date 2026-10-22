@@ -39,35 +39,40 @@ class SplashApp extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner:
           buildConfig.buildEnvironment.debugShowCheckedModeBanner,
-      localeResolutionCallback: (locale, supportedLocales) {
-        // First try exact match
-        if (locale != null && supportedLocales.contains(locale)) {
-          final appLocale = locale.appLocale;
-          moduleConfigurators.insert(0, AppLocaleConfigurator(appLocale));
-          return locale;
-        }
-
-        // If no exact match, try to find by language code
-        Locale? resolvedLocale;
-        if (locale != null) {
-          resolvedLocale = supportedLocales.firstWhere(
-            (supportedLocale) =>
-                supportedLocale.languageCode == locale.languageCode,
-            orElse: () => supportedLocales.first,
-          );
-        } else {
-          resolvedLocale = supportedLocales.first;
-        }
-
-        final appLocale = resolvedLocale.appLocale;
-        moduleConfigurators.insert(0, AppLocaleConfigurator(appLocale));
-        return resolvedLocale;
-      },
+      localeResolutionCallback: resolveLocale,
       home: SplashScreen(
         buildConfig: buildConfig,
         moduleConfigurators: moduleConfigurators,
         onInitializationSuccessful: onInitializationSuccessful,
       ),
     );
+  }
+
+  /// Picks the supported locale for [locale] and registers it as the app
+  /// locale. The locale can be resolved more than once, so the app locale is
+  /// replaced instead of added again.
+  @visibleForTesting
+  Locale resolveLocale(Locale? locale, Iterable<Locale> supportedLocales) {
+    final resolvedLocale = switch (locale) {
+      final locale? when supportedLocales.contains(locale) => locale,
+      final locale? => supportedLocales.firstWhere(
+        (supportedLocale) =>
+            supportedLocale.languageCode == locale.languageCode,
+        orElse: () => supportedLocales.first,
+      ),
+      null => supportedLocales.first,
+    };
+    final appLocaleConfigurator = AppLocaleConfigurator(
+      resolvedLocale.appLocale,
+    );
+    final appLocaleConfiguratorIndex = moduleConfigurators.indexWhere(
+      (configurator) => configurator is AppLocaleConfigurator,
+    );
+    if (appLocaleConfiguratorIndex == -1) {
+      moduleConfigurators.insert(0, appLocaleConfigurator);
+    } else {
+      moduleConfigurators[appLocaleConfiguratorIndex] = appLocaleConfigurator;
+    }
+    return resolvedLocale;
   }
 }

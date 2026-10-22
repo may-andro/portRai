@@ -1,13 +1,14 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/force_update/force_update.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/route/route.dart';
 
-class PortraiApp extends StatelessWidget {
+class PortraiApp extends StatefulWidget {
   const PortraiApp({
     required this.buildConfig,
     required this.designSystem,
@@ -22,18 +23,47 @@ class PortraiApp extends StatelessWidget {
   final GoRouterConfigurator routeConfigurator;
 
   @override
+  State<PortraiApp> createState() => _PortraiAppState();
+}
+
+class _PortraiAppState extends State<PortraiApp> {
+  late GoRouter _router = widget.routeConfigurator.createRouter();
+
+  @override
+  void didUpdateWidget(PortraiApp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A new router restarts navigation, so screens load their content again
+    // in the new locale. Other rebuilds keep the current router.
+    if (widget.appLocale != oldWidget.appLocale ||
+        widget.routeConfigurator != oldWidget.routeConfigurator) {
+      final previousRouter = _router;
+      _router = widget.routeConfigurator.createRouter();
+      // The previous router stays in use until the new one replaces it.
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => previousRouter.dispose(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'PortRai',
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: appLocale.locale,
+      locale: widget.appLocale.locale,
       debugShowCheckedModeBanner:
-          buildConfig.buildEnvironment.debugShowCheckedModeBanner,
+          widget.buildConfig.buildEnvironment.debugShowCheckedModeBanner,
       builder: (context, child) {
         return DSThemeBuilderWidget(
           brightness: context.platformBrightness,
-          designSystem: designSystem,
+          designSystem: widget.designSystem,
           child: SystemLocaleObserverWidget(
             child: ForceUpdateListenerWidget(
               child: ConnectivityListenerWidget(
@@ -43,7 +73,7 @@ class PortraiApp extends StatelessWidget {
           ),
         );
       },
-      routerConfig: routeConfigurator.router,
+      routerConfig: _router,
     );
   }
 }
