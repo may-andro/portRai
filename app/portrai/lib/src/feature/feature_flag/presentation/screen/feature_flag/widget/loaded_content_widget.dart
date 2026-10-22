@@ -8,9 +8,9 @@ class _LoadedContentPaddingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.space(factor: 2),
-        vertical: context.space(factor: context.isDesktop ? 2 : 1),
+      padding: context.screenHorizontalPadding.copyWith(
+        top: context.space(factor: context.isDesktop ? 2 : 1),
+        bottom: context.space(factor: context.isDesktop ? 2 : 1),
       ),
       sliver: sliver,
     );
