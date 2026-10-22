@@ -1,10 +1,14 @@
 import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/setting_screen.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/widget/app_version_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import 'package:use_case/use_case.dart';
 
@@ -29,11 +33,15 @@ void main() {
         (tester) async {
           await tester.pumpWidget(
             TestWidgetWrapper(
-              child: ContentWidget(
-                state: SettingLoadedState(
-                  isLanguageSelectorEnabled: false,
-                  isDevMenuEnabled: isDevMenuEnabled,
-                ),
+              child: CustomScrollView(
+                slivers: [
+                  ContentWidget(
+                    state: SettingLoadedState(
+                      isLanguageSelectorEnabled: false,
+                      isDevMenuEnabled: isDevMenuEnabled,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -88,17 +96,51 @@ void main() {
       expect(find.byType(DSErrorCardWidget), findsOneWidget);
     });
 
-    testWidgets('should render the settings when loading succeeds', (
-      tester,
-    ) async {
-      final bloc = MockSettingBloc()
-        ..stubState(const SettingLoadedState(isLanguageSelectorEnabled: false));
-      appServiceLocator.registerFactory<SettingBloc>(() => bloc);
+    testWidgets(
+      'should scroll the settings followed by the footer when loading '
+      'succeeds',
+      (tester) async {
+        final bloc = MockSettingBloc()
+          ..stubState(
+            const SettingLoadedState(isLanguageSelectorEnabled: false),
+          );
+        appServiceLocator.registerFactory<SettingBloc>(() => bloc);
 
-      await tester.pumpWidget(const TestWidgetWrapper(child: SettingScreen()));
-      await tester.pump();
+        await tester.pumpWidget(
+          const TestWidgetWrapper(
+            child: ScreenFooterProviderWidget(
+              footer: Text('footer'),
+              child: SettingScreen(),
+            ),
+          ),
+        );
+        await tester.pump();
 
-      expect(find.byType(ContentWidget), findsOneWidget);
-    });
+        expect(
+          find.descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(ContentWidget),
+          ),
+          findsOneWidget,
+        );
+        expect(find.byType(FooterWidget), findsNothing);
+        // The settings fill the screen, so the footer starts below it.
+        final footer = find.text('footer', skipOffstage: false);
+        expect(
+          find.descendant(
+            of: find.byType(CustomScrollView),
+            matching: footer,
+            skipOffstage: false,
+          ),
+          findsOneWidget,
+        );
+        expect(
+          tester.getTopLeft(footer).dy,
+          greaterThanOrEqualTo(
+            tester.getBottomLeft(find.byType(AppVersionWidget)).dy,
+          ),
+        );
+      },
+    );
   });
 }

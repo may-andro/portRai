@@ -36,8 +36,8 @@ class SettingScreen extends StatelessWidget {
                   SettingErrorState(:final failure) => ScreenErrorContent(
                     failure,
                   ),
-                  final SettingLoadedState state => ScreenLoadedContent(
-                    ContentWidget(state: state),
+                  final SettingLoadedState state => ScreenLoadedContent.slivers(
+                    [ContentWidget(state: state)],
                   ),
                 },
               ),
