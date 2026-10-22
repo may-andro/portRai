@@ -3,3 +3,6 @@ lib/
 coverage/
 *.log
 .firebase/
+
+# Deploy credentials
+.deploy/

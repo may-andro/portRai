@@ -405,3 +405,44 @@ This runs the checks and then `firebase deploy --only functions:portrai` from
 functions deployed from elsewhere are left alone. To deploy one function, run
 `firebase deploy --only functions:portrai:fetchJobOpenings` from `tool/functions`. The deploy does not change Firestore rules or
 indexes.
+
+### Deploying from GitHub Actions
+
+`functions_production.yaml` deploys the `portrai` codebase when a push to `develop` changes
+`tool/functions`. It runs the same checks as pull requests first, then
+`firebase deploy --only functions:portrai --force`. `--force` deletes functions removed from the
+codebase and sets the container image cleanup policy without a prompt.
+
+The deploy signs in as the `github-actions-functions` service account. Create it, grant its roles
+and store its key once:
+
+```bash
+gcloud iam service-accounts create github-actions-functions \
+  --display-name="GitHub Actions functions deploy" --project="$PROJECT_ID"
+DEPLOYER="serviceAccount:github-actions-functions@${PROJECT_ID}.iam.gserviceaccount.com"
+for role in roles/cloudfunctions.developer roles/cloudscheduler.admin \
+  roles/artifactregistry.admin roles/serviceusage.serviceUsageConsumer roles/firebase.viewer; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="$DEPLOYER" --role="$role"
+done
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
+for account in "job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
+  "${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"; do
+  gcloud iam service-accounts add-iam-policy-binding "$account" \
+    --member="$DEPLOYER" --role=roles/iam.serviceAccountUser --project="$PROJECT_ID"
+done
+gcloud iam service-accounts keys create key.json \
+  --iam-account="github-actions-functions@${PROJECT_ID}.iam.gserviceaccount.com"
+base64 < key.json | gh secret set FUNCTIONS_DEPLOY_SERVICE_ACCOUNT
+rm key.json
+```
+
+| Role                                      | Needed for                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| `roles/cloudfunctions.developer`          | Creating and updating functions                                                      |
+| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                        |
+| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                      |
+| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                       |
+| `roles/firebase.viewer`                   | Reading the Firebase project                                                         |
+| `roles/iam.serviceAccountUser`            | Running functions as `job-openings` and building them as the default compute account |
+
+The workflow also reads the `FIREBASE_PROJECT_ID` secret that the other deploys use.
