@@ -256,13 +256,13 @@ parameters stay metadata-only in diagnostics.
   revision live in `FlutterEdgeAiLocalAssistantRepository`.
 - Explicit model download confirmation, progress, cancellation, keep/delete and retry
   controls remain available from Settings and the setup screen.
-- Installed models load lazily on a question. A readiness inference probes engine support.
 - The app process runs at most one model download. An in-app restart disposes the repository
   but not its download, and the next repository joins it with the progress reached so far.
   On Android the download runs in the foreground with a progress notification, which needs the
   notification permission on Android 13 and later, so it continues while the app is in the
   background. If the assistant is enabled and the model is still missing at launch, the download
   resumes, attaching to the one still running if there is one.
+- Installed models load lazily on a question. A readiness inference probes engine support.
 - Questions use deterministic contact/career answers where applicable and otherwise
   bounded context selection. Missing portfolio facts are not guessed.
 - Disable and reset invalidate late output and clear follow-up context. Reset retains
