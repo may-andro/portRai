@@ -132,6 +132,37 @@ void main() {
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should ask with a freshly built context when a question is sent',
+    build: () {
+      final bloc = createBloc();
+      when(() => getContext()).thenAnswer((_) => const Right('Today'));
+      askQuestion.stubCall(
+        params: const AskLocalPortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Today',
+        ),
+        result: const Right(AssistantTextResponseEntity(text: 'Answer')),
+      );
+      return bloc;
+    },
+    seed: () => const LocalAssistantState(
+      status: LocalAssistantReady(),
+      portfolioContext: 'Last month',
+      isLoadingContext: false,
+    ),
+    act: (bloc) =>
+        bloc.add(const SendLocalAssistantQuestionClickEvent('Question')),
+    verify: (_) => verify(
+      () => askQuestion(
+        const AskLocalPortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Today',
+        ),
+      ),
+    ).called(1),
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
     'should show the answer as it grows when the model streams it',
     build: () {
       final bloc = createBloc();
