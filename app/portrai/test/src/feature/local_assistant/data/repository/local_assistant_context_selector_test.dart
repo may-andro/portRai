@@ -310,6 +310,28 @@ void main() {
     );
   });
 
+  test('should not select facts by the owner name', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'profile': {'name': 'Jane Doe'},
+          'testimonials': [
+            {'name': 'Ann', 'testimonial': 'Jane Doe was great'},
+          ],
+          'services': [
+            {'title': 'Consulting', 'detail': 'Architecture reviews'},
+          ],
+        }),
+      ),
+      'Does Jane Doe offer consulting?',
+    );
+
+    expect(
+      selected.indexOf('Architecture reviews'),
+      lessThan(selected.indexOf('Jane Doe was great')),
+    );
+  });
+
   test('should skip null values and presentation fields', () {
     final selected = LocalAssistantContextSelector().select(
       _portfolioOf(

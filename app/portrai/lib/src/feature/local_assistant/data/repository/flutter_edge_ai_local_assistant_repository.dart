@@ -59,16 +59,18 @@ class FlutterEdgeAiLocalAssistantRepository
   static const _modelRevision = 'b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1';
   static const _maxTokens = 8192;
   static const _modelFile = 'gemma-4-E2B-it.litertlm';
-  static const _systemInstruction =
-      "You are the Q&A assistant for Mayank Rai's professional portfolio. "
+  // The owner's name comes from the portfolio, so the instruction follows the
+  // data instead of repeating it.
+  static String _systemInstruction(String name) =>
+      "You are the Q&A assistant for $name's professional portfolio. "
       'You are not a general-purpose chatbot. Answer questions only about '
-      'Mayank, his contact details, background, experience, projects, skills, '
-      'services, and availability, using only the portfolio information below. '
-      "If asked who to contact, give Mayank Rai's name and the contact "
-      'details provided. Greet only when the message is nothing but a '
-      'greeting; otherwise answer the question directly. For unrelated '
-      "questions, politely say you can only help with Mayank's portfolio. "
-      'For questions about Mayank that the portfolio does not cover, such as '
+      '$name, their contact details, background, experience, projects, '
+      'skills, services, and availability, using only the portfolio '
+      "information below. If asked who to contact, give $name's name and "
+      'the contact details provided. Greet only when the message is nothing '
+      'but a greeting; otherwise answer the question directly. For unrelated '
+      "questions, politely say you can only help with $name's portfolio. "
+      'For questions about $name that the portfolio does not cover, such as '
       'salary, age, visa or hobbies, say that this is not in the portfolio '
       'and do not guess. For questions about a year, period, order, country, '
       'remote or freelance work, years with a technology, career gaps, '
@@ -247,10 +249,16 @@ class FlutterEdgeAiLocalAssistantRepository
     // UTF-8 bytes conservatively bound token count. Reserve room for the
     // answer and chat-template tokens rather than silently truncating input.
     // English text averages about 3 bytes per token or more.
+    final profileName = (portfolio['profile'] as Map?)?['name'];
+    final systemInstruction = _systemInstruction(
+      profileName is String && profileName.trim().isNotEmpty
+          ? profileName.trim()
+          : 'the portfolio owner',
+    );
     final availableBytes =
         (_maxTokens - 1024) * 2 -
         utf8
-            .encode('$_systemInstruction$question${previousQuestion ?? ''}')
+            .encode('$systemInstruction$question${previousQuestion ?? ''}')
             .length;
     if (availableBytes < 512) {
       throw ArgumentError.value(question, 'question', 'Question is too long.');
@@ -277,6 +285,7 @@ class FlutterEdgeAiLocalAssistantRepository
         await _generate(
           model,
           generation: generation,
+          systemInstruction: systemInstruction,
           temperature: temperature,
           text:
               'Portfolio information:\n$selectedContext\n\n'
@@ -299,6 +308,7 @@ class FlutterEdgeAiLocalAssistantRepository
   Future<String> _generate(
     InferenceModel model, {
     required int generation,
+    required String systemInstruction,
     required double temperature,
     required String text,
   }) async {
@@ -306,7 +316,7 @@ class FlutterEdgeAiLocalAssistantRepository
     _chat = null;
     _ensureCurrent(generation);
     final chat = await model.createChat(
-      systemInstruction: _systemInstruction,
+      systemInstruction: systemInstruction,
       temperature: temperature,
       topK: 40,
       maxOutputTokens: 512,

@@ -165,6 +165,49 @@ void main() {
     },
   );
 
+  test('should name the portfolio owner in the system instruction', () async {
+    final model = MockInferenceModel();
+    final chat = MockInferenceChat();
+    when(
+      () => model.createChat(
+        systemInstruction: any(named: 'systemInstruction'),
+        temperature: any(named: 'temperature'),
+        topK: any(named: 'topK'),
+        maxOutputTokens: any(named: 'maxOutputTokens'),
+      ),
+    ).thenAnswer((_) async => chat);
+    when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
+    when(
+      () => chat.generateChatResponse(),
+    ).thenAnswer((_) async => const TextResponse('Ready'));
+    when(() => chat.close()).thenAnswer((_) async {});
+    when(() => model.close()).thenAnswer((_) async {});
+    final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
+      (_) async => model,
+    );
+    addTearDown(repository.dispose);
+
+    await repository.answer(
+      question: 'What does she build?',
+      portfolioContext: jsonEncode({
+        'profile': {'name': 'Jane Doe'},
+      }),
+    );
+
+    final instruction =
+        verify(
+              () => model.createChat(
+                systemInstruction: captureAny(named: 'systemInstruction'),
+                temperature: 0.2,
+                topK: 40,
+                maxOutputTokens: 512,
+              ),
+            ).captured.single
+            as String;
+    expect(instruction, contains("Jane Doe's professional portfolio"));
+    expect(instruction, isNot(contains('Mayank')));
+  });
+
   group('portfolio context', () {
     Future<
       ({

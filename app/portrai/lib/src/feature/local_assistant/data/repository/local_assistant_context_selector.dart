@@ -77,9 +77,14 @@ class LocalAssistantContextSelector {
     String? previousQuestion,
     int maxBytes = maxContextBytes,
   }) {
-    final terms = _questionTerms(question);
+    // Every question is about the owner, so their name selects nothing.
+    final ownerTerms = _terms(
+      '${(portfolio['profile'] as Map?)?['name'] ?? ''}',
+    );
+    final terms = _questionTerms(question)..removeAll(ownerTerms);
     final countryTerms = _countryTerms(portfolio);
-    final previousTerms = _questionTerms(previousQuestion ?? '');
+    final previousTerms = _questionTerms(previousQuestion ?? '')
+      ..removeAll(ownerTerms);
     final asksTechnologyDuration =
         terms.intersection(_durationTerms).isNotEmpty &&
         terms.intersection(_technologyTerms(portfolio)).isNotEmpty;
@@ -612,7 +617,5 @@ class LocalAssistantContextSelector {
     'on',
     'by',
     'as',
-    'mayank',
-    'rai',
   };
 }
