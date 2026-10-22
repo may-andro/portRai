@@ -10,10 +10,6 @@ class CvExportTrackingDelegate extends ScreenTrackingDelegate {
   CvExportTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
-
   void trackTemplateSelection(String templateName) {
     trackEvent(
       Tracking(

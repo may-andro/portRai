@@ -6,9 +6,9 @@ import 'package:portrai/src/feature/cv_export/presentation/extension/_extension.
 import 'package:portrai/src/feature/cv_export/presentation/route/cv_export_module_route.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc/_bloc.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/widget/_widget.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/go_route/go_route_extension.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
+import 'package:portrai/src/widget/screen_scaffold_widget.dart';
 
 class CvExportScreen extends StatelessWidget {
   const CvExportScreen({super.key, this.tailoringTarget});
@@ -32,40 +32,36 @@ class CvExportScreen extends StatelessWidget {
       labels,
       tailoringTarget: tailoringTarget,
     );
-    return Scaffold(
-      backgroundColor: context.colorPalette.background.color,
-      body: BlocProvider(
-        create: (_) {
-          return appServiceLocator.get<CvExportBloc>()..add(loadEvent);
-        },
-        child: Builder(
-          builder: (context) => Stack(
-            children: [
-              ScreenContentWidget<CvExportBloc, CvExportState>(
-                buildWhen: (previous, current) => previous != current,
-                contentOf: (state) => switch (state) {
-                  CvExportInitialState() => const ScreenLoadingContent(),
-                  CvExportLoadingState(:final isTailoring) =>
-                    ScreenLoadingContent(
-                      message: isTailoring
-                          ? context.localizations.cvExportTailoring
-                          : null,
-                    ),
-                  CvExportErrorState(:final failure) => ScreenErrorContent(
-                    failure,
-                    onRetry: () => context.bloc.add(loadEvent),
+    return ScreenScaffoldWidget<CvExportBloc, CvExportState>(
+      onCreate: (bloc) => bloc.add(loadEvent),
+      body: Builder(
+        builder: (context) => Stack(
+          children: [
+            ScreenContentWidget<CvExportBloc, CvExportState>(
+              buildWhen: (previous, current) => previous != current,
+              contentOf: (state) => switch (state) {
+                CvExportInitialState() => const ScreenLoadingContent(),
+                CvExportLoadingState(:final isTailoring) =>
+                  ScreenLoadingContent(
+                    message: isTailoring
+                        ? context.localizations.cvExportTailoring
+                        : null,
                   ),
-                  final CvExportLoadedState state =>
-                    ScreenLoadedContent.slivers([ContentWidget(state: state)]),
-                },
-              ),
-              Positioned(
-                right: context.space(factor: 2),
-                bottom: context.space(factor: 2),
-                child: const SafeArea(child: DownloadButtonWidget()),
-              ),
-            ],
-          ),
+                CvExportErrorState(:final failure) => ScreenErrorContent(
+                  failure,
+                  onRetry: () => context.bloc.add(loadEvent),
+                ),
+                final CvExportLoadedState state => ScreenLoadedContent.slivers([
+                  ContentWidget(state: state),
+                ]),
+              },
+            ),
+            Positioned(
+              right: context.space(factor: 2),
+              bottom: context.space(factor: 2),
+              child: const SafeArea(child: DownloadButtonWidget()),
+            ),
+          ],
         ),
       ),
     );
