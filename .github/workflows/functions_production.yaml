@@ -1,0 +1,67 @@
+name: Functions Production Release
+
+# A deploy that is cut off half way can leave functions out of step with each
+# other, so a newer push waits for the running deploy instead of cancelling it.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'tool/functions/**'
+      - '.github/workflows/functions_production.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Quality Checks
+    uses: ./.github/workflows/functions.yaml
+
+  deploy:
+    name: Deploy Cloud Functions
+    needs: [quality]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tool/functions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tool/functions/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare deploy credentials
+        id: creds
+        uses: ./.github/actions/prepare-service-account
+        with:
+          credentials-base64: ${{ secrets.FUNCTIONS_DEPLOY_SERVICE_ACCOUNT }}
+
+      # --force deletes functions removed from the portrai codebase and sets the
+      # container image cleanup policy, which would otherwise need a prompt.
+      - name: Deploy
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.creds.outputs.file }}
+        run: >-
+          npx --yes firebase-tools@15.34.1 deploy
+          --only functions:portrai
+          --project ${{ secrets.FIREBASE_PROJECT_ID }}
+          --non-interactive
+          --force
+
+      - name: Remove deploy credentials
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/deployment-service-account.json"

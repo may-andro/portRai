@@ -110,6 +110,11 @@ strings, e.g. `'*\+*-prod'`. An unescaped `+` is a repetition operator and
 `*+*` is invalid.
 Git's `git tag -l '*+*-prod'` uses different glob syntax and needs no escaping.
 
+`functions_production.yaml` is the one branch-triggered deploy: it runs on pushes to `develop`
+that change `tool/functions`, calls `functions.yaml` as its quality gate and then deploys the
+`portrai` functions codebase. Cloud Functions have no build artifact or version tag, so they
+skip the extract-version and build jobs.
+
 New reusable build/deploy workflows should be prefixed with `_` and declare `workflow_call:`
 inputs/secrets explicitly (no `pull_request:`/`push:` triggers of their own) — they're building
 blocks, not standalone pipelines.

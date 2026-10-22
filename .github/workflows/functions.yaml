@@ -1,6 +1,7 @@
 name: functions
 
 on:
+  workflow_call:
   pull_request:
     paths:
       - 'tool/functions/**'
