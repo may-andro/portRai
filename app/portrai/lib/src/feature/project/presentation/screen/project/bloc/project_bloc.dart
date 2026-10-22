@@ -19,7 +19,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState>
     on<LoadProjectEvent>(_mapLoadProjectEventToState);
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
-    on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
+    trackViewEventOn<SectionVisibleEvent>((event) => event.trackingId);
     on<HeaderTabClickEvent>(_mapHeaderTabClickEventToState);
   }
 
@@ -56,12 +56,5 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState>
     Emitter<ProjectState> emit,
   ) {
     _trackingDelegate.trackTabItemSelection(event.section.trackingId);
-  }
-
-  FutureOr<void> _mapSectionVisibleEventToState(
-    SectionVisibleEvent event,
-    Emitter<ProjectState> emit,
-  ) {
-    _trackingDelegate.trackSectionView(event.trackingId);
   }
 }

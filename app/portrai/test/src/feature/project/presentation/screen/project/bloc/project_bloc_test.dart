@@ -120,7 +120,7 @@ void main() {
         verify(() => tracking.trackViewEvent('loading_content_view')).called(1);
         verify(() => tracking.trackViewEvent('loaded_content_view')).called(1);
         verify(
-          () => tracking.trackSectionView('project_overview_section'),
+          () => tracking.trackViewEvent('project_overview_section'),
         ).called(1);
         verify(
           () => tracking.trackTabItemSelection('project_overview_section'),

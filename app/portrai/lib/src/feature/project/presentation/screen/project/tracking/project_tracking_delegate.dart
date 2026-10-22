@@ -27,8 +27,4 @@ class ProjectTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
-
-  void trackSectionView(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
 }
