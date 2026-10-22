@@ -18,7 +18,9 @@ class ContentWidget extends StatelessWidget {
           final failure = state.failure;
           final errorText = failure?.remoteAssistantErrorText(context);
           if (state.status == RemoteAssistantStatus.loading) {
-            return const Center(child: DSLoadingWidget(size: 40));
+            return const Center(
+              child: DSLoadingWidget(style: DSLoadingStyle.lottie, size: 40),
+            );
           }
           if (state.status == RemoteAssistantStatus.unavailable) {
             return Center(
@@ -37,7 +39,14 @@ class ContentWidget extends StatelessWidget {
           return Column(
             children: [
               if (state.isLoadingContext)
-                const Expanded(child: Center(child: DSLoadingWidget(size: 40)))
+                const Expanded(
+                  child: Center(
+                    child: DSLoadingWidget(
+                      style: DSLoadingStyle.lottie,
+                      size: 40,
+                    ),
+                  ),
+                )
               else if (state.portfolioContext == null)
                 Expanded(
                   child: Center(
