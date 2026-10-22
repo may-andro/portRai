@@ -18,26 +18,13 @@ class ContentWidget extends StatelessWidget {
       contentOf: (state) => switch (state) {
         DeveloperMenuInitialState() ||
         DeveloperMenuLoadingState() => const ScreenLoadingContent(),
-        DeveloperMenuLoadedState() => const ScreenLoadedContent(
-          _SuccessWidget(),
-        ),
+        DeveloperMenuLoadedState() => const ScreenLoadedContent.slivers([
+          _DeveloperMenuContentWidget(),
+        ]),
         DeveloperMenuErrorState(:final failure) => ScreenErrorContent(failure),
       },
       onContentVisible: (content) =>
           context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
-    );
-  }
-}
-
-class _SuccessWidget extends StatelessWidget {
-  const _SuccessWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return DSResponsiveContainerWidget(
-      mobileBuilder: (_) => const _DeveloperMenuContentWidget(),
-      tabletBuilder: (_) => const _DeveloperMenuContentWidget(),
-      desktopBuilder: (_) => const _DeveloperMenuContentWidget(),
     );
   }
 }
@@ -47,118 +34,114 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.space(factor: 2),
-            vertical: context.space(factor: 2),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionHeader(
-                title: context.localizations.developerMenuControlsAndTools,
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.space(factor: 2),
+        vertical: context.space(factor: 2),
+      ),
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _SectionHeader(
+              title: context.localizations.developerMenuControlsAndTools,
+            ),
+            DSCardWidget(
+              child: Column(
+                children: [
+                  DSLabeledInfoRowWidget(
+                    icon: Icons.storage_outlined,
+                    label: context.localizations.developerMenuCachePlayground,
+                    value: context
+                        .localizations
+                        .developerMenuCachePlaygroundDescription,
+                    onTap: () {},
+                  ),
+                  DSHorizontalDividerWidget(
+                    thickness: 1,
+                    color: context.colorPalette.neutral.grey3,
+                  ),
+                  DSLabeledInfoRowWidget(
+                    icon: Icons.flag_outlined,
+                    label: context.localizations.developerMenuFeatureFlags,
+                    value: context
+                        .localizations
+                        .developerMenuFeatureFlagsDescription,
+                    onTap: () => FeatureFlagScreen.navigate(context),
+                  ),
+                ],
               ),
-              DSCardWidget(
-                child: Column(
-                  children: [
-                    DSLabeledInfoRowWidget(
-                      icon: Icons.storage_outlined,
-                      label: context.localizations.developerMenuCachePlayground,
-                      value: context
-                          .localizations
-                          .developerMenuCachePlaygroundDescription,
-                      onTap: () {},
-                    ),
-                    DSHorizontalDividerWidget(
-                      thickness: 1,
-                      color: context.colorPalette.neutral.grey3,
-                    ),
-                    DSLabeledInfoRowWidget(
-                      icon: Icons.flag_outlined,
-                      label: context.localizations.developerMenuFeatureFlags,
-                      value: context
-                          .localizations
-                          .developerMenuFeatureFlagsDescription,
-                      onTap: () => FeatureFlagScreen.navigate(context),
-                    ),
-                  ],
-                ),
-              ),
-              const DSVerticalSpacerWidget(3),
+            ),
+            const DSVerticalSpacerWidget(3),
 
-              _SectionHeader(
-                title: context.localizations.developerMenuDataSource,
-              ),
-              const DSCardWidget(child: _AssetSourceTile()),
-              const DSVerticalSpacerWidget(3),
+            _SectionHeader(
+              title: context.localizations.developerMenuDataSource,
+            ),
+            const DSCardWidget(child: _AssetSourceTile()),
+            const DSVerticalSpacerWidget(3),
 
-              _SectionHeader(title: context.localizations.developerMenuAiImage),
-              const DSCardWidget(
-                child: Column(
-                  children: [_AiImageStyleTile(), _AiImageModelTile()],
-                ),
+            _SectionHeader(title: context.localizations.developerMenuAiImage),
+            const DSCardWidget(
+              child: Column(
+                children: [_AiImageStyleTile(), _AiImageModelTile()],
               ),
-              const DSVerticalSpacerWidget(3),
+            ),
+            const DSVerticalSpacerWidget(3),
 
-              _SectionHeader(
-                title: context.localizations.developerMenuDesignSystem,
-              ),
-              const DesignSystemSelectorWidget(),
-              const DSVerticalSpacerWidget(3),
+            _SectionHeader(
+              title: context.localizations.developerMenuDesignSystem,
+            ),
+            const DesignSystemSelectorWidget(),
+            const DSVerticalSpacerWidget(3),
 
-              _SectionHeader(
-                title: context.localizations.developerMenuErrorSimulation,
+            _SectionHeader(
+              title: context.localizations.developerMenuErrorSimulation,
+            ),
+            DSCardWidget(
+              child: Column(
+                children: [
+                  _ActionTile(
+                    title: context.localizations.developerMenuForceFatalCrash,
+                    subTitle: context
+                        .localizations
+                        .developerMenuForceFatalCrashDescription,
+                    icon: Icons.warning_amber_outlined,
+                    onPressed: () =>
+                        context.bloc.add(const ForceFatalCrashEvent()),
+                  ),
+                  DSHorizontalDividerWidget(
+                    thickness: 1,
+                    color: context.colorPalette.neutral.grey3,
+                  ),
+                  _ActionTile(
+                    title:
+                        context.localizations.developerMenuForceNonFatalCrash,
+                    subTitle: context
+                        .localizations
+                        .developerMenuForceNonFatalCrashDescription,
+                    icon: Icons.error_outline,
+                    onPressed: () =>
+                        context.bloc.add(const ForceNonFatalCrashEvent()),
+                  ),
+                  DSHorizontalDividerWidget(
+                    thickness: 1,
+                    color: context.colorPalette.neutral.grey3,
+                  ),
+                  _ActionTile(
+                    title:
+                        context.localizations.developerMenuForceBlacklistError,
+                    subTitle: context
+                        .localizations
+                        .developerMenuForceBlacklistErrorDescription,
+                    icon: Icons.block_outlined,
+                    onPressed: () =>
+                        context.bloc.add(const ForceBlacklistErrorEvent()),
+                  ),
+                ],
               ),
-              DSCardWidget(
-                child: Column(
-                  children: [
-                    _ActionTile(
-                      title: context.localizations.developerMenuForceFatalCrash,
-                      subTitle: context
-                          .localizations
-                          .developerMenuForceFatalCrashDescription,
-                      icon: Icons.warning_amber_outlined,
-                      onPressed: () =>
-                          context.bloc.add(const ForceFatalCrashEvent()),
-                    ),
-                    DSHorizontalDividerWidget(
-                      thickness: 1,
-                      color: context.colorPalette.neutral.grey3,
-                    ),
-                    _ActionTile(
-                      title:
-                          context.localizations.developerMenuForceNonFatalCrash,
-                      subTitle: context
-                          .localizations
-                          .developerMenuForceNonFatalCrashDescription,
-                      icon: Icons.error_outline,
-                      onPressed: () =>
-                          context.bloc.add(const ForceNonFatalCrashEvent()),
-                    ),
-                    DSHorizontalDividerWidget(
-                      thickness: 1,
-                      color: context.colorPalette.neutral.grey3,
-                    ),
-                    _ActionTile(
-                      title: context
-                          .localizations
-                          .developerMenuForceBlacklistError,
-                      subTitle: context
-                          .localizations
-                          .developerMenuForceBlacklistErrorDescription,
-                      icon: Icons.block_outlined,
-                      onPressed: () =>
-                          context.bloc.add(const ForceBlacklistErrorEvent()),
-                    ),
-                  ],
-                ),
-              ),
-              const DSVerticalSpacerWidget(3),
-            ],
-          ),
+            ),
+            const DSVerticalSpacerWidget(3),
+          ],
         ),
       ),
     );
