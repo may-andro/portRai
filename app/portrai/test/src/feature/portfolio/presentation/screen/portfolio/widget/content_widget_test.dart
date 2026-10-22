@@ -5,16 +5,12 @@ import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/content_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
-import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/_bloc.dart'
-    show FooterBloc;
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../../mock/feature/ai_image_gen/presentation/bloc/mock_ai_image_bloc.dart';
-import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
-import '../../../../../../../mock/feature/profile/domain/use_case/mock_open_email_use_case.dart';
-import '../../../../../../../mock/feature/profile/presentation/widget/footer/tracking/mock_footer_tracking_delegate.dart';
+import '../../../../../../../mock/feature/profile/presentation/widget/footer/bloc/mock_footer_bloc.dart';
 import '../../../../../../../mock/feature/profile/presentation/widget/professional_summary/bloc/mock_professional_summary_bloc.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -75,13 +71,9 @@ void main() {
         await appServiceLocator.reset();
         registerTestPackageInfo();
         addTearDown(appServiceLocator.reset);
-        appServiceLocator.registerFactory<FooterBloc>(
-          () => FooterBloc(
-            MockOpenExternalUrlUseCase(),
-            MockOpenEmailUseCase(),
-            MockFooterTrackingDelegate(),
-          ),
-        );
+        MockFooterBloc()
+          ..stubLoadingState()
+          ..registerFactory();
         MockProfessionalSummaryBloc()
           ..stubLoadingState()
           ..registerFactory();
