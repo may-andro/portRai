@@ -7,7 +7,6 @@ import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/cv_export_screen.dart';
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:use_case/use_case.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -48,12 +47,9 @@ void main() {
       verify(() => bloc.add(any(that: isA<LoadCvExportEvent>()))).called(1);
     });
 
-    testWidgets('should show the loader under the header when loading starts', (
-      tester,
-    ) async {
+    testWidgets('should show the loader when loading starts', (tester) async {
       await pumpScreen(tester, const CvExportInitialState());
 
-      expect(find.byType(PageAppBarWidget), findsOneWidget);
       expect(find.byType(DSLoadingWidget), findsOneWidget);
       expect(find.text('Tailoring your CV for this job…'), findsNothing);
     });
@@ -83,7 +79,6 @@ void main() {
     ) async {
       await pumpScreen(tester, const CvExportErrorState(UnknownFailure()));
 
-      expect(find.byType(PageAppBarWidget), findsOneWidget);
       expect(find.byType(DSErrorCardWidget), findsOneWidget);
     });
 

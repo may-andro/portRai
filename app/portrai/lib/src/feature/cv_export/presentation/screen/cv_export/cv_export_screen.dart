@@ -8,7 +8,6 @@ import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/bloc
 import 'package:portrai/src/feature/cv_export/presentation/screen/cv_export/widget/_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/go_route/go_route_extension.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class CvExportScreen extends StatelessWidget {
@@ -42,9 +41,6 @@ class CvExportScreen extends StatelessWidget {
         child: Builder(
           builder: (context) =>
               ScreenContentWidget<CvExportBloc, CvExportState>(
-                header: PageAppBarWidget(
-                  title: context.localizations.cvExportTitle,
-                ),
                 buildWhen: (previous, current) => previous != current,
                 contentOf: (state) => switch (state) {
                   CvExportInitialState() => const ScreenLoadingContent(),
