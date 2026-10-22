@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/developer_mode/presentation/screen/developer
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/widget/content_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 import 'package:use_case/use_case.dart';
 
@@ -170,6 +171,7 @@ void main() {
           ),
         );
         expect(find.byType(FooterWidget), findsNothing);
+        expect(find.byType(PageAppBarWidget), findsOneWidget);
       },
     );
   });

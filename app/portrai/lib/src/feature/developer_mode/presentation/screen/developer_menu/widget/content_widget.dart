@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -18,8 +19,9 @@ class ContentWidget extends StatelessWidget {
       contentOf: (state) => switch (state) {
         DeveloperMenuInitialState() ||
         DeveloperMenuLoadingState() => const ScreenLoadingContent(),
-        DeveloperMenuLoadedState() => const ScreenLoadedContent.slivers([
-          _DeveloperMenuContentWidget(),
+        DeveloperMenuLoadedState() => ScreenLoadedContent.slivers([
+          PageAppBarWidget(title: context.localizations.settingDeveloperMode),
+          const _DeveloperMenuContentWidget(),
         ]),
         DeveloperMenuErrorState(:final failure) => ScreenErrorContent(failure),
       },

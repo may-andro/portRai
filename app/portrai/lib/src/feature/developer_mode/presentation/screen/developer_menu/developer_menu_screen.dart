@@ -1,4 +1,3 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/route/developer_menu_module_route.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
@@ -18,7 +17,6 @@ class DeveloperMenuScreen extends StatelessWidget {
     return ScreenScaffoldWidget<DeveloperMenuBloc, DeveloperMenuState>(
       onCreate: (bloc) => bloc.add(const LoadDeveloperMenuEvent()),
       onResume: (bloc) => bloc.add(const ScreenVisibleEvent()),
-      appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
       body: const ContentWidget(),
     );
   }
