@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/experience/domain/use_case/mock_get_experience_use_case.dart';
@@ -12,7 +11,6 @@ import '../../../../../../../mock/feature/experience/domain/use_case/mock_get_ex
 import '../../../../../../../mock/feature/experience/presentation/screen/experience/tracking/mock_experience_tracking_delegate.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
-import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
 
 ExperienceEntity _experienceStartingIn(int year, String id) {
   return ExperienceEntity(
@@ -58,17 +56,11 @@ void main() {
   group('ExperienceBloc', () {
     late MockGetExperienceUseCase getExperience;
     late MockGetExperiencesUseCase getExperiences;
-    late MockGetProfileUseCase getProfile;
     late MockOpenExternalUrlUseCase openUrl;
     late MockExperienceTrackingDelegate tracking;
 
-    ExperienceBloc buildBloc() => ExperienceBloc(
-      getExperience,
-      getExperiences,
-      getProfile,
-      openUrl,
-      tracking,
-    );
+    ExperienceBloc buildBloc() =>
+        ExperienceBloc(getExperience, getExperiences, openUrl, tracking);
 
     setUp(() {
       getExperience = MockGetExperienceUseCase();
@@ -78,19 +70,13 @@ void main() {
             ExperiencesNotFoundFailure(),
           ),
         );
-      getProfile = MockGetProfileUseCase();
       openUrl = MockOpenExternalUrlUseCase();
       tracking = MockExperienceTrackingDelegate();
     });
 
     blocTest<ExperienceBloc, ExperienceState>(
-      'should emit loaded with no profile when the experience succeeds but profile fails',
+      'should emit loaded when the experience loads',
       setUp: () {
-        getProfile.stubCall(
-          const Left<GetProfileFailure, ProfileEntity>(
-            ProfileNotFoundFailure(),
-          ),
-        );
         getExperience.stubCall(
           experience.id,
           Right<GetExperienceFailure, ExperienceEntity>(experience),
@@ -109,11 +95,6 @@ void main() {
       setUp: () {
         final newest = _experienceStartingIn(2025, 'newest');
         final oldest = _experienceStartingIn(2020, 'oldest');
-        getProfile.stubCall(
-          const Left<GetProfileFailure, ProfileEntity>(
-            ProfileNotFoundFailure(),
-          ),
-        );
         getExperience.stubCall(
           experience.id,
           Right<GetExperienceFailure, ExperienceEntity>(experience),
@@ -151,11 +132,6 @@ void main() {
     blocTest<ExperienceBloc, ExperienceState>(
       'should emit error when loading the experience fails',
       setUp: () {
-        getProfile.stubCall(
-          const Left<GetProfileFailure, ProfileEntity>(
-            ProfileNotFoundFailure(),
-          ),
-        );
         getExperience.stubCall(
           experience.id,
           const Left<GetExperienceFailure, ExperienceEntity>(

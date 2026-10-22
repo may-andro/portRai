@@ -3,15 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/widget/section_widget.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
-part 'desktop_content_widget.dart';
-part 'mobile_tablet_content_widget.dart';
 part 'tab_bar_widget.dart';
 
-class ContentWidget extends StatelessWidget {
+class ContentWidget extends StatefulWidget {
   const ContentWidget({super.key});
+
+  @override
+  State<ContentWidget> createState() => _ContentWidgetState();
+}
+
+class _ContentWidgetState extends State<ContentWidget>
+    with TickerProviderStateMixin {
+  late final ScrollController _scrollController;
+  _Sections? _sections;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _sections?.tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,100 +39,88 @@ class ContentWidget extends StatelessWidget {
       contentOf: (state) => switch (state) {
         LoadingState() => const ScreenLoadingContent(),
         ErrorState(:final failure) => ScreenErrorContent(failure),
-        LoadedState(:final experience) => ScreenLoadedContent(
-          _SuccessWidget(experience: experience),
-        ),
+        LoadedState() => _loadedContentOf(state),
       },
       onContentVisible: (content) =>
           context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
-}
 
-class _SuccessWidget extends StatefulWidget {
-  const _SuccessWidget({required this.experience});
+  ScreenLoadedContent _loadedContentOf(LoadedState state) {
+    final experience = state.experience;
+    final sections = _sectionsFor(experience);
+    return ScreenLoadedContent.slivers(scrollController: _scrollController, [
+      SliverToBoxAdapter(child: IntroSectionWidget(experience: experience)),
+      SliverToBoxAdapter(child: KeyFactsSectionWidget(experience: experience)),
+      SliverPersistentHeader(
+        pinned: true,
+        delegate: _PersistentTabBarDelegate(
+          sections: sections.scrollableSections,
+          tabController: sections.tabController,
+          height: DSTabItemWidget.getHeight(context),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            ...sections.scrollableSections,
+            if (state.newerExperience != null || state.olderExperience != null)
+              AdjacentExperiencesSectionWidget(
+                experience: experience,
+                newerExperience: state.newerExperience,
+                olderExperience: state.olderExperience,
+              ),
+          ],
+        ),
+      ),
+    ]);
+  }
 
-  final ExperienceEntity experience;
+  /// The sections of [experience] with their tab controller, kept across
+  /// rebuilds so the section keys and the selected tab stay the same.
+  _Sections _sectionsFor(ExperienceEntity experience) {
+    final current = _sections;
+    if (current != null && current.experience == experience) return current;
 
-  @override
-  State<_SuccessWidget> createState() => _SuccessWidgetState();
-}
-
-class _SuccessWidgetState extends State<_SuccessWidget>
-    with TickerProviderStateMixin {
-  late final ScrollController _scrollController;
-  late final TabController _tabController;
-  late final List<ScrollableSectionWidget> _scrollableSections;
-
-  @override
-  void initState() {
-    super.initState();
-    // Create section widgets from experience entity
-    _scrollableSections = [
-      OverviewSectionWidget(experience: widget.experience),
-      AchievementsSectionWidget(experience: widget.experience),
-      ResponsibilitiesSectionWidget(experience: widget.experience),
-      TechnologiesSectionWidget(experience: widget.experience),
-      if (widget.experience.latitude != null &&
-          widget.experience.longitude != null)
-        LocationSectionWidget(experience: widget.experience),
+    final scrollableSections = <ScrollableSectionWidget>[
+      OverviewSectionWidget(experience: experience),
+      AchievementsSectionWidget(experience: experience),
+      ResponsibilitiesSectionWidget(experience: experience),
+      TechnologiesSectionWidget(experience: experience),
+      if (experience.latitude != null && experience.longitude != null)
+        LocationSectionWidget(experience: experience),
     ];
-    _scrollController = ScrollController()..addListener(_onScroll);
-    _tabController = TabController(
-      length: _scrollableSections.length,
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DSResponsiveContainerWidget(
-      mobileBuilder: (context) {
-        return _MobileTabletContentWidget(
-          experience: widget.experience,
-          scrollableSections: _scrollableSections,
-          scrollController: _scrollController,
-          tabController: _tabController,
-        );
-      },
-      tabletBuilder: (context) {
-        return _MobileTabletContentWidget(
-          experience: widget.experience,
-          scrollableSections: _scrollableSections,
-          scrollController: _scrollController,
-          tabController: _tabController,
-        );
-      },
-      desktopBuilder: (context) => _DesktopContentWidget(
-        experience: widget.experience,
-        scrollableSections: _scrollableSections,
-        scrollController: _scrollController,
-        tabController: _tabController,
+    final sections = _Sections(
+      experience: experience,
+      scrollableSections: scrollableSections,
+      tabController: TabController(
+        length: scrollableSections.length,
+        vsync: this,
       ),
     );
+    if (current != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => current.tabController.dispose(),
+      );
+    }
+    return _sections = sections;
   }
 
   void _onScroll() {
-    final state = context.bloc.state;
-    if (state is! LoadedState) return;
+    final sections = _sections;
+    if (sections == null) return;
 
-    for (var i = 0; i < _scrollableSections.length; i++) {
-      final keyContext = _scrollableSections[i].sectionKey.currentContext;
+    final scrollableSections = sections.scrollableSections;
+    for (var i = 0; i < scrollableSections.length; i++) {
+      final keyContext = scrollableSections[i].sectionKey.currentContext;
       if (keyContext case final BuildContext context) {
         final renderBox = context.findRenderObject() as RenderBox?;
         if (renderBox case final RenderBox box) {
           final position = box.localToGlobal(Offset.zero).dy;
           if (position <= context.height / 2 &&
               position >= -box.size.height / 2) {
-            if (_tabController.index != i) {
-              _tabController.animateTo(i);
+            if (sections.tabController.index != i) {
+              sections.tabController.animateTo(i);
             }
             break;
           }
@@ -123,26 +130,15 @@ class _SuccessWidgetState extends State<_SuccessWidget>
   }
 }
 
-/// All scrollable sections followed by links to the neighbouring roles.
-class _SectionListWidget extends StatelessWidget {
-  const _SectionListWidget({required this.scrollableSections});
+/// The scrollable sections of one experience and the tabs that follow them.
+class _Sections {
+  const _Sections({
+    required this.experience,
+    required this.scrollableSections,
+    required this.tabController,
+  });
 
+  final ExperienceEntity experience;
   final List<ScrollableSectionWidget> scrollableSections;
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.state;
-    return Column(
-      children: [
-        ...scrollableSections,
-        if (state is LoadedState &&
-            (state.newerExperience != null || state.olderExperience != null))
-          AdjacentExperiencesSectionWidget(
-            experience: state.experience,
-            newerExperience: state.newerExperience,
-            olderExperience: state.olderExperience,
-          ),
-      ],
-    );
-  }
+  final TabController tabController;
 }

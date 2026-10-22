@@ -7,14 +7,12 @@ import 'package:portrai/src/feature/experience/presentation/screen/experience/bl
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/experience_state.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/tracking/_tracking.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 
 @register
 class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
   ExperienceBloc(
     this._getExperienceUseCase,
     this._getExperiencesUseCase,
-    this._getProfileUseCase,
     this._openExternalUrlUseCase,
     this._trackingDelegate,
   ) : super(const LoadingState()) {
@@ -29,7 +27,6 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
 
   final GetExperienceUseCase _getExperienceUseCase;
   final GetExperiencesUseCase _getExperiencesUseCase;
-  final GetProfileUseCase _getProfileUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final ExperienceTrackingDelegate _trackingDelegate;
 
@@ -38,12 +35,6 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     Emitter<ExperienceState> emit,
   ) async {
     emit(const LoadingState());
-
-    final eitherProfileResult = await _getProfileUseCase();
-    final profile = eitherProfileResult.fold<ProfileEntity?>(
-      (_) => null,
-      (profile) => profile,
-    );
 
     final eitherExperienceResult = await _getExperienceUseCase(event.id);
     if (eitherExperienceResult.isLeft) {
@@ -68,7 +59,6 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     emit(
       LoadedState(
         experience: experience,
-        profile: profile,
         newerExperience: hasNewerExperience
             ? experiencesNewestFirst[experienceIndex - 1]
             : null,
