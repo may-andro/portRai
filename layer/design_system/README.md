@@ -129,7 +129,7 @@ import 'package:design_system/design_system.dart';
 | `DSBulletPointListWidget` | Vertically stacked bullet-point list |
 | `DSCarousalWidget` | Carousel slider wrapping `carousel_slider` |
 | `DSDialogWidget` | Themed, rounded modal dialog with responsive sizing |
-| `DSErrorCardWidget` | Error state card with icon, message, and optional retry button |
+| `DSErrorCardWidget` | Error state card with icon, title, message, and optional retry button (title and retry label are overridable for translation) |
 | `DSSectionContainerWidget` | Visibility-triggered section with animated title, background theming, and responsive padding |
 | `DSStaggeredGridWidget` | Masonry grid layout via `flutter_staggered_grid_view` |
 
