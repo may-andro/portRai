@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +9,8 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/widget/_widget.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
 import '../../../../../../../mock/feature/job_opening/presentation/screen/job_openings/bloc/mock_job_openings_bloc.dart';
@@ -14,20 +18,19 @@ import '../../../../../../../util/animated_page_test_util.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
-  Future<MockJobOpeningsBloc> pumpContent(
-    WidgetTester tester,
-    JobOpeningsState state,
-  ) async {
+  Future<void> pumpBloc(WidgetTester tester, MockJobOpeningsBloc bloc) async {
     setUpAnimatedPage(tester);
-    final bloc = MockJobOpeningsBloc()..stubState(state);
     addTearDown(bloc.close);
     final router = GoRouter(
       routes: [
         GoRoute(
           path: '/',
-          builder: (_, _) => BlocProvider<JobOpeningsBloc>.value(
-            value: bloc,
-            child: const Scaffold(body: ContentWidget()),
+          builder: (_, _) => ScreenFooterProviderWidget(
+            footer: const Text('footer'),
+            child: BlocProvider<JobOpeningsBloc>.value(
+              value: bloc,
+              child: const Scaffold(body: ContentWidget()),
+            ),
           ),
         ),
         GoRoute(
@@ -42,6 +45,14 @@ void main() {
       TestWidgetWrapper(routerConfig: router, child: const SizedBox()),
     );
     await pumpAnimations(tester);
+  }
+
+  Future<MockJobOpeningsBloc> pumpContent(
+    WidgetTester tester,
+    JobOpeningsState state,
+  ) async {
+    final bloc = MockJobOpeningsBloc()..stubState(state);
+    await pumpBloc(tester, bloc);
     return bloc;
   }
 
@@ -290,8 +301,9 @@ void main() {
     expect(loader.size, 144);
   });
 
-  testWidgets('should show the job search and footer sections while the '
-      'matches load', (tester) async {
+  testWidgets('should show the job search section while the matches load', (
+    tester,
+  ) async {
     await pumpContent(tester, const JobOpeningsState());
 
     expect(find.byType(DSLoadingWidget), findsOneWidget);
@@ -422,5 +434,64 @@ void main() {
     );
     expect(fade.opacity.value, 1);
     await pumpAnimations(tester);
+  });
+
+  testWidgets('should end the shared scroll view with the screen footer when '
+      'loaded', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [jobOpeningEntityFixture()],
+      ),
+    );
+
+    final scrollView = find.descendant(
+      of: find.byType(ScreenContentWidget<JobOpeningsBloc, JobOpeningsState>),
+      matching: find.byType(CustomScrollView),
+    );
+    expect(scrollView, findsOneWidget);
+    expect(
+      find.descendant(
+        of: scrollView,
+        matching: find.text('Senior Flutter Developer'),
+      ),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(find.text('footer'), 200);
+    expect(
+      tester.getTopLeft(find.text('footer')).dy,
+      greaterThan(
+        tester.getBottomLeft(find.text('Senior Flutter Developer')).dy,
+      ),
+    );
+    expect(find.byType(FooterWidget), findsNothing);
+  });
+
+  testWidgets('should keep the scroll view and update the matches when they '
+      'load', (tester) async {
+    final states = StreamController<JobOpeningsState>();
+    addTearDown(states.close);
+    final bloc = MockJobOpeningsBloc()
+      ..stubStates(states.stream, initialState: const JobOpeningsState());
+    await pumpBloc(tester, bloc);
+    final scrollViewWhileLoading = tester.widget<CustomScrollView>(
+      find.byType(CustomScrollView),
+    );
+
+    states.add(
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [jobOpeningEntityFixture()],
+      ),
+    );
+    await pumpAnimations(tester);
+
+    expect(
+      tester.widget<CustomScrollView>(find.byType(CustomScrollView)),
+      same(scrollViewWhileLoading),
+    );
+    expect(find.text('Senior Flutter Developer'), findsOneWidget);
+    expect(find.byType(DSLoadingWidget), findsNothing);
   });
 }

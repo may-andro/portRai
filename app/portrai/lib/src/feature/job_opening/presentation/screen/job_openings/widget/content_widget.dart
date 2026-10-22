@@ -10,7 +10,6 @@ import 'package:portrai/src/feature/job_opening/presentation/route/_route.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/job_opening_screen.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
@@ -26,14 +25,11 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Each section rebuilds only for its own part of the state, so loading
-    // the job search setting or the footer does not rebuild the list.
-    return CustomScrollView(
-      scrollBehavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(scrollbars: false, overscroll: false),
-      physics: const BouncingScrollPhysics(),
-      slivers: [
+    return ScreenContentWidget<JobOpeningsBloc, JobOpeningsState>(
+      // Each section rebuilds only for its own part of the state, so loading
+      // the job search setting does not rebuild the list.
+      buildWhen: (_, _) => false,
+      contentOf: (_) => ScreenLoadedContent.slivers([
         BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
           buildWhen: (previous, current) =>
               previous.status != current.status ||
@@ -80,27 +76,18 @@ class ContentWidget extends StatelessWidget {
                         context.bloc.add(const JobOpeningsRetryClickEvent()),
                   ),
                   JobOpeningsStatus.loaded when state.jobOpenings.isEmpty =>
-                    const ScreenLoadedContent(
+                    const ScreenLoadedContent.slivers([
                       SliverToBoxAdapter(child: _EmptyWidget()),
-                    ),
-                  JobOpeningsStatus.loaded => ScreenLoadedContent(
+                    ]),
+                  JobOpeningsStatus.loaded => ScreenLoadedContent.slivers([
                     _GridWidget(jobOpenings: state.jobOpenings),
-                  ),
+                  ]),
                 },
               ),
             ],
           ),
         ),
-        BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
-          buildWhen: (previous, current) => previous.profile != current.profile,
-          builder: (context, state) => switch (state.profile) {
-            final profile? => SliverToBoxAdapter(
-              child: FooterWidget(profile: profile),
-            ),
-            null => const SliverToBoxAdapter(),
-          },
-        ),
-      ],
+      ]),
     );
   }
 }
