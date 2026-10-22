@@ -1,3 +1,4 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,16 +29,73 @@ void main() {
     return bloc;
   }
 
-  testWidgets('should hide chat when the remote rollout is unavailable', (
+  testWidgets('should show the loader when access is being checked', (
     tester,
   ) async {
+    await pumpContent(tester, const RemoteAssistantState());
+    expect(find.byType(DSLoadingWidget), findsOneWidget);
+    expect(find.byType(AssistantConversationWidget), findsNothing);
+    expect(find.byType(DSErrorCardWidget), findsNothing);
+  });
+
+  testWidgets('should show the error card without chat when the remote '
+      'rollout is unavailable', (tester) async {
     await pumpContent(
       tester,
       const RemoteAssistantState(status: RemoteAssistantStatus.unavailable),
     );
     expect(find.byType(AssistantConversationWidget), findsNothing);
-    expect(find.byType(DSTextWidget), findsOneWidget);
-    expect(find.byType(FilledButton), findsNothing);
+    expect(find.byType(DSErrorCardWidget), findsOneWidget);
+    expect(find.text('The cloud assistant is not available.'), findsOneWidget);
+    expect(find.byType(DSButtonWidget), findsNothing);
+  });
+
+  testWidgets('should show the loader without chat when the context is '
+      'loading', (tester) async {
+    await pumpContent(
+      tester,
+      const RemoteAssistantState(
+        status: RemoteAssistantStatus.ready,
+        isLoadingContext: true,
+      ),
+    );
+    expect(find.byType(DSLoadingWidget), findsOneWidget);
+    expect(find.byType(AssistantConversationWidget), findsNothing);
+  });
+
+  testWidgets('should rebuild the chat when a new message arrives', (
+    tester,
+  ) async {
+    final bloc = MockRemoteAssistantBloc();
+    addTearDown(bloc.close);
+    const ready = RemoteAssistantState(
+      status: RemoteAssistantStatus.ready,
+      portfolioContext: 'Portfolio',
+    );
+    whenListen(
+      bloc,
+      Stream.value(
+        ready.copyWith(
+          messages: const [
+            AssistantMessageEntity(
+              content: AssistantTextResponseEntity(text: 'New answer'),
+              isUser: false,
+            ),
+          ],
+        ),
+      ),
+      initialState: ready,
+    );
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: BlocProvider<RemoteAssistantBloc>.value(
+          value: bloc,
+          child: const ContentWidget(),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('New answer'), findsOneWidget);
   });
 
   for (final (role, expected, notExpected) in [
@@ -130,6 +188,7 @@ void main() {
       const RemoteAssistantState(status: RemoteAssistantStatus.ready),
     );
     expect(find.byType(AssistantConversationWidget), findsNothing);
+    expect(find.byType(DSErrorCardWidget), findsOneWidget);
     expect(find.byType(DSButtonWidget), findsOneWidget);
     await tester.tap(find.text('Retry'));
     verify(() => bloc.add(const RemoteAssistantStartedEvent())).called(1);
