@@ -9,6 +9,7 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/data/cache/_cache.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_context_selector.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_direct_answerer.dart';
+import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_model_download.dart';
 import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/repository/_repository.dart';
@@ -19,16 +20,19 @@ class FlutterEdgeAiLocalAssistantRepository
   FlutterEdgeAiLocalAssistantRepository(
     this._enabledCache, {
     required IsFeatureEnabledUseCase this._isFeatureEnabled,
-  });
+  }) : _modelDownload = LocalAssistantModelDownload.process;
 
   @visibleForTesting
   FlutterEdgeAiLocalAssistantRepository.withModelLoader(
     this._modelLoader, {
     LocalAssistantEnabledCache? enabledCache,
     this._isFeatureEnabled,
-  }) : _enabledCache = enabledCache ?? LocalAssistantEnabledCache();
+    LocalAssistantModelDownload? modelDownload,
+  }) : _enabledCache = enabledCache ?? LocalAssistantEnabledCache(),
+       _modelDownload = modelDownload ?? LocalAssistantModelDownload();
 
   final LocalAssistantEnabledCache _enabledCache;
+  final LocalAssistantModelDownload _modelDownload;
   final IsFeatureEnabledUseCase? _isFeatureEnabled;
   int _generation = 0;
   bool _requestActive = false;
@@ -81,11 +85,12 @@ class FlutterEdgeAiLocalAssistantRepository
 
   Future<void>? _initialization;
   Future<void>? _preparation;
+  // Read when a download starts; a running download keeps its setting.
+  bool _showsDownloadNotification = false;
   Future<InferenceModel> Function(void Function(int))? _modelLoader;
   InferenceModel? _model;
   InferenceChat? _chat;
   String? _previousQuestion;
-  CancelToken? _cancelToken;
   // The last decoded portfolio context and its source. Questions about the
   // same portfolio reuse it instead of decoding the JSON again.
   String? _decodedPortfolioSource;
@@ -123,28 +128,45 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   @override
-  Future<void> prepareModel({required void Function(int) onProgress}) async {
+  Future<void> prepareModel({
+    required void Function(int) onProgress,
+    bool showsNotification = false,
+  }) async {
+    _showsDownloadNotification = showsNotification;
     await _ensureFeatureEnabled();
     if (_model != null) return;
     await (_preparation ??= _prepareModel(onProgress));
   }
 
   Future<InferenceModel> _loadModel(void Function(int) onProgress) async {
+    final generation = _generation;
     await _initialize();
-    final cancelToken = _cancelToken = CancelToken();
-    await FlutterEdgeAi.installModel(
-          modelType: ModelType.gemma4,
-          fileType: ModelFileType.litertlm,
-        )
-        .fromHuggingFace(
-          _modelRepository,
-          file: _modelFile,
-          revision: _modelRevision,
-        )
-        .withProgress(onProgress)
-        .withCancelToken(cancelToken)
-        .install();
+    // Joins a download another instance of this process already started.
+    // With notifications allowed, it shows its progress in a notification
+    // and, on Android, runs in the foreground, so it continues while the app
+    // is in the background and a relaunch attaches to it instead of starting
+    // over.
+    await _modelDownload.run(
+      (cancelToken, onDownloadProgress) =>
+          FlutterEdgeAi.installModel(
+                modelType: ModelType.gemma4,
+                fileType: ModelFileType.litertlm,
+              )
+              .fromHuggingFace(
+                _modelRepository,
+                file: _modelFile,
+                revision: _modelRevision,
+                foreground: _showsDownloadNotification,
+              )
+              .withProgress(onDownloadProgress)
+              .withCancelToken(cancelToken)
+              .install(),
+      onProgress: onProgress,
+    );
     onProgress(100);
+    // A repository disposed meanwhile must not load a second copy of the
+    // model into memory.
+    _ensureCurrent(generation);
 
     return await FlutterEdgeAi.getActiveModel(
       maxTokens: _maxTokens,
@@ -351,7 +373,8 @@ class FlutterEdgeAiLocalAssistantRepository
   @override
   Future<void> cancelPreparation() async {
     final pending = _preparation;
-    _cancelToken?.cancel('The assistant was turned off.');
+    // The download may belong to an earlier instance of this repository.
+    await _modelDownload.cancel('The assistant was turned off.');
     try {
       await pending;
     } on Object {
@@ -391,6 +414,8 @@ class FlutterEdgeAiLocalAssistantRepository
 
   @override
   Future<void> dispose() async {
+    // A running download is left to finish: an in-app restart disposes this
+    // instance, and the next one joins the download instead of restarting it.
     _generation++;
     await _chat?.close();
     await _model?.close();

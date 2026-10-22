@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
+import '../../../../../../../mock/feature/permission/domain/use_case/mock_is_permission_supported_use_case.dart';
 import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 
 void main() {
@@ -21,15 +23,19 @@ void main() {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
     late MockGetGuestUserUseCase getGuestUserUseCase;
+    late MockIsPermissionSupportedUseCase isPermissionSupported;
 
     SettingBloc buildBloc() => SettingBloc(
       isFeatureEnabledUseCase,
       BuildConfig(buildEnvironment: BuildEnvironment.prod),
       local,
       getGuestUserUseCase,
+      isPermissionSupported,
     );
 
     setUp(() {
+      isPermissionSupported = MockIsPermissionSupportedUseCase()
+        ..stubCall(AppPermission.notifications, isSupported: false);
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase()
         ..stubCall(
           definition: LocalAssistantFeatureFlags.aiAssistant,
@@ -150,6 +156,7 @@ void main() {
         BuildConfig(buildEnvironment: BuildEnvironment.staging),
         local,
         getGuestUserUseCase,
+        isPermissionSupported,
       ),
       act: (bloc) => bloc.add(const LoadSettingsEvent()),
       expect: () => const [
@@ -285,5 +292,25 @@ void main() {
         ],
       );
     }
+
+    blocTest<SettingBloc, SettingState>(
+      'should offer the notification setting when the platform supports it',
+      setUp: () {
+        isFeatureEnabledUseCase.stubCall(
+          definition: SettingFeatureFlags.languageSelector,
+          result: const Right<IsFeatureEnabledFailure, bool>(false),
+        );
+        isPermissionSupported.stubCall(
+          AppPermission.notifications,
+          isSupported: true,
+        );
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadSettingsEvent()),
+      verify: (bloc) => expect(
+        (bloc.state as SettingLoadedState).isNotificationSettingAvailable,
+        isTrue,
+      ),
+    );
   });
 }

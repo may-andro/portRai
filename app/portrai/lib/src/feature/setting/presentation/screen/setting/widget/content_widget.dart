@@ -4,6 +4,7 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/developer_menu_screen.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
@@ -38,6 +39,12 @@ class ContentWidget extends StatelessWidget {
                 title: context.localizations.settingRoleSection,
               ),
               RoleCardWidget(role: userRole),
+            ],
+            if (state.isNotificationSettingAvailable) ...[
+              SectionTitleWidget(
+                title: context.localizations.settingNotificationSection,
+              ),
+              const NotificationPermissionCardWidget(),
             ],
             if (state.isLocalAssistantAvailable) ...[
               SectionTitleWidget(title: context.localizations.assistantTitle),

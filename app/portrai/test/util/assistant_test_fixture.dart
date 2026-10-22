@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_po
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_bloc.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/feature_flag/remote_assistant_feature_flags.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_bloc.dart';
@@ -27,6 +28,7 @@ import '../mock/feature/local_assistant/domain/use_case/mock_prepare_local_assis
 import '../mock/feature/local_assistant/domain/use_case/mock_reset_local_assistant_session_use_case.dart';
 import '../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
+import '../mock/feature/permission/domain/use_case/mock_request_permission_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_ask_remote_portfolio_question_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_is_remote_assistant_supported_use_case.dart';
 import '../mock/feature/remote_assistant/domain/use_case/mock_reset_remote_assistant_session_use_case.dart';
@@ -83,6 +85,11 @@ class AssistantTestFixture {
       IsFeatureEnabledUseCase(flagRepository),
       isLocalAssistantSupportedUseCase: isLocalAssistantSupportedUseCase,
       resetLocalAssistantSessionUseCase: resetLocal,
+      requestPermissionUseCase: MockRequestPermissionUseCase()
+        ..stubCall(
+          AppPermission.notifications,
+          const Right(AppPermissionStatus.granted),
+        ),
     );
     when(() => resetRemote()).thenAnswer((_) => const Right(null));
     remoteSupport.stubCall(Right(remoteSupported));
