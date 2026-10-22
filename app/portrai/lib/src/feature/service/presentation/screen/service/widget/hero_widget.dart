@@ -44,9 +44,9 @@ class _HeroWidgetState extends State<_HeroWidget>
                 child: _HeroAtmosphereWidget(animation: _backgroundController),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.horizontalPadding,
-                  vertical: context.space(factor: isWide ? 6 : 4),
+                padding: context.screenHorizontalPadding.copyWith(
+                  top: context.space(factor: isWide ? 6 : 4),
+                  bottom: context.space(factor: isWide ? 6 : 4),
                 ),
                 child: Center(
                   child: ConstrainedBox(

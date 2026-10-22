@@ -53,16 +53,3 @@ class ContentWidget extends StatelessWidget {
     );
   }
 }
-
-extension on BuildContext {
-  double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
-    }
-  }
-}
