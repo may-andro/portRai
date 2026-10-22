@@ -233,6 +233,83 @@ void main() {
         expect(find.text('Reintentar'), findsOneWidget);
       },
     );
+
+    Future<void> pumpWithFooter(
+      WidgetTester tester,
+      ScreenContent content,
+    ) async {
+      final cubit = MockScreenContentCubit()
+        ..stubStates(const FakeLoadedState());
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: ScreenFooterProviderWidget(
+            footer: const Text('footer'),
+            child: BlocProvider<MockScreenContentCubit>.value(
+              value: cubit,
+              child:
+                  ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
+                    contentOf: (_) => content,
+                  ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets(
+      'should scroll the slivers followed by the footer when the content '
+      'is scrollable',
+      (tester) async {
+        await pumpWithFooter(
+          tester,
+          const ScreenLoadedContent.slivers([
+            SliverToBoxAdapter(child: Text('loaded content')),
+          ]),
+        );
+
+        expect(find.byType(CustomScrollView), findsOneWidget);
+        expect(find.text('loaded content'), findsOneWidget);
+        expect(find.text('footer'), findsOneWidget);
+        expect(
+          tester.getTopLeft(find.text('footer')).dy,
+          greaterThan(tester.getTopLeft(find.text('loaded content')).dy),
+        );
+      },
+    );
+
+    testWidgets('should not add the footer when the content is full screen', (
+      tester,
+    ) async {
+      await pumpWithFooter(
+        tester,
+        const ScreenLoadedContent.fullScreen(Text('loaded content')),
+      );
+
+      expect(find.text('loaded content'), findsOneWidget);
+      expect(find.text('footer'), findsNothing);
+    });
+
+    testWidgets(
+      'should show scrollable content without a footer when none is provided',
+      (tester) async {
+        await pumpContent(
+          tester,
+          const ScreenLoadedContent.slivers([
+            SliverToBoxAdapter(child: Text('loaded content')),
+          ]),
+        );
+
+        expect(find.text('loaded content'), findsOneWidget);
+        expect(find.text('footer'), findsNothing);
+      },
+    );
+
+    testWidgets('should not add the footer while loading', (tester) async {
+      await pumpWithFooter(tester, const ScreenLoadingContent());
+
+      expect(find.byType(DSLoadingWidget), findsOneWidget);
+      expect(find.text('footer'), findsNothing);
+    });
   });
 
   group('ScreenContentSliverWidget', () {
@@ -281,6 +358,38 @@ void main() {
       );
 
       expect(find.text('loaded content'), findsOneWidget);
+    });
+
+    testWidgets('should show the loaded slivers without a footer when loaded', (
+      tester,
+    ) async {
+      final cubit = MockScreenContentCubit()
+        ..stubStates(const FakeLoadedState());
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: ScreenFooterProviderWidget(
+            footer: const Text('footer'),
+            child: BlocProvider<MockScreenContentCubit>.value(
+              value: cubit,
+              child: CustomScrollView(
+                slivers: [
+                  ScreenContentSliverWidget<
+                    MockScreenContentCubit,
+                    FakeScreenState
+                  >(
+                    contentOf: (_) => const ScreenLoadedContent.slivers([
+                      SliverToBoxAdapter(child: Text('loaded content')),
+                    ]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('loaded content'), findsOneWidget);
+      expect(find.text('footer'), findsNothing);
     });
   });
 }

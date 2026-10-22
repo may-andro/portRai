@@ -45,16 +45,33 @@ final class ScreenErrorContent extends ScreenContent {
 }
 
 final class ScreenLoadedContent extends ScreenContent {
-  const ScreenLoadedContent(this.child);
+  const ScreenLoadedContent(Widget this.child)
+    : slivers = null,
+      scrollController = null;
 
-  final Widget child;
+  /// Scrollable content; the screen footer is added after [slivers].
+  const ScreenLoadedContent.slivers(
+    List<Widget> this.slivers, {
+    this.scrollController,
+  }) : child = null;
+
+  /// Content that fills the screen and scrolls itself, such as a chat; it has
+  /// no screen footer.
+  const ScreenLoadedContent.fullScreen(Widget this.child)
+    : slivers = null,
+      scrollController = null;
+
+  final Widget? child;
+  final List<Widget>? slivers;
+  final ScrollController? scrollController;
 
   @override
   String get trackingLabel => 'loaded_content_view';
 }
 
-/// Builds the loading indicator, error card or loaded [ScreenLoadedContent.child]
-/// for the state of bloc [B]. When [onContentVisible] is given, it is called
+/// Builds the loading indicator, error card or loaded content for the state of
+/// bloc [B]. Scrollable loaded content ends with the footer from
+/// [ScreenFooterProviderWidget]. When [onContentVisible] is given, it is called
 /// the first time each one is seen.
 ///
 /// Loading always shows the lottie loader so every screen looks the same.
@@ -88,7 +105,12 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
       builder: (context, state) {
         final content = contentOf(state);
         final child = switch (content) {
-          ScreenLoadedContent(:final child) => child,
+          ScreenLoadedContent(:final slivers?, :final scrollController) =>
+            _ScrollableContentWidget(
+              slivers: slivers,
+              scrollController: scrollController,
+            ),
+          ScreenLoadedContent(:final child?) => child,
           _ => Center(child: _statusWidgetFor(content)),
         };
         final onContentVisible = this.onContentVisible;
@@ -104,9 +126,8 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
   }
 }
 
-/// [ScreenContentWidget] for a section of a scroll view: the loaded
-/// [ScreenLoadedContent.child] must be a sliver, and loading and error are
-/// shown as box slivers.
+/// [ScreenContentWidget] for a section of a scroll view: loaded content is
+/// shown as slivers without a footer, and loading and error as box slivers.
 ///
 /// Rebuilds only when the state type changes unless [buildWhen] is given.
 class ScreenContentSliverWidget<B extends StateStreamable<S>, S>
@@ -129,7 +150,10 @@ class ScreenContentSliverWidget<B extends StateStreamable<S>, S>
       builder: (context, state) {
         final content = contentOf(state);
         return switch (content) {
-          ScreenLoadedContent(:final child) => child,
+          ScreenLoadedContent(:final slivers?) => SliverMainAxisGroup(
+            slivers: slivers,
+          ),
+          ScreenLoadedContent(:final child?) => child,
           _ => SliverToBoxAdapter(child: _statusWidgetFor(content)),
         };
       },
@@ -176,7 +200,57 @@ Widget _statusWidgetFor(ScreenContent content) {
             retryLabel: context.localizations.retry,
           ),
         ),
-      ScreenLoadedContent(:final child) => child,
+      ScreenLoadedContent() => const SizedBox.shrink(),
     },
   );
+}
+
+/// Provides the footer that [ScreenContentWidget] adds after scrollable
+/// loaded content.
+class ScreenFooterProviderWidget extends InheritedWidget {
+  const ScreenFooterProviderWidget({
+    required this.footer,
+    required super.child,
+    super.key,
+  });
+
+  final Widget footer;
+
+  static Widget? maybeFooterOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ScreenFooterProviderWidget>()
+        ?.footer;
+  }
+
+  @override
+  bool updateShouldNotify(ScreenFooterProviderWidget oldWidget) {
+    return footer != oldWidget.footer;
+  }
+}
+
+/// Scrolls [slivers] followed by the provided screen footer.
+class _ScrollableContentWidget extends StatelessWidget {
+  const _ScrollableContentWidget({
+    required this.slivers,
+    required this.scrollController,
+  });
+
+  final List<Widget> slivers;
+  final ScrollController? scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    final footer = ScreenFooterProviderWidget.maybeFooterOf(context);
+    return CustomScrollView(
+      controller: scrollController,
+      scrollBehavior: ScrollConfiguration.of(
+        context,
+      ).copyWith(scrollbars: false, overscroll: false),
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        ...slivers,
+        if (footer != null) SliverToBoxAdapter(child: footer),
+      ],
+    );
+  }
 }
