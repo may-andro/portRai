@@ -80,5 +80,25 @@ void main() {
         expect(alphaAt(pixels, 1, 1), 0);
       },
     );
+
+    test(
+      'should clear every backdrop pixel when the fill spans several slices',
+      () async {
+        // More pixels than one slice, so the fill yields to the event loop.
+        const largeSize = 300;
+        final pixels = Uint8List(largeSize * largeSize * 4)
+          ..fillRange(0, largeSize * largeSize * 4, 255);
+
+        await clearBackdrop(pixels, width: largeSize, height: largeSize);
+
+        for (
+          var pixelIndex = 0;
+          pixelIndex < largeSize * largeSize;
+          pixelIndex++
+        ) {
+          expect(pixels[pixelIndex * 4 + 3], 0);
+        }
+      },
+    );
   });
 }
