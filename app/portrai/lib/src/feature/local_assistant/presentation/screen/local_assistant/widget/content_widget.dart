@@ -29,7 +29,7 @@ class ContentWidget extends StatelessWidget {
           );
         }
         if (state.isLoadingContext) {
-          return const DSLoadingWidget(size: 40);
+          return const DSLoadingWidget(style: DSLoadingStyle.lottie, size: 40);
         }
         if (state.hasError && state.portfolioContext == null) {
           return Center(
