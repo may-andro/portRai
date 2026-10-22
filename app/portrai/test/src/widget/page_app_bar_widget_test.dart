@@ -114,4 +114,57 @@ void main() {
       );
     }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
   });
+
+  group('PageTopBarWidget', () {
+    Future<void> pumpPushedTopBar(WidgetTester tester) async {
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const Scaffold(
+                    body: PageTopBarWidget(
+                      title: 'Title',
+                      actions: [Icon(Icons.refresh)],
+                    ),
+                  ),
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+      'should show the logo header with the actions and no back button when '
+      'the platform shows the header',
+      (tester) async {
+        await pumpPushedTopBar(tester);
+
+        expect(find.byType(PageHeaderWidget), findsOneWidget);
+        expect(find.byIcon(Icons.refresh), findsOneWidget);
+        expect(find.byType(BackButton), findsNothing);
+      },
+      variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+    );
+
+    testWidgets(
+      'should show the title, the actions and the close button but no back '
+      'button when the platform shows a title bar',
+      (tester) async {
+        await pumpPushedTopBar(tester);
+
+        expect(find.text('Title'), findsOneWidget);
+        expect(find.byIcon(Icons.refresh), findsOneWidget);
+        expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+        expect(find.byType(BackButton), findsNothing);
+      },
+      variant: TargetPlatformVariant.only(TargetPlatform.android),
+    );
+  });
 }
