@@ -44,11 +44,9 @@ final class ScreenErrorContent extends ScreenContent {
   String get trackingLabel => 'error_content_view';
 }
 
+/// Loaded content: [ScreenLoadedContent.slivers] for screens, which always
+/// end with the screen footer, or [ScreenLoadedContent.fullScreen].
 final class ScreenLoadedContent extends ScreenContent {
-  const ScreenLoadedContent(Widget this.child)
-    : slivers = null,
-      scrollController = null;
-
   /// Scrollable content; the screen footer is added after [slivers].
   const ScreenLoadedContent.slivers(
     List<Widget> this.slivers, {
@@ -153,7 +151,9 @@ class ScreenContentSliverWidget<B extends StateStreamable<S>, S>
           ScreenLoadedContent(:final slivers?) => SliverMainAxisGroup(
             slivers: slivers,
           ),
-          ScreenLoadedContent(:final child?) => child,
+          ScreenLoadedContent(:final child?) => SliverToBoxAdapter(
+            child: child,
+          ),
           _ => SliverToBoxAdapter(child: _statusWidgetFor(content)),
         };
       },

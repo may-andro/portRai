@@ -28,7 +28,7 @@ void main() {
               contentOf: (state) => switch (state) {
                 FakeLoadingState() => const ScreenLoadingContent(),
                 FakeErrorState() => const ScreenErrorContent(UnknownFailure()),
-                FakeLoadedState() => const ScreenLoadedContent(
+                FakeLoadedState() => const ScreenLoadedContent.fullScreen(
                   Text('loaded content'),
                 ),
               },
@@ -114,8 +114,9 @@ void main() {
               value: cubit,
               child:
                   ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
-                    contentOf: (_) =>
-                        const ScreenLoadedContent(Text('loaded content')),
+                    contentOf: (_) => const ScreenLoadedContent.fullScreen(
+                      Text('loaded content'),
+                    ),
                   ),
             ),
           ),
@@ -352,9 +353,9 @@ void main() {
     testWidgets('should show the loaded sliver when loaded', (tester) async {
       await pumpSliverContent(
         tester,
-        const ScreenLoadedContent(
+        const ScreenLoadedContent.slivers([
           SliverToBoxAdapter(child: Text('loaded content')),
-        ),
+        ]),
       );
 
       expect(find.text('loaded content'), findsOneWidget);
