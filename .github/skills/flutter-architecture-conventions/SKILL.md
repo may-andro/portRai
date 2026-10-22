@@ -107,7 +107,8 @@ Every screen renders its content with `ScreenContentWidget`
 - **Loaded content** is `ScreenLoadedContent.slivers([...], scrollController:)`. The widget builds
   the scroll view and always ends it with the screen footer that the app provides through
   `ScreenFooterProviderWidget`, so screens never place `FooterWidget` themselves and blocs don't
-  load the profile for it. The page header (such as `PageAppBarWidget`) is one of the slivers.
+  load the profile for it. Content shorter than the screen is padded to the screen height, so the
+  footer always starts below a full screen of content. The page header (such as `PageAppBarWidget`) is one of the slivers.
   Only content that fills the screen and scrolls itself, such as a chat, uses
   `ScreenLoadedContent.fullScreen(child)`, which has no footer.
 - **Rebuilds** happen only when the state type changes unless `buildWhen` is given. Pass
