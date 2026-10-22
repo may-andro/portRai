@@ -31,7 +31,9 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DSLoadingWidget), findsOneWidget);
-      verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+      verify(
+        () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+      ).called(1);
     });
 
     testWidgets('should render an error card when loading fails', (
@@ -70,7 +72,9 @@ void main() {
       await tester.pump();
 
       expect(find.byType(ExperienceListWidget), findsOneWidget);
-      verify(() => bloc.add(ViewStateVisibleEvent.success())).called(1);
+      verify(
+        () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
+      ).called(1);
     });
   });
 }

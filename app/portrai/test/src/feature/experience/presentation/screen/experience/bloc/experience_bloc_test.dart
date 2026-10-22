@@ -223,7 +223,7 @@ void main() {
       act: (bloc) {
         bloc.add(const ScreenVisibleEvent());
         bloc.add(const SectionVisibleEvent('overview'));
-        bloc.add(ViewStateVisibleEvent.success());
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
         bloc.add(const HeaderTabClickEvent('technologies'));
       },
       expect: () => const <ExperienceState>[],

@@ -30,7 +30,9 @@ void main() {
         await tester.pump();
 
         expect(find.byType(DSLoadingWidget), findsOneWidget);
-        verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+        ).called(1);
       },
     );
 
@@ -51,7 +53,9 @@ void main() {
         await tester.pump();
 
         expect(find.byType(DSErrorCardWidget), findsOneWidget);
-        verify(() => bloc.add(ViewStateVisibleEvent.error())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('error_content_view')),
+        ).called(1);
       },
     );
 

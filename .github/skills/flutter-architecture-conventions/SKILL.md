@@ -95,6 +95,30 @@ Use `design_system` components whenever an equivalent exists. Render user-facing
 `context.colorPalette`; do not use Flutter `Text` as a shortcut. Prefer DS buttons, icons, app-bar
 components, and spacers where they fit without changing the screen's behavior or required layout.
 
+## Screen content states and padding
+A screen whose bloc has loading, error and loaded states renders them with
+`ScreenContentWidget` (`lib/src/widget/screen_content_widget.dart`) instead of its own
+`_LoadingWidget`/`_ErrorWidget`. It shows `DSLoadingWidget` or a translated
+`DSErrorCardWidget`, reports each content's impression once, and rebuilds only when the state
+type changes unless `buildWhen` is given. Report the impression as a
+`ViewStateVisibleEvent(content.trackingLabel)`.
+
+```dart
+return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
+  impressionPrefix: 'experiences',
+  contentOf: (state) => switch (state) {
+    LoadingState() => const ScreenLoadingContent(),
+    ErrorState(:final failure) => ScreenErrorContent(failure),
+    LoadedState(:final experiences) => ScreenLoadedContent(_SuccessWidget(experiences)),
+  },
+  onContentVisible: (content) =>
+      context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
+);
+```
+
+Use the design system's `context.screenHorizontalPadding` for a screen's horizontal padding;
+don't redeclare the mobile/tablet/desktop switch in a private `BuildContext` extension.
+
 ## Presentation extensions
 Extensions that need `BuildContext`/localization (e.g. formatting an entity for display) live in `presentation/extension/` with an `_extension.dart` barrel, exported from `presentation/_presentation.dart`. Never put them in the domain layer or in `widget/`. Examples: `experience_date_range_extension.dart`, `project_date_range_extension.dart`, `locale_code_extension.dart`. Screen-specific ones sit next to their screen (`screen/<name>/extension/`).
 

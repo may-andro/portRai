@@ -1,72 +1,29 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/widget/_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExperiencesBloc, ExperiencesState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
-      },
-      builder: (context, state) {
-        return switch (state) {
-          final LoadingState _ => const _LoadingWidget(),
-          final LoadedState state => _SuccessWidget(
-            experiences: state.experiences,
-            profile: state.profile,
-          ),
-          final ErrorState state => _ErrorWidget(
-            message: FailureTranslator.translate(context, state.failure),
-          ),
-        };
-      },
-    );
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'experiences_loading_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
-      child: DSLoadingWidget(
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
-    );
-  }
-}
-
-class _ErrorWidget extends StatelessWidget {
-  const _ErrorWidget({required this.message});
-
-  final String? message;
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'experiences_error_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(context.space()),
-          child: DSErrorCardWidget(message: message),
+    return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
+      impressionPrefix: 'experiences',
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(),
+        ErrorState(:final failure) => ScreenErrorContent(failure),
+        LoadedState(:final experiences, :final profile) => ScreenLoadedContent(
+          _SuccessWidget(experiences: experiences, profile: profile),
         ),
-      ),
+      },
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
 }
@@ -79,48 +36,31 @@ class _SuccessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'experiences_success_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
-      child: CustomScrollView(
-        scrollBehavior: ScrollConfiguration.of(
-          context,
-        ).copyWith(scrollbars: false, overscroll: false),
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          PageAppBarWidget(title: context.localizations.experiencesTitle),
-          SliverPadding(
-            padding: EdgeInsets.symmetric(
-              vertical: context.space(factor: 3),
-              horizontal: context.horizontalPadding,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: ExperienceListWidget(
-                experiences: experiences,
-                isVisible: true,
-              ),
+    return CustomScrollView(
+      scrollBehavior: ScrollConfiguration.of(
+        context,
+      ).copyWith(scrollbars: false, overscroll: false),
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        PageAppBarWidget(title: context.localizations.experiencesTitle),
+        SliverPadding(
+          padding: context.screenHorizontalPadding.copyWith(
+            top: context.space(factor: 3),
+            bottom: context.space(factor: 3),
+          ),
+          sliver: SliverToBoxAdapter(
+            child: ExperienceListWidget(
+              experiences: experiences,
+              isVisible: true,
             ),
           ),
-          if (profile case final ProfileEntity profile)
-            SliverPadding(
-              padding: EdgeInsets.only(top: context.space(factor: 3)),
-              sliver: SliverToBoxAdapter(child: FooterWidget(profile: profile)),
-            ),
-        ],
-      ),
+        ),
+        if (profile case final ProfileEntity profile)
+          SliverPadding(
+            padding: EdgeInsets.only(top: context.space(factor: 3)),
+            sliver: SliverToBoxAdapter(child: FooterWidget(profile: profile)),
+          ),
+      ],
     );
-  }
-}
-
-extension on BuildContext {
-  double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
-    }
   }
 }

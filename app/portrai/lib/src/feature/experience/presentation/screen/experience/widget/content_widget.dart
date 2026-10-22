@@ -1,13 +1,10 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/widget/section_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'desktop_content_widget.dart';
 part 'mobile_tablet_content_widget.dart';
@@ -18,57 +15,19 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExperienceBloc, ExperienceState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
-      },
-      builder: (context, state) {
-        return switch (state) {
-          final LoadingState _ => const _LoadingWidget(),
-          final LoadedState state => _SuccessWidget(
-            experience: state.experience,
-          ),
-          final ErrorState state => _ErrorWidget(
-            message: FailureTranslator.translate(context, state.failure),
-          ),
-        };
-      },
-    );
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'experience_loading_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
-      child: DSLoadingWidget(
-        style: DSLoadingStyle.lottie,
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
-    );
-  }
-}
-
-class _ErrorWidget extends StatelessWidget {
-  const _ErrorWidget({required this.message});
-
-  final String? message;
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'experience_error_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(context.space()),
-          child: DSErrorCardWidget(message: message),
+    return ScreenContentWidget<ExperienceBloc, ExperienceState>(
+      impressionPrefix: 'experience',
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(
+          style: DSLoadingStyle.lottie,
         ),
-      ),
+        ErrorState(:final failure) => ScreenErrorContent(failure),
+        LoadedState(:final experience) => ScreenLoadedContent(
+          _SuccessWidget(experience: experience),
+        ),
+      },
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
 }
@@ -117,32 +76,28 @@ class _SuccessWidgetState extends State<_SuccessWidget>
 
   @override
   Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'experience_success_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
-      child: DSResponsiveContainerWidget(
-        mobileBuilder: (context) {
-          return _MobileTabletContentWidget(
-            experience: widget.experience,
-            scrollableSections: _scrollableSections,
-            scrollController: _scrollController,
-            tabController: _tabController,
-          );
-        },
-        tabletBuilder: (context) {
-          return _MobileTabletContentWidget(
-            experience: widget.experience,
-            scrollableSections: _scrollableSections,
-            scrollController: _scrollController,
-            tabController: _tabController,
-          );
-        },
-        desktopBuilder: (context) => _DesktopContentWidget(
+    return DSResponsiveContainerWidget(
+      mobileBuilder: (context) {
+        return _MobileTabletContentWidget(
           experience: widget.experience,
           scrollableSections: _scrollableSections,
           scrollController: _scrollController,
           tabController: _tabController,
-        ),
+        );
+      },
+      tabletBuilder: (context) {
+        return _MobileTabletContentWidget(
+          experience: widget.experience,
+          scrollableSections: _scrollableSections,
+          scrollController: _scrollController,
+          tabController: _tabController,
+        );
+      },
+      desktopBuilder: (context) => _DesktopContentWidget(
+        experience: widget.experience,
+        scrollableSections: _scrollableSections,
+        scrollController: _scrollController,
+        tabController: _tabController,
       ),
     );
   }
@@ -191,18 +146,5 @@ class _SectionListWidget extends StatelessWidget {
           ),
       ],
     );
-  }
-}
-
-extension on BuildContext {
-  double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
-    }
   }
 }
