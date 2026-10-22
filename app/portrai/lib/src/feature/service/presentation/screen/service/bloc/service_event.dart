@@ -10,7 +10,3 @@ sealed class ServiceEvent extends Equatable {
 }
 
 final class ScreenVisibleEvent extends ServiceEvent {}
-
-final class LoadProfileEvent extends ServiceEvent {
-  const LoadProfileEvent();
-}

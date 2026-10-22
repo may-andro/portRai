@@ -25,10 +25,7 @@ class ServiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) {
-        return appServiceLocator.get<ServiceBloc>()
-          ..add(const LoadProfileEvent());
-      },
+      create: (_) => appServiceLocator.get<ServiceBloc>(),
       child: Builder(
         builder: (context) {
           return RouteObserverWidget(
