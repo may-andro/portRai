@@ -12,10 +12,14 @@ class PageAppBarWidget extends StatelessWidget {
     required this.title,
     this.backgroundColor,
     this.titleColor,
+    this.actions = const [],
     super.key,
   });
 
   final String title;
+
+  /// Shown at the end of the bar on every platform, before the close button.
+  final List<Widget> actions;
   final Color? backgroundColor;
   final DSColor? titleColor;
 
@@ -23,7 +27,7 @@ class PageAppBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final chrome = PageChrome.current;
     if (chrome == PageChrome.header) {
-      return const SliverToBoxAdapter(child: PageHeaderWidget());
+      return SliverToBoxAdapter(child: PageHeaderWidget(actions: actions));
     }
 
     final palette = context.colorPalette;
@@ -44,6 +48,58 @@ class PageAppBarWidget extends StatelessWidget {
         maxLines: 1,
       ),
       actions: [
+        ...actions,
+        if (chrome == PageChrome.close && Navigator.of(context).canPop())
+          Padding(
+            padding: EdgeInsets.only(right: context.space()),
+            child: PageCloseButtonWidget(color: resolvedTitleColor.color),
+          ),
+      ],
+    );
+  }
+}
+
+/// [PageAppBarWidget] for pages whose content fills the screen and scrolls
+/// itself, such as a chat: the same header, but as a box above the content.
+class PageTopBarWidget extends StatelessWidget {
+  const PageTopBarWidget({
+    required this.title,
+    this.titleColor,
+    this.actions = const [],
+    super.key,
+  });
+
+  final String title;
+  final DSColor? titleColor;
+
+  /// Shown at the end of the bar on every platform, before the close button.
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final chrome = PageChrome.current;
+    if (chrome == PageChrome.header) {
+      return PageHeaderWidget(actions: actions);
+    }
+
+    final palette = context.colorPalette;
+    final resolvedTitleColor = titleColor ?? palette.neutral.grey9;
+    return AppBar(
+      elevation: context.dimen.elevationNone.value,
+      scrolledUnderElevation: context.dimen.elevationNone.value,
+      backgroundColor: palette.background.color,
+      surfaceTintColor: palette.neutral.transparent.color,
+      foregroundColor: resolvedTitleColor.color,
+      automaticallyImplyLeading: false,
+      centerTitle: true,
+      title: DSTextWidget(
+        title,
+        color: resolvedTitleColor,
+        style: context.typography.emphasizedTitleMedium,
+        maxLines: 1,
+      ),
+      actions: [
+        ...actions,
         if (chrome == PageChrome.close && Navigator.of(context).canPop())
           Padding(
             padding: EdgeInsets.only(right: context.space()),

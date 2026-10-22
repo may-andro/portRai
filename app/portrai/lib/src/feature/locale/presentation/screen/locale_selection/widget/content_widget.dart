@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/locale/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/_bloc.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'locale_list_widget.dart';
@@ -30,6 +31,7 @@ class ContentWidget extends StatelessWidget {
           ),
         ),
         final LoadedState state => ScreenLoadedContent.slivers([
+          PageAppBarWidget(title: context.localizations.language),
           SliverToBoxAdapter(child: _SuccessWidget(state, isDialog: isDialog)),
           const SliverToBoxAdapter(child: DSVerticalSpacerWidget(2)),
         ]),

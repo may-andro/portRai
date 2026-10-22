@@ -2,20 +2,15 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 
-class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
-  const AppBarWidget({super.key});
+/// The page header of the chat, with its actions.
+class TopBarWidget extends StatelessWidget {
+  const TopBarWidget({super.key});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
-  Widget build(BuildContext context) => AppBar(
-    title: DSTextWidget(
-      context.localizations.chatAssistantTitle,
-      color: context.colorPalette.neutral.grey9,
-      style: context.typography.emphasizedTitleMedium,
-    ),
+  Widget build(BuildContext context) => PageTopBarWidget(
+    title: context.localizations.chatAssistantTitle,
     actions: [
       Tooltip(
         message: context.localizations.chatAssistantClear,

@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/widget/_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/feature_flag/presentation/screen/feature_flag/bloc/mock_feature_flag_bloc.dart';
@@ -225,5 +226,99 @@ void main() {
         ).called(1);
       },
     );
+
+    testWidgets('should show no header actions when the flags are loading', (
+      tester,
+    ) async {
+      final bloc = MockFeatureFlagBloc()
+        ..stubState(const FeatureFlagLoadingState());
+
+      await pumpWidget(tester, bloc);
+
+      expect(find.byIcon(Icons.grid_view), findsNothing);
+      expect(find.byIcon(Icons.refresh), findsNothing);
+    });
+
+    testWidgets(
+      'should dispatch the view mode and reset events when the header actions '
+      'are tapped',
+      (tester) async {
+        final bloc = MockFeatureFlagBloc()
+          ..stubState(const FeatureFlagLoadedState(allFeatureFlags));
+
+        await pumpWidget(tester, bloc);
+        await tester.tap(find.byIcon(Icons.grid_view));
+        await tester.tap(find.byIcon(Icons.refresh));
+
+        verify(() => bloc.add(const ToggleViewModeEvent())).called(1);
+        verify(() => bloc.add(const ResetAllFeatureFlagsEvent())).called(1);
+      },
+    );
+
+    testWidgets(
+      'should show the list icon when the flags are shown in a grid',
+      (tester) async {
+        final bloc = MockFeatureFlagBloc()
+          ..stubState(
+            const FeatureFlagLoadedState(
+              allFeatureFlags,
+              viewMode: FeatureFlagViewMode.grid,
+            ),
+          );
+
+        await pumpWidget(tester, bloc);
+
+        expect(find.byIcon(Icons.view_list), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'should show the header actions next to the logo when shown in a wide '
+      'desktop window',
+      (tester) async {
+        tester.view.physicalSize = const Size(1440, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final bloc = MockFeatureFlagBloc()
+          ..stubState(const FeatureFlagLoadedState(allFeatureFlags));
+
+        await pumpWidget(tester, bloc);
+
+        expect(find.byType(PageHeaderWidget), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(PageHeaderWidget),
+            matching: find.byIcon(Icons.grid_view),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(PageHeaderWidget),
+            matching: find.byIcon(Icons.refresh),
+          ),
+          findsOneWidget,
+        );
+      },
+      variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+    );
+
+    testWidgets('should keep the search header pinned when the flags scroll', (
+      tester,
+    ) async {
+      final bloc = MockFeatureFlagBloc()
+        ..stubState(const FeatureFlagLoadedState(allFeatureFlags));
+      await pumpWidget(tester, bloc);
+      final searchTop = tester.getTopLeft(find.byType(HeaderWidget)).dy;
+
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HeaderWidget), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byType(HeaderWidget)).dy,
+        lessThanOrEqualTo(searchTop),
+      );
+    });
   });
 }

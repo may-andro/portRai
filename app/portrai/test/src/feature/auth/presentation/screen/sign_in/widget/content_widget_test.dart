@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/_bloc.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/widget/_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/page_header_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/auth/presentation/screen/sign_in/bloc/mock_sign_in_bloc.dart';
@@ -14,9 +15,10 @@ import '../../../../../../../util/test_wrapper_widget.dart';
 void main() {
   Future<MockSignInBloc> pumpContent(
     WidgetTester tester,
-    SignInState state,
-  ) async {
-    setUpAnimatedPage(tester);
+    SignInState state, {
+    Size size = const Size(1440, 2400),
+  }) async {
+    setUpAnimatedPage(tester, size: size);
     final bloc = MockSignInBloc()..stubState(state);
     addTearDown(bloc.close);
     await tester.pumpWidget(
@@ -144,4 +146,118 @@ void main() {
     );
     expect(find.byType(FooterWidget), findsNothing);
   });
+
+  double logoLeft(WidgetTester tester) {
+    return tester
+        .getTopLeft(
+          find.descendant(
+            of: find.byType(PageHeaderWidget),
+            matching: find.byType(Image),
+          ),
+        )
+        .dx;
+  }
+
+  testWidgets(
+    'should centre the welcome text under the illustration in the panel when '
+    'shown side by side',
+    (tester) async {
+      await pumpContent(tester, const SignInState());
+
+      // The panel takes 5 of the 9 columns of the 1440 wide window.
+      const panelCentre = 1440 * 5 / 9 / 2;
+      final illustration = find.byType(DSLottieIllustrationWidget).first;
+      expect(tester.getCenter(illustration).dx, closeTo(panelCentre, 1));
+      expect(
+        tester.getCenter(find.text('Welcome back')).dx,
+        closeTo(panelCentre, 1),
+      );
+      expect(
+        tester.getTopLeft(find.text('Welcome back')).dy,
+        greaterThan(tester.getBottomLeft(illustration).dy),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should start the welcome text and the form where the logo starts when '
+    'stacked',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(400, 1600),
+      );
+
+      expect(tester.getTopLeft(find.text('Welcome back')).dx, logoLeft(tester));
+      expect(
+        tester.getTopLeft(find.byType(TextFormField).first).dx,
+        logoLeft(tester),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should show the side by side layout without overflow when the window is '
+    'short',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(1440, 800),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Welcome back'), findsOneWidget);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should lay the header over the welcome band and start the welcome text '
+    'below it when stacked',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(820, 1600),
+      );
+
+      final band = find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).gradient is LinearGradient,
+      );
+      final headerBottom = tester
+          .getBottomLeft(find.byType(PageHeaderWidget))
+          .dy;
+      expect(tester.getTopLeft(band.first).dy, 0);
+      expect(tester.getTopLeft(find.byType(PageHeaderWidget)).dy, 0);
+      expect(
+        tester.getTopLeft(find.text('Welcome back')).dy,
+        greaterThan(headerBottom),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should start the form where the logo starts on a tablet when stacked',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(820, 1600),
+      );
+
+      expect(
+        tester.getTopLeft(find.byType(TextFormField).first).dx,
+        logoLeft(tester),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
 }

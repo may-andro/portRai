@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assist
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../util/assistant_test_fixture.dart';
@@ -288,6 +289,36 @@ void main() {
       await pumpEventQueue();
       verify(() => fixture.askLocal(any())).called(1);
       expect(fixture.local.state.isReady, isTrue);
+    },
+  );
+
+  testWidgets(
+    'should show the shared page header without a back button when opened '
+    'from another screen',
+    (tester) async {
+      final fixture = AssistantTestFixture(localEnabled: true);
+      await appServiceLocator.reset();
+      addTearDown(appServiceLocator.reset);
+      fixture.install();
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const LocalAssistantScreen(),
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PageTopBarWidget), findsOneWidget);
+      expect(find.byType(BackButton), findsNothing);
     },
   );
 }

@@ -70,7 +70,10 @@ class _HeaderWidgetState extends State<HeaderWidget> {
       radius: const DSRadius(0),
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: EdgeInsets.all(context.space(factor: 2)),
+        padding: context.screenHorizontalPadding.copyWith(
+          top: context.space(factor: 2),
+          bottom: context.space(factor: 2),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

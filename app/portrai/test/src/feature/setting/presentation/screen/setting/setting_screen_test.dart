@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/setting_
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/widget/app_version_widget.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import 'package:use_case/use_case.dart';
@@ -124,6 +125,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.byType(FooterWidget), findsNothing);
+        expect(find.byType(PageAppBarWidget), findsOneWidget);
         // The settings fill the screen, so the footer starts below it.
         final footer = find.text('footer', skipOffstage: false);
         expect(

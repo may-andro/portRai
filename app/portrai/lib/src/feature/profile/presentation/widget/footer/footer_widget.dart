@@ -123,7 +123,7 @@ class _MobileContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: context.horizontalScreenPadding,
+      padding: context.screenHorizontalPadding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +148,7 @@ class _TabletContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: context.horizontalScreenPadding,
+      padding: context.screenHorizontalPadding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         spacing: context.space(factor: 2),
@@ -189,8 +189,4 @@ class _DesktopContentWidget extends StatelessWidget {
       ],
     );
   }
-}
-
-extension on BuildContext {
-  EdgeInsets get horizontalScreenPadding => screenHorizontalPadding;
 }

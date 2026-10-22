@@ -6,19 +6,6 @@ import 'package:flutter/material.dart';
 /// Widest the page content grows, matching the other portfolio pages.
 const jobOpeningMaxContentWidth = 1100.0;
 
-extension JobOpeningPageExtension on BuildContext {
-  double get jobOpeningHorizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.12;
-    }
-  }
-}
-
 /// Centers [child] in the page column with the page's side padding.
 class JobOpeningPageColumnWidget extends StatelessWidget {
   const JobOpeningPageColumnWidget({
@@ -34,7 +21,7 @@ class JobOpeningPageColumnWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: context.jobOpeningHorizontalPadding,
+        horizontal: context.screenHorizontalPadding.left,
         vertical: verticalPadding,
       ),
       child: Center(
@@ -273,7 +260,7 @@ class JobOpeningBandSliverWidget extends StatelessWidget {
       ),
       sliver: SliverLayoutBuilder(
         builder: (context, constraints) {
-          final pagePadding = context.jobOpeningHorizontalPadding;
+          final pagePadding = context.screenHorizontalPadding.left;
           final contentWidth = min(
             constraints.crossAxisExtent - pagePadding * 2,
             jobOpeningMaxContentWidth,

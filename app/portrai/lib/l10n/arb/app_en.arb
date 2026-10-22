@@ -385,6 +385,10 @@
   "@settingDeveloperMode": {
     "description": "Button label for opening the developer mode menu"
   },
+  "settingTitle": "Settings",
+  "@settingTitle": {
+    "description": "Title of the settings screen"
+  },
   "splashContactSupport": "contact support",
   "@splashContactSupport": {
     "description": "Support contact link on splash error"

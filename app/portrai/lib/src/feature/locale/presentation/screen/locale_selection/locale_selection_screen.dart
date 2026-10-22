@@ -65,7 +65,6 @@ class LocaleSelectionScreen extends StatelessWidget {
         }
       },
       hasScaffold: !isDialog,
-      appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
       body: ContentWidget(isDialog: isDialog),
     );
   }
