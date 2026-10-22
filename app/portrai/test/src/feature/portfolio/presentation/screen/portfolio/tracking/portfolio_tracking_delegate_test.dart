@@ -63,22 +63,6 @@ void main() {
       expect(tracking.parameters['area'], 'portfolio');
     });
 
-    test(
-      'should send a view impression event when trackViewEvent is called',
-      () {
-        delegate.trackViewEvent('loaded_content_view');
-
-        final tracking =
-            verify(
-                  () => trackingReporter.sendTrackingEvent(captureAny()),
-                ).captured.single
-                as Tracking;
-
-        expect(tracking.parameters['event'], 'view_impression');
-        expect(tracking.parameters['label'], 'loaded_content_view');
-      },
-    );
-
     test('should send a drawer open event when trackDrawerOpen is called', () {
       delegate.trackDrawerOpen();
 

@@ -10,10 +10,13 @@ import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/tracking/_tracking.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/user/user.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 import 'package:use_case/use_case.dart';
 
 @register
-class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
+class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
+    with ScreenTrackingBlocMixin<PortfolioEvent, PortfolioState> {
   PortfolioBloc(
     this._getPortfolioUseCase,
     this._trackingDelegate,
@@ -25,8 +28,8 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
     on<DrawerClickEvent>(_mapDrawerClickEventToState);
     on<SectionNavigationEvent>(_mapSectionNavigationEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
-    on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
+    trackViewEventOn<SectionVisibleEvent>((event) => event.trackingId);
     on<AssistantLaunchClickEvent>(_mapAssistantLaunchClickEventToState);
   }
 
@@ -36,6 +39,9 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
   final GetGuestUserUseCase _getGuestUserUseCase;
   int _availabilityRevision = 0;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   Future<void> _mapLoadPortfolioEventToState(
     LoadPortfolioEvent event,
@@ -140,19 +146,5 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     } else {
       _trackingDelegate.trackDrawerClose();
     }
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<PortfolioState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
-  }
-
-  FutureOr<void> _mapSectionVisibleEventToState(
-    SectionVisibleEvent event,
-    Emitter<PortfolioState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }

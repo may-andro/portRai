@@ -58,5 +58,27 @@ void main() {
         ).called(1);
       },
     );
+    testWidgets(
+      'should dispatch drawer click events when the drawer opens and closes',
+      (tester) async {
+        tester.view.physicalSize = const Size(400, 800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final bloc = MockPortfolioBloc()..stubState(const LoadingState());
+        appServiceLocator.registerFactory<PortfolioBloc>(() => bloc);
+
+        await pumpScreen(tester);
+        final scaffold = tester.firstState<ScaffoldState>(
+          find.byType(Scaffold),
+        );
+        scaffold.openDrawer();
+        await tester.pump(const Duration(seconds: 1));
+        scaffold.closeDrawer();
+        await tester.pump(const Duration(seconds: 1));
+
+        verify(() => bloc.add(const DrawerClickEvent(true))).called(1);
+        verify(() => bloc.add(const DrawerClickEvent(false))).called(1);
+      },
+    );
   });
 }
