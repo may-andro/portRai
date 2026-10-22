@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
@@ -8,62 +6,25 @@ import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DeveloperMenuBloc, DeveloperMenuState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
-      },
-      builder: (context, state) {
-        return switch (state) {
-          DeveloperMenuInitialState() ||
-          DeveloperMenuLoadingState() => const _LoadingWidget(),
-          DeveloperMenuLoadedState() => const _SuccessWidget(),
-          final DeveloperMenuErrorState state => _ErrorWidget(
-            message: state.message,
-          ),
-        };
-      },
-    );
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'developer_menu_loading_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
-      child: DSLoadingWidget(
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
-    );
-  }
-}
-
-class _ErrorWidget extends StatelessWidget {
-  const _ErrorWidget({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'developer_menu_error_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(context.space()),
-          child: DSErrorCardWidget(message: message),
+    return ScreenContentWidget<DeveloperMenuBloc, DeveloperMenuState>(
+      impressionPrefix: 'developer_menu',
+      contentOf: (state) => switch (state) {
+        DeveloperMenuInitialState() ||
+        DeveloperMenuLoadingState() => const ScreenLoadingContent(),
+        DeveloperMenuLoadedState() => const ScreenLoadedContent(
+          _SuccessWidget(),
         ),
-      ),
+        DeveloperMenuErrorState(:final failure) => ScreenErrorContent(failure),
+      },
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
 }
@@ -73,14 +34,10 @@ class _SuccessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'developer_menu_loaded_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
-      child: DSResponsiveContainerWidget(
-        mobileBuilder: (_) => const _DeveloperMenuContentWidget(),
-        tabletBuilder: (_) => const _DeveloperMenuContentWidget(),
-        desktopBuilder: (_) => const _DeveloperMenuContentWidget(),
-      ),
+    return DSResponsiveContainerWidget(
+      mobileBuilder: (_) => const _DeveloperMenuContentWidget(),
+      tabletBuilder: (_) => const _DeveloperMenuContentWidget(),
+      desktopBuilder: (_) => const _DeveloperMenuContentWidget(),
     );
   }
 }

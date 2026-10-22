@@ -101,27 +101,21 @@ void main() {
       build: buildBloc,
       act: (bloc) {
         bloc.add(const ScreenVisibleEvent());
-        bloc.add(ViewStateVisibleEvent.loading());
-        bloc.add(ViewStateVisibleEvent.success());
-        bloc.add(ViewStateVisibleEvent.error());
+        bloc.add(const ViewStateVisibleEvent('loading_content_view'));
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
+        bloc.add(const ViewStateVisibleEvent('error_content_view'));
       },
       expect: () => const <DeveloperMenuState>[],
       verify: (_) {
         verify(() => trackingDelegate.trackScreenView()).called(1);
         verify(
-          () => trackingDelegate.trackViewEvent(
-            'developer_menu_loading_content_view',
-          ),
+          () => trackingDelegate.trackViewEvent('loading_content_view'),
         ).called(1);
         verify(
-          () => trackingDelegate.trackViewEvent(
-            'developer_menu_loaded_content_view',
-          ),
+          () => trackingDelegate.trackViewEvent('loaded_content_view'),
         ).called(1);
         verify(
-          () => trackingDelegate.trackViewEvent(
-            'developer_menu_error_content_view',
-          ),
+          () => trackingDelegate.trackViewEvent('error_content_view'),
         ).called(1);
       },
     );

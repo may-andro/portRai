@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
+import 'package:use_case/use_case.dart';
 
 sealed class DeveloperMenuState extends Equatable {
   const DeveloperMenuState();
@@ -44,10 +45,10 @@ class DeveloperMenuLoadedState extends DeveloperMenuState {
 }
 
 class DeveloperMenuErrorState extends DeveloperMenuState {
-  const DeveloperMenuErrorState(this.message);
+  const DeveloperMenuErrorState(this.failure);
 
-  final String message;
+  final Failure failure;
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }
