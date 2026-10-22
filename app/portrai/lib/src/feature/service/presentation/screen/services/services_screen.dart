@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/service/presentation/route/_route.dart';
 import 'package:portrai/src/feature/service/presentation/screen/services/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/screen/services/widget/_widget.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
+import 'package:portrai/src/widget/screen_scaffold_widget.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
@@ -15,23 +15,11 @@ class ServicesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        return appServiceLocator.get<ServicesBloc>()
-          ..add(const LoadServicesEvent());
-      },
-      child: Builder(
-        builder: (context) {
-          return RouteObserverWidget(
-            onResume: () => context.bloc.add(const ScreenVisibleEvent()),
-            child: Scaffold(
-              backgroundColor:
-                  context.colorPalette.surface.inverseSurface.color,
-              body: const ContentWidget(),
-            ),
-          );
-        },
-      ),
+    return ScreenScaffoldWidget<ServicesBloc, ServicesState>(
+      onCreate: (bloc) => bloc.add(const LoadServicesEvent()),
+      onResume: (bloc) => bloc.add(const ScreenVisibleEvent()),
+      backgroundColor: context.colorPalette.surface.inverseSurface,
+      body: const ContentWidget(),
     );
   }
 }
