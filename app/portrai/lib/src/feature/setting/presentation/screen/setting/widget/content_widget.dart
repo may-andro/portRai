@@ -19,81 +19,52 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverLayoutBuilder(
-      builder: (context, constraints) {
-        return SliverFillRemaining(
-          hasScrollBody: false,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: context.getFormCardWidth(constraints.crossAxisExtent),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.space(factor: 2),
-                  vertical: context.space(factor: context.isDesktop ? 2 : 0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (state.isLanguageSelectorEnabled) ...[
-                      SectionTitleWidget(title: context.localizations.language),
-                      const LanguageCardWidget(),
-                    ],
-                    if (state.userRole case final userRole?) ...[
-                      SectionTitleWidget(
-                        title: context.localizations.settingRoleSection,
-                      ),
-                      RoleCardWidget(role: userRole),
-                    ],
-                    if (state.isLocalAssistantAvailable) ...[
-                      SectionTitleWidget(
-                        title: context.localizations.assistantTitle,
-                      ),
-                      const LocalAssistantCardWidget(),
-                    ],
-                    if (state.isJobOpeningsEnabled) ...[
-                      SectionTitleWidget(
-                        title: context.localizations.jobOpeningsSection,
-                      ),
-                      const JobOpeningsCardWidget(),
-                    ],
-                    if (state.isDevMenuEnabled) ...[
-                      const DSVerticalSpacerWidget(3),
-                      DSButtonWidget(
-                        label: context.localizations.settingDeveloperMode,
-                        onPressed: () => DeveloperMenuScreen.navigate(context),
-                        variant: DSButtonVariant.text,
-                        size: DSButtonSize.small,
-                      ),
-                    ],
-                    const Spacer(),
-                    const DSVerticalSpacerWidget(3),
-                    const SafeArea(child: Align(child: AppVersionWidget())),
-                    const DSVerticalSpacerWidget(2),
-                  ],
-                ),
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Padding(
+        padding: context.screenHorizontalPadding.copyWith(
+          top: context.space(factor: context.isDesktop ? 2 : 0),
+          bottom: context.space(factor: context.isDesktop ? 2 : 0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (state.isLanguageSelectorEnabled) ...[
+              SectionTitleWidget(title: context.localizations.language),
+              const LanguageCardWidget(),
+            ],
+            if (state.userRole case final userRole?) ...[
+              SectionTitleWidget(
+                title: context.localizations.settingRoleSection,
               ),
-            ),
-          ),
-        );
-      },
+              RoleCardWidget(role: userRole),
+            ],
+            if (state.isLocalAssistantAvailable) ...[
+              SectionTitleWidget(title: context.localizations.assistantTitle),
+              const LocalAssistantCardWidget(),
+            ],
+            if (state.isJobOpeningsEnabled) ...[
+              SectionTitleWidget(
+                title: context.localizations.jobOpeningsSection,
+              ),
+              const JobOpeningsCardWidget(),
+            ],
+            if (state.isDevMenuEnabled) ...[
+              const DSVerticalSpacerWidget(3),
+              DSButtonWidget(
+                label: context.localizations.settingDeveloperMode,
+                onPressed: () => DeveloperMenuScreen.navigate(context),
+                variant: DSButtonVariant.text,
+                size: DSButtonSize.small,
+              ),
+            ],
+            const Spacer(),
+            const DSVerticalSpacerWidget(3),
+            const SafeArea(child: Align(child: AppVersionWidget())),
+            const DSVerticalSpacerWidget(2),
+          ],
+        ),
+      ),
     );
-  }
-}
-
-extension on BuildContext {
-  double getFormCardWidth(double maxWidth) {
-    switch (deviceWidth) {
-      case DSDeviceWidthResolution.xs:
-        return maxWidth;
-      case DSDeviceWidthResolution.s:
-        return maxWidth;
-      case DSDeviceWidthResolution.m:
-        return maxWidth * 0.8;
-      case DSDeviceWidthResolution.l:
-        return maxWidth * 0.7;
-      case DSDeviceWidthResolution.xl:
-        return maxWidth * 0.5;
-    }
   }
 }
