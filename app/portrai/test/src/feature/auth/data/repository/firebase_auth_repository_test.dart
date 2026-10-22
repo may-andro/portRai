@@ -114,6 +114,36 @@ void main() {
       expect(await repository.getSignedInUser(), isNull);
     });
 
+    test('should return the current user without waiting for an auth state '
+        'when the first auth state was already received', () async {
+      final user = MockUser()
+        ..stubAccount(userId: 'owner-uid', email: 'owner@example.com');
+      authController
+        ..stubAuthStateChanges([null])
+        ..stubCurrentUser(user);
+
+      expect(await repository.getSignedInUser(), isNull);
+      expect(
+        await repository.getSignedInUser(),
+        const AuthUserEntity(id: 'owner-uid', email: 'owner@example.com'),
+      );
+      verify(() => authController.authStateChanges).called(1);
+    });
+
+    test('should wait for the auth state again when reading the first auth '
+        'state failed', () async {
+      authController.stubAuthStateChangesThrows(StateError('broken'));
+      await expectLater(
+        repository.getSignedInUser(),
+        throwsA(isA<AuthUnknownException>()),
+      );
+      authController.stubAuthStateChanges([null]);
+
+      expect(await repository.getSignedInUser(), isNull);
+      verify(() => authController.authStateChanges).called(2);
+      verifyNever(() => authController.currentUser);
+    });
+
     test('should throw an unknown auth exception when the auth state stream '
         'fails', () async {
       authController.stubAuthStateChangesThrows(StateError('broken'));
