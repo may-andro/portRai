@@ -24,7 +24,7 @@ class ContentWidget extends StatelessWidget {
             state.failure?.remoteAssistantErrorText(context) ??
                 context.localizations.errorRemoteAssistantUnavailable,
           ),
-          RemoteAssistantStatus.ready => ScreenLoadedContent(
+          RemoteAssistantStatus.ready => ScreenLoadedContent.fullScreen(
             _ReadyWidget(state: state),
           ),
         },
