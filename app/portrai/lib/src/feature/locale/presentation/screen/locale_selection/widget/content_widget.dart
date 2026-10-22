@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/locale/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/_bloc.dart';
-import 'package:portrai/src/route/route.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'locale_list_widget.dart';
@@ -16,33 +15,27 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RouteObserverWidget(
-      onResume: () => context.bloc.add(ScreenVisibleEvent(isDialog)),
-      child: ScreenContentWidget<LocaleSelectionBloc, LocaleSelectionState>(
-        impressionPrefix: 'language_update',
-        buildWhen: (previous, current) => previous != current,
-        contentOf: (state) => switch (state) {
-          LoadingState() => const ScreenLoadingContent(),
-          ErrorState(:final failure) => ScreenErrorContent(
-            failure,
-            onRetry: () => context.bloc.add(const LoadLocaleEvent()),
+    return ScreenContentWidget<LocaleSelectionBloc, LocaleSelectionState>(
+      impressionPrefix: 'language_update',
+      buildWhen: (previous, current) => previous != current,
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(),
+        ErrorState(:final failure) => ScreenErrorContent(
+          failure,
+          onRetry: () => context.bloc.add(const LoadLocaleEvent()),
+        ),
+        final LoadedState state when isDialog => ScreenLoadedContent.fullScreen(
+          SingleChildScrollView(
+            child: _SuccessWidget(state, isDialog: isDialog),
           ),
-          final LoadedState state when isDialog =>
-            ScreenLoadedContent.fullScreen(
-              SingleChildScrollView(
-                child: _SuccessWidget(state, isDialog: isDialog),
-              ),
-            ),
-          final LoadedState state => ScreenLoadedContent.slivers([
-            SliverToBoxAdapter(
-              child: _SuccessWidget(state, isDialog: isDialog),
-            ),
-            const SliverToBoxAdapter(child: DSVerticalSpacerWidget(2)),
-          ]),
-        },
-        onContentVisible: (content) =>
-            context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
-      ),
+        ),
+        final LoadedState state => ScreenLoadedContent.slivers([
+          SliverToBoxAdapter(child: _SuccessWidget(state, isDialog: isDialog)),
+          const SliverToBoxAdapter(child: DSVerticalSpacerWidget(2)),
+        ]),
+      },
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
 }

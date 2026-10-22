@@ -25,7 +25,10 @@ void main() {
       await appServiceLocator.reset();
     });
 
-    Future<void> pumpScreen(WidgetTester tester) async {
+    Future<void> pumpScreen(
+      WidgetTester tester, {
+      bool isDialog = false,
+    }) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -38,7 +41,9 @@ void main() {
               child: child!,
             );
           },
-          home: const LocaleSelectionScreen(),
+          home: isDialog
+              ? const Material(child: LocaleSelectionScreen(isDialog: true))
+              : const LocaleSelectionScreen(),
         ),
       );
       await tester.pump();
@@ -53,6 +58,22 @@ void main() {
         await pumpScreen(tester);
 
         verify(() => bloc.add(const LoadLocaleEvent())).called(1);
+        verify(() => bloc.add(const ScreenVisibleEvent(false))).called(1);
+        expect(find.byType(Scaffold), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'should dispatch the dialog visible event without a scaffold when shown as a dialog',
+      (tester) async {
+        final bloc = MockLocaleSelectionBloc()..stubState(const LoadingState());
+        appServiceLocator.registerFactory<LocaleSelectionBloc>(() => bloc);
+
+        await pumpScreen(tester, isDialog: true);
+
+        verify(() => bloc.add(const LoadLocaleEvent())).called(1);
+        verify(() => bloc.add(const ScreenVisibleEvent(true))).called(1);
+        expect(find.byType(Scaffold), findsNothing);
       },
     );
 

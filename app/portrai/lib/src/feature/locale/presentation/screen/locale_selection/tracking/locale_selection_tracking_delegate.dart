@@ -20,10 +20,6 @@ class LocaleSelectionTrackingDelegate extends ScreenTrackingDelegate {
     trackEvent(ScreenViewTracking(area: const _TrackingArea()));
   }
 
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
-
   void trackLocaleSelectionClick(String localeCode) {
     trackEvent(
       Tracking(
