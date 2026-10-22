@@ -85,6 +85,8 @@ class FlutterEdgeAiLocalAssistantRepository
 
   Future<void>? _initialization;
   Future<void>? _preparation;
+  // Read when a download starts; a running download keeps its setting.
+  bool _showsDownloadNotification = false;
   Future<InferenceModel> Function(void Function(int))? _modelLoader;
   InferenceModel? _model;
   InferenceChat? _chat;
@@ -126,7 +128,11 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   @override
-  Future<void> prepareModel({required void Function(int) onProgress}) async {
+  Future<void> prepareModel({
+    required void Function(int) onProgress,
+    bool showsNotification = false,
+  }) async {
+    _showsDownloadNotification = showsNotification;
     await _ensureFeatureEnabled();
     if (_model != null) return;
     await (_preparation ??= _prepareModel(onProgress));
@@ -136,9 +142,10 @@ class FlutterEdgeAiLocalAssistantRepository
     final generation = _generation;
     await _initialize();
     // Joins a download another instance of this process already started.
-    // On Android it runs as a foreground download with a progress
-    // notification, so it continues while the app is in the background and
-    // a relaunch attaches to it instead of starting over.
+    // With notifications allowed, it shows its progress in a notification
+    // and, on Android, runs in the foreground, so it continues while the app
+    // is in the background and a relaunch attaches to it instead of starting
+    // over.
     await _modelDownload.run(
       (cancelToken, onDownloadProgress) =>
           FlutterEdgeAi.installModel(
@@ -149,7 +156,7 @@ class FlutterEdgeAiLocalAssistantRepository
                 _modelRepository,
                 file: _modelFile,
                 revision: _modelRevision,
-                foreground: true,
+                foreground: _showsDownloadNotification,
               )
               .withProgress(onDownloadProgress)
               .withCancelToken(cancelToken)
