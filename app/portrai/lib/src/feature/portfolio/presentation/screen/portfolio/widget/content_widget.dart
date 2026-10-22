@@ -1,37 +1,29 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/header/header_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/user/user.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PortfolioBloc, PortfolioState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
+    return ScreenContentWidget<PortfolioBloc, PortfolioState>(
+      impressionPrefix: 'portfolio',
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(),
+        ErrorState(:final failure) => ScreenErrorContent(failure),
+        LoadedState(:final portfolio, :final userRole) => ScreenLoadedContent(
+          _SuccessWidget(portfolio: portfolio, userRole: userRole),
+        ),
       },
-      builder: (context, state) {
-        return switch (state) {
-          final LoadingState _ => const _LoadingWidget(),
-          final ErrorState state => _ErrorWidget(
-            errorMessage: FailureTranslator.translate(context, state.failure),
-          ),
-          final LoadedState state => _SuccessWidget(
-            portfolio: state.portfolio,
-            userRole: state.userRole,
-          ),
-        };
-      },
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
 }
@@ -72,49 +64,45 @@ class _SuccessWidgetState extends State<_SuccessWidget>
 
   @override
   Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'portfolio_loaded_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
-      child: BlocListener<PortfolioBloc, PortfolioState>(
-        listenWhen: (previous, current) {
-          // Listen when tab index changes AND navigation is from drawer/header (not scroll)
-          if (previous is LoadedState && current is LoadedState) {
-            final indexChanged =
-                previous.selectedSectionIndex != current.selectedSectionIndex;
-            final isFromUserClick =
-                current.lastNavigationSource == NavigationSource.drawer ||
-                current.lastNavigationSource == NavigationSource.header;
-            return indexChanged && isFromUserClick;
-          }
-          return false;
-        },
-        listener: (context, state) {
-          if (state is LoadedState) {
-            _scrollToSection(state.selectedSectionIndex);
-          }
-        },
-        child: PrimaryScrollController(
+    return BlocListener<PortfolioBloc, PortfolioState>(
+      listenWhen: (previous, current) {
+        // Listen when tab index changes AND navigation is from drawer/header (not scroll)
+        if (previous is LoadedState && current is LoadedState) {
+          final indexChanged =
+              previous.selectedSectionIndex != current.selectedSectionIndex;
+          final isFromUserClick =
+              current.lastNavigationSource == NavigationSource.drawer ||
+              current.lastNavigationSource == NavigationSource.header;
+          return indexChanged && isFromUserClick;
+        }
+        return false;
+      },
+      listener: (context, state) {
+        if (state is LoadedState) {
+          _scrollToSection(state.selectedSectionIndex);
+        }
+      },
+      child: PrimaryScrollController(
+        controller: _scrollController,
+        child: CustomScrollView(
           controller: _scrollController,
-          child: CustomScrollView(
-            controller: _scrollController,
-            scrollBehavior: ScrollConfiguration.of(
-              context,
-            ).copyWith(scrollbars: false, overscroll: false),
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              HeaderWidget(
-                sections: _scrollableSections,
-                tabController: _tabController,
-              ),
-              // Build each portfolio section as SliverToBoxAdapter widgets
-              ..._scrollableSections.map((section) {
-                return SliverToBoxAdapter(child: section);
-              }),
-              SliverToBoxAdapter(
-                child: FooterWidget(profile: widget.portfolio.profile),
-              ),
-            ],
-          ),
+          scrollBehavior: ScrollConfiguration.of(
+            context,
+          ).copyWith(scrollbars: false, overscroll: false),
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            HeaderWidget(
+              sections: _scrollableSections,
+              tabController: _tabController,
+            ),
+            // Build each portfolio section as SliverToBoxAdapter widgets
+            ..._scrollableSections.map((section) {
+              return SliverToBoxAdapter(child: section);
+            }),
+            SliverToBoxAdapter(
+              child: FooterWidget(profile: widget.portfolio.profile),
+            ),
+          ],
         ),
       ),
     );
@@ -160,42 +148,5 @@ class _SuccessWidgetState extends State<_SuccessWidget>
         }
       }
     }
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'portfolio_loading_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
-      child: DSLoadingWidget(
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
-    );
-  }
-}
-
-class _ErrorWidget extends StatelessWidget {
-  const _ErrorWidget({this.errorMessage});
-
-  final String? errorMessage;
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'portfolio_failure_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.isDesktop
-              ? context.width * 0.15
-              : context.space(factor: 2),
-        ),
-        child: Center(child: DSErrorCardWidget(message: errorMessage)),
-      ),
-    );
   }
 }

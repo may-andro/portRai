@@ -89,7 +89,7 @@ class _SectionContainerWidgetState extends State<SectionContainerWidget> {
   Widget get verticalSpacerWidget => const DSVerticalSpacerWidget(3);
 
   double get horizontalPadding {
-    return widget.horizontalPadding ?? context.horizontalScreenPaddingDimen;
+    return widget.horizontalPadding ?? context.screenHorizontalPadding.left;
   }
 
   @override
@@ -167,7 +167,7 @@ class _HeaderWidget extends StatelessWidget {
     return Padding(
       padding: EdgeInsetsGeometry.symmetric(
         vertical: context.space(factor: 3),
-        horizontal: context.horizontalScreenPaddingDimen,
+        horizontal: context.screenHorizontalPadding.left,
       ),
       child: Row(
         spacing: context.space(factor: 2),
@@ -238,18 +238,5 @@ class _HeaderWidget extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-extension on BuildContext {
-  double get horizontalScreenPaddingDimen {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
-    }
   }
 }
