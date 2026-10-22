@@ -5,8 +5,8 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/locale/presentation/route/_route.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/_bloc.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/widget/_widget.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
+import 'package:portrai/src/widget/screen_scaffold_widget.dart';
 
 class LocaleSelectionScreen extends StatelessWidget {
   const LocaleSelectionScreen({super.key, this.isDialog = false});
@@ -51,38 +51,22 @@ class LocaleSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) {
-        return appServiceLocator.get<LocaleSelectionBloc>()
-          ..add(const LoadLocaleEvent());
-      },
-      child: BlocConsumer<LocaleSelectionBloc, LocaleSelectionState>(
-        listenWhen: (_, current) => current.isUpdatingFailed,
-        listener: (context, state) {
-          if (state case final LocaleSelectionState state
-              when state is LocaleSelectionUpdateFailureState) {
-            final message = FailureTranslator.translate(context, state.failure);
-            context.showSnackBar(
-              snackBar: DSSnackBar(
-                message: message,
-                type: DSSnackBarType.error,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          final content = ContentWidget(isDialog: isDialog);
-
-          if (isDialog) {
-            return content;
-          }
-
-          return Scaffold(
-            appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
-            body: content,
+    return ScreenScaffoldWidget<LocaleSelectionBloc, LocaleSelectionState>(
+      onCreate: (bloc) => bloc.add(const LoadLocaleEvent()),
+      onResume: (bloc) => bloc.add(ScreenVisibleEvent(isDialog)),
+      listenWhen: (_, current) => current.isUpdatingFailed,
+      listener: (context, state) {
+        if (state case final LocaleSelectionState state
+            when state is LocaleSelectionUpdateFailureState) {
+          final message = FailureTranslator.translate(context, state.failure);
+          context.showSnackBar(
+            snackBar: DSSnackBar(message: message, type: DSSnackBarType.error),
           );
-        },
-      ),
+        }
+      },
+      hasScaffold: !isDialog,
+      appBar: DSAppBarWidget(height: DSAppBarWidget.getHeight(context)),
+      body: ContentWidget(isDialog: isDialog),
     );
   }
 }

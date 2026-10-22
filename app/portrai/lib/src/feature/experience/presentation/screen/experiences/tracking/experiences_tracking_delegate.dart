@@ -9,8 +9,4 @@ class _TrackingArea extends TrackingArea {
 class ExperiencesTrackingDelegate extends ScreenTrackingDelegate {
   ExperiencesTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
-
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
 }

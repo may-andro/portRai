@@ -10,10 +10,6 @@ class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
   PortfolioTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
-
   void trackAssistantLaunch({required bool isLocal}) {
     trackEvent(
       Tracking(

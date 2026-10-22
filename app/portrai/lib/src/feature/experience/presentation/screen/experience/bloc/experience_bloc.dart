@@ -7,9 +7,12 @@ import 'package:portrai/src/feature/experience/presentation/screen/experience/bl
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/experience_state.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/tracking/_tracking.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
+class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState>
+    with ScreenTrackingBlocMixin<ExperienceEvent, ExperienceState> {
   ExperienceBloc(
     this._getExperienceUseCase,
     this._getExperiencesUseCase,
@@ -20,15 +23,18 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
     on<HeaderTabClickEvent>(_mapHeaderTabClickEventToState);
     on<AdjacentExperienceClickEvent>(_mapAdjacentExperienceClickEventToState);
-    on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
-    on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
+    trackScreenViewOn<ScreenVisibleEvent>();
+    trackViewEventOn<SectionVisibleEvent>((event) => event.trackingId);
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final GetExperienceUseCase _getExperienceUseCase;
   final GetExperiencesUseCase _getExperiencesUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final ExperienceTrackingDelegate _trackingDelegate;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   FutureOr<void> _mapLoadExperienceEventToState(
     LoadExperienceEvent event,
@@ -85,20 +91,6 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
   }
 
   // Tracking Events
-  FutureOr<void> _mapScreenVisibleEventToState(
-    ScreenVisibleEvent event,
-    Emitter<ExperienceState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<ExperienceState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
-  }
-
   FutureOr<void> _mapHeaderTabClickEventToState(
     HeaderTabClickEvent event,
     Emitter<ExperienceState> emit,
@@ -111,12 +103,5 @@ class ExperienceBloc extends Bloc<ExperienceEvent, ExperienceState> {
     Emitter<ExperienceState> emit,
   ) {
     _trackingDelegate.trackAdjacentExperienceClick(event.experienceId);
-  }
-
-  FutureOr<void> _mapSectionVisibleEventToState(
-    SectionVisibleEvent event,
-    Emitter<ExperienceState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }

@@ -32,21 +32,5 @@ void main() {
       expect(tracking.parameters['event'], 'screen_view');
       expect(tracking.parameters['area'], 'developer_menu');
     });
-
-    test(
-      'should send a view impression event when trackViewEvent is called',
-      () {
-        delegate.trackViewEvent('loaded_content_view');
-
-        final tracking =
-            verify(
-                  () => trackingReporter.sendTrackingEvent(captureAny()),
-                ).captured.single
-                as Tracking;
-
-        expect(tracking.parameters['event'], 'view_impression');
-        expect(tracking.parameters['label'], 'loaded_content_view');
-      },
-    );
   });
 }

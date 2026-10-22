@@ -4,6 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/_sign_in.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
@@ -11,7 +12,7 @@ import '../../../../../../mock/feature/auth/presentation/screen/sign_in/bloc/moc
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
-  Future<void> pumpSignInScreen(
+  Future<MockSignInBloc> pumpSignInScreen(
     WidgetTester tester, {
     required String initialLocation,
   }) async {
@@ -38,7 +39,16 @@ void main() {
       TestWidgetWrapper(routerConfig: router, child: const SizedBox()),
     );
     await tester.pumpAndSettle();
+    return bloc;
   }
+
+  testWidgets('should add the started event when the screen is created', (
+    tester,
+  ) async {
+    final bloc = await pumpSignInScreen(tester, initialLocation: '/sign-in');
+
+    verify(() => bloc.add(const SignInStartedEvent())).called(1);
+  });
 
   testWidgets('should open the requested location when signed in', (
     tester,

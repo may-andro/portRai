@@ -4,24 +4,23 @@ import 'package:portrai/src/feature/auth/domain/_domain.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/sign_in_event.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/sign_in_state.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class SignInBloc extends Bloc<SignInEvent, SignInState> {
+class SignInBloc extends Bloc<SignInEvent, SignInState>
+    with ScreenTrackingBlocMixin<SignInEvent, SignInState> {
   SignInBloc(this._signInUseCase, this._trackingDelegate)
     : super(const SignInState()) {
-    on<SignInStartedEvent>(_mapSignInStartedEventToState);
+    trackScreenViewOn<SignInStartedEvent>();
     on<SignInClickEvent>(_mapSignInClickEventToState);
   }
 
   final SignInUseCase _signInUseCase;
   final SignInTrackingDelegate _trackingDelegate;
 
-  void _mapSignInStartedEventToState(
-    SignInStartedEvent event,
-    Emitter<SignInState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   Future<void> _mapSignInClickEventToState(
     SignInClickEvent event,

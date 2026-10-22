@@ -10,10 +10,6 @@ class ProjectTrackingDelegate extends ScreenTrackingDelegate {
   ProjectTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
-
   void trackAvailabilityLinkClick(String availabilityLinkName) {
     trackEvent(
       Tracking(
@@ -30,9 +26,5 @@ class ProjectTrackingDelegate extends ScreenTrackingDelegate {
         action: ClickAction(label: headerSectionName),
       ),
     );
-  }
-
-  void trackSectionView(String label) {
-    trackEvent(ViewTracking(label: label));
   }
 }

@@ -6,18 +6,24 @@ import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertises/bloc/expertises_event.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertises/bloc/expertises_state.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertises/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class ExpertisesBloc extends Bloc<ExpertisesEvent, ExpertisesState> {
+class ExpertisesBloc extends Bloc<ExpertisesEvent, ExpertisesState>
+    with ScreenTrackingBlocMixin<ExpertisesEvent, ExpertisesState> {
   ExpertisesBloc(this._getAllExpertiseUseCase, this._trackingDelegate)
     : super(const LoadingState()) {
     on<LoadExpertisesEvent>(_mapLoadExpertisesEventToState);
-    on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
+    trackScreenViewOn<ScreenVisibleEvent>();
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final GetAllExpertiseUseCase _getAllExpertiseUseCase;
   final ExpertisesTrackingDelegate _trackingDelegate;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   FutureOr<void> _mapLoadExpertisesEventToState(
     LoadExpertisesEvent event,
@@ -34,20 +40,5 @@ class ExpertisesBloc extends Bloc<ExpertisesEvent, ExpertisesState> {
         emit(LoadedState(expertises: expertises));
       },
     );
-  }
-
-  // Tracking Events
-  FutureOr<void> _mapScreenVisibleEventToState(
-    ScreenVisibleEvent event,
-    Emitter<ExpertisesState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<ExpertisesState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }

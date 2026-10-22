@@ -1,14 +1,15 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/feature_flag_event.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/feature_flag_state.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
+class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState>
+    with ScreenTrackingBlocMixin<FeatureFlagEvent, FeatureFlagState> {
   FeatureFlagBloc(
     this._getAllFeatureFlagsUseCase,
     this._updateFeatureFlagUseCase,
@@ -20,14 +21,17 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
     on<ResetAllFeatureFlagsEvent>(_onResetAllFeatureFlags);
     on<SearchFeatureFlagsEvent>(_onSearchFeatureFlags);
     on<ToggleViewModeEvent>(_onToggleViewMode);
-    on<ScreenVisibleEvent>(_onScreenVisible);
-    on<ViewStateVisibleEvent>(_onViewStateVisible);
+    trackScreenViewOn<ScreenVisibleEvent>();
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final GetAllFeatureFlagsUseCase _getAllFeatureFlagsUseCase;
   final UpdateFeatureFlagUseCase _updateFeatureFlagUseCase;
   final ResetFeatureFlagsUseCase _resetFeatureFlagsUseCase;
   final FeatureFlagTrackingDelegate _trackingDelegate;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   Future<void> _onLoadFeatureFlag(
     LoadFeatureFlagEvent event,
@@ -124,19 +128,5 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
         ? FeatureFlagViewMode.grid
         : FeatureFlagViewMode.list;
     emit(currentState.copyWith(viewMode: newMode));
-  }
-
-  FutureOr<void> _onScreenVisible(
-    ScreenVisibleEvent event,
-    Emitter<FeatureFlagState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
-
-  FutureOr<void> _onViewStateVisible(
-    ViewStateVisibleEvent event,
-    Emitter<FeatureFlagState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }

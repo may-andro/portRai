@@ -4,24 +4,23 @@ import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/bl
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/bloc/onboarding_state.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/tracking/_tracking.dart';
 import 'package:portrai/src/feature/user/user.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
+class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState>
+    with ScreenTrackingBlocMixin<OnboardingEvent, OnboardingState> {
   OnboardingBloc(this._saveGuestUserUseCase, this._trackingDelegate)
     : super(const OnboardingState()) {
-    on<OnboardingStartedEvent>(_mapOnboardingStartedEventToState);
+    trackScreenViewOn<OnboardingStartedEvent>();
     on<RoleSelectedClickEvent>(_mapRoleSelectedClickEventToState);
   }
 
   final SaveGuestUserUseCase _saveGuestUserUseCase;
   final OnboardingTrackingDelegate _trackingDelegate;
 
-  void _mapOnboardingStartedEventToState(
-    OnboardingStartedEvent event,
-    Emitter<OnboardingState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   Future<void> _mapRoleSelectedClickEventToState(
     RoleSelectedClickEvent event,

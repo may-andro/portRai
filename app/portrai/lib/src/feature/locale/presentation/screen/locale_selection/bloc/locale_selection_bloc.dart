@@ -10,10 +10,13 @@ import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/locale_selection_state_extension.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/locale_selection_state_factory.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
 class LocaleSelectionBloc
-    extends Bloc<LocaleSelectionEvent, LocaleSelectionState> {
+    extends Bloc<LocaleSelectionEvent, LocaleSelectionState>
+    with ScreenTrackingBlocMixin<LocaleSelectionEvent, LocaleSelectionState> {
   LocaleSelectionBloc(
     this._getLocaleUseCase,
     this._updateLocaleUseCase,
@@ -22,12 +25,15 @@ class LocaleSelectionBloc
     on<LoadLocaleEvent>(_mapLoadLocaleEventToState);
     on<UpdateLocaleEvent>(_mapUpdateLocaleEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final GetLocaleUseCase _getLocaleUseCase;
   final UpdateLocaleUseCase _updateLocaleUseCase;
   final LocaleSelectionTrackingDelegate _trackingDelegate;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   Future<void> _mapLoadLocaleEventToState(
     LoadLocaleEvent event,
@@ -100,12 +106,5 @@ class LocaleSelectionBloc
     Emitter<LocaleSelectionState> emit,
   ) {
     _trackingDelegate.trackVisibleScreen(event.isDialog);
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<LocaleSelectionState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }
