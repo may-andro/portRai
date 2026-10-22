@@ -15,14 +15,18 @@ class PageHeaderWidget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: context.space(factor: 2)),
       child: Row(
         children: [
-          Flexible(
-            child: Image.asset(
-              DSImage.logoPath,
-              package: 'design_system',
-              fit: BoxFit.cover,
+          // Takes the free width so the actions sit at the end of the row.
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Image.asset(
+                DSImage.logoPath,
+                package: 'design_system',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          if (actions.isNotEmpty) ...[const Spacer(), ...actions],
+          ...actions,
         ],
       ),
     );
