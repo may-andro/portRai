@@ -65,7 +65,7 @@ class IntroWidget extends StatelessWidget {
                     closeColor: Colors.white,
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: pageHorizontalInset(context),
+                        horizontal: context.screenHorizontalPadding.left,
                         vertical: context.space(factor: isWide ? 8 : 4),
                       ),
                       child: isWide

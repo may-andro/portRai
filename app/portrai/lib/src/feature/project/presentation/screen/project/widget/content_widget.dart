@@ -4,7 +4,6 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/metrics_widget.dart';
-import 'package:portrai/src/widget/page_band_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'body_widget.dart';
