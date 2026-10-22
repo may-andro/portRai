@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/widget/_widget.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
@@ -179,6 +180,33 @@ void main() {
     expect(loader.style, DSLoadingStyle.lottie);
     // A tenth of the shortest side of the 1440 x 2400 test window.
     expect(loader.size, 144);
+  });
+
+  testWidgets('should show the page title above the loader when '
+      'loading', (tester) async {
+    await pumpContent(tester, const JobOpeningState(id: 'job-1'));
+
+    expect(find.byType(PageAppBarWidget), findsOneWidget);
+    expect(find.text('Job opening'), findsOneWidget);
+    expect(find.byType(DSLoadingWidget), findsOneWidget);
+  });
+
+  testWidgets('should show the page title above the error and retry when '
+      'retry is tapped', (tester) async {
+    final bloc = await pumpContent(
+      tester,
+      const JobOpeningState(id: 'job-1', status: JobOpeningStatus.failed),
+    );
+
+    expect(find.byType(PageAppBarWidget), findsOneWidget);
+    final errorCard = find.byType(DSErrorCardWidget);
+    expect(errorCard, findsOneWidget);
+    await tester.tap(
+      find.descendant(of: errorCard, matching: find.byType(DSButtonWidget)),
+    );
+    await tester.pump();
+
+    verify(() => bloc.add(const JobOpeningRetryClickEvent())).called(1);
   });
 
   testWidgets('should show how long ago the opening was posted next to its '
