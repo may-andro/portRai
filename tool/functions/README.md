@@ -426,7 +426,8 @@ for role in roles/cloudfunctions.developer roles/cloudscheduler.admin \
 done
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
 for account in "job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
-  "${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"; do
+  "${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  "${PROJECT_ID}@appspot.gserviceaccount.com"; do
   gcloud iam service-accounts add-iam-policy-binding "$account" \
     --member="$DEPLOYER" --role=roles/iam.serviceAccountUser --project="$PROJECT_ID"
 done
@@ -436,13 +437,13 @@ base64 < key.json | gh secret set FUNCTIONS_DEPLOY_SERVICE_ACCOUNT
 rm key.json
 ```
 
-| Role                                      | Needed for                                                                           |
-| ----------------------------------------- | ------------------------------------------------------------------------------------ |
-| `roles/cloudfunctions.developer`          | Creating and updating functions                                                      |
-| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                        |
-| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                      |
-| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                       |
-| `roles/firebase.viewer`                   | Reading the Firebase project                                                         |
-| `roles/iam.serviceAccountUser`            | Running functions as `job-openings` and building them as the default compute account |
+| Role                                      | Needed for                                                                                                                                                                                |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `roles/cloudfunctions.developer`          | Creating and updating functions                                                                                                                                                           |
+| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                                                                                                                             |
+| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                                                                                                                           |
+| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                                                                                                                            |
+| `roles/firebase.viewer`                   | Reading the Firebase project                                                                                                                                                              |
+| `roles/iam.serviceAccountUser`            | Running functions as `job-openings`, building them as the default compute account and deploying scheduled functions, which the Firebase CLI checks against the App Engine default account |
 
 The workflow also reads the `FIREBASE_PROJECT_ID` secret that the other deploys use.
