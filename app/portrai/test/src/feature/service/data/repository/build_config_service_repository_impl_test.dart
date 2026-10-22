@@ -48,12 +48,12 @@ void main() {
       test(
         'should delegate cache writes to the selected source when requested',
         () async {
-          selected.stubCacheService(service);
+          selected.stubCacheServices([service]);
 
-          await repository.cacheService(service);
+          await repository.cacheServices([service]);
 
-          verify(() => selected.cacheService(service)).called(1);
-          verifyNever(() => unselected.cacheService(service));
+          verify(() => selected.cacheServices([service])).called(1);
+          verifyNever(() => unselected.cacheServices([service]));
         },
       );
     });

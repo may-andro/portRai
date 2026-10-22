@@ -18,9 +18,9 @@ class CacheExperienceRepositoryImpl implements ExperienceRepository {
   final AppLocale _appLocale;
 
   @override
-  Future<void> cacheExperience(ExperienceEntity experience) async {
+  Future<void> cacheExperiences(List<ExperienceEntity> experiences) async {
     try {
-      return await _experienceCache.put(_mapper.from(experience));
+      return await _experienceCache.putAll(experiences.map(_mapper.from));
     } on DBNotInitialisedException catch (e, stackTrace) {
       throw ExperienceCacheException(
         cause: 'Database not initialized: $e',
@@ -28,7 +28,7 @@ class CacheExperienceRepositoryImpl implements ExperienceRepository {
       );
     } catch (e, stackTrace) {
       throw ExperienceCacheException(
-        cause: 'Unexpected error while caching experience: $e',
+        cause: 'Unexpected error while caching experiences: $e',
         stackTrace: stackTrace,
       );
     }

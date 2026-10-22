@@ -92,9 +92,7 @@ void main() {
           const ExpertiseNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final expertise in expertiseList) {
-          cacheDelegateRepository.stubCacheExpertise(expertise);
-        }
+        cacheDelegateRepository.stubCacheAllExpertise(expertiseList);
 
         final result = await repository.getAllExpertise();
 
@@ -105,11 +103,9 @@ void main() {
             localeCode,
           ),
         ).called(1);
-        for (final expertise in expertiseList) {
-          verify(
-            () => cacheDelegateRepository.cacheExpertise(expertise),
-          ).called(1);
-        }
+        verify(
+          () => cacheDelegateRepository.cacheAllExpertise(expertiseList),
+        ).called(1);
       },
     );
 
@@ -120,9 +116,7 @@ void main() {
           const ExpertiseCacheException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        for (final expertise in expertiseList) {
-          cacheDelegateRepository.stubCacheExpertise(expertise);
-        }
+        cacheDelegateRepository.stubCacheAllExpertise(expertiseList);
 
         final result = await repository.getAllExpertise();
 
@@ -143,8 +137,8 @@ void main() {
           const ExpertiseNotFoundException(),
         );
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
-        cacheDelegateRepository.stubCacheExpertiseThrows(
-          expertise: expertiseList.first,
+        cacheDelegateRepository.stubCacheAllExpertiseThrows(
+          expertiseList: expertiseList,
           error: Exception('cache write failed'),
         );
 

@@ -12,11 +12,11 @@ extension MockServiceRepositoryStub on MockServiceRepository {
     when(() => getServices()).thenThrow(error);
   }
 
-  void stubCacheService(ServiceEntity service) {
-    when(() => cacheService(service)).thenAnswer((_) async {});
+  void stubCacheServices(List<ServiceEntity> services) {
+    when(() => cacheServices(services)).thenAnswer((_) async {});
   }
 
-  void stubCacheServiceThrows(ServiceEntity service, Object error) {
-    when(() => cacheService(service)).thenThrow(error);
+  void stubCacheServicesThrows(List<ServiceEntity> services, Object error) {
+    when(() => cacheServices(services)).thenThrow(error);
   }
 }

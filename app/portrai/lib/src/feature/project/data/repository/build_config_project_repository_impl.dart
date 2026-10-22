@@ -17,8 +17,8 @@ class BuildConfigProjectRepositoryImpl implements ProjectRepository {
   final ProjectRepository _demoDelegateRepository;
 
   @override
-  Future<void> cacheProject(ProjectEntity project) {
-    return _delegateRepository.cacheProject(project);
+  Future<void> cacheProjects(List<ProjectEntity> projects) {
+    return _delegateRepository.cacheProjects(projects);
   }
 
   @override

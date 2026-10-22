@@ -226,6 +226,79 @@ void main() {
         expect(results.first.name, 'Test Updated');
       });
 
+      test(
+        'should store every model when putAll is called with several models',
+        () async {
+          await testModelCache.putAll([
+            TestModel(id: '1', name: 'Test A', category: 'A'),
+            TestModel(id: '1', name: 'Test B', category: 'B'),
+            TestModel(id: '2', name: 'Test C', category: 'A'),
+          ]);
+
+          final results = await testModelCache.getAll();
+
+          expect(results.map((model) => model.name), [
+            'Test A',
+            'Test B',
+            'Test C',
+          ]);
+        },
+      );
+
+      test(
+        'should replace records with the same key when putAll is called',
+        () async {
+          await testModelCache.put(
+            TestModel(id: '1', name: 'Test 1', category: 'A'),
+          );
+
+          await testModelCache.putAll([
+            TestModel(id: '1', name: 'Test Updated', category: 'A'),
+            TestModel(id: '2', name: 'Test 2', category: 'A'),
+          ]);
+
+          final results = await testModelCache.getAll();
+
+          expect(results.map((model) => model.name), [
+            'Test Updated',
+            'Test 2',
+          ]);
+        },
+      );
+
+      test(
+        'should store nothing when putAll is called with no models',
+        () async {
+          await testModelCache.putAll(const []);
+
+          final results = await testModelCache.getAll();
+
+          expect(results, isEmpty);
+          expect(testModelCache.lastCachedTimestamp, 0);
+        },
+      );
+
+      test(
+        'should emit an event per model when putAll stores several models',
+        () async {
+          final events = <DbCacheEvent<TestModel>>[];
+          final subscription = testModelCache.watch().listen(events.add);
+          await pumpEventQueue();
+
+          await testModelCache.putAll([
+            TestModel(id: '1', name: 'Test A', category: 'A'),
+            TestModel(id: '2', name: 'Test B', category: 'A'),
+          ]);
+          await pumpEventQueue();
+          await subscription.cancel();
+
+          expect(events.map((event) => event.value?.name), [
+            'Test A',
+            'Test B',
+          ]);
+        },
+      );
+
       test('should query data by category', () async {
         final testModel1 = TestModel(id: '1', name: 'Test A1', category: 'A');
         final testModel2 = TestModel(id: '2', name: 'Test A2', category: 'A');

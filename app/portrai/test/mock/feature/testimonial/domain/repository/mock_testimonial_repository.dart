@@ -4,15 +4,15 @@ import 'package:portrai/src/feature/testimonial/domain/_domain.dart';
 class MockTestimonialRepository extends Mock implements TestimonialRepository {}
 
 extension MockTestimonialRepositoryStub on MockTestimonialRepository {
-  void stubCacheTestimonial(TestimonialEntity testimonial) {
-    when(() => cacheTestimonial(testimonial)).thenAnswer((_) async {});
+  void stubCacheTestimonials(List<TestimonialEntity> testimonials) {
+    when(() => cacheTestimonials(testimonials)).thenAnswer((_) async {});
   }
 
-  void stubCacheTestimonialThrows({
-    required TestimonialEntity testimonial,
+  void stubCacheTestimonialsThrows({
+    required List<TestimonialEntity> testimonials,
     required Object error,
   }) {
-    when(() => cacheTestimonial(testimonial)).thenThrow(error);
+    when(() => cacheTestimonials(testimonials)).thenThrow(error);
   }
 
   void stubGetTestimonial({

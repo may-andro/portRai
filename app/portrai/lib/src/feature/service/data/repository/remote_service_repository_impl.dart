@@ -26,8 +26,8 @@ class RemoteServiceRepositoryImpl implements ServiceRepository {
   final LogReporter _logReporter;
 
   @override
-  Future<void> cacheService(ServiceEntity expert) {
-    return _cacheDelegateRepository.cacheService(expert);
+  Future<void> cacheServices(List<ServiceEntity> services) {
+    return _cacheDelegateRepository.cacheServices(services);
   }
 
   @override
@@ -109,9 +109,7 @@ class RemoteServiceRepositoryImpl implements ServiceRepository {
 
   Future<void> _cacheServiceSafely(List<ServiceEntity> services) async {
     try {
-      for (final services in services) {
-        await cacheService(services);
-      }
+      await cacheServices(services);
     } catch (_) {
       _logReporter.error(
         'Failed to cache services from remote, continuing without caching.',

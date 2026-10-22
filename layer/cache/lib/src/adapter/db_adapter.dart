@@ -113,6 +113,10 @@ abstract class DbAdapter {
   /// [DbTableSchema.primaryKeyColumns] is non-empty).
   Future<void> upsert(Map<String, dynamic> values);
 
+  /// Applies [upsert] to every entry of [records] in a single transaction, so
+  /// either all of them are stored or none is.
+  Future<void> upsertAll(List<Map<String, dynamic>> records);
+
   /// Returns every record currently in the table.
   Future<List<Map<String, dynamic>>> findAll();
 

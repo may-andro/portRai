@@ -22,7 +22,7 @@ void main() {
     late CacheTestimonialRepositoryImpl repository;
 
     setUpAll(() {
-      registerFallbackValue(model);
+      registerFallbackValue(<TestimonialModel>[]);
     });
 
     setUp(() {
@@ -103,25 +103,26 @@ void main() {
     );
 
     test('should cache the mapped testimonial when caching succeeds', () async {
-      testimonialCache.stubPut();
+      testimonialCache.stubPutAll();
 
-      await repository.cacheTestimonial(testimonial);
+      await repository.cacheTestimonials([testimonial]);
 
       final captured =
-          verify(() => testimonialCache.put(captureAny())).captured.single
-              as TestimonialModel;
+          (verify(() => testimonialCache.putAll(captureAny())).captured.single
+                  as Iterable<TestimonialModel>)
+              .single;
       expect(captured.toJson(), model.toJson());
     });
 
     test(
       'should throw a cache exception when the database is unavailable while caching',
       () {
-        testimonialCache.stubPutThrows(
+        testimonialCache.stubPutAllThrows(
           DBNotInitialisedException(cause: Exception('db init failed')),
         );
 
         expect(
-          () => repository.cacheTestimonial(testimonial),
+          () => repository.cacheTestimonials([testimonial]),
           throwsA(isA<TestimonialCacheException>()),
         );
       },

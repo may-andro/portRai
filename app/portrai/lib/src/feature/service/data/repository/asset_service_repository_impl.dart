@@ -29,8 +29,8 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
   final GetAssetSourceUseCase _getAssetSourceUseCase;
 
   @override
-  Future<void> cacheService(ServiceEntity expert) {
-    return _cacheDelegateRepository.cacheService(expert);
+  Future<void> cacheServices(List<ServiceEntity> services) {
+    return _cacheDelegateRepository.cacheServices(services);
   }
 
   @override
@@ -89,9 +89,7 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
 
   Future<void> _cacheServiceSafely(List<ServiceEntity> servicesList) async {
     try {
-      for (final services in servicesList) {
-        await cacheService(services);
-      }
+      await cacheServices(servicesList);
     } catch (_) {
       _logReporter.error(
         'Failed to cache services from assets, continuing without caching.',
