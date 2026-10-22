@@ -352,8 +352,8 @@ void main() {
     }
 
     testWidgets(
-      'should start the footer below the screen when the content is shorter '
-      'than the screen',
+      'should keep the footer at the bottom of the screen when the content is '
+      'shorter than the screen',
       (tester) async {
         await pumpWithSizedFooter(tester, contentHeight: 200);
         await tester.drag(
@@ -362,11 +362,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final footerTop = tester.getTopLeft(find.byKey(const Key('footer'))).dy;
-        final contentTop = tester
-            .getTopLeft(find.byKey(const Key('content')))
-            .dy;
-        expect(footerTop - contentTop, 800);
+        expect(tester.getTopLeft(find.byKey(const Key('content'))).dy, 0);
+        expect(tester.getBottomLeft(find.byKey(const Key('footer'))).dy, 800);
       },
     );
 

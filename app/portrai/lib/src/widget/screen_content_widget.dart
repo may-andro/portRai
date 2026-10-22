@@ -228,8 +228,8 @@ class ScreenFooterProviderWidget extends InheritedWidget {
   }
 }
 
-/// Scrolls [slivers], at least a screen tall, followed by the provided screen
-/// footer.
+/// Scrolls [slivers] followed by the provided screen footer, which sits at the
+/// bottom of the screen when the content is shorter than it.
 class _ScrollableContentWidget extends StatelessWidget {
   const _ScrollableContentWidget({
     required this.slivers,
@@ -250,15 +250,24 @@ class _ScrollableContentWidget extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       slivers: [
         ...slivers,
-        if (footer != null) ...[
-          // Makes the content at least as tall as the screen, so the footer
-          // starts below it.
-          const SliverFillRemaining(
-            hasScrollBody: false,
-            child: SizedBox.shrink(),
+        if (footer != null)
+          // Fills the space left below the content, so a short screen keeps
+          // the footer at the bottom and a long one has it right after the
+          // content.
+          SliverLayoutBuilder(
+            builder: (context, constraints) => SliverToBoxAdapter(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: max(
+                    0,
+                    constraints.viewportMainAxisExtent -
+                        constraints.precedingScrollExtent,
+                  ),
+                ),
+                child: Align(alignment: Alignment.bottomCenter, child: footer),
+              ),
+            ),
           ),
-          SliverToBoxAdapter(child: footer),
-        ],
       ],
     );
   }

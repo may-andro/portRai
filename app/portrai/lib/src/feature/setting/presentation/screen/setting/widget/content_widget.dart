@@ -10,7 +10,7 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/l
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
 
-/// The settings form as a sliver that fills the remaining height.
+/// The settings form as a sliver.
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key, required this.state});
 
@@ -18,8 +18,7 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverFillRemaining(
-      hasScrollBody: false,
+    return SliverToBoxAdapter(
       child: Padding(
         padding: context.screenHorizontalPadding.copyWith(
           top: context.space(factor: context.isDesktop ? 2 : 0),

@@ -110,12 +110,12 @@ void main() {
             .slivers
             .last;
         expect(
-          lastSliver,
-          isA<SliverToBoxAdapter>().having(
-            (sliver) => (sliver.child! as Text).data,
-            'footer text',
-            'footer',
+          find.descendant(
+            of: find.byWidget(lastSliver, skipOffstage: false),
+            matching: find.text('footer', skipOffstage: false),
+            skipOffstage: false,
           ),
+          findsOneWidget,
         );
         expect(find.byType(FooterWidget), findsNothing);
         await disposeContent(tester);
