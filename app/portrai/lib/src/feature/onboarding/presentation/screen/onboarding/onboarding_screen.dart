@@ -4,20 +4,16 @@ import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/bloc/_bloc.dart';
 import 'package:portrai/src/feature/onboarding/presentation/screen/onboarding/widget/_widget.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
+import 'package:portrai/src/widget/screen_scaffold_widget.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) {
-        return appServiceLocator.get<OnboardingBloc>()
-          ..add(const OnboardingStartedEvent());
-      },
-      child: BlocListener<OnboardingBloc, OnboardingState>(
+  Widget build(BuildContext context) =>
+      ScreenScaffoldWidget<OnboardingBloc, OnboardingState>(
+        onCreate: (bloc) => bloc.add(const OnboardingStartedEvent()),
         listenWhen: (previous, current) =>
             previous.isCompleted != current.isCompleted ||
             previous.failure != current.failure,
@@ -35,11 +31,6 @@ class OnboardingScreen extends StatelessWidget {
             );
           }
         },
-        child: Scaffold(
-          backgroundColor: context.colorPalette.background.color,
-          body: const ContentWidget(),
-        ),
-      ),
-    );
-  }
+        body: const ContentWidget(),
+      );
 }
