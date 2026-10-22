@@ -149,5 +149,133 @@ void main() {
 
       expect(retryCount, 1);
     });
+
+    Future<void> pumpContent(
+      WidgetTester tester,
+      ScreenContent content, {
+      Widget? header,
+    }) async {
+      final cubit = MockScreenContentCubit()
+        ..stubStates(const FakeLoadingState());
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: BlocProvider<MockScreenContentCubit>.value(
+            value: cubit,
+            child: ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
+              contentOf: (_) => content,
+              header: header,
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('should show the message under the loader when one is given', (
+      tester,
+    ) async {
+      await pumpContent(
+        tester,
+        const ScreenLoadingContent(message: 'Tailoring'),
+      );
+
+      expect(find.byType(DSLoadingWidget), findsOneWidget);
+      expect(find.text('Tailoring'), findsOneWidget);
+    });
+
+    testWidgets(
+      'should show the given message on the error card when the error has '
+      'its own wording',
+      (tester) async {
+        await pumpContent(
+          tester,
+          const ScreenErrorContent.message('Assistant is unavailable'),
+        );
+
+        expect(find.text('Assistant is unavailable'), findsOneWidget);
+      },
+    );
+
+    testWidgets('should show the generic error when the error has no failure', (
+      tester,
+    ) async {
+      await pumpContent(tester, const ScreenErrorContent(null));
+
+      expect(find.text('Something went wrong. Please try again'), findsOne);
+    });
+
+    testWidgets('should show the header above the loader when one is given', (
+      tester,
+    ) async {
+      await pumpContent(
+        tester,
+        const ScreenLoadingContent(),
+        header: const SliverToBoxAdapter(child: Text('header')),
+      );
+
+      expect(find.text('header'), findsOneWidget);
+      expect(find.byType(DSLoadingWidget), findsOneWidget);
+    });
+
+    testWidgets('should not show the header when the content is loaded', (
+      tester,
+    ) async {
+      await pumpContent(
+        tester,
+        const ScreenLoadedContent(Text('loaded content')),
+        header: const SliverToBoxAdapter(child: Text('header')),
+      );
+
+      expect(find.text('header'), findsNothing);
+      expect(find.text('loaded content'), findsOneWidget);
+    });
+  });
+
+  group('ScreenContentSliverWidget', () {
+    Future<void> pumpSliverContent(WidgetTester tester, ScreenContent content) {
+      final cubit = MockScreenContentCubit()
+        ..stubStates(const FakeLoadingState());
+      return tester.pumpWidget(
+        TestWidgetWrapper(
+          child: BlocProvider<MockScreenContentCubit>.value(
+            value: cubit,
+            child: CustomScrollView(
+              slivers: [
+                ScreenContentSliverWidget<
+                  MockScreenContentCubit,
+                  FakeScreenState
+                >(contentOf: (_) => content),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('should show the loader in the scroll view when loading', (
+      tester,
+    ) async {
+      await pumpSliverContent(tester, const ScreenLoadingContent());
+
+      expect(find.byType(DSLoadingWidget), findsOneWidget);
+    });
+
+    testWidgets('should show the error card in the scroll view when failed', (
+      tester,
+    ) async {
+      await pumpSliverContent(tester, const ScreenErrorContent(null));
+
+      expect(find.byType(DSErrorCardWidget), findsOneWidget);
+    });
+
+    testWidgets('should show the loaded sliver when loaded', (tester) async {
+      await pumpSliverContent(
+        tester,
+        const ScreenLoadedContent(
+          SliverToBoxAdapter(child: Text('loaded content')),
+        ),
+      );
+
+      expect(find.text('loaded content'), findsOneWidget);
+    });
   });
 }

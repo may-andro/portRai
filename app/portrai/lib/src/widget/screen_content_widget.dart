@@ -16,16 +16,25 @@ sealed class ScreenContent {
 }
 
 final class ScreenLoadingContent extends ScreenContent {
-  const ScreenLoadingContent();
+  const ScreenLoadingContent({this.message});
+
+  /// Shown under the loader when given.
+  final String? message;
 
   @override
   String get trackingLabel => 'loading_content_view';
 }
 
 final class ScreenErrorContent extends ScreenContent {
-  const ScreenErrorContent(this.failure, {this.onRetry});
+  /// Shows the translated [failure], or the generic error when it is null.
+  const ScreenErrorContent(this.failure, {this.onRetry}) : message = null;
 
-  final Failure failure;
+  /// Shows [message] as it is, for errors the screen words itself.
+  const ScreenErrorContent.message(String this.message, {this.onRetry})
+    : failure = null;
+
+  final Failure? failure;
+  final String? message;
 
   /// Shows a retry button on the error card when given.
   final VoidCallback? onRetry;
@@ -48,6 +57,8 @@ final class ScreenLoadedContent extends ScreenContent {
 /// the first time each one is seen.
 ///
 /// Loading always shows the lottie loader so every screen looks the same.
+/// When [header] is given, loading and error are centred under it; the loaded
+/// child draws its own header.
 /// Rebuilds only when the state type changes unless [buildWhen] is given.
 class ScreenContentWidget<B extends StateStreamable<S>, S>
     extends StatelessWidget {
@@ -56,6 +67,7 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
     this.impressionPrefix,
     this.onContentVisible,
     this.buildWhen,
+    this.header,
     super.key,
   }) : assert(
          onContentVisible == null || impressionPrefix != null,
@@ -69,6 +81,9 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
   final ValueChanged<ScreenContent>? onContentVisible;
   final BlocBuilderCondition<S>? buildWhen;
 
+  /// Sliver shown above the loading and error content, such as an app bar.
+  final Widget? header;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<B, S>(
@@ -78,20 +93,8 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
       builder: (context, state) {
         final content = contentOf(state);
         final child = switch (content) {
-          ScreenLoadingContent() => DSLoadingWidget(
-            style: DSLoadingStyle.lottie,
-            size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-          ),
-          ScreenErrorContent(:final failure, :final onRetry) => Center(
-            child: Padding(
-              padding: EdgeInsets.all(context.space()),
-              child: DSErrorCardWidget(
-                message: FailureTranslator.translate(context, failure),
-                onRetryClicked: onRetry,
-              ),
-            ),
-          ),
           ScreenLoadedContent(:final child) => child,
+          _ => _withHeader(_statusWidgetFor(content)),
         };
         final onContentVisible = this.onContentVisible;
         if (onContentVisible == null) return child;
@@ -104,4 +107,93 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
       },
     );
   }
+
+  Widget _withHeader(Widget statusWidget) {
+    final header = this.header;
+    if (header == null) return Center(child: statusWidget);
+    return CustomScrollView(
+      slivers: [
+        header,
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(child: statusWidget),
+        ),
+      ],
+    );
+  }
+}
+
+/// [ScreenContentWidget] for a section of a scroll view: the loaded
+/// [ScreenLoadedContent.child] must be a sliver, and loading and error are
+/// shown as box slivers.
+///
+/// Rebuilds only when the state type changes unless [buildWhen] is given.
+class ScreenContentSliverWidget<B extends StateStreamable<S>, S>
+    extends StatelessWidget {
+  const ScreenContentSliverWidget({
+    required this.contentOf,
+    this.buildWhen,
+    super.key,
+  });
+
+  final ScreenContent Function(S state) contentOf;
+  final BlocBuilderCondition<S>? buildWhen;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<B, S>(
+      buildWhen:
+          buildWhen ??
+          (previous, current) => previous.runtimeType != current.runtimeType,
+      builder: (context, state) {
+        final content = contentOf(state);
+        return switch (content) {
+          ScreenLoadedContent(:final child) => child,
+          _ => SliverToBoxAdapter(child: _statusWidgetFor(content)),
+        };
+      },
+    );
+  }
+}
+
+/// The loader or error card for [content], which is not loaded content.
+Widget _statusWidgetFor(ScreenContent content) {
+  return Builder(
+    builder: (context) => switch (content) {
+      ScreenLoadingContent(:final message) => Padding(
+        padding: EdgeInsets.all(context.space()),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: context.space(factor: 2),
+          children: [
+            DSLoadingWidget(
+              style: DSLoadingStyle.lottie,
+              size: max(context.shortestSide * 0.1, context.space(factor: 2)),
+            ),
+            if (message != null)
+              DSTextWidget(
+                message,
+                style: context.typography.bodyMedium,
+                color: context.colorPalette.neutral.grey7,
+                textAlign: TextAlign.center,
+              ),
+          ],
+        ),
+      ),
+      ScreenErrorContent(:final failure, :final message, :final onRetry) =>
+        Padding(
+          padding: EdgeInsets.all(context.space()),
+          child: DSErrorCardWidget(
+            message:
+                message ??
+                FailureTranslator.translate(
+                  context,
+                  failure ?? const UnknownFailure(),
+                ),
+            onRetryClicked: onRetry,
+          ),
+        ),
+      ScreenLoadedContent(:final child) => child,
+    },
+  );
 }
