@@ -182,23 +182,22 @@ void main() {
     expect(loader.size, 144);
   });
 
-  testWidgets('should show the page title above the loader when '
-      'loading', (tester) async {
+  testWidgets('should show only the loader when loading', (tester) async {
     await pumpContent(tester, const JobOpeningState(id: 'job-1'));
 
-    expect(find.byType(PageAppBarWidget), findsOneWidget);
-    expect(find.text('Job opening'), findsOneWidget);
+    expect(find.byType(PageAppBarWidget), findsNothing);
     expect(find.byType(DSLoadingWidget), findsOneWidget);
   });
 
-  testWidgets('should show the page title above the error and retry when '
-      'retry is tapped', (tester) async {
+  testWidgets('should retry from the error card when retry is tapped', (
+    tester,
+  ) async {
     final bloc = await pumpContent(
       tester,
       const JobOpeningState(id: 'job-1', status: JobOpeningStatus.failed),
     );
 
-    expect(find.byType(PageAppBarWidget), findsOneWidget);
+    expect(find.byType(PageAppBarWidget), findsNothing);
     final errorCard = find.byType(DSErrorCardWidget);
     expect(errorCard, findsOneWidget);
     await tester.tap(

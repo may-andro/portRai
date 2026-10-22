@@ -12,7 +12,6 @@ import 'package:portrai/src/feature/job_opening/presentation/extension/_extensio
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
@@ -39,7 +38,6 @@ class ContentWidget extends StatelessWidget {
           previous.isTailoredCvAvailable != current.isTailoredCvAvailable ||
           (previous.insightsStatus == JobOpeningInsightsStatus.unavailable) !=
               (current.insightsStatus == JobOpeningInsightsStatus.unavailable),
-      header: PageAppBarWidget(title: context.localizations.jobOpeningTitle),
       contentOf: (state) => switch (state.status) {
         JobOpeningStatus.loading => const ScreenLoadingContent(),
         JobOpeningStatus.failed => ScreenErrorContent(
