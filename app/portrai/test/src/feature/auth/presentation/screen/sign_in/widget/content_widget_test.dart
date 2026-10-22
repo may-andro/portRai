@@ -214,4 +214,50 @@ void main() {
     },
     variant: TargetPlatformVariant.only(TargetPlatform.macOS),
   );
+
+  testWidgets(
+    'should lay the header over the welcome band and start the welcome text '
+    'below it when stacked',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(820, 1600),
+      );
+
+      final band = find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).gradient is LinearGradient,
+      );
+      final headerBottom = tester
+          .getBottomLeft(find.byType(PageHeaderWidget))
+          .dy;
+      expect(tester.getTopLeft(band.first).dy, 0);
+      expect(tester.getTopLeft(find.byType(PageHeaderWidget)).dy, 0);
+      expect(
+        tester.getTopLeft(find.text('Welcome back')).dy,
+        greaterThan(headerBottom),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets(
+    'should start the form where the logo starts on a tablet when stacked',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const SignInState(),
+        size: const Size(820, 1600),
+      );
+
+      expect(
+        tester.getTopLeft(find.byType(TextFormField).first).dx,
+        logoLeft(tester),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
 }

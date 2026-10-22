@@ -14,10 +14,13 @@ class PageHeaderWidget extends StatelessWidget {
     return context.space(factor: 2);
   }
 
+  /// Height of the header, for content that sits below it when overlaid.
+  static double height(BuildContext context) => context.space(factor: 7);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: context.space(factor: 7),
+      height: height(context),
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding(context)),
       child: Row(
         children: [

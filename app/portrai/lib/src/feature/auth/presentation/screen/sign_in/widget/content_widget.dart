@@ -13,6 +13,9 @@ part 'visual_panel_widget.dart';
 
 const _formMaxWidth = 400.0;
 
+/// Widest the form grows when stacked below the panel.
+const _stackedFormMaxWidth = 560.0;
+
 /// A split screen on desktop, with the full-height welcome panel beside the
 /// sign-in form. Phones and tablets show the panel as a full-width band
 /// above the form.
@@ -26,10 +29,11 @@ class ContentWidget extends StatelessWidget {
     // Side by side only on desktop; phones and tablets stack the panel first.
     final isSideBySide = context.isDesktop;
 
-    final form = Center(
+    // Side by side, the form is centred in its half of the page; stacked, it
+    // starts where the logo and the welcome text do.
+    final form = Align(
+      alignment: isSideBySide ? Alignment.center : Alignment.topLeft,
       child: Padding(
-        // Stacked, the form lines up with the logo; side by side it is
-        // centred in its half of the page.
         padding: EdgeInsets.symmetric(
           horizontal: isSideBySide
               ? context.space(factor: 3)
@@ -37,15 +41,21 @@ class ContentWidget extends StatelessWidget {
           vertical: context.space(factor: isSideBySide ? 6 : 3),
         ),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: _formMaxWidth),
+          constraints: BoxConstraints(
+            maxWidth: isSideBySide ? _formMaxWidth : _stackedFormMaxWidth,
+          ),
           child: const _FormWidget(),
         ),
       ),
     );
-    // The logo sits top-left across the whole page, as on every screen.
-    final header = chrome == PageChrome.header
+    // The logo sits top-left over the panel, as on every screen.
+    final isHeaderShown = chrome == PageChrome.header;
+    final header = isHeaderShown
         ? const PageHeaderWidget()
         : SizedBox(height: MediaQuery.paddingOf(context).top);
+    final headerHeight = isHeaderShown
+        ? PageHeaderWidget.height(context)
+        : MediaQuery.paddingOf(context).top;
 
     return ColoredBox(
       color: palette.background.color,
@@ -77,9 +87,16 @@ class ContentWidget extends StatelessWidget {
                   ),
                 )
               else ...[
-                SliverToBoxAdapter(child: header),
-                const SliverToBoxAdapter(
-                  child: _VisualPanelWidget(isCompact: true),
+                SliverToBoxAdapter(
+                  child: Stack(
+                    children: [
+                      _VisualPanelWidget(
+                        isCompact: true,
+                        topInset: headerHeight,
+                      ),
+                      Positioned(top: 0, left: 0, right: 0, child: header),
+                    ],
+                  ),
                 ),
                 SliverToBoxAdapter(child: form),
               ],

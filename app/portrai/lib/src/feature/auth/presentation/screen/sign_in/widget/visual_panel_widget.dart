@@ -6,10 +6,13 @@ const _copyMaxWidth = 480.0;
 /// The welcome panel: a deep gradient with translucent waves rolling across
 /// its lower part, the welcome copy and the floating sign-in animation.
 class _VisualPanelWidget extends StatefulWidget {
-  const _VisualPanelWidget({required this.isCompact});
+  const _VisualPanelWidget({required this.isCompact, this.topInset = 0});
 
   /// The shorter band above the form on phones and tablets.
   final bool isCompact;
+
+  /// Space kept free at the top for the header laid over the band.
+  final double topInset;
 
   @override
   State<_VisualPanelWidget> createState() => _VisualPanelWidgetState();
@@ -119,10 +122,12 @@ class _VisualPanelWidgetState extends State<_VisualPanelWidget>
             ),
             if (isCompact)
               Padding(
-                // The band starts where the logo does.
-                padding: EdgeInsets.symmetric(
-                  horizontal: PageHeaderWidget.horizontalPadding(context),
-                  vertical: context.space(factor: 4),
+                // The band starts where the logo does, below the header.
+                padding: EdgeInsets.fromLTRB(
+                  PageHeaderWidget.horizontalPadding(context),
+                  widget.topInset + context.space(factor: 2),
+                  PageHeaderWidget.horizontalPadding(context),
+                  context.space(factor: 4),
                 ),
                 child: Row(
                   spacing: context.space(factor: 2),
