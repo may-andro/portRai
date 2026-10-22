@@ -32,7 +32,7 @@ void main() {
 
         expect(find.byType(DSLoadingWidget), findsOneWidget);
         verify(
-          () => bloc.add(const LoadingContentViewVisibleEvent()),
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
         ).called(1);
       },
     );
@@ -63,7 +63,7 @@ void main() {
         await tester.pump();
         expect(find.text('Overview'), findsWidgets);
         verify(
-          () => bloc.add(const SuccessContentViewVisibleEvent()),
+          () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
         ).called(1);
       },
     );

@@ -10,16 +10,8 @@ class ProjectTrackingDelegate extends ScreenTrackingDelegate {
   ProjectTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackLoadingContentView() {
-    trackEvent(ViewTracking(label: 'loading_content_view'));
-  }
-
-  void trackLoadedContentView() {
-    trackEvent(ViewTracking(label: 'loaded_content_view'));
-  }
-
-  void trackErrorContentView() {
-    trackEvent(ViewTracking(label: 'error_content_view'));
+  void trackViewEvent(String label) {
+    trackEvent(ViewTracking(label: label));
   }
 
   void trackAvailabilityLinkClick(String availabilityLinkName) {

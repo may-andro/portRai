@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
@@ -7,7 +5,7 @@ import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bl
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/metrics_widget.dart';
 import 'package:portrai/src/widget/page_band_widget.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'body_widget.dart';
 part 'tab_bar_widget.dart';
@@ -17,37 +15,21 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProjectBloc, ProjectState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
-      },
-      builder: (context, state) {
-        return switch (state) {
-          final LoadingState _ => const _LoadingWidget(),
-          final LoadedState state => _SuccessWidget(
+    return ScreenContentWidget<ProjectBloc, ProjectState>(
+      impressionPrefix: 'project',
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(
+          style: DSLoadingStyle.lottie,
+        ),
+        final LoadedState state => ScreenLoadedContent(
+          _SuccessWidget(
             introSection: state.introSection,
             scrollableSections: state.scrollableSections,
           ),
-        };
+        ),
       },
-    );
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'project_loading_content_view',
-      onImpression: () {
-        context.bloc.add(const LoadingContentViewVisibleEvent());
-      },
-      child: DSLoadingWidget(
-        style: DSLoadingStyle.lottie,
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
   }
 }
@@ -97,15 +79,9 @@ class _SuccessWidgetState extends State<_SuccessWidget>
 
   @override
   Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'project_success_content_view',
-      onImpression: () {
-        context.bloc.add(const SuccessContentViewVisibleEvent());
-      },
-      child: _BodyWidget(
-        scrollController: _scrollController,
-        tabController: _tabController,
-      ),
+    return _BodyWidget(
+      scrollController: _scrollController,
+      tabController: _tabController,
     );
   }
 

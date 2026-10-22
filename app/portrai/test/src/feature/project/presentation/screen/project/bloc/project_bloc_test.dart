@@ -128,16 +128,16 @@ void main() {
             .whereType<ScrollableProjectSectionDTO>()
             .first;
         bloc.add(ScreenVisibleEvent());
-        bloc.add(const LoadingContentViewVisibleEvent());
-        bloc.add(const SuccessContentViewVisibleEvent());
+        bloc.add(const ViewStateVisibleEvent('loading_content_view'));
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
         bloc.add(SectionVisibleEvent(section.trackingId));
         bloc.add(HeaderTabClickEvent(section));
       },
       expect: () => const <ProjectState>[],
       verify: (_) {
         verify(() => tracking.trackScreenView()).called(1);
-        verify(() => tracking.trackLoadingContentView()).called(1);
-        verify(() => tracking.trackLoadedContentView()).called(1);
+        verify(() => tracking.trackViewEvent('loading_content_view')).called(1);
+        verify(() => tracking.trackViewEvent('loaded_content_view')).called(1);
         verify(
           () => tracking.trackSectionView('project_overview_section'),
         ).called(1);

@@ -18,12 +18,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   ) : super(const LoadingState()) {
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
     on<LoadProjectEvent>(_mapLoadProjectEventToState);
-    on<LoadingContentViewVisibleEvent>(
-      _mapLoadingContentViewVisibleEventToState,
-    );
-    on<SuccessContentViewVisibleEvent>(
-      _mapSuccessContentViewVisibleEventToState,
-    );
+    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
     on<SectionVisibleEvent>(_mapSectionVisibleEventToState);
     on<HeaderTabClickEvent>(_mapHeaderTabClickEventToState);
@@ -55,18 +50,11 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     );
   }
 
-  FutureOr<void> _mapLoadingContentViewVisibleEventToState(
-    LoadingContentViewVisibleEvent event,
+  FutureOr<void> _mapViewStateVisibleEventToState(
+    ViewStateVisibleEvent event,
     Emitter<ProjectState> emit,
   ) {
-    _trackingDelegate.trackLoadingContentView();
-  }
-
-  FutureOr<void> _mapSuccessContentViewVisibleEventToState(
-    SuccessContentViewVisibleEvent event,
-    Emitter<ProjectState> emit,
-  ) {
-    _trackingDelegate.trackLoadedContentView();
+    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 
   FutureOr<void> _mapOpenExternalUrlEventToState(
