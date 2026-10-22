@@ -6,18 +6,24 @@ import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/experiences_event.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/experiences_state.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/tracking/_tracking.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
+class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState>
+    with ScreenTrackingBlocMixin<ExperiencesEvent, ExperiencesState> {
   ExperiencesBloc(this._getExperiencesUseCase, this._trackingDelegate)
     : super(const LoadingState()) {
     on<LoadExperiencesEvent>(_mapLoadExperiencesEventToState);
-    on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
-    on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
+    trackScreenViewOn<ScreenVisibleEvent>();
+    trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
 
   final GetExperiencesUseCase _getExperiencesUseCase;
   final ExperiencesTrackingDelegate _trackingDelegate;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
 
   FutureOr<void> _mapLoadExperiencesEventToState(
     LoadExperiencesEvent event,
@@ -34,20 +40,5 @@ class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
         emit(LoadedState(experiences: experiences));
       },
     );
-  }
-
-  // Tracking Events
-  FutureOr<void> _mapScreenVisibleEventToState(
-    ScreenVisibleEvent event,
-    Emitter<ExperiencesState> emit,
-  ) {
-    _trackingDelegate.trackScreenView();
-  }
-
-  FutureOr<void> _mapViewStateVisibleEventToState(
-    ViewStateVisibleEvent event,
-    Emitter<ExperiencesState> emit,
-  ) {
-    _trackingDelegate.trackViewEvent(event.trackingId);
   }
 }
