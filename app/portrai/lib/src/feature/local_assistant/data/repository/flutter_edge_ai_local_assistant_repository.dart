@@ -287,18 +287,21 @@ class FlutterEdgeAiLocalAssistantRepository
         previousQuestion: previousQuestion,
         maxBytes: bytes,
       );
-      answer = _cleanAnswer(
-        await _generate(
-          model,
-          generation: generation,
-          systemInstruction: systemInstruction,
-          temperature: temperature,
-          text:
-              'Portfolio information:\n$selectedContext\n\n'
-              '${previousQuestion == null ? '' : 'Previous user question: $previousQuestion\n\n'}'
-              'Answer only this question, using only the portfolio '
-              'information above: $question',
+      answer = _groundAnswer(
+        _cleanAnswer(
+          await _generate(
+            model,
+            generation: generation,
+            systemInstruction: systemInstruction,
+            temperature: temperature,
+            text:
+                'Portfolio information:\n$selectedContext\n\n'
+                '${previousQuestion == null ? '' : 'Previous user question: $previousQuestion\n\n'}'
+                'Answer only this question, using only the portfolio '
+                'information above: $question',
+          ),
         ),
+        selectedContext,
       );
       if (kDebugMode) {
         debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
@@ -382,6 +385,32 @@ class FlutterEdgeAiLocalAssistantRepository
       .replaceFirst(_answerLabel, '')
       .replaceAll(_blankLines, '\n\n')
       .trim();
+
+  static final _url = RegExp(r'https?://[^\s<>"]+');
+  static final _urlTrailingPunctuation = RegExp(r'[.,;:!?)\]]+$');
+  static final _sentenceEnd = RegExp(r'[.!?](?=\s|$)');
+  static const _missingLink = '(no link listed in the portfolio)';
+  static const _answerBytesNearLimit = 1600;
+
+  // A link the facts do not contain was made up, so it is replaced rather
+  // than shown. An answer about as long as the output limit was cut off, so
+  // it ends at its last full sentence instead of mid-word.
+  static String _groundAnswer(String answer, String selectedContext) {
+    var grounded = answer.replaceAllMapped(_url, (match) {
+      final text = match[0]!;
+      final url = text.replaceFirst(_urlTrailingPunctuation, '');
+      final trailing = text.substring(url.length);
+      return selectedContext.contains(url) ? text : '$_missingLink$trailing';
+    });
+    if (utf8.encode(grounded).length >= _answerBytesNearLimit &&
+        !grounded.endsWith('.') &&
+        !grounded.endsWith('!') &&
+        !grounded.endsWith('?')) {
+      final lastEnd = _sentenceEnd.allMatches(grounded).lastOrNull;
+      if (lastEnd != null) grounded = grounded.substring(0, lastEnd.end);
+    }
+    return grounded.trim();
+  }
 
   @override
   Future<void> cancelPreparation() async {

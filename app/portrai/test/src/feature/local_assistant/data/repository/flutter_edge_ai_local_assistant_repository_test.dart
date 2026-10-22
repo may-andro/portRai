@@ -310,6 +310,57 @@ void main() {
       verify(() => chat.addQueryChunk(any())).called(1);
     });
 
+    test('should replace a link the facts do not contain', () async {
+      final (:repository, :chat) = await prepareRepository();
+      when(() => chat.generateChatResponse()).thenAnswer(
+        (_) async => const TextResponse(
+          'Play Store: https://p/stuart. GitHub: https://github.com/made-up.',
+        ),
+      );
+
+      final answer = await repository.answer(
+        question: 'Where can I find the Stuart app?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {
+              'title': 'Stuart',
+              'links': [
+                'Links for the Stuart project in Spain: https://p/stuart.',
+              ],
+            },
+          ],
+        }),
+      );
+
+      expect(
+        answer,
+        'Play Store: https://p/stuart. '
+        'GitHub: (no link listed in the portfolio).',
+      );
+    });
+
+    test('should end a cut-off answer at its last full sentence', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final complete = [
+        for (var feature = 0; feature < 100; feature++)
+          'Feature $feature shipped.',
+      ].join(' ');
+      when(
+        () => chat.generateChatResponse(),
+      ).thenAnswer((_) async => TextResponse('$complete He also wor'));
+
+      final answer = await repository.answer(
+        question: 'What did he do at Stuart?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'Stuart'},
+          ],
+        }),
+      );
+
+      expect(answer, complete);
+    });
+
     test('should strip markdown from the generated answer', () async {
       final (:repository, :chat) = await prepareRepository();
       when(() => chat.generateChatResponse()).thenAnswer(
