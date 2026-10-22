@@ -38,7 +38,7 @@ class ContentWidget extends StatelessWidget {
       );
     }
     if (!state.isReady) {
-      return ScreenLoadedContent(
+      return ScreenLoadedContent.fullScreen(
         SingleChildScrollView(
           child: Column(
             children: [
@@ -49,7 +49,7 @@ class ContentWidget extends StatelessWidget {
         ),
       );
     }
-    return ScreenLoadedContent(
+    return ScreenLoadedContent.fullScreen(
       AssistantConversationWidget(
         messages: state.messages,
         isSendingQuestion: state.isSendingQuestion,
