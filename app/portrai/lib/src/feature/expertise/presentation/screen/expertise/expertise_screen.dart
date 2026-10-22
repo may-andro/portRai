@@ -28,10 +28,7 @@ class ExpertiseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) {
-        return appServiceLocator.get<ExpertiseBloc>()
-          ..add(const LoadExpertiseEvent());
-      },
+      create: (_) => appServiceLocator.get<ExpertiseBloc>(),
       child: Builder(
         builder: (context) {
           return RouteObserverWidget(

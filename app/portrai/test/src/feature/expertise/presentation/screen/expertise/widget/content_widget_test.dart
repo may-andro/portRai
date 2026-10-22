@@ -1,14 +1,13 @@
-import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
+import '../../../../../../../mock/feature/expertise/presentation/screen/expertise/bloc/mock_expertise_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
-
-class _MockExpertiseBloc extends MockBloc<ExpertiseEvent, ExpertiseState>
-    implements ExpertiseBloc {}
 
 void main() {
   const expertise = ExpertiseEntity(
@@ -34,18 +33,14 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final bloc = _MockExpertiseBloc();
-    whenListen(
-      bloc,
-      const Stream<ExpertiseState>.empty(),
-      initialState: const ExpertiseState(),
-    );
-
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: BlocProvider<ExpertiseBloc>.value(
-          value: bloc,
-          child: const Scaffold(body: ContentWidget(expertise: expertise)),
+        child: ScreenFooterProviderWidget(
+          footer: const Text('footer'),
+          child: BlocProvider<ExpertiseBloc>.value(
+            value: MockExpertiseBloc()..stubState(const ExpertiseState()),
+            child: const ContentWidget(expertise: expertise),
+          ),
         ),
       ),
     );
@@ -83,5 +78,44 @@ void main() {
       expect(tester.takeException(), isNull);
       await disposeContent(tester);
     });
+
+    testWidgets(
+      'should end the shared scroll view with the provided footer when shown',
+      (tester) async {
+        await pumpContent(tester, const Size(1400, 900));
+
+        final scrollView = find.byType(CustomScrollView);
+        expect(scrollView, findsOneWidget);
+        expect(
+          find.descendant(of: scrollView, matching: find.text('SKILLS')),
+          findsOneWidget,
+        );
+        await tester.scrollUntilVisible(
+          find.text('footer'),
+          500,
+          scrollable: find
+              .descendant(of: scrollView, matching: find.byType(Scrollable))
+              .first,
+        );
+        expect(
+          find.descendant(of: scrollView, matching: find.text('footer')),
+          findsOneWidget,
+        );
+        final lastSliver = tester
+            .widget<CustomScrollView>(scrollView)
+            .slivers
+            .last;
+        expect(
+          lastSliver,
+          isA<SliverToBoxAdapter>().having(
+            (sliver) => (sliver.child! as Text).data,
+            'footer text',
+            'footer',
+          ),
+        );
+        expect(find.byType(FooterWidget), findsNothing);
+        await disposeContent(tester);
+      },
+    );
   });
 }
