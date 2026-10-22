@@ -1,11 +1,10 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 import 'package:portrai/src/feature/expertise/presentation/route/_route.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/widget/_widget.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
+import 'package:portrai/src/widget/screen_scaffold_widget.dart';
 
 class ExpertiseScreen extends StatelessWidget {
   const ExpertiseScreen({super.key, required this.expertise});
@@ -27,19 +26,9 @@ class ExpertiseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => appServiceLocator.get<ExpertiseBloc>(),
-      child: Builder(
-        builder: (context) {
-          return RouteObserverWidget(
-            onResume: () => context.bloc.add(const ScreenVisibleEvent()),
-            child: Scaffold(
-              backgroundColor: context.colorPalette.background.color,
-              body: SafeArea(child: ContentWidget(expertise: expertise)),
-            ),
-          );
-        },
-      ),
+    return ScreenScaffoldWidget<ExpertiseBloc, ExpertiseState>(
+      onResume: (bloc) => bloc.add(const ScreenVisibleEvent()),
+      body: SafeArea(child: ContentWidget(expertise: expertise)),
     );
   }
 }
