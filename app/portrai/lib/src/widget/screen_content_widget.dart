@@ -25,9 +25,12 @@ final class ScreenLoadingContent extends ScreenContent {
 }
 
 final class ScreenErrorContent extends ScreenContent {
-  const ScreenErrorContent(this.failure);
+  const ScreenErrorContent(this.failure, {this.onRetry});
 
   final Failure failure;
+
+  /// Shows a retry button on the error card when given.
+  final VoidCallback? onRetry;
 
   @override
   String get trackingLabel => 'error_content_view';
@@ -80,11 +83,12 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
             style: style,
             size: max(context.shortestSide * 0.1, context.space(factor: 2)),
           ),
-          ScreenErrorContent(:final failure) => Center(
+          ScreenErrorContent(:final failure, :final onRetry) => Center(
             child: Padding(
               padding: EdgeInsets.all(context.space()),
               child: DSErrorCardWidget(
                 message: FailureTranslator.translate(context, failure),
+                onRetryClicked: onRetry,
               ),
             ),
           ),

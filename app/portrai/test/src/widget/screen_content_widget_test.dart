@@ -121,5 +121,30 @@ void main() {
         expect(find.byType(TrackingImpressionDetectorWidget), findsNothing);
       },
     );
+
+    testWidgets('should call onRetry when the error card retry is tapped', (
+      tester,
+    ) async {
+      var retryCount = 0;
+      final cubit = MockScreenContentCubit()
+        ..stubStates(const FakeErrorState());
+
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: BlocProvider<MockScreenContentCubit>.value(
+            value: cubit,
+            child: ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
+              contentOf: (_) => ScreenErrorContent(
+                const UnknownFailure(),
+                onRetry: () => retryCount++,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(DSButtonWidget));
+
+      expect(retryCount, 1);
+    });
   });
 }
