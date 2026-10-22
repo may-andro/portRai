@@ -104,11 +104,11 @@ class _AssistantConversationWidgetState
                           (widget.isSendingQuestion ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index == widget.messages.length) {
-                          return const Align(
+                          return Align(
                             alignment: Alignment.centerLeft,
                             child: DSLoadingWidget(
                               style: DSLoadingStyle.lottie,
-                              size: 14,
+                              size: context.space(factor: 1.75),
                             ),
                           );
                         }
