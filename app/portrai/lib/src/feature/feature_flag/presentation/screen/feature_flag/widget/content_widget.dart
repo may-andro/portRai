@@ -28,31 +28,26 @@ class ContentWidget extends StatelessWidget {
       contentOf: (state) => switch (state) {
         FeatureFlagInitialState() ||
         FeatureFlagLoadingState() => const ScreenLoadingContent(),
-        final FeatureFlagLoadedState state => ScreenLoadedContent(
-          _SuccessWidget(state: state),
-        ),
+        FeatureFlagLoadedState(:final filteredFlags, :final searchQuery)
+            when filteredFlags.isEmpty =>
+          ScreenLoadedContent.slivers([
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: _EmptySearchResultWidget(searchQuery: searchQuery),
+            ),
+          ]),
+        FeatureFlagLoadedState(:final filteredFlags, :final viewMode) =>
+          ScreenLoadedContent.slivers([
+            _LoadedContentPaddingWidget(
+              sliver: viewMode == FeatureFlagViewMode.list
+                  ? _ListWidget(flags: filteredFlags)
+                  : _GridWidget(flags: filteredFlags),
+            ),
+          ]),
         FeatureFlagErrorState(:final failure) => ScreenErrorContent(failure),
       },
       onContentVisible: (content) =>
           context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
-    );
-  }
-}
-
-class _SuccessWidget extends StatelessWidget {
-  const _SuccessWidget({required this.state});
-
-  final FeatureFlagLoadedState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return DSResponsiveContainerWidget(
-      key: ValueKey(
-        'feature_flag_content_${state.viewMode}_${state.searchQuery}_${state.allFlags.length}',
-      ),
-      mobileBuilder: (_) => _LoadedContentWidget(state),
-      tabletBuilder: (_) => _LoadedContentWidget(state),
-      desktopBuilder: (_) => _LoadedContentWidget(state),
     );
   }
 }

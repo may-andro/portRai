@@ -7,9 +7,9 @@ class _ListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: flags.map((flag) => _ListItemWidget(flag: flag)).toList(),
+    return SliverList.builder(
+      itemCount: flags.length,
+      itemBuilder: (context, index) => _ListItemWidget(flag: flags[index]),
     );
   }
 }
