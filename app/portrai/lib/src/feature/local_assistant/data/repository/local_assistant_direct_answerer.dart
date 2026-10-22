@@ -1,23 +1,109 @@
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_context_selector.dart';
 
+/// One deterministic answer: [applies] decides whether the question asks for
+/// it, [answer] builds it from the portfolio or returns null when the
+/// portfolio lacks the fact.
+class _Rule {
+  const _Rule({required this.applies, required this.answer});
+
+  final bool Function(String normalizedQuestion) applies;
+  final String? Function(String normalizedQuestion) answer;
+}
+
 /// Answers contact, tenure and career-overview questions straight from the
 /// decoded portfolio JSON built by `GetAssistantContextUseCase`; every other
 /// question is left to the on-device model, which garbles numbers too often
 /// to be trusted with them. Returns null when the model is needed.
+///
+/// Each answer is a [_Rule]; the first rule that applies and finds its fact
+/// wins, so a more specific rule must come before a broader one.
 class LocalAssistantDirectAnswerer {
-  const LocalAssistantDirectAnswerer(this._portfolio);
+  LocalAssistantDirectAnswerer(this._portfolio);
 
   final Map<String, dynamic> _portfolio;
 
+  late final List<_Rule> _rules = [
+    _Rule(
+      applies: (question) =>
+          !_productWords.hasMatch(question) && !_namesPortfolioEntity(question),
+      answer: _contactAnswer,
+    ),
+    _Rule(applies: _asksDuration, answer: _placeDurationAnswer),
+    _Rule(applies: _asksDuration, answer: _companyDurationAnswer),
+    _Rule(applies: _asksDuration, answer: _technologyDurationAnswer),
+    _Rule(
+      applies: (question) =>
+          _totalExperience.hasMatch(question) &&
+          !_otherIntent.hasMatch(question) &&
+          !_namesPortfolioEntity(question) &&
+          !_namesPlace(question),
+      answer: (_) => _totalExperienceAnswer(),
+    ),
+    _overviewRule(
+      (question) =>
+          _longestOrShortest.hasMatch(question) &&
+          _roleWords.hasMatch(question) &&
+          !_knownPlaceHint.hasMatch(question),
+      (question) => _possessive(
+        _overviewLine(
+          question.contains('longest') ? 'Longest role' : 'Shortest role',
+        ),
+      ),
+    ),
+    _overviewRule(
+      _firstRole.hasMatch,
+      (_) => _possessive(_overviewLine('First role')),
+    ),
+    _overviewRule(
+      _currentRole.hasMatch,
+      (_) => _possessive(_overviewLine('Current role')),
+    ),
+    _overviewRule(
+      _careerGaps.hasMatch,
+      (_) => _possessive(_overviewLine('Career gaps')),
+    ),
+    _overviewRule(
+      _leadership.hasMatch,
+      (_) => _possessive(_overviewLine('Leadership roles')),
+    ),
+    _overviewRule(
+      _roleCount.hasMatch,
+      (_) => _possessive(_overviewLine('Career overview')),
+    ),
+    _overviewRule(
+      (question) =>
+          _languages.hasMatch(question) &&
+          _languageKnowledge.hasMatch(question) &&
+          !_programming.hasMatch(question),
+      (_) => _spokenLanguagesAnswer(),
+    ),
+  ];
+
   String? answer(String question) {
     final normalizedQuestion = question.toLowerCase();
-    return _contactAnswer(normalizedQuestion) ??
-        _placeDurationAnswer(normalizedQuestion) ??
-        _companyDurationAnswer(normalizedQuestion) ??
-        _technologyDurationAnswer(normalizedQuestion) ??
-        _totalExperienceAnswer(normalizedQuestion) ??
-        _overviewAnswer(normalizedQuestion);
+    for (final rule in _rules) {
+      if (!rule.applies(normalizedQuestion)) continue;
+      final answer = rule.answer(normalizedQuestion);
+      if (answer != null) return answer;
+    }
+    return null;
   }
+
+  // Ready-computed career facts, returned as written so the model cannot
+  // garble the numbers. Questions that name a company, project or person are
+  // left to the model, which sees that record's own facts.
+  _Rule _overviewRule(
+    bool Function(String normalizedQuestion) matches,
+    String? Function(String normalizedQuestion) answer,
+  ) => _Rule(
+    applies: (question) =>
+        matches(question) && !_namesPortfolioEntity(question),
+    answer: answer,
+  );
+
+  bool _asksDuration(String normalizedQuestion) =>
+      _durationWords.hasMatch(normalizedQuestion) &&
+      !_otherIntent.hasMatch(normalizedQuestion);
 
   static final _durationWords = RegExp(
     r'\b(how long|how many (years|months)|how much (time|experience)|years of|months of|duration|tenure|length of)\b',
@@ -133,10 +219,6 @@ class LocalAssistantDirectAnswerer {
   // "Flutter: 5 years and 2 months; Android: 4 years" -> the entry named in
   // the question.
   String? _technologyDurationAnswer(String normalizedQuestion) {
-    if (!_durationWords.hasMatch(normalizedQuestion) ||
-        _otherIntent.hasMatch(normalizedQuestion)) {
-      return null;
-    }
     for (final (technology, duration) in _entries(
       'Time using each technology',
     )) {
@@ -151,10 +233,6 @@ class LocalAssistantDirectAnswerer {
   // "MediaMarkt Saturn: 3 years and 7 months in 2 roles (...)" -> the company
   // named in the question, as its full name or its first word.
   String? _companyDurationAnswer(String normalizedQuestion) {
-    if (!_durationWords.hasMatch(normalizedQuestion) ||
-        _otherIntent.hasMatch(normalizedQuestion)) {
-      return null;
-    }
     final line = _overviewLine('Time per company');
     if (line == null) return null;
     for (final match in _companyEntry.allMatches(line)) {
@@ -179,59 +257,13 @@ class LocalAssistantDirectAnswerer {
   // "Total professional experience: 10 years (July 2015 to present), ..."
   // for a question about the whole career rather than a place, company or
   // technology.
-  String? _totalExperienceAnswer(String normalizedQuestion) {
-    if (!_totalExperience.hasMatch(normalizedQuestion) ||
-        _otherIntent.hasMatch(normalizedQuestion) ||
-        _namesPortfolioEntity(normalizedQuestion) ||
-        _namesPlace(normalizedQuestion)) {
-      return null;
-    }
+  String? _totalExperienceAnswer() {
     final line = _overviewLine('Total professional experience');
     if (line == null) return null;
     final match = _totalExperienceLine.firstMatch(line);
     if (match == null) return null;
     return '$_name has ${match.group(1)} of professional experience '
         '(${match.group(2)}), counting overlapping roles once.';
-  }
-
-  // Ready-computed career facts, returned as written so the model cannot
-  // garble the numbers. Questions that name a place or a company are left to
-  // the model, which sees that record's own facts.
-  String? _overviewAnswer(String normalizedQuestion) {
-    bool isAbout(RegExp pattern) => pattern.hasMatch(normalizedQuestion);
-    if (_namesPortfolioEntity(normalizedQuestion)) return null;
-    if (isAbout(_longestOrShortest) &&
-        isAbout(_roleWords) &&
-        !_knownPlaceHint.hasMatch(normalizedQuestion)) {
-      return _possessive(
-        _overviewLine(
-          normalizedQuestion.contains('longest')
-              ? 'Longest role'
-              : 'Shortest role',
-        ),
-      );
-    }
-    if (isAbout(_firstRole)) {
-      return _possessive(_overviewLine('First role'));
-    }
-    if (isAbout(_currentRole)) {
-      return _possessive(_overviewLine('Current role'));
-    }
-    if (isAbout(_careerGaps)) {
-      return _possessive(_overviewLine('Career gaps'));
-    }
-    if (isAbout(_leadership)) {
-      return _possessive(_overviewLine('Leadership roles'));
-    }
-    if (isAbout(_roleCount)) {
-      return _possessive(_overviewLine('Career overview'));
-    }
-    if (isAbout(_languages) &&
-        isAbout(_languageKnowledge) &&
-        !isAbout(_programming)) {
-      return _spokenLanguagesAnswer();
-    }
-    return null;
   }
 
   // "Longest role: X." -> "Mayank Rai's longest role: X."
@@ -282,10 +314,6 @@ class LocalAssistantDirectAnswerer {
   }
 
   String? _placeDurationAnswer(String normalizedQuestion) {
-    if (!_durationWords.hasMatch(normalizedQuestion) ||
-        _otherIntent.hasMatch(normalizedQuestion)) {
-      return null;
-    }
     final name = _name;
     for (final (place, (:isCity, :match)) in _places()) {
       if (!_namePattern(place).hasMatch(normalizedQuestion)) continue;
@@ -304,16 +332,12 @@ class LocalAssistantDirectAnswerer {
     return null;
   }
 
-  // Contact details and social links, unless the question is about a
-  // product ("a contact app") or names a company or project ("the GitHub
+  // Contact details and social links. The rule skips questions about a
+  // product ("a contact app") or a named company or project ("the GitHub
   // link for MediaMarkt"), which the model answers from that record.
   String? _contactAnswer(String normalizedQuestion) {
     final profile = _portfolio['profile'];
     if (profile is! Map<String, dynamic>) return null;
-    if (_productWords.hasMatch(normalizedQuestion) ||
-        _namesPortfolioEntity(normalizedQuestion)) {
-      return null;
-    }
     final name = _name;
     final email = _text(profile['email']);
     final phone = _text(profile['phone']);
