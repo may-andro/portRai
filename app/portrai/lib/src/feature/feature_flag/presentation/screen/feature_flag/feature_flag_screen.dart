@@ -1,4 +1,3 @@
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/route/_route.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/_bloc.dart';
@@ -18,13 +17,7 @@ class FeatureFlagScreen extends StatelessWidget {
     return ScreenScaffoldWidget<FeatureFlagBloc, FeatureFlagState>(
       onCreate: (bloc) => bloc.add(const LoadFeatureFlagEvent()),
       onResume: (bloc) => bloc.add(const ScreenVisibleEvent()),
-      appBar: AppBarWidget(height: DSAppBarWidget.getHeight(context)),
-      body: const Column(
-        children: [
-          HeaderWidget(),
-          Expanded(child: ContentWidget()),
-        ],
-      ),
+      body: const ContentWidget(),
     );
   }
 }
