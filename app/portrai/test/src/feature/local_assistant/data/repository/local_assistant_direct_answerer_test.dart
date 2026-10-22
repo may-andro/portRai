@@ -25,7 +25,24 @@ Map<String, dynamic> _portfolio({Map<String, Object?>? profile}) =>
               {'company': 'Acme'},
             ],
             'projects': [
-              {'title': 'Stuart'},
+              {
+                'title': 'Stuart',
+                'technologies': ['Flutter', 'Flutter Web'],
+                'markets': [
+                  {'country': 'Spain', 'playStore': 'https://p/stuart'},
+                ],
+              },
+              {
+                'title': 'Tote',
+                'technologies': ['Kotlin', 'Flutter'],
+                'markets': [
+                  {'country': 'US', 'playStore': '', 'website': 'https://w'},
+                ],
+              },
+            ],
+            'services': [
+              {'title': 'App Development', 'description': 'Mobile apps.'},
+              {'title': 'Consulting'},
             ],
             'overview': [
               'Total time worked per country, overlapping roles counted once: Spain: 6 years and 10 months (A, B); India: 4 years (C, D).',
@@ -39,6 +56,7 @@ Map<String, dynamic> _portfolio({Map<String, Object?>? profile}) =>
               'Time using each technology across all roles, overlapping roles counted once (technologies listed on the roles): Flutter: 5 years and 2 months; Android: 4 years; Android SDK: 6 years.',
               'Career gaps: none, there is no month without a role. Job changes: 3.',
               'Leadership roles: Tech Lead at Initech.',
+              'All roles in chronological order, to answer questions about a year or period: Acme (Dev), July 2015 to September 2015, 3 months, located in India; Initech (Lead), April 2024 to present, 2 years, located in Spain.',
               'Spoken languages (2): English (Fluent), Spanish (Proficient). No other spoken languages are listed.',
               'Experience per city, with time worked and roles: Hyderabad: 2 years and 11 months in 2 roles (C (Dev), D (Lead)); Pune: 2 years and 1 month in 1 role (E (Junior)).',
             ],
@@ -196,6 +214,59 @@ void main() {
 
   test('should leave the question to the model when it names a place', () {
     expect(answerer.answer('longest job at Initech'), isNull);
+  });
+
+  test('should list the projects in a store when asked', () {
+    expect(
+      answerer.answer('Which apps are on the Play Store?'),
+      "Mayank Rai's projects on the Play Store: Stuart.",
+    );
+    expect(
+      answerer.answer('Which projects have a website?'),
+      "Mayank Rai's projects with a website: Tote.",
+    );
+    expect(
+      answerer.answer('Which apps are on the App Store?'),
+      'No project in the portfolio is listed on the App Store.',
+    );
+  });
+
+  test('should list the projects using a technology when asked', () {
+    expect(
+      answerer.answer('Which projects use Flutter?'),
+      "Mayank Rai's projects that use Flutter: Stuart, Tote.",
+    );
+    expect(
+      answerer.answer('Which apps were built with Flutter Web?'),
+      "Mayank Rai's projects that use Flutter Web: Stuart.",
+    );
+  });
+
+  test('should leave project questions about a named record to the model', () {
+    expect(answerer.answer('Which Flutter apps did he build at Acme?'), isNull);
+    expect(answerer.answer('Is Stuart on the Play Store?'), isNull);
+  });
+
+  test('should list the services when asked', () {
+    expect(
+      answerer.answer('Which services are offered?'),
+      'Mayank Rai offers these services:\n'
+      '- App Development: Mobile apps.\n'
+      '- Consulting',
+    );
+  });
+
+  test('should summarize the experience from the overview', () {
+    expect(
+      answerer.answer('Summarize the experience'),
+      'Mayank Rai has 9 years of professional experience (July 2015 to '
+      'present), counting overlapping roles once.\n'
+      'In total: 8 roles at 7 different companies.\n'
+      'Current role: Lead at Initech since April 2024.\n'
+      'Roles from the most recent:\n'
+      '- Initech (Lead), April 2024 to present, 2 years\n'
+      '- Acme (Dev), July 2015 to September 2015, 3 months',
+    );
   });
 
   test('should leave an earlier employer to the model', () {

@@ -271,49 +271,81 @@ class LocalAssistantContextSelector {
   static bool mentionsPortfolioName(
     Map<String, dynamic> portfolio,
     String question,
-  ) {
+  ) =>
+      mentionsRecordName(portfolio, question) ||
+      _mentions(_technologyPatternsOf(portfolio), question);
+
+  /// Whether [question] names a company, project or testimonial author of
+  /// the [portfolio]; technologies do not count.
+  static bool mentionsRecordName(
+    Map<String, dynamic> portfolio,
+    String question,
+  ) => _mentions(_recordPatternsOf(portfolio), question);
+
+  static bool _mentions(List<RegExp> patterns, String question) {
     final normalizedQuestion = question.toLowerCase();
-    return _namePatternsOf(
-      portfolio,
-    ).any((pattern) => pattern.hasMatch(normalizedQuestion));
+    return patterns.any((pattern) => pattern.hasMatch(normalizedQuestion));
   }
 
   // The name patterns of a decoded portfolio, built on its first question
   // and released with it, since the repository keeps one decoded portfolio
   // for as long as the context does not change.
-  static final _namePatternsByPortfolio = Expando<List<RegExp>>();
+  static final _recordPatternsByPortfolio = Expando<List<RegExp>>();
+  static final _technologyPatternsByPortfolio = Expando<List<RegExp>>();
 
-  static List<RegExp> _namePatternsOf(Map<String, dynamic> portfolio) =>
-      _namePatternsByPortfolio[portfolio] ??= [
-        for (final name in portfolioNames(portfolio)) namePattern(name),
+  static List<RegExp> _recordPatternsOf(Map<String, dynamic> portfolio) =>
+      _recordPatternsByPortfolio[portfolio] ??= [
+        for (final name in recordNames(portfolio)) namePattern(name),
+      ];
+
+  static List<RegExp> _technologyPatternsOf(Map<String, dynamic> portfolio) =>
+      _technologyPatternsByPortfolio[portfolio] ??= [
+        for (final name in technologyNames(portfolio)) namePattern(name),
       ];
 
   /// The lower-case names a question can refer to: companies and their
   /// first word, project titles, technologies and testimonial authors.
-  static Set<String> portfolioNames(Map<String, dynamic> portfolio) {
-    List<Map<String, dynamic>> records(String section) =>
-        (portfolio[section] as List? ?? const [])
-            .whereType<Map<String, dynamic>>()
-            .toList();
-    final names = <String>{
-      for (final record in records('experiences')) ...[
-        '${record['company'] ?? ''}',
-        '${record['company'] ?? ''}'.split(' ').first,
-        for (final technology in record['technologies'] as List? ?? const [])
-          '$technology',
-      ],
-      for (final record in records('projects')) ...[
-        '${record['title'] ?? ''}',
-        for (final technology in record['technologies'] as List? ?? const [])
-          '$technology',
-      ],
-      for (final record in records('testimonials')) '${record['name'] ?? ''}',
-    };
-    return {
-      for (final name in names)
-        if (name.trim().length >= 4) name.trim().toLowerCase(),
-    };
-  }
+  static Set<String> portfolioNames(Map<String, dynamic> portfolio) => {
+    ...recordNames(portfolio),
+    ...technologyNames(portfolio),
+  };
+
+  /// The lower-case company names and their first word, project titles and
+  /// testimonial authors.
+  static Set<String> recordNames(Map<String, dynamic> portfolio) =>
+      _significant({
+        for (final record in _records(portfolio, 'experiences')) ...[
+          '${record['company'] ?? ''}',
+          '${record['company'] ?? ''}'.split(' ').first,
+        ],
+        for (final record in _records(portfolio, 'projects'))
+          '${record['title'] ?? ''}',
+        for (final record in _records(portfolio, 'testimonials'))
+          '${record['name'] ?? ''}',
+      });
+
+  /// The lower-case technologies listed on experiences and projects.
+  static Set<String> technologyNames(Map<String, dynamic> portfolio) =>
+      _significant({
+        for (final section in ['experiences', 'projects'])
+          for (final record in _records(portfolio, section))
+            for (final technology
+                in record['technologies'] as List? ?? const [])
+              '$technology',
+      });
+
+  static List<Map<String, dynamic>> _records(
+    Map<String, dynamic> portfolio,
+    String section,
+  ) => (portfolio[section] as List? ?? const [])
+      .whereType<Map<String, dynamic>>()
+      .toList();
+
+  // Names shorter than four characters ("Go", "UI") match too many words.
+  static Set<String> _significant(Set<String> names) => {
+    for (final name in names)
+      if (name.trim().length >= 4) name.trim().toLowerCase(),
+  };
 
   /// Matches the lower-case [name] as a whole word or phrase of a
   /// lower-case question; "c++" and "c#" keep their symbols.

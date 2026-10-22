@@ -28,6 +28,27 @@ class LocalAssistantDirectAnswerer {
           !_productWords.hasMatch(question) && !_namesPortfolioEntity(question),
       answer: _contactAnswer,
     ),
+    _Rule(
+      applies: (question) =>
+          _projectWords.hasMatch(question) &&
+          !_durationWords.hasMatch(question) &&
+          !_namesRecord(question),
+      answer: _projectsByStoreAnswer,
+    ),
+    _Rule(
+      applies: (question) =>
+          _projectWords.hasMatch(question) &&
+          !_durationWords.hasMatch(question) &&
+          !_namesRecord(question),
+      answer: _projectsByTechnologyAnswer,
+    ),
+    _Rule(
+      applies: (question) =>
+          _services.hasMatch(question) &&
+          _listIntent.hasMatch(question) &&
+          !_namesRecord(question),
+      answer: (_) => _servicesAnswer(),
+    ),
     _Rule(applies: _asksDuration, answer: _placeDurationAnswer),
     _Rule(applies: _asksDuration, answer: _companyDurationAnswer),
     _Rule(applies: _asksDuration, answer: _technologyDurationAnswer),
@@ -77,6 +98,10 @@ class LocalAssistantDirectAnswerer {
           !_programming.hasMatch(question),
       (_) => _spokenLanguagesAnswer(),
     ),
+    _overviewRule(
+      _experienceSummary.hasMatch,
+      (_) => _experienceSummaryAnswer(),
+    ),
   ];
 
   String? answer(String question) {
@@ -100,6 +125,99 @@ class LocalAssistantDirectAnswerer {
         matches(question) && !_namesPortfolioEntity(question),
     answer: answer,
   );
+
+  bool _namesRecord(String normalizedQuestion) =>
+      LocalAssistantContextSelector.mentionsRecordName(
+        _portfolio,
+        normalizedQuestion,
+      );
+
+  List<Map<String, dynamic>> _records(String section) =>
+      (_portfolio[section] as List? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .toList();
+
+  static String _titles(Iterable<Map<String, dynamic>> records) =>
+      records.map((record) => '${record['title']}').join(', ');
+
+  // "Which apps are on the Play Store?" -> every project with a link in
+  // that store in at least one market.
+  String? _projectsByStoreAnswer(String normalizedQuestion) {
+    for (final MapEntry(key: store, value: (:label, :pattern))
+        in _stores.entries) {
+      if (!pattern.hasMatch(normalizedQuestion)) continue;
+      final projects = _records('projects').where(
+        (project) => (project['markets'] as List? ?? const [])
+            .whereType<Map<String, dynamic>>()
+            .any((market) => _text(market[store]) != null),
+      );
+      return projects.isEmpty
+          ? 'No project in the portfolio is listed $label.'
+          : "$_name's projects $label: ${_titles(projects)}.";
+    }
+    return null;
+  }
+
+  // "Which projects use Flutter?" -> every project listing the technology the
+  // question names, preferring the longest name ("Flutter Web" over
+  // "Flutter").
+  String? _projectsByTechnologyAnswer(String normalizedQuestion) {
+    final projects = _records('projects');
+    final technologies =
+        {
+            for (final project in projects)
+              for (final technology
+                  in project['technologies'] as List? ?? const [])
+                '$technology',
+          }.toList()
+          ..sort((longer, shorter) => shorter.length.compareTo(longer.length));
+    for (final technology in technologies) {
+      if (!_namePattern(technology).hasMatch(normalizedQuestion)) continue;
+      final using = projects.where(
+        (project) => (project['technologies'] as List? ?? const []).any(
+          (listed) => '$listed'.toLowerCase() == technology.toLowerCase(),
+        ),
+      );
+      return "$_name's projects that use $technology: ${_titles(using)}.";
+    }
+    return null;
+  }
+
+  String? _servicesAnswer() {
+    final services = _records('services');
+    if (services.isEmpty) return null;
+    final described = services.map((service) {
+      final description = _text(service['description']);
+      return description == null
+          ? '- ${service['title']}'
+          : '- ${service['title']}: $description';
+    });
+    return '$_name offers these services:\n${described.join('\n')}';
+  }
+
+  // The total, the counts, the current role and every role from the most
+  // recent, all taken from the computed overview.
+  String? _experienceSummaryAnswer() {
+    final total = _totalExperienceAnswer();
+    final counts = _overviewLine('Career overview');
+    final timeline = _overviewLine('All roles in chronological order');
+    if (total == null || counts == null || timeline == null) return null;
+    final roles = timeline
+        .substring(timeline.indexOf(': ') + 2)
+        .replaceFirst(_trailingPeriod, '')
+        .split('; ')
+        .map((entry) => '- ${entry.replaceFirst(_chronologicalEntry, '')}')
+        .toList()
+        .reversed;
+    final current = _overviewLine('Current role');
+    return [
+      total,
+      counts.replaceFirst('Career overview: ', 'In total: '),
+      ?current,
+      'Roles from the most recent:',
+      ...roles,
+    ].join('\n');
+  }
 
   bool _asksDuration(String normalizedQuestion) =>
       _durationWords.hasMatch(normalizedQuestion) &&
@@ -169,6 +287,25 @@ class LocalAssistantDirectAnswerer {
     r'\b(apps?|application|projects?|features?|build|built|develop|developed|screen|form)\b',
   );
   static final _knownPlaceHint = RegExp(r'\b(in|at|from|for)\s+[a-z]+');
+  static final _projectWords = RegExp(r'\b(projects?|apps?|applications?)\b');
+  static final _services = RegExp(r'\bservices?\b');
+  static final _listIntent = RegExp(
+    r'\b(which|what|list|offer|offers|offered|provide|provides|available)\b',
+  );
+  static final _experienceSummary = RegExp(
+    r'\b(summari[sz]e|summary|overview|outline)\b.*\b(experience|career|work|background|roles?|jobs?)\b|'
+    r'\b(experience|career|work|background)\b.*\b(summari[sz]e|summary|overview|outline)\b',
+  );
+  static final _stores = <String, ({String label, RegExp pattern})>{
+    'playStore': (
+      label: 'on the Play Store',
+      pattern: RegExp(r'\b(play ?store|google play)\b'),
+    ),
+    'appStore': (label: 'on the App Store', pattern: RegExp(r'\bapp ?store\b')),
+    'website': (label: 'with a website', pattern: RegExp(r'\bwebsites?\b')),
+    'github': (label: 'on GitHub', pattern: RegExp(r'\bgithub\b')),
+  };
+  static final _chronologicalEntry = RegExp(r', located in [^;]+$');
 
   // Technology, place and network names come from the portfolio, so their
   // patterns are kept with the decoded portfolio and released with it.
