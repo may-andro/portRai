@@ -62,7 +62,7 @@ class _HeroWidget extends StatelessWidget {
               closeColor: Colors.white,
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.horizontalPadding,
+                  horizontal: context.screenHorizontalPadding.left,
                   vertical: context.space(factor: 2),
                 ),
                 child: isDesktop

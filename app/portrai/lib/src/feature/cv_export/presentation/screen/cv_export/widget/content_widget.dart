@@ -25,23 +25,6 @@ part 'section_picker_widget.dart';
 part 'tailoring_banner_widget.dart';
 part 'template_picker_widget.dart';
 
-extension on BuildContext {
-  /// Same page margins as the other screens, scaled by the window width.
-  double get horizontalPadding {
-    switch (deviceWidth) {
-      case DSDeviceWidthResolution.xs:
-        return space(factor: 3);
-      case DSDeviceWidthResolution.s:
-        return space(factor: 5);
-      case DSDeviceWidthResolution.m:
-        return width * 0.08;
-      case DSDeviceWidthResolution.l:
-      case DSDeviceWidthResolution.xl:
-        return width * 0.15;
-    }
-  }
-}
-
 /// The loaded CV as a sliver: the hero, then the preview and its controls,
 /// with room at the bottom for [DownloadButtonWidget].
 class ContentWidget extends StatelessWidget {
@@ -75,9 +58,9 @@ class ContentWidget extends StatelessWidget {
         const SliverToBoxAdapter(child: _HeroWidget()),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
-            context.horizontalPadding,
+            context.screenHorizontalPadding.left,
             context.space(factor: 3),
-            context.horizontalPadding,
+            context.screenHorizontalPadding.left,
             context.space(factor: 14),
           ),
           sliver: SliverToBoxAdapter(
