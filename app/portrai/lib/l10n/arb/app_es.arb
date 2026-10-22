@@ -91,6 +91,7 @@
   "routeNotFoundTitle": "Página No Encontrada",
   "selectedLanguage": "Idioma Actual",
   "settingDeveloperMode": "Modo Desarrollador",
+  "settingTitle": "Ajustes",
   "splashContactSupport": "contactar soporte",
   "splashErrorMessage": "Algo salió mal durante el inicio. Reinicia la app o",
   "splashErrorTitle": "Error de Configuración",
