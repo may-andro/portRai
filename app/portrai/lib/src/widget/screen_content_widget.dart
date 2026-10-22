@@ -58,8 +58,6 @@ final class ScreenLoadedContent extends ScreenContent {
 /// the first time each one is seen.
 ///
 /// Loading always shows the lottie loader so every screen looks the same.
-/// When [header] is given, loading and error are centred under it; the loaded
-/// child draws its own header.
 /// Rebuilds only when the state type changes unless [buildWhen] is given.
 class ScreenContentWidget<B extends StateStreamable<S>, S>
     extends StatelessWidget {
@@ -68,7 +66,6 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
     this.impressionPrefix,
     this.onContentVisible,
     this.buildWhen,
-    this.header,
     super.key,
   }) : assert(
          onContentVisible == null || impressionPrefix != null,
@@ -82,9 +79,6 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
   final ValueChanged<ScreenContent>? onContentVisible;
   final BlocBuilderCondition<S>? buildWhen;
 
-  /// Sliver shown above the loading and error content, such as an app bar.
-  final Widget? header;
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<B, S>(
@@ -95,7 +89,7 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
         final content = contentOf(state);
         final child = switch (content) {
           ScreenLoadedContent(:final child) => child,
-          _ => _withHeader(_statusWidgetFor(content)),
+          _ => Center(child: _statusWidgetFor(content)),
         };
         final onContentVisible = this.onContentVisible;
         if (onContentVisible == null) return child;
@@ -106,20 +100,6 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
           child: child,
         );
       },
-    );
-  }
-
-  Widget _withHeader(Widget statusWidget) {
-    final header = this.header;
-    if (header == null) return Center(child: statusWidget);
-    return CustomScrollView(
-      slivers: [
-        header,
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Center(child: statusWidget),
-        ),
-      ],
     );
   }
 }

@@ -151,11 +151,7 @@ void main() {
       expect(retryCount, 1);
     });
 
-    Future<void> pumpContent(
-      WidgetTester tester,
-      ScreenContent content, {
-      Widget? header,
-    }) async {
+    Future<void> pumpContent(WidgetTester tester, ScreenContent content) async {
       final cubit = MockScreenContentCubit()
         ..stubStates(const FakeLoadingState());
       await tester.pumpWidget(
@@ -164,7 +160,6 @@ void main() {
             value: cubit,
             child: ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
               contentOf: (_) => content,
-              header: header,
             ),
           ),
         ),
@@ -202,32 +197,6 @@ void main() {
       await pumpContent(tester, const ScreenErrorContent(null));
 
       expect(find.text('Something went wrong. Please try again'), findsOne);
-    });
-
-    testWidgets('should show the header above the loader when one is given', (
-      tester,
-    ) async {
-      await pumpContent(
-        tester,
-        const ScreenLoadingContent(),
-        header: const SliverToBoxAdapter(child: Text('header')),
-      );
-
-      expect(find.text('header'), findsOneWidget);
-      expect(find.byType(DSLoadingWidget), findsOneWidget);
-    });
-
-    testWidgets('should not show the header when the content is loaded', (
-      tester,
-    ) async {
-      await pumpContent(
-        tester,
-        const ScreenLoadedContent(Text('loaded content')),
-        header: const SliverToBoxAdapter(child: Text('header')),
-      );
-
-      expect(find.text('header'), findsNothing);
-      expect(find.text('loaded content'), findsOneWidget);
     });
 
     testWidgets(
