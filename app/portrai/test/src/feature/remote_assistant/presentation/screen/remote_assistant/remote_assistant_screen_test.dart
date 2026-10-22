@@ -13,6 +13,7 @@ import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/widget/content_widget.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../mock/feature/remote_assistant/presentation/screen/remote_assistant/bloc/mock_remote_assistant_bloc.dart';
@@ -274,6 +275,36 @@ void main() {
       verify(() => bloc.add(const ResetRemoteAssistantClickEvent())).called(1);
       await tester.pumpWidget(const SizedBox.shrink());
       verifyNever(bloc.close);
+    },
+  );
+
+  testWidgets(
+    'should show the shared page header without a back button when opened '
+    'from another screen',
+    (tester) async {
+      final fixture = AssistantTestFixture(localEnabled: true);
+      await appServiceLocator.reset();
+      addTearDown(appServiceLocator.reset);
+      fixture.install();
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const RemoteAssistantScreen(),
+                ),
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PageTopBarWidget), findsOneWidget);
+      expect(find.byType(BackButton), findsNothing);
     },
   );
 }
