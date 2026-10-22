@@ -462,6 +462,35 @@ void main() {
     }
   });
 
+  test('should match the names of each portfolio separately', () {
+    Map<String, dynamic> portfolioWith(String company) => _portfolioOf(
+      jsonEncode({
+        'experiences': [
+          {'company': company},
+        ],
+      }),
+    );
+    final stuart = portfolioWith('Stuart');
+    final initech = portfolioWith('Initech');
+
+    for (var repeat = 0; repeat < 2; repeat++) {
+      expect(
+        LocalAssistantContextSelector.mentionsPortfolioName(
+          stuart,
+          'at Stuart',
+        ),
+        isTrue,
+      );
+      expect(
+        LocalAssistantContextSelector.mentionsPortfolioName(
+          initech,
+          'at Stuart',
+        ),
+        isFalse,
+      );
+    }
+  });
+
   test('should treat a pronoun as a follow-up only when nothing is named', () {
     final portfolio = _portfolioOf(
       jsonEncode({

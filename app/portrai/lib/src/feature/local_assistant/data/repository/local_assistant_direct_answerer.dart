@@ -170,16 +170,15 @@ class LocalAssistantDirectAnswerer {
   );
   static final _knownPlaceHint = RegExp(r'\b(in|at|from|for)\s+[a-z]+');
 
-  // Technology and place names come from the portfolio, a small fixed set, so
-  // their patterns are built once and reused across questions.
-  static final _namePatterns = <String, RegExp>{};
+  // Technology, place and network names come from the portfolio, so their
+  // patterns are kept with the decoded portfolio and released with it.
+  static final _namePatternsByPortfolio = Expando<Map<String, RegExp>>();
 
-  static RegExp _namePattern(String name) => _namePatterns.putIfAbsent(
-    name,
-    () => RegExp(
-      '(^|[^a-z0-9])${RegExp.escape(name.toLowerCase())}(\$|[^a-z0-9+#])',
-    ),
-  );
+  RegExp _namePattern(String name) =>
+      (_namePatternsByPortfolio[_portfolio] ??= {}).putIfAbsent(
+        name,
+        () => LocalAssistantContextSelector.namePattern(name),
+      );
 
   String? _overviewLine(String prefix) {
     final overview = _portfolio['overview'];

@@ -273,10 +273,20 @@ class LocalAssistantContextSelector {
     String question,
   ) {
     final normalizedQuestion = question.toLowerCase();
-    return portfolioNames(
+    return _namePatternsOf(
       portfolio,
-    ).any((name) => _namePattern(name).hasMatch(normalizedQuestion));
+    ).any((pattern) => pattern.hasMatch(normalizedQuestion));
   }
+
+  // The name patterns of a decoded portfolio, built on its first question
+  // and released with it, since the repository keeps one decoded portfolio
+  // for as long as the context does not change.
+  static final _namePatternsByPortfolio = Expando<List<RegExp>>();
+
+  static List<RegExp> _namePatternsOf(Map<String, dynamic> portfolio) =>
+      _namePatternsByPortfolio[portfolio] ??= [
+        for (final name in portfolioNames(portfolio)) namePattern(name),
+      ];
 
   /// The lower-case names a question can refer to: companies and their
   /// first word, project titles, technologies and testimonial authors.
@@ -305,11 +315,10 @@ class LocalAssistantContextSelector {
     };
   }
 
-  static final _namePatterns = <String, RegExp>{};
-
-  static RegExp _namePattern(String name) => _namePatterns.putIfAbsent(
-    name,
-    () => RegExp('(^|[^a-z0-9])${RegExp.escape(name)}(\$|[^a-z0-9+#])'),
+  /// Matches the lower-case [name] as a whole word or phrase of a
+  /// lower-case question; "c++" and "c#" keep their symbols.
+  static RegExp namePattern(String name) => RegExp(
+    '(^|[^a-z0-9])${RegExp.escape(name.toLowerCase())}(\$|[^a-z0-9+#])',
   );
 
   // Words of every city and country that appears in an experience location.
