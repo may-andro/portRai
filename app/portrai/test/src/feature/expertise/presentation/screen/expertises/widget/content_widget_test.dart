@@ -1,10 +1,13 @@
 import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertises/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertises/widget/content_widget.dart';
 import 'package:portrai/src/feature/expertise/presentation/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/expertise/presentation/screen/expertises/bloc/mock_expertises_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -16,9 +19,12 @@ void main() {
   Future<void> pumpContent(WidgetTester tester, MockExpertisesBloc bloc) async {
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: BlocProvider<ExpertisesBloc>.value(
-          value: bloc,
-          child: const ContentWidget(),
+        child: ScreenFooterProviderWidget(
+          footer: const Text('footer'),
+          child: BlocProvider<ExpertisesBloc>.value(
+            value: bloc,
+            child: const ContentWidget(),
+          ),
         ),
       ),
     );
@@ -58,7 +64,7 @@ void main() {
       'should render an expertise list and track its impression when loading succeeds',
       (tester) async {
         final bloc = MockExpertisesBloc()
-          ..stubState(const LoadedState(expertises: [], profile: null));
+          ..stubState(const LoadedState(expertises: []));
 
         await pumpContent(tester, bloc);
 
@@ -66,6 +72,37 @@ void main() {
         verify(
           () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
         ).called(1);
+      },
+    );
+
+    testWidgets(
+      'should end the shared scroll view with the provided footer when loading succeeds',
+      (tester) async {
+        final bloc = MockExpertisesBloc()
+          ..stubState(const LoadedState(expertises: []));
+
+        await pumpContent(tester, bloc);
+
+        final scrollView = find.byType(CustomScrollView);
+        expect(scrollView, findsOneWidget);
+        expect(
+          find.descendant(
+            of: scrollView,
+            matching: find.byType(ExpertiseListWidget),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(of: scrollView, matching: find.text('footer')),
+          findsOneWidget,
+        );
+        expect(
+          tester.getTopLeft(find.text('footer')).dy,
+          greaterThanOrEqualTo(
+            tester.getBottomLeft(find.byType(ExpertiseListWidget)).dy,
+          ),
+        );
+        expect(find.byType(FooterWidget), findsNothing);
       },
     );
   });
