@@ -317,6 +317,10 @@ flutter test test/src/feature/assistant test/src/feature/local_assistant \
 Tests use deterministic fixtures and mocked inference. They cover discovery combinations,
 unsupported platforms, flag-only cloud activation, direct-route guards, pending-request invalidation,
 local download consent, and independent sessions. No model download or live AI generation is needed.
+`local_assistant_portfolio_evaluation_test.dart` runs the on-device answer routing and fact
+selection over the real portfolio in `assets/dashboard`. Those files are git-ignored, so the test
+is skipped where they are absent, such as CI; run it locally after changing the selector, the
+direct answers or the portfolio data.
 The catalog widget tests feed real v0.9 messages through `A2uiParserTransformer`
 and `SurfaceController` into `Surface`, covering DS composition, literal text,
 binding updates, surface deletion and unsupported-component error reporting.
