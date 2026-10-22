@@ -68,6 +68,7 @@ void main() {
         final visibleLabels = await pumpScreenContent(tester, cubit);
 
         expect(find.byType(DSErrorCardWidget), findsOneWidget);
+        expect(find.text('Oops…'), findsOneWidget);
         expect(find.text('Something went wrong. Please try again'), findsOne);
         expect(visibleLabels, ['error_content_view']);
       },
@@ -228,6 +229,41 @@ void main() {
       expect(find.text('header'), findsNothing);
       expect(find.text('loaded content'), findsOneWidget);
     });
+
+    testWidgets(
+      'should show the error title and retry label in the app language when '
+      'the language is Spanish',
+      (tester) async {
+        final cubit = MockScreenContentCubit()
+          ..stubStates(const FakeErrorState());
+
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: Builder(
+              builder: (context) => Localizations.override(
+                context: context,
+                locale: const Locale('es'),
+                child: BlocProvider<MockScreenContentCubit>.value(
+                  value: cubit,
+                  child:
+                      ScreenContentWidget<
+                        MockScreenContentCubit,
+                        FakeScreenState
+                      >(
+                        contentOf: (_) =>
+                            ScreenErrorContent(null, onRetry: () {}),
+                      ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('¡Vaya!'), findsOneWidget);
+        expect(find.text('Reintentar'), findsOneWidget);
+      },
+    );
   });
 
   group('ScreenContentSliverWidget', () {

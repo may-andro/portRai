@@ -4,6 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:portrai/generated/failure_translator.g.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:tracking/tracking.dart';
 import 'package:use_case/use_case.dart';
 
@@ -191,6 +192,8 @@ Widget _statusWidgetFor(ScreenContent content) {
                   failure ?? const UnknownFailure(),
                 ),
             onRetryClicked: onRetry,
+            title: context.localizations.errorTitle,
+            retryLabel: context.localizations.retry,
           ),
         ),
       ScreenLoadedContent(:final child) => child,
