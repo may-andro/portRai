@@ -1,3 +1,4 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
@@ -62,5 +63,33 @@ void main() {
       },
       variant: TargetPlatformVariant.only(TargetPlatform.android),
     );
+
+    for (final entry in const {
+      'phone': Size(390, 844),
+      'tablet': Size(820, 1180),
+      'desktop': Size(1440, 900),
+    }.entries) {
+      testWidgets('should start the logo at the screen padding when shown on a '
+          '${entry.key}', (tester) async {
+        tester.view.physicalSize = entry.value;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+
+        await pumpAppBar(tester);
+
+        final context = tester.element(find.byType(PageHeaderWidget));
+        expect(
+          tester
+              .getTopLeft(
+                find.descendant(
+                  of: find.byType(PageHeaderWidget),
+                  matching: find.byType(Image),
+                ),
+              )
+              .dx,
+          context.screenHorizontalPadding.left,
+        );
+      }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+    }
   });
 }
