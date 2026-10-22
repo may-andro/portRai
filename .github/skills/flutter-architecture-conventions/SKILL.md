@@ -105,7 +105,14 @@ type changes unless `buildWhen` is given. Report the impression as a
 `ViewStateVisibleEvent(content.trackingLabel)`. Give `ScreenErrorContent` an `onRetry` when the
 screen can reload, and omit `impressionPrefix`/`onContentVisible` on screens without impression
 tracking. Pass `buildWhen: (previous, current) => previous != current` when a loaded state can
-follow another loaded state with new data.
+follow another loaded state with new data. A single state class with a status enum works too; pass
+a `buildWhen` then. Pass `header:` (e.g. `PageAppBarWidget`) when loading and error must sit under
+the page header, `ScreenLoadingContent(message:)` to explain a long wait, and
+`ScreenErrorContent.message(text)` for errors the feature words itself. For a stateful section
+inside a `CustomScrollView`, use `ScreenContentSliverWidget`, whose loaded child is a sliver.
+
+Screens without loading or error states (forms, static pages, routes that receive their data)
+don't need the widget.
 
 ```dart
 return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
