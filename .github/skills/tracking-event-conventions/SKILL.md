@@ -28,10 +28,6 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
   ExperienceTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackViewEvent(String label) {
-    trackEvent(ViewTracking(label: label));
-  }
-
   void trackTabItemSelection(String sectionName) {
     trackEvent(Tracking(name: 'header_tab', action: ClickAction(label: sectionName)));
   }
@@ -45,8 +41,10 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
 - The delegate is `@register`ed like any other class (see
   `module-injector-annotation-conventions`) and injected into the owning
   bloc's constructor, e.g. `final ExperienceTrackingDelegate _trackingDelegate;`.
-- Expose one small, intention-revealing method per trackable action
-  (`trackViewEvent`, `trackTabItemSelection`, `trackExternalLinkClick`), not
+- `ScreenTrackingDelegate` already provides `trackScreenView()` and
+  `trackViewEvent(label)`; don't redeclare them in a screen delegate.
+- Expose one small, intention-revealing method per other trackable action
+  (`trackTabItemSelection`, `trackExternalLinkClick`), not
   a generic `track(event)` passthrough — callers in the bloc should never
   construct raw `Tracking`/`ViewTracking` objects themselves.
 - Use `ViewTracking(label:)` for screen/section visibility events, and
@@ -58,8 +56,11 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
 ## Wiring into a bloc
 
 The bloc owns the delegate and calls its methods from the relevant event
-handlers (e.g. call `trackViewEvent` on a `ScreenVisibleEvent`,
-`trackTabItemSelection` on a `HeaderTabClickEvent`). Don't call tracking
+handlers (e.g. `trackTabItemSelection` on a `HeaderTabClickEvent`). Screen views
+and view events go through `ScreenTrackingBlocMixin`:
+`trackScreenViewOn<ScreenVisibleEvent>()` and
+`trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId)` (see
+`flutter-architecture-conventions`). Don't call tracking
 methods from widgets directly — widgets only dispatch bloc events (see
 `flutter-architecture-conventions`).
 

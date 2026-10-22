@@ -80,15 +80,39 @@ onPressed: () async {
 ## Bloc event naming
 UI interaction events are named `<Action>ClickEvent` (e.g. `HeaderTabClickEvent`, `DrawerClickEvent`), not `<Action>PressedEvent` or other variants.
 
-Register events with private `_map<EventName>ToState` methods rather than inline handlers.
+Register events with private `_map<EventName>ToState` methods rather than inline handlers. The
+one exception is view tracking: a bloc whose screen tracks views mixes in
+`ScreenTrackingBlocMixin` (`lib/src/utility/screen_tracking_bloc_mixin.dart`), overrides
+`screenTrackingDelegate`, and registers events whose handlers would only track with
+`trackScreenViewOn<ScreenVisibleEvent>()` and
+`trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId)`. Events that also load or
+change state keep their own `_map...ToState` handler.
 
 ## Feature presentation boundaries
 Blocs, states, and events are module-internal presentation details; do not export them from
 public feature barrels or consume them from other features or app composition. Expose domain
 data through feature-owned use cases instead. Public module widgets and routes own their
 internal bloc providers. Route builders return screens directly; provider setup belongs inside
-the screen, not in the route definition. For retained singleton sessions, use
-`BlocProvider.value` so navigating away does not close the shared session.
+the screen, not in the route definition.
+
+Screens build their frame with `ScreenScaffoldWidget<XBloc, XState>`
+(`lib/src/widget/screen_scaffold_widget.dart`) instead of nesting `BlocProvider`, `Builder`,
+`RouteObserverWidget`, `BlocListener` and `Scaffold` themselves. It provides the bloc from the
+service locator. Add the start event in `onCreate` and the visibility event in `onResume`, and
+pass one-off effects (snackbars, navigation) as `listenWhen`/`listener`. Retained singleton
+sessions use `isRetained: true`, so navigating away does not close the shared session. A screen
+shown in a dialog passes `hasScaffold: false`. Widgets passed as `appBar`, `drawer` or
+`floatingActionButton` that need the bloc read it in their own build (e.g. a screen's
+`AppBarWidget`), because the screen's own context is above the provider. Wrappers that don't need
+the bloc, such as `LocalAssistantVisibilityWidget`, go around it.
+
+```dart
+return ScreenScaffoldWidget<ExperiencesBloc, ExperiencesState>(
+  onCreate: (bloc) => bloc.add(const LoadExperiencesEvent()),
+  onResume: (bloc) => bloc.add(const ScreenVisibleEvent()),
+  body: const ContentWidget(),
+);
+```
 
 Use `design_system` components whenever an equivalent exists. Render user-facing plain text with
 `DSTextWidget`, choosing its style from `context.typography` and color from
