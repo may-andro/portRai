@@ -25,6 +25,7 @@ import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/project.dart';
@@ -67,6 +68,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   layer_ff.FeatureFlagModuleConfigurator(appId: 'portrai'),
   AppFeatureFlagModuleConfigurator(),
   ExternalAppHandlerModuleConfigurator(),
+  PermissionModuleConfigurator(),
   UserModuleConfigurator(),
   AuthModuleConfigurator(),
   JobOpeningModuleConfigurator(),
