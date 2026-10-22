@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
+import 'package:tracking/tracking.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../mock/widget/mock_screen_content_cubit.dart';
@@ -93,6 +94,31 @@ void main() {
 
         expect(find.text('loaded content'), findsOneWidget);
         expect(visibleLabels, ['loading_content_view', 'loaded_content_view']);
+      },
+    );
+
+    testWidgets(
+      'should show the loaded child without an impression detector when no '
+      'content callback is given',
+      (tester) async {
+        final cubit = MockScreenContentCubit()
+          ..stubStates(const FakeLoadedState());
+
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: BlocProvider<MockScreenContentCubit>.value(
+              value: cubit,
+              child:
+                  ScreenContentWidget<MockScreenContentCubit, FakeScreenState>(
+                    contentOf: (_) =>
+                        const ScreenLoadedContent(Text('loaded content')),
+                  ),
+            ),
+          ),
+        );
+
+        expect(find.text('loaded content'), findsOneWidget);
+        expect(find.byType(TrackingImpressionDetectorWidget), findsNothing);
       },
     );
   });

@@ -43,24 +43,28 @@ final class ScreenLoadedContent extends ScreenContent {
 }
 
 /// Builds the loading indicator, error card or loaded [ScreenLoadedContent.child]
-/// for the state of bloc [B], and calls [onContentVisible] the first time
-/// each one is seen.
+/// for the state of bloc [B]. When [onContentVisible] is given, it is called
+/// the first time each one is seen.
 ///
 /// Rebuilds only when the state type changes unless [buildWhen] is given.
 class ScreenContentWidget<B extends StateStreamable<S>, S>
     extends StatelessWidget {
   const ScreenContentWidget({
-    required this.impressionPrefix,
     required this.contentOf,
-    required this.onContentVisible,
+    this.impressionPrefix,
+    this.onContentVisible,
     this.buildWhen,
     super.key,
-  });
+  }) : assert(
+         onContentVisible == null || impressionPrefix != null,
+         'An impressionPrefix is needed to report content impressions',
+       );
 
   /// Prefix that keeps this screen's impressions apart from other screens'.
-  final String impressionPrefix;
+  /// Needed when [onContentVisible] is given.
+  final String? impressionPrefix;
   final ScreenContent Function(S state) contentOf;
-  final ValueChanged<ScreenContent> onContentVisible;
+  final ValueChanged<ScreenContent>? onContentVisible;
   final BlocBuilderCondition<S>? buildWhen;
 
   @override
@@ -71,25 +75,28 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
           (previous, current) => previous.runtimeType != current.runtimeType,
       builder: (context, state) {
         final content = contentOf(state);
+        final child = switch (content) {
+          ScreenLoadingContent(:final style) => DSLoadingWidget(
+            style: style,
+            size: max(context.shortestSide * 0.1, context.space(factor: 2)),
+          ),
+          ScreenErrorContent(:final failure) => Center(
+            child: Padding(
+              padding: EdgeInsets.all(context.space()),
+              child: DSErrorCardWidget(
+                message: FailureTranslator.translate(context, failure),
+              ),
+            ),
+          ),
+          ScreenLoadedContent(:final child) => child,
+        };
+        final onContentVisible = this.onContentVisible;
+        if (onContentVisible == null) return child;
         return TrackingImpressionDetectorWidget(
           key: ValueKey(content.trackingLabel),
           impressionId: '${impressionPrefix}_${content.trackingLabel}',
           onImpression: () => onContentVisible(content),
-          child: switch (content) {
-            ScreenLoadingContent(:final style) => DSLoadingWidget(
-              style: style,
-              size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-            ),
-            ScreenErrorContent(:final failure) => Center(
-              child: Padding(
-                padding: EdgeInsets.all(context.space()),
-                child: DSErrorCardWidget(
-                  message: FailureTranslator.translate(context, failure),
-                ),
-              ),
-            ),
-            ScreenLoadedContent(:final child) => child,
-          },
+          child: child,
         );
       },
     );
