@@ -43,14 +43,17 @@ void main() {
     }
 
     testWidgets(
-      'should show the loading indicator and report it when loading',
+      'should show the lottie loading indicator and report it when loading',
       (tester) async {
         final cubit = MockScreenContentCubit()
           ..stubStates(const FakeLoadingState());
 
         final visibleLabels = await pumpScreenContent(tester, cubit);
 
-        expect(find.byType(DSLoadingWidget), findsOneWidget);
+        final loadingWidget = tester.widget<DSLoadingWidget>(
+          find.byType(DSLoadingWidget),
+        );
+        expect(loadingWidget.style, DSLoadingStyle.lottie);
         expect(visibleLabels, ['loading_content_view']);
       },
     );

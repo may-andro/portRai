@@ -18,9 +18,7 @@ class ContentWidget extends StatelessWidget {
     return ScreenContentWidget<ExperienceBloc, ExperienceState>(
       impressionPrefix: 'experience',
       contentOf: (state) => switch (state) {
-        LoadingState() => const ScreenLoadingContent(
-          style: DSLoadingStyle.lottie,
-        ),
+        LoadingState() => const ScreenLoadingContent(),
         ErrorState(:final failure) => ScreenErrorContent(failure),
         LoadedState(:final experience) => ScreenLoadedContent(
           _SuccessWidget(experience: experience),

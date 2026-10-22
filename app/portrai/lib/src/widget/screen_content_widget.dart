@@ -16,9 +16,7 @@ sealed class ScreenContent {
 }
 
 final class ScreenLoadingContent extends ScreenContent {
-  const ScreenLoadingContent({this.style = DSLoadingStyle.dots});
-
-  final DSLoadingStyle style;
+  const ScreenLoadingContent();
 
   @override
   String get trackingLabel => 'loading_content_view';
@@ -49,6 +47,7 @@ final class ScreenLoadedContent extends ScreenContent {
 /// for the state of bloc [B]. When [onContentVisible] is given, it is called
 /// the first time each one is seen.
 ///
+/// Loading always shows the lottie loader so every screen looks the same.
 /// Rebuilds only when the state type changes unless [buildWhen] is given.
 class ScreenContentWidget<B extends StateStreamable<S>, S>
     extends StatelessWidget {
@@ -79,8 +78,8 @@ class ScreenContentWidget<B extends StateStreamable<S>, S>
       builder: (context, state) {
         final content = contentOf(state);
         final child = switch (content) {
-          ScreenLoadingContent(:final style) => DSLoadingWidget(
-            style: style,
+          ScreenLoadingContent() => DSLoadingWidget(
+            style: DSLoadingStyle.lottie,
             size: max(context.shortestSide * 0.1, context.space(factor: 2)),
           ),
           ScreenErrorContent(:final failure, :final onRetry) => Center(

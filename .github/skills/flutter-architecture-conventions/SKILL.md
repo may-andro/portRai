@@ -98,7 +98,8 @@ components, and spacers where they fit without changing the screen's behavior or
 ## Screen content states and padding
 A screen whose bloc has loading, error and loaded states renders them with
 `ScreenContentWidget` (`lib/src/widget/screen_content_widget.dart`) instead of its own
-`_LoadingWidget`/`_ErrorWidget`. It shows `DSLoadingWidget` or a translated
+`_LoadingWidget`/`_ErrorWidget`. It shows the lottie `DSLoadingWidget` (the only loading style for
+screen states) or a translated
 `DSErrorCardWidget`, reports each content's impression once, and rebuilds only when the state
 type changes unless `buildWhen` is given. Report the impression as a
 `ViewStateVisibleEvent(content.trackingLabel)`. Give `ScreenErrorContent` an `onRetry` when the

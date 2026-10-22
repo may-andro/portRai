@@ -30,9 +30,7 @@ class ContentWidget extends StatelessWidget {
     return ScreenContentWidget<ProfileBloc, ProfileState>(
       impressionPrefix: 'profile',
       contentOf: (state) => switch (state) {
-        LoadingState() => const ScreenLoadingContent(
-          style: DSLoadingStyle.lottie,
-        ),
+        LoadingState() => const ScreenLoadingContent(),
         ErrorState(:final failure) => ScreenErrorContent(failure),
         LoadedState(:final profile, :final workPlaces) => ScreenLoadedContent(
           _BodyWidget(profile: profile, workPlaces: workPlaces),

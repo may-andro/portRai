@@ -17,9 +17,7 @@ class ContentWidget extends StatelessWidget {
     return ScreenContentWidget<ProjectBloc, ProjectState>(
       impressionPrefix: 'project',
       contentOf: (state) => switch (state) {
-        LoadingState() => const ScreenLoadingContent(
-          style: DSLoadingStyle.lottie,
-        ),
+        LoadingState() => const ScreenLoadingContent(),
         final LoadedState state => ScreenLoadedContent(
           _SuccessWidget(
             introSection: state.introSection,
