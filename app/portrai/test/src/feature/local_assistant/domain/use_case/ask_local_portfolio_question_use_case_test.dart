@@ -41,10 +41,38 @@ void main() {
         () => repository.answer(
           question: params.question,
           portfolioContext: params.portfolioContext,
+          onPartialAnswer: any(named: 'onPartialAnswer'),
         ),
       ).called(1);
     },
   );
+
+  test('should pass partial answers on when the repository streams', () async {
+    final partialAnswers = <String>[];
+    final repository = MockLocalAssistantRepository();
+    when(
+      () => repository.answer(
+        question: params.question,
+        portfolioContext: params.portfolioContext,
+        onPartialAnswer: any(named: 'onPartialAnswer'),
+      ),
+    ).thenAnswer((invocation) async {
+      final onPartialAnswer =
+          invocation.namedArguments[#onPartialAnswer] as void Function(String)?;
+      onPartialAnswer?.call('These');
+      return 'These projects';
+    });
+
+    await AskLocalPortfolioQuestionUseCase(repository, supportedCase())(
+      AskLocalPortfolioQuestionParams(
+        question: params.question,
+        portfolioContext: params.portfolioContext,
+        onPartialAnswer: partialAnswers.add,
+      ),
+    );
+
+    expect(partialAnswers, ['These']);
+  });
 
   test('should preserve the cause when the repository fails', () async {
     final error = StateError('Model unavailable');
@@ -116,6 +144,7 @@ void main() {
         () => repository.answer(
           question: params.question,
           portfolioContext: params.portfolioContext,
+          onPartialAnswer: any(named: 'onPartialAnswer'),
         ),
       );
     },

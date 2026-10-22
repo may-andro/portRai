@@ -192,6 +192,7 @@ class FlutterEdgeAiLocalAssistantRepository
   Future<String> answer({
     required String question,
     required String portfolioContext,
+    void Function(String partialAnswer)? onPartialAnswer,
   }) async {
     if (_requestActive) throw const LocalAssistantBusyException();
     _requestActive = true;
@@ -206,6 +207,7 @@ class FlutterEdgeAiLocalAssistantRepository
         question: question,
         portfolioContext: portfolioContext,
         generation: generation,
+        onPartialAnswer: onPartialAnswer,
       );
       _ensureCurrent(generation);
       _previousQuestion = question;
@@ -219,6 +221,7 @@ class FlutterEdgeAiLocalAssistantRepository
     required String question,
     required String portfolioContext,
     required int generation,
+    void Function(String partialAnswer)? onPartialAnswer,
   }) async {
     final portfolio = _decodePortfolio(portfolioContext);
     if (portfolio == null) {
@@ -281,6 +284,8 @@ class FlutterEdgeAiLocalAssistantRepository
       (0.2, maxBytes),
       (0.7, maxBytes < 6000 ? maxBytes : 6000),
     ]) {
+      // A retry starts a fresh answer, so the abandoned text is withdrawn.
+      if (answer.isNotEmpty) onPartialAnswer?.call('');
       final selectedContext = LocalAssistantContextSelector().select(
         portfolio,
         question,
@@ -294,6 +299,7 @@ class FlutterEdgeAiLocalAssistantRepository
             generation: generation,
             systemInstruction: systemInstruction,
             temperature: temperature,
+            onPartialAnswer: onPartialAnswer,
             text:
                 'Portfolio information:\n$selectedContext\n\n'
                 '${previousQuestion == null ? '' : 'Previous user question: $previousQuestion\n\n'}'
@@ -320,6 +326,7 @@ class FlutterEdgeAiLocalAssistantRepository
     required String systemInstruction,
     required double temperature,
     required String text,
+    void Function(String partialAnswer)? onPartialAnswer,
   }) async {
     await _chat?.close();
     _chat = null;
@@ -339,9 +346,19 @@ class FlutterEdgeAiLocalAssistantRepository
     // model attends to them far better than in a long system prompt.
     await chat.addQueryChunk(Message(text: text, isUser: true));
     _ensureCurrent(generation);
-    final response = await chat.generateChatResponse();
+    // Tokens are shown as they arrive. A run that starts looping is cut
+    // short, so the retry does not wait for the full output limit.
+    final generated = StringBuffer();
+    await for (final response in chat.generateChatResponseAsync()) {
+      _ensureCurrent(generation);
+      if (response is! TextResponse) continue;
+      generated.write(response.token);
+      final partialAnswer = generated.toString();
+      if (_isDegenerate(partialAnswer)) break;
+      onPartialAnswer?.call(_cleanAnswer(partialAnswer));
+    }
     _ensureCurrent(generation);
-    return response is TextResponse ? response.token.trim() : '';
+    return generated.toString().trim();
   }
 
   /// Returns the decoded [portfolioContext], or null when it is not a JSON

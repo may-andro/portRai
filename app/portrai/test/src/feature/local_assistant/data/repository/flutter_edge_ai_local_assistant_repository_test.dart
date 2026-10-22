@@ -23,9 +23,7 @@ void main() {
         () => model.createChat(temperature: 0.2, maxOutputTokens: 16),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => const TextResponse('Ready'));
+      chat.stubReply('Ready');
       when(() => chat.close()).thenAnswer((_) async {});
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader((
@@ -127,9 +125,7 @@ void main() {
         ),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => const TextResponse('Ready'));
+      chat.stubReply('Ready');
       when(() => chat.close()).thenAnswer((_) async {});
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
@@ -177,9 +173,7 @@ void main() {
       ),
     ).thenAnswer((_) async => chat);
     when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-    when(
-      () => chat.generateChatResponse(),
-    ).thenAnswer((_) async => const TextResponse('Ready'));
+    chat.stubReply('Ready');
     when(() => chat.close()).thenAnswer((_) async {});
     when(() => model.close()).thenAnswer((_) async {});
     final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
@@ -230,9 +224,7 @@ void main() {
         ),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => const TextResponse('Ready'));
+      chat.stubReply('Ready');
       when(() => chat.close()).thenAnswer((_) async {});
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
@@ -312,10 +304,10 @@ void main() {
 
     test('should replace a link the facts do not contain', () async {
       final (:repository, :chat) = await prepareRepository();
-      when(() => chat.generateChatResponse()).thenAnswer(
-        (_) async => const TextResponse(
+      chat.stubStreamedAnswer(
+        () => [
           'Play Store: https://p/stuart. GitHub: https://github.com/made-up.',
-        ),
+        ],
       );
 
       final answer = await repository.answer(
@@ -345,9 +337,7 @@ void main() {
         for (var feature = 0; feature < 100; feature++)
           'Feature $feature shipped.',
       ].join(' ');
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => TextResponse('$complete He also wor'));
+      chat.stubStreamedAnswer(() => ['$complete He also wor']);
 
       final answer = await repository.answer(
         question: 'What did he do at Stuart?',
@@ -363,10 +353,8 @@ void main() {
 
     test('should strip markdown from the generated answer', () async {
       final (:repository, :chat) = await prepareRepository();
-      when(() => chat.generateChatResponse()).thenAnswer(
-        (_) async => const TextResponse(
-          '**Answer:** He built:\n* the MediaMarkt app\n* the Saturn app',
-        ),
+      chat.stubStreamedAnswer(
+        () => ['**Answer:** He built:\n* the MediaMarkt app\n* the Saturn app'],
       );
 
       final answer = await repository.answer(
@@ -381,15 +369,59 @@ void main() {
       expect(answer, 'He built:\n- the MediaMarkt app\n- the Saturn app');
     });
 
+    test('should pass the answer on as it is generated', () async {
+      final (:repository, :chat) = await prepareRepository();
+      chat.stubStreamedAnswer(() => ['**He**', ' builds', ' apps.']);
+      final partialAnswers = <String>[];
+
+      final answer = await repository.answer(
+        question: 'What does he build?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'Stuart'},
+          ],
+        }),
+        onPartialAnswer: partialAnswers.add,
+      );
+
+      expect(partialAnswers, ['He', 'He builds', 'He builds apps.']);
+      expect(answer, 'He builds apps.');
+    });
+
+    test('should withdraw a looping answer before the retry', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final answers = [
+        ['Mayank Rai', ' Mayank Rai', ' Mayank Rai', ' Mayank Rai'],
+        ['He is a Flutter developer.'],
+      ];
+      chat.stubStreamedAnswer(() => answers.removeAt(0));
+      final partialAnswers = <String>[];
+
+      await repository.answer(
+        question: 'Who is he?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai'},
+        }),
+        onPartialAnswer: partialAnswers.add,
+      );
+
+      expect(partialAnswers.last, 'He is a Flutter developer.');
+      expect(partialAnswers, contains(''));
+      expect(
+        partialAnswers,
+        isNot(
+          contains(startsWith('Mayank Rai Mayank Rai Mayank Rai Mayank Rai')),
+        ),
+      );
+    });
+
     test('should retry once when the answer repeats a phrase', () async {
       final (:repository, :chat) = await prepareRepository();
       final answers = [
         'Mayank Rai Mayank Rai Mayank Rai Mayank Rai Mayank Rai',
         'He is a Flutter developer.',
       ];
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => TextResponse(answers.removeAt(0)));
+      chat.stubStreamedAnswer(() => [answers.removeAt(0)]);
 
       final answer = await repository.answer(
         question: 'Who is he?',

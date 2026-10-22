@@ -11,7 +11,11 @@ extension MockLocalAssistantRepositoryStub on MockLocalAssistantRepository {
     required String answer,
   }) {
     when(
-      () => this.answer(question: question, portfolioContext: portfolioContext),
+      () => this.answer(
+        question: question,
+        portfolioContext: portfolioContext,
+        onPartialAnswer: any(named: 'onPartialAnswer'),
+      ),
     ).thenAnswer((_) async => answer);
   }
 
@@ -21,7 +25,11 @@ extension MockLocalAssistantRepositoryStub on MockLocalAssistantRepository {
     required Object error,
   }) {
     when(
-      () => answer(question: question, portfolioContext: portfolioContext),
+      () => answer(
+        question: question,
+        portfolioContext: portfolioContext,
+        onPartialAnswer: any(named: 'onPartialAnswer'),
+      ),
     ).thenThrow(error);
   }
 }

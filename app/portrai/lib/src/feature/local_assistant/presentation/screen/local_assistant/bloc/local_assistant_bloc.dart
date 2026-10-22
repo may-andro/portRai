@@ -83,6 +83,7 @@ class LocalAssistantBloc
         status: const LocalAssistantUnavailable(),
         messages: const [],
         isSendingQuestion: false,
+        partialAnswer: '',
         isLoadingContext: false,
         clearContext: true,
         hasError: result.isLeft || support.isLeft,
@@ -224,6 +225,7 @@ class LocalAssistantBloc
         hasError: false,
         messages: const [],
         isSendingQuestion: false,
+        partialAnswer: '',
         clearFailure: true,
       ),
     );
@@ -336,6 +338,11 @@ class LocalAssistantBloc
       AskLocalPortfolioQuestionParams(
         question: question,
         portfolioContext: portfolioContext,
+        onPartialAnswer: (partialAnswer) {
+          if (!emit.isDone && revision == _requestRevision && state.isReady) {
+            emit(state.copyWith(partialAnswer: partialAnswer));
+          }
+        },
       ),
     );
     if (emit.isDone || revision != _requestRevision || !state.isReady) return;
@@ -344,6 +351,7 @@ class LocalAssistantBloc
         state.copyWith(
           messages: history,
           isSendingQuestion: false,
+          partialAnswer: '',
           hasError: true,
           failure: failure,
         ),
@@ -355,6 +363,7 @@ class LocalAssistantBloc
             AssistantMessageEntity(content: answer, isUser: false),
           ],
           isSendingQuestion: false,
+          partialAnswer: '',
           hasError: false,
           clearFailure: true,
         ),
@@ -372,6 +381,7 @@ class LocalAssistantBloc
       state.copyWith(
         messages: const [],
         isSendingQuestion: false,
+        partialAnswer: '',
         hasError: false,
         clearFailure: true,
       ),
