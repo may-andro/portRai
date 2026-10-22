@@ -4,27 +4,39 @@ import 'dart:io';
 import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
-import 'package:portrai/src/feature/experience/data/mapper/_mapper.dart';
-import 'package:portrai/src/feature/experience/data/model/_model.dart';
-import 'package:portrai/src/feature/expertise/data/mapper/_mapper.dart';
-import 'package:portrai/src/feature/expertise/data/model/_model.dart';
+import 'package:portrai/src/feature/experience/data/mapper/experience_mapper.dart';
+import 'package:portrai/src/feature/experience/data/model/experience_model.dart';
+import 'package:portrai/src/feature/expertise/data/mapper/expertise_mapper.dart';
+import 'package:portrai/src/feature/expertise/data/model/expertise_model.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_context_selector.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/local_assistant_direct_answerer.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
-import 'package:portrai/src/feature/profile/data/mapper/_mapper.dart';
-import 'package:portrai/src/feature/profile/data/model/_model.dart';
-import 'package:portrai/src/feature/project/data/mapper/_mapper.dart';
-import 'package:portrai/src/feature/project/data/model/_model.dart';
-import 'package:portrai/src/feature/service/data/mapper/_mapper.dart';
-import 'package:portrai/src/feature/service/data/model/_model.dart';
-import 'package:portrai/src/feature/testimonial/data/mapper/_mapper.dart';
-import 'package:portrai/src/feature/testimonial/data/model/_model.dart';
+import 'package:portrai/src/feature/profile/data/mapper/availability_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/certification_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/coordinates_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/education_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/language_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/location_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/profile_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/published_at_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/resume_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/social_link_mapper.dart';
+import 'package:portrai/src/feature/profile/data/mapper/working_hours_mapper.dart';
+import 'package:portrai/src/feature/profile/data/model/profile_model.dart';
+import 'package:portrai/src/feature/project/data/mapper/project_mapper.dart';
+import 'package:portrai/src/feature/project/data/model/project_model.dart';
+import 'package:portrai/src/feature/service/data/mapper/service_mapper.dart';
+import 'package:portrai/src/feature/service/data/model/service_model.dart';
+import 'package:portrai/src/feature/testimonial/data/mapper/testimonial_mapper.dart';
+import 'package:portrai/src/feature/testimonial/data/model/testimonial_model.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
 
 // Runs the assistant over the real portfolio in assets/dashboard. Those files
 // are git-ignored, so the test is skipped where they are absent, such as CI.
+// The portfolio is parsed with each feature's own models and mappers, the
+// same path the app's asset repositories take.
 // It checks which questions are answered directly and what the model would
 // see first, which the hand-built fixtures elsewhere cannot catch.
 const _dashboard = 'assets/dashboard';
