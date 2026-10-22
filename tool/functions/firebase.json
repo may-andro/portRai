@@ -12,7 +12,8 @@
         "*.local",
         "src",
         "test",
-        "coverage"
+        "coverage",
+        ".deploy"
       ],
       "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
     }
