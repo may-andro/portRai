@@ -256,6 +256,14 @@ parameters stay metadata-only in diagnostics.
   revision live in `FlutterEdgeAiLocalAssistantRepository`.
 - Explicit model download confirmation, progress, cancellation, keep/delete and retry
   controls remain available from Settings and the setup screen.
+- The app process runs at most one model download. An in-app restart disposes the repository
+  but not its download, and the next repository joins it with the progress reached so far.
+  If the assistant is enabled and the model is still missing at launch, the download resumes,
+  attaching to the one still running if there is one.
+- Agreeing to the download asks for notification permission through the `permission` feature;
+  either answer continues the download. While the app may show notifications, the download shows
+  its progress in one and, on Android, runs in the foreground, so it continues in the
+  background. The app's notification setting is on the Settings screen.
 - Installed models load lazily on a question. A readiness inference probes engine support.
 - Contact details, social links, tenure per place, company and technology, total
   experience and the career overview are answered from the computed context without

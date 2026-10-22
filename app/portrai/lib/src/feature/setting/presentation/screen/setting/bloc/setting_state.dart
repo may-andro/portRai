@@ -23,6 +23,7 @@ class SettingLoadedState extends SettingState {
     this.isDevMenuEnabled = false,
     this.isLocalAssistantAvailable = false,
     this.isJobOpeningsEnabled = false,
+    this.isNotificationSettingAvailable = false,
     this.userRole,
   });
 
@@ -30,6 +31,9 @@ class SettingLoadedState extends SettingState {
   final bool isDevMenuEnabled;
   final bool isLocalAssistantAvailable;
   final bool isJobOpeningsEnabled;
+
+  /// The platform has a notification permission for the app to show.
+  final bool isNotificationSettingAvailable;
   final UserRole? userRole;
 
   @override
@@ -38,6 +42,7 @@ class SettingLoadedState extends SettingState {
     isDevMenuEnabled,
     isLocalAssistantAvailable,
     isJobOpeningsEnabled,
+    isNotificationSettingAvailable,
     userRole,
   ];
 }

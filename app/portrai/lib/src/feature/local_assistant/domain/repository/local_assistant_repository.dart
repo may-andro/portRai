@@ -7,7 +7,13 @@ abstract interface class LocalAssistantRepository {
   /// Whether the model files are already on the device.
   Future<bool> isModelDownloaded();
 
-  Future<void> prepareModel({required void Function(int) onProgress});
+  /// Downloads the model if needed and loads it. With [showsNotification],
+  /// a download shows its progress in a notification and, on Android, runs
+  /// in the foreground so it continues in the background.
+  Future<void> prepareModel({
+    required void Function(int) onProgress,
+    bool showsNotification = false,
+  });
 
   /// Cancels a download or waits for native loading to finish, discards its
   /// result, then deletes everything it wrote.

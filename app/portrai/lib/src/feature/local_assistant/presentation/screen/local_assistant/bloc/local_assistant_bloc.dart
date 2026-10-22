@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/local_assistant/domain/_domain.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_event.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/local_assistant_state.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/tracking/_tracking.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 
 // One shared instance: Settings, the portfolio button and the assistant
 // screen all reflect the same download and enabled state.
@@ -28,6 +29,7 @@ class LocalAssistantBloc
     required this._isLocalAssistantSupportedUseCase,
     @Inject(ResetLocalAssistantSessionUseCase)
     required this._resetLocalAssistantSessionUseCase,
+    required this._requestPermissionUseCase,
   }) : super(const LocalAssistantState()) {
     on<LocalAssistantStartedEvent>(_mapLocalAssistantStartedEventToState);
     on<LocalAssistantInitializedEvent>(
@@ -59,6 +61,7 @@ class LocalAssistantBloc
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
   final ResetLocalAssistantSessionUseCase _resetLocalAssistantSessionUseCase;
+  final RequestPermissionUseCase _requestPermissionUseCase;
   int _controlRevision = 0;
   int _requestRevision = 0;
 
@@ -197,6 +200,13 @@ class LocalAssistantBloc
       ),
     );
     if (!await _checkAvailability(emit) || revision != _controlRevision) return;
+    // The download can show its progress in a notification, so the user is
+    // asked for notifications when agreeing to it. Either answer continues
+    // the download. A kept model needs no download.
+    if (!state.isModelDownloaded) {
+      await _requestPermissionUseCase(AppPermission.notifications);
+      if (emit.isDone || revision != _controlRevision) return;
+    }
     final result = await _updateAssistantEnabledUseCase(true);
     if (emit.isDone || revision != _controlRevision) return;
     if (result.isLeft) {

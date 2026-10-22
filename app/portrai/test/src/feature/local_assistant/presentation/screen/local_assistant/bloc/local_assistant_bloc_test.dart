@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
+import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/assistant/domain/use_case/mock_get_assistant_context_use_case.dart';
@@ -22,6 +23,7 @@ import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_p
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_reset_local_assistant_session_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_update_local_assistant_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/presentation/screen/local_assistant/tracking/mock_local_assistant_tracking_delegate.dart';
+import '../../../../../../../mock/feature/permission/domain/use_case/mock_request_permission_use_case.dart';
 
 void main() {
   late MockGetAssistantContextUseCase getContext;
@@ -35,6 +37,7 @@ void main() {
   late MockIsLocalAssistantSupportedUseCase isSupported;
   late MockAskLocalPortfolioQuestionUseCase askQuestion;
   late MockResetLocalAssistantSessionUseCase resetSession;
+  late MockRequestPermissionUseCase requestPermission;
 
   setUpAll(() {
     registerFallbackValue((int _) {});
@@ -64,6 +67,11 @@ void main() {
     isSupported = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
     resetSession = MockResetLocalAssistantSessionUseCase()
       ..stubCall(const Right(null));
+    requestPermission = MockRequestPermissionUseCase()
+      ..stubCall(
+        AppPermission.notifications,
+        const Right(AppPermissionStatus.granted),
+      );
     return LocalAssistantBloc(
       getContext,
       prepare,
@@ -77,8 +85,42 @@ void main() {
       isFeatureEnabled,
       isLocalAssistantSupportedUseCase: isSupported,
       resetLocalAssistantSessionUseCase: resetSession,
+      requestPermissionUseCase: requestPermission,
     );
   }
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should ask for notifications when the user agrees to the download',
+    build: createBloc,
+    act: (bloc) => bloc.add(const EnableLocalAssistantClickEvent()),
+    verify: (_) {
+      verify(() => requestPermission(AppPermission.notifications)).called(1);
+      verify(() => updateEnabled(true)).called(1);
+    },
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should download when notifications are not allowed',
+    build: () {
+      final bloc = createBloc();
+      requestPermission.stubCall(
+        AppPermission.notifications,
+        const Right(AppPermissionStatus.denied),
+      );
+      return bloc;
+    },
+    act: (bloc) => bloc.add(const EnableLocalAssistantClickEvent()),
+    verify: (_) => verify(() => prepare(any())).called(1),
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should not ask for notifications when the model is kept',
+    build: createBloc,
+    seed: () => const LocalAssistantState(isModelDownloaded: true),
+    act: (bloc) => bloc.add(const EnableLocalAssistantClickEvent()),
+    verify: (_) =>
+        verifyNever(() => requestPermission(AppPermission.notifications)),
+  );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
     'should append typed messages when a portfolio question succeeds',

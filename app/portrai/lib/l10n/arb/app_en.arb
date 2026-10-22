@@ -959,6 +959,30 @@
   "@assistantSettingsReady": {
     "description": "Status shown in settings when the AI model is downloaded and the assistant is enabled"
   },
+  "settingNotificationSection": "Notifications",
+  "@settingNotificationSection": {
+    "description": "Settings section title for the app notification setting"
+  },
+  "notificationPermissionCardTitle": "Allow notifications",
+  "@notificationPermissionCardTitle": {
+    "description": "Label of the switch that shows whether the app may show notifications"
+  },
+  "notificationPermissionCardDescription": "Let the app send you notifications. You can change this at any time in your device settings.",
+  "@notificationPermissionCardDescription": {
+    "description": "Explains the app notification switch and that the device settings control it"
+  },
+  "errorPermissionStatus": "Could not check the app permissions. Please try again.",
+  "@errorPermissionStatus": {
+    "description": "Error shown when the app cannot read whether a permission is allowed"
+  },
+  "errorPermissionRequest": "Could not ask for the permission. Please try again.",
+  "@errorPermissionRequest": {
+    "description": "Error shown when the app cannot show the system permission prompt"
+  },
+  "errorPermissionSettings": "Could not open the app settings. Open them from your device settings.",
+  "@errorPermissionSettings": {
+    "description": "Error shown when the app cannot open its page in the device settings"
+  },
   "assistantEnableDialogTitle": "Download the AI model?",
   "@assistantEnableDialogTitle": {
     "description": "Title of the dialog asking consent to download the AI model"
