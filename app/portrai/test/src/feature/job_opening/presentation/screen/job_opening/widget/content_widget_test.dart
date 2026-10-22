@@ -1,7 +1,8 @@
-import 'dart:ui';
+import 'dart:async';
 
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
@@ -306,5 +307,73 @@ void main() {
     );
 
     expect(find.text('Tailored CV'), findsNothing);
+  });
+
+  group('rebuilds', () {
+    final loadedState = JobOpeningState(
+      id: 'job-1',
+      status: JobOpeningStatus.loaded,
+      jobOpening: jobOpeningEntityFixture(),
+      insightsStatus: JobOpeningInsightsStatus.idle,
+    );
+
+    Future<StreamController<JobOpeningState>> pumpStates(
+      WidgetTester tester,
+    ) async {
+      setUpAnimatedPage(tester);
+      final states = StreamController<JobOpeningState>();
+      addTearDown(states.close);
+      final bloc = MockJobOpeningBloc()
+        ..stubStates(states.stream, initialState: loadedState);
+      addTearDown(bloc.close);
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: BlocProvider<JobOpeningBloc>.value(
+            value: bloc,
+            child: const ContentWidget(),
+          ),
+        ),
+      );
+      await pumpAnimations(tester);
+      return states;
+    }
+
+    CustomScrollView scrollView(WidgetTester tester) =>
+        tester.widget<CustomScrollView>(find.byType(CustomScrollView));
+
+    testWidgets('should not rebuild the page when only the insights '
+        'progress changes', (tester) async {
+      final states = await pumpStates(tester);
+      final pageBeforeInsights = scrollView(tester);
+
+      states.add(
+        loadedState.copyWith(
+          insightsStatus: JobOpeningInsightsStatus.generating,
+        ),
+      );
+      await tester.pump();
+      states.add(
+        loadedState.copyWith(
+          insightsStatus: JobOpeningInsightsStatus.generating,
+          insightsSurfaceIds: const ['surface-1'],
+        ),
+      );
+      await tester.pump();
+
+      expect(scrollView(tester), same(pageBeforeInsights));
+      expect(find.text('Preparing your insights…'), findsOneWidget);
+    });
+
+    testWidgets('should rebuild the page when the tailored CV becomes '
+        'available', (tester) async {
+      final states = await pumpStates(tester);
+      final pageBeforeTailoredCv = scrollView(tester);
+
+      states.add(loadedState.copyWith(isTailoredCvAvailable: true));
+      await tester.pump();
+
+      expect(scrollView(tester), isNot(same(pageBeforeTailoredCv)));
+      expect(find.text('Tailored CV'), findsOneWidget);
+    });
   });
 }

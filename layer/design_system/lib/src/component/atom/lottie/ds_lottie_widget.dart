@@ -1,6 +1,7 @@
 import 'package:design_system/assets/assets.gen.dart';
 import 'package:design_system/src/component/atom/container/ds_visibility_detector_widget.dart';
 import 'package:design_system/src/foundation/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -66,14 +67,54 @@ class _DSLottieWidgetState extends State<DSLottieWidget>
   bool _hasPlayed = false;
   bool _isVisible = false;
 
+  // Lottie resolves the delegates again whenever it receives a new instance,
+  // so they are rebuilt only when the color overrides change.
+  late LottieDelegates _delegates = _buildDelegates();
+
   @override
   void didUpdateWidget(DSLottieWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!_hasSameColorOverrides(
+      oldWidget.colorOverrides,
+      widget.colorOverrides,
+    )) {
+      _delegates = _buildDelegates();
+    }
     if (widget.playback == DSLottiePlayback.trigger &&
         widget.trigger != oldWidget.trigger &&
         _controller.duration != null) {
       _controller.forward(from: 0);
     }
+  }
+
+  LottieDelegates _buildDelegates() {
+    return LottieDelegates(
+      values: [
+        for (final override in widget.colorOverrides) ...[
+          ValueDelegate.color(override.keyPath, value: override.color.color),
+          ValueDelegate.strokeColor(
+            override.keyPath,
+            value: override.color.color,
+          ),
+        ],
+      ],
+    );
+  }
+
+  bool _hasSameColorOverrides(
+    List<DSLottieColorOverride> previousOverrides,
+    List<DSLottieColorOverride> currentOverrides,
+  ) {
+    if (identical(previousOverrides, currentOverrides)) return true;
+    if (previousOverrides.length != currentOverrides.length) return false;
+    for (final (overrideIndex, previousOverride) in previousOverrides.indexed) {
+      final currentOverride = currentOverrides[overrideIndex];
+      if (!listEquals(previousOverride.keyPath, currentOverride.keyPath) ||
+          previousOverride.color.color != currentOverride.color.color) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @override
@@ -118,20 +159,7 @@ class _DSLottieWidgetState extends State<DSLottieWidget>
           package: 'design_system',
           controller: _controller,
           fit: BoxFit.contain,
-          delegates: LottieDelegates(
-            values: [
-              for (final override in widget.colorOverrides) ...[
-                ValueDelegate.color(
-                  override.keyPath,
-                  value: override.color.color,
-                ),
-                ValueDelegate.strokeColor(
-                  override.keyPath,
-                  value: override.color.color,
-                ),
-              ],
-            ],
-          ),
+          delegates: _delegates,
           onLoaded: (composition) {
             _controller.duration = composition.duration;
             _updatePlayback();

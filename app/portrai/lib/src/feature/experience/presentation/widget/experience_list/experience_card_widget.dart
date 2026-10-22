@@ -27,7 +27,10 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
   bool _expanded = false;
   bool _isHovering = false;
   bool _isCompanyHovering = false;
-  Offset? _pointer;
+
+  // Only the spotlight follows the pointer, so moving it does not rebuild
+  // the whole card.
+  final _pointer = ValueNotifier<Offset?>(null);
 
   @override
   void initState() {
@@ -42,6 +45,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
   @override
   void dispose() {
     _controller.dispose();
+    _pointer.dispose();
     super.dispose();
   }
 
@@ -51,10 +55,8 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
   }
 
   void _setHover(bool value) {
-    setState(() {
-      _isHovering = value;
-      if (!value) _pointer = null;
-    });
+    setState(() => _isHovering = value);
+    if (!value) _pointer.value = null;
     widget.onHoverChange(value);
   }
 
@@ -87,7 +89,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
     return MouseRegion(
       onEnter: (_) => _setHover(true),
       onExit: (_) => _setHover(false),
-      onHover: (event) => setState(() => _pointer = event.localPosition),
+      onHover: (event) => _pointer.value = event.localPosition,
       child: AnimatedContainer(
         duration: 300.ms,
         curve: Curves.easeOutCubic,
@@ -194,29 +196,40 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
 
   Widget _spotlight(Color accent) {
     return IgnorePointer(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final pointer = _pointer;
-          final alignment = pointer == null || constraints.maxWidth == 0
-              ? Alignment.topRight
-              : Alignment(
-                  (pointer.dx / constraints.maxWidth) * 2 - 1,
-                  (pointer.dy / constraints.maxHeight.clamp(1, 4000)) * 2 - 1,
-                );
-          return AnimatedOpacity(
-            duration: 300.ms,
-            opacity: _isHovering ? 1 : 0.35,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: alignment,
-                  radius: 0.9,
-                  colors: [Colors.white.withAlpha(24), Colors.transparent],
-                ),
-              ),
-            ),
-          );
-        },
+      child: RepaintBoundary(
+        child: AnimatedOpacity(
+          duration: 300.ms,
+          opacity: _isHovering ? 1 : 0.35,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return ValueListenableBuilder<Offset?>(
+                valueListenable: _pointer,
+                builder: (context, pointer, _) {
+                  final alignment = pointer == null || constraints.maxWidth == 0
+                      ? Alignment.topRight
+                      : Alignment(
+                          (pointer.dx / constraints.maxWidth) * 2 - 1,
+                          (pointer.dy / constraints.maxHeight.clamp(1, 4000)) *
+                                  2 -
+                              1,
+                        );
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: alignment,
+                        radius: 0.9,
+                        colors: [
+                          Colors.white.withAlpha(24),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
