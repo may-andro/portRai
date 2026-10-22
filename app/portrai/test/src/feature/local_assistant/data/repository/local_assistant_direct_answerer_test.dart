@@ -269,6 +269,47 @@ void main() {
     );
   });
 
+  test('should greet back when the message is only a greeting', () {
+    expect(answerer.answer('Hi'), startsWith('Hi! Ask me about Mayank Rai'));
+    expect(answerer.answer('hello there!'), startsWith('Hi!'));
+    expect(answerer.answer('Thanks!'), "You're welcome!");
+    expect(answerer.answer('Hi, what is his email?'), contains('m@x.com'));
+  });
+
+  test('should say the portfolio has no personal details when asked', () {
+    for (final question in [
+      'How old is he?',
+      'What are his hobbies?',
+      'Is he married?',
+    ]) {
+      expect(
+        answerer.answer(question),
+        startsWith('The portfolio does not include personal details'),
+      );
+    }
+  });
+
+  test('should offer the hourly rate when asked for a salary', () {
+    final withRate = LocalAssistantDirectAnswerer(
+      _portfolio(
+        profile: {
+          'name': 'Mayank Rai',
+          'availability': {'hourlyRate': r'$50-75/hour'},
+        },
+      ),
+    );
+
+    expect(
+      withRate.answer('What is his salary expectation?'),
+      'The portfolio does not list a salary expectation. For freelance and '
+      r"consulting work, Mayank Rai's hourly rate is $50-75/hour.",
+    );
+    expect(
+      answerer.answer('What is his salary?'),
+      'The portfolio does not list a salary or rate.',
+    );
+  });
+
   test('should leave an earlier employer to the model', () {
     expect(answerer.answer('Who was his previous employer?'), isNull);
     expect(answerer.answer('Which employer came before that?'), isNull);

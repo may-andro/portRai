@@ -23,6 +23,21 @@ class LocalAssistantDirectAnswerer {
   final Map<String, dynamic> _portfolio;
 
   late final List<_Rule> _rules = [
+    _Rule(applies: _greeting.hasMatch, answer: (_) => _greetingAnswer()),
+    _Rule(applies: _thanks.hasMatch, answer: (_) => "You're welcome!"),
+    _Rule(
+      applies: (question) =>
+          _salary.hasMatch(question) && !_namesRecord(question),
+      answer: (_) => _salaryAnswer(),
+    ),
+    _Rule(
+      applies: (question) =>
+          _personalTopic.hasMatch(question) && !_namesRecord(question),
+      answer: (_) =>
+          'The portfolio does not include personal details such as age, '
+          "family or hobbies. It covers $_name's experience, projects, "
+          'skills, services and availability.',
+    ),
     _Rule(
       applies: (question) =>
           !_productWords.hasMatch(question) && !_namesPortfolioEntity(question),
@@ -125,6 +140,22 @@ class LocalAssistantDirectAnswerer {
         matches(question) && !_namesPortfolioEntity(question),
     answer: answer,
   );
+
+  String _greetingAnswer() =>
+      "Hi! Ask me about $_name's experience, projects, skills, services or "
+      'availability.';
+
+  // The portfolio has no salary, so the freelance rate is the closest fact.
+  String _salaryAnswer() {
+    final availability = (_portfolio['profile'] as Map?)?['availability'];
+    final hourlyRate = availability is Map
+        ? _text(availability['hourlyRate'])
+        : null;
+    return hourlyRate == null
+        ? 'The portfolio does not list a salary or rate.'
+        : 'The portfolio does not list a salary expectation. For freelance '
+              "and consulting work, $_name's hourly rate is $hourlyRate.";
+  }
 
   bool _namesRecord(String normalizedQuestion) =>
       LocalAssistantContextSelector.mentionsRecordName(
@@ -287,6 +318,20 @@ class LocalAssistantDirectAnswerer {
     r'\b(apps?|application|projects?|features?|build|built|develop|developed|screen|form)\b',
   );
   static final _knownPlaceHint = RegExp(r'\b(in|at|from|for)\s+[a-z]+');
+  // A message that is nothing but a greeting or thanks.
+  static final _greeting = RegExp(
+    r'^\s*(hi|hello|hey|hola|good (morning|afternoon|evening))( there)?[\s!.,]*$',
+  );
+  static final _thanks = RegExp(
+    r'^\s*(thanks|thank you|thx|cheers)( a lot| so much)?[\s!.,]*$',
+  );
+  static final _salary = RegExp(
+    r'\b(salary|salaries|compensation|wage|wages|earns?|earning|paid|pay)\b',
+  );
+  static final _personalTopic = RegExp(
+    r'\b(age|how old|born|birthday|birth date|date of birth|married|wife|husband|'
+    r'children|kids|family|religion|hobby|hobbies|interests|free time|spare time)\b',
+  );
   static final _projectWords = RegExp(r'\b(projects?|apps?|applications?)\b');
   static final _services = RegExp(r'\bservices?\b');
   static final _listIntent = RegExp(
