@@ -39,7 +39,7 @@ void main() {
     await tester.pumpWidget(
       TestWidgetWrapper(
         child: BlocProvider<ServiceBloc>.value(
-          value: MockServiceBloc()..stubState(const LoadingState()),
+          value: MockServiceBloc()..stubState(const ServiceState()),
           child: ContentWidget(service: service),
         ),
       ),

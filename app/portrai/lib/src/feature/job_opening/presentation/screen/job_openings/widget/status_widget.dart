@@ -1,22 +1,5 @@
 part of 'content_widget.dart';
 
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.space(factor: 6)),
-      child: Center(
-        child: DSLoadingWidget(
-          style: DSLoadingStyle.lottie,
-          size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-        ),
-      ),
-    );
-  }
-}
-
 class _EmptyWidget extends StatelessWidget {
   const _EmptyWidget();
 

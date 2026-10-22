@@ -76,7 +76,7 @@ class _HeroWidget extends StatelessWidget {
                 closeColor: Colors.white,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.horizontalPadding,
+                    horizontal: context.screenHorizontalPadding.left,
                     vertical: context.space(factor: isWide ? 5 : 3),
                   ),
                   child: isWide

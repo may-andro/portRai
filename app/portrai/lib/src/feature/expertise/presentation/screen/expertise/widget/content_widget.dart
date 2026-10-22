@@ -5,8 +5,8 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/lottie/_lottie.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 import 'package:tracking/tracking.dart';
 
 part 'hero_widget.dart';
@@ -29,12 +29,8 @@ class ContentWidget extends StatelessWidget {
     return TrackingImpressionDetectorWidget(
       impressionId: 'expertise_content_view',
       onImpression: () => context.bloc.add(const ContentVisibleEvent()),
-      child: CustomScrollView(
-        scrollBehavior: ScrollConfiguration.of(
-          context,
-        ).copyWith(scrollbars: false, overscroll: false),
-        physics: const BouncingScrollPhysics(),
-        slivers: [
+      child: ScreenContentWidget<ExpertiseBloc, ExpertiseState>(
+        contentOf: (_) => ScreenLoadedContent.slivers([
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,34 +38,11 @@ class ContentWidget extends StatelessWidget {
                 _HeroWidget(expertise: expertise),
                 _StatsBandWidget(expertise: expertise),
                 _SkillsBandWidget(expertise: expertise),
-                BlocBuilder<ExpertiseBloc, ExpertiseState>(
-                  buildWhen: (previous, current) {
-                    return previous.profile != current.profile;
-                  },
-                  builder: (context, state) {
-                    final profile = state.profile;
-                    if (profile == null) return const SizedBox.shrink();
-                    return FooterWidget(profile: profile);
-                  },
-                ),
               ],
             ),
           ),
-        ],
+        ]),
       ),
     );
-  }
-}
-
-extension on BuildContext {
-  double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
-    }
   }
 }

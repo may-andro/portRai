@@ -25,6 +25,7 @@
   "errorExternalUrlLaunch": "No se puede abrir el enlace. Inténtalo de nuevo",
   "errorForceUpdateStoreUrl": "No se puede abrir la tienda de aplicaciones. Inténtalo de nuevo",
   "errorGeneric": "Algo salió mal. Inténtalo de nuevo",
+  "errorTitle": "¡Vaya!",
   "errorLocaleFailedToLoadFromCache": "Error al cargar la configuración de idioma",
   "errorLocaleFailedToLoadUnknownReason": "Error al cargar la configuración de idioma",
   "errorAiImageSettingsSave": "Error al guardar la configuración de la imagen de IA",

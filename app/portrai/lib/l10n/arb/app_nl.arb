@@ -25,6 +25,7 @@
   "errorExternalUrlLaunch": "Kan de link niet openen. Probeer opnieuw",
   "errorForceUpdateStoreUrl": "Kan de app store niet openen. Probeer opnieuw",
   "errorGeneric": "Er ging iets mis. Probeer opnieuw",
+  "errorTitle": "Oeps…",
   "errorLocaleFailedToLoadFromCache": "Fout bij laden taalinstelling",
   "errorLocaleFailedToLoadUnknownReason": "Fout bij laden taalinstelling",
   "errorAiImageSettingsSave": "Fout bij opslaan van AI-afbeeldingsinstellingen",

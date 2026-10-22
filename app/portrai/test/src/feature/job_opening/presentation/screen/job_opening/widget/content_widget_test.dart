@@ -9,7 +9,10 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/widget/_widget.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
@@ -27,9 +30,12 @@ void main() {
     addTearDown(bloc.close);
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: BlocProvider<JobOpeningBloc>.value(
-          value: bloc,
-          child: const ContentWidget(),
+        child: ScreenFooterProviderWidget(
+          footer: const Text('footer'),
+          child: BlocProvider<JobOpeningBloc>.value(
+            value: bloc,
+            child: const ContentWidget(),
+          ),
         ),
       ),
     );
@@ -181,6 +187,32 @@ void main() {
     expect(loader.size, 144);
   });
 
+  testWidgets('should show only the loader when loading', (tester) async {
+    await pumpContent(tester, const JobOpeningState(id: 'job-1'));
+
+    expect(find.byType(PageAppBarWidget), findsNothing);
+    expect(find.byType(DSLoadingWidget), findsOneWidget);
+  });
+
+  testWidgets('should retry from the error card when retry is tapped', (
+    tester,
+  ) async {
+    final bloc = await pumpContent(
+      tester,
+      const JobOpeningState(id: 'job-1', status: JobOpeningStatus.failed),
+    );
+
+    expect(find.byType(PageAppBarWidget), findsNothing);
+    final errorCard = find.byType(DSErrorCardWidget);
+    expect(errorCard, findsOneWidget);
+    await tester.tap(
+      find.descendant(of: errorCard, matching: find.byType(DSButtonWidget)),
+    );
+    await tester.pump();
+
+    verify(() => bloc.add(const JobOpeningRetryClickEvent())).called(1);
+  });
+
   testWidgets('should show how long ago the opening was posted next to its '
       'date', (tester) async {
     final posted = DateTime.now().subtract(const Duration(days: 3));
@@ -195,6 +227,46 @@ void main() {
 
     expect(find.text('Posted 3 days ago'), findsOneWidget);
     expect(find.text(DateFormat.yMMMd('en').format(posted)), findsOneWidget);
+  });
+
+  testWidgets('should end the shared scroll view with the screen footer when '
+      'loaded', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningState(
+        id: 'job-1',
+        status: JobOpeningStatus.loaded,
+        jobOpening: jobOpeningEntityFixture(),
+      ),
+    );
+
+    final scrollView = find.descendant(
+      of: find.byType(ScreenContentWidget<JobOpeningBloc, JobOpeningState>),
+      matching: find.byType(CustomScrollView),
+    );
+    expect(scrollView, findsOneWidget);
+    expect(
+      find.descendant(
+        of: scrollView,
+        matching: find.text('Senior Flutter Developer'),
+      ),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.text('footer', skipOffstage: false),
+      200,
+    );
+    expect(
+      tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
+      greaterThan(tester.getBottomLeft(find.text('Apply on Remotive').last).dy),
+    );
+    expect(find.byType(FooterWidget), findsNothing);
+  });
+
+  testWidgets('should show no footer while loading', (tester) async {
+    await pumpContent(tester, const JobOpeningState(id: 'job-1'));
+
+    expect(find.text('footer', skipOffstage: false), findsNothing);
   });
 
   JobOpeningState insightsState(
@@ -328,9 +400,12 @@ void main() {
       addTearDown(bloc.close);
       await tester.pumpWidget(
         TestWidgetWrapper(
-          child: BlocProvider<JobOpeningBloc>.value(
-            value: bloc,
-            child: const ContentWidget(),
+          child: ScreenFooterProviderWidget(
+            footer: const Text('footer'),
+            child: BlocProvider<JobOpeningBloc>.value(
+              value: bloc,
+              child: const ContentWidget(),
+            ),
           ),
         ),
       );

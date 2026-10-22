@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/feature_flag/domain/_domain.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/presentation/screen/feature_flag/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/feature_flag/presentation/screen/feature_flag/bloc/mock_feature_flag_bloc.dart';
 import '../../../../../../../mock/feature/feature_flag/test_data/feature_flag_test_data.dart';
@@ -22,7 +25,13 @@ void main() {
     Future<void> pumpWidget(WidgetTester tester, FeatureFlagBloc bloc) async {
       await tester.pumpWidget(
         TestWidgetWrapper(
-          child: BlocProvider.value(value: bloc, child: const ContentWidget()),
+          child: ScreenFooterProviderWidget(
+            footer: const Text('footer'),
+            child: BlocProvider.value(
+              value: bloc,
+              child: const ContentWidget(),
+            ),
+          ),
         ),
       );
       await tester.pump();
@@ -47,30 +56,38 @@ void main() {
 
         await pumpWidget(tester, bloc);
 
-        verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+        ).called(1);
       },
     );
 
-    testWidgets('should render an error message when the state is error', (
-      tester,
-    ) async {
-      const state = FeatureFlagErrorState('something went wrong');
-      final bloc = MockFeatureFlagBloc()..stubState(state);
+    testWidgets(
+      'should render an error card with the translated failure when the state is error',
+      (tester) async {
+        const state = FeatureFlagErrorState(FeatureFlagsNotFoundFailure());
+        final bloc = MockFeatureFlagBloc()..stubState(state);
 
-      await pumpWidget(tester, bloc);
+        await pumpWidget(tester, bloc);
 
-      expect(find.text('something went wrong'), findsOneWidget);
-    });
+        expect(find.byType(DSErrorCardWidget), findsOneWidget);
+        expect(find.text('No feature flags found'), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'should dispatch error impression event when the error content becomes visible',
       (tester) async {
         final bloc = MockFeatureFlagBloc()
-          ..stubState(const FeatureFlagErrorState('boom'));
+          ..stubState(
+            const FeatureFlagErrorState(FeatureFlagsNotFoundFailure()),
+          );
 
         await pumpWidget(tester, bloc);
 
-        verify(() => bloc.add(ViewStateVisibleEvent.error())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('error_content_view')),
+        ).called(1);
       },
     );
 
@@ -92,6 +109,50 @@ void main() {
     );
 
     testWidgets(
+      'should render the flags inside the shared scroll view followed by the footer when the state is loaded',
+      (tester) async {
+        final bloc = MockFeatureFlagBloc()
+          ..stubState(const FeatureFlagLoadedState([testimonialsFlag]));
+
+        await pumpWidget(tester, bloc);
+
+        expect(
+          find.descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.text(testimonialsFlag.name),
+          ),
+          findsOneWidget,
+        );
+        expect(find.byType(SliverList), findsOneWidget);
+        expect(find.text('footer', skipOffstage: false), findsOneWidget);
+        expect(
+          tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
+          greaterThan(
+            tester.getBottomLeft(find.text(testimonialsFlag.name)).dy,
+          ),
+        );
+        expect(find.byType(FooterWidget), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'should fill the remaining height with the empty search result followed by the footer when no flags match the query',
+      (tester) async {
+        final bloc = MockFeatureFlagBloc()
+          ..stubState(
+            const FeatureFlagLoadedState([
+              testimonialsFlag,
+            ], searchQuery: 'missing'),
+          );
+
+        await pumpWidget(tester, bloc);
+
+        expect(find.byType(SliverFillRemaining), findsOneWidget);
+        expect(find.text('footer', skipOffstage: false), findsOneWidget);
+      },
+    );
+
+    testWidgets(
       'should dispatch success impression event when the loaded content becomes visible',
       (tester) async {
         final bloc = MockFeatureFlagBloc()
@@ -99,7 +160,9 @@ void main() {
 
         await pumpWidget(tester, bloc);
 
-        verify(() => bloc.add(ViewStateVisibleEvent.success())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
+        ).called(1);
       },
     );
 
@@ -142,7 +205,7 @@ void main() {
 
       await pumpWidget(tester, bloc);
 
-      expect(find.byType(GridView), findsOneWidget);
+      expect(find.byType(SliverGrid), findsOneWidget);
       expect(find.text(testimonialsFlag.name), findsOneWidget);
       expect(find.text(servicesFlag.name), findsOneWidget);
     });

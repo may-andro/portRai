@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
@@ -17,21 +18,29 @@ void main() {
 
   tearDown(() => appServiceLocator.reset());
 
+  Future<void> pumpContent(
+    WidgetTester tester,
+    SettingLoadedState state,
+  ) async {
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: CustomScrollView(slivers: [ContentWidget(state: state)]),
+      ),
+    );
+    await tester.pump();
+  }
+
   group('Setting ContentWidget', () {
     for (final isJobOpeningsEnabled in [true, false]) {
       testWidgets('should show the job openings card only when its flag is '
           'on, when the flag is $isJobOpeningsEnabled', (tester) async {
-        await tester.pumpWidget(
-          TestWidgetWrapper(
-            child: ContentWidget(
-              state: SettingLoadedState(
-                isLanguageSelectorEnabled: false,
-                isJobOpeningsEnabled: isJobOpeningsEnabled,
-              ),
-            ),
+        await pumpContent(
+          tester,
+          SettingLoadedState(
+            isLanguageSelectorEnabled: false,
+            isJobOpeningsEnabled: isJobOpeningsEnabled,
           ),
         );
-        await tester.pump();
 
         expect(
           find.byType(JobOpeningsCardWidget),
@@ -44,17 +53,13 @@ void main() {
       tester,
     ) async {
       AssistantTestFixture(remoteRollout: false).install();
-      await tester.pumpWidget(
-        const TestWidgetWrapper(
-          child: ContentWidget(
-            state: SettingLoadedState(
-              isLanguageSelectorEnabled: false,
-              isLocalAssistantAvailable: true,
-            ),
-          ),
+      await pumpContent(
+        tester,
+        const SettingLoadedState(
+          isLanguageSelectorEnabled: false,
+          isLocalAssistantAvailable: true,
         ),
       );
-      await tester.pump();
 
       expect(find.text('Portfolio AI'), findsOneWidget);
     });
@@ -62,14 +67,10 @@ void main() {
     testWidgets('should hide the AI section when the feature flag is off', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        const TestWidgetWrapper(
-          child: ContentWidget(
-            state: SettingLoadedState(isLanguageSelectorEnabled: false),
-          ),
-        ),
+      await pumpContent(
+        tester,
+        const SettingLoadedState(isLanguageSelectorEnabled: false),
       );
-      await tester.pump();
 
       expect(find.text('Portfolio AI'), findsNothing);
     });
@@ -77,17 +78,13 @@ void main() {
     testWidgets(
       'should render the language section and developer mode button when both are enabled',
       (tester) async {
-        await tester.pumpWidget(
-          const TestWidgetWrapper(
-            child: ContentWidget(
-              state: SettingLoadedState(
-                isLanguageSelectorEnabled: true,
-                isDevMenuEnabled: true,
-              ),
-            ),
+        await pumpContent(
+          tester,
+          const SettingLoadedState(
+            isLanguageSelectorEnabled: true,
+            isDevMenuEnabled: true,
           ),
         );
-        await tester.pump();
 
         expect(find.text('Language'), findsOneWidget);
         expect(find.text('Current Language'), findsOneWidget);
@@ -98,18 +95,13 @@ void main() {
     testWidgets(
       'should hide the language section when the selector is disabled and developer mode is enabled',
       (tester) async {
-        await tester.pumpWidget(
-          const TestWidgetWrapper(
-            child: ContentWidget(
-              state: SettingLoadedState(
-                isLanguageSelectorEnabled: false,
-                isDevMenuEnabled: true,
-              ),
-            ),
+        await pumpContent(
+          tester,
+          const SettingLoadedState(
+            isLanguageSelectorEnabled: false,
+            isDevMenuEnabled: true,
           ),
         );
-
-        await tester.pump();
 
         expect(find.text('Language'), findsNothing);
         expect(find.text('Current Language'), findsNothing);
@@ -120,14 +112,10 @@ void main() {
     testWidgets(
       'should hide developer mode when disabled while the language selector is enabled',
       (tester) async {
-        await tester.pumpWidget(
-          const TestWidgetWrapper(
-            child: ContentWidget(
-              state: SettingLoadedState(isLanguageSelectorEnabled: true),
-            ),
-          ),
+        await pumpContent(
+          tester,
+          const SettingLoadedState(isLanguageSelectorEnabled: true),
         );
-        await tester.pump();
 
         expect(find.text('Language'), findsOneWidget);
         expect(find.text('Current Language'), findsOneWidget);

@@ -10,6 +10,8 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/r
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
 import 'package:portrai/src/widget/app_version_widget.dart';
 
+/// The settings form as a sliver that fills the remaining height, keeping the
+/// app version at the bottom.
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key, required this.state});
 
@@ -17,89 +19,81 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: context.getFormCardWidth(constraints),
-                minHeight: constraints.maxHeight,
-              ),
+    return SliverLayoutBuilder(
+      builder: (context, constraints) {
+        return SliverFillRemaining(
+          hasScrollBody: false,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: context.getFormCardWidth(constraints.crossAxisExtent),
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.space(factor: 2),
                   vertical: context.space(factor: context.isDesktop ? 2 : 0),
                 ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (state.isLanguageSelectorEnabled) ...[
-                        SectionTitleWidget(
-                          title: context.localizations.language,
-                        ),
-                        const LanguageCardWidget(),
-                      ],
-                      if (state.userRole case final userRole?) ...[
-                        SectionTitleWidget(
-                          title: context.localizations.settingRoleSection,
-                        ),
-                        RoleCardWidget(role: userRole),
-                      ],
-                      if (state.isLocalAssistantAvailable) ...[
-                        SectionTitleWidget(
-                          title: context.localizations.assistantTitle,
-                        ),
-                        const LocalAssistantCardWidget(),
-                      ],
-                      if (state.isJobOpeningsEnabled) ...[
-                        SectionTitleWidget(
-                          title: context.localizations.jobOpeningsSection,
-                        ),
-                        const JobOpeningsCardWidget(),
-                      ],
-                      if (state.isDevMenuEnabled) ...[
-                        const DSVerticalSpacerWidget(3),
-                        DSButtonWidget(
-                          label: context.localizations.settingDeveloperMode,
-                          onPressed: () =>
-                              DeveloperMenuScreen.navigate(context),
-                          variant: DSButtonVariant.text,
-                          size: DSButtonSize.small,
-                        ),
-                      ],
-                      const Spacer(),
-                      const DSVerticalSpacerWidget(3),
-                      const SafeArea(child: Align(child: AppVersionWidget())),
-                      const DSVerticalSpacerWidget(2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (state.isLanguageSelectorEnabled) ...[
+                      SectionTitleWidget(title: context.localizations.language),
+                      const LanguageCardWidget(),
                     ],
-                  ),
+                    if (state.userRole case final userRole?) ...[
+                      SectionTitleWidget(
+                        title: context.localizations.settingRoleSection,
+                      ),
+                      RoleCardWidget(role: userRole),
+                    ],
+                    if (state.isLocalAssistantAvailable) ...[
+                      SectionTitleWidget(
+                        title: context.localizations.assistantTitle,
+                      ),
+                      const LocalAssistantCardWidget(),
+                    ],
+                    if (state.isJobOpeningsEnabled) ...[
+                      SectionTitleWidget(
+                        title: context.localizations.jobOpeningsSection,
+                      ),
+                      const JobOpeningsCardWidget(),
+                    ],
+                    if (state.isDevMenuEnabled) ...[
+                      const DSVerticalSpacerWidget(3),
+                      DSButtonWidget(
+                        label: context.localizations.settingDeveloperMode,
+                        onPressed: () => DeveloperMenuScreen.navigate(context),
+                        variant: DSButtonVariant.text,
+                        size: DSButtonSize.small,
+                      ),
+                    ],
+                    const Spacer(),
+                    const DSVerticalSpacerWidget(3),
+                    const SafeArea(child: Align(child: AppVersionWidget())),
+                    const DSVerticalSpacerWidget(2),
+                  ],
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 extension on BuildContext {
-  double getFormCardWidth(BoxConstraints constraints) {
+  double getFormCardWidth(double maxWidth) {
     switch (deviceWidth) {
       case DSDeviceWidthResolution.xs:
-        return constraints.maxWidth;
+        return maxWidth;
       case DSDeviceWidthResolution.s:
-        return constraints.maxWidth;
+        return maxWidth;
       case DSDeviceWidthResolution.m:
-        return constraints.maxWidth * 0.8;
+        return maxWidth * 0.8;
       case DSDeviceWidthResolution.l:
-        return constraints.maxWidth * 0.7;
+        return maxWidth * 0.7;
       case DSDeviceWidthResolution.xl:
-        return constraints.maxWidth * 0.5;
+        return maxWidth * 0.5;
     }
   }
 }

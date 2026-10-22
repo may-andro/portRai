@@ -42,7 +42,7 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
 
     final result = await _getAllFeatureFlagsUseCase();
     result.fold(
-      (failure) => emit(FeatureFlagErrorState(failure.toString())),
+      (failure) => emit(FeatureFlagErrorState(failure)),
       (flags) => emit(
         previousState != null
             ? previousState.copyWith(allFlags: flags)
@@ -90,7 +90,7 @@ class FeatureFlagBloc extends Bloc<FeatureFlagEvent, FeatureFlagState> {
     // Load flags with preserved state, but reset hasManipulatedFlags
     final result = await _getAllFeatureFlagsUseCase();
     result.fold(
-      (failure) => emit(FeatureFlagErrorState(failure.toString())),
+      (failure) => emit(FeatureFlagErrorState(failure)),
       (flags) => emit(
         previousState != null
             ? FeatureFlagLoadedState(

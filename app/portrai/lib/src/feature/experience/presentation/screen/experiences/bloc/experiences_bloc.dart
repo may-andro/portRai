@@ -6,22 +6,17 @@ import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/experiences_event.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/experiences_state.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/tracking/_tracking.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 
 @register
 class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
-  ExperiencesBloc(
-    this._getExperiencesUseCase,
-    this._getProfileUseCase,
-    this._trackingDelegate,
-  ) : super(const LoadingState()) {
+  ExperiencesBloc(this._getExperiencesUseCase, this._trackingDelegate)
+    : super(const LoadingState()) {
     on<LoadExperiencesEvent>(_mapLoadExperiencesEventToState);
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
     on<ViewStateVisibleEvent>(_mapViewStateVisibleEventToState);
   }
 
   final GetExperiencesUseCase _getExperiencesUseCase;
-  final GetProfileUseCase _getProfileUseCase;
   final ExperiencesTrackingDelegate _trackingDelegate;
 
   FutureOr<void> _mapLoadExperiencesEventToState(
@@ -30,19 +25,13 @@ class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState> {
   ) async {
     emit(const LoadingState());
 
-    final eitherProfileResult = await _getProfileUseCase();
-    final profile = eitherProfileResult.fold<ProfileEntity?>(
-      (_) => null,
-      (profile) => profile,
-    );
-
     final eitherExperiencesResult = await _getExperiencesUseCase();
     eitherExperiencesResult.fold(
       (failure) {
         emit(ErrorState(failure: failure));
       },
       (experiences) {
-        emit(LoadedState(experiences: experiences, profile: profile));
+        emit(LoadedState(experiences: experiences));
       },
     );
   }

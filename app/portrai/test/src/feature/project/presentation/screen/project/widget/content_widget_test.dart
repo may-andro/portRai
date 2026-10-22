@@ -2,9 +2,11 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/extension/_extension.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/content_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/project/presentation/screen/project/bloc/mock_project_bloc.dart';
 import '../../../../../../../mock/feature/project/test_data/project_test_data.dart';
@@ -32,7 +34,7 @@ void main() {
 
         expect(find.byType(DSLoadingWidget), findsOneWidget);
         verify(
-          () => bloc.add(const LoadingContentViewVisibleEvent()),
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
         ).called(1);
       },
     );
@@ -63,8 +65,48 @@ void main() {
         await tester.pump();
         expect(find.text('Overview'), findsWidgets);
         verify(
-          () => bloc.add(const SuccessContentViewVisibleEvent()),
+          () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
         ).called(1);
+      },
+    );
+
+    testWidgets(
+      'should scroll the sections followed by the shared footer when loaded',
+      (tester) async {
+        final project = createProjectEntity();
+        final bloc = MockProjectBloc()
+          ..stubState(
+            LoadedState(project: project, sections: project.sections),
+          );
+
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: ScreenFooterProviderWidget(
+              footer: const Text('footer'),
+              child: BlocProvider<ProjectBloc>.value(
+                value: bloc,
+                child: const ContentWidget(),
+              ),
+            ),
+          ),
+        );
+        await tester.pump(const Duration(seconds: 3));
+
+        expect(find.byType(CustomScrollView), findsOneWidget);
+        expect(find.text('A polished portfolio app'), findsOneWidget);
+        await tester.scrollUntilVisible(
+          find.text('footer', skipOffstage: false),
+          500,
+          scrollable: find
+              .descendant(
+                of: find.byType(CustomScrollView),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        await tester.pump();
+        expect(find.text('footer', skipOffstage: false), findsOneWidget);
+        expect(find.byType(FooterWidget), findsNothing);
       },
     );
 

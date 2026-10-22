@@ -11,7 +11,10 @@ class _PreviewWidget extends StatelessWidget {
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
     final pageMargin = context.space(factor: 2);
     final loader = Center(
-      child: DSLoadingWidget(size: context.space(factor: 5)),
+      child: DSLoadingWidget(
+        style: DSLoadingStyle.lottie,
+        size: context.space(factor: 5),
+      ),
     );
 
     // The preview is exactly one A4 page plus its margin.

@@ -299,7 +299,7 @@ class ProjectTechMarqueeWidget extends StatelessWidget {
     final hasSecondRow = items.length >= 6;
     final firstRow = hasSecondRow ? items.sublist(0, splitAt) : items;
     final secondRow = hasSecondRow ? items.sublist(splitAt) : const <String>[];
-    final inset = pageHorizontalInset(context);
+    final inset = context.screenHorizontalPadding.left;
     final rowCount = secondRow.isEmpty ? 1 : 2;
     final height =
         rowCount * _MarqueeRowWidgetState.rowHeight +

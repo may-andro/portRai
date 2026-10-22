@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 @immutable
@@ -26,11 +25,10 @@ final class ErrorState extends ExpertisesState {
 }
 
 final class LoadedState extends ExpertisesState {
-  const LoadedState({required this.expertises, required this.profile});
+  const LoadedState({required this.expertises});
 
   final List<ExpertiseEntity> expertises;
-  final ProfileEntity? profile;
 
   @override
-  List<Object?> get props => [expertises, profile];
+  List<Object?> get props => [expertises];
 }

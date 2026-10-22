@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/bloc/_bloc.dart';
 import 'package:portrai/src/feature/auth/presentation/screen/sign_in/widget/_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/auth/presentation/screen/sign_in/bloc/mock_sign_in_bloc.dart';
 import '../../../../../../../util/animated_page_test_util.dart';
@@ -19,9 +21,12 @@ void main() {
     addTearDown(bloc.close);
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: BlocProvider<SignInBloc>.value(
-          value: bloc,
-          child: const ContentWidget(),
+        child: ScreenFooterProviderWidget(
+          footer: const Text('footer'),
+          child: BlocProvider<SignInBloc>.value(
+            value: bloc,
+            child: const ContentWidget(),
+          ),
         ),
       ),
     );
@@ -83,5 +88,60 @@ void main() {
     final welcome = tester.getTopLeft(find.text('Welcome back'));
     final email = tester.getTopLeft(find.text('Email'));
     expect(welcome.dy, lessThan(email.dy));
+  });
+
+  testWidgets('should end the shared scroll view with the screen footer when '
+      'shown on a desktop', (tester) async {
+    await pumpContent(tester, const SignInState());
+
+    final scrollView = find.descendant(
+      of: find.byType(ScreenContentWidget<SignInBloc, SignInState>),
+      matching: find.byType(CustomScrollView),
+    );
+    expect(scrollView, findsOneWidget);
+    expect(
+      find.descendant(of: scrollView, matching: find.text('Email')),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.text('footer', skipOffstage: false),
+      200,
+      scrollable: find
+          .descendant(of: scrollView, matching: find.byType(Scrollable))
+          .first,
+    );
+    expect(
+      tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
+      greaterThan(tester.getBottomLeft(find.byType(DSButtonWidget)).dy),
+    );
+    expect(find.byType(FooterWidget), findsNothing);
+  });
+
+  testWidgets('should end the shared scroll view with the screen footer when '
+      'shown on a phone', (tester) async {
+    await pumpContent(tester, const SignInState());
+    setUpAnimatedPage(tester, size: const Size(390, 1400));
+    await pumpAnimations(tester);
+
+    final scrollView = find.descendant(
+      of: find.byType(ScreenContentWidget<SignInBloc, SignInState>),
+      matching: find.byType(CustomScrollView),
+    );
+    expect(
+      find.descendant(of: scrollView, matching: find.text('Welcome back')),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.text('footer', skipOffstage: false),
+      200,
+      scrollable: find
+          .descendant(of: scrollView, matching: find.byType(Scrollable))
+          .first,
+    );
+    expect(
+      tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,
+      greaterThan(tester.getBottomLeft(find.byType(DSButtonWidget)).dy),
+    );
+    expect(find.byType(FooterWidget), findsNothing);
   });
 }

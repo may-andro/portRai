@@ -95,6 +95,51 @@ Use `design_system` components whenever an equivalent exists. Render user-facing
 `context.colorPalette`; do not use Flutter `Text` as a shortcut. Prefer DS buttons, icons, app-bar
 components, and spacers where they fit without changing the screen's behavior or required layout.
 
+## Screen content states and padding
+Every screen renders its content with `ScreenContentWidget`
+(`lib/src/widget/screen_content_widget.dart`) instead of its own scroll view,
+`_LoadingWidget`/`_ErrorWidget` or footer.
+
+- **Loading and error** fill the screen on their own: the lottie `DSLoadingWidget` (the only
+  loading style for screen states; `ScreenLoadingContent(message:)` explains a long wait) or a
+  translated `DSErrorCardWidget` (`ScreenErrorContent(failure, onRetry:)`, or
+  `ScreenErrorContent.message(text)` for errors the feature words itself).
+- **Loaded content** is `ScreenLoadedContent.slivers([...], scrollController:)`. The widget builds
+  the scroll view and always ends it with the screen footer that the app provides through
+  `ScreenFooterProviderWidget`, so screens never place `FooterWidget` themselves and blocs don't
+  load the profile for it. Content shorter than the screen is padded to the screen height, so the
+  footer always starts below a full screen of content. The page header (such as `PageAppBarWidget`) is one of the slivers.
+  Only content that fills the screen and scrolls itself, such as a chat, uses
+  `ScreenLoadedContent.fullScreen(child)`, which has no footer.
+- **Rebuilds** happen only when the state type changes unless `buildWhen` is given. Pass
+  `(previous, current) => previous != current` when a loaded state can follow another loaded state
+  with new data, `(_, _) => false` when the sections rebuild themselves, and a `buildWhen` for a
+  single state class with a status enum. A screen without loading states always returns loaded
+  content.
+- **Impressions:** report them as `ViewStateVisibleEvent(content.trackingLabel)` with an
+  `impressionPrefix`; omit both on screens without impression tracking.
+- A stateful section inside the screen's slivers uses `ScreenContentSliverWidget`, which never
+  adds a footer.
+
+```dart
+return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
+  impressionPrefix: 'experiences',
+  contentOf: (state) => switch (state) {
+    LoadingState() => const ScreenLoadingContent(),
+    ErrorState(:final failure) => ScreenErrorContent(failure),
+    LoadedState(:final experiences) => ScreenLoadedContent.slivers([
+      PageAppBarWidget(title: context.localizations.experiencesTitle),
+      SliverToBoxAdapter(child: ExperienceListWidget(experiences: experiences)),
+    ]),
+  },
+  onContentVisible: (content) =>
+      context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
+);
+```
+
+Use the design system's `context.screenHorizontalPadding` for a screen's horizontal padding;
+don't redeclare the mobile/tablet/desktop switch in a private `BuildContext` extension.
+
 ## Presentation extensions
 Extensions that need `BuildContext`/localization (e.g. formatting an entity for display) live in `presentation/extension/` with an `_extension.dart` barrel, exported from `presentation/_presentation.dart`. Never put them in the domain layer or in `widget/`. Examples: `experience_date_range_extension.dart`, `project_date_range_extension.dart`, `locale_code_extension.dart`. Screen-specific ones sit next to their screen (`screen/<name>/extension/`).
 

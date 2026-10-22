@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 enum JobOpeningsStatus { loading, loaded, failed }
@@ -17,7 +16,6 @@ class JobOpeningsState extends Equatable {
     this.isSigningOut = false,
     this.isSignedOut = false,
     this.actionFailure,
-    this.profile,
   });
 
   final JobOpeningsStatus status;
@@ -35,9 +33,6 @@ class JobOpeningsState extends Equatable {
   /// Why turning job search on or off, or signing out, failed. Shown once.
   final Failure? actionFailure;
 
-  /// For the page footer; null until loaded or when it could not be read.
-  final ProfileEntity? profile;
-
   JobOpeningsState copyWith({
     JobOpeningsStatus? status,
     List<JobOpeningEntity>? jobOpenings,
@@ -49,7 +44,6 @@ class JobOpeningsState extends Equatable {
     bool? isSignedOut,
     Failure? actionFailure,
     bool clearActionFailure = false,
-    ProfileEntity? profile,
   }) {
     return JobOpeningsState(
       status: status ?? this.status,
@@ -62,7 +56,6 @@ class JobOpeningsState extends Equatable {
       actionFailure: clearActionFailure
           ? null
           : actionFailure ?? this.actionFailure,
-      profile: profile ?? this.profile,
     );
   }
 
@@ -76,6 +69,5 @@ class JobOpeningsState extends Equatable {
     isSigningOut,
     isSignedOut,
     actionFailure,
-    profile,
   ];
 }

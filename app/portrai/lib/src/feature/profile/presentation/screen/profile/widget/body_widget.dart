@@ -9,29 +9,18 @@ class _BodyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = context.isDesktop;
-    return CustomScrollView(
-      scrollBehavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(scrollbars: false, overscroll: false),
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _HeroWidget(profile: profile, isDesktop: isDesktop),
-              _GlobalBandWidget(
-                profile: profile,
-                workPlaces: workPlaces,
-                isDesktop: isDesktop,
-              ),
-              _AboutBandWidget(profile: profile, isDesktop: isDesktop),
-              _BackgroundBandWidget(profile: profile, isDesktop: isDesktop),
-              _ContactBandWidget(profile: profile, isDesktop: isDesktop),
-              FooterWidget(profile: profile),
-            ],
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _HeroWidget(profile: profile, isDesktop: isDesktop),
+        _GlobalBandWidget(
+          profile: profile,
+          workPlaces: workPlaces,
+          isDesktop: isDesktop,
         ),
+        _AboutBandWidget(profile: profile, isDesktop: isDesktop),
+        _BackgroundBandWidget(profile: profile, isDesktop: isDesktop),
+        _ContactBandWidget(profile: profile, isDesktop: isDesktop),
       ],
     );
   }

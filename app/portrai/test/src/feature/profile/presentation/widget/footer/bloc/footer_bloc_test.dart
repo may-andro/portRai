@@ -3,10 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/_bloc.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
+import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
 import '../../../../../../../mock/feature/profile/domain/use_case/mock_open_email_use_case.dart';
 import '../../../../../../../mock/feature/profile/presentation/widget/footer/tracking/mock_footer_tracking_delegate.dart';
 import '../../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
@@ -17,13 +19,16 @@ void main() {
   setUpAll(() => registerFallbackValue(FakeOpenExternalUrlParam()));
 
   group('FooterBloc', () {
+    late MockGetProfileUseCase getProfile;
     late MockOpenExternalUrlUseCase openUrl;
     late MockOpenEmailUseCase openEmail;
     late MockFooterTrackingDelegate tracking;
 
-    FooterBloc buildBloc() => FooterBloc(openUrl, openEmail, tracking);
+    FooterBloc buildBloc() =>
+        FooterBloc(getProfile, openUrl, openEmail, tracking);
 
     setUp(() {
+      getProfile = MockGetProfileUseCase();
       openUrl = MockOpenExternalUrlUseCase();
       openEmail = MockOpenEmailUseCase();
       tracking = MockFooterTrackingDelegate();
@@ -34,6 +39,26 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc.add(LoadDataEvent(profile: profile)),
       expect: () => [LoadedState(profile: profile)],
+      verify: (_) => verifyNever(() => getProfile()),
+    );
+
+    blocTest<FooterBloc, FooterState>(
+      'should load the profile itself when load data has no profile',
+      setUp: () =>
+          getProfile.stubCall(Right<GetProfileFailure, ProfileEntity>(profile)),
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadDataEvent()),
+      expect: () => [LoadedState(profile: profile)],
+    );
+
+    blocTest<FooterBloc, FooterState>(
+      'should emit unavailable when the profile cannot be loaded',
+      setUp: () => getProfile.stubCall(
+        const Left<GetProfileFailure, ProfileEntity>(ProfileNotFoundFailure()),
+      ),
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadDataEvent()),
+      expect: () => const [UnavailableState()],
     );
 
     blocTest<FooterBloc, FooterState>(

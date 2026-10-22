@@ -20,6 +20,15 @@ void main() {
           onRetryClicked: () {},
         ),
       ),
+      TestCase(
+        'with custom title and retry label',
+        DSErrorCardWidget(
+          title: '¡Vaya!',
+          message: 'No se pudo conectar con el servidor.',
+          retryLabel: 'Reintentar',
+          onRetryClicked: () {},
+        ),
+      ),
     ],
   );
 }

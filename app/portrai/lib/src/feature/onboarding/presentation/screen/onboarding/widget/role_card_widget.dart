@@ -150,7 +150,10 @@ class _ArrowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return DSLoadingWidget(size: context.space(factor: 2.5));
+      return DSLoadingWidget(
+        style: DSLoadingStyle.lottie,
+        size: context.space(factor: 1.25),
+      );
     }
     return AnimatedSlide(
       offset: Offset(isHovering ? 0.3 : 0, 0),

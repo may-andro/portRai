@@ -36,7 +36,7 @@ void main() {
     test(
       'should send a view_impression event when trackViewEvent is called',
       () {
-        delegate.trackViewEvent('feature_flag_loaded_content_view');
+        delegate.trackViewEvent('loaded_content_view');
 
         final tracking =
             verify(
@@ -45,10 +45,7 @@ void main() {
                 as Tracking;
 
         expect(tracking.parameters['event'], 'view_impression');
-        expect(
-          tracking.parameters['label'],
-          'feature_flag_loaded_content_view',
-        );
+        expect(tracking.parameters['label'], 'loaded_content_view');
       },
     );
   });

@@ -11,7 +11,6 @@ import 'package:portrai/src/feature/locale/domain/use_case/get_locale_use_case.d
 import 'package:portrai/src/feature/locale/domain/use_case/update_locale_use_case.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/locale_selection_bloc.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/tracking/locale_selection_tracking_delegate.dart';
-import 'package:portrai/src/feature/profile/domain/use_case/get_profile_use_case.dart';
 import 'package:tracking/src/reporter/tracking_reporter.dart';
 
 void $registerLocaleDependencies(ServiceLocator sl) {
@@ -32,7 +31,6 @@ void $registerLocaleDependencies(ServiceLocator sl) {
     () => LocaleSelectionBloc(
       sl.get<GetLocaleUseCase>(),
       sl.get<UpdateLocaleUseCase>(),
-      sl.get<GetProfileUseCase>(),
       sl.get<LocaleSelectionTrackingDelegate>(),
     ),
   );

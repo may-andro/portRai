@@ -22,12 +22,13 @@ final class LoadProjectEvent extends ProjectEvent {
   List<Object?> get props => [project];
 }
 
-final class LoadingContentViewVisibleEvent extends ProjectEvent {
-  const LoadingContentViewVisibleEvent();
-}
+final class ViewStateVisibleEvent extends ProjectEvent {
+  const ViewStateVisibleEvent(this.trackingId);
 
-final class SuccessContentViewVisibleEvent extends ProjectEvent {
-  const SuccessContentViewVisibleEvent();
+  final String trackingId;
+
+  @override
+  List<Object?> get props => [trackingId];
 }
 
 final class OpenExternalUrlEvent extends ProjectEvent {

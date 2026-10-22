@@ -109,6 +109,10 @@
   "@errorGeneric": {
     "description": "Generic error for unexpected failures"
   },
+  "errorTitle": "Oops…",
+  "@errorTitle": {
+    "description": "Heading of the error card shown when a screen fails to load"
+  },
   "errorLocaleFailedToLoadFromCache": "Failed to load language settings",
   "@errorLocaleFailedToLoadFromCache": {
     "description": "Error when locale cannot be loaded from storage"

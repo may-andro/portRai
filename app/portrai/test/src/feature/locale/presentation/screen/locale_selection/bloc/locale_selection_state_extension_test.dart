@@ -12,19 +12,16 @@ void main() {
       final loaded = LocaleSelectionStateFactory.loaded(
         supportedLocales: createSupportedLocales(),
         appLocale: createEnglishLocale(),
-        profile: createLocaleProfile(),
       );
       final updating = LocaleSelectionStateFactory.updating(
         supportedLocales: createSupportedLocales(),
         appLocale: createEnglishLocale(),
         targetLocale: createDutchLocale(),
-        profile: createLocaleProfile(),
       );
       final updateFailure = LocaleSelectionStateFactory.updateFailure(
         supportedLocales: createSupportedLocales(),
         appLocale: createEnglishLocale(),
         targetLocale: createSpanishLocale(),
-        profile: createLocaleProfile(),
         failure: const UpdateLocaleUnknownFailure(),
       );
 
@@ -36,10 +33,8 @@ void main() {
       expect(loaded.loadedState, same(loaded));
       expect(updating.isUpdating, isTrue);
       expect(updating.updatingState, same(updating));
-      expect(updating.profile, isNotNull);
       expect(updateFailure.isUpdatingFailed, isTrue);
       expect(updateFailure.updateFailureState, same(updateFailure));
-      expect(updateFailure.profile, isNotNull);
     });
   });
 }

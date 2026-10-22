@@ -9,4 +9,12 @@ extension MockJobOpeningsBlocStub on MockJobOpeningsBloc {
   void stubState(JobOpeningsState state) {
     when(() => this.state).thenReturn(state);
   }
+
+  /// Starts at [initialState] and then emits each of [states].
+  void stubStates(
+    Stream<JobOpeningsState> states, {
+    required JobOpeningsState initialState,
+  }) {
+    whenListen(this, states, initialState: initialState);
+  }
 }

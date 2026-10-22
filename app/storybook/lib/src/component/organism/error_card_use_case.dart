@@ -10,6 +10,13 @@ Widget buildErrorCard(BuildContext context) {
     initialValue: null,
   );
 
+  final title = context.knobs.string(label: 'Title', initialValue: 'Oops…');
+
+  final retryLabel = context.knobs.string(
+    label: 'Retry Label',
+    initialValue: 'Retry',
+  );
+
   final hasRetry = context.knobs.boolean(
     label: 'Has Retry Button',
     initialValue: false,
@@ -44,6 +51,8 @@ Widget buildErrorCard(BuildContext context) {
     return Center(
       child: DSErrorCardWidget(
         message: selectedError,
+        title: title,
+        retryLabel: retryLabel,
         onRetryClicked: hasRetry ? () {} : null,
       ),
     );
@@ -52,6 +61,8 @@ Widget buildErrorCard(BuildContext context) {
   return Center(
     child: DSErrorCardWidget(
       message: message,
+      title: title,
+      retryLabel: retryLabel,
       onRetryClicked: hasRetry ? () {} : null,
     ),
   );

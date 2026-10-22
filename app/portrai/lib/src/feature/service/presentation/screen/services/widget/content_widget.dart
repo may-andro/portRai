@@ -1,127 +1,40 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
-import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/services/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/widget/_widget.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ServicesBloc, ServicesState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
-      },
-      builder: (context, state) {
-        return switch (state) {
-          final LoadingState _ => const _LoadingWidget(),
-          final LoadedState state => _SuccessWidget(
-            services: state.services,
-            profile: state.profile,
-          ),
-          final ErrorState state => _ErrorWidget(
-            message: FailureTranslator.translate(context, state.failure),
-          ),
-        };
-      },
-    );
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'services_loading_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.loading()),
-      child: DSLoadingWidget(
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
-    );
-  }
-}
-
-class _ErrorWidget extends StatelessWidget {
-  const _ErrorWidget({required this.message});
-
-  final String? message;
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'services_error_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.error()),
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(context.space()),
-          child: DSErrorCardWidget(message: message),
-        ),
-      ),
-    );
-  }
-}
-
-class _SuccessWidget extends StatelessWidget {
-  const _SuccessWidget({required this.services, this.profile});
-
-  final List<ServiceEntity> services;
-  final ProfileEntity? profile;
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'services_success_content_view',
-      onImpression: () => context.bloc.add(ViewStateVisibleEvent.success()),
-      child: CustomScrollView(
-        scrollBehavior: ScrollConfiguration.of(
-          context,
-        ).copyWith(scrollbars: false, overscroll: false),
-        physics: const BouncingScrollPhysics(),
-        slivers: [
+    return ScreenContentWidget<ServicesBloc, ServicesState>(
+      impressionPrefix: 'services',
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(),
+        ErrorState(:final failure) => ScreenErrorContent(failure),
+        LoadedState(:final services) => ScreenLoadedContent.slivers([
           PageAppBarWidget(
             title: context.localizations.portfolioSectionServices,
             backgroundColor: context.colorPalette.surface.inverseSurface.color,
             titleColor: context.colorPalette.surface.onInverseSurface,
           ),
           SliverPadding(
-            padding: EdgeInsets.symmetric(
-              vertical: context.space(factor: 3),
-              horizontal: context.horizontalPadding,
+            padding: context.screenHorizontalPadding.copyWith(
+              top: context.space(factor: 3),
+              bottom: context.space(factor: 3),
             ),
             sliver: SliverToBoxAdapter(
               child: ServiceListWidget(services: services, isVisible: true),
             ),
           ),
-          if (profile case final ProfileEntity profile)
-            SliverPadding(
-              padding: EdgeInsets.only(top: context.space(factor: 3)),
-              sliver: SliverToBoxAdapter(child: FooterWidget(profile: profile)),
-            ),
-        ],
-      ),
+        ]),
+      },
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
-  }
-}
-
-extension on BuildContext {
-  double get horizontalPadding {
-    switch (deviceResolution) {
-      case DSDeviceResolution.mobile:
-        return space(factor: 3);
-      case DSDeviceResolution.tablet:
-        return space(factor: 5);
-      case DSDeviceResolution.desktop:
-        return width * 0.15;
-    }
   }
 }

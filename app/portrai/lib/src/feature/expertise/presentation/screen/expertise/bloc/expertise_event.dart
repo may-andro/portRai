@@ -9,10 +9,6 @@ sealed class ExpertiseEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class LoadExpertiseEvent extends ExpertiseEvent {
-  const LoadExpertiseEvent();
-}
-
 // Tracking Events
 final class ScreenVisibleEvent extends ExpertiseEvent {
   const ScreenVisibleEvent();

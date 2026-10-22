@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 @immutable
@@ -26,11 +25,10 @@ final class ErrorState extends ExperiencesState {
 }
 
 final class LoadedState extends ExperiencesState {
-  const LoadedState({required this.experiences, required this.profile});
+  const LoadedState({required this.experiences});
 
   final List<ExperienceEntity> experiences;
-  final ProfileEntity? profile;
 
   @override
-  List<Object?> get props => [experiences, profile];
+  List<Object?> get props => [experiences];
 }

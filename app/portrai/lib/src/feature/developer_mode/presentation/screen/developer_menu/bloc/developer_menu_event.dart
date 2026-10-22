@@ -62,18 +62,6 @@ final class ScreenVisibleEvent extends DeveloperMenuEvent {
 final class ViewStateVisibleEvent extends DeveloperMenuEvent {
   const ViewStateVisibleEvent(this.trackingId);
 
-  factory ViewStateVisibleEvent.loading() {
-    return const ViewStateVisibleEvent('developer_menu_loading_content_view');
-  }
-
-  factory ViewStateVisibleEvent.success() {
-    return const ViewStateVisibleEvent('developer_menu_loaded_content_view');
-  }
-
-  factory ViewStateVisibleEvent.error() {
-    return const ViewStateVisibleEvent('developer_menu_error_content_view');
-  }
-
   final String trackingId;
 
   @override

@@ -1,75 +1,23 @@
-import 'dart:math';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/bloc/_bloc.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/dto/_dto.dart';
 import 'package:portrai/src/feature/project/presentation/screen/project/widget/metrics_widget.dart';
-import 'package:portrai/src/widget/page_band_widget.dart';
-import 'package:tracking/tracking.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
-part 'body_widget.dart';
 part 'tab_bar_widget.dart';
 
-class ContentWidget extends StatelessWidget {
+class ContentWidget extends StatefulWidget {
   const ContentWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProjectBloc, ProjectState>(
-      buildWhen: (previous, current) {
-        return previous.runtimeType != current.runtimeType;
-      },
-      builder: (context, state) {
-        return switch (state) {
-          final LoadingState _ => const _LoadingWidget(),
-          final LoadedState state => _SuccessWidget(
-            introSection: state.introSection,
-            scrollableSections: state.scrollableSections,
-          ),
-        };
-      },
-    );
-  }
+  State<ContentWidget> createState() => _ContentWidgetState();
 }
 
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'project_loading_content_view',
-      onImpression: () {
-        context.bloc.add(const LoadingContentViewVisibleEvent());
-      },
-      child: DSLoadingWidget(
-        style: DSLoadingStyle.lottie,
-        size: max(context.shortestSide * 0.1, context.space(factor: 2)),
-      ),
-    );
-  }
-}
-
-class _SuccessWidget extends StatefulWidget {
-  const _SuccessWidget({
-    required this.introSection,
-    required this.scrollableSections,
-  });
-
-  final ProjectSectionDTO introSection;
-  final List<ScrollableProjectSectionDTO> scrollableSections;
-
-  @override
-  State<_SuccessWidget> createState() => _SuccessWidgetState();
-}
-
-class _SuccessWidgetState extends State<_SuccessWidget>
+class _ContentWidgetState extends State<ContentWidget>
     with TickerProviderStateMixin {
   late final ScrollController _scrollController;
-  late TabController _tabController;
-  bool _hasTabController = false;
+  TabController? _tabController;
 
   @override
   void initState() {
@@ -78,42 +26,66 @@ class _SuccessWidgetState extends State<_SuccessWidget>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final length = widget.scrollableSections.length;
-    if (!_hasTabController || _tabController.length != length) {
-      if (_hasTabController) _tabController.dispose();
-      _tabController = TabController(length: length, vsync: this);
-      _hasTabController = true;
-    }
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return TrackingImpressionDetectorWidget(
-      impressionId: 'project_success_content_view',
-      onImpression: () {
-        context.bloc.add(const SuccessContentViewVisibleEvent());
+    return ScreenContentWidget<ProjectBloc, ProjectState>(
+      impressionPrefix: 'project',
+      contentOf: (state) => switch (state) {
+        LoadingState() => const ScreenLoadingContent(),
+        final LoadedState state => ScreenLoadedContent.slivers(
+          _slivers(state),
+          scrollController: _scrollController,
+        ),
       },
-      child: _BodyWidget(
-        scrollController: _scrollController,
-        tabController: _tabController,
-      ),
+      onContentVisible: (content) =>
+          context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
     );
+  }
+
+  List<Widget> _slivers(LoadedState state) {
+    final sections = state.scrollableSections;
+    return [
+      SliverToBoxAdapter(child: state.introSection.buildWidget(context)),
+      SliverToBoxAdapter(child: MetricsWidget(project: state.project)),
+      SliverPersistentHeader(
+        pinned: true,
+        delegate: _PersistentTabBarDelegate(
+          sections: sections,
+          tabController: _tabControllerFor(sections.length),
+          height: DSTabItemWidget.getHeight(context),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            for (final section in sections) section.buildWidget(context),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  /// The tab controller for [length] sections, replaced when the count
+  /// changes.
+  TabController _tabControllerFor(int length) {
+    final current = _tabController;
+    if (current != null && current.length == length) return current;
+    current?.dispose();
+    return _tabController = TabController(length: length, vsync: this);
   }
 
   void _onScroll() {
     final state = context.bloc.state;
-    if (state is! LoadedState) return;
+    final tabController = _tabController;
+    if (state is! LoadedState || tabController == null) return;
 
-    final sections = widget.scrollableSections;
+    final sections = state.scrollableSections;
     for (var i = 0; i < sections.length; i++) {
       final keyContext = sections[i].sectionKey.currentContext;
       if (keyContext case final BuildContext context) {
@@ -122,8 +94,8 @@ class _SuccessWidgetState extends State<_SuccessWidget>
           final position = box.localToGlobal(Offset.zero).dy;
           if (position <= context.height / 2 &&
               position >= -box.size.height / 2) {
-            if (_tabController.index != i) {
-              _tabController.animateTo(i);
+            if (tabController.index != i) {
+              tabController.animateTo(i);
             }
             break;
           }

@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/profile/presentation/widget/footer/footer_wi
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
+import '../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
 import '../../../../../../mock/feature/profile/domain/use_case/mock_open_email_use_case.dart';
 import '../../../../../../mock/feature/profile/presentation/widget/footer/tracking/mock_footer_tracking_delegate.dart';
 import '../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
@@ -28,6 +29,7 @@ void main() {
     List<PublishedAtEntity> stores,
   ) async {
     final bloc = FooterBloc(
+      MockGetProfileUseCase(),
       MockOpenExternalUrlUseCase(),
       MockOpenEmailUseCase(),
       MockFooterTrackingDelegate(),

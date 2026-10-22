@@ -11,9 +11,8 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'apply_band_widget.dart';
 part 'hero_widget.dart';
@@ -27,72 +26,32 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<JobOpeningBloc, JobOpeningState>(
+    return ScreenContentWidget<JobOpeningBloc, JobOpeningState>(
       // Insights update the state many times while they generate; their own
       // section rebuilds for them, so the page rebuilds only for what it shows.
       buildWhen: (previous, current) =>
           previous.status != current.status ||
           previous.jobOpening != current.jobOpening ||
           previous.loadFailure != current.loadFailure ||
-          previous.profile != current.profile ||
           previous.isTailoredCvAvailable != current.isTailoredCvAvailable ||
           (previous.insightsStatus == JobOpeningInsightsStatus.unavailable) !=
               (current.insightsStatus == JobOpeningInsightsStatus.unavailable),
-      builder: (context, state) {
-        return CustomScrollView(
-          scrollBehavior: ScrollConfiguration.of(
-            context,
-          ).copyWith(scrollbars: false, overscroll: false),
-          physics: const BouncingScrollPhysics(),
-          slivers: switch (state.status) {
-            JobOpeningStatus.loaded => [
-              SliverToBoxAdapter(
-                child: _DetailsWidget(
-                  jobOpening: state.jobOpening!,
-                  hasInsights:
-                      state.insightsStatus !=
-                      JobOpeningInsightsStatus.unavailable,
-                  isTailoredCvAvailable: state.isTailoredCvAvailable,
-                ),
-              ),
-              if (state.profile case final profile?)
-                SliverToBoxAdapter(child: FooterWidget(profile: profile)),
-            ],
-            JobOpeningStatus.loading => [
-              PageAppBarWidget(title: context.localizations.jobOpeningTitle),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: DSLoadingWidget(
-                    style: DSLoadingStyle.lottie,
-                    size: max(
-                      context.shortestSide * 0.1,
-                      context.space(factor: 2),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-            JobOpeningStatus.failed => [
-              PageAppBarWidget(title: context.localizations.jobOpeningTitle),
-              SliverToBoxAdapter(
-                child: JobOpeningPageColumnWidget(
-                  verticalPadding: context.space(factor: 4),
-                  child: DSErrorCardWidget(
-                    message: state.loadFailure == null
-                        ? null
-                        : FailureTranslator.translate(
-                            context,
-                            state.loadFailure!,
-                          ),
-                    onRetryClicked: () =>
-                        context.bloc.add(const JobOpeningRetryClickEvent()),
-                  ),
-                ),
-              ),
-            ],
-          },
-        );
+      contentOf: (state) => switch (state.status) {
+        JobOpeningStatus.loading => const ScreenLoadingContent(),
+        JobOpeningStatus.failed => ScreenErrorContent(
+          state.loadFailure,
+          onRetry: () => context.bloc.add(const JobOpeningRetryClickEvent()),
+        ),
+        JobOpeningStatus.loaded => ScreenLoadedContent.slivers([
+          SliverToBoxAdapter(
+            child: _DetailsWidget(
+              jobOpening: state.jobOpening!,
+              hasInsights:
+                  state.insightsStatus != JobOpeningInsightsStatus.unavailable,
+              isTailoredCvAvailable: state.isTailoredCvAvailable,
+            ),
+          ),
+        ]),
       },
     );
   }

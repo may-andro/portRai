@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/generated/failure_translator.g.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/extension/_extension.dart';
@@ -11,9 +10,9 @@ import 'package:portrai/src/feature/job_opening/presentation/route/_route.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/job_opening_screen.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/_bloc.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'grid_widget.dart';
 part 'hero_widget.dart';
@@ -26,14 +25,11 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Each section rebuilds only for its own part of the state, so loading
-    // the job search setting or the footer does not rebuild the list.
-    return CustomScrollView(
-      scrollBehavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(scrollbars: false, overscroll: false),
-      physics: const BouncingScrollPhysics(),
-      slivers: [
+    return ScreenContentWidget<JobOpeningsBloc, JobOpeningsState>(
+      // Each section rebuilds only for its own part of the state, so loading
+      // the job search setting does not rebuild the list.
+      buildWhen: (_, _) => false,
+      contentOf: (_) => ScreenLoadedContent.slivers([
         BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
           buildWhen: (previous, current) =>
               previous.status != current.status ||
@@ -67,46 +63,31 @@ class ContentWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
+              ScreenContentSliverWidget<JobOpeningsBloc, JobOpeningsState>(
                 buildWhen: (previous, current) =>
                     previous.status != current.status ||
                     previous.jobOpenings != current.jobOpenings ||
                     previous.loadFailure != current.loadFailure,
-                builder: _bodyFor,
+                contentOf: (state) => switch (state.status) {
+                  JobOpeningsStatus.loading => const ScreenLoadingContent(),
+                  JobOpeningsStatus.failed => ScreenErrorContent(
+                    state.loadFailure,
+                    onRetry: () =>
+                        context.bloc.add(const JobOpeningsRetryClickEvent()),
+                  ),
+                  JobOpeningsStatus.loaded when state.jobOpenings.isEmpty =>
+                    const ScreenLoadedContent.slivers([
+                      SliverToBoxAdapter(child: _EmptyWidget()),
+                    ]),
+                  JobOpeningsStatus.loaded => ScreenLoadedContent.slivers([
+                    _GridWidget(jobOpenings: state.jobOpenings),
+                  ]),
+                },
               ),
             ],
           ),
         ),
-        BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
-          buildWhen: (previous, current) => previous.profile != current.profile,
-          builder: (context, state) => switch (state.profile) {
-            final profile? => SliverToBoxAdapter(
-              child: FooterWidget(profile: profile),
-            ),
-            null => const SliverToBoxAdapter(),
-          },
-        ),
-      ],
+      ]),
     );
-  }
-
-  Widget _bodyFor(BuildContext context, JobOpeningsState state) {
-    return switch (state.status) {
-      JobOpeningsStatus.loading => const SliverToBoxAdapter(
-        child: _LoadingWidget(),
-      ),
-      JobOpeningsStatus.failed => SliverToBoxAdapter(
-        child: DSErrorCardWidget(
-          message: state.loadFailure == null
-              ? null
-              : FailureTranslator.translate(context, state.loadFailure!),
-          onRetryClicked: () =>
-              context.bloc.add(const JobOpeningsRetryClickEvent()),
-        ),
-      ),
-      JobOpeningsStatus.loaded when state.jobOpenings.isEmpty =>
-        const SliverToBoxAdapter(child: _EmptyWidget()),
-      JobOpeningsStatus.loaded => _GridWidget(jobOpenings: state.jobOpenings),
-    };
   }
 }

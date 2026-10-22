@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/extension/experience_date_range_extension.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
-import 'package:portrai/src/widget/page_band_widget.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';
 
 class IntroWidget extends StatelessWidget {
@@ -81,7 +80,7 @@ class IntroWidget extends StatelessWidget {
               closeColor: Colors.white,
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: pageHorizontalInset(context),
+                  horizontal: context.screenHorizontalPadding.left,
                   vertical: context.space(factor: isMobile ? 4 : 8),
                 ),
                 child: isMobile

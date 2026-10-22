@@ -24,7 +24,7 @@ class _BandWidget extends StatelessWidget {
           if (background != null) Positioned.fill(child: background!),
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: context.horizontalPadding,
+              horizontal: context.screenHorizontalPadding.left,
               vertical: context.space(factor: verticalFactor),
             ),
             child: _RevealWidget(child: child),

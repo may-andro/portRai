@@ -10,7 +10,6 @@ import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/locale_selection_state_extension.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/bloc/locale_selection_state_factory.dart';
 import 'package:portrai/src/feature/locale/presentation/screen/locale_selection/tracking/_tracking.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 
 @register
 class LocaleSelectionBloc
@@ -18,7 +17,6 @@ class LocaleSelectionBloc
   LocaleSelectionBloc(
     this._getLocaleUseCase,
     this._updateLocaleUseCase,
-    this._getProfileUseCase,
     this._trackingDelegate,
   ) : super(LocaleSelectionStateFactory.loading()) {
     on<LoadLocaleEvent>(_mapLoadLocaleEventToState);
@@ -29,7 +27,6 @@ class LocaleSelectionBloc
 
   final GetLocaleUseCase _getLocaleUseCase;
   final UpdateLocaleUseCase _updateLocaleUseCase;
-  final GetProfileUseCase _getProfileUseCase;
   final LocaleSelectionTrackingDelegate _trackingDelegate;
 
   Future<void> _mapLoadLocaleEventToState(
@@ -37,12 +34,6 @@ class LocaleSelectionBloc
     Emitter<LocaleSelectionState> emit,
   ) async {
     emit(LocaleSelectionStateFactory.loading());
-
-    ProfileEntity? profile;
-    final eitherProfileResult = await _getProfileUseCase();
-    if (eitherProfileResult.isRight) {
-      profile = eitherProfileResult.right;
-    }
 
     final localeEither = await _getLocaleUseCase();
     if (!localeEither.isRight) {
@@ -54,7 +45,6 @@ class LocaleSelectionBloc
       LocaleSelectionStateFactory.loaded(
         supportedLocales: AppLocalizations.supportedLocales,
         appLocale: localeEither.right,
-        profile: profile,
       ),
     );
   }
@@ -75,7 +65,6 @@ class LocaleSelectionBloc
         supportedLocales: currentState.supportedLocales,
         appLocale: currentState.appLocale,
         targetLocale: targetLocale,
-        profile: currentState.profile,
       ),
     );
 
@@ -88,7 +77,6 @@ class LocaleSelectionBloc
           appLocale: currentState.appLocale,
           failure: eitherResult.left,
           targetLocale: targetLocale,
-          profile: currentState.profile,
         ),
       );
       return;
@@ -102,7 +90,6 @@ class LocaleSelectionBloc
       LocaleSelectionStateFactory.loaded(
         supportedLocales: currentState.supportedLocales,
         appLocale: targetLocale,
-        profile: currentState.profile,
       ),
     );
   }

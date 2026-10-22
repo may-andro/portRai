@@ -5,13 +5,59 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/widget/content_widget.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/experience/presentation/screen/experience/bloc/mock_experience_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
 
+final _experience = ExperienceEntity(
+  company: 'Acme',
+  position: 'Lead Engineer',
+  location: 'Madrid',
+  startDate: DateTime(2020),
+  endDate: null,
+  current: true,
+  employmentType: 'Full-time',
+  description: 'Short description',
+  longDescription: 'Long description',
+  responsibilities: const ['Lead the team'],
+  achievements: const ['Shipped it'],
+  technologies: const ['Flutter', 'Dart'],
+  companyLogo: '',
+  url: 'https://acme.com',
+  id: 'acme',
+);
+
 void main() {
   setUp(resetTrackingImpressions);
+
+  Future<void> pumpLoaded(WidgetTester tester) async {
+    final bloc = MockExperienceBloc()
+      ..stubState(LoadedState(experience: _experience));
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: ScreenFooterProviderWidget(
+          footer: const Text('footer'),
+          child: BlocProvider<ExperienceBloc>.value(
+            value: bloc,
+            child: const ContentWidget(),
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 3));
+  }
+
+  CustomScrollView screenScrollView(WidgetTester tester) {
+    return tester.widget<CustomScrollView>(
+      find.ancestor(
+        of: find.text('Lead Engineer'),
+        matching: find.byType(CustomScrollView),
+      ),
+    );
+  }
 
   group('Experience ContentWidget', () {
     testWidgets(
@@ -30,7 +76,9 @@ void main() {
         await tester.pump();
 
         expect(find.byType(DSLoadingWidget), findsOneWidget);
-        verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+        ).called(1);
       },
     );
 
@@ -51,7 +99,9 @@ void main() {
         await tester.pump();
 
         expect(find.byType(DSErrorCardWidget), findsOneWidget);
-        verify(() => bloc.add(ViewStateVisibleEvent.error())).called(1);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('error_content_view')),
+        ).called(1);
       },
     );
 
@@ -68,27 +118,7 @@ void main() {
           tester.view.devicePixelRatio = 1;
           addTearDown(tester.view.reset);
           final bloc = MockExperienceBloc()
-            ..stubState(
-              LoadedState(
-                experience: ExperienceEntity(
-                  company: 'Acme',
-                  position: 'Lead Engineer',
-                  location: 'Madrid',
-                  startDate: DateTime(2020),
-                  endDate: null,
-                  current: true,
-                  employmentType: 'Full-time',
-                  description: 'Short description',
-                  longDescription: 'Long description',
-                  responsibilities: const ['Lead the team'],
-                  achievements: const ['Shipped it'],
-                  technologies: const ['Flutter', 'Dart'],
-                  companyLogo: '',
-                  url: 'https://acme.com',
-                  id: 'acme',
-                ),
-              ),
-            );
+            ..stubState(LoadedState(experience: _experience));
 
           await tester.pumpWidget(
             TestWidgetWrapper(
@@ -106,5 +136,44 @@ void main() {
         },
       );
     }
+
+    testWidgets(
+      'should show the details in the screen scroll view followed by the footer when loaded',
+      (tester) async {
+        await pumpLoaded(tester);
+
+        final slivers = screenScrollView(tester).slivers;
+        expect(
+          slivers.last,
+          isA<SliverToBoxAdapter>().having(
+            (sliver) => (sliver.child! as Text).data,
+            'footer',
+            'footer',
+          ),
+        );
+        expect(find.byType(FooterWidget), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'should select a later section tab when the details are scrolled to the end',
+      (tester) async {
+        await pumpLoaded(tester);
+        final tabController = tester
+            .widget<TabBar>(find.byType(TabBar, skipOffstage: false))
+            .controller!;
+        expect(tabController.index, 0);
+
+        final scrollController = screenScrollView(tester).controller!;
+        final end = scrollController.position.maxScrollExtent;
+        scrollController.jumpTo(end - 1);
+        await tester.pump();
+        // Sections are measured on scroll, so scroll again once laid out.
+        scrollController.jumpTo(end);
+        await tester.pump(const Duration(seconds: 1));
+
+        expect(tabController.index, greaterThan(0));
+      },
+    );
   });
 }

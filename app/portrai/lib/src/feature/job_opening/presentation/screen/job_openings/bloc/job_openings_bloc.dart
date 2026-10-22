@@ -5,7 +5,6 @@ import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/job_openings_event.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/bloc/job_openings_state.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings/tracking/_tracking.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 
 @register
 class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
@@ -14,7 +13,6 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
     this._isJobSearchEnabledUseCase,
     this._setJobSearchEnabledUseCase,
     this._signOutUseCase,
-    this._getProfileUseCase,
     this._trackingDelegate,
   ) : super(const JobOpeningsState()) {
     on<JobOpeningsStartedEvent>(_mapJobOpeningsStartedEventToState);
@@ -28,7 +26,6 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
   final IsJobSearchEnabledUseCase _isJobSearchEnabledUseCase;
   final SetJobSearchEnabledUseCase _setJobSearchEnabledUseCase;
   final SignOutUseCase _signOutUseCase;
-  final GetProfileUseCase _getProfileUseCase;
   final JobOpeningsTrackingDelegate _trackingDelegate;
 
   Future<void> _mapJobOpeningsStartedEventToState(
@@ -37,11 +34,6 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
   ) async {
     _trackingDelegate.trackScreenView();
     await Future.wait([_loadJobOpenings(emit), _loadJobSearch(emit)]);
-    // Only the footer needs it, so it loads after the page content.
-    final profileEither = await _getProfileUseCase();
-    if (profileEither.isRight) {
-      emit(state.copyWith(profile: profileEither.right));
-    }
   }
 
   Future<void> _mapJobOpeningsRetryClickEventToState(

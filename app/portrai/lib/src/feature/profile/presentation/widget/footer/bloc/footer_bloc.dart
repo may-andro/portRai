@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
+import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/footer_event.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/footer_state.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/tracking/_tracking.dart';
@@ -10,6 +11,7 @@ import 'package:portrai/src/feature/profile/presentation/widget/footer/tracking/
 @register
 class FooterBloc extends Bloc<FooterEvent, FooterState> {
   FooterBloc(
+    this._getProfileUseCase,
     this._openExternalUrlUseCase,
     this._openEmailUseCase,
     this._trackingDelegate,
@@ -19,6 +21,7 @@ class FooterBloc extends Bloc<FooterEvent, FooterState> {
     on<OpenEmailClientEvent>(_mapOpenEmailClientEventToState);
   }
 
+  final GetProfileUseCase _getProfileUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
   final OpenEmailUseCase _openEmailUseCase;
   final FooterTrackingDelegate _trackingDelegate;
@@ -26,8 +29,17 @@ class FooterBloc extends Bloc<FooterEvent, FooterState> {
   FutureOr<void> _mapLoadDataEventToState(
     LoadDataEvent event,
     Emitter<FooterState> emit,
-  ) {
-    emit(LoadedState(profile: event.profile));
+  ) async {
+    if (event.profile case final profile?) {
+      emit(LoadedState(profile: profile));
+      return;
+    }
+    final profileEither = await _getProfileUseCase();
+    if (profileEither.isLeft) {
+      emit(const UnavailableState());
+      return;
+    }
+    emit(LoadedState(profile: profileEither.right));
   }
 
   FutureOr<void> _mapOpenExternalUrlEventToState(

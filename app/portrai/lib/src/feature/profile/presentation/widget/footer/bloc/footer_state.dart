@@ -12,6 +12,11 @@ final class LoadingState extends FooterState {
   const LoadingState();
 }
 
+/// The profile could not be loaded, so there is nothing to show.
+final class UnavailableState extends FooterState {
+  const UnavailableState();
+}
+
 final class LoadedState extends FooterState {
   const LoadedState({required this.profile});
 

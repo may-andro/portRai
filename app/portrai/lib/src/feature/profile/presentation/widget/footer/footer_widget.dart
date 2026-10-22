@@ -24,9 +24,10 @@ part 'help_widget.dart';
 part 'intro_widget.dart';
 
 class FooterWidget extends StatelessWidget {
-  const FooterWidget({super.key, required this.profile});
+  const FooterWidget({super.key, this.profile});
 
-  final ProfileEntity profile;
+  /// The profile to show; the footer loads it itself when null.
+  final ProfileEntity? profile;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,7 @@ class FooterWidget extends StatelessWidget {
         builder: (context, state) {
           return switch (state) {
             final LoadingState _ => const _LoadingWidget(),
+            final UnavailableState _ => const SizedBox.shrink(),
             final LoadedState _ => const _SuccessWidget(),
           };
         },
@@ -53,6 +55,7 @@ class _LoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DSLoadingWidget(
+      style: DSLoadingStyle.lottie,
       size: max(context.shortestSide * 0.1, context.space(factor: 2)),
     );
   }

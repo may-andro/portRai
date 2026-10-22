@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/_
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/go_route/go_route_extension.dart';
 import 'package:portrai/src/route/observer/route_observer_widget.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -27,17 +28,17 @@ class SettingScreen extends StatelessWidget {
           child: Builder(
             builder: (context) => RouteObserverWidget(
               onResume: () => context.bloc.add(const LoadSettingsEvent()),
-              child: BlocBuilder<SettingBloc, SettingState>(
-                builder: (context, state) {
-                  switch (state) {
-                    case SettingInitialState():
-                    case SettingLoadingState():
-                      return const _LoadingStateWidget();
-                    case final SettingLoadedState state:
-                      return ContentWidget(state: state);
-                    case SettingErrorState(:final message):
-                      return Center(child: Text(message));
-                  }
+              child: ScreenContentWidget<SettingBloc, SettingState>(
+                buildWhen: (previous, current) => previous != current,
+                contentOf: (state) => switch (state) {
+                  SettingInitialState() ||
+                  SettingLoadingState() => const ScreenLoadingContent(),
+                  SettingErrorState(:final failure) => ScreenErrorContent(
+                    failure,
+                  ),
+                  final SettingLoadedState state => ScreenLoadedContent.slivers(
+                    [ContentWidget(state: state)],
+                  ),
                 },
               ),
             ),
@@ -45,14 +46,5 @@ class SettingScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _LoadingStateWidget extends StatelessWidget {
-  const _LoadingStateWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: DSLoadingWidget(size: context.space(factor: 5)));
   }
 }

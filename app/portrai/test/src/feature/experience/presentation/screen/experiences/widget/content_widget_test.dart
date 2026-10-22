@@ -1,10 +1,13 @@
 import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experiences/widget/content_widget.dart';
 import 'package:portrai/src/feature/experience/presentation/widget/experience_list/experience_list.dart';
+import 'package:portrai/src/feature/profile/profile.dart';
+import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import '../../../../../../../mock/feature/experience/presentation/screen/experiences/bloc/mock_experiences_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -31,7 +34,9 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DSLoadingWidget), findsOneWidget);
-      verify(() => bloc.add(ViewStateVisibleEvent.loading())).called(1);
+      verify(
+        () => bloc.add(const ViewStateVisibleEvent('loading_content_view')),
+      ).called(1);
     });
 
     testWidgets('should render an error card when loading fails', (
@@ -53,24 +58,43 @@ void main() {
       expect(find.byType(DSErrorCardWidget), findsOneWidget);
     });
 
-    testWidgets('should render an experience list when loading succeeds', (
-      tester,
-    ) async {
-      const state = LoadedState(experiences: [], profile: null);
-      final bloc = MockExperiencesBloc()..stubState(state);
+    testWidgets(
+      'should render an experience list in the screen scroll view followed by the footer when loading succeeds',
+      (tester) async {
+        const state = LoadedState(experiences: []);
+        final bloc = MockExperiencesBloc()..stubState(state);
 
-      await tester.pumpWidget(
-        TestWidgetWrapper(
-          child: BlocProvider<ExperiencesBloc>.value(
-            value: bloc,
-            child: const ContentWidget(),
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: ScreenFooterProviderWidget(
+              footer: const Text('footer'),
+              child: BlocProvider<ExperiencesBloc>.value(
+                value: bloc,
+                child: const ContentWidget(),
+              ),
+            ),
           ),
-        ),
-      );
-      await tester.pump();
+        );
+        await tester.pump();
 
-      expect(find.byType(ExperienceListWidget), findsOneWidget);
-      verify(() => bloc.add(ViewStateVisibleEvent.success())).called(1);
-    });
+        final scrollView = find.ancestor(
+          of: find.byType(ExperienceListWidget),
+          matching: find.byType(CustomScrollView),
+        );
+        expect(scrollView, findsOneWidget);
+        expect(
+          tester.widget<CustomScrollView>(scrollView).slivers.last,
+          isA<SliverToBoxAdapter>().having(
+            (sliver) => (sliver.child! as Text).data,
+            'footer',
+            'footer',
+          ),
+        );
+        expect(find.byType(FooterWidget), findsNothing);
+        verify(
+          () => bloc.add(const ViewStateVisibleEvent('loaded_content_view')),
+        ).called(1);
+      },
+    );
   });
 }

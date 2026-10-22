@@ -266,9 +266,9 @@ void main() {
         bloc.add(const ScreenVisibleEvent());
         bloc.add(const DrawerClickEvent(true));
         bloc.add(const DrawerClickEvent(false));
-        bloc.add(ViewStateVisibleEvent.loading());
-        bloc.add(ViewStateVisibleEvent.success());
-        bloc.add(ViewStateVisibleEvent.error());
+        bloc.add(const ViewStateVisibleEvent('loading_content_view'));
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
+        bloc.add(const ViewStateVisibleEvent('error_content_view'));
         bloc.add(const SectionVisibleEvent('portfolio_projects_section'));
       },
       expect: () => const <PortfolioState>[],

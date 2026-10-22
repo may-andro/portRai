@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:core/core.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
 @immutable
@@ -29,18 +28,13 @@ class ErrorState extends LocaleSelectionState {
 
 // Base class for states that have locale data
 sealed class LoadedState extends LocaleSelectionState {
-  const LoadedState({
-    required this.supportedLocales,
-    required this.appLocale,
-    this.profile,
-  });
+  const LoadedState({required this.supportedLocales, required this.appLocale});
 
   final List<Locale> supportedLocales;
   final AppLocale appLocale;
-  final ProfileEntity? profile;
 
   @override
-  List<Object?> get props => [supportedLocales, appLocale, profile];
+  List<Object?> get props => [supportedLocales, appLocale];
 }
 
 // Loaded state
@@ -48,18 +42,15 @@ class LocaleSelectionLoadedState extends LoadedState {
   const LocaleSelectionLoadedState({
     required super.supportedLocales,
     required super.appLocale,
-    super.profile,
   });
 
   LocaleSelectionLoadedState copyWith({
     List<Locale>? supportedLocales,
     AppLocale? appLocale,
-    ProfileEntity? profile,
   }) {
     return LocaleSelectionLoadedState(
       supportedLocales: supportedLocales ?? this.supportedLocales,
       appLocale: appLocale ?? this.appLocale,
-      profile: profile ?? this.profile,
     );
   }
 }
@@ -69,7 +60,6 @@ class LocaleSelectionUpdatingState extends LoadedState {
   const LocaleSelectionUpdatingState({
     required super.supportedLocales,
     required super.appLocale,
-    super.profile,
     required this.targetLocale,
   });
 
@@ -84,7 +74,6 @@ class LocaleSelectionUpdateFailureState extends LoadedState {
   const LocaleSelectionUpdateFailureState({
     required super.supportedLocales,
     required super.appLocale,
-    super.profile,
     required this.targetLocale,
     required this.failure,
   });

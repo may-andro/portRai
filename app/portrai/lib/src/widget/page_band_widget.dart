@@ -3,15 +3,6 @@ import 'package:flutter/material.dart';
 
 const pageOnDarkColor = DSColor(0xFFFFFFFF);
 
-/// Horizontal inset shared by every band so content lines up down the page.
-double pageHorizontalInset(BuildContext context) {
-  return switch (context.deviceResolution) {
-    DSDeviceResolution.mobile => context.space(factor: 3),
-    DSDeviceResolution.tablet => context.space(factor: 5),
-    DSDeviceResolution.desktop => context.width * 0.15,
-  };
-}
-
 /// Full-width page section with its own background.
 class PageBandWidget extends StatelessWidget {
   const PageBandWidget({
@@ -39,7 +30,7 @@ class PageBandWidget extends StatelessWidget {
           if (background != null) Positioned.fill(child: background!),
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: pageHorizontalInset(context),
+              horizontal: context.screenHorizontalPadding.left,
               vertical: context.space(factor: verticalFactor),
             ),
             child: RevealWidget(child: child),

@@ -1,12 +1,10 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/services/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
 import '../../../../../../../mock/feature/service/domain/use_case/mock_get_services_use_case.dart';
 import '../../../../../../../mock/feature/service/presentation/screen/services/tracking/mock_services_tracking_delegate.dart';
 
@@ -20,14 +18,12 @@ void main() {
 
   group('ServicesBloc', () {
     late MockGetServicesUseCase getServices;
-    late MockGetProfileUseCase getProfile;
     late MockServicesTrackingDelegate tracking;
 
-    ServicesBloc buildBloc() => ServicesBloc(getServices, getProfile, tracking);
+    ServicesBloc buildBloc() => ServicesBloc(getServices, tracking);
 
     setUp(() {
       getServices = MockGetServicesUseCase();
-      getProfile = MockGetProfileUseCase();
       tracking = MockServicesTrackingDelegate();
     });
 
@@ -36,13 +32,8 @@ void main() {
     });
 
     blocTest<ServicesBloc, ServicesState>(
-      'should emit loaded without a profile when services load but profile fails',
+      'should emit loaded when services load',
       setUp: () {
-        getProfile.stubCall(
-          const Left<GetProfileFailure, ProfileEntity>(
-            ProfileNotFoundFailure(),
-          ),
-        );
         getServices.stubCall(
           const Right<GetServicesFailure, List<ServiceEntity>>([service]),
         );
@@ -51,18 +42,13 @@ void main() {
       act: (bloc) => bloc.add(const LoadServicesEvent()),
       expect: () => [
         const LoadingState(),
-        const LoadedState(services: [service], profile: null),
+        const LoadedState(services: [service]),
       ],
     );
 
     blocTest<ServicesBloc, ServicesState>(
       'should emit error when loading services fails',
       setUp: () {
-        getProfile.stubCall(
-          const Left<GetProfileFailure, ProfileEntity>(
-            ProfileNotFoundFailure(),
-          ),
-        );
         getServices.stubCall(
           const Left<GetServicesFailure, List<ServiceEntity>>(
             ServicesNetworkFailure(),
@@ -86,7 +72,7 @@ void main() {
       build: buildBloc,
       act: (bloc) {
         bloc.add(const ScreenVisibleEvent());
-        bloc.add(ViewStateVisibleEvent.success());
+        bloc.add(const ViewStateVisibleEvent('loaded_content_view'));
       },
       expect: () => const <ServicesState>[],
       verify: (_) {

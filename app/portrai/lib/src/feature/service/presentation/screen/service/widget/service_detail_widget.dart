@@ -90,9 +90,9 @@ class _DetailQuoteBandWidgetState extends State<_DetailQuoteBandWidget>
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.horizontalPadding,
-                vertical: context.space(factor: 6),
+              padding: context.screenHorizontalPadding.copyWith(
+                top: context.space(factor: 6),
+                bottom: context.space(factor: 6),
               ),
               child: Center(
                 child: ConstrainedBox(
