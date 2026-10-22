@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 
 /// Logo header shown at the top of desktop screens.
 class PageHeaderWidget extends StatelessWidget {
-  const PageHeaderWidget({super.key});
+  const PageHeaderWidget({this.actions = const [], super.key});
+
+  /// Shown at the end of the header, after the logo.
+  final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +22,7 @@ class PageHeaderWidget extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
+          if (actions.isNotEmpty) ...[const Spacer(), ...actions],
         ],
       ),
     );
