@@ -245,6 +245,26 @@ ScreenTrackerWidget({
 - `additionalParams`: Optional parameters to include with screen view event
 - `child`: The screen content widget
 
+### ScreenTrackingDelegate
+
+Base class for the tracking of one screen. Subclass it with a `TrackingArea`
+naming the screen; it reports through the injected `TrackingReporter`.
+
+```dart
+class _CatalogArea extends TrackingArea {
+  const _CatalogArea() : super('catalog');
+}
+
+class CatalogTrackingDelegate extends ScreenTrackingDelegate {
+  CatalogTrackingDelegate(TrackingReporter trackingReporter)
+    : super(const _CatalogArea(), trackingReporter);
+}
+```
+
+- `trackScreenView()` sends a `ScreenViewTracking` for the area.
+- `trackViewEvent(label)` sends a `ViewTracking` with the given label.
+- `trackEvent(tracking)` sends any other `Tracking`.
+
 ### Firebase Analytics Integration
 
 The module automatically integrates with Firebase Analytics when configured:

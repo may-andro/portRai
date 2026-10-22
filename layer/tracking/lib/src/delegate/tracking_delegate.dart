@@ -22,4 +22,9 @@ abstract class ScreenTrackingDelegate extends TrackingDelegate {
   void trackScreenView() {
     trackEvent(ScreenViewTracking(area: _area));
   }
+
+  /// Tracks that a view labelled [label] became visible on the screen.
+  void trackViewEvent(String label) {
+    trackEvent(ViewTracking(label: label));
+  }
 }
