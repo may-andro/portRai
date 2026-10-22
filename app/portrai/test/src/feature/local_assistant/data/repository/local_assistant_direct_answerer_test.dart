@@ -310,6 +310,40 @@ void main() {
     );
   });
 
+  test('should answer a continuation like the previous question', () {
+    expect(
+      answerer.answerFollowUp(
+        'and at Acme?',
+        previousQuestion: 'How long did he work at Initech?',
+      ),
+      startsWith('Mayank Rai worked at Acme for 2 years and 2 months'),
+    );
+    expect(
+      answerer.answerFollowUp(
+        'what about Android?',
+        previousQuestion: 'How many years of Flutter experience?',
+      ),
+      contains('Android for 4 years'),
+    );
+    expect(
+      answerer.answerFollowUp(
+        'and in Pune?',
+        previousQuestion: 'How long did he work in Hyderabad?',
+      ),
+      contains('2 years and 1 month in Pune'),
+    );
+  });
+
+  test('should not treat a full question as a continuation', () {
+    expect(
+      answerer.answerFollowUp(
+        'Tell me about Acme',
+        previousQuestion: 'How long did he work at Initech?',
+      ),
+      isNull,
+    );
+  });
+
   test('should leave an earlier employer to the model', () {
     expect(answerer.answer('Who was his previous employer?'), isNull);
     expect(answerer.answer('Which employer came before that?'), isNull);

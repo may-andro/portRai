@@ -228,7 +228,13 @@ class FlutterEdgeAiLocalAssistantRepository
     }
     // Facts the app already computed are answered without waiting for the
     // engine, which is loaded on the first question that needs it.
-    final direct = LocalAssistantDirectAnswerer(portfolio).answer(question);
+    final answerer = LocalAssistantDirectAnswerer(portfolio);
+    final previous = _previousQuestion;
+    final direct =
+        answerer.answer(question) ??
+        (previous == null
+            ? null
+            : answerer.answerFollowUp(question, previousQuestion: previous));
     if (direct != null) {
       return direct;
     }

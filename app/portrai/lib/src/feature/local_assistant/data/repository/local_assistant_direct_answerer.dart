@@ -119,6 +119,40 @@ class LocalAssistantDirectAnswerer {
     ),
   ];
 
+  /// Answers a short continuation such as "and at Stuart?" or "what about
+  /// Kotlin?" by asking [previousQuestion] again about the newly named
+  /// company, place or technology. Returns null for any other question.
+  String? answerFollowUp(String question, {required String previousQuestion}) {
+    final normalizedQuestion = question.toLowerCase().trim();
+    if (!_continuation.hasMatch(normalizedQuestion) ||
+        normalizedQuestion.split(_whitespace).length > 6) {
+      return null;
+    }
+    var previous = previousQuestion.toLowerCase();
+    for (final name in _replaceableNames()) {
+      previous = previous.replaceAllMapped(
+        _namePattern(name),
+        (match) => '${match[1]} ${match[2]}',
+      );
+    }
+    return answer('$previous $normalizedQuestion');
+  }
+
+  // Names a continuation can swap: companies, projects, people,
+  // technologies, places and social networks, longest first.
+  List<String> _replaceableNames() {
+    final profile = _portfolio['profile'];
+    final links = profile is Map ? profile['socialLinks'] : null;
+    return {
+        ...LocalAssistantContextSelector.portfolioNames(_portfolio),
+        for (final (place, _) in _places()) place.toLowerCase(),
+        if (links is List)
+          for (final link in links.whereType<Map<String, dynamic>>())
+            if (_text(link['name']) case final network?) network.toLowerCase(),
+      }.toList()
+      ..sort((longer, shorter) => shorter.length.compareTo(longer.length));
+  }
+
   String? answer(String question) {
     final normalizedQuestion = question.toLowerCase();
     for (final rule in _rules) {
@@ -332,6 +366,10 @@ class LocalAssistantDirectAnswerer {
     r'\b(age|how old|born|birthday|birth date|date of birth|married|wife|husband|'
     r'children|kids|family|religion|hobby|hobbies|interests|free time|spare time)\b',
   );
+  static final _continuation = RegExp(
+    r'^(and|also|what about|how about|same for|then)\b',
+  );
+  static final _whitespace = RegExp(r'\s+');
   static final _projectWords = RegExp(r'\b(projects?|apps?|applications?)\b');
   static final _services = RegExp(r'\bservices?\b');
   static final _listIntent = RegExp(

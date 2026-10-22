@@ -283,6 +283,33 @@ void main() {
       expect(answer, "Mayank Rai's email is m@x.com.");
     });
 
+    test('should answer a continuation directly after a direct answer', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final portfolioContext = jsonEncode({
+        'profile': {'name': 'Mayank Rai'},
+        'experiences': [
+          {'company': 'Stuart'},
+          {'company': 'Acme'},
+        ],
+        'overview': [
+          'Time per company, overlapping roles counted once: Stuart: 1 year in 1 role (Developer, July 2022 to June 2023). Acme: 2 years in 1 role (Lead, July 2023 to June 2025).',
+        ],
+      });
+
+      await repository.answer(
+        question: 'How long did he work at Stuart?',
+        portfolioContext: portfolioContext,
+      );
+      final followUp = await repository.answer(
+        question: 'and at Acme?',
+        portfolioContext: portfolioContext,
+      );
+
+      expect(followUp, startsWith('Mayank Rai worked at Acme for 2 years'));
+      // Only the readiness check reached the model.
+      verify(() => chat.addQueryChunk(any())).called(1);
+    });
+
     test('should strip markdown from the generated answer', () async {
       final (:repository, :chat) = await prepareRepository();
       when(() => chat.generateChatResponse()).thenAnswer(
