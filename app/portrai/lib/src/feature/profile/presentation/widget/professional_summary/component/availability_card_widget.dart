@@ -19,7 +19,6 @@ class _AvailabilityCardWidget extends StatelessWidget {
       profile.location.city,
       profile.location.country,
     ].where((part) => part.isNotEmpty).join(', ');
-    final notice = availability.noticePeriod;
 
     final details = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,8 +51,6 @@ class _AvailabilityCardWidget extends StatelessWidget {
               ),
             if (location.isNotEmpty)
               _Fact(icon: Icons.place_outlined, label: location),
-            if (notice != null && notice.isNotEmpty)
-              _Fact(icon: Icons.schedule_rounded, label: notice),
           ],
           isVisible: isVisible,
           hasHorizontalPadding: false,

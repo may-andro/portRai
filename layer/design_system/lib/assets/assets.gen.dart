@@ -109,6 +109,10 @@ class $AssetsLottieGen {
   LottieGenImage get recruiterRole =>
       const LottieGenImage('assets/lottie/recruiter_role.json');
 
+  /// File path: assets/lottie/resume.json
+  LottieGenImage get resume =>
+      const LottieGenImage('assets/lottie/resume.json');
+
   /// File path: assets/lottie/sign_in.json
   LottieGenImage get signIn =>
       const LottieGenImage('assets/lottie/sign_in.json');
@@ -120,6 +124,10 @@ class $AssetsLottieGen {
   /// File path: assets/lottie/tech_stack.json
   LottieGenImage get techStack =>
       const LottieGenImage('assets/lottie/tech_stack.json');
+
+  /// File path: assets/lottie/website.json
+  LottieGenImage get website =>
+      const LottieGenImage('assets/lottie/website.json');
 
   /// List of all assets
   List<LottieGenImage> get values => [
@@ -144,9 +152,11 @@ class $AssetsLottieGen {
     paperPlane,
     pinPulse,
     recruiterRole,
+    resume,
     signIn,
     talentSearch,
     techStack,
+    website,
   ];
 }
 

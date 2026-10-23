@@ -17,6 +17,11 @@ void main() {
       expect(DSBrandIcon.fromName('GitHub'), DSBrandIcon.github);
     });
 
+    test('should return resume and website when they are named', () {
+      expect(DSBrandIcon.fromName('Resume'), DSBrandIcon.resume);
+      expect(DSBrandIcon.fromName('Website'), DSBrandIcon.website);
+    });
+
     test('should return null when the brand is unknown', () {
       expect(DSBrandIcon.fromName('unknown'), isNull);
     });
@@ -63,6 +68,65 @@ void main() {
 
       final lottie = tester.widget<LottieBuilder>(find.byType(LottieBuilder));
       expect(lottie.controller!.status, AnimationStatus.completed);
+    });
+
+    for (final brand in DSBrandIcon.values) {
+      testWidgets('should load the animation when brand is ${brand.name}', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            brightness: Brightness.light,
+            designSystem: DesignSystem.values.first,
+            child: DSBrandIconWidget(brand: brand, size: 48),
+          ),
+        );
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(seconds: 1)),
+        );
+        await tester.pump();
+
+        expect(find.byType(RawLottie), findsOneWidget);
+        expect(find.byIcon(brand.fallbackIcon), findsNothing);
+      });
+    }
+
+    testWidgets('should paint the circle with primary when no color is given', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildSubject());
+
+      final lottie = tester.widget<DSLottieWidget>(find.byType(DSLottieWidget));
+      final context = tester.element(find.byType(DSLottieWidget));
+      expect(
+        lottie.colorOverrides.first.color,
+        context.colorPalette.brand.primary,
+      );
+    });
+
+    testWidgets('should paint the circle and mark with the given colors', (
+      tester,
+    ) async {
+      const color = DSColor(0xFF112233);
+      const onColor = DSColor(0xFF445566);
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          brightness: Brightness.light,
+          designSystem: DesignSystem.values.first,
+          child: const DSBrandIconWidget(
+            brand: DSBrandIcon.github,
+            size: 48,
+            color: color,
+            onColor: onColor,
+          ),
+        ),
+      );
+
+      final lottie = tester.widget<DSLottieWidget>(find.byType(DSLottieWidget));
+      expect(lottie.colorOverrides.map((override) => override.color), [
+        color,
+        onColor,
+      ]);
     });
 
     testWidgets('should keep animating when playback is loop', (tester) async {
