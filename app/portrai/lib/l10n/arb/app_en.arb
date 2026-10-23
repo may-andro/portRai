@@ -1750,5 +1750,141 @@
   "jobOpeningEngagementFreelance": "Freelance",
   "@jobOpeningEngagementFreelance": {
     "description": "Chip on a job opening card for freelance work"
+  },
+  "settingThemeSection": "Theme",
+  "@settingThemeSection": {
+    "description": "Settings section title for the app theme"
+  },
+  "themeCardTitle": "App theme",
+  "@themeCardTitle": {
+    "description": "Title of the Settings card that opens the theme gallery"
+  },
+  "themeGalleryTitle": "Themes",
+  "@themeGalleryTitle": {
+    "description": "Title of the theme gallery screen"
+  },
+  "themeGalleryHint": "Swipe the deck to try each theme",
+  "@themeGalleryHint": {
+    "description": "Hint telling the user how to browse the theme cards"
+  },
+  "themeGalleryApply": "Apply theme",
+  "@themeGalleryApply": {
+    "description": "Button that applies the previewed theme and restarts the app"
+  },
+  "themeGalleryInUse": "In use",
+  "@themeGalleryInUse": {
+    "description": "Disabled apply button label and card badge when the previewed theme is the one in use"
+  },
+  "themeGalleryThisMonth": "This month",
+  "@themeGalleryThisMonth": {
+    "description": "Card badge on the theme that belongs to the current month"
+  },
+  "themeGalleryApplyNote": "The app restarts to apply it. Your pick stays until the end of the month, then the new month brings its own theme.",
+  "@themeGalleryApplyNote": {
+    "description": "Note under the apply button explaining the restart and that a chosen theme lasts until the end of the month"
+  },
+  "themeGalleryPrevious": "Previous theme",
+  "@themeGalleryPrevious": {
+    "description": "Accessibility label of the button that shows the previous theme"
+  },
+  "themeGalleryNext": "Next theme",
+  "@themeGalleryNext": {
+    "description": "Accessibility label of the button that shows the next theme"
+  },
+  "themeNameBeltane": "Beltane",
+  "@themeNameBeltane": {
+    "description": "Name of the Beltane theme"
+  },
+  "themeNameCarnival": "Carnival",
+  "@themeNameCarnival": {
+    "description": "Name of the Carnival theme"
+  },
+  "themeNameChuseok": "Chuseok",
+  "@themeNameChuseok": {
+    "description": "Name of the Chuseok theme"
+  },
+  "themeNameDiwali": "Diwali",
+  "@themeNameDiwali": {
+    "description": "Name of the Diwali theme"
+  },
+  "themeNameHalloween": "Halloween",
+  "@themeNameHalloween": {
+    "description": "Name of the Halloween theme"
+  },
+  "themeNameHogeras": "Hogueras",
+  "@themeNameHogeras": {
+    "description": "Name of the Hogueras de San Juan theme"
+  },
+  "themeNameHogmanay": "Hogmanay",
+  "@themeNameHogmanay": {
+    "description": "Name of the Hogmanay theme"
+  },
+  "themeNameHoli": "Holi",
+  "@themeNameHoli": {
+    "description": "Name of the Holi theme"
+  },
+  "themeNameObon": "Obon",
+  "@themeNameObon": {
+    "description": "Name of the Obon theme"
+  },
+  "themeNamePachamama": "Pachamama",
+  "@themeNamePachamama": {
+    "description": "Name of the Pachamama theme"
+  },
+  "themeNameSakura": "Sakura",
+  "@themeNameSakura": {
+    "description": "Name of the Sakura theme"
+  },
+  "themeNameXmas": "Christmas",
+  "@themeNameXmas": {
+    "description": "Name of the Christmas theme"
+  },
+  "themeTaglineBeltane": "Spring meadows and May Day fires",
+  "@themeTaglineBeltane": {
+    "description": "Short description of the Beltane theme"
+  },
+  "themeTaglineCarnival": "Confetti, masks and samba",
+  "@themeTaglineCarnival": {
+    "description": "Short description of the Carnival theme"
+  },
+  "themeTaglineChuseok": "Autumn leaves under a harvest moon",
+  "@themeTaglineChuseok": {
+    "description": "Short description of the Chuseok theme"
+  },
+  "themeTaglineDiwali": "Glowing lamps and lanterns",
+  "@themeTaglineDiwali": {
+    "description": "Short description of the Diwali theme"
+  },
+  "themeTaglineHalloween": "Ghosts, pumpkins and moonlit mischief",
+  "@themeTaglineHalloween": {
+    "description": "Short description of the Halloween theme"
+  },
+  "themeTaglineHogeras": "Midsummer bonfires and flying sparks",
+  "@themeTaglineHogeras": {
+    "description": "Short description of the Hogueras de San Juan theme"
+  },
+  "themeTaglineHogmanay": "Fireworks to ring in the new year",
+  "@themeTaglineHogmanay": {
+    "description": "Short description of the Hogmanay theme"
+  },
+  "themeTaglineHoli": "Splashes of colour everywhere",
+  "@themeTaglineHoli": {
+    "description": "Short description of the Holi theme"
+  },
+  "themeTaglineObon": "Fireflies on warm summer nights",
+  "@themeTaglineObon": {
+    "description": "Short description of the Obon theme"
+  },
+  "themeTaglinePachamama": "Woven patterns for Mother Earth",
+  "@themeTaglinePachamama": {
+    "description": "Short description of the Pachamama theme"
+  },
+  "themeTaglineSakura": "Cherry blossom on the breeze",
+  "@themeTaglineSakura": {
+    "description": "Short description of the Sakura theme"
+  },
+  "themeTaglineXmas": "Snowfall and warm winter lights",
+  "@themeTaglineXmas": {
+    "description": "Short description of the Christmas theme"
   }
 }

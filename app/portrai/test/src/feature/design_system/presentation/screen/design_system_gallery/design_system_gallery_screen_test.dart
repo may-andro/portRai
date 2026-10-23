@@ -1,0 +1,175 @@
+import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/design_system/design_system.dart';
+import 'package:portrai/src/feature/design_system/presentation/screen/design_system_gallery/bloc/_bloc.dart';
+import 'package:portrai/src/feature/design_system/presentation/screen/design_system_gallery/design_system_gallery_screen.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
+
+import '../../../../../../mock/feature/design_system/presentation/screen/design_system_gallery/bloc/mock_design_system_gallery_bloc.dart';
+import '../../../../../../util/test_wrapper_widget.dart';
+
+void main() {
+  group('DesignSystemGalleryScreen', () {
+    const designSystemsByMonth = [
+      DesignSystem.hogmanay,
+      DesignSystem.carnival,
+      DesignSystem.holi,
+      DesignSystem.sakura,
+      DesignSystem.beltane,
+      DesignSystem.hogeras,
+      DesignSystem.obon,
+      DesignSystem.pachamama,
+      DesignSystem.chuseok,
+      DesignSystem.halloween,
+      DesignSystem.diwali,
+      DesignSystem.xmas,
+    ];
+    const loadedState = DesignSystemGalleryLoadedState(
+      designSystems: designSystemsByMonth,
+      appliedDesignSystem: DesignSystem.holi,
+      monthlyDesignSystem: DesignSystem.halloween,
+      previewedDesignSystem: DesignSystem.holi,
+    );
+
+    late MockDesignSystemGalleryBloc bloc;
+
+    setUpAll(() {
+      registerFallbackValue(const LoadDesignSystemGalleryEvent());
+    });
+
+    setUp(() async {
+      await appServiceLocator.reset();
+      bloc = MockDesignSystemGalleryBloc();
+      appServiceLocator.registerFactory<DesignSystemGalleryBloc>(() => bloc);
+    });
+
+    tearDown(() async {
+      await appServiceLocator.reset();
+    });
+
+    Future<void> pumpScreen(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1179, 2556);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        const TestWidgetWrapper(child: DesignSystemGalleryScreen()),
+      );
+      await tester.pump();
+    }
+
+    // The festival effects loop, so the deck is given time to settle instead
+    // of waiting for every animation to end.
+    Future<void> settleDeck(WidgetTester tester) async {
+      for (var frame = 0; frame < 40; frame++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+    }
+
+    testWidgets('should load the gallery and show a loading indicator', (
+      tester,
+    ) async {
+      bloc.stubState(const DesignSystemGalleryLoadingState());
+
+      await pumpScreen(tester);
+
+      expect(find.byType(DSLoadingWidget), findsOneWidget);
+      verify(() => bloc.add(const LoadDesignSystemGalleryEvent())).called(1);
+    });
+
+    testWidgets(
+      'should show the previewed theme in front and mark it as in use',
+      (tester) async {
+        bloc.stubState(loadedState);
+
+        await pumpScreen(tester);
+
+        expect(find.text('Holi'), findsOneWidget);
+        expect(find.text('Splashes of colour everywhere'), findsOneWidget);
+        final applyButton = tester.widget<DSButtonWidget>(
+          find.byType(DSButtonWidget),
+        );
+        expect(applyButton.label, 'In use');
+        expect(applyButton.isDisabled, isTrue);
+      },
+    );
+
+    testWidgets('should preview the next theme when the next arrow is tapped', (
+      tester,
+    ) async {
+      bloc.stubState(loadedState);
+      await pumpScreen(tester);
+
+      await tester.tap(find.byTooltip('Next theme'));
+      await settleDeck(tester);
+
+      verify(
+        () =>
+            bloc.add(const PreviewDesignSystemClickEvent(DesignSystem.sakura)),
+      ).called(1);
+    });
+
+    testWidgets(
+      'should preview the previous theme when the front card is flung right',
+      (tester) async {
+        bloc.stubState(loadedState);
+        await pumpScreen(tester);
+
+        await tester.fling(find.text('Holi'), const Offset(200, 0), 1500);
+        await settleDeck(tester);
+
+        verify(
+          () => bloc.add(
+            const PreviewDesignSystemClickEvent(DesignSystem.carnival),
+          ),
+        ).called(1);
+      },
+    );
+
+    testWidgets('should take the deck to a month when its dot is tapped', (
+      tester,
+    ) async {
+      bloc.stubState(loadedState);
+      await pumpScreen(tester);
+
+      await tester.tap(find.bySemanticsLabel('Christmas'));
+      await settleDeck(tester);
+
+      verify(
+        () => bloc.add(const PreviewDesignSystemClickEvent(DesignSystem.xmas)),
+      ).called(1);
+    });
+
+    testWidgets(
+      'should apply the previewed theme when the apply button is tapped',
+      (tester) async {
+        bloc.stubState(
+          loadedState.copyWith(previewedDesignSystem: DesignSystem.halloween),
+        );
+        await pumpScreen(tester);
+
+        await tester.tap(find.text('Apply theme'));
+        await tester.pump();
+
+        verify(() => bloc.add(const ApplyDesignSystemClickEvent())).called(1);
+      },
+    );
+
+    testWidgets('should tell the user when applying the theme fails', (
+      tester,
+    ) async {
+      bloc.stubState(
+        loadedState.copyWith(
+          previewedDesignSystem: DesignSystem.halloween,
+          failure: const ApplyDesignSystemUnknownFailure(),
+        ),
+      );
+
+      await pumpScreen(tester);
+      await tester.pump();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+  });
+}
