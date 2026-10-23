@@ -30,14 +30,6 @@ final class LoadedState extends ProfessionalSummaryState {
         (socialHandle) => socialHandle.name == 'Portfolio',
       );
     }
-    socialHandles.add(
-      SocialLinkEntity(
-        name: 'Resume',
-        url: profile.resume.url,
-        image: profile.resume.image,
-      ),
-    );
-
     return socialHandles;
   }
 }
