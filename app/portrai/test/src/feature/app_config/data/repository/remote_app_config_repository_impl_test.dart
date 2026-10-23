@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,92 +59,96 @@ void main() {
     });
 
     group('getAppConfig', () {
-      test('should return the remote app config and cache it when the '
-          'document exists', () async {
+      const cachedAppConfig = PortraiAppConfigEntity(
+        minimumRequiredAppVersion: '0.9.0',
+      );
+      const remoteAppConfig = PortraiAppConfigEntity(
+        minimumRequiredAppVersion: '1.2.3',
+      );
+
+      test('should return the cached app config and cache the remote one '
+          'when an app config is cached', () async {
+        cacheDelegateRepository
+          ..stubGetAppConfig(cachedAppConfig)
+          ..stubCacheAppConfig();
         firestoreController.stubGetDocumentFromCollection({
           'minimumRequiredAppVersion': '1.2.3',
         });
-        cacheDelegateRepository.stubCacheAppConfig();
 
-        final result = await repository.getAppConfig();
+        final appConfig = await repository.getAppConfig();
+        await pumpEventQueue();
 
-        expect(
-          result,
-          const PortraiAppConfigEntity(minimumRequiredAppVersion: '1.2.3'),
-        );
+        expect(appConfig, cachedAppConfig);
         verify(
-          () => cacheDelegateRepository.cacheAppConfig(
-            const PortraiAppConfigEntity(minimumRequiredAppVersion: '1.2.3'),
-          ),
+          () => cacheDelegateRepository.cacheAppConfig(remoteAppConfig),
         ).called(1);
       });
 
-      test('should fall back to cache and log a warning when the remote '
-          'document does not exist', () async {
-        firestoreController.stubGetDocumentFromCollection(null);
-        const cachedAppConfig = PortraiAppConfigEntity(
-          minimumRequiredAppVersion: '0.9.0',
-        );
+      test('should return the cached app config without waiting for remote '
+          'when an app config is cached', () async {
         cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
+        firestoreController.stubGetDocumentFromCollectionFuture(
+          Completer<Map<String, dynamic>?>().future,
+        );
 
-        final result = await repository.getAppConfig();
+        final appConfig = await repository.getAppConfig();
 
-        expect(result, cachedAppConfig);
+        expect(appConfig, cachedAppConfig);
+      });
+
+      test('should log an error and keep the cached app config when the '
+          'refresh from remote fails', () async {
+        cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
+        firestoreController.stubGetDocumentFromCollectionThrows(
+          const FirestoreNetworkException('network error', StackTrace.empty),
+        );
+
+        final appConfig = await repository.getAppConfig();
+        await pumpEventQueue();
+
+        expect(appConfig, cachedAppConfig);
+        verifyNever(() => cacheDelegateRepository.cacheAppConfig(any()));
         verify(
           () => logReporter.error(
-            'Failed to load app config from remote, falling back to cache.',
+            'Failed to refresh the cached app config from remote.',
             tag: 'RemoteAppConfigRepositoryImpl',
           ),
         ).called(1);
       });
 
-      test('should fall back to cache when the remote document has invalid '
-          'data', () async {
-        firestoreController.stubGetDocumentFromCollection({
-          'unexpectedField': 'value',
-        });
-        const cachedAppConfig = PortraiAppConfigEntity(
-          minimumRequiredAppVersion: '0.9.0',
-        );
-        cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
-
-        final result = await repository.getAppConfig();
-
-        expect(result, cachedAppConfig);
-      });
-
-      test(
-        'should fall back to cache when the firestore controller throws',
-        () async {
-          firestoreController.stubGetDocumentFromCollectionThrows(
-            const FirestoreNetworkException('network error', StackTrace.empty),
-          );
-          const cachedAppConfig = PortraiAppConfigEntity(
-            minimumRequiredAppVersion: '0.9.0',
-          );
-          cacheDelegateRepository.stubGetAppConfig(cachedAppConfig);
-
-          final result = await repository.getAppConfig();
-
-          expect(result, cachedAppConfig);
-        },
-      );
-
-      test('should not cache silently when caching after a successful remote '
-          'load fails', () async {
+      test('should return the remote app config and cache it when no app '
+          'config is cached', () async {
+        cacheDelegateRepository
+          ..stubGetAppConfigThrows(
+            const AppConfigNotFoundException(cause: 'no cache'),
+          )
+          ..stubCacheAppConfig();
         firestoreController.stubGetDocumentFromCollection({
           'minimumRequiredAppVersion': '1.2.3',
         });
-        cacheDelegateRepository.stubCacheAppConfigThrows(
-          Exception('cache write failed'),
-        );
 
-        final result = await repository.getAppConfig();
+        final appConfig = await repository.getAppConfig();
 
-        expect(
-          result,
-          const PortraiAppConfigEntity(minimumRequiredAppVersion: '1.2.3'),
-        );
+        expect(appConfig, remoteAppConfig);
+        verify(
+          () => cacheDelegateRepository.cacheAppConfig(remoteAppConfig),
+        ).called(1);
+      });
+
+      test('should log an error and return the remote app config when '
+          'caching it fails', () async {
+        cacheDelegateRepository
+          ..stubGetAppConfigThrows(
+            const AppConfigNotFoundException(cause: 'no cache'),
+          )
+          ..stubCacheAppConfigThrows(Exception('cache write failed'));
+        firestoreController.stubGetDocumentFromCollection({
+          'minimumRequiredAppVersion': '1.2.3',
+        });
+
+        final appConfig = await repository.getAppConfig();
+
+        expect(appConfig, remoteAppConfig);
         verify(
           () => logReporter.error(
             'Failed to cache app config from remote, continuing without '
@@ -152,17 +158,46 @@ void main() {
         ).called(1);
       });
 
-      test('should rethrow when both remote and cache fail', () {
-        firestoreController.stubGetDocumentFromCollectionThrows(
-          Exception('boom'),
-        );
+      test('should throw a not found exception when no app config is cached '
+          'and the remote document does not exist', () {
         cacheDelegateRepository.stubGetAppConfigThrows(
-          const AppConfigNotFoundException(cause: 'no cache either'),
+          const AppConfigNotFoundException(cause: 'no cache'),
         );
+        firestoreController.stubGetDocumentFromCollection(null);
 
         expect(
           repository.getAppConfig,
           throwsA(isA<AppConfigNotFoundException>()),
+        );
+      });
+
+      test('should throw a parsing exception when no app config is cached '
+          'and the remote document has invalid data', () {
+        cacheDelegateRepository.stubGetAppConfigThrows(
+          const AppConfigNotFoundException(cause: 'no cache'),
+        );
+        firestoreController.stubGetDocumentFromCollection({
+          'unexpectedField': 'value',
+        });
+
+        expect(
+          repository.getAppConfig,
+          throwsA(isA<AppConfigParsingException>()),
+        );
+      });
+
+      test('should throw a network exception when no app config is cached '
+          'and the remote load fails on the network', () {
+        cacheDelegateRepository.stubGetAppConfigThrows(
+          const AppConfigNotFoundException(cause: 'no cache'),
+        );
+        firestoreController.stubGetDocumentFromCollectionThrows(
+          const FirestoreNetworkException('network error', StackTrace.empty),
+        );
+
+        expect(
+          repository.getAppConfig,
+          throwsA(isA<AppConfigNetworkException>()),
         );
       });
     });

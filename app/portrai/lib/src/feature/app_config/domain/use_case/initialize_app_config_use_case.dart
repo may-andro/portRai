@@ -23,8 +23,9 @@ class InitializeAppConfigUnknownFailure extends InitializeAppConfigFailure {
   const InitializeAppConfigUnknownFailure({super.cause});
 }
 
-/// Fetches [PortraiAppConfigEntity] from remote (falling back to cache) so it can
-/// be registered as the app-wide singleton.
+/// Loads [PortraiAppConfigEntity] from cache (or from remote when nothing is
+/// cached yet) so it can be registered as the app-wide singleton. A remote
+/// change applies from the next start.
 ///
 /// This is a **startup-only** use case: it is meant to be called exactly
 /// once, by `AppConfigModuleConfigurator` during DI setup. Do not call it
