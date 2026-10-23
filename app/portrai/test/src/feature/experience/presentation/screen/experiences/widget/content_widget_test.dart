@@ -83,12 +83,15 @@ void main() {
         );
         expect(scrollView, findsOneWidget);
         expect(
-          tester.widget<CustomScrollView>(scrollView).slivers.last,
-          isA<SliverToBoxAdapter>().having(
-            (sliver) => (sliver.child! as Text).data,
-            'footer',
-            'footer',
+          find.descendant(
+            of: find.byWidget(
+              tester.widget<CustomScrollView>(scrollView).slivers.last,
+              skipOffstage: false,
+            ),
+            matching: find.text('footer', skipOffstage: false),
+            skipOffstage: false,
           ),
+          findsOneWidget,
         );
         expect(find.byType(FooterWidget), findsNothing);
         verify(

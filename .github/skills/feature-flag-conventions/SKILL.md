@@ -28,20 +28,20 @@ Each feature that owns a flag declares its own
 `feature_flag` module itself never hardcodes any business flag.
 
 ```dart
-// app/portrai/lib/src/feature/portfolio/domain/feature_flag/portfolio_feature_flags.dart
-abstract final class PortfolioFeatureFlags {
-  static const testimonialsSection = AppFeatureFlagDefinition(
-    key: 'feature_testimonials_section',
+// app/portrai/lib/src/feature/cv_export/domain/feature_flag/cv_export_feature_flags.dart
+abstract final class CvExportFeatureFlags {
+  static const tailoredCv = AppFeatureFlagDefinition(
+    key: 'feature_tailored_cv',
     defaultValue: false,
-    displayName: 'Testimonials Section',
-    description: 'Enables the testimonials section on portfolio page',
+    displayName: 'Tailored CV',
+    description: 'Lets a CV be tailored for a job',
   );
 
-  static const all = [testimonialsSection, /* ...other flags */];
+  static const all = [tailoredCv, /* ...other flags */];
 }
 ```
 
-- Key naming: `feature_<snake_case_name>` (e.g. `feature_experiences_section`).
+- Key naming: `feature_<snake_case_name>` (e.g. `feature_tailored_cv`).
 - Always provide `displayName` and a short `description` — they're shown
   verbatim on the dev-tools flags screen.
 - Group every flag owned by a feature into one `all` list on the holder
@@ -57,7 +57,7 @@ routes — see `creating-new-modules`):
 @override
 Future<void> postDependenciesSetup(ServiceLocator sl) async {
   final registry = sl.get<AppFeatureFlagDefinitionRegistry>();
-  for (final definition in PortfolioFeatureFlags.all) {
+  for (final definition in CvExportFeatureFlags.all) {
     registry.register(definition);
   }
 }

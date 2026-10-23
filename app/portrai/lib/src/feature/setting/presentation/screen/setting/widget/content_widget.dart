@@ -9,10 +9,8 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bl
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
-import 'package:portrai/src/widget/app_version_widget.dart';
 
-/// The settings form as a sliver that fills the remaining height, keeping the
-/// app version at the bottom.
+/// The settings form as a sliver.
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key, required this.state});
 
@@ -20,8 +18,7 @@ class ContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverFillRemaining(
-      hasScrollBody: false,
+    return SliverToBoxAdapter(
       child: Padding(
         padding: context.screenHorizontalPadding.copyWith(
           top: context.space(factor: context.isDesktop ? 2 : 0),
@@ -65,10 +62,6 @@ class ContentWidget extends StatelessWidget {
                 size: DSButtonSize.small,
               ),
             ],
-            const Spacer(),
-            const DSVerticalSpacerWidget(3),
-            const SafeArea(child: Align(child: AppVersionWidget())),
-            const DSVerticalSpacerWidget(2),
           ],
         ),
       ),

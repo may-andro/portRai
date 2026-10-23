@@ -144,12 +144,12 @@ void main() {
 
         final slivers = screenScrollView(tester).slivers;
         expect(
-          slivers.last,
-          isA<SliverToBoxAdapter>().having(
-            (sliver) => (sliver.child! as Text).data,
-            'footer',
-            'footer',
+          find.descendant(
+            of: find.byWidget(slivers.last, skipOffstage: false),
+            matching: find.text('footer', skipOffstage: false),
+            skipOffstage: false,
           ),
+          findsOneWidget,
         );
         expect(find.byType(FooterWidget), findsNothing);
       },
