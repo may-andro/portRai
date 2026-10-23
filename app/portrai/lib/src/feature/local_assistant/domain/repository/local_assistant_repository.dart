@@ -22,9 +22,13 @@ abstract interface class LocalAssistantRepository {
   /// Unloads the model and deletes its downloaded files.
   Future<void> deleteModel();
 
+  /// Answers [question] from [portfolioContext]. A generated answer is also
+  /// passed to [onPartialAnswer] as it grows, as the whole text so far; an
+  /// empty text withdraws it before a retry.
   Future<String> answer({
     required String question,
     required String portfolioContext,
+    void Function(String partialAnswer)? onPartialAnswer,
   });
 
   /// Invalidates pending results and clears follow-up context. Native generation

@@ -48,6 +48,7 @@ class LocalAssistantState extends Equatable {
     this.isModelDownloaded = false,
     this.isSendingQuestion = false,
     this.messages = const [],
+    this.partialAnswer = '',
     this.hasError = false,
     this.failure,
   });
@@ -61,6 +62,19 @@ class LocalAssistantState extends Equatable {
   final bool isModelDownloaded;
   final bool isSendingQuestion;
   final List<AssistantMessageEntity> messages;
+
+  /// The answer being generated, shown as it grows; empty when none is.
+  final String partialAnswer;
+
+  /// [messages] followed by the answer being generated, if any.
+  List<AssistantMessageEntity> get visibleMessages => [
+    ...messages,
+    if (partialAnswer.isNotEmpty)
+      AssistantMessageEntity(
+        content: AssistantTextResponseEntity(text: partialAnswer),
+        isUser: false,
+      ),
+  ];
 
   /// The context failed to load, or the last answer failed.
   final bool hasError;
@@ -79,6 +93,7 @@ class LocalAssistantState extends Equatable {
     bool? isModelDownloaded,
     bool? isSendingQuestion,
     List<AssistantMessageEntity>? messages,
+    String? partialAnswer,
     bool? hasError,
     Failure? failure,
     bool clearFailure = false,
@@ -93,6 +108,7 @@ class LocalAssistantState extends Equatable {
       isModelDownloaded: isModelDownloaded ?? this.isModelDownloaded,
       isSendingQuestion: isSendingQuestion ?? this.isSendingQuestion,
       messages: messages ?? this.messages,
+      partialAnswer: partialAnswer ?? this.partialAnswer,
       hasError: hasError ?? this.hasError,
       failure: clearFailure ? null : failure ?? this.failure,
     );
@@ -106,6 +122,7 @@ class LocalAssistantState extends Equatable {
     isModelDownloaded,
     isSendingQuestion,
     messages,
+    partialAnswer,
     hasError,
     failure,
   ];

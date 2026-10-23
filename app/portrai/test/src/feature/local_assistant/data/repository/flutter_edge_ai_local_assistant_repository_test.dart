@@ -23,9 +23,7 @@ void main() {
         () => model.createChat(temperature: 0.2, maxOutputTokens: 16),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => const TextResponse('Ready'));
+      chat.stubReply('Ready');
       when(() => chat.close()).thenAnswer((_) async {});
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader((
@@ -73,7 +71,9 @@ void main() {
       await expectLater(
         repository.answer(
           question: 'Who?',
-          portfolioContext: 'Name: Mayank Rai',
+          portfolioContext: jsonEncode({
+            'profile': {'name': 'Mayank Rai'},
+          }),
         ),
         throwsStateError,
       );
@@ -125,9 +125,7 @@ void main() {
         ),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => const TextResponse('Ready'));
+      chat.stubReply('Ready');
       when(() => chat.close()).thenAnswer((_) async {});
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
@@ -163,6 +161,47 @@ void main() {
     },
   );
 
+  test('should name the portfolio owner in the system instruction', () async {
+    final model = MockInferenceModel();
+    final chat = MockInferenceChat();
+    when(
+      () => model.createChat(
+        systemInstruction: any(named: 'systemInstruction'),
+        temperature: any(named: 'temperature'),
+        topK: any(named: 'topK'),
+        maxOutputTokens: any(named: 'maxOutputTokens'),
+      ),
+    ).thenAnswer((_) async => chat);
+    when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
+    chat.stubReply('Ready');
+    when(() => chat.close()).thenAnswer((_) async {});
+    when(() => model.close()).thenAnswer((_) async {});
+    final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
+      (_) async => model,
+    );
+    addTearDown(repository.dispose);
+
+    await repository.answer(
+      question: 'What does she build?',
+      portfolioContext: jsonEncode({
+        'profile': {'name': 'Jane Doe'},
+      }),
+    );
+
+    final instruction =
+        verify(
+              () => model.createChat(
+                systemInstruction: captureAny(named: 'systemInstruction'),
+                temperature: 0.2,
+                topK: 40,
+                maxOutputTokens: 512,
+              ),
+            ).captured.single
+            as String;
+    expect(instruction, contains("Jane Doe's professional portfolio"));
+    expect(instruction, isNot(contains('Mayank')));
+  });
+
   group('portfolio context', () {
     Future<
       ({
@@ -185,9 +224,7 @@ void main() {
         ),
       ).thenAnswer((_) async => chat);
       when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
-      when(
-        () => chat.generateChatResponse(),
-      ).thenAnswer((_) async => const TextResponse('Ready'));
+      chat.stubReply('Ready');
       when(() => chat.close()).thenAnswer((_) async {});
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
@@ -221,6 +258,181 @@ void main() {
         verify(() => chat.addQueryChunk(any())).called(1);
       },
     );
+
+    test('should answer a computed fact without loading the model', () async {
+      final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
+        (_) => throw StateError('Must not load'),
+      );
+      addTearDown(repository.dispose);
+
+      final answer = await repository.answer(
+        question: 'What is his email?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai', 'email': 'm@x.com'},
+        }),
+      );
+
+      expect(answer, "Mayank Rai's email is m@x.com.");
+    });
+
+    test('should answer a continuation directly after a direct answer', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final portfolioContext = jsonEncode({
+        'profile': {'name': 'Mayank Rai'},
+        'experiences': [
+          {'company': 'Stuart'},
+          {'company': 'Acme'},
+        ],
+        'overview': [
+          'Time per company, overlapping roles counted once: Stuart: 1 year in 1 role (Developer, July 2022 to June 2023). Acme: 2 years in 1 role (Lead, July 2023 to June 2025).',
+        ],
+      });
+
+      await repository.answer(
+        question: 'How long did he work at Stuart?',
+        portfolioContext: portfolioContext,
+      );
+      final followUp = await repository.answer(
+        question: 'and at Acme?',
+        portfolioContext: portfolioContext,
+      );
+
+      expect(followUp, startsWith('Mayank Rai worked at Acme for 2 years'));
+      // Only the readiness check reached the model.
+      verify(() => chat.addQueryChunk(any())).called(1);
+    });
+
+    test('should replace a link the facts do not contain', () async {
+      final (:repository, :chat) = await prepareRepository();
+      chat.stubStreamedAnswer(
+        () => [
+          'Play Store: https://p/stuart. GitHub: https://github.com/made-up.',
+        ],
+      );
+
+      final answer = await repository.answer(
+        question: 'Where can I find the Stuart app?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {
+              'title': 'Stuart',
+              'links': [
+                'Links for the Stuart project in Spain: https://p/stuart.',
+              ],
+            },
+          ],
+        }),
+      );
+
+      expect(
+        answer,
+        'Play Store: https://p/stuart. '
+        'GitHub: (no link listed in the portfolio).',
+      );
+    });
+
+    test('should end a cut-off answer at its last full sentence', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final complete = [
+        for (var feature = 0; feature < 100; feature++)
+          'Feature $feature shipped.',
+      ].join(' ');
+      chat.stubStreamedAnswer(() => ['$complete He also wor']);
+
+      final answer = await repository.answer(
+        question: 'What did he do at Stuart?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'Stuart'},
+          ],
+        }),
+      );
+
+      expect(answer, complete);
+    });
+
+    test('should strip markdown from the generated answer', () async {
+      final (:repository, :chat) = await prepareRepository();
+      chat.stubStreamedAnswer(
+        () => ['**Answer:** He built:\n* the MediaMarkt app\n* the Saturn app'],
+      );
+
+      final answer = await repository.answer(
+        question: 'What did he build?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'MediaMarkt'},
+          ],
+        }),
+      );
+
+      expect(answer, 'He built:\n- the MediaMarkt app\n- the Saturn app');
+    });
+
+    test('should pass the answer on as it is generated', () async {
+      final (:repository, :chat) = await prepareRepository();
+      chat.stubStreamedAnswer(() => ['**He**', ' builds', ' apps.']);
+      final partialAnswers = <String>[];
+
+      final answer = await repository.answer(
+        question: 'What does he build?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'Stuart'},
+          ],
+        }),
+        onPartialAnswer: partialAnswers.add,
+      );
+
+      expect(partialAnswers, ['He', 'He builds', 'He builds apps.']);
+      expect(answer, 'He builds apps.');
+    });
+
+    test('should withdraw a looping answer before the retry', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final answers = [
+        ['Mayank Rai', ' Mayank Rai', ' Mayank Rai', ' Mayank Rai'],
+        ['He is a Flutter developer.'],
+      ];
+      chat.stubStreamedAnswer(() => answers.removeAt(0));
+      final partialAnswers = <String>[];
+
+      await repository.answer(
+        question: 'Who is he?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai'},
+        }),
+        onPartialAnswer: partialAnswers.add,
+      );
+
+      expect(partialAnswers.last, 'He is a Flutter developer.');
+      expect(partialAnswers, contains(''));
+      expect(
+        partialAnswers,
+        isNot(
+          contains(startsWith('Mayank Rai Mayank Rai Mayank Rai Mayank Rai')),
+        ),
+      );
+    });
+
+    test('should retry once when the answer repeats a phrase', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final answers = [
+        'Mayank Rai Mayank Rai Mayank Rai Mayank Rai Mayank Rai',
+        'He is a Flutter developer.',
+      ];
+      chat.stubStreamedAnswer(() => [answers.removeAt(0)]);
+
+      final answer = await repository.answer(
+        question: 'Who is he?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai'},
+        }),
+      );
+
+      expect(answer, 'He is a Flutter developer.');
+      expect(answers, isEmpty);
+    });
 
     test(
       'should throw a format exception when the context is not a portfolio object and the model is needed',

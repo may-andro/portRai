@@ -86,6 +86,7 @@ class LocalAssistantBloc
         status: const LocalAssistantUnavailable(),
         messages: const [],
         isSendingQuestion: false,
+        partialAnswer: '',
         isLoadingContext: false,
         clearContext: true,
         hasError: result.isLeft || support.isLeft,
@@ -234,6 +235,7 @@ class LocalAssistantBloc
         hasError: false,
         messages: const [],
         isSendingQuestion: false,
+        partialAnswer: '',
         clearFailure: true,
       ),
     );
@@ -342,10 +344,23 @@ class LocalAssistantBloc
     if (!await _checkAvailability(emit) || revision != _requestRevision) return;
     _trackingDelegate.trackQuestionSubmission();
 
+    // The context states durations up to today, and a retained chat can stay
+    // open for days, so each question uses a freshly built one. Building it
+    // is cheap and unchanged text keeps the repository's decoded copy. The
+    // loaded context remains the fallback.
+    final freshContextEither = await _getAssistantContextUseCase();
+    if (emit.isDone || revision != _requestRevision) return;
     final result = await _askPortfolioQuestionUseCase(
       AskLocalPortfolioQuestionParams(
         question: question,
-        portfolioContext: portfolioContext,
+        portfolioContext: freshContextEither.isRight
+            ? freshContextEither.right
+            : portfolioContext,
+        onPartialAnswer: (partialAnswer) {
+          if (!emit.isDone && revision == _requestRevision && state.isReady) {
+            emit(state.copyWith(partialAnswer: partialAnswer));
+          }
+        },
       ),
     );
     if (emit.isDone || revision != _requestRevision || !state.isReady) return;
@@ -354,6 +369,7 @@ class LocalAssistantBloc
         state.copyWith(
           messages: history,
           isSendingQuestion: false,
+          partialAnswer: '',
           hasError: true,
           failure: failure,
         ),
@@ -365,6 +381,7 @@ class LocalAssistantBloc
             AssistantMessageEntity(content: answer, isUser: false),
           ],
           isSendingQuestion: false,
+          partialAnswer: '',
           hasError: false,
           clearFailure: true,
         ),
@@ -382,6 +399,7 @@ class LocalAssistantBloc
       state.copyWith(
         messages: const [],
         isSendingQuestion: false,
+        partialAnswer: '',
         hasError: false,
         clearFailure: true,
       ),

@@ -27,6 +27,8 @@ This document tracks what is missing, what was already fixed, and what each fix 
 - Hindi is not listed in `languages`; add it if it applies.
 - The Spanish content uses "España", so country matching in the assistant treats it as a different
   country than "Spain" in English data. Country names should be normalized or the selector should map them.
+- One experience lists `Android` where the others list `Android SDK`, so "how long has he used
+  Android" is answered with that single role's duration. Use one spelling across experiences.
 
 ### Availability
 - `availability` says freelance and consulting, part-time (20 hrs/week), `$50-75/hour`. This is
@@ -66,7 +68,8 @@ Questions the assistant cannot answer today because the data does not exist:
 
 ## Behaviour for missing data
 The assistant is instructed to say the information is not available in the portfolio instead of
-guessing. The golden question tests in
-`test/src/feature/assistant/data/repository/assistant_golden_questions_test.dart` cover the facts
-that are computed in code (country totals, work modes, technology durations, gaps, leadership).
-Add a golden question whenever a new computed fact or data field is added.
+guessing, and the context selector states empty lists as "none listed". The golden question tests in
+`test/src/feature/local_assistant/data/repository/local_assistant_golden_questions_test.dart` cover
+the facts that are computed in code (country, city, company and technology totals, total experience,
+work modes, gaps, leadership). Add a golden question whenever a new computed fact or data field is
+added.

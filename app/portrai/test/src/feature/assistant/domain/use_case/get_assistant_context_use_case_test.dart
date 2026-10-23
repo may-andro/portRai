@@ -121,15 +121,21 @@ void main() {
 
         final result = await GetAssistantContextUseCase(getPortfolioUseCase)();
 
-        final summary = _firstRecord(
-          jsonDecode(result.right) as Map<String, Object?>,
-          'projects',
-        )['summary'];
+        final links =
+            (_firstRecord(
+                      jsonDecode(result.right) as Map<String, Object?>,
+                      'projects',
+                    )['links']!
+                    as List)
+                .join(' ');
         expect(
-          summary,
-          contains('Spain: Play Store link: https://play.google.com/stuart'),
+          links,
+          contains(
+            'Links for the Stuart project in Spain: Play Store link: '
+            'https://play.google.com/stuart.',
+          ),
         );
-        expect(summary, contains('App Store link: not found'));
+        expect(links, contains('App Store link: not found'));
       },
     );
 
@@ -166,7 +172,10 @@ void main() {
         final market = (first['markets']! as List).single as Map;
         expect(market['country'], 'Germany');
         expect(market['latitude'], 51.1657);
-        expect(first['summary'], contains('Germany: Play Store link'));
+        expect(
+          (first['links']! as List).single,
+          contains('in Germany: Play Store link'),
+        );
         expect((projects.last! as Map).containsKey('markets'), isFalse);
       },
     );
@@ -408,6 +417,122 @@ void main() {
       },
     );
 
+    test('should total the time per company and across the career', () async {
+      final getPortfolio = MockGetPortfolioUseCase()
+        ..stubCall(
+          Right<GetPortfolioFailure, PortfolioEntity>(
+            createPortfolioEntity(
+              experiences: [
+                _role(
+                  'Stuart',
+                  'Developer',
+                  DateTime(2020),
+                  DateTime(2020, 12, 31),
+                ),
+                _role('Stuart', 'Lead', DateTime(2022), DateTime(2022, 12, 31)),
+                _role('Acme', 'Dev', DateTime(2021), DateTime(2021, 3)),
+              ],
+            ),
+          ),
+        );
+
+      final result = await GetAssistantContextUseCase(getPortfolio)();
+      final overview = ((jsonDecode(result.right) as Map)['overview'] as List)
+          .cast<String>();
+
+      expect(
+        overview,
+        contains(
+          'Time per company, overlapping roles counted once: Stuart: 2 years '
+          'in 2 roles (Developer, January 2020 to December 2020; Lead, '
+          'January 2022 to December 2022). Acme: 2 months in 1 role (Dev, '
+          'January 2021 to March 2021).',
+        ),
+      );
+      expect(
+        overview,
+        contains(
+          'Total professional experience: 2 years and 3 months (January 2020 '
+          'to December 2022), overlapping roles counted once.',
+        ),
+      );
+    });
+
+    test('should list every technology with its time', () async {
+      final getPortfolio = MockGetPortfolioUseCase()
+        ..stubCall(
+          Right<GetPortfolioFailure, PortfolioEntity>(
+            createPortfolioEntity(
+              experiences: [
+                _role(
+                  'Acme',
+                  'Dev',
+                  DateTime(2021),
+                  DateTime(2021, 3, 31),
+                  technologies: const ['Flutter', 'Bloc'],
+                ),
+              ],
+            ),
+          ),
+        );
+
+      final result = await GetAssistantContextUseCase(getPortfolio)();
+
+      expect(
+        result.right,
+        contains(
+          '(technologies listed on the roles): Flutter: 3 months; Bloc: 3 months.',
+        ),
+      );
+    });
+
+    test('should date a gap that starts in December', () async {
+      final getPortfolio = MockGetPortfolioUseCase()
+        ..stubCall(
+          Right<GetPortfolioFailure, PortfolioEntity>(
+            createPortfolioEntity(
+              experiences: [
+                _role('Acme', 'Dev', DateTime(2020), DateTime(2020, 11, 30)),
+                _role(
+                  'Globex',
+                  'Dev',
+                  DateTime(2021, 2),
+                  DateTime(2021, 3, 31),
+                ),
+              ],
+            ),
+          ),
+        );
+
+      final result = await GetAssistantContextUseCase(getPortfolio)();
+
+      expect(
+        result.right,
+        contains('Career gaps between roles: 2 months starting December 2020.'),
+      );
+    });
+
+    test('should state that a project without markets has no links', () async {
+      final getPortfolio = MockGetPortfolioUseCase()
+        ..stubCall(
+          Right<GetPortfolioFailure, PortfolioEntity>(
+            createPortfolioEntity(
+              projects: [createProjectEntity(title: 'Tote')],
+            ),
+          ),
+        );
+
+      final result = await GetAssistantContextUseCase(getPortfolio)();
+
+      expect(
+        _firstRecord(
+          jsonDecode(result.right) as Map<String, Object?>,
+          'projects',
+        )['links'],
+        ['No store or website links are listed for the Tote project.'],
+      );
+    });
+
     test(
       'should return an assistant failure when portfolio loading fails',
       () async {
@@ -427,6 +552,30 @@ void main() {
     );
   });
 }
+
+ExperienceEntity _role(
+  String company,
+  String position,
+  DateTime start,
+  DateTime end, {
+  List<String> technologies = const [],
+}) => ExperienceEntity(
+  company: company,
+  position: position,
+  location: 'Barcelona, Spain',
+  startDate: start,
+  endDate: end,
+  current: false,
+  employmentType: 'Full-time',
+  description: 'Worked at $company',
+  longDescription: 'Worked at $company on mobile apps',
+  responsibilities: const [],
+  achievements: const [],
+  technologies: technologies,
+  companyLogo: '',
+  url: null,
+  id: '$company-$position'.toLowerCase(),
+);
 
 Map<String, Object?> _firstRecord(
   Map<String, Object?> context,

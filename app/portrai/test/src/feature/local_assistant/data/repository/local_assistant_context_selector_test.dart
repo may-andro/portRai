@@ -149,12 +149,13 @@ void main() {
       final lines = shortest.split('\n');
 
       expect(lines[1], contains('4 roles at 4 different companies'));
+      expect(lines[2], startsWith('Total professional experience: '));
       expect(
-        lines[2],
+        lines[3],
         'Shortest role: Wahl Analytics (Senior Flutter Developer), '
         'January 2025 to March 2025, 2 months.',
       );
-      expect(lines[3], startsWith('Longest role: MediaMarkt Saturn'));
+      expect(lines[4], startsWith('Longest role: MediaMarkt Saturn'));
       expect(
         shortest,
         contains(
@@ -261,12 +262,15 @@ void main() {
       'projects': [
         {
           'title': 'Other',
-          'summary': 'Links for the Other project. Play Store link: not found.',
+          'links': [
+            'Links for the Other project in Spain: Play Store link: not found.',
+          ],
         },
         {
           'title': 'Stuart',
-          'summary':
-              'Links for the Stuart project. Play Store link: https://p/stuart.',
+          'links': [
+            'Links for the Stuart project in Spain: Play Store link: https://p/stuart.',
+          ],
         },
       ],
     });
@@ -278,6 +282,258 @@ void main() {
     );
 
     expect(selected, contains('https://p/stuart'));
+  });
+
+  test('should rank the resume link before project links when asked', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'profile': {
+            'resume': {'url': 'https://r/cv.pdf', 'lastUpdated': '2025-10-15'},
+          },
+          'projects': [
+            {
+              'title': 'Other',
+              'links': [
+                'Links for the Other project in Spain: Play Store link: https://p/other.',
+              ],
+            },
+          ],
+        }),
+      ),
+      'Give me the resume link',
+    );
+
+    expect(
+      selected.indexOf('https://r/cv.pdf'),
+      lessThan(selected.indexOf('https://p/other')),
+    );
+  });
+
+  test('should not select facts by the owner name', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'profile': {'name': 'Jane Doe'},
+          'testimonials': [
+            {'name': 'Ann', 'testimonial': 'Jane Doe was great'},
+          ],
+          'services': [
+            {'title': 'Consulting', 'detail': 'Architecture reviews'},
+          ],
+        }),
+      ),
+      'Does Jane Doe offer consulting?',
+    );
+
+    expect(
+      selected.indexOf('Architecture reviews'),
+      lessThan(selected.indexOf('Jane Doe was great')),
+    );
+  });
+
+  test('should skip null values and presentation fields', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'experiences': [
+            {
+              'company': 'Stuart',
+              'endDate': null,
+              'companyLogo': 'https://logo',
+              'id': 'stuart',
+              'latitude': 1.5,
+              'description': 'Delivery platform',
+            },
+          ],
+        }),
+      ),
+      'Tell me about Stuart',
+    );
+
+    expect(selected, contains('Delivery platform'));
+    expect(selected, isNot(contains('not provided')));
+    expect(selected, isNot(contains('endDate')));
+    expect(selected, isNot(contains('https://logo')));
+    expect(selected, isNot(contains('latitude')));
+    expect(selected, isNot(contains('.id:')));
+  });
+
+  test('should keep a record of plain values on one line', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'expertises': [
+            {
+              'title': 'Backend',
+              'skills': [
+                {'name': 'GraphQL', 'level': 'advanced', 'years': 5},
+              ],
+            },
+          ],
+        }),
+      ),
+      'What is his level in GraphQL?',
+    );
+
+    expect(
+      selected.split('\n')[1],
+      'expertises[0] (Backend).skills[0]: name: GraphQL, level: advanced, '
+      'years: 5',
+    );
+  });
+
+  test('should state that an empty list has nothing listed', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'profile': {'certifications': <String>[]},
+          'digest': ['Project X'],
+        }),
+      ),
+      'Does he have any certifications?',
+    );
+
+    expect(selected.split('\n')[1], 'profile.certifications: none listed');
+  });
+
+  test('should rank a named section before the digest', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'digest': ['Project X'],
+          'testimonials': [
+            {'name': 'Pitter Wahl', 'testimonial': 'Great work'},
+          ],
+        }),
+      ),
+      'What did the testimonials say?',
+    );
+
+    expect(
+      selected.indexOf('Great work'),
+      lessThan(selected.indexOf('Project X')),
+    );
+  });
+
+  test('should not treat an everyday service title as a name', () {
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'digest': ['Project MediaMarkt: On Play Store: yes.'],
+          'services': [
+            {'title': 'Intelligent Apps', 'detail': 'AI agents'},
+          ],
+        }),
+      ),
+      'Which apps are on the Play Store?',
+    );
+
+    expect(
+      selected.indexOf('Project MediaMarkt'),
+      lessThan(selected.indexOf('AI agents')),
+    );
+  });
+
+  test('should split long text at sentence ends', () {
+    final sentence = 'Built ${'x' * 120} feature.';
+    final selected = LocalAssistantContextSelector().select(
+      _portfolioOf(
+        jsonEncode({
+          'projects': [
+            {
+              'title': 'Stuart',
+              'description': List.filled(5, sentence).join(' '),
+            },
+          ],
+        }),
+      ),
+      'Tell me about Stuart',
+    );
+    final parts = selected
+        .split('\n')
+        .where((line) => line.contains('.description: '))
+        .toList();
+
+    expect(parts, hasLength(3));
+    for (final part in parts) {
+      expect(part, endsWith('feature.'));
+      expect(part.runes.length, lessThanOrEqualTo(340));
+    }
+  });
+
+  test('should match the names of each portfolio separately', () {
+    Map<String, dynamic> portfolioWith(String company) => _portfolioOf(
+      jsonEncode({
+        'experiences': [
+          {'company': company},
+        ],
+      }),
+    );
+    final stuart = portfolioWith('Stuart');
+    final initech = portfolioWith('Initech');
+
+    for (var repeat = 0; repeat < 2; repeat++) {
+      expect(
+        LocalAssistantContextSelector.mentionsPortfolioName(
+          stuart,
+          'at Stuart',
+        ),
+        isTrue,
+      );
+      expect(
+        LocalAssistantContextSelector.mentionsPortfolioName(
+          initech,
+          'at Stuart',
+        ),
+        isFalse,
+      );
+    }
+  });
+
+  test('should treat a pronoun as a follow-up only when nothing is named', () {
+    final portfolio = _portfolioOf(
+      jsonEncode({
+        'experiences': [
+          {
+            'company': 'MediaMarkt Saturn',
+            'technologies': ['Flutter'],
+          },
+        ],
+        'projects': [
+          {'title': 'Stuart'},
+        ],
+      }),
+    );
+
+    expect(
+      LocalAssistantContextSelector.isFollowUp(
+        portfolio,
+        'What were his achievements there?',
+      ),
+      isTrue,
+    );
+    expect(
+      LocalAssistantContextSelector.isFollowUp(
+        portfolio,
+        'Is there a GitHub link for Stuart?',
+      ),
+      isFalse,
+    );
+    expect(
+      LocalAssistantContextSelector.isFollowUp(
+        portfolio,
+        'What did he build at MediaMarkt with it?',
+      ),
+      isFalse,
+    );
+    expect(
+      LocalAssistantContextSelector.isFollowUp(
+        portfolio,
+        'Does he use Flutter?',
+      ),
+      isFalse,
+    );
   });
 }
 

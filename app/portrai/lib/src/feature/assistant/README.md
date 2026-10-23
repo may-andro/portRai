@@ -265,8 +265,17 @@ parameters stay metadata-only in diagnostics.
   its progress in one and, on Android, runs in the foreground, so it continues in the
   background. The app's notification setting is on the Settings screen.
 - Installed models load lazily on a question. A readiness inference probes engine support.
-- Questions use deterministic contact/career answers where applicable and otherwise
-  bounded context selection. Missing portfolio facts are not guessed.
+- Contact details, social links, tenure per place, company and technology, total
+  experience and the career overview are answered from the computed context without
+  loading the model, unless the question names a product or another record. Every
+  other question goes to the model with a bounded selection of facts: matching
+  records and digest lines first, employment summaries and the short overview lines
+  after them, long career lists and technology totals only for career questions, and
+  never ids, image URLs or coordinates. Null fields are left out and empty lists are
+  stated as "none listed", so missing portfolio facts are not guessed. A question
+  with a pronoun counts as a follow-up only when it names no company, project,
+  technology or person. Generated text is stripped of markdown, and an answer that
+  loops on a character or phrase is generated once more.
 - Disable and reset invalidate late output and clear follow-up context. Reset retains
   enablement and downloaded files. Invalidating output does not guarantee cancellation
   of native generation; download cancellation waits for cleanup.
@@ -316,6 +325,10 @@ flutter test test/src/feature/assistant test/src/feature/local_assistant \
 Tests use deterministic fixtures and mocked inference. They cover discovery combinations,
 unsupported platforms, flag-only cloud activation, direct-route guards, pending-request invalidation,
 local download consent, and independent sessions. No model download or live AI generation is needed.
+`local_assistant_portfolio_evaluation_test.dart` runs the on-device answer routing and fact
+selection over the real portfolio in `assets/dashboard`. Those files are git-ignored, so the test
+is skipped where they are absent, such as CI; run it locally after changing the selector, the
+direct answers or the portfolio data.
 The catalog widget tests feed real v0.9 messages through `A2uiParserTransformer`
 and `SurfaceController` into `Surface`, covering DS composition, literal text,
 binding updates, surface deletion and unsupported-component error reporting.

@@ -174,6 +174,92 @@ void main() {
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should ask with a freshly built context when a question is sent',
+    build: () {
+      final bloc = createBloc();
+      when(() => getContext()).thenAnswer((_) => const Right('Today'));
+      askQuestion.stubCall(
+        params: const AskLocalPortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Today',
+        ),
+        result: const Right(AssistantTextResponseEntity(text: 'Answer')),
+      );
+      return bloc;
+    },
+    seed: () => const LocalAssistantState(
+      status: LocalAssistantReady(),
+      portfolioContext: 'Last month',
+      isLoadingContext: false,
+    ),
+    act: (bloc) =>
+        bloc.add(const SendLocalAssistantQuestionClickEvent('Question')),
+    verify: (_) => verify(
+      () => askQuestion(
+        const AskLocalPortfolioQuestionParams(
+          question: 'Question',
+          portfolioContext: 'Today',
+        ),
+      ),
+    ).called(1),
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should show the answer as it grows when the model streams it',
+    build: () {
+      final bloc = createBloc();
+      when(() => askQuestion(any())).thenAnswer((invocation) {
+        final params =
+            invocation.positionalArguments.single
+                as AskLocalPortfolioQuestionParams;
+        params.onPartialAnswer?.call('Ans');
+        return const Right(AssistantTextResponseEntity(text: 'Answer'));
+      });
+      return bloc;
+    },
+    setUp: () => registerFallbackValue(
+      const AskLocalPortfolioQuestionParams(
+        question: 'Question',
+        portfolioContext: 'Context',
+      ),
+    ),
+    seed: () => const LocalAssistantState(
+      status: LocalAssistantReady(),
+      portfolioContext: 'Context',
+      isLoadingContext: false,
+    ),
+    act: (bloc) =>
+        bloc.add(const SendLocalAssistantQuestionClickEvent('Question')),
+    expect: () => [
+      isA<LocalAssistantState>().having(
+        (state) => state.isSendingQuestion,
+        'isSendingQuestion',
+        isTrue,
+      ),
+      isA<LocalAssistantState>()
+          .having((state) => state.partialAnswer, 'partialAnswer', 'Ans')
+          .having(
+            (state) => state.visibleMessages.last,
+            'last visible message',
+            const AssistantMessageEntity(
+              content: AssistantTextResponseEntity(text: 'Ans'),
+              isUser: false,
+            ),
+          ),
+      isA<LocalAssistantState>()
+          .having((state) => state.partialAnswer, 'partialAnswer', isEmpty)
+          .having(
+            (state) => state.messages.last,
+            'last message',
+            const AssistantMessageEntity(
+              content: AssistantTextResponseEntity(text: 'Answer'),
+              isUser: false,
+            ),
+          ),
+    ],
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
     'should discard the failed turn and expose a failure when answering fails',
     build: () {
       final bloc = createBloc();

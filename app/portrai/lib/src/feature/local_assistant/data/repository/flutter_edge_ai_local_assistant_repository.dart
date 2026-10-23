@@ -63,16 +63,18 @@ class FlutterEdgeAiLocalAssistantRepository
   static const _modelRevision = 'b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1';
   static const _maxTokens = 8192;
   static const _modelFile = 'gemma-4-E2B-it.litertlm';
-  static const _systemInstruction =
-      "You are the Q&A assistant for Mayank Rai's professional portfolio. "
+  // The owner's name comes from the portfolio, so the instruction follows the
+  // data instead of repeating it.
+  static String _systemInstruction(String name) =>
+      "You are the Q&A assistant for $name's professional portfolio. "
       'You are not a general-purpose chatbot. Answer questions only about '
-      'Mayank, his contact details, background, experience, projects, skills, '
-      'services, and availability, using only the portfolio information below. '
-      "If asked who to contact, give Mayank Rai's name and the contact "
-      'details provided. Greet only when the message is nothing but a '
-      'greeting; otherwise answer the question directly. For unrelated '
-      "questions, politely say you can only help with Mayank's portfolio. "
-      'For questions about Mayank that the portfolio does not cover, such as '
+      '$name, their contact details, background, experience, projects, '
+      'skills, services, and availability, using only the portfolio '
+      "information below. If asked who to contact, give $name's name and "
+      'the contact details provided. Greet only when the message is nothing '
+      'but a greeting; otherwise answer the question directly. For unrelated '
+      "questions, politely say you can only help with $name's portfolio. "
+      'For questions about $name that the portfolio does not cover, such as '
       'salary, age, visa or hobbies, say that this is not in the portfolio '
       'and do not guess. For questions about a year, period, order, country, '
       'remote or freelance work, years with a technology, career gaps, '
@@ -81,7 +83,9 @@ class FlutterEdgeAiLocalAssistantRepository
       'spoken languages line, never from country names. Answer a follow-up for what it asks, not like the '
       'previous question. When asked for a link, copy the URL exactly as '
       'written, and if it says "not found" say that no such link was found. '
-      'Keep answers direct and concise.';
+      'Keep answers direct and concise. Write plain sentences: no markdown, '
+      'no bullet symbols, and never mention field names, paths or brackets '
+      'such as experiences[0].';
 
   Future<void>? _initialization;
   Future<void>? _preparation;
@@ -210,6 +214,7 @@ class FlutterEdgeAiLocalAssistantRepository
   Future<String> answer({
     required String question,
     required String portfolioContext,
+    void Function(String partialAnswer)? onPartialAnswer,
   }) async {
     if (_requestActive) throw const LocalAssistantBusyException();
     _requestActive = true;
@@ -224,6 +229,7 @@ class FlutterEdgeAiLocalAssistantRepository
         question: question,
         portfolioContext: portfolioContext,
         generation: generation,
+        onPartialAnswer: onPartialAnswer,
       );
       _ensureCurrent(generation);
       _previousQuestion = question;
@@ -237,8 +243,27 @@ class FlutterEdgeAiLocalAssistantRepository
     required String question,
     required String portfolioContext,
     required int generation,
+    void Function(String partialAnswer)? onPartialAnswer,
   }) async {
-    // The engine is loaded on the first question rather than at startup.
+    final portfolio = _decodePortfolio(portfolioContext);
+    if (portfolio == null) {
+      throw const FormatException(
+        'Assistant context must be a portfolio object.',
+      );
+    }
+    // Facts the app already computed are answered without waiting for the
+    // engine, which is loaded on the first question that needs it.
+    final answerer = LocalAssistantDirectAnswerer(portfolio);
+    final previous = _previousQuestion;
+    final direct =
+        answerer.answer(question) ??
+        (previous == null
+            ? null
+            : answerer.answerFollowUp(question, previousQuestion: previous));
+    if (direct != null) {
+      return direct;
+    }
+
     await prepareModel(onProgress: (_) {});
     _ensureCurrent(generation);
     final model = _model;
@@ -246,30 +271,26 @@ class FlutterEdgeAiLocalAssistantRepository
       throw StateError('The on-device model could not be loaded.');
     }
 
-    final portfolio = _decodePortfolio(portfolioContext);
-    final direct = LocalAssistantDirectAnswerer(
-      portfolio ?? const {},
-    ).answer(question);
-    if (direct != null) {
-      return direct;
-    }
-    if (portfolio == null) {
-      throw const FormatException(
-        'Assistant context must be a portfolio object.',
-      );
-    }
-
     // A standalone question must not see the previous one: the small model
     // tends to answer that instead.
-    final previousQuestion = _isFollowUp(question)
-        ? (_previousQuestion ?? 'none')
-        : 'none';
+    final previousQuestion =
+        LocalAssistantContextSelector.isFollowUp(portfolio, question)
+        ? _previousQuestion
+        : null;
     // UTF-8 bytes conservatively bound token count. Reserve room for the
     // answer and chat-template tokens rather than silently truncating input.
     // English text averages about 3 bytes per token or more.
+    final profileName = (portfolio['profile'] as Map?)?['name'];
+    final systemInstruction = _systemInstruction(
+      profileName is String && profileName.trim().isNotEmpty
+          ? profileName.trim()
+          : 'the portfolio owner',
+    );
     final availableBytes =
         (_maxTokens - 1024) * 2 -
-        utf8.encode('$_systemInstruction$question$previousQuestion').length;
+        utf8
+            .encode('$systemInstruction$question${previousQuestion ?? ''}')
+            .length;
     if (availableBytes < 512) {
       throw ArgumentError.value(question, 'question', 'Question is too long.');
     }
@@ -285,21 +306,30 @@ class FlutterEdgeAiLocalAssistantRepository
       (0.2, maxBytes),
       (0.7, maxBytes < 6000 ? maxBytes : 6000),
     ]) {
+      // A retry starts a fresh answer, so the abandoned text is withdrawn.
+      if (answer.isNotEmpty) onPartialAnswer?.call('');
       final selectedContext = LocalAssistantContextSelector().select(
         portfolio,
         question,
-        previousQuestion: previousQuestion == 'none' ? null : previousQuestion,
+        previousQuestion: previousQuestion,
         maxBytes: bytes,
       );
-      answer = await _generate(
-        model,
-        generation: generation,
-        temperature: temperature,
-        text:
-            'Portfolio information:\n$selectedContext\n\n'
-            '${previousQuestion == 'none' ? '' : 'Previous user question: $previousQuestion\n\n'}'
-            'Answer only this question, using only the portfolio '
-            'information above: $question',
+      answer = _groundAnswer(
+        _cleanAnswer(
+          await _generate(
+            model,
+            generation: generation,
+            systemInstruction: systemInstruction,
+            temperature: temperature,
+            onPartialAnswer: onPartialAnswer,
+            text:
+                'Portfolio information:\n$selectedContext\n\n'
+                '${previousQuestion == null ? '' : 'Previous user question: $previousQuestion\n\n'}'
+                'Answer only this question, using only the portfolio '
+                'information above: $question',
+          ),
+        ),
+        selectedContext,
       );
       if (kDebugMode) {
         debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
@@ -315,14 +345,16 @@ class FlutterEdgeAiLocalAssistantRepository
   Future<String> _generate(
     InferenceModel model, {
     required int generation,
+    required String systemInstruction,
     required double temperature,
     required String text,
+    void Function(String partialAnswer)? onPartialAnswer,
   }) async {
     await _chat?.close();
     _chat = null;
     _ensureCurrent(generation);
     final chat = await model.createChat(
-      systemInstruction: _systemInstruction,
+      systemInstruction: systemInstruction,
       temperature: temperature,
       topK: 40,
       maxOutputTokens: 512,
@@ -336,9 +368,19 @@ class FlutterEdgeAiLocalAssistantRepository
     // model attends to them far better than in a long system prompt.
     await chat.addQueryChunk(Message(text: text, isUser: true));
     _ensureCurrent(generation);
-    final response = await chat.generateChatResponse();
+    // Tokens are shown as they arrive. A run that starts looping is cut
+    // short, so the retry does not wait for the full output limit.
+    final generated = StringBuffer();
+    await for (final response in chat.generateChatResponseAsync()) {
+      _ensureCurrent(generation);
+      if (response is! TextResponse) continue;
+      generated.write(response.token);
+      final partialAnswer = generated.toString();
+      if (_isDegenerate(partialAnswer)) break;
+      onPartialAnswer?.call(_cleanAnswer(partialAnswer));
+    }
     _ensureCurrent(generation);
-    return response is TextResponse ? response.token.trim() : '';
+    return generated.toString().trim();
   }
 
   /// Returns the decoded [portfolioContext], or null when it is not a JSON
@@ -358,17 +400,56 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   static final _repeatedRun = RegExp(r'(\S)\1{11,}');
-
-  static bool _isDegenerate(String answer) => _repeatedRun.hasMatch(answer);
-
-  static final _followUpPattern = RegExp(
-    r'\b(else|also|more|that|those|there|it|them|again|another|other)\b|'
-    r'^(and|in|for|what about|how about)\b',
+  // The same two to six words four or more times in a row.
+  static final _repeatedPhrase = RegExp(
+    r'(\b\w+(?:\s+\w+){1,5}\b)(?:\W+\1\b){3,}',
     caseSensitive: false,
   );
 
-  static bool _isFollowUp(String question) =>
-      _followUpPattern.hasMatch(question.trim());
+  static bool _isDegenerate(String answer) =>
+      _repeatedRun.hasMatch(answer) || _repeatedPhrase.hasMatch(answer);
+
+  static final _emphasisMarkers = RegExp(r'\*\*|__');
+  static final _headingMarkers = RegExp(r'^#{1,6}\s+', multiLine: true);
+  static final _bulletMarkers = RegExp(r'^\s*[*•]\s+', multiLine: true);
+  static final _answerLabel = RegExp(r'^(answer|a):\s*', caseSensitive: false);
+  static final _blankLines = RegExp(r'\n{3,}');
+
+  // The chat renders plain text, so markdown the model adds despite the
+  // instruction would show up as literal asterisks.
+  static String _cleanAnswer(String answer) => answer
+      .replaceAll(_emphasisMarkers, '')
+      .replaceAll(_headingMarkers, '')
+      .replaceAll(_bulletMarkers, '- ')
+      .replaceFirst(_answerLabel, '')
+      .replaceAll(_blankLines, '\n\n')
+      .trim();
+
+  static final _url = RegExp(r'https?://[^\s<>"]+');
+  static final _urlTrailingPunctuation = RegExp(r'[.,;:!?)\]]+$');
+  static final _sentenceEnd = RegExp(r'[.!?](?=\s|$)');
+  static const _missingLink = '(no link listed in the portfolio)';
+  static const _answerBytesNearLimit = 1600;
+
+  // A link the facts do not contain was made up, so it is replaced rather
+  // than shown. An answer about as long as the output limit was cut off, so
+  // it ends at its last full sentence instead of mid-word.
+  static String _groundAnswer(String answer, String selectedContext) {
+    var grounded = answer.replaceAllMapped(_url, (match) {
+      final text = match[0]!;
+      final url = text.replaceFirst(_urlTrailingPunctuation, '');
+      final trailing = text.substring(url.length);
+      return selectedContext.contains(url) ? text : '$_missingLink$trailing';
+    });
+    if (utf8.encode(grounded).length >= _answerBytesNearLimit &&
+        !grounded.endsWith('.') &&
+        !grounded.endsWith('!') &&
+        !grounded.endsWith('?')) {
+      final lastEnd = _sentenceEnd.allMatches(grounded).lastOrNull;
+      if (lastEnd != null) grounded = grounded.substring(0, lastEnd.end);
+    }
+    return grounded.trim();
+  }
 
   @override
   Future<void> cancelPreparation() async {

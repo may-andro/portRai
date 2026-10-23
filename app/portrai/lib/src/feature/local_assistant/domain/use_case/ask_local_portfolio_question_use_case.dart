@@ -13,10 +13,15 @@ class AskLocalPortfolioQuestionParams extends Equatable {
   const AskLocalPortfolioQuestionParams({
     required this.question,
     required this.portfolioContext,
+    this.onPartialAnswer,
   });
 
   final String question;
   final String portfolioContext;
+
+  /// Receives a generated answer as it grows; see
+  /// [LocalAssistantRepository.answer]. Not part of equality.
+  final void Function(String partialAnswer)? onPartialAnswer;
 
   @override
   List<Object?> get props => [question, portfolioContext];
@@ -50,6 +55,7 @@ class AskLocalPortfolioQuestionUseCase
     final answer = await _repository.answer(
       question: params.question,
       portfolioContext: params.portfolioContext,
+      onPartialAnswer: params.onPartialAnswer,
     );
     return Right(AssistantTextResponseEntity(text: answer));
   }

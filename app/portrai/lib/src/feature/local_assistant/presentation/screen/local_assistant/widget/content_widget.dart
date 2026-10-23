@@ -51,7 +51,7 @@ class ContentWidget extends StatelessWidget {
     }
     return ScreenLoadedContent.fullScreen(
       AssistantConversationWidget(
-        messages: state.messages,
+        messages: state.visibleMessages,
         isSendingQuestion: state.isSendingQuestion,
         errorText: state.hasError
             ? state.failure == null
