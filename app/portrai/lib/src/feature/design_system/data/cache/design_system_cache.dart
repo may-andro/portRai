@@ -9,11 +9,8 @@ class DesignSystemCache extends KeyValueCache<DesignSystem> {
   /// A chosen design system lasts until the end of the month it was chosen
   /// in, so the next month starts with its own design system again.
   @override
-  bool get isExpired {
-    final cachedAt = DateTime.fromMillisecondsSinceEpoch(lastCachedTimestamp);
-    final now = DateTime.now();
-    return cachedAt.year != now.year || cachedAt.month != now.month;
-  }
+  DateTime? expiryOf(DateTime cachedAt) =>
+      DateTime(cachedAt.year, cachedAt.month + 1);
 
   @override
   DesignSystem deserializeValue(Map<String, dynamic> map) {
