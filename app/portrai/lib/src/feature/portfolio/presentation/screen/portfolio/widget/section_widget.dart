@@ -179,6 +179,8 @@ class _ExpertiseSectionBodyWidgetState
       },
       visibilityKey: widget.visibilityKey,
       title: widget.title,
+      // The orbit's mobile dial reaches the screen edges and pads itself.
+      horizontalPadding: context.isMobile ? 0 : null,
       background: const InverseSectionBackground(),
       action: widget.action,
     );

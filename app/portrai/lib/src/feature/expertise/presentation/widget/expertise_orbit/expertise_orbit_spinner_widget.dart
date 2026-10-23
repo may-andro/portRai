@@ -1,12 +1,12 @@
 part of 'expertise_orbit_widget.dart';
 
-/// Slowly counter-rotating dotted rings inside the orbit, with a small
-/// satellite travelling along the node ring.
+/// Paints a looping 40 second animation behind the orbit or the dial with
+/// the painter [painterOf] builds for the loop's progress, from 0 to 1.
 class _OrbitSpinnerWidget extends StatefulWidget {
-  const _OrbitSpinnerWidget({required this.layout, required this.color});
+  const _OrbitSpinnerWidget({required this.painterOf, this.size = Size.zero});
 
-  final _OrbitLayout layout;
-  final Color color;
+  final CustomPainter Function(double turns) painterOf;
+  final Size size;
 
   @override
   State<_OrbitSpinnerWidget> createState() => _OrbitSpinnerWidgetState();
@@ -45,20 +45,16 @@ class _OrbitSpinnerWidgetState extends State<_OrbitSpinnerWidget>
       child: RepaintBoundary(
         child: ValueListenableBuilder<double>(
           valueListenable: _turns,
-          builder: (context, turns, _) => CustomPaint(
-            size: Size.square(widget.layout.side),
-            painter: _OrbitSpinnerPainter(
-              layout: widget.layout,
-              color: widget.color,
-              turns: turns,
-            ),
-          ),
+          builder: (context, turns, _) =>
+              CustomPaint(size: widget.size, painter: widget.painterOf(turns)),
         ),
       ),
     );
   }
 }
 
+/// Slowly counter-rotating dotted rings inside the orbit, with a small
+/// satellite travelling along the node ring.
 class _OrbitSpinnerPainter extends CustomPainter {
   const _OrbitSpinnerPainter({
     required this.layout,

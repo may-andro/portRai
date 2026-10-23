@@ -4,6 +4,9 @@ part of 'expertise_orbit_widget.dart';
 class _OrbitLayout {
   _OrbitLayout(this.side, this.count);
 
+  /// How much larger the selected node is than the others.
+  static const selectedScale = 1.4;
+
   final double side;
   final int count;
 
@@ -11,14 +14,22 @@ class _OrbitLayout {
 
   double get nodeSize => min(side * 0.15, side * 2.5 / count * 0.62);
 
-  /// Radius of the circle the nodes sit on.
-  double get radius => side / 2 - nodeSize * 0.8;
+  /// Radius of the circle the nodes sit on, leaving room for the selected
+  /// node's size and lift.
+  double get radius => side / 2 - nodeSize * (selectedScale / 2 + 0.15);
 
   double get centerWidth => radius * 1.15;
 
   double get segmentAngle => 2 * pi / count;
 
   double midAngle(int index) => -pi / 2 + segmentAngle * (index + 0.5);
+
+  /// Angle an arc keeps clear of a node's centre, room for the node and the
+  /// arc's rounded cap.
+  double clearanceOf({required bool isSelected}) {
+    final halfSize = isSelected ? selectedScale / 2 : 0.5;
+    return nodeSize * (halfSize + 0.06) / radius + 0.05;
+  }
 
   Offset nodeOffset(int index) {
     final angle = midAngle(index);
@@ -51,15 +62,16 @@ class _OrbitArcsPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final count = layout.count;
     final rect = Rect.fromCircle(center: layout.center, radius: layout.radius);
-    // Arcs run between neighbouring nodes, leaving room for the node itself
-    // (including its selected scale) and the rounded caps.
-    final clearance = layout.nodeSize * 0.61 / layout.radius + 0.05;
-
     for (var index = 0; index < count; index++) {
       final next = (index + 1) % count;
       final isLit = index == selected || next == selected;
-      final start = layout.midAngle(index) + clearance;
-      final sweep = layout.segmentAngle - 2 * clearance;
+      // Arcs run between neighbouring nodes, leaving room for each node.
+      final startClearance = layout.clearanceOf(isSelected: index == selected);
+      final start = layout.midAngle(index) + startClearance;
+      final sweep =
+          layout.segmentAngle -
+          startClearance -
+          layout.clearanceOf(isSelected: next == selected);
       if (count < 2 || sweep <= 0) continue;
 
       final paint = Paint()
