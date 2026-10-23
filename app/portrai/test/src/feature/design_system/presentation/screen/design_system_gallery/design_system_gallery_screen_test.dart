@@ -156,6 +156,29 @@ void main() {
       },
     );
 
+    testWidgets(
+      'should keep the apply button in place when the previewed theme changes',
+      (tester) async {
+        Future<Offset> applyButtonPositionFor(DesignSystem designSystem) async {
+          bloc = MockDesignSystemGalleryBloc()
+            ..stubState(
+              loadedState.copyWith(previewedDesignSystem: designSystem),
+            );
+          await pumpScreen(tester);
+          final position = tester.getTopLeft(find.byType(DSButtonWidget));
+          await tester.pumpWidget(const SizedBox());
+          return position;
+        }
+
+        final positions = [
+          for (final designSystem in designSystemsByMonth)
+            await applyButtonPositionFor(designSystem),
+        ];
+
+        expect(positions.toSet(), hasLength(1));
+      },
+    );
+
     testWidgets('should tell the user when applying the theme fails', (
       tester,
     ) async {

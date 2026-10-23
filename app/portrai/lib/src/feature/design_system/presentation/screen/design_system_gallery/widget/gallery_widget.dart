@@ -126,11 +126,11 @@ class _GalleryWidgetState extends State<_GalleryWidget>
                           padding: context.screenHorizontalPadding,
                           child: Column(
                             children: [
-                              DSTextWidget(
+                              _SteadyTextWidget(
                                 context.localizations.themeGalleryHint,
-                                style: context.typography.bodyMedium,
+                                designSystems: state.designSystems,
+                                styleOf: (typography) => typography.bodyMedium,
                                 color: context.colorPalette.neutral.grey7,
-                                textAlign: TextAlign.center,
                               ),
                               Expanded(
                                 child: _DeckWidget(

@@ -15,6 +15,7 @@ part 'apply_panel_widget.dart';
 part 'deck_widget.dart';
 part 'gallery_widget.dart';
 part 'month_dial_widget.dart';
+part 'steady_text_widget.dart';
 part 'theme_card_widget.dart';
 
 class ContentWidget extends StatelessWidget {

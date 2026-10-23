@@ -1,7 +1,8 @@
 part of 'content_widget.dart';
 
 /// The apply button, and a note that the app restarts and that the choice
-/// lasts until the end of the month.
+/// lasts until the end of the month. The note keeps one height for every
+/// design system, so the button does not move while browsing.
 class _ApplyPanelWidget extends StatelessWidget {
   const _ApplyPanelWidget({required this.state});
 
@@ -25,11 +26,11 @@ class _ApplyPanelWidget extends StatelessWidget {
               context.bloc.add(const ApplyDesignSystemClickEvent()),
         ),
         const DSVerticalSpacerWidget(1),
-        DSTextWidget(
+        _SteadyTextWidget(
           localizations.themeGalleryApplyNote,
-          style: context.typography.bodySmall,
+          designSystems: state.designSystems,
+          styleOf: (typography) => typography.bodySmall,
           color: context.colorPalette.neutral.grey7,
-          textAlign: TextAlign.center,
         ),
       ],
     );
