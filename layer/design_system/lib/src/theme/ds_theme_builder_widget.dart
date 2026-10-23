@@ -16,6 +16,16 @@ class DSThemeBuilderWidget extends StatefulWidget {
   final Brightness brightness;
   final Widget child;
 
+  /// Builds the theme for [designSystem] in [brightness] ahead of time. A
+  /// builder showing it later reuses it instead of building it during a
+  /// frame.
+  static void precacheTheme({
+    required DesignSystem designSystem,
+    required Brightness brightness,
+  }) {
+    DSTheme(brightness: brightness, designSystem: designSystem).theme;
+  }
+
   @override
   State<DSThemeBuilderWidget> createState() => _DSThemeBuilderWidgetState();
 }
@@ -39,7 +49,7 @@ class _DSThemeBuilderWidgetState extends State<DSThemeBuilderWidget> {
     }
   }
 
-  // Building ThemeData runs ColorScheme.fromSeed, so it is only rebuilt when
+  // Building ThemeData runs ColorScheme.fromSeed, so it is only looked up when
   // the brightness or the design system changes.
   void _updateTheme() {
     _dsTheme = DSTheme(

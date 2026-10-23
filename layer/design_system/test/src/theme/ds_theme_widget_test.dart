@@ -1,4 +1,5 @@
 import 'package:design_system/design_system.dart';
+import 'package:design_system/src/extension/ds_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -67,9 +68,54 @@ void main() {
         ),
       );
     });
+
+    test('should reuse the built theme data for an equal theme', () {
+      final themeData = DSTheme(
+        brightness: Brightness.dark,
+        designSystem: DesignSystem.obon,
+      ).theme;
+
+      expect(
+        DSTheme(
+          brightness: Brightness.dark,
+          designSystem: DesignSystem.obon,
+        ).theme,
+        same(themeData),
+      );
+    });
   });
 
   group(DSThemeBuilderWidget, () {
+    testWidgets('should show the theme data built by precacheTheme', (
+      tester,
+    ) async {
+      DSThemeBuilderWidget.precacheTheme(
+        designSystem: DesignSystem.holi,
+        brightness: Brightness.dark,
+      );
+
+      await tester.pumpWidget(
+        const DSThemeBuilderWidget(
+          brightness: Brightness.dark,
+          designSystem: DesignSystem.holi,
+          child: SizedBox.shrink(),
+        ),
+      );
+
+      final animatedTheme = tester.widget<AnimatedTheme>(
+        find.byType(AnimatedTheme),
+      );
+      expect(
+        animatedTheme.data,
+        same(
+          DSTheme(
+            brightness: Brightness.dark,
+            designSystem: DesignSystem.holi,
+          ).theme,
+        ),
+      );
+    });
+
     testWidgets('should not rebuild theme dependants when view insets change', (
       WidgetTester tester,
     ) async {

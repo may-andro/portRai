@@ -40,6 +40,17 @@ DSThemeBuilderWidget(
 )
 ```
 
+Each design system and brightness pair builds its `ThemeData` once and reuses it. A screen that is
+about to show other design systems can build their themes ahead of time, for example in idle
+time, so switching does not build them during a frame:
+
+```dart
+DSThemeBuilderWidget.precacheTheme(
+  designSystem: DesignSystem.holi,
+  brightness: Brightness.dark,
+);
+```
+
 ### Reading Theme Values from `BuildContext`
 
 ```dart

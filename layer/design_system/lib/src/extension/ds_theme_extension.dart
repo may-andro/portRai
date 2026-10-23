@@ -1,14 +1,16 @@
 import 'package:design_system/src/theme/ds_theme.dart';
 import 'package:flutter/material.dart';
 
+// Building ThemeData takes a noticeable part of a frame, and there are only a
+// few design system and brightness pairs, so each is built once and kept.
+final _themeDataCache = <DSTheme, ThemeData>{};
+
 extension DSThemeExtension on DSTheme {
-  ThemeData get theme {
-    return ThemeData(
-      brightness: brightness,
-      colorScheme: colorScheme,
-      useMaterial3: true,
-    );
-  }
+  ThemeData get theme => _themeDataCache[this] ??= ThemeData(
+    brightness: brightness,
+    colorScheme: colorScheme,
+    useMaterial3: true,
+  );
 
   ColorScheme get colorScheme {
     return ColorScheme.fromSeed(
