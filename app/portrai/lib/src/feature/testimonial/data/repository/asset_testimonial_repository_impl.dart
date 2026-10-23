@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:core/core.dart';
+import 'package:error_reporter/error_reporter.dart';
 import 'package:flutter/services.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
@@ -17,6 +18,7 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
     @Inject(CacheTestimonialRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._errorReporter,
     this._getAssetSourceUseCase,
   );
 
@@ -24,6 +26,7 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
   final TestimonialRepository _cacheDelegateRepository;
   final TestimonialMapper _mapper;
   final LogReporter _logReporter;
+  final ErrorReporter _errorReporter;
   final GetAssetSourceUseCase _getAssetSourceUseCase;
   static const _tag = 'AssetTestimonialRepositoryImpl';
 
@@ -151,9 +154,12 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
   ) async {
     try {
       await cacheTestimonials(testimonials);
-    } catch (_) {
-      _logReporter.error(
-        'Failed to cache testimonials from assets, continuing without caching.',
+    } on TestimonialCacheException catch (exception, stackTrace) {
+      // Loading still succeeds without the cache, so the failure is reported
+      // instead of thrown.
+      await _errorReporter.reportError(
+        exception: exception,
+        stackTrace: stackTrace,
         tag: _tag,
       );
     }

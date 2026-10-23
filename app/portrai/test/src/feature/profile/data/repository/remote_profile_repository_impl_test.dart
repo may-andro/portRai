@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/profile/domain/_domain.dart';
 
 import '../../../../../mock/feature/profile/domain/repository/mock_profile_repository.dart';
 import '../../../../../mock/feature/profile/test_data/profile_test_data.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -35,18 +36,21 @@ void main() {
     late MockFbFirestoreController firestoreController;
     late MockProfileRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late RemoteProfileRepositoryImpl repository;
 
     setUp(() {
       firestoreController = MockFbFirestoreController();
       cacheDelegateRepository = MockProfileRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       repository = RemoteProfileRepositoryImpl(
         firestoreController,
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        errorReporter,
       );
     });
 
@@ -109,7 +113,7 @@ void main() {
     );
 
     test(
-      'should log and continue when caching the remote profile fails',
+      'should report the error and continue when caching the remote profile fails',
       () async {
         cacheDelegateRepository.stubGetProfileThrows(
           const ProfileNotFoundException(),
@@ -117,18 +121,15 @@ void main() {
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
         cacheDelegateRepository.stubCacheProfileThrows(
           profile: profile,
-          error: Exception('cache write failed'),
+          error: const ProfileCacheException(cause: 'cache write failed'),
         );
 
         final result = await repository.getProfile();
 
         expect(result, profile);
-        verify(
-          () => logReporter.error(
-            'Failed to cache profile from remote, continuing without caching.',
-            tag: 'RemoteProfileRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ProfileCacheException>());
+        expect(reportedError.tag, 'RemoteProfileRepositoryImpl');
       },
     );
 

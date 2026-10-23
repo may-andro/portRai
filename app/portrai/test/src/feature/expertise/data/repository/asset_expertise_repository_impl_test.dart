@@ -11,6 +11,7 @@ import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
 import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/expertise/domain/repository/mock_expertise_repository.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
 void main() {
@@ -64,12 +65,14 @@ void main() {
   group('AssetExpertiseRepositoryImpl', () {
     late MockExpertiseRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetExpertiseRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockExpertiseRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       getAssetSourceUseCase = MockGetAssetSourceUseCase()
         ..stubCall(AssetSource.real);
       repository = AssetExpertiseRepositoryImpl(
@@ -77,6 +80,7 @@ void main() {
         cacheDelegateRepository,
         mapper,
         logReporter,
+        errorReporter,
         getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -150,25 +154,22 @@ void main() {
     );
 
     test(
-      'should log and continue when caching expertise loaded from assets fails',
+      'should report the error and continue when caching expertise loaded from assets fails',
       () async {
         cacheDelegateRepository.stubGetAllExpertiseThrows(
           const ExpertiseNotFoundException(),
         );
         cacheDelegateRepository.stubCacheAllExpertiseThrows(
           expertiseList: expertiseList,
-          error: Exception('cache write failed'),
+          error: const ExpertiseCacheException(cause: 'cache write failed'),
         );
 
         final result = await repository.getAllExpertise();
 
         expect(result, expertiseList);
-        verify(
-          () => logReporter.error(
-            'Failed to cache expertise from assets, continuing without caching.',
-            tag: 'AssetExpertiseRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ExpertiseCacheException>());
+        expect(reportedError.tag, 'AssetExpertiseRepositoryImpl');
       },
     );
 

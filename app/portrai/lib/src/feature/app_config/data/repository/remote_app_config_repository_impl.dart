@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:core/core.dart';
+import 'package:error_reporter/error_reporter.dart';
 import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
@@ -17,6 +18,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
     @Inject(CacheAppConfigRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._errorReporter,
   );
 
   static const _collectionPath = 'app_config';
@@ -27,6 +29,7 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
   final AppConfigRepository _cacheDelegateRepository;
   final PortraiAppConfigMapper _mapper;
   final LogReporter _logReporter;
+  final ErrorReporter _errorReporter;
 
   @override
   Future<void> cacheAppConfig(PortraiAppConfigEntity appConfig) {
@@ -107,9 +110,12 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
   Future<void> _cacheAppConfigSafely(PortraiAppConfigEntity appConfig) async {
     try {
       await cacheAppConfig(appConfig);
-    } catch (_) {
-      _logReporter.error(
-        'Failed to cache app config from remote, continuing without caching.',
+    } on AppConfigCacheException catch (exception, stackTrace) {
+      // Loading still succeeds without the cache, so the failure is reported
+      // instead of thrown.
+      await _errorReporter.reportError(
+        exception: exception,
+        stackTrace: stackTrace,
         tag: _tag,
       );
     }

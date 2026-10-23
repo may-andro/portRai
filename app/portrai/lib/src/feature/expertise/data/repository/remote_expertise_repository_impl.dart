@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:error_reporter/error_reporter.dart';
 import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
@@ -17,6 +18,7 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
     @Inject(CacheExpertiseRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._errorReporter,
   );
 
   final FbFirestoreController _firestoreController;
@@ -24,6 +26,7 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
   final ExpertiseRepository _cacheDelegateRepository;
   final ExpertiseMapper _mapper;
   final LogReporter _logReporter;
+  final ErrorReporter _errorReporter;
 
   @override
   Future<void> cacheAllExpertise(List<ExpertiseEntity> expertiseList) {
@@ -109,10 +112,13 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
   ) async {
     try {
       await cacheAllExpertise(expertiseList);
-    } catch (_) {
-      _logReporter.error(
+    } on ExpertiseCacheException catch (exception, stackTrace) {
+      // Loading still succeeds without the cache, so the failure is reported
+      // instead of thrown.
+      await _errorReporter.reportError(
+        exception: exception,
+        stackTrace: stackTrace,
         tag: _logTag,
-        'Failed to cache expertise from remote, continuing without caching.',
       );
     }
   }

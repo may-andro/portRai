@@ -11,6 +11,7 @@ import 'package:portrai/src/feature/service/domain/_domain.dart';
 
 import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/service/domain/repository/mock_service_repository.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
 void main() {
@@ -39,12 +40,14 @@ void main() {
   group('AssetServiceRepositoryImpl', () {
     late MockServiceRepository cacheRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetServiceRepositoryImpl repository;
 
     setUp(() async {
       cacheRepository = MockServiceRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       getAssetSourceUseCase = MockGetAssetSourceUseCase()
         ..stubCall(AssetSource.real);
       repository = AssetServiceRepositoryImpl(
@@ -52,6 +55,7 @@ void main() {
         cacheRepository,
         ServiceMapper(appLocale: AppLocale('en')),
         logReporter,
+        errorReporter,
         getAssetSourceUseCase,
       );
       when(
@@ -135,6 +139,7 @@ void main() {
           cacheRepository,
           ServiceMapper(appLocale: AppLocale('fr')),
           logReporter,
+          errorReporter,
           getAssetSourceUseCase,
         );
 
@@ -154,12 +159,9 @@ void main() {
         ], const ServiceCacheException());
 
         expect(await repository.getServices(), const [service]);
-        verify(
-          () => logReporter.error(
-            'Failed to cache services from assets, continuing without caching.',
-            tag: 'AssetServiceRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ServiceCacheException>());
+        expect(reportedError.tag, 'AssetServiceRepositoryImpl');
       },
     );
 

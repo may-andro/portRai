@@ -11,6 +11,7 @@ import 'package:portrai/src/feature/app_config/domain/exception/app_config_excep
 
 import '../../../../../mock/feature/app_config/domain/entity/fake_portrai_app_config_entity.dart';
 import '../../../../../mock/feature/app_config/domain/repository/mock_app_config_repository.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -20,6 +21,7 @@ void main() {
     late BuildConfig buildConfig;
     late MockAppConfigRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late RemoteAppConfigRepositoryImpl repository;
 
     setUpAll(() {
@@ -31,6 +33,7 @@ void main() {
       buildConfig = BuildConfig(buildEnvironment: BuildEnvironment.prod);
       cacheDelegateRepository = MockAppConfigRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       repository = RemoteAppConfigRepositoryImpl(
         firestoreController,
         buildConfig,
@@ -40,6 +43,7 @@ void main() {
           AiRateLimitAppConfigMapper(),
         ),
         logReporter,
+        errorReporter,
       );
     });
 
@@ -135,13 +139,15 @@ void main() {
         ).called(1);
       });
 
-      test('should log an error and return the remote app config when '
+      test('should report the error and return the remote app config when '
           'caching it fails', () async {
         cacheDelegateRepository
           ..stubGetAppConfigThrows(
             const AppConfigNotFoundException(cause: 'no cache'),
           )
-          ..stubCacheAppConfigThrows(Exception('cache write failed'));
+          ..stubCacheAppConfigThrows(
+            const AppConfigCacheException(cause: 'cache write failed'),
+          );
         firestoreController.stubGetDocumentFromCollection({
           'minimumRequiredAppVersion': '1.2.3',
         });
@@ -149,13 +155,9 @@ void main() {
         final appConfig = await repository.getAppConfig();
 
         expect(appConfig, remoteAppConfig);
-        verify(
-          () => logReporter.error(
-            'Failed to cache app config from remote, continuing without '
-            'caching.',
-            tag: 'RemoteAppConfigRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<AppConfigCacheException>());
+        expect(reportedError.tag, 'RemoteAppConfigRepositoryImpl');
       });
 
       test('should throw a not found exception when no app config is cached '

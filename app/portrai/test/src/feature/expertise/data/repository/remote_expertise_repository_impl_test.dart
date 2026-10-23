@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/expertise/data/repository/remote_expertise_r
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
 
 import '../../../../../mock/feature/expertise/domain/repository/mock_expertise_repository.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -55,18 +56,21 @@ void main() {
     late MockFbFirestoreController firestoreController;
     late MockExpertiseRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late RemoteExpertiseRepositoryImpl repository;
 
     setUp(() {
       firestoreController = MockFbFirestoreController();
       cacheDelegateRepository = MockExpertiseRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       repository = RemoteExpertiseRepositoryImpl(
         firestoreController,
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        errorReporter,
       );
     });
 
@@ -131,7 +135,7 @@ void main() {
     );
 
     test(
-      'should log and continue when caching expertise loaded from remote fails',
+      'should report the error and continue when caching expertise loaded from remote fails',
       () async {
         cacheDelegateRepository.stubGetAllExpertiseThrows(
           const ExpertiseNotFoundException(),
@@ -139,18 +143,15 @@ void main() {
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
         cacheDelegateRepository.stubCacheAllExpertiseThrows(
           expertiseList: expertiseList,
-          error: Exception('cache write failed'),
+          error: const ExpertiseCacheException(cause: 'cache write failed'),
         );
 
         final result = await repository.getAllExpertise();
 
         expect(result, expertiseList);
-        verify(
-          () => logReporter.error(
-            'Failed to cache expertise from remote, continuing without caching.',
-            tag: 'RemoteExpertiseRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ExpertiseCacheException>());
+        expect(reportedError.tag, 'RemoteExpertiseRepositoryImpl');
       },
     );
 

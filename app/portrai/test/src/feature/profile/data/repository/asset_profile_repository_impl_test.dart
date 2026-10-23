@@ -12,6 +12,7 @@ import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/profile/domain/repository/mock_profile_repository.dart';
 import '../../../../../mock/feature/profile/test_data/profile_test_data.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
 void main() {
@@ -42,12 +43,14 @@ void main() {
   group('AssetProfileRepositoryImpl', () {
     late MockProfileRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetProfileRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockProfileRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       getAssetSourceUseCase = MockGetAssetSourceUseCase()
         ..stubCall(AssetSource.real);
       repository = AssetProfileRepositoryImpl(
@@ -55,6 +58,7 @@ void main() {
         cacheDelegateRepository,
         mapper,
         logReporter,
+        errorReporter,
         getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -122,25 +126,22 @@ void main() {
     );
 
     test(
-      'should log and continue when caching the asset profile fails',
+      'should report the error and continue when caching the asset profile fails',
       () async {
         cacheDelegateRepository.stubGetProfileThrows(
           const ProfileNotFoundException(),
         );
         cacheDelegateRepository.stubCacheProfileThrows(
           profile: profile,
-          error: Exception('cache write failed'),
+          error: const ProfileCacheException(cause: 'cache write failed'),
         );
 
         final result = await repository.getProfile();
 
         expect(result, profile);
-        verify(
-          () => logReporter.error(
-            'Failed to cache profile from assets, continuing without caching.',
-            tag: 'AssetProfileRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ProfileCacheException>());
+        expect(reportedError.tag, 'AssetProfileRepositoryImpl');
       },
     );
 
@@ -155,6 +156,7 @@ void main() {
           cacheDelegateRepository,
           mapper,
           logReporter,
+          errorReporter,
           getAssetSourceUseCase,
         );
 
