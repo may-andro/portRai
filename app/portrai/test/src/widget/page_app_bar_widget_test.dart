@@ -171,5 +171,23 @@ void main() {
       },
       variant: TargetPlatformVariant.only(TargetPlatform.android),
     );
+
+    testWidgets('should paint the bar with the given background color', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const TestWidgetWrapper(
+          child: Scaffold(
+            body: PageTopBarWidget(
+              title: 'Title',
+              backgroundColor: Colors.transparent,
+            ),
+          ),
+        ),
+      );
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.backgroundColor, Colors.transparent);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.android));
   });
 }

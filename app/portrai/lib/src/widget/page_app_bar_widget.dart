@@ -64,12 +64,14 @@ class PageAppBarWidget extends StatelessWidget {
 class PageTopBarWidget extends StatelessWidget {
   const PageTopBarWidget({
     required this.title,
+    this.backgroundColor,
     this.titleColor,
     this.actions = const [],
     super.key,
   });
 
   final String title;
+  final Color? backgroundColor;
   final DSColor? titleColor;
 
   /// Shown at the end of the bar on every platform, before the close button.
@@ -87,7 +89,7 @@ class PageTopBarWidget extends StatelessWidget {
     return AppBar(
       elevation: context.dimen.elevationNone.value,
       scrolledUnderElevation: context.dimen.elevationNone.value,
-      backgroundColor: palette.background.color,
+      backgroundColor: backgroundColor ?? palette.background.color,
       surfaceTintColor: palette.neutral.transparent.color,
       foregroundColor: resolvedTitleColor.color,
       automaticallyImplyLeading: false,
