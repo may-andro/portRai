@@ -152,7 +152,7 @@ void main() {
         .getTopLeft(
           find.descendant(
             of: find.byType(PageHeaderWidget),
-            matching: find.byType(Image),
+            matching: find.byType(DSLottieIllustrationWidget),
           ),
         )
         .dx;
