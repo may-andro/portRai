@@ -30,10 +30,11 @@ class SplashApp extends StatelessWidget {
         ),
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          surface: const Color(0xFF1E1E1E),
-          onSurface: const Color(0xFFE0E0E0),
-        ),
+        colorScheme: ColorScheme.fromSwatch(brightness: Brightness.dark)
+            .copyWith(
+              surface: const Color(0xFF1E1E1E),
+              onSurface: const Color(0xFFE0E0E0),
+            ),
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
