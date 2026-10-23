@@ -39,6 +39,7 @@ void main() {
     DSLottieIllustration.talentSearch,
     DSLottieIllustration.signIn,
     DSLottieIllustration.binoculars,
+    DSLottieIllustration.logo,
   ]) {
     testWidgets('should size ${illustration.name} by its aspect ratio when '
         'shown', (tester) async {

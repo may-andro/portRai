@@ -21,10 +21,9 @@ class _HeaderDesktopContentWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset(
-            DSImage.logoPath,
-            package: 'design_system',
-            fit: BoxFit.cover,
+          DSLottieIllustrationWidget(
+            illustration: DSLottieIllustration.logo,
+            width: getHeight(context),
           ),
           const DSHorizontalSpacerWidget(2),
           Expanded(

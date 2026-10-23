@@ -82,7 +82,7 @@ void main() {
               .getTopLeft(
                 find.descendant(
                   of: find.byType(PageHeaderWidget),
-                  matching: find.byType(Image),
+                  matching: find.byType(DSLottieIllustrationWidget),
                 ),
               )
               .dx,
@@ -106,7 +106,7 @@ void main() {
             .getTopLeft(
               find.descendant(
                 of: find.byType(PageHeaderWidget),
-                matching: find.byType(Image),
+                matching: find.byType(DSLottieIllustrationWidget),
               ),
             )
             .dx,
@@ -123,10 +123,15 @@ void main() {
             builder: (context) => TextButton(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => const Scaffold(
-                    body: PageTopBarWidget(
-                      title: 'Title',
-                      actions: [Icon(Icons.refresh)],
+                  // The header logo loops, so its ticker is muted to let
+                  // pumpAndSettle finish.
+                  builder: (_) => const TickerMode(
+                    enabled: false,
+                    child: Scaffold(
+                      body: PageTopBarWidget(
+                        title: 'Title',
+                        actions: [Icon(Icons.refresh)],
+                      ),
                     ),
                   ),
                 ),

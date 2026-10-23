@@ -31,10 +31,9 @@ class PageHeaderWidget extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Image.asset(
-                DSImage.logoPath,
-                package: 'design_system',
-                fit: BoxFit.cover,
+              child: DSLottieIllustrationWidget(
+                illustration: DSLottieIllustration.logo,
+                width: height(context),
               ),
             ),
           ),
