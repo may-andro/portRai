@@ -23,21 +23,25 @@ void main() {
 
     await tester.pumpWidget(
       TestWidgetWrapper(
-        child: BlocProvider<PortfolioBloc>.value(
-          value: bloc,
-          child: DefaultTabController(
-            length: sections.length,
-            child: Builder(
-              builder: (context) {
-                return CustomScrollView(
-                  slivers: [
-                    HeaderWidget(
-                      sections: sections,
-                      tabController: DefaultTabController.of(context),
-                    ),
-                  ],
-                );
-              },
+        // The logo loops, so its ticker is muted to let pumpAndSettle finish.
+        child: TickerMode(
+          enabled: false,
+          child: BlocProvider<PortfolioBloc>.value(
+            value: bloc,
+            child: DefaultTabController(
+              length: sections.length,
+              child: Builder(
+                builder: (context) {
+                  return CustomScrollView(
+                    slivers: [
+                      HeaderWidget(
+                        sections: sections,
+                        tabController: DefaultTabController.of(context),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),

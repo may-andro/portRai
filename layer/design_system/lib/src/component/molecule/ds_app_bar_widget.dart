@@ -50,7 +50,10 @@ class DSAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
           : null,
       title: GestureDetector(
         onTap: onLogoClicked,
-        child: SizedBox(height: height, child: DSImage.logo()),
+        child: DSLottieIllustrationWidget(
+          illustration: DSLottieIllustration.logo,
+          width: height,
+        ),
       ),
       actions: actions,
     );
