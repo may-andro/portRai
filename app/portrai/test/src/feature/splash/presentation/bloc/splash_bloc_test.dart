@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
 
@@ -36,6 +37,17 @@ class _ThrowingRegisterModuleConfigurator extends ModuleConfigurator {
   @override
   Future<void> postDependenciesSetup(ServiceLocator serviceLocator) =>
       Future.value();
+}
+
+class _FailingOnceModuleConfigurator extends _NoOpModuleConfigurator {
+  bool _hasFailed = false;
+
+  @override
+  Future<void> postDependenciesSetup(ServiceLocator serviceLocator) {
+    if (_hasFailed) return Future.value();
+    _hasFailed = true;
+    return Future.error(PostInjectionException('post failed', 'offline'));
+  }
 }
 
 void main() {
@@ -86,13 +98,64 @@ void main() {
     );
 
     blocTest<SplashBloc, SplashState>(
-      'should emit no internet state when opened without internet',
+      'should complete without checking the internet when set up succeeds',
       setUp: () => connectivityRepository.stubIsConnected(false),
       build: () => SplashBloc(ModuleInjectorController(), [
         _NoOpModuleConfigurator(),
       ], connectivityRepository: connectivityRepository),
       act: (bloc) => bloc.add(InitEvent()),
-      expect: () => const [SetUpNoInternetState()],
+      skip: 4,
+      expect: () => const [SetUpCompetedState(DesignSystem.hogmanay)],
+      verify: (_) => verifyNever(connectivityRepository.isConnected),
+    );
+
+    blocTest<SplashBloc, SplashState>(
+      'should emit no internet state when set up fails without internet',
+      setUp: () => connectivityRepository.stubIsConnected(false),
+      build: () => SplashBloc(ModuleInjectorController(), [
+        _ThrowingRegisterModuleConfigurator(),
+      ], connectivityRepository: connectivityRepository),
+      act: (bloc) => bloc.add(InitEvent()),
+      expect: () => const [
+        SetUpProgressState([InjectionStatus.start], 0.25),
+        SetUpProgressState([
+          InjectionStatus.start,
+          InjectionStatus.register,
+        ], 0.5),
+        SetUpNoInternetState(),
+      ],
+    );
+
+    blocTest<SplashBloc, SplashState>(
+      'should complete when retry is clicked after set up failed without '
+      'internet',
+      build: () => SplashBloc(ModuleInjectorController(), [
+        _FailingOnceModuleConfigurator(),
+      ], connectivityRepository: connectivityRepository),
+      act: (bloc) async {
+        connectivityRepository.stubIsConnected(false);
+        bloc.add(InitEvent());
+        await pumpEventQueue();
+        connectivityRepository.stubIsConnected(true);
+        bloc.add(RetryClickEvent());
+      },
+      skip: 3,
+      expect: () => const [
+        SetUpNoInternetState(),
+        SetUpProgressState([], 0),
+        SetUpProgressState([InjectionStatus.start], 0.25),
+        SetUpProgressState([
+          InjectionStatus.start,
+          InjectionStatus.register,
+        ], 0.5),
+        SetUpProgressState([
+          InjectionStatus.start,
+          InjectionStatus.register,
+          InjectionStatus.postRegister,
+        ], 0.75),
+        SetUpProgressState(InjectionStatus.values, 1),
+        SetUpCompetedState(DesignSystem.hogmanay),
+      ],
     );
 
     blocTest<SplashBloc, SplashState>(
