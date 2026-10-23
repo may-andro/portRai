@@ -120,13 +120,15 @@ class _DSNetworkImageWidgetState extends State<DSNetworkImageWidget> {
     final decodeWidth = _physicalPixels(widget.width, devicePixelRatio);
     final decodeHeight = _physicalPixels(widget.height, devicePixelRatio);
     if (fit == BoxFit.none || (decodeWidth == null && decodeHeight == null)) {
-      return networkImageProvider;
+      return LoadErrorHandledImage(networkImageProvider);
     }
-    return FittedResizeImage(
-      networkImageProvider,
-      width: decodeWidth,
-      height: decodeHeight,
-      fit: fit,
+    return LoadErrorHandledImage(
+      FittedResizeImage(
+        networkImageProvider,
+        width: decodeWidth,
+        height: decodeHeight,
+        fit: fit,
+      ),
     );
   }
 
@@ -254,6 +256,42 @@ class FittedResizeImage extends ImageProvider<Object> {
   String toString() =>
       '${objectRuntimeType(this, 'FittedResizeImage')}'
       '($imageProvider, width: $width, height: $height, fit: $fit)';
+}
+
+/// Loads [imageProvider] and marks a failed load as handled.
+///
+/// [ExtendedImage] stops listening to an image that is no longer shown while
+/// the load keeps running. A load that fails after that has no error listener,
+/// so the image stream reports the error to [FlutterError.onError]. The failed
+/// state is shown by [DSNetworkImageWidget] whenever the image is listened to.
+@visibleForTesting
+@immutable
+class LoadErrorHandledImage extends ImageProvider<Object> {
+  const LoadErrorHandledImage(this.imageProvider);
+
+  final ImageProvider<Object> imageProvider;
+
+  @override
+  Future<Object> obtainKey(ImageConfiguration configuration) {
+    return imageProvider.obtainKey(configuration);
+  }
+
+  @override
+  ImageStreamCompleter loadImage(Object key, ImageDecoderCallback decode) {
+    return imageProvider.loadImage(key, decode)
+      ..addEphemeralErrorListener((_, _) {});
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is LoadErrorHandledImage && other.imageProvider == imageProvider;
+
+  @override
+  int get hashCode => imageProvider.hashCode;
+
+  @override
+  String toString() =>
+      '${objectRuntimeType(this, 'LoadErrorHandledImage')}($imageProvider)';
 }
 
 @immutable
