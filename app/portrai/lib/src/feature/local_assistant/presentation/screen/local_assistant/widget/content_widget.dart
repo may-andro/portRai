@@ -40,11 +40,20 @@ class ContentWidget extends StatelessWidget {
     if (!state.isReady) {
       return ScreenLoadedContent.fullScreen(
         SingleChildScrollView(
-          child: Column(
-            children: [
-              _ModelSetupWidget(state: state),
-              const LocalAssistantCardContentWidget(),
-            ],
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Padding(
+                padding: EdgeInsets.all(context.space(factor: 3)),
+                child: Column(
+                  children: [
+                    _ModelSetupWidget(state: state),
+                    const DSVerticalSpacerWidget(3),
+                    const LocalAssistantCardContentWidget(),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       );

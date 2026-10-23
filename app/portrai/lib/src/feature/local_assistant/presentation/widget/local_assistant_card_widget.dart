@@ -50,7 +50,7 @@ class LocalAssistantCardContentWidget extends StatelessWidget {
                 Row(
                   children: [
                     DSIconWidget(
-                      Icons.auto_awesome,
+                      Icons.offline_bolt_rounded,
                       size: context.isMobile
                           ? DSIconSize.large
                           : DSIconSize.medium,
