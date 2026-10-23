@@ -3,15 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
+import 'package:portrai/src/route/route.dart';
 
 import '../../../mock/feature/design_system/domain/use_case/mock_get_design_system_use_case.dart';
 import '../../../mock/feature/design_system/domain/use_case/mock_select_design_system_use_case.dart';
+import '../../../mock/utility/mock_module_route_controller.dart';
 
 void main() {
   group('DesignSystemModuleConfigurator', () {
     late ServiceLocator serviceLocator;
     late MockGetDesignSystemUseCase getDesignSystemUseCase;
     late MockSelectDesignSystemUseCase selectDesignSystemUseCase;
+    late MockModuleRouteController routeController;
 
     setUp(() async {
       serviceLocator = ModuleInjectorController().serviceLocator;
@@ -25,6 +28,10 @@ void main() {
       );
       serviceLocator.registerSingleton<SelectDesignSystemUseCase>(
         () => selectDesignSystemUseCase,
+      );
+      routeController = MockModuleRouteController();
+      serviceLocator.registerSingleton<ModuleRouteController>(
+        () => routeController,
       );
     });
 
@@ -57,5 +64,19 @@ void main() {
         verify(() => selectDesignSystemUseCase()).called(1);
       },
     );
+
+    test('should register the theme gallery route', () async {
+      getDesignSystemUseCase.stubCall(null);
+
+      await DesignSystemModuleConfigurator().postDependenciesSetup(
+        serviceLocator,
+      );
+
+      verify(
+        () => routeController.register(
+          DesignSystemModuleRoute.designSystemGallery,
+        ),
+      ).called(1);
+    });
   });
 }

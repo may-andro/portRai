@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
-import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
@@ -88,12 +87,6 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                 children: [_AiImageStyleTile(), _AiImageModelTile()],
               ),
             ),
-            const DSVerticalSpacerWidget(3),
-
-            _SectionHeader(
-              title: context.localizations.developerMenuDesignSystem,
-            ),
-            const DesignSystemSelectorWidget(),
             const DSVerticalSpacerWidget(3),
 
             _SectionHeader(
