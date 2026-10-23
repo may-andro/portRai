@@ -14,6 +14,7 @@ void main() {
         final result = cache.serialize(model);
 
         expect(result['publishedAt'], isA<String>());
+        expect(result['profileImages'], isA<String>());
         expect(result['resume'], isA<String>());
         expect(result['socialLinks'], isA<String>());
         expect(result['availability'], isA<String>());
@@ -36,6 +37,13 @@ void main() {
 
     test('should use email and locale as the composite key when caching', () {
       expect(cache.primaryKeyColumns, ['email', 'locale']);
+    });
+
+    test('should only write values that have a table column when writing a '
+        'model', () {
+      final columnNames = cache.columns.map((column) => column.name);
+
+      expect(cache.serialize(model).keys, everyElement(isIn(columnNames)));
     });
   });
 }
