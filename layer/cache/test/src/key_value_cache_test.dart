@@ -55,7 +55,60 @@ class _TestCache extends KeyValueCache<String> {
   Duration get timeToLive => const Duration(milliseconds: 300);
 }
 
+/// Expires values at a fixed moment instead of after a duration.
+class _ExpiryTestCache extends KeyValueCache<String> {
+  _ExpiryTestCache({required this.expiry, super.adapter})
+    : super('expiry_test_cache');
+
+  final DateTime expiry;
+
+  @override
+  DateTime? expiryOf(DateTime cachedAt) => expiry;
+
+  @override
+  String deserializeValue(Map<String, dynamic> map) => map['name'] as String;
+
+  @override
+  Map<String, dynamic> serializeValue(String value) => {'name': value};
+}
+
 void main() {
+  group('expiryOf', () {
+    test('should expire a value the time to live after it was cached', () {
+      final cachedAt = DateTime(2026, 10, 23, 12);
+
+      expect(
+        _TestCache().expiryOf(cachedAt),
+        cachedAt.add(const Duration(milliseconds: 300)),
+      );
+    });
+
+    test('should return the value before the expiry it overrides', () async {
+      final adapter = _InMemoryKeyValueAdapter();
+      final cache = _ExpiryTestCache(
+        expiry: DateTime.now().add(const Duration(days: 1)),
+        adapter: adapter,
+      );
+
+      await cache.put('test');
+
+      expect(await cache.get(), 'test');
+    });
+
+    test('should drop the value after the expiry it overrides', () async {
+      final adapter = _InMemoryKeyValueAdapter();
+      final cache = _ExpiryTestCache(
+        expiry: DateTime.now().subtract(const Duration(days: 1)),
+        adapter: adapter,
+      );
+
+      await cache.put('test');
+
+      expect(await cache.get(), isNull);
+      expect(adapter._strings.containsKey('expiry_test_cache'), isFalse);
+    });
+  });
+
   group(KeyValueCache, () {
     late KeyValueCache<String> keyValueCache;
     late _InMemoryKeyValueAdapter adapter;

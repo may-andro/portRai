@@ -183,10 +183,22 @@ All cache types support automatic expiration through the `timeToLive` property:
 Duration get timeToLive => const Duration(minutes: 30);
 ```
 
+### Custom Expiry
+
+When a fixed duration cannot express the expiry, override `expiryOf`, which returns when a value
+cached at a given time expires (`null` for never). By default it returns `timeToLive` after that
+time. For example, a value that lasts until the end of the month it was cached in:
+
+```dart
+@override
+DateTime? expiryOf(DateTime cachedAt) =>
+    DateTime(cachedAt.year, cachedAt.month + 1);
+```
+
 ### Expiration Handling
 
 - Expired data is automatically detected and removed when accessed
-- The `isExpired` property checks if cached data has exceeded its TTL
+- The `isExpired` property checks if cached data has passed its `expiryOf`
 - `lastCachedTimestamp` tracks when data was last stored
 
 ### Thread Safety

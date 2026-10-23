@@ -291,12 +291,8 @@ abstract class DBCache<T> extends Cache {
     return raw is int ? raw : null;
   }
 
-  /// Returns `true` when [timestamp] has not yet exceeded the [timeToLive].
-  bool _isTimestampValid(int timestamp) {
-    final allowedMs = timeToLive.inMilliseconds;
-    if (allowedMs == 0) return true; // no TTL set → never expires
-    return timestamp + allowedMs >= DateTime.now().millisecondsSinceEpoch;
-  }
+  /// Returns `true` when [timestamp] has not yet passed its [expiryOf].
+  bool _isTimestampValid(int timestamp) => !isExpiredAt(timestamp);
 
   void _deleteExpiredEntries(List<Map<String, dynamic>> expiredRecords) {
     for (final record in expiredRecords) {
