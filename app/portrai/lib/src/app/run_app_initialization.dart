@@ -19,19 +19,20 @@ import 'package:tracking/tracking.dart';
 
 Future<void> runAppWithInitialization() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // SplashScreen removes the native splash once it can draw the logo.
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle());
+  SystemChrome.setSystemUIOverlayStyle(
+    _splashOverlayStyle(widgetsBinding.platformDispatcher.platformBrightness),
+  );
 
   final buildConfig = BuildConfig(
     buildEnvironment: BuildEnvironment.buildEnvironment,
   );
   final moduleConfigurators = getModuleConfigurators(buildConfig);
-
-  FlutterNativeSplash.remove();
 
   runApp(
     SplashApp(
@@ -44,6 +45,9 @@ Future<void> runAppWithInitialization() async {
 
 Future<void> runMainApp(DesignSystem designSystem) async {
   await _initFeatureFlags();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(systemNavigationBarContrastEnforced: true),
+  );
 
   final appLocale = appServiceLocator.get<AppLocale>();
   _sendAppInitializationFinishedEvent(appLocale);
@@ -61,6 +65,18 @@ Future<void> runMainApp(DesignSystem designSystem) async {
         );
       },
     ),
+  );
+}
+
+/// Lets the splash background run under the navigation bar without a scrim,
+/// as it does on the native splash.
+SystemUiOverlayStyle _splashOverlayStyle(Brightness platformBrightness) {
+  return SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
+    systemNavigationBarIconBrightness: platformBrightness == Brightness.dark
+        ? Brightness.light
+        : Brightness.dark,
   );
 }
 

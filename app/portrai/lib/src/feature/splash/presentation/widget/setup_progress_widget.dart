@@ -31,9 +31,5 @@ class SetupProgressWidget extends StatelessWidget {
 }
 
 extension on BuildContext {
-  Color get color {
-    return MediaQuery.platformBrightnessOf(this) == Brightness.light
-        ? const Color(0xFF121212)
-        : const Color(0xFFFFFFFF);
-  }
+  Color get color => Theme.of(this).colorScheme.onSurface;
 }

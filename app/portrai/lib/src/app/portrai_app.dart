@@ -66,12 +66,19 @@ class _PortraiAppState extends State<PortraiApp> {
         return DSThemeBuilderWidget(
           brightness: context.platformBrightness,
           designSystem: widget.designSystem,
-          child: SystemLocaleObserverWidget(
-            child: ForceUpdateListenerWidget(
-              child: ConnectivityListenerWidget(
-                child: ScreenFooterProviderWidget(
-                  footer: const FooterWidget(),
-                  child: child ?? const SizedBox.shrink(),
+          // The router can resolve its first page a frame late, so the
+          // surface fills that frame instead of black.
+          child: Builder(
+            builder: (context) => ColoredBox(
+              color: context.colorPalette.surface.surface.color,
+              child: SystemLocaleObserverWidget(
+                child: ForceUpdateListenerWidget(
+                  child: ConnectivityListenerWidget(
+                    child: ScreenFooterProviderWidget(
+                      footer: const FooterWidget(),
+                      child: child ?? const SizedBox.shrink(),
+                    ),
+                  ),
                 ),
               ),
             ),

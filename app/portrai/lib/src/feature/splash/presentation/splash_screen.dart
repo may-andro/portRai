@@ -1,12 +1,15 @@
 import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/feature/splash/presentation/widget/_widget.dart';
 
-class SplashScreen extends StatelessWidget {
+/// Takes over from the native splash, which stays on screen until this
+/// screen can draw the logo.
+class SplashScreen extends StatefulWidget {
   const SplashScreen({
     required this.buildConfig,
     required this.moduleConfigurators,
@@ -19,13 +22,32 @@ class SplashScreen extends StatelessWidget {
   final void Function(DesignSystem) onInitializationSuccessful;
 
   @override
-  Widget build(BuildContext context) {
-    // Make the screen full screen by hiding system overlays
-    //SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+  State<SplashScreen> createState() => _SplashScreenState();
+}
 
+class _SplashScreenState extends State<SplashScreen> {
+  /// Delays the set up messages, so a quick start only shows the logo.
+  static const _infoRevealDelay = Duration(milliseconds: 600);
+
+  bool _isLogoRequested = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isLogoRequested) return;
+    _isLogoRequested = true;
+    // The first frame would otherwise draw before the logo is decoded.
+    precacheImage(
+      AssetImage(DSImage.logoPath, package: 'design_system'),
+      context,
+    ).whenComplete(FlutterNativeSplash.remove);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          SplashBloc(ModuleInjectorController(), moduleConfigurators)
+          SplashBloc(ModuleInjectorController(), widget.moduleConfigurators)
             ..add(InitEvent()),
       child: BlocBuilder<SplashBloc, SplashState>(
         builder: (context, state) {
@@ -37,19 +59,14 @@ class SplashScreen extends StatelessWidget {
           }
           return Scaffold(
             backgroundColor: Theme.of(context).colorScheme.surface,
-            body: LayoutBuilder(
-              builder: (context, constraints) {
-                return Stack(
-                  children: [
-                    CircularRevealLogoWidget(
-                      state: state,
-                      constraints: constraints,
-                      onComplete: () => handleAnimationComplete(state),
-                    ),
-                    _buildFadingInfoWidget(state),
-                  ],
-                );
-              },
+            body: Stack(
+              children: [
+                CircularRevealLogoWidget(
+                  state: state,
+                  onComplete: () => handleAnimationComplete(state),
+                ),
+                _buildFadingInfoWidget(state),
+              ],
             ),
           );
         },
@@ -65,14 +82,16 @@ class SplashScreen extends StatelessWidget {
       child: AnimatedOpacity(
         opacity: state is SetUpCompetedState ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 300),
-        child: _SplashInfoWidget(state, buildConfig),
+        child: _SplashInfoWidget(state, widget.buildConfig)
+            .animate(delay: _infoRevealDelay)
+            .fadeIn(duration: const Duration(milliseconds: 300)),
       ),
     );
   }
 
   void handleAnimationComplete(SplashState state) {
     if (state is SetUpCompetedState) {
-      onInitializationSuccessful(state.designSystem);
+      widget.onInitializationSuccessful(state.designSystem);
     }
   }
 }
