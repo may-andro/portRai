@@ -39,6 +39,46 @@ class _GalleryWidgetState extends State<_GalleryWidget>
 
   List<DesignSystem> get _designSystems => widget.state.designSystems;
 
+  /// The deck, kept so a new preview does not rebuild it.
+  Widget? _deck;
+  Brightness? _deckBrightness;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _precacheThemes());
+  }
+
+  @override
+  void didUpdateWidget(covariant _GalleryWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final state = widget.state;
+    final oldState = oldWidget.state;
+    if (state.designSystems != oldState.designSystems ||
+        state.appliedDesignSystem != oldState.appliedDesignSystem ||
+        state.monthlyDesignSystem != oldState.monthlyDesignSystem) {
+      _deck = null;
+    }
+  }
+
+  /// Builds the theme of every design system between frames, one per task,
+  /// so a card or a preview coming in does not build one during a frame.
+  /// Idle tasks would wait for the festival effects, which never stop, so the
+  /// tasks run at animation priority.
+  void _precacheThemes() {
+    if (!mounted) return;
+    final brightness = context.platformBrightness;
+    for (final designSystem in _designSystems) {
+      SchedulerBinding.instance.scheduleTask(
+        () => DSThemeBuilderWidget.precacheTheme(
+          designSystem: designSystem,
+          brightness: brightness,
+        ),
+        Priority.animation,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _deckController.dispose();
@@ -95,14 +135,28 @@ class _GalleryWidgetState extends State<_GalleryWidget>
     _settleAt(frontPosition + cards);
   }
 
-  Widget _buildDeck() => _DeckWidget(
-    deckPosition: _deckController,
-    designSystemAt: _designSystemAt,
-    state: widget.state,
-    onDragStart: _onDragStart,
-    onDragUpdate: _onDragUpdate,
-    onDragEnd: _onDragEnd,
-  );
+  /// The cards carry their own design systems, so the deck sits in the
+  /// applied one instead of the previewed one. A new preview then neither
+  /// changes nor rebuilds it.
+  Widget _buildDeck(BuildContext context) {
+    final brightness = context.platformBrightness;
+    if (_deck == null || brightness != _deckBrightness) {
+      _deckBrightness = brightness;
+      _deck = DSThemeBuilderWidget(
+        designSystem: widget.state.appliedDesignSystem,
+        brightness: brightness,
+        child: _DeckWidget(
+          deckPosition: _deckController,
+          designSystemAt: _designSystemAt,
+          state: widget.state,
+          onDragStart: _onDragStart,
+          onDragUpdate: _onDragUpdate,
+          onDragEnd: _onDragEnd,
+        ),
+      );
+    }
+    return _deck!;
+  }
 
   Widget _buildMonthDial() => _MonthDialWidget(
     deckPosition: _deckController,
@@ -129,7 +183,7 @@ class _GalleryWidgetState extends State<_GalleryWidget>
           child: Column(
             children: [
               _buildHint(context),
-              Expanded(child: _buildDeck()),
+              Expanded(child: _buildDeck(context)),
               _buildMonthDial(),
               const DSVerticalSpacerWidget(1.5),
               _ApplyPanelWidget(state: widget.state),
@@ -150,7 +204,7 @@ class _GalleryWidgetState extends State<_GalleryWidget>
       ),
       child: Row(
         children: [
-          Expanded(flex: 5, child: _buildDeck()),
+          Expanded(flex: 5, child: _buildDeck(context)),
           const DSHorizontalSpacerWidget(4),
           Expanded(
             flex: 4,

@@ -21,6 +21,13 @@ class _MonthDialWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
     final brightness = context.platformBrightness;
+    final dotColors = [
+      for (final designSystem in designSystems)
+        DSTheme(
+          brightness: brightness,
+          designSystem: designSystem,
+        ).colorPalette.brand.primary,
+    ];
     return Row(
       children: [
         IconButton(
@@ -44,10 +51,7 @@ class _MonthDialWidget extends StatelessWidget {
                     Expanded(
                       child: _MonthDotWidget(
                         designSystem: designSystem,
-                        color: DSTheme(
-                          brightness: brightness,
-                          designSystem: designSystem,
-                        ).colorPalette.brand.primary,
+                        color: dotColors[index],
                         isFront: index == frontIndex,
                         onClick: () => onDesignSystemClick(designSystem),
                       ),

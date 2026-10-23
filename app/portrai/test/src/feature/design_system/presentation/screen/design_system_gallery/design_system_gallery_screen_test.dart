@@ -63,6 +63,8 @@ void main() {
         const TestWidgetWrapper(child: DesignSystemGalleryScreen()),
       );
       await tester.pump();
+      // Lets the gallery build the themes it prepares between frames.
+      await tester.pump(const Duration(milliseconds: 100));
     }
 
     // The festival effects loop, so the deck is given time to settle instead
