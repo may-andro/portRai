@@ -17,15 +17,31 @@ class EngineeringProfessionalSummary extends ProfessionalSummaryVariant {
   @override
   bool get hasFlexibleTabletHeight => true;
 
+  /// How much larger the illustration is drawn on mobile. The artwork has an
+  /// empty margin around it, so only that margin goes past the area.
+  static const _mobileIllustrationScale = 1.25;
+
   @override
   Widget buildVisual(BuildContext context, ProfessionalSummaryScope scope) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final shortestSide = constraints.biggest.shortestSide;
+        if (scope.isMobile) {
+          final width = shortestSide * _mobileIllustrationScale;
+          return OverflowBox(
+            maxWidth: width,
+            maxHeight: width,
+            child: DSLottieIllustrationWidget(
+              illustration: DSLottieIllustration.techStack,
+              width: width,
+            ),
+          );
+        }
         return Center(
           child: DSLottieIllustrationWidget(
             illustration: DSLottieIllustration.techStack,
             width: min(
-              constraints.biggest.shortestSide,
+              shortestSide,
               scope.resolution == DSDeviceResolution.tablet ? 240 : 480,
             ),
           ),
@@ -48,7 +64,8 @@ class EngineeringProfessionalSummary extends ProfessionalSummaryVariant {
     final padding = scope.bodyHasHorizontalPadding;
     final card = _CodeCardWidget(
       profile: scope.profile,
-      stack: stack,
+      // Mobile keeps the card short and leaves the stack out.
+      stack: scope.isMobile ? const [] : stack,
       isVisible: scope.isVisible,
       hasHorizontalPadding: padding,
     );

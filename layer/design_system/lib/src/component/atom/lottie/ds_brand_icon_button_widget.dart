@@ -1,5 +1,6 @@
 import 'package:design_system/src/component/atom/lottie/ds_brand_icon_widget.dart';
 import 'package:design_system/src/component/atom/lottie/ds_lottie_widget.dart';
+import 'package:design_system/src/foundation/color/ds_color.dart';
 import 'package:flutter/material.dart';
 
 /// A circular button that is the animated brand icon itself, without the
@@ -12,6 +13,8 @@ class DSBrandIconButtonWidget extends StatelessWidget {
     this.diameter = 56,
     this.tooltip,
     this.playback = DSLottiePlayback.loop,
+    this.color,
+    this.onColor,
   });
 
   /// The artwork's circle fills this share of the Lottie canvas.
@@ -24,6 +27,12 @@ class DSBrandIconButtonWidget extends StatelessWidget {
   final double diameter;
   final String? tooltip;
   final DSLottiePlayback playback;
+
+  /// Circle color, the brand primary by default.
+  final DSColor? color;
+
+  /// Mark color, the brand on-primary by default.
+  final DSColor? onColor;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +63,8 @@ class DSBrandIconButtonWidget extends StatelessWidget {
                   brand: brand,
                   size: diameter / _artworkRatio,
                   playback: playback,
+                  color: color,
+                  onColor: onColor,
                 ),
               ),
             ),
