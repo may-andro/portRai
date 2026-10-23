@@ -26,7 +26,7 @@ class ProjectScreen extends StatelessWidget {
     return ScreenScaffoldWidget<ProjectBloc, ProjectState>(
       onCreate: (bloc) => bloc.add(LoadProjectEvent(project)),
       onResume: (bloc) => bloc.add(ScreenVisibleEvent()),
-      body: const SafeArea(child: ContentWidget()),
+      body: const ContentWidget(),
     );
   }
 }

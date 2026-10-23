@@ -35,15 +35,15 @@ class _HeroWidgetState extends State<_HeroWidget>
 
     return ColoredBox(
       color: palette.background.color,
-      child: PageChromeWidget(
-        closeColor: palette.neutral.grey10.color,
-        child: ClipRect(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: _HeroAtmosphereWidget(animation: _backgroundController),
-              ),
-              Padding(
+      child: ClipRect(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: _HeroAtmosphereWidget(animation: _backgroundController),
+            ),
+            PageChromeWidget(
+              closeColor: palette.neutral.grey10.color,
+              child: Padding(
                 padding: context.screenHorizontalPadding.copyWith(
                   top: context.space(factor: isWide ? 6 : 4),
                   bottom: context.space(factor: isWide ? 6 : 4),
@@ -85,8 +85,8 @@ class _HeroWidgetState extends State<_HeroWidget>
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

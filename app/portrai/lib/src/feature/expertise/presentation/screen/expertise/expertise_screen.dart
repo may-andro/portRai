@@ -28,7 +28,7 @@ class ExpertiseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenScaffoldWidget<ExpertiseBloc, ExpertiseState>(
       onResume: (bloc) => bloc.add(const ScreenVisibleEvent()),
-      body: SafeArea(child: ContentWidget(expertise: expertise)),
+      body: ContentWidget(expertise: expertise),
     );
   }
 }
