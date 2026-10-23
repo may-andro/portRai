@@ -11,11 +11,9 @@ class _HeaderMobileTabletContentWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const _DrawerMenuWidget(),
-        Align(
-          child: SizedBox(
-            height: getHeight(context),
-            child: DSImage.logo(fit: BoxFit.cover),
-          ),
+        DSLottieIllustrationWidget(
+          illustration: DSLottieIllustration.logo,
+          width: getHeight(context),
         ),
         const SettingButtonWidget(),
       ],
