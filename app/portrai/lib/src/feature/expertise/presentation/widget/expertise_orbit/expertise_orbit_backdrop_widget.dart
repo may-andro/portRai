@@ -31,17 +31,20 @@ class ExpertiseOrbitBackdropWidget extends StatelessWidget {
                     isVisible: isVisible,
                   ),
                 ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: selection,
-                    builder: (context, index, _) => _OrbitStatsChartWidget(
-                      expertise: expertises[min(index, expertises.length - 1)],
-                      width: min(constraints.maxWidth * 0.3, 360),
+                // Too small to read on mobile.
+                if (!context.isMobile)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: ValueListenableBuilder<int>(
+                      valueListenable: selection,
+                      builder: (context, index, _) => _OrbitStatsChartWidget(
+                        expertise:
+                            expertises[min(index, expertises.length - 1)],
+                        width: min(constraints.maxWidth * 0.3, 360),
+                      ),
                     ),
                   ),
-                ),
               ],
             );
           },

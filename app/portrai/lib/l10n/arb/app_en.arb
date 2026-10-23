@@ -515,6 +515,14 @@
   "@expertiseViewDetails": {
     "description": "Button on the expertise orbit that opens the selected expertise"
   },
+  "expertisePrevious": "Previous expertise",
+  "@expertisePrevious": {
+    "description": "Screen reader label of the arrow that turns the expertise dial to the previous expertise"
+  },
+  "expertiseNext": "Next expertise",
+  "@expertiseNext": {
+    "description": "Screen reader label of the arrow that turns the expertise dial to the next expertise"
+  },
   "expertiseSkillsHeading": "Skills & Technologies",
   "@expertiseSkillsHeading": {
     "description": "Heading above the skills grid on the expertise screen"

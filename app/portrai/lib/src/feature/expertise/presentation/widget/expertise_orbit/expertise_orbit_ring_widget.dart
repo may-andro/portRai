@@ -48,7 +48,14 @@ class _OrbitRingWidget extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    _OrbitSpinnerWidget(layout: layout, color: accent),
+                    _OrbitSpinnerWidget(
+                      size: Size.square(layout.side),
+                      painterOf: (turns) => _OrbitSpinnerPainter(
+                        layout: layout,
+                        color: accent,
+                        turns: turns,
+                      ),
+                    ),
                     Positioned.fill(
                       child: TweenAnimationBuilder<double>(
                         key: ValueKey(selected),
@@ -87,12 +94,7 @@ class _OrbitRingWidget extends StatelessWidget {
   }
 
   Widget _center(BuildContext context, _OrbitLayout layout, Color accent) {
-    final palette = context.colorPalette;
-    final expertise = expertises[selected];
     final diameter = 2 * (layout.radius - layout.nodeSize);
-    final skillsLabel =
-        '${expertise.skills.length} '
-        '${context.localizations.expertiseStatSkills}';
 
     return SizedBox.square(
       dimension: diameter,
@@ -100,38 +102,14 @@ class _OrbitRingWidget extends StatelessWidget {
         padding: EdgeInsets.all(diameter * 0.08),
         child: AnimatedSwitcher(
           duration: 250.ms,
-          child: Column(
+          child: _OrbitSummaryWidget(
             key: ValueKey(selected),
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: context.space(),
-            children: [
-              Flexible(
-                child: DSTextWidget(
-                  expertise.title,
-                  style: context.typography.emphasizedHeadlineSmall,
-                  color: palette.surface.onInverseSurface,
-                  textAlign: TextAlign.center,
-                  maxLines: 3,
-                  textOverflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.space(),
-                  vertical: context.space() / 3,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(999),
-                  color: accent.withAlpha(36),
-                  border: Border.all(color: accent.withAlpha(140)),
-                ),
-                child: DSTextWidget(
-                  skillsLabel,
-                  style: context.typography.labelSmall,
-                  color: _dsColor(accent),
-                ),
-              ),
-            ],
+            expertise: expertises[selected],
+            accent: accent,
+            onOpen: () => ExpertiseScreen.navigate(
+              context,
+              expertise: expertises[selected],
+            ),
           ),
         ),
       ),
@@ -144,12 +122,10 @@ class _OrbitRingWidget extends StatelessWidget {
     int index,
     Color accent,
   ) {
-    final palette = context.colorPalette;
-    final background = palette.surface.inverseSurface.color;
-    final foreground = palette.surface.onInverseSurface.color;
     final offset = layout.nodeOffset(index);
-    final isSelected = index == selected;
-    final nodeSize = layout.nodeSize;
+    // Laid out at the selected size so its image stays sharp, and scaled
+    // down when it isn't selected.
+    final nodeSize = layout.nodeSize * _OrbitLayout.selectedScale;
 
     return Positioned(
       left: layout.center.dx + offset.dx - nodeSize / 2,
@@ -158,51 +134,13 @@ class _OrbitRingWidget extends StatelessWidget {
       height: nodeSize,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: AnimatedSlide(
-          offset: isSelected ? const Offset(0, -0.08) : Offset.zero,
-          duration: 220.ms,
-          curve: Curves.easeOutBack,
-          child: AnimatedScale(
-            scale: isSelected ? 1.2 : 1,
-            duration: 220.ms,
-            curve: Curves.easeOutBack,
-            child: AnimatedContainer(
-              duration: 220.ms,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected
-                    ? accent
-                    : Color.alphaBlend(foreground.withAlpha(18), background),
-                border: Border.all(
-                  color: isSelected ? accent : foreground.withAlpha(70),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  if (isSelected)
-                    BoxShadow(
-                      color: accent.withAlpha(120),
-                      blurRadius: 22,
-                      offset: Offset(0, nodeSize * 0.12),
-                    )
-                  else
-                    BoxShadow(
-                      color: Colors.black.withAlpha(60),
-                      blurRadius: 8,
-                      offset: Offset(0, nodeSize * 0.05),
-                    ),
-                ],
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(nodeSize * 0.18),
-                child: DSNetworkImageWidget(
-                  url: expertises[index].image,
-                  fit: BoxFit.cover,
-                  borderRadius: BorderRadius.circular(nodeSize),
-                ),
-              ),
-            ),
-          ),
+        child: _OrbitNodeWidget(
+          expertise: expertises[index],
+          isSelected: index == selected,
+          size: nodeSize,
+          accent: accent,
+          selectedScale: 1,
+          restingScale: 1 / _OrbitLayout.selectedScale,
         ),
       ),
     );
