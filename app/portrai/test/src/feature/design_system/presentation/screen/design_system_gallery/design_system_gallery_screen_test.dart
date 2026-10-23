@@ -49,9 +49,15 @@ void main() {
       await appServiceLocator.reset();
     });
 
-    Future<void> pumpScreen(WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1179, 2556);
-      tester.view.devicePixelRatio = 3;
+    const phoneSize = Size(393, 852);
+    const desktopSize = Size(1440, 900);
+
+    Future<void> pumpScreen(
+      WidgetTester tester, {
+      Size screenSize = phoneSize,
+    }) async {
+      tester.view.physicalSize = screenSize;
+      tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         const TestWidgetWrapper(child: DesignSystemGalleryScreen()),
@@ -156,26 +162,66 @@ void main() {
       },
     );
 
+    for (final screenSize in [phoneSize, desktopSize]) {
+      testWidgets(
+        'should keep the apply button in place when the previewed theme '
+        'changes, on a $screenSize screen',
+        (tester) async {
+          Future<Offset> applyButtonPositionFor(
+            DesignSystem designSystem,
+          ) async {
+            bloc = MockDesignSystemGalleryBloc()
+              ..stubState(
+                loadedState.copyWith(previewedDesignSystem: designSystem),
+              );
+            await pumpScreen(tester, screenSize: screenSize);
+            final position = tester.getTopLeft(find.byType(DSButtonWidget));
+            await tester.pumpWidget(const SizedBox());
+            return position;
+          }
+
+          final positions = [
+            for (final designSystem in designSystemsByMonth)
+              await applyButtonPositionFor(designSystem),
+          ];
+
+          expect(positions.toSet(), hasLength(1));
+        },
+      );
+    }
+
     testWidgets(
-      'should keep the apply button in place when the previewed theme changes',
+      'should place the controls beside the deck on a landscape screen',
       (tester) async {
-        Future<Offset> applyButtonPositionFor(DesignSystem designSystem) async {
-          bloc = MockDesignSystemGalleryBloc()
-            ..stubState(
-              loadedState.copyWith(previewedDesignSystem: designSystem),
-            );
-          await pumpScreen(tester);
-          final position = tester.getTopLeft(find.byType(DSButtonWidget));
-          await tester.pumpWidget(const SizedBox());
-          return position;
-        }
+        bloc.stubState(loadedState);
 
-        final positions = [
-          for (final designSystem in designSystemsByMonth)
-            await applyButtonPositionFor(designSystem),
-        ];
+        await pumpScreen(tester, screenSize: desktopSize);
 
-        expect(positions.toSet(), hasLength(1));
+        final deckRight = tester.getTopRight(find.text('Holi').first).dx;
+        final applyButtonLeft = tester
+            .getTopLeft(find.byType(DSButtonWidget))
+            .dx;
+        expect(applyButtonLeft, greaterThan(desktopSize.width / 2));
+        expect(applyButtonLeft, greaterThan(deckRight));
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'should stack the deck above the controls on a portrait screen',
+      (tester) async {
+        bloc.stubState(loadedState);
+
+        await pumpScreen(tester);
+
+        final deckBottom = tester
+            .getBottomLeft(find.text('Splashes of colour everywhere'))
+            .dy;
+        final applyButtonTop = tester
+            .getTopLeft(find.byType(DSButtonWidget))
+            .dy;
+        expect(applyButtonTop, greaterThan(deckBottom));
+        expect(tester.takeException(), isNull);
       },
     );
 

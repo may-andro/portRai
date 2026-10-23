@@ -1,20 +1,24 @@
 part of 'content_widget.dart';
 
-/// Centered text in the ambient design system that takes the height of its
-/// tallest look across [designSystems], so moving between design systems does
-/// not shift what is around it.
+/// Text in the ambient design system that takes the height of the tallest
+/// text [textOf] gives across [designSystems], each in its own style, so
+/// moving between design systems does not shift what is around it.
 class _SteadyTextWidget extends StatelessWidget {
-  const _SteadyTextWidget(
-    this.text, {
+  const _SteadyTextWidget({
     required this.designSystems,
+    required this.textOf,
     required this.styleOf,
     required this.color,
+    this.textAlign = TextAlign.center,
+    this.maxLines,
   });
 
-  final String text;
   final List<DesignSystem> designSystems;
+  final String Function(DesignSystem designSystem) textOf;
   final DSTextStyle Function(DSTypography typography) styleOf;
   final DSColor color;
+  final TextAlign textAlign;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -30,26 +34,26 @@ class _SteadyTextWidget extends StatelessWidget {
               maintainSize: true,
               maintainAnimation: true,
               maintainState: true,
-              child: DSTextWidget(
-                text,
-                style: styleOf(
-                  DSTheme(
-                    brightness: brightness,
-                    designSystem: designSystem,
-                  ).typography,
-                ),
-                color: color,
-                textAlign: TextAlign.center,
+              child: _buildText(
+                textOf(designSystem),
+                DSTheme(
+                  brightness: brightness,
+                  designSystem: designSystem,
+                ).typography,
               ),
             ),
-          DSTextWidget(
-            text,
-            style: styleOf(context.typography),
-            color: color,
-            textAlign: TextAlign.center,
-          ),
+          _buildText(textOf(context.theme.designSystem), context.typography),
         ],
       ),
     );
   }
+
+  Widget _buildText(String text, DSTypography typography) => DSTextWidget(
+    text,
+    style: styleOf(typography),
+    color: color,
+    textAlign: textAlign,
+    maxLines: maxLines,
+    textOverflow: maxLines == null ? null : TextOverflow.ellipsis,
+  );
 }

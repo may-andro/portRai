@@ -17,6 +17,12 @@ class _GalleryWidget extends StatefulWidget {
 
 class _GalleryWidgetState extends State<_GalleryWidget>
     with SingleTickerProviderStateMixin {
+  /// The narrowest landscape area that shows the deck and the controls side
+  /// by side.
+  static const _sideBySideMinWidth = 720.0;
+  static const _stackedMaxWidth = 560.0;
+  static const _panelMaxWidth = 440.0;
+
   static const _deckSpring = SpringDescription(
     mass: 1,
     stiffness: 170,
@@ -89,6 +95,107 @@ class _GalleryWidgetState extends State<_GalleryWidget>
     _settleAt(frontPosition + cards);
   }
 
+  Widget _buildDeck() => _DeckWidget(
+    deckPosition: _deckController,
+    designSystemAt: _designSystemAt,
+    state: widget.state,
+    onDragStart: _onDragStart,
+    onDragUpdate: _onDragUpdate,
+    onDragEnd: _onDragEnd,
+  );
+
+  Widget _buildMonthDial() => _MonthDialWidget(
+    deckPosition: _deckController,
+    designSystems: _designSystems,
+    onDesignSystemClick: _showDesignSystem,
+    onPreviousClick: () => _step(-1),
+    onNextClick: () => _step(1),
+  );
+
+  Widget _buildHint(BuildContext context) => _SteadyTextWidget(
+    designSystems: _designSystems,
+    textOf: (_) => context.localizations.themeGalleryHint,
+    styleOf: (typography) => typography.bodyMedium,
+    color: context.colorPalette.neutral.grey7,
+  );
+
+  /// Phones and portrait windows: the deck between the hint and the controls.
+  Widget _buildStacked(BuildContext context) {
+    return Padding(
+      padding: context.screenHorizontalPadding,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _stackedMaxWidth),
+          child: Column(
+            children: [
+              _buildHint(context),
+              Expanded(child: _buildDeck()),
+              _buildMonthDial(),
+              const DSVerticalSpacerWidget(1.5),
+              _ApplyPanelWidget(state: widget.state),
+              const DSVerticalSpacerWidget(2),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Landscape windows: the deck on the left and the controls beside it.
+  Widget _buildSideBySide(BuildContext context) {
+    final state = widget.state;
+    return Padding(
+      padding: context.screenHorizontalPadding.copyWith(
+        bottom: context.space(factor: 2),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 5, child: _buildDeck()),
+          const DSHorizontalSpacerWidget(4),
+          Expanded(
+            flex: 4,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _panelMaxWidth),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _SteadyTextWidget(
+                        designSystems: state.designSystems,
+                        textOf: (designSystem) => designSystem.title(context),
+                        styleOf: (typography) =>
+                            typography.emphasizedDisplaySmall,
+                        color: context.colorPalette.neutral.grey9,
+                        textAlign: TextAlign.start,
+                        maxLines: 1,
+                      ),
+                      const DSVerticalSpacerWidget(0.5),
+                      _SteadyTextWidget(
+                        designSystems: state.designSystems,
+                        textOf: (designSystem) => designSystem.tagline(context),
+                        styleOf: (typography) => typography.titleMedium,
+                        color: context.colorPalette.neutral.grey7,
+                        textAlign: TextAlign.start,
+                        maxLines: 2,
+                      ),
+                      const DSVerticalSpacerWidget(3),
+                      _buildMonthDial(),
+                      const DSVerticalSpacerWidget(3),
+                      _ApplyPanelWidget(state: state),
+                      const DSVerticalSpacerWidget(2),
+                      _buildHint(context),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = widget.state;
@@ -119,43 +226,12 @@ class _GalleryWidgetState extends State<_GalleryWidget>
                 Expanded(
                   child: SafeArea(
                     top: false,
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 560),
-                        child: Padding(
-                          padding: context.screenHorizontalPadding,
-                          child: Column(
-                            children: [
-                              _SteadyTextWidget(
-                                context.localizations.themeGalleryHint,
-                                designSystems: state.designSystems,
-                                styleOf: (typography) => typography.bodyMedium,
-                                color: context.colorPalette.neutral.grey7,
-                              ),
-                              Expanded(
-                                child: _DeckWidget(
-                                  deckPosition: _deckController,
-                                  designSystemAt: _designSystemAt,
-                                  state: state,
-                                  onDragStart: _onDragStart,
-                                  onDragUpdate: _onDragUpdate,
-                                  onDragEnd: _onDragEnd,
-                                ),
-                              ),
-                              _MonthDialWidget(
-                                deckPosition: _deckController,
-                                designSystems: state.designSystems,
-                                onDesignSystemClick: _showDesignSystem,
-                                onPreviousClick: () => _step(-1),
-                                onNextClick: () => _step(1),
-                              ),
-                              const DSVerticalSpacerWidget(1.5),
-                              _ApplyPanelWidget(state: state),
-                              const DSVerticalSpacerWidget(2),
-                            ],
-                          ),
-                        ),
-                      ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) =>
+                          constraints.maxWidth > constraints.maxHeight &&
+                              constraints.maxWidth >= _sideBySideMinWidth
+                          ? _buildSideBySide(context)
+                          : _buildStacked(context),
                     ),
                   ),
                 ),

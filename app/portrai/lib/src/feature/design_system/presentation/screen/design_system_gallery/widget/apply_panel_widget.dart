@@ -27,8 +27,8 @@ class _ApplyPanelWidget extends StatelessWidget {
         ),
         const DSVerticalSpacerWidget(1),
         _SteadyTextWidget(
-          localizations.themeGalleryApplyNote,
           designSystems: state.designSystems,
+          textOf: (_) => localizations.themeGalleryApplyNote,
           styleOf: (typography) => typography.bodySmall,
           color: context.colorPalette.neutral.grey7,
         ),

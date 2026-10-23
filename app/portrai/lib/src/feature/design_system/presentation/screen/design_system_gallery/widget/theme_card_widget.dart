@@ -22,12 +22,24 @@ class _ThemeCardWidget extends StatelessWidget {
   /// Runs the festival effect; cards deep in the deck stay still.
   final bool isAnimated;
 
+  /// The card is laid out at this phone-sized layout and scaled to the space
+  /// it gets, so it looks the same on every screen.
+  static const _layoutSize = Size(272, 400);
+
   @override
   Widget build(BuildContext context) {
-    return DSThemeBuilderWidget(
-      designSystem: designSystem,
-      brightness: context.platformBrightness,
-      child: Builder(builder: _buildCard),
+    return FittedBox(
+      child: SizedBox.fromSize(
+        size: _layoutSize,
+        child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(size: _layoutSize),
+          child: DSThemeBuilderWidget(
+            designSystem: designSystem,
+            brightness: context.platformBrightness,
+            child: Builder(builder: _buildCard),
+          ),
+        ),
+      ),
     );
   }
 
