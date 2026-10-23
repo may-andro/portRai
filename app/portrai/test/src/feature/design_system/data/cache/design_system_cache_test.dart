@@ -4,26 +4,34 @@ import 'package:portrai/src/feature/design_system/data/cache/design_system_cache
 
 void main() {
   group('DesignSystemCache', () {
-    test('should expire a design system at the start of the next month', () {
+    test('should keep a design system until the start of the next month', () {
       expect(
-        DesignSystemCache().expiryOf(DateTime(2026, 10, 23, 18, 30)),
-        DateTime(2026, 11),
+        DesignSystemCache.timeLeftInMonth(DateTime(2026, 10, 23, 18, 30)),
+        DateTime(2026, 11).difference(DateTime(2026, 10, 23, 18, 30)),
       );
     });
 
-    test('should expire a design system chosen on the last moment of a month '
-        'at the start of the next month', () {
+    test('should keep a design system chosen on the last second of a month '
+        'for that second only', () {
       expect(
-        DesignSystemCache().expiryOf(DateTime(2026, 10, 31, 23, 59, 59)),
-        DateTime(2026, 11),
+        DesignSystemCache.timeLeftInMonth(DateTime(2026, 10, 31, 23, 59, 59)),
+        const Duration(seconds: 1),
       );
     });
 
-    test('should expire a design system chosen in December at the start of '
+    test('should keep a design system chosen on the first day of a month for '
+        'the whole month', () {
+      expect(
+        DesignSystemCache.timeLeftInMonth(DateTime(2026, 2)),
+        const Duration(days: 28),
+      );
+    });
+
+    test('should keep a design system chosen in December until the start of '
         'the next year', () {
       expect(
-        DesignSystemCache().expiryOf(DateTime(2026, 12, 15)),
-        DateTime(2027),
+        DesignSystemCache.timeLeftInMonth(DateTime(2026, 12, 15)),
+        DateTime(2027).difference(DateTime(2026, 12, 15)),
       );
     });
 
