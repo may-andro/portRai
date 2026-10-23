@@ -22,7 +22,7 @@ class LocalAssistantButton extends StatelessWidget {
           tooltip: context.localizations.assistantAskAi,
           onPressed: () => LocalAssistantScreen.navigate(context),
           child: DSIconWidget(
-            Icons.auto_awesome,
+            Icons.offline_bolt_rounded,
             color: context.colorPalette.brand.onPrimary,
             size: context.isMobile ? DSIconSize.large : DSIconSize.medium,
           ),

@@ -36,7 +36,7 @@ class AssistantLauncherWidget extends StatelessWidget {
             (onRemoteLaunch ?? () => RemoteAssistantScreen.navigate(context))();
           }
         },
-        child: const Icon(Icons.auto_awesome),
+        child: Icon(isLocal ? Icons.offline_bolt_rounded : Icons.auto_awesome),
       );
     },
   );

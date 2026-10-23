@@ -80,6 +80,25 @@ void main() {
     },
   );
 
+  testWidgets(
+    'should inset the setup card from the screen edges when the local '
+    'assistant is not ready',
+    (tester) async {
+      await pumpContent(
+        tester,
+        const LocalAssistantState(
+          status: LocalAssistantDownloading(42),
+          isLoadingContext: false,
+        ),
+      );
+
+      final card = tester.getRect(find.byType(DSCardWidget));
+      final screen = tester.getRect(find.byType(ContentWidget));
+      expect(card.left, greaterThan(screen.left));
+      expect(card.right, lessThan(screen.right));
+    },
+  );
+
   testWidgets('should show the loader when the portfolio context is loading', (
     tester,
   ) async {

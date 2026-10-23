@@ -50,12 +50,19 @@ void main() {
           expect(find.byType(FloatingActionButton), findsNothing);
           return;
         }
+        final isLocal = local && !remote;
+        expect(
+          find.byIcon(
+            isLocal ? Icons.offline_bolt_rounded : Icons.auto_awesome,
+          ),
+          findsOneWidget,
+        );
         await tester.tap(find.byType(FloatingActionButton));
-        expect(localClicks, local && !remote ? 1 : 0);
+        expect(localClicks, isLocal ? 1 : 0);
         expect(remoteClicks, remote ? 1 : 0);
         expect(find.byType(BottomSheet), findsNothing);
         verify(
-          () => bloc.add(AssistantLaunchClickEvent(isLocal: local && !remote)),
+          () => bloc.add(AssistantLaunchClickEvent(isLocal: isLocal)),
         ).called(1);
       },
     );

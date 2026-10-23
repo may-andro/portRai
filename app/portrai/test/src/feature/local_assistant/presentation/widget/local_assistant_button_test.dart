@@ -32,7 +32,7 @@ void main() {
       const LocalAssistantState(status: LocalAssistantReady()),
     );
 
-    expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
+    expect(find.byIcon(Icons.offline_bolt_rounded), findsOneWidget);
   });
 
   testWidgets('should hide the button when the model is downloading', (
