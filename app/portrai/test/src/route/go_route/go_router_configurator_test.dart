@@ -277,7 +277,9 @@ void main() {
               return DSThemeBuilderWidget(
                 brightness: Brightness.light,
                 designSystem: DesignSystem.beltane,
-                child: child!,
+                // The app bar logo loops, so its ticker is muted to let
+                // pumpAndSettle finish.
+                child: TickerMode(enabled: false, child: child!),
               );
             },
           ),
