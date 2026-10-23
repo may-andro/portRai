@@ -1,6 +1,7 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/developer_menu_screen.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
@@ -31,6 +32,10 @@ class ContentWidget extends StatelessWidget {
               SectionTitleWidget(title: context.localizations.language),
               const LanguageCardWidget(),
             ],
+            SectionTitleWidget(
+              title: context.localizations.settingThemeSection,
+            ),
+            const DesignSystemCardWidget(),
             if (state.userRole case final userRole?) ...[
               SectionTitleWidget(
                 title: context.localizations.settingRoleSection,

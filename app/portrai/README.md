@@ -265,8 +265,13 @@ The app supports 12 custom themes, each with unique color palettes and styling.
 12. Christmas - Winter holiday theme
 
 ### Switching Themes
-Themes can be switched at runtime through the app settings or controlled via Firebase Remote
-Config.
+Each month has its own theme (`SelectDesignSystemUseCase`), and the app starts with it unless a
+theme was chosen.
+
+Settings > Theme opens a gallery that shows every theme as a card in a deck. The screen takes on
+the theme of the card in front, and applying it saves the choice and restarts the app. A chosen
+theme lasts until the end of the month it was chosen in; after that, the app follows the month
+again. Choosing the current month's theme clears the saved choice.
 
 ## Supported Platforms
 

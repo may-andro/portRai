@@ -222,12 +222,6 @@
   "developerMenuDataSource": "Gegevensbron",
   "developerMenuUseTemplateData": "Demogegevens gebruiken",
   "developerMenuUseTemplateDataDescription": "Laad de fictieve template-assets in plaats van de echte. Herstart de app om toe te passen",
-  "developerMenuDesignSystem": "Designsysteem",
-  "developerMenuDesignSystemPicker": "Designsysteem overschrijven",
-  "developerMenuDesignSystemPickerDescription": "Kies handmatig een festivalontwerpsysteem. Herstart de app om toe te passen",
-  "developerMenuDesignSystemAutomatic": "Automatisch (per maand)",
-  "developerMenuDesignSystemReset": "Designsysteem resetten",
-  "developerMenuDesignSystemResetDescription": "Verwijder de overschrijving en volg weer de huidige maand",
   "developerMenuAiImage": "AI-afbeelding",
   "developerMenuAiImageStyle": "AI-afbeeldingsstijl",
   "developerMenuAiImageStyleDescription": "Stijl voor het genereren van de profielafbeelding. De app herstart om toe te passen",
@@ -617,5 +611,141 @@
   "errorCvTailoringNetwork": "Het cv kon niet worden afgestemd. Controleer je verbinding en probeer het opnieuw.",
   "errorCvTailoringUnknown": "Er ging iets mis bij het afstemmen van je cv. Probeer het opnieuw.",
   "jobOpeningEngagementContract": "Contract",
-  "jobOpeningEngagementFreelance": "Freelance"
+  "jobOpeningEngagementFreelance": "Freelance",
+  "settingThemeSection": "Thema",
+  "@settingThemeSection": {
+    "description": "Settings section title for the app theme"
+  },
+  "themeCardTitle": "App-thema",
+  "@themeCardTitle": {
+    "description": "Title of the Settings card that opens the theme gallery"
+  },
+  "themeGalleryTitle": "Thema's",
+  "@themeGalleryTitle": {
+    "description": "Title of the theme gallery screen"
+  },
+  "themeGalleryHint": "Veeg door de stapel om elk thema te proberen",
+  "@themeGalleryHint": {
+    "description": "Hint telling the user how to browse the theme cards"
+  },
+  "themeGalleryApply": "Thema toepassen",
+  "@themeGalleryApply": {
+    "description": "Button that applies the previewed theme and restarts the app"
+  },
+  "themeGalleryInUse": "In gebruik",
+  "@themeGalleryInUse": {
+    "description": "Disabled apply button label and card badge when the previewed theme is the one in use"
+  },
+  "themeGalleryThisMonth": "Deze maand",
+  "@themeGalleryThisMonth": {
+    "description": "Card badge on the theme that belongs to the current month"
+  },
+  "themeGalleryApplyNote": "De app start opnieuw om het toe te passen. Je keuze blijft tot het einde van de maand, daarna brengt de nieuwe maand een eigen thema.",
+  "@themeGalleryApplyNote": {
+    "description": "Note under the apply button explaining the restart and that a chosen theme lasts until the end of the month"
+  },
+  "themeGalleryPrevious": "Vorig thema",
+  "@themeGalleryPrevious": {
+    "description": "Accessibility label of the button that shows the previous theme"
+  },
+  "themeGalleryNext": "Volgend thema",
+  "@themeGalleryNext": {
+    "description": "Accessibility label of the button that shows the next theme"
+  },
+  "themeNameBeltane": "Beltane",
+  "@themeNameBeltane": {
+    "description": "Name of the Beltane theme"
+  },
+  "themeNameCarnival": "Carnaval",
+  "@themeNameCarnival": {
+    "description": "Name of the Carnival theme"
+  },
+  "themeNameChuseok": "Chuseok",
+  "@themeNameChuseok": {
+    "description": "Name of the Chuseok theme"
+  },
+  "themeNameDiwali": "Diwali",
+  "@themeNameDiwali": {
+    "description": "Name of the Diwali theme"
+  },
+  "themeNameHalloween": "Halloween",
+  "@themeNameHalloween": {
+    "description": "Name of the Halloween theme"
+  },
+  "themeNameHogeras": "Hogueras",
+  "@themeNameHogeras": {
+    "description": "Name of the Hogueras de San Juan theme"
+  },
+  "themeNameHogmanay": "Hogmanay",
+  "@themeNameHogmanay": {
+    "description": "Name of the Hogmanay theme"
+  },
+  "themeNameHoli": "Holi",
+  "@themeNameHoli": {
+    "description": "Name of the Holi theme"
+  },
+  "themeNameObon": "Obon",
+  "@themeNameObon": {
+    "description": "Name of the Obon theme"
+  },
+  "themeNamePachamama": "Pachamama",
+  "@themeNamePachamama": {
+    "description": "Name of the Pachamama theme"
+  },
+  "themeNameSakura": "Sakura",
+  "@themeNameSakura": {
+    "description": "Name of the Sakura theme"
+  },
+  "themeNameXmas": "Kerstmis",
+  "@themeNameXmas": {
+    "description": "Name of the Christmas theme"
+  },
+  "themeTaglineBeltane": "Lenteweiden en meivuren",
+  "@themeTaglineBeltane": {
+    "description": "Short description of the Beltane theme"
+  },
+  "themeTaglineCarnival": "Confetti, maskers en samba",
+  "@themeTaglineCarnival": {
+    "description": "Short description of the Carnival theme"
+  },
+  "themeTaglineChuseok": "Herfstbladeren onder de oogstmaan",
+  "@themeTaglineChuseok": {
+    "description": "Short description of the Chuseok theme"
+  },
+  "themeTaglineDiwali": "Gloeiende lampjes en lantaarns",
+  "@themeTaglineDiwali": {
+    "description": "Short description of the Diwali theme"
+  },
+  "themeTaglineHalloween": "Spoken, pompoenen en kattenkwaad bij maanlicht",
+  "@themeTaglineHalloween": {
+    "description": "Short description of the Halloween theme"
+  },
+  "themeTaglineHogeras": "Midzomervuren en vliegende vonken",
+  "@themeTaglineHogeras": {
+    "description": "Short description of the Hogueras de San Juan theme"
+  },
+  "themeTaglineHogmanay": "Vuurwerk om het nieuwe jaar in te luiden",
+  "@themeTaglineHogmanay": {
+    "description": "Short description of the Hogmanay theme"
+  },
+  "themeTaglineHoli": "Overal kleurige spatten",
+  "@themeTaglineHoli": {
+    "description": "Short description of the Holi theme"
+  },
+  "themeTaglineObon": "Vuurvliegjes op warme zomeravonden",
+  "@themeTaglineObon": {
+    "description": "Short description of the Obon theme"
+  },
+  "themeTaglinePachamama": "Geweven patronen voor Moeder Aarde",
+  "@themeTaglinePachamama": {
+    "description": "Short description of the Pachamama theme"
+  },
+  "themeTaglineSakura": "Kersenbloesem op de wind",
+  "@themeTaglineSakura": {
+    "description": "Short description of the Sakura theme"
+  },
+  "themeTaglineXmas": "Sneeuwval en warme winterlichtjes",
+  "@themeTaglineXmas": {
+    "description": "Short description of the Christmas theme"
+  }
 }
