@@ -30,7 +30,7 @@ class CircularRevealLogoWidget extends StatefulWidget {
 class _CircularRevealLogoWidgetState extends State<CircularRevealLogoWidget>
     with SingleTickerProviderStateMixin {
   late final AnimationController revealController = AnimationController(
-    duration: 600.milliseconds,
+    duration: 400.milliseconds,
     vsync: this,
   )..addStatusListener(_onRevealStatusChanged);
 

@@ -62,7 +62,7 @@ void main() {
       await tester.pumpWidget(
         buildWidget(const SetUpCompetedState(DesignSystem.beltane), onComplete),
       );
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(completionCount, 0);
       expect(logoOpacity(tester), inExclusiveRange(0, 1));
