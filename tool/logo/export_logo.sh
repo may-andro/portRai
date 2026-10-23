@@ -2,7 +2,7 @@
 # Exports every logo PNG the app uses from the vector source, then
 # regenerates the platform launcher icons and native splash screens.
 #
-#   logo_trace.svg  smooth outlines traced from the original artwork (potrace)
+#   logo_trace.svg  outlines of the logo shapes, without colour
 #   build_logo.py   applies the navy-to-teal gradient and the placement
 #   render_logo.sh  renders an SVG to PNG with headless Chrome
 #
