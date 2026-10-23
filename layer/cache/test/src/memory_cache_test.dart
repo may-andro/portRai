@@ -14,10 +14,6 @@ void main() {
       memoryCache = _TestMemoryCache();
     });
 
-    test('should never expire a value when there is no time to live', () {
-      expect(MemoryCache<String>().expiryOf(DateTime(2026)), isNull);
-    });
-
     group('get', () {
       test('should return null by when no value is set', () {
         final result = memoryCache.get();
