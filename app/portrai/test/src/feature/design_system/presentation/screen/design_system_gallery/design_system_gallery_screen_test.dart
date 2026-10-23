@@ -119,6 +119,34 @@ void main() {
     });
 
     testWidgets(
+      'should hide the tossed card while the next one settles in front',
+      (tester) async {
+        bloc.stubState(loadedState);
+        await pumpScreen(tester);
+
+        await tester.tap(find.byTooltip('Next theme'));
+        for (var frame = 0; frame < 25; frame++) {
+          await tester.pump(const Duration(milliseconds: 16));
+        }
+
+        // The spring is close to rest, with the tossed card almost a card
+        // width away.
+        for (var frame = 0; frame < 40; frame++) {
+          await tester.pump(const Duration(milliseconds: 16));
+          final tossedCardOpacities = tester
+              .widgetList<Opacity>(
+                find.ancestor(
+                  of: find.text('Holi'),
+                  matching: find.byType(Opacity),
+                ),
+              )
+              .map((opacity) => opacity.opacity);
+          expect(tossedCardOpacities, everyElement(0));
+        }
+      },
+    );
+
+    testWidgets(
       'should preview the previous theme when the front card is flung right',
       (tester) async {
         bloc.stubState(loadedState);

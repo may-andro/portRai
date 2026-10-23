@@ -22,6 +22,11 @@ class _DeckWidget extends StatelessWidget {
   /// How much smaller each card behind the front one is.
   static const _scaleStep = 0.06;
 
+  /// How far a tossed card travels, in cards, before it has faded out. It is
+  /// gone well before the next card settles, so a spring that eases or
+  /// bounces around the next card never brings it back into view.
+  static const _tossFadeEnd = 0.75;
+
   final Animation<double> deckPosition;
   final DesignSystem Function(int deckPosition) designSystemAt;
   final DesignSystemGalleryLoadedState state;
@@ -92,11 +97,11 @@ class _DeckWidget extends StatelessWidget {
     final double opacity;
     if (depth <= 0) {
       final leaving = -depth;
-      horizontalShift = -leaving * cardSize.width * 1.2;
+      horizontalShift = -leaving * cardSize.width * 1.5;
       verticalShift = leaving * peek * 2;
       turn = -leaving * 0.3;
       scale = 1;
-      opacity = 1 - leaving * 0.5;
+      opacity = (1 - leaving / _tossFadeEnd).clamp(0, 1).toDouble();
     } else {
       scale = 1 - depth * _scaleStep;
       horizontalShift = 0;
@@ -105,6 +110,8 @@ class _DeckWidget extends StatelessWidget {
       turn = fanSide * math.min(depth, 1) * 0.06;
       opacity = (_visibleDepth + 1 - depth).clamp(0, 1).toDouble();
     }
+    // A card gone from view is skipped, so it neither paints nor animates.
+    if (opacity == 0) return SizedBox.shrink(key: ValueKey(cardPosition));
     final designSystem = designSystemAt(cardPosition);
     return Transform.translate(
       key: ValueKey(cardPosition),
