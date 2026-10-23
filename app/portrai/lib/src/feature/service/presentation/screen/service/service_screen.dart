@@ -25,7 +25,7 @@ class ServiceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenScaffoldWidget<ServiceBloc, ServiceState>(
       onResume: (bloc) => bloc.add(ScreenVisibleEvent()),
-      body: SafeArea(child: ContentWidget(service: service)),
+      body: ContentWidget(service: service),
     );
   }
 }
