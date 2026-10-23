@@ -6,6 +6,15 @@ import 'package:module_injector/module_injector.dart';
 class DesignSystemCache extends KeyValueCache<DesignSystem> {
   DesignSystemCache() : super('design_system_cache');
 
+  /// A chosen design system lasts until the end of the month it was chosen
+  /// in, so the next month starts with its own design system again.
+  @override
+  bool get isExpired {
+    final cachedAt = DateTime.fromMillisecondsSinceEpoch(lastCachedTimestamp);
+    final now = DateTime.now();
+    return cachedAt.year != now.year || cachedAt.month != now.month;
+  }
+
   @override
   DesignSystem deserializeValue(Map<String, dynamic> map) {
     return DesignSystem.values.asNameMap()[map['designSystem']] ??
