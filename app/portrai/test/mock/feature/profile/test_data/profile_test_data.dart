@@ -1,7 +1,10 @@
 import 'package:portrai/src/feature/profile/data/model/_model.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 
-ProfileEntity createProfileEntity({List<PublishedAtEntity>? publishedAt}) {
+ProfileEntity createProfileEntity({
+  List<PublishedAtEntity>? publishedAt,
+  List<SocialLinkEntity>? socialLinks,
+}) {
   return ProfileEntity(
     fullName: 'Mayank Rai',
     title: 'Senior Flutter & Android Developer',
@@ -37,18 +40,20 @@ ProfileEntity createProfileEntity({List<PublishedAtEntity>? publishedAt}) {
       lastUpdated: '2025-10-15',
       image: 'https://example.com/resume.png',
     ),
-    socialLinks: const [
-      SocialLinkEntity(
-        name: 'Github',
-        url: 'https://github.com/example',
-        image: 'https://example.com/github.png',
-      ),
-      SocialLinkEntity(
-        name: 'Portfolio',
-        url: 'https://example.com/portfolio',
-        image: 'https://example.com/portfolio.png',
-      ),
-    ],
+    socialLinks:
+        socialLinks ??
+        const [
+          SocialLinkEntity(
+            name: 'Github',
+            url: 'https://github.com/example',
+            image: 'https://example.com/github.png',
+          ),
+          SocialLinkEntity(
+            name: 'Portfolio',
+            url: 'https://example.com/portfolio',
+            image: 'https://example.com/portfolio.png',
+          ),
+        ],
     availability: const AvailabilityEntity(
       status: 'Available for consulting',
       workType: 'Remote',

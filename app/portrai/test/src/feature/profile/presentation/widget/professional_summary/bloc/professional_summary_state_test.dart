@@ -6,13 +6,12 @@ import '../../../../../../../mock/feature/profile/test_data/profile_test_data.da
 void main() {
   group('ProfessionalSummary LoadedState', () {
     test(
-      'should append the resume to the social links when appSocialLinks is read',
+      'should return the profile social links when appSocialLinks is read',
       () {
-        final state = LoadedState(profile: createProfileEntity());
+        final profile = createProfileEntity();
+        final state = LoadedState(profile: profile);
 
-        expect(state.appSocialLinks.last.name, 'Resume');
-        expect(state.appSocialLinks.last.url, 'https://example.com/resume.pdf');
-        expect(state.appSocialLinks, hasLength(3));
+        expect(state.appSocialLinks, profile.socialLinks);
       },
     );
   });
