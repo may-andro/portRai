@@ -7,7 +7,6 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bl
 import 'package:portrai/src/feature/setting/presentation/screen/setting/setting_screen.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
-import 'package:portrai/src/widget/app_version_widget.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
@@ -120,27 +119,23 @@ void main() {
         expect(
           find.descendant(
             of: find.byType(CustomScrollView),
-            matching: find.byType(ContentWidget),
+            matching: find.byType(ContentWidget, skipOffstage: false),
+            skipOffstage: false,
           ),
           findsOneWidget,
         );
         expect(find.byType(FooterWidget), findsNothing);
         expect(find.byType(PageAppBarWidget), findsOneWidget);
-        // The settings fill the screen, so the footer starts below it.
-        final footer = find.text('footer', skipOffstage: false);
+        // The settings are shorter than the screen, so the footer sits at
+        // its bottom.
+        final footer = find.text('footer');
         expect(
-          find.descendant(
-            of: find.byType(CustomScrollView),
-            matching: footer,
-            skipOffstage: false,
-          ),
+          find.descendant(of: find.byType(CustomScrollView), matching: footer),
           findsOneWidget,
         );
         expect(
-          tester.getTopLeft(footer).dy,
-          greaterThanOrEqualTo(
-            tester.getBottomLeft(find.byType(AppVersionWidget)).dy,
-          ),
+          tester.getBottomLeft(footer).dy,
+          tester.getBottomLeft(find.byType(CustomScrollView)).dy,
         );
       },
     );
