@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
@@ -31,18 +33,32 @@ class RemoteAppConfigRepositoryImpl implements AppConfigRepository {
     return _cacheDelegateRepository.cacheAppConfig(appConfig);
   }
 
+  /// Returns the cached app config when there is one, so start up doesn't
+  /// wait for the network, and refreshes the cache from remote for the next
+  /// start. Without a cached app config, waits for the remote one.
   @override
   Future<PortraiAppConfigEntity> getAppConfig() async {
+    final PortraiAppConfigEntity cachedAppConfig;
     try {
+      cachedAppConfig = await _cacheDelegateRepository.getAppConfig();
+    } on AppConfigException {
       final appConfig = await _loadAppConfigFromRemote();
       await _cacheAppConfigSafely(appConfig);
       return appConfig;
-    } on AppConfigException catch (_) {
+    }
+    unawaited(_refreshCachedAppConfig());
+    return cachedAppConfig;
+  }
+
+  Future<void> _refreshCachedAppConfig() async {
+    try {
+      final appConfig = await _loadAppConfigFromRemote();
+      await _cacheAppConfigSafely(appConfig);
+    } on AppConfigException {
       _logReporter.error(
-        'Failed to load app config from remote, falling back to cache.',
+        'Failed to refresh the cached app config from remote.',
         tag: _tag,
       );
-      return await _cacheDelegateRepository.getAppConfig();
     }
   }
 

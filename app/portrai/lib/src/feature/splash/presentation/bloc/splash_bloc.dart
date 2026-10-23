@@ -31,18 +31,14 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
   final _receivedSetUpStatus = <InjectionStatus>[];
 
-  bool _errorDuringDI = false;
-
   FutureOr<void> _onInitEventToState(
     SplashEvent event,
     Emitter<SplashState> emit,
   ) async {
     if (state is SetUpNoInternetState) emit(SetUpProgressState.initial());
-    if (!await _connectivityRepository.isConnected()) {
-      emit(const SetUpNoInternetState());
-      return;
-    }
+    _receivedSetUpStatus.clear();
 
+    Object? setUpError;
     await emit.onEach<InjectionStatus>(
       _moduleInjectorController.setUpDIGraph(
         configurators: _moduleConfigurators,
@@ -55,18 +51,26 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
           SetUpProgressState(List.unmodifiable(_receivedSetUpStatus), progress),
         );
       },
-      onError: (error, stackTrace) {
-        _errorDuringDI = true;
-        if (error is InjectionException) {
-          emit(SetUpErrorState(error.message ?? error.cause ?? error));
-          return;
-        }
-        emit(SetUpErrorState(error));
-      },
+      onError: (error, stackTrace) => setUpError = error,
     );
 
-    if (!_errorDuringDI) {
+    if (setUpError == null) {
       emit(SetUpCompetedState(appServiceLocator.get<DesignSystem>()));
+      return;
     }
+    // Set up runs offline from cached data, so the internet only matters once
+    // set up has failed.
+    if (!await _connectivityRepository.isConnected()) {
+      emit(const SetUpNoInternetState());
+      return;
+    }
+    emit(SetUpErrorState(_setUpErrorCause(setUpError)));
+  }
+
+  Object? _setUpErrorCause(Object? error) {
+    if (error is InjectionException) {
+      return error.message ?? error.cause ?? error;
+    }
+    return error;
   }
 }

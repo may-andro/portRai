@@ -13,6 +13,16 @@ extension MockFbFirestoreControllerStub on MockFbFirestoreController {
   }
 
   /// Stubs `getDocumentFromCollection(collectionPath, documentPath)` to
+  /// return [document] once it completes.
+  void stubGetDocumentFromCollectionFuture(
+    Future<Map<String, dynamic>?> document,
+  ) {
+    when(
+      () => getDocumentFromCollection(any(), any()),
+    ).thenAnswer((_) => document);
+  }
+
+  /// Stubs `getDocumentFromCollection(collectionPath, documentPath)` to
   /// throw [error].
   void stubGetDocumentFromCollectionThrows(Object error) {
     when(() => getDocumentFromCollection(any(), any())).thenThrow(error);
