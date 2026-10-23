@@ -2,8 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/design_system/design_system.dart';
-import 'package:portrai/src/feature/design_system/presentation/bloc/design_system_bloc.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/widget/content_widget.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
@@ -12,9 +10,6 @@ import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../../../mock/feature/design_system/domain/use_case/mock_get_design_system_use_case.dart';
-import '../../../../../../../mock/feature/design_system/domain/use_case/mock_reset_design_system_use_case.dart';
-import '../../../../../../../mock/feature/design_system/domain/use_case/mock_set_design_system_use_case.dart';
 import '../../../../../../../mock/feature/developer_mode/presentation/screen/developer_menu/bloc/mock_developer_menu_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
@@ -79,13 +74,6 @@ void main() {
       (tester) async {
         final bloc = MockDeveloperMenuBloc()
           ..stubState(const DeveloperMenuLoadedState());
-        appServiceLocator.registerFactory<DesignSystemBloc>(
-          () => DesignSystemBloc(
-            MockGetDesignSystemUseCase()..stubCall(null),
-            MockSetDesignSystemUseCase(),
-            MockResetDesignSystemUseCase(),
-          ),
-        );
         addTearDown(appServiceLocator.reset);
 
         await tester.pumpWidget(
@@ -102,7 +90,7 @@ void main() {
         expect(find.text('Cache Playground'), findsOneWidget);
         expect(find.text('Feature Flags'), findsOneWidget);
         expect(find.text('Error Simulation'), findsOneWidget);
-        expect(find.byType(DesignSystemSelectorWidget), findsOneWidget);
+        expect(find.text('Design system'), findsNothing);
 
         await tester.ensureVisible(find.text('Force Fatal Crash'));
         await tester.pump();
@@ -131,13 +119,6 @@ void main() {
       (tester) async {
         final bloc = MockDeveloperMenuBloc()
           ..stubState(const DeveloperMenuLoadedState());
-        appServiceLocator.registerFactory<DesignSystemBloc>(
-          () => DesignSystemBloc(
-            MockGetDesignSystemUseCase()..stubCall(null),
-            MockSetDesignSystemUseCase(),
-            MockResetDesignSystemUseCase(),
-          ),
-        );
         addTearDown(appServiceLocator.reset);
 
         await tester.pumpWidget(
