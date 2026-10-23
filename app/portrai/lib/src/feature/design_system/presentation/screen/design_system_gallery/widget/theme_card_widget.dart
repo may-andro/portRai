@@ -3,6 +3,10 @@ part of 'content_widget.dart';
 /// One design system as a playing card, drawn in its own colors, shapes and
 /// fonts: the month in the corner, the festival effect across the face, and
 /// the name, a line about it and its main colors at the bottom.
+///
+/// The card reads its design system's tokens from a [DSTheme] instead of
+/// sitting in a [DSThemeBuilderWidget], which would build a Material theme
+/// for every card coming into the deck.
 class _ThemeCardWidget extends StatelessWidget {
   const _ThemeCardWidget({
     required this.designSystem,
@@ -33,20 +37,22 @@ class _ThemeCardWidget extends StatelessWidget {
         size: _layoutSize,
         child: MediaQuery(
           data: MediaQuery.of(context).copyWith(size: _layoutSize),
-          child: DSThemeBuilderWidget(
-            designSystem: designSystem,
-            brightness: context.platformBrightness,
-            child: Builder(builder: _buildCard),
-          ),
+          child: Builder(builder: _buildCard),
         ),
       ),
     );
   }
 
   Widget _buildCard(BuildContext context) {
-    final palette = context.colorPalette;
+    final theme = DSTheme(
+      brightness: context.platformBrightness,
+      designSystem: designSystem,
+    );
+    final palette = theme.colorPalette;
+    final typography = theme.typography;
+    final textColor = _lightestNeutral(theme);
     final brand = palette.brand;
-    final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
+    final radius = BorderRadius.circular(theme.dimen.radiusLevel3.value);
     final padding = context.space(factor: 2);
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -70,8 +76,9 @@ class _ThemeCardWidget extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (isAnimated)
-              const DSFestiveBackdropWidget(
+              DSFestiveBackdropWidget(
                 shape: DSFestiveBackdropShape.rectangle,
+                designSystem: designSystem,
                 particleCount: 36,
               ),
             DecoratedBox(
@@ -97,7 +104,7 @@ class _ThemeCardWidget extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _CornerIndexWidget(month: month),
+                      _CornerIndexWidget(month: month, theme: theme),
                       const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -107,12 +114,14 @@ class _ThemeCardWidget extends StatelessWidget {
                             _BadgeWidget(
                               label: context.localizations.themeGalleryInUse,
                               icon: Icons.check_rounded,
+                              theme: theme,
                             ),
                           if (isMonthly)
                             _BadgeWidget(
                               label:
                                   context.localizations.themeGalleryThisMonth,
                               icon: Icons.event_rounded,
+                              theme: theme,
                             ),
                         ],
                       ),
@@ -121,21 +130,22 @@ class _ThemeCardWidget extends StatelessWidget {
                   const Spacer(),
                   DSTextWidget(
                     designSystem.title(context),
-                    style: context.typography.emphasizedDisplaySmall,
-                    color: _lightestNeutral(context),
+                    style: typography.emphasizedDisplaySmall,
+                    color: textColor,
                     maxLines: 1,
                     textOverflow: TextOverflow.ellipsis,
                   ),
                   const DSVerticalSpacerWidget(0.5),
                   DSTextWidget(
                     designSystem.tagline(context),
-                    style: context.typography.bodyMedium,
-                    color: _lightestNeutral(context),
+                    style: typography.bodyMedium,
+                    color: textColor,
                     maxLines: 2,
                     textOverflow: TextOverflow.ellipsis,
                   ),
                   const DSVerticalSpacerWidget(1.5),
                   _SwatchesWidget(
+                    borderColor: textColor,
                     colors: [
                       brand.primary,
                       brand.secondary,
@@ -155,32 +165,34 @@ class _ThemeCardWidget extends StatelessWidget {
 
 /// Text on a card sits on a darkened face, so it uses the lightest neutral,
 /// which dark palettes keep in `black`.
-DSColor _lightestNeutral(BuildContext context) => context.isDarkMode
-    ? context.colorPalette.neutral.black
-    : context.colorPalette.neutral.white;
+DSColor _lightestNeutral(DSTheme theme) => theme.brightness == Brightness.dark
+    ? theme.colorPalette.neutral.black
+    : theme.colorPalette.neutral.white;
 
 /// The month number over the short month name, like a card's rank.
 class _CornerIndexWidget extends StatelessWidget {
-  const _CornerIndexWidget({required this.month});
+  const _CornerIndexWidget({required this.month, required this.theme});
 
   final int month;
+  final DSTheme theme;
 
   @override
   Widget build(BuildContext context) {
     final monthName = DateFormat.MMM(
       Localizations.localeOf(context).toString(),
     ).format(DateTime(2000, month));
+    final textColor = _lightestNeutral(theme);
     return Column(
       children: [
         DSTextWidget(
           '$month',
-          style: context.typography.emphasizedHeadlineMedium,
-          color: _lightestNeutral(context),
+          style: theme.typography.emphasizedHeadlineMedium,
+          color: textColor,
         ),
         DSTextWidget(
           monthName.toUpperCase(),
-          style: context.typography.emphasizedLabelSmall,
-          color: _lightestNeutral(context),
+          style: theme.typography.emphasizedLabelSmall,
+          color: textColor,
         ),
       ],
     );
@@ -188,19 +200,24 @@ class _CornerIndexWidget extends StatelessWidget {
 }
 
 class _BadgeWidget extends StatelessWidget {
-  const _BadgeWidget({required this.label, required this.icon});
+  const _BadgeWidget({
+    required this.label,
+    required this.icon,
+    required this.theme,
+  });
 
   final String label;
   final IconData icon;
+  final DSTheme theme;
 
   @override
   Widget build(BuildContext context) {
-    final white = _lightestNeutral(context);
+    final textColor = _lightestNeutral(theme);
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: white.color.withValues(alpha: 0.22),
-        borderRadius: BorderRadius.circular(context.dimen.radiusCircular.value),
-        border: Border.all(color: white.color.withValues(alpha: 0.5)),
+        color: textColor.color.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(theme.dimen.radiusCircular.value),
+        border: Border.all(color: textColor.color.withValues(alpha: 0.5)),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -211,11 +228,11 @@ class _BadgeWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: context.space(factor: 0.5),
           children: [
-            DSIconWidget(icon, color: white, size: DSIconSize.small),
+            DSIconWidget(icon, color: textColor, size: DSIconSize.small),
             DSTextWidget(
               label,
-              style: context.typography.emphasizedLabelSmall,
-              color: white,
+              style: theme.typography.emphasizedLabelSmall,
+              color: textColor,
             ),
           ],
         ),
@@ -226,9 +243,10 @@ class _BadgeWidget extends StatelessWidget {
 
 /// Overlapping dots of the design system's main colors.
 class _SwatchesWidget extends StatelessWidget {
-  const _SwatchesWidget({required this.colors});
+  const _SwatchesWidget({required this.colors, required this.borderColor});
 
   final List<DSColor> colors;
+  final DSColor borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -244,10 +262,7 @@ class _SwatchesWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color.color,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: _lightestNeutral(context).color,
-                  width: 2,
-                ),
+                border: Border.all(color: borderColor.color, width: 2),
               ),
             ),
           ),

@@ -1,13 +1,19 @@
 part of 'content_widget.dart';
 
-/// Fills the screen with the background of the ambient design system, a glow
-/// of its brand color and a faint run of its festival effect.
+/// Fills the screen with the background of [designSystem], a glow of its
+/// brand color and a faint run of its festival effect. It reads the tokens
+/// from a [DSTheme], so a new preview does not build a Material theme for it.
 class _AmbienceWidget extends StatelessWidget {
-  const _AmbienceWidget();
+  const _AmbienceWidget({required this.designSystem, super.key});
+
+  final DesignSystem designSystem;
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
+    final palette = DSTheme(
+      brightness: context.platformBrightness,
+      designSystem: designSystem,
+    ).colorPalette;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: palette.background.color,
@@ -20,8 +26,9 @@ class _AmbienceWidget extends StatelessWidget {
           ],
         ),
       ),
-      child: const DSFestiveBackdropWidget(
+      child: DSFestiveBackdropWidget(
         shape: DSFestiveBackdropShape.rectangle,
+        designSystem: designSystem,
         effectOpacity: 0.3,
         particleCount: 20,
       ),

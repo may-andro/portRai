@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/design_system/presentation/extension/_extension.dart';

@@ -44,12 +44,6 @@ class _GalleryWidgetState extends State<_GalleryWidget>
   Brightness? _deckBrightness;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _precacheThemes());
-  }
-
-  @override
   void didUpdateWidget(covariant _GalleryWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     final state = widget.state;
@@ -58,24 +52,6 @@ class _GalleryWidgetState extends State<_GalleryWidget>
         state.appliedDesignSystem != oldState.appliedDesignSystem ||
         state.monthlyDesignSystem != oldState.monthlyDesignSystem) {
       _deck = null;
-    }
-  }
-
-  /// Builds the theme of every design system between frames, one per task,
-  /// so a card or a preview coming in does not build one during a frame.
-  /// Idle tasks would wait for the festival effects, which never stop, so the
-  /// tasks run at animation priority.
-  void _precacheThemes() {
-    if (!mounted) return;
-    final brightness = context.platformBrightness;
-    for (final designSystem in _designSystems) {
-      SchedulerBinding.instance.scheduleTask(
-        () => DSThemeBuilderWidget.precacheTheme(
-          designSystem: designSystem,
-          brightness: brightness,
-        ),
-        Priority.animation,
-      );
     }
   }
 
@@ -137,7 +113,8 @@ class _GalleryWidgetState extends State<_GalleryWidget>
 
   /// The cards carry their own design systems, so the deck sits in the
   /// applied one instead of the previewed one. A new preview then neither
-  /// changes nor rebuilds it.
+  /// changes nor rebuilds it, and this theme is built only once, when the
+  /// gallery opens.
   Widget _buildDeck(BuildContext context) {
     final brightness = context.platformBrightness;
     if (_deck == null || brightness != _deckBrightness) {
@@ -259,11 +236,9 @@ class _GalleryWidgetState extends State<_GalleryWidget>
       children: [
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 600),
-          child: DSThemeBuilderWidget(
+          child: _AmbienceWidget(
             key: ValueKey(state.previewedDesignSystem),
             designSystem: state.previewedDesignSystem,
-            brightness: brightness,
-            child: const _AmbienceWidget(),
           ),
         ),
         DSThemeBuilderWidget(
