@@ -16,7 +16,7 @@ class ExperienceCache extends DBCache<ExperienceModel> {
   String get tableName => 'experience_table';
 
   @override
-  int get tableVersion => 1;
+  int get tableVersion => 2;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -40,6 +40,8 @@ class ExperienceCache extends DBCache<ExperienceModel> {
     const DbColumnDefinition(name: 'url'),
     const DbColumnDefinition(name: 'id', nullable: false),
     const DbColumnDefinition(name: 'locale', nullable: false),
+    const DbColumnDefinition(name: 'latitude', type: DbColumnType.real),
+    const DbColumnDefinition(name: 'longitude', type: DbColumnType.real),
   ];
 
   @override

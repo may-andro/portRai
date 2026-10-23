@@ -16,7 +16,7 @@ class ProfileCache extends DBCache<ProfileModel> {
   String get tableName => 'profile_table';
 
   @override
-  int get tableVersion => 2;
+  int get tableVersion => 3;
 
   @override
   List<DbColumnDefinition> get columns => [
@@ -26,6 +26,7 @@ class ProfileCache extends DBCache<ProfileModel> {
     const DbColumnDefinition(name: 'email', nullable: false),
     const DbColumnDefinition(name: 'phone', nullable: false),
     const DbColumnDefinition(name: 'profileImage', nullable: false),
+    const DbColumnDefinition(name: 'profileImages', nullable: false),
     const DbColumnDefinition(name: 'coverImage', nullable: false),
     const DbColumnDefinition(name: 'summary', nullable: false),
     const DbColumnDefinition(name: 'detailedBio', nullable: false),
@@ -67,6 +68,12 @@ class ProfileCache extends DBCache<ProfileModel> {
         modifiedMap['publishedAt'] is String) {
       modifiedMap['publishedAt'] = jsonDecode(
         modifiedMap['publishedAt'] as String,
+      );
+    }
+
+    if (modifiedMap['profileImages'] is String) {
+      modifiedMap['profileImages'] = jsonDecode(
+        modifiedMap['profileImages'] as String,
       );
     }
 
@@ -128,6 +135,10 @@ class ProfileCache extends DBCache<ProfileModel> {
     // Convert complex objects and lists to JSON strings for SQLite storage
     if (json.containsKey('publishedAt') && json['publishedAt'] is List) {
       json['publishedAt'] = jsonEncode(json['publishedAt']);
+    }
+
+    if (json['profileImages'] is List) {
+      json['profileImages'] = jsonEncode(json['profileImages']);
     }
 
     if (json.containsKey('resume') && json['resume'] is Map) {

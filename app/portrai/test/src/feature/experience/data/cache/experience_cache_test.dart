@@ -55,5 +55,12 @@ void main() {
     test('should use ID and locale as the composite key when caching', () {
       expect(cache.primaryKeyColumns, ['id', 'locale']);
     });
+
+    test('should only write values that have a table column when writing a '
+        'model', () {
+      final columnNames = cache.columns.map((column) => column.name);
+
+      expect(cache.serialize(model).keys, everyElement(isIn(columnNames)));
+    });
   });
 }
