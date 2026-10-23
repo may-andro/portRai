@@ -9,7 +9,8 @@ import 'package:use_case/use_case.dart';
 @register
 class SelectDesignSystemUseCase
     extends BaseNoParamUseCase<DesignSystem, NoFailure> {
-  static const _designSystemByMonth = <int, DesignSystem>{
+  /// The design system of each month, keyed by [DateTime.month].
+  static const designSystemByMonth = <int, DesignSystem>{
     DateTime.january: DesignSystem.hogmanay,
     DateTime.february: DesignSystem.carnival,
     DateTime.march: DesignSystem.holi,
@@ -27,7 +28,7 @@ class SelectDesignSystemUseCase
   @protected
   @override
   FutureOr<Either<NoFailure, DesignSystem>> execute() =>
-      Right(_designSystemByMonth[DateTime.now().month]!);
+      Right(designSystemByMonth[DateTime.now().month]!);
 
   @protected
   @override
