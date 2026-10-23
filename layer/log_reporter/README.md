@@ -7,6 +7,7 @@ A comprehensive logging solution for Flutter applications that provides a unifie
 - **Unified Logging Interface**: Simple, consistent API with `debug()` and `error()` methods
 - **Automatic Configuration**: Pre-configured logging setup through module configurator
 - **Multiple Destinations**: Automatically logs to both local console and Firebase Crashlytics
+- **Crashlytics Log Lines**: Each message is added to the Crashlytics log with its tag and, when a stack trace is given, its top eight frames; the log is uploaded with the next crash or non-fatal report
 - **Cross-Platform**: Works on Android, iOS, macOS, and Web platforms
 - **Structured Logging**: Support for tags, error objects, and stack traces
 - **Workspace Integration**: Follows workspace development patterns with proper dependency injection
