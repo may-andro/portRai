@@ -87,6 +87,9 @@ class $AssetsLottieGen {
   LottieGenImage get loader =>
       const LottieGenImage('assets/lottie/loader.json');
 
+  /// File path: assets/lottie/logo.json
+  LottieGenImage get logo => const LottieGenImage('assets/lottie/logo.json');
+
   /// File path: assets/lottie/map_pin.json
   LottieGenImage get mapPin =>
       const LottieGenImage('assets/lottie/map_pin.json');
@@ -138,6 +141,7 @@ class $AssetsLottieGen {
     language,
     linkedin,
     loader,
+    logo,
     mapPin,
     medal,
     orbit,
