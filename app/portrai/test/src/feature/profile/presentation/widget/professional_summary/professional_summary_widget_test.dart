@@ -127,6 +127,25 @@ void main() {
     expect(githubButtons, findsOneWidget);
   });
 
+  for (final size in sizes.entries) {
+    final isMobile = size.key == 'mobile';
+    testWidgets(
+      'should ${isMobile ? 'hide' : 'show'} the stack command when engineering is ${size.key}',
+      (tester) async {
+        await pumpWidget(
+          tester,
+          size: size.value,
+          variant: variants['engineering']!,
+        );
+
+        expect(
+          find.textContaining(r'echo $STACK', findRichText: true),
+          isMobile ? findsNothing : findsWidgets,
+        );
+      },
+    );
+  }
+
   testWidgets('should show the tech stack illustration when engineering', (
     tester,
   ) async {
