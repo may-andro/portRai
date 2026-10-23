@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
@@ -31,6 +32,16 @@ void main() {
   }
 
   group('Setting ContentWidget', () {
+    testWidgets('should always show the theme section', (tester) async {
+      await pumpContent(
+        tester,
+        const SettingLoadedState(isLanguageSelectorEnabled: false),
+      );
+
+      expect(find.text('Theme'), findsOneWidget);
+      expect(find.byType(DesignSystemCardWidget), findsOneWidget);
+    });
+
     for (final isJobOpeningsEnabled in [true, false]) {
       testWidgets('should show the job openings card only when its flag is '
           'on, when the flag is $isJobOpeningsEnabled', (tester) async {
