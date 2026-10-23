@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:design_system/design_system.dart';
 import 'package:design_system/src/component/molecule/ds_network_image_widget.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -66,10 +67,14 @@ void main() {
       final image = tester.widget<ExtendedImage>(find.byType(ExtendedImage));
       expect(
         image.image,
-        isA<FittedResizeImage>()
-            .having((provider) => provider.width, 'width', 200)
-            .having((provider) => provider.height, 'height', 100)
-            .having((provider) => provider.fit, 'fit', BoxFit.cover),
+        isA<LoadErrorHandledImage>().having(
+          (provider) => provider.imageProvider,
+          'imageProvider',
+          isA<FittedResizeImage>()
+              .having((provider) => provider.width, 'width', 200)
+              .having((provider) => provider.height, 'height', 100)
+              .having((provider) => provider.fit, 'fit', BoxFit.cover),
+        ),
       );
     });
 
@@ -85,9 +90,13 @@ void main() {
       final image = tester.widget<ExtendedImage>(find.byType(ExtendedImage));
       expect(
         image.image,
-        isA<FittedResizeImage>()
-            .having((provider) => provider.width, 'width', 160)
-            .having((provider) => provider.height, 'height', isNull),
+        isA<LoadErrorHandledImage>().having(
+          (provider) => provider.imageProvider,
+          'imageProvider',
+          isA<FittedResizeImage>()
+              .having((provider) => provider.width, 'width', 160)
+              .having((provider) => provider.height, 'height', isNull),
+        ),
       );
     });
 
@@ -104,7 +113,14 @@ void main() {
       ]);
 
       final image = tester.widget<ExtendedImage>(find.byType(ExtendedImage));
-      expect(image.image, isA<ExtendedNetworkImageProvider>());
+      expect(
+        image.image,
+        isA<LoadErrorHandledImage>().having(
+          (provider) => provider.imageProvider,
+          'imageProvider',
+          isA<ExtendedNetworkImageProvider>(),
+        ),
+      );
     });
 
     testWidgets('should share one connectivity subscription while images '
@@ -219,6 +235,62 @@ void main() {
       decodedImage.dispose();
     });
   });
+  group('LoadErrorHandledImage', () {
+    testWidgets('should not report a failed load that nothing listens to', (
+      tester,
+    ) async {
+      final failedLoad = Completer<ImageInfo>();
+      final provider = LoadErrorHandledImage(_FailingImage(failedLoad.future));
+
+      provider.resolve(ImageConfiguration.empty);
+      await tester.pump();
+      failedLoad.completeError(StateError('Failed to load'));
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('should pass a failed load to the listeners of the image', (
+      tester,
+    ) async {
+      final failedLoad = Completer<ImageInfo>();
+      final provider = LoadErrorHandledImage(_FailingImage(failedLoad.future));
+      Object? reportedError;
+
+      provider
+          .resolve(ImageConfiguration.empty)
+          .addListener(
+            ImageStreamListener(
+              (_, _) {},
+              onError: (error, _) => reportedError = error,
+            ),
+          );
+      await tester.pump();
+      failedLoad.completeError(StateError('Failed to load'));
+      await tester.pump();
+
+      expect(reportedError, isA<StateError>());
+    });
+  });
+}
+
+class _FailingImage extends ImageProvider<_FailingImage> {
+  const _FailingImage(this.imageInfo);
+
+  final Future<ImageInfo> imageInfo;
+
+  @override
+  Future<_FailingImage> obtainKey(ImageConfiguration configuration) {
+    return SynchronousFuture(this);
+  }
+
+  @override
+  ImageStreamCompleter loadImage(
+    _FailingImage key,
+    ImageDecoderCallback decode,
+  ) {
+    return OneFrameImageStreamCompleter(imageInfo);
+  }
 }
 
 extension on ImageStream {
