@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/service/data/repository/remote_service_repos
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 
 import '../../../../../mock/feature/service/domain/repository/mock_service_repository.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -22,18 +23,21 @@ void main() {
     late MockFbFirestoreController firestoreController;
     late MockServiceRepository cacheRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late RemoteServiceRepositoryImpl repository;
 
     setUp(() {
       firestoreController = MockFbFirestoreController();
       cacheRepository = MockServiceRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       repository = RemoteServiceRepositoryImpl(
         firestoreController,
         AppLocale('en'),
         cacheRepository,
         ServiceMapper(appLocale: AppLocale('en')),
         logReporter,
+        errorReporter,
       );
       when(
         () => logReporter.error(any(), tag: any(named: 'tag')),
@@ -183,12 +187,9 @@ void main() {
         });
 
         expect(await repository.getServices(), const [service]);
-        verify(
-          () => logReporter.error(
-            'Failed to cache services from remote, continuing without caching.',
-            tag: 'RemoteServiceRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ServiceCacheException>());
+        expect(reportedError.tag, 'RemoteServiceRepositoryImpl');
       },
     );
   });

@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:error_reporter/error_reporter.dart';
 import 'package:firebase/firebase.dart';
 import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
@@ -17,6 +18,7 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
     @Inject(CacheExperienceRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._errorReporter,
   );
 
   final FbFirestoreController _firestoreController;
@@ -24,6 +26,7 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
   final ExperienceRepository _cacheDelegateRepository;
   final ExperienceMapper _mapper;
   final LogReporter _logReporter;
+  final ErrorReporter _errorReporter;
 
   @override
   Future<void> cacheExperiences(List<ExperienceEntity> experiences) {
@@ -149,10 +152,13 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
   ) async {
     try {
       await cacheExperiences(experiences);
-    } catch (_) {
-      _logReporter.error(
+    } on ExperienceCacheException catch (exception, stackTrace) {
+      // Loading still succeeds without the cache, so the failure is reported
+      // instead of thrown.
+      await _errorReporter.reportError(
+        exception: exception,
+        stackTrace: stackTrace,
         tag: _logTag,
-        'Failed to cache experiences from remote, continuing without caching.',
       );
     }
   }

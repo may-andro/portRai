@@ -12,6 +12,7 @@ import 'package:portrai/src/feature/project/domain/_domain.dart';
 import '../../../../../mock/feature/asset_source/domain/use_case/mock_get_asset_source_use_case.dart';
 import '../../../../../mock/feature/project/domain/repository/mock_project_repository.dart';
 import '../../../../../mock/feature/project/test_data/project_test_data.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
 void main() {
@@ -34,12 +35,14 @@ void main() {
   group('AssetProjectRepositoryImpl', () {
     late MockProjectRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late MockGetAssetSourceUseCase getAssetSourceUseCase;
     late AssetProjectRepositoryImpl repository;
 
     setUp(() {
       cacheDelegateRepository = MockProjectRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       getAssetSourceUseCase = MockGetAssetSourceUseCase()
         ..stubCall(AssetSource.real);
       repository = AssetProjectRepositoryImpl(
@@ -47,6 +50,7 @@ void main() {
         cacheDelegateRepository,
         mapper,
         logReporter,
+        errorReporter,
         getAssetSourceUseCase,
       );
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -138,25 +142,22 @@ void main() {
     );
 
     test(
-      'should log and continue when caching projects loaded from assets fails',
+      'should report the error and continue when caching projects loaded from assets fails',
       () async {
         cacheDelegateRepository.stubGetProjectsThrows(
           const ProjectNotFoundException(),
         );
         cacheDelegateRepository.stubCacheProjectsThrows(
           projects: projects,
-          error: Exception('cache write failed'),
+          error: const ProjectCacheException(cause: 'cache write failed'),
         );
 
         final result = await repository.getProjects();
 
         expect(result, projects);
-        verify(
-          () => logReporter.error(
-            'Failed to cache projects from assets, continuing without caching.',
-            tag: 'AssetProjectRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<ProjectCacheException>());
+        expect(reportedError.tag, 'AssetProjectRepositoryImpl');
       },
     );
 

@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/testimonial/domain/_domain.dart';
 
 import '../../../../../mock/feature/testimonial/domain/repository/mock_testimonial_repository.dart';
 import '../../../../../mock/feature/testimonial/test_data/testimonial_test_data.dart';
+import '../../../../../mock/utility/fake_error_reporter.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 import '../../../../../mock/utility/mock_log_reporter.dart';
 
@@ -36,18 +37,21 @@ void main() {
     late MockFbFirestoreController firestoreController;
     late MockTestimonialRepository cacheDelegateRepository;
     late MockLogReporter logReporter;
+    late FakeErrorReporter errorReporter;
     late RemoteTestimonialRepositoryImpl repository;
 
     setUp(() {
       firestoreController = MockFbFirestoreController();
       cacheDelegateRepository = MockTestimonialRepository();
       logReporter = MockLogReporter();
+      errorReporter = FakeErrorReporter();
       repository = RemoteTestimonialRepositoryImpl(
         firestoreController,
         appLocale,
         cacheDelegateRepository,
         mapper,
         logReporter,
+        errorReporter,
       );
     });
 
@@ -135,7 +139,7 @@ void main() {
     );
 
     test(
-      'should log and continue when caching testimonials loaded from remote fails',
+      'should report the error and continue when caching testimonials loaded from remote fails',
       () async {
         cacheDelegateRepository.stubGetTestimonialsThrows(
           const TestimonialNotFoundException(),
@@ -143,18 +147,15 @@ void main() {
         firestoreController.stubGetDocumentFromCollection(firestoreDocument);
         cacheDelegateRepository.stubCacheTestimonialsThrows(
           testimonials: testimonials,
-          error: Exception('cache write failed'),
+          error: const TestimonialCacheException(cause: 'cache write failed'),
         );
 
         final result = await repository.getTestimonials();
 
         expect(result, testimonials);
-        verify(
-          () => logReporter.error(
-            'Failed to cache testimonials from remote, continuing without caching.',
-            tag: 'RemoteTestimonialRepositoryImpl',
-          ),
-        ).called(1);
+        final reportedError = errorReporter.reportedErrors.single;
+        expect(reportedError.exception, isA<TestimonialCacheException>());
+        expect(reportedError.tag, 'RemoteTestimonialRepositoryImpl');
       },
     );
 
