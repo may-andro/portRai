@@ -9,7 +9,7 @@ import 'package:portrai/src/feature/force_update/domain/use_case/is_app_update_r
 import 'package:portrai/src/feature/force_update/presentation/bloc/force_update_bloc.dart';
 import 'package:portrai/src/feature/locale/domain/use_case/get_locale_use_case.dart';
 import 'package:portrai/src/feature/locale/domain/use_case/update_locale_use_case.dart';
-import 'package:portrai/src/feature/notification/presentation/bloc/_bloc.dart';
+import 'package:portrai/src/feature/notification/presentation/bloc/notification_listener_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:use_case/use_case.dart';
