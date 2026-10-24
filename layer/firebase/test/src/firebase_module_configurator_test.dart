@@ -30,6 +30,7 @@ void main() {
 
         expect(locator.isRegistered<FirebaseAI>(), isTrue);
         expect(locator.isRegistered<FbAiController>(), isTrue);
+        expect(locator.isRegistered<FbMessagingController>(), isTrue);
         expect(configurator.aiBackend, backend);
         expect(configurator.aiLocation, 'europe-west4');
       },
