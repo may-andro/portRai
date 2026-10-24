@@ -1,5 +1,11 @@
-/** Region every function deploys to. */
+/** Region every function deploys to, except Firestore triggers. */
 export const functionRegion = 'europe-west3';
+
+/**
+ * Region Firestore triggers deploy to. A trigger must run in the region of
+ * the Cloud Firestore database, which is `us-central1`.
+ */
+export const firestoreTriggerRegion = 'us-central1';
 
 /**
  * The project the code is deployed to or runs in. The Firebase CLI sets it
