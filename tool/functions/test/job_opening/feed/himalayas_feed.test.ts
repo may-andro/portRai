@@ -181,6 +181,61 @@ describe('HimalayasFeed', () => {
     ]);
   });
 
+  it('should list the places in the preferred regions first when the list is long', async () => {
+    const fetchJson = vi
+      .fn()
+      .mockResolvedValueOnce({
+        jobs: [
+          {
+            ...himalayasJob,
+            employmentType: 'Full Time',
+            locationRestrictions: [
+              'Argentina',
+              'Brazil',
+              'Canada',
+              'Chile',
+              'Spain',
+            ],
+          },
+        ],
+      })
+      .mockResolvedValue({ jobs: [] });
+
+    const openings = await new HimalayasFeed(fetchJson).fetchJobs(
+      searchQuery({ terms: ['Flutter'], regions: new Set(['europe']) }),
+    );
+
+    expect(openings.map((opening) => opening.location)).toEqual([
+      'Spain, Argentina, Brazil +2 more',
+    ]);
+  });
+
+  it('should drop a long list outside the preferred regions', async () => {
+    const fetchJson = vi
+      .fn()
+      .mockResolvedValueOnce({
+        jobs: [
+          {
+            ...himalayasJob,
+            employmentType: 'Full Time',
+            locationRestrictions: [
+              'United States',
+              'Canada',
+              'Mexico',
+              'Brazil',
+            ],
+          },
+        ],
+      })
+      .mockResolvedValue({ jobs: [] });
+
+    const openings = await new HimalayasFeed(fetchJson).fetchJobs(
+      searchQuery({ terms: ['Flutter'], regions: new Set(['europe']) }),
+    );
+
+    expect(openings).toEqual([]);
+  });
+
   it('should throw when a page has no jobs list', async () => {
     await expect(
       new HimalayasFeed(vi.fn().mockResolvedValue({ error: 'x' })).fetchJobs(

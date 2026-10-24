@@ -11,6 +11,7 @@ const fit = {
   matchedSkills: ['Flutter'],
   missingSkills: ['GraphQL'],
   reasons: ['The core stack is Flutter.'],
+  openToCandidate: false,
 };
 
 describe('toJobFitDocument', () => {

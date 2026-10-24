@@ -21,6 +21,7 @@ export function toJobFitDocument(fit: JobFit, now: Date) {
     matchedSkills: fit.matchedSkills,
     missingSkills: fit.missingSkills,
     reasons: fit.reasons,
+    openToCandidate: fit.openToCandidate,
     expiresAt: Timestamp.fromDate(
       new Date(now.getTime() + jobFitLifetimeDays * dayMs),
     ),
@@ -35,5 +36,6 @@ export function fromJobFitDocument(data: unknown): JobFit | null {
     matchedSkills: stringList(data.matchedSkills),
     missingSkills: stringList(data.missingSkills),
     reasons: stringList(data.reasons),
+    openToCandidate: data.openToCandidate !== false,
   };
 }

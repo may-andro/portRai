@@ -69,7 +69,10 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
       : null;
   if (!slug || !title || !company || !url || !publishedAt) return null;
   const location = stringOrNull(job.location);
-  if (!isWantedJob(query, { title, location, publishedAt })) return null;
+  const jobTypes = stringList(job.job_types);
+  if (!isWantedJob(query, { title, location, jobTypes, publishedAt })) {
+    return null;
+  }
 
   return {
     source: 'arbeitnow',
@@ -80,7 +83,7 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
     url,
     location,
     tags: stringList(job.tags),
-    jobTypes: stringList(job.job_types),
+    jobTypes,
     description: htmlToText(
       typeof job.description === 'string' ? job.description : '',
     ),

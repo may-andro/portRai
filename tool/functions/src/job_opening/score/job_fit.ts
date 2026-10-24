@@ -1,4 +1,5 @@
 import { isRecord, stringList } from '../../shared/json_value.js';
+import type { Region } from '../match/region_filter.js';
 import type {
   JobFit,
   MatchedJobOpening,
@@ -19,7 +20,8 @@ Reply with JSON only:
 - score: an integer from 0 to 100. 80 or more means the core stack of the job is in the portfolio and the role and seniority match portfolioRoles and yearsOfExperience. 60 to 79 means most of the core stack is there and the gaps are learnable. Below 60 means the job's main work is outside the portfolio, the role is not hands-on software engineering, or its seniority is clearly far from the developer's, such as a junior role for a lead.
 - matchedSkills: portfolio skills the job needs, copied exactly as spelled in portfolioSkills.
 - missingSkills: at most ${maxMissingSkills} skills the job asks for that are not in portfolioSkills, most important first.
-- reasons: at most ${maxReasons} short sentences explaining the score.`;
+- reasons: at most ${maxReasons} short sentences explaining the score.
+- openToCandidate: false only when the job states that candidates must live in, or be authorized to work in, places outside candidateRegions, such as "US only" or "must be authorized to work in the United States" for a developer in europe. A location field alone is not such a statement. True when the job is open worldwide or to candidateRegions, says nothing about where candidates live, or candidateRegions is empty.`;
 
 /** The response shape Gemini must reply with. */
 export const jobFitSchema = {
@@ -29,19 +31,31 @@ export const jobFitSchema = {
     matchedSkills: { type: 'array', items: { type: 'string' } },
     missingSkills: { type: 'array', items: { type: 'string' } },
     reasons: { type: 'array', items: { type: 'string' } },
+    openToCandidate: { type: 'boolean' },
   },
-  required: ['score', 'matchedSkills', 'missingSkills', 'reasons'],
+  required: [
+    'score',
+    'matchedSkills',
+    'missingSkills',
+    'reasons',
+    'openToCandidate',
+  ],
 } as const;
 
-/** The untrusted part of the request: the portfolio and the job's fields. */
+/**
+ * The untrusted part of the request: the portfolio, the [regions] the
+ * candidate can work from and the job's fields.
+ */
 export function jobFitPrompt(
   opening: MatchedJobOpening,
   profile: PortfolioProfile,
+  regions: ReadonlySet<Region>,
 ): string {
   return JSON.stringify({
     portfolioSkills: profile.skills,
     portfolioRoles: profile.roles,
     yearsOfExperience: profile.yearsOfExperience,
+    candidateRegions: [...regions],
     job: {
       title: opening.title,
       company: opening.company,
@@ -95,6 +109,8 @@ export function parseJobFit(text: string, skills: readonly string[]): JobFit {
     matchedSkills,
     missingSkills,
     reasons,
+    // Only an explicit false drops the job.
+    openToCandidate: value.openToCandidate !== false,
   };
 }
 

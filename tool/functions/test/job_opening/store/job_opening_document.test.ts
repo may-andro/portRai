@@ -14,6 +14,7 @@ describe('toJobOpeningDocument', () => {
       score: 82,
       missingSkills: ['GraphQL'],
       reasons: ['The core stack is Flutter.'],
+      openToCandidate: true,
     };
 
     const document = toJobOpeningDocument(opening, now);
@@ -43,6 +44,7 @@ describe('toJobOpeningDocument', () => {
       score: 70,
       missingSkills: [],
       reasons: [],
+      openToCandidate: true,
     };
 
     expect(toJobOpeningDocument(opening, now).expiresAt).toEqual(

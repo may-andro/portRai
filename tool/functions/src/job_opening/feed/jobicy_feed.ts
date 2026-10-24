@@ -68,7 +68,10 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   const publishedAt = parseDate(job.pubDate);
   if (!id || !title || !company || !url || !publishedAt) return null;
   const location = stringOrNull(job.jobGeo);
-  if (!isWantedJob(query, { title, location, publishedAt })) return null;
+  const jobTypes = stringList(job.jobType);
+  if (!isWantedJob(query, { title, location, jobTypes, publishedAt })) {
+    return null;
+  }
 
   const level = stringOrNull(job.jobLevel);
   return {
@@ -80,7 +83,7 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
     url,
     location,
     tags: [...(level ? [level] : []), ...stringList(job.jobIndustry)],
-    jobTypes: stringList(job.jobType),
+    jobTypes,
     description: htmlToText(
       typeof job.jobDescription === 'string' ? job.jobDescription : '',
     ),

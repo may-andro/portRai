@@ -54,6 +54,7 @@ export class AshbyFeed implements JobFeed {
         {
           title,
           location,
+          jobTypes: jobTypesOf(job),
           isRemote:
             job.workplaceType === 'Remote' ||
             remotePattern.test(location ?? ''),
@@ -81,6 +82,14 @@ function locationsOf(job: Record<string, unknown>): string | null {
   return locations.length > 0 ? [...new Set(locations)].join(', ') : null;
 }
 
+/** The employment type, `FullTime` as `Full Time`, or none. */
+function jobTypesOf(job: Record<string, unknown>): string[] {
+  const employmentType = stringOrNull(job.employmentType);
+  return employmentType
+    ? [employmentType.replace(/([a-z])([A-Z])/g, '$1 $2')]
+    : [];
+}
+
 function toJobOpening(
   board: CompanyBoard,
   job: Record<string, unknown>,
@@ -91,7 +100,6 @@ function toJobOpening(
   const url = stringOrNull(job.jobUrl);
   const publishedAt = parseDate(job.publishedAt);
   if (!id || !url || !publishedAt) return null;
-  const employmentType = stringOrNull(job.employmentType);
   const tags = [stringOrNull(job.department), stringOrNull(job.team)].filter(
     (tag): tag is string => Boolean(tag),
   );
@@ -104,10 +112,7 @@ function toJobOpening(
     url,
     location,
     tags: [...new Set(tags)],
-    // `FullTime` as `Full Time`.
-    jobTypes: employmentType
-      ? [employmentType.replace(/([a-z])([A-Z])/g, '$1 $2')]
-      : [],
+    jobTypes: jobTypesOf(job),
     description: htmlToText(
       typeof job.descriptionHtml === 'string' ? job.descriptionHtml : '',
     ),

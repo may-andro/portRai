@@ -23,9 +23,34 @@ export const jobSearchSettingsDocument = {
   documentId: 'settings',
 } as const;
 
-/** Locations open to most of the world, including lists such as `+70 more`. */
+/** Locations open to most of the world. */
 const worldwidePattern =
-  /\b(worldwide|anywhere|global|globally|world ?wide|international)\b|\+\s*\d+\s+more\b/;
+  /\b(worldwide|anywhere|global|globally|world ?wide|international)\b/;
+
+/**
+ * Wording that limits a worldwide location to some places, such as
+ * `Anywhere in the US` or `Worldwide (US time zones)`.
+ */
+const limitedWorldwidePattern =
+  /\b(anywhere|worldwide|global|globally)\s+(in|within|from)\s+(?!the world\b)|\btime ?zones?\b/;
+
+/** Job types that are not employment, such as `Contract` or `freelance`. */
+const contractPattern = /contract|freelanc/i;
+
+// A restriction's places follow these words, as in `must be based in the US`.
+const followingRestrictionPatterns = [
+  /\b(?:must|should|need to|required to)\s+(?:be\s+)?(?:currently\s+)?(?:based|located|living|residing|reside|live)\s+(?:in|within)\s+([^;!?\n]{1,60})/gi,
+  /\b(?:authori[sz]ed|eligible|permitted|right)\s+to\s+work\s+(?:in|within|for)\s+([^;!?\n]{1,60})/gi,
+  /\bwork\s+(?:authori[sz]ation|permit)\s+(?:in|within|for)\s+([^;!?\n]{1,60})/gi,
+  /\b(?:open|available|limited|restricted)\s+(?:only\s+)?to\s+(?:candidates|applicants|residents|people)\s+(?:in|from|within|based in|located in|residing in)\s+([^;!?\n]{1,60})/gi,
+  /\b(?:remote|anywhere|candidates|applicants)\s+within\s+([^;!?\n]{1,60})/gi,
+];
+
+// A restriction's places come before these words, as in `Remote (US only)`.
+const precedingRestrictionPatterns = [
+  /([^;:!?\n(]{1,30})\bonly\b(?=\s*(?:[)\].,;:!\n]|$))/gi,
+  /\b(?:must|should)\s+(?:be|hold)\s+(?:an?\s+)?([^;!?\n]{1,30}?)\s*citizen/gi,
+];
 
 /** Lowercase names that place a location in a region, as whole words. */
 const regionNames: Record<Region, string[]> = {
@@ -128,6 +153,7 @@ const regionNames: Record<Region, string[]> = {
     'usa',
     'u.s.',
     'u.s.a.',
+    'u.s',
     'canada',
     'alabama',
     'alaska',
@@ -192,9 +218,29 @@ const regionNames: Record<Region, string[]> = {
     'denver',
     'atlanta',
     'miami',
+    'philadelphia',
+    'portland',
+    'san diego',
+    'san jose',
+    'palo alto',
+    'mountain view',
+    'menlo park',
+    'silicon valley',
+    'dallas',
+    'houston',
+    'phoenix',
+    'minneapolis',
+    'detroit',
+    'pittsburgh',
+    'raleigh',
+    'boulder',
+    'salt lake city',
+    'brooklyn',
     'toronto',
     'vancouver',
     'montreal',
+    'ottawa',
+    'calgary',
     'est',
     'edt',
     'pst',
@@ -225,6 +271,14 @@ const regionNames: Record<Region, string[]> = {
     'guatemala',
     'panama',
     'dominican republic',
+    'são paulo',
+    'sao paulo',
+    'buenos aires',
+    'bogotá',
+    'bogota',
+    'medellín',
+    'medellin',
+    'mexico city',
   ],
   asia_pacific: [
     'apac',
@@ -254,7 +308,27 @@ const regionNames: Record<Region, string[]> = {
     'melbourne',
     'bangalore',
     'bengaluru',
+    'hyderabad',
+    'pune',
+    'mumbai',
+    'delhi',
+    'new delhi',
+    'chennai',
+    'gurgaon',
+    'gurugram',
+    'noida',
     'tokyo',
+    'seoul',
+    'shanghai',
+    'beijing',
+    'shenzhen',
+    'manila',
+    'jakarta',
+    'kuala lumpur',
+    'hanoi',
+    'ho chi minh',
+    'auckland',
+    'brisbane',
   ],
   middle_east_africa: [
     'middle east',
@@ -280,6 +354,15 @@ const regionNames: Record<Region, string[]> = {
     'senegal',
     'turkey',
     'türkiye',
+    'istanbul',
+    'riyadh',
+    'doha',
+    'qatar',
+    'cairo',
+    'lagos',
+    'nairobi',
+    'cape town',
+    'johannesburg',
   ],
 };
 
@@ -288,6 +371,10 @@ const regionCodes: Partial<Record<Region, string[]>> = {
   north_america: ['US', 'USA', 'CA'],
   europe: ['EU', 'UK', 'DE', 'NL', 'ES', 'FR', 'PT', 'IE'],
 };
+
+/** A US state code after a city, such as `Boulder, CO`. */
+const stateCodePattern =
+  /,\s*(AL|AK|AZ|AR|CO|CT|DC|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)(?![A-Za-z])/;
 
 const namePatterns = Object.entries(regionNames).map(
   ([region, names]) =>
@@ -317,6 +404,7 @@ export function regionsOf(location: string): Set<Region> {
   for (const [region, pattern] of codePatterns) {
     if (pattern.test(location)) found.add(region);
   }
+  if (stateCodePattern.test(location)) found.add('north_america');
   return found;
 }
 
@@ -324,16 +412,85 @@ export function regionsOf(location: string): Set<Region> {
  * Whether a job at [location] can be taken from one of [allowed]. A job is
  * kept when its location is unknown, worldwide, or names an allowed region;
  * it is dropped only when it names other regions alone, such as `Remote - US`
- * for Europe.
+ * or `Anywhere in the US` for Europe.
  */
 export function isLocationInRegions(
   location: string | null,
   allowed: ReadonlySet<Region>,
 ): boolean {
   if (!location || allowed.size === 0) return true;
-  if (worldwidePattern.test(location.toLowerCase())) return true;
+  const lowerLocation = location.toLowerCase();
+  if (
+    worldwidePattern.test(lowerLocation) &&
+    !limitedWorldwidePattern.test(lowerLocation)
+  ) {
+    return true;
+  }
   const named = regionsOf(location);
   return named.size === 0 || [...named].some((region) => allowed.has(region));
+}
+
+/**
+ * The regions [text] limits candidates to, in wording such as `US only`,
+ * `must be based in the US` or `authorized to work in the United States`;
+ * empty when it states no such limit.
+ */
+export function restrictedRegionsOf(text: string): Set<Region> {
+  const found = new Set<Region>();
+  const addRegions = (places: string) => {
+    for (const region of regionsOf(places)) found.add(region);
+  };
+  for (const pattern of followingRestrictionPatterns) {
+    for (const match of text.matchAll(pattern)) {
+      // Up to the end of the sentence, keeping the dots of `U.S.`.
+      addRegions(match[1].split(/\.\s/)[0]);
+    }
+  }
+  for (const pattern of precedingRestrictionPatterns) {
+    for (const match of text.matchAll(pattern)) {
+      // From the start of the sentence.
+      addRegions(match[1].trimEnd().split(/\.\s/).pop() ?? '');
+    }
+  }
+  return found;
+}
+
+/** Whether [jobTypes] name a contract or freelance job. */
+export function isContractWork(jobTypes: readonly string[]): boolean {
+  return jobTypes.some((jobType) => contractPattern.test(jobType));
+}
+
+/** What a job says about where it can be done. */
+export interface JobPlace {
+  location: string | null;
+  jobTypes?: readonly string[];
+  description?: string;
+}
+
+/**
+ * Whether a job can be taken from one of [allowed]. A job whose location or
+ * description limits candidates to other regions alone is dropped. Otherwise
+ * a contract or freelance job is kept wherever it is, and any other job is
+ * kept when [isLocationInRegions] keeps its location.
+ */
+export function isOpenToRegions(
+  job: JobPlace,
+  allowed: ReadonlySet<Region>,
+): boolean {
+  if (allowed.size === 0) return true;
+  const restricted = restrictedRegionsOf(
+    `${job.location ?? ''}\n${job.description ?? ''}`,
+  );
+  if (
+    restricted.size > 0 &&
+    ![...restricted].some((region) => allowed.has(region))
+  ) {
+    return false;
+  }
+  return (
+    isContractWork(job.jobTypes ?? []) ||
+    isLocationInRegions(job.location, allowed)
+  );
 }
 
 /** The region of a country name, such as `Spain`, or null when unknown. */

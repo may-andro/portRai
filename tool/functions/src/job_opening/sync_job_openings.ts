@@ -9,7 +9,7 @@ import type {
   ScoredJobOpening,
 } from './job_opening.js';
 import { dedupeJobOpenings } from './match/dedupe.js';
-import { isLocationInRegions, type Region } from './match/region_filter.js';
+import { isOpenToRegions, type Region } from './match/region_filter.js';
 import { isPortfolioKindOfRole } from './match/role_filter.js';
 import { SkillMatcher, termPattern } from './match/skill_matcher.js';
 import type { JobScorer } from './score/job_scorer.js';
@@ -72,6 +72,8 @@ export interface SyncResult {
   staleCount: number;
   /** Openings dropped as limited to regions other than the preferred ones. */
   otherRegionCount: number;
+  /** Scored openings Gemini found closed to the preferred regions. */
+  closedToRegionCount: number;
   /** Openings dropped as a kind of role the portfolio does not hold. */
   otherRoleCount: number;
   matchedCount: number;
@@ -89,7 +91,8 @@ export interface SyncResult {
  * than [maxJobAgeDays], from other regions or of other kinds of role, keeps
  * those that match the portfolio's skills or roles, scores them with the
  * [JobScorer], reusing fits stored by earlier runs, and writes the ones
- * scoring at least [minJobFitScore] for each user with job search on. Feeds
+ * scoring at least [minJobFitScore] that the scorer finds open to the
+ * preferred regions for each user with job search on. Feeds
  * get the same limits in the query to skip such openings early; the run
  * applies them again to everything the feeds return. A feed or score that
  * fails is skipped; the run fails only when every feed or every score fails.
@@ -110,6 +113,7 @@ export async function syncJobOpenings(
       fetchedCount: 0,
       staleCount: 0,
       otherRegionCount: 0,
+      closedToRegionCount: 0,
       otherRoleCount: 0,
       matchedCount: 0,
       scoredCount: 0,
@@ -127,6 +131,7 @@ export async function syncJobOpenings(
       fetchedCount: 0,
       staleCount: 0,
       otherRegionCount: 0,
+      closedToRegionCount: 0,
       otherRoleCount: 0,
       matchedCount: 0,
       scoredCount: 0,
@@ -196,9 +201,7 @@ export async function syncJobOpenings(
   // Before matching, so no scoring goes to jobs that cannot be taken from
   // the preferred regions or that are another kind of role, such as a
   // product manager for a mobile app.
-  const inRegion = fresh.filter((opening) =>
-    isLocationInRegions(opening.location, regions),
-  );
+  const inRegion = fresh.filter((opening) => isOpenToRegions(opening, regions));
   const relevant = inRegion.filter((opening) =>
     isPortfolioKindOfRole(opening.title, profile.roles),
   );
@@ -225,7 +228,7 @@ export async function syncJobOpenings(
     .sort(byBestKeywordMatch)
     .map(({ isRoleMatch: _, ...opening }): MatchedJobOpening => opening);
   const fitKeys = ranked.map((opening) =>
-    dependencies.scorer.fitKey(opening, profile),
+    dependencies.scorer.fitKey(opening, profile, regions),
   );
   const storedFits = await loadStoredFits(fitKeys, dependencies);
   const reused: ScoredJobOpening[] = [];
@@ -250,6 +253,7 @@ export async function syncJobOpenings(
   const { scored, fits, failedCount } = await scoreOpenings(
     candidates,
     profile,
+    regions,
     startedAt.getTime() + scoringDeadlineMs,
     dependencies,
   );
@@ -257,7 +261,19 @@ export async function syncJobOpenings(
     throw new Error(`Every job score failed (${failedCount} openings)`);
   }
   await saveNewFits(fits, dependencies);
-  const kept = [...reused, ...scored].filter(
+  // Gemini reads the whole description, so it also finds limits such as
+  // "must be authorized to work in the US" that the region filter misses.
+  const openToRegions = [...reused, ...scored].filter(
+    (opening) => opening.openToCandidate,
+  );
+  const closedToRegionCount =
+    reused.length + scored.length - openToRegions.length;
+  if (closedToRegionCount > 0) {
+    logger.info('Dropped job openings closed to the preferred regions', {
+      closedToRegion: closedToRegionCount,
+    });
+  }
+  const kept = openToRegions.filter(
     (opening) => opening.score >= minJobFitScore,
   );
 
@@ -275,6 +291,7 @@ export async function syncJobOpenings(
     fetchedCount: openings.length,
     staleCount: openings.length - fresh.length,
     otherRegionCount: fresh.length - inRegion.length,
+    closedToRegionCount,
     otherRoleCount: inRegion.length - relevant.length,
     matchedCount: matched.length,
     scoredCount: scored.length,
@@ -293,6 +310,7 @@ interface FitCandidate {
 async function scoreOpenings(
   candidates: FitCandidate[],
   profile: PortfolioProfile,
+  regions: ReadonlySet<Region>,
   deadline: number,
   { scorer, logger, now }: SyncDependencies,
 ): Promise<{
@@ -307,7 +325,7 @@ async function scoreOpenings(
       if (now().getTime() >= deadline) {
         throw new Error('Skipped: the scoring time limit was reached');
       }
-      return scorer.score(opening, profile);
+      return scorer.score(opening, profile, regions);
     },
   );
   const scored: ScoredJobOpening[] = [];
@@ -363,6 +381,7 @@ function withFit(opening: MatchedJobOpening, fit: JobFit): ScoredJobOpening {
     score: fit.score,
     missingSkills: fit.missingSkills,
     reasons: fit.reasons,
+    openToCandidate: fit.openToCandidate,
   };
 }
 
