@@ -25,7 +25,7 @@ into `shared/`.
 ### Adding a function
 
 1. Create `src/<feature>/` with the function in its own file, using `functionRegion` from
-   `shared/function_options.ts`.
+   `shared/function_options.ts`, or `firestoreTriggerRegion` for a Firestore trigger.
 2. Export it from `src/index.ts`.
 3. Add tests under `test/<feature>/` and a row to the table above.
 
@@ -364,7 +364,8 @@ device.
 one function for each portfolio collection: `profile`, `experiences`, `expertise`, `projects`,
 `services` and `testimonials`.
 
-- Runs when a document `<collection>/{locale}` is created or changed, in `europe-west3`.
+- Runs when a document `<collection>/{locale}` is created or changed, in `us-central1`, the
+  region of the Cloud Firestore database.
 - Sends one notification to the topic `portfolio_updates_<locale>`, such as "Portfolio updated
   — Take a look at what's new.", in that locale (`en`, `es` or `nl`, English otherwise). The
   app subscribes to the topic of its language when the user turns notifications on.
@@ -397,7 +398,7 @@ export PROJECT_ID=<your-firebase-project-id>
 - The Agent Platform API (`aiplatform.googleapis.com`) on, and the `job-openings` service
   account with its three roles. See [Service account](#service-account).
 - The Eventarc API on, and the `notifications` service account with its roles.
-- A Cloud Firestore database in a location that can trigger functions in `europe-west3`.
+- A Cloud Firestore database in `us-central1`, where the Firestore triggers run.
 - The Firebase CLI, signed in to an account that can deploy to the project.
 
 ### Service account
@@ -448,8 +449,8 @@ done
 | `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events           |
 | `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the functions     |
 
-Firestore triggers must run in a region the database's location supports. Check the location
-with `gcloud firestore databases describe --project="$PROJECT_ID" --format="value(locationId)"`.
+Firestore triggers must run in the database's region, set by `firestoreTriggerRegion`. Check the
+location with `gcloud firestore databases describe --project="$PROJECT_ID" --format="value(locationId)"`.
 
 The deploy lets the account start the function from Cloud Scheduler, so it needs no other
 role. Deploying needs permission to act as the account, which project Owners have.

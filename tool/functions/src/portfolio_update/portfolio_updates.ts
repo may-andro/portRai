@@ -4,7 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 
 import {
-  functionRegion,
+  firestoreTriggerRegion,
   serviceAccountEmail,
 } from '../shared/function_options.js';
 import { cloudMessagingSender } from '../shared/messaging.js';
@@ -40,7 +40,7 @@ function portfolioUpdateTrigger(collection: string) {
   return onDocumentWritten(
     {
       document: `${collection}/{locale}`,
-      region: functionRegion,
+      region: firestoreTriggerRegion,
       // Only allowed to read and write Firestore and to send notifications.
       serviceAccount: serviceAccountEmail('notifications'),
       retry: false,
