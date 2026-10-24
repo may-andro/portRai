@@ -56,11 +56,17 @@ export interface SyncDependencies {
   /** The fits stored by earlier runs for [fitKeys], by key. */
   loadJobFits(fitKeys: string[]): Promise<Map<string, JobFit>>;
   saveJobFits(fits: Map<string, JobFit>, now: Date): Promise<void>;
+  /** Returns how many of [openings] the user did not have yet. */
   writeJobOpenings(
     userId: string,
     openings: ScoredJobOpening[],
     now: Date,
-  ): Promise<void>;
+  ): Promise<number>;
+  /**
+   * Tells [userId] about [count] new openings and returns whether the user
+   * has a device to tell.
+   */
+  notifyNewJobOpenings(userId: string, count: number): Promise<boolean>;
   now(): Date;
   logger: SyncLogger;
 }
@@ -83,6 +89,8 @@ export interface SyncResult {
   reusedScoreCount: number;
   failedScoreCount: number;
   keptCount: number;
+  /** Users told about new openings on at least one device. */
+  notifiedUserCount: number;
   failedSources: string[];
 }
 
@@ -120,6 +128,7 @@ export async function syncJobOpenings(
       reusedScoreCount: 0,
       failedScoreCount: 0,
       keptCount: 0,
+      notifiedUserCount: 0,
       failedSources: [],
     };
   }
@@ -138,6 +147,7 @@ export async function syncJobOpenings(
       reusedScoreCount: 0,
       failedScoreCount: 0,
       keptCount: 0,
+      notifiedUserCount: 0,
       failedSources: [],
     };
   }
@@ -278,13 +288,15 @@ export async function syncJobOpenings(
   );
 
   const now = dependencies.now();
-  await Promise.all(
+  const newCounts = await Promise.all(
     userIds.map((userId) => dependencies.writeJobOpenings(userId, kept, now)),
   );
   logger.info('Wrote job openings', {
     users: userIds.length,
     openings: kept.length,
+    newOpenings: newCounts,
   });
+  const notifiedUserCount = await notifyUsers(userIds, newCounts, dependencies);
 
   return {
     userCount: userIds.length,
@@ -298,8 +310,35 @@ export async function syncJobOpenings(
     reusedScoreCount: reused.length,
     failedScoreCount: failedCount,
     keptCount: kept.length,
+    notifiedUserCount,
     failedSources,
   };
+}
+
+/**
+ * Tells each user with new openings about them. The openings are already
+ * stored, so a failed notification is only logged.
+ */
+async function notifyUsers(
+  userIds: string[],
+  newCounts: number[],
+  { notifyNewJobOpenings, logger }: SyncDependencies,
+): Promise<number> {
+  const notified = await Promise.all(
+    userIds.map(async (userId, index) => {
+      if (newCounts[index] === 0) return false;
+      try {
+        return await notifyNewJobOpenings(userId, newCounts[index]);
+      } catch (error) {
+        logger.warn('Notifying a user of new job openings failed', {
+          userId,
+          error: String(error),
+        });
+        return false;
+      }
+    }),
+  );
+  return notified.filter(Boolean).length;
 }
 
 interface FitCandidate {

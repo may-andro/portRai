@@ -11,16 +11,20 @@ Firestore emulator.
 
 ## Rules
 
-| Path                                                                                  | Client access                                                     |
-| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `profile`, `experiences`, `expertise`, `projects`, `services`, `testimonials` `/{id}` | Anyone can read a document by ID. Listing and writing are refused |
-| `app_config/{id}`                                                                     | Anyone can read a document by ID. Listing and writing are refused |
-| `users/{uid}`                                                                         | The signed-in user can read it and write only its `jobSearch` map |
-| `users/{uid}/job_openings/{id}`                                                       | The signed-in user can list and read them. Writing is refused     |
-| Any other path                                                                        | Refused                                                           |
+| Path                                                                                  | Client access                                                                     |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `profile`, `experiences`, `expertise`, `projects`, `services`, `testimonials` `/{id}` | Anyone can read a document by ID. Listing and writing are refused                 |
+| `app_config/{id}`                                                                     | Anyone can read a document by ID. Listing and writing are refused                 |
+| `users/{uid}`                                                                         | The signed-in user can read it and write only its `jobSearch` map                 |
+| `users/{uid}/job_openings/{id}`                                                       | The signed-in user can list and read them. Writing is refused                     |
+| `users/{uid}/devices/{token}`                                                         | The signed-in user can register, read and remove one by token. Listing is refused |
+| Any other path                                                                        | Refused                                                                           |
 
 `jobSearch` may hold only a boolean `enabled` and an `updatedAt` equal to the server time of the
 write, which `FieldValue.serverTimestamp()` produces. Users cannot delete their document.
+
+A device holds exactly a `locale` string of up to 10 characters, a `platform` of `android`,
+`ios` or `web` and an `updatedAt` equal to the server time of the write.
 
 Server code authenticates with a service account, and security rules do not apply to it. The
 Cloud Functions in [`tool/functions`](../functions/README.md) and the

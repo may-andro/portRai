@@ -16,6 +16,17 @@ service cloud.firestore {
         && jobSearch.updatedAt == request.time;
     }
 
+    // A device of the user that receives their notifications, keyed by its
+    // token. `updatedAt` must be the server time.
+    function isValidDevice(device) {
+      return device.keys().hasOnly(['locale', 'platform', 'updatedAt'])
+        && device.keys().hasAll(['locale', 'platform', 'updatedAt'])
+        && device.locale is string
+        && device.locale.size() <= 10
+        && device.platform in ['android', 'ios', 'web']
+        && device.updatedAt == request.time;
+    }
+
     // Portfolio content, one document per locale. Public, read-only.
     match /profile/{locale} {
       allow get: if true;
@@ -53,6 +64,15 @@ service cloud.firestore {
       // Written by the job openings function only.
       match /job_openings/{jobOpeningId} {
         allow read: if isSignedInAs(userId);
+      }
+
+      // Registered while the user is signed in on a device, removed when they
+      // sign out. Only functions read the list to send notifications.
+      match /devices/{token} {
+        allow get, delete: if isSignedInAs(userId);
+        allow create, update: if isSignedInAs(userId)
+          && token.size() <= 4096
+          && isValidDevice(request.resource.data);
       }
     }
   }

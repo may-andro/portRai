@@ -1,6 +1,7 @@
 import type { Firestore } from 'firebase-admin/firestore';
 
 import type { JobFit, ScoredJobOpening } from '../job_opening.js';
+import type { UserDevice } from '../notify/notify_new_job_openings.js';
 import type { ReadDocument } from '../skill/portfolio_skills.js';
 import { fromJobFitDocument, toJobFitDocument } from './job_fit_document.js';
 import { toJobOpeningDocument } from './job_opening_document.js';
@@ -8,7 +9,7 @@ import { toJobOpeningDocument } from './job_opening_document.js';
 const jobFitsCollection = 'job_fits';
 
 // Keeps each read well within Firestore's request limits.
-const fitReadBatchSize = 100;
+const readBatchSize = 100;
 
 export function firestoreReadDocument(db: Firestore): ReadDocument {
   return async (collection, documentId) => {
@@ -28,26 +29,64 @@ export async function listJobSearchUserIds(db: Firestore): Promise<string[]> {
 }
 
 /**
- * Writes the openings under the user. An opening seen again replaces its
- * document, which also pushes its expiry back.
+ * Writes the openings under the user and returns how many the user did not
+ * have yet. An opening seen again replaces its document, which also pushes
+ * its expiry back.
  */
 export async function writeJobOpenings(
   db: Firestore,
   userId: string,
   openings: ScoredJobOpening[],
   now: Date,
-): Promise<void> {
+): Promise<number> {
   const collection = db
     .collection('users')
     .doc(userId)
     .collection('job_openings');
-  const writer = db.bulkWriter();
-  for (const opening of openings) {
-    void writer.set(
-      collection.doc(opening.dedupeKey),
-      toJobOpeningDocument(opening, now),
+  const refs = openings.map((opening) => collection.doc(opening.dedupeKey));
+  let existingCount = 0;
+  for (let start = 0; start < refs.length; start += readBatchSize) {
+    const snapshots = await db.getAll(
+      ...refs.slice(start, start + readBatchSize),
     );
+    existingCount += snapshots.filter((snapshot) => snapshot.exists).length;
   }
+
+  const writer = db.bulkWriter();
+  openings.forEach((opening, index) => {
+    void writer.set(refs[index], toJobOpeningDocument(opening, now));
+  });
+  await writer.close();
+  return openings.length - existingCount;
+}
+
+/** The devices at `users/{uid}/devices/{token}` that receive notifications. */
+export async function listUserDevices(
+  db: Firestore,
+  userId: string,
+): Promise<UserDevice[]> {
+  const snapshot = await db
+    .collection('users')
+    .doc(userId)
+    .collection('devices')
+    .get();
+  return snapshot.docs.map((document) => {
+    const locale = document.get('locale');
+    return {
+      token: document.id,
+      locale: typeof locale === 'string' ? locale : 'en',
+    };
+  });
+}
+
+export async function deleteUserDevices(
+  db: Firestore,
+  userId: string,
+  tokens: string[],
+): Promise<void> {
+  const collection = db.collection('users').doc(userId).collection('devices');
+  const writer = db.bulkWriter();
+  for (const token of tokens) void writer.delete(collection.doc(token));
   await writer.close();
 }
 
@@ -58,9 +97,9 @@ export async function loadJobFits(
 ): Promise<Map<string, JobFit>> {
   const collection = db.collection(jobFitsCollection);
   const fits = new Map<string, JobFit>();
-  for (let start = 0; start < fitKeys.length; start += fitReadBatchSize) {
+  for (let start = 0; start < fitKeys.length; start += readBatchSize) {
     const refs = fitKeys
-      .slice(start, start + fitReadBatchSize)
+      .slice(start, start + readBatchSize)
       .map((key) => collection.doc(key));
     const snapshots = await db.getAll(...refs);
     for (const snapshot of snapshots) {

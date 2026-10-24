@@ -55,7 +55,8 @@ function dependencies(
     scorer: scorer(),
     loadJobFits: vi.fn().mockResolvedValue(new Map()),
     saveJobFits: vi.fn().mockResolvedValue(undefined),
-    writeJobOpenings: vi.fn().mockResolvedValue(undefined),
+    writeJobOpenings: vi.fn().mockResolvedValue(0),
+    notifyNewJobOpenings: vi.fn().mockResolvedValue(true),
     now: () => new Date('2026-10-19T04:00:00Z'),
     logger: { info: vi.fn(), warn: vi.fn() },
     ...overrides,
@@ -88,6 +89,7 @@ describe('syncJobOpenings', () => {
       reusedScoreCount: 0,
       failedScoreCount: 0,
       keptCount: 1,
+      notifiedUserCount: 0,
       failedSources: [],
     });
     expect(deps.writeJobOpenings).toHaveBeenCalledTimes(2);
@@ -388,8 +390,8 @@ describe('syncJobOpenings', () => {
       listUserIds: vi.fn().mockResolvedValue(['owner-uid', 'other-uid']),
       writeJobOpenings: vi.fn(
         () =>
-          new Promise<void>((resolve) => {
-            pendingWrites.push(resolve);
+          new Promise<number>((resolve) => {
+            pendingWrites.push(() => resolve(0));
           }),
       ),
     });
@@ -401,6 +403,42 @@ describe('syncJobOpenings', () => {
     for (const finishWrite of pendingWrites) finishWrite();
 
     expect((await syncing).userCount).toBe(2);
+  });
+
+  it('should notify each user with new openings and count those with a device', async () => {
+    const deps = dependencies({
+      listUserIds: vi
+        .fn()
+        .mockResolvedValue(['owner-uid', 'other-uid', 'quiet-uid']),
+      writeJobOpenings: vi.fn(async (userId: string) =>
+        userId === 'quiet-uid' ? 0 : 1,
+      ),
+      notifyNewJobOpenings: vi.fn(
+        async (userId: string) => userId === 'owner-uid',
+      ),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(deps.notifyNewJobOpenings).toHaveBeenCalledTimes(2);
+    expect(deps.notifyNewJobOpenings).toHaveBeenCalledWith('owner-uid', 1);
+    expect(deps.notifyNewJobOpenings).toHaveBeenCalledWith('other-uid', 1);
+    expect(result.notifiedUserCount).toBe(1);
+  });
+
+  it('should finish the run when a notification fails', async () => {
+    const deps = dependencies({
+      writeJobOpenings: vi.fn().mockResolvedValue(1),
+      notifyNewJobOpenings: vi.fn().mockRejectedValue(new Error('FCM down')),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({ keptCount: 1, notifiedUserCount: 0 });
+    expect(deps.logger.warn).toHaveBeenCalledWith(
+      'Notifying a user of new job openings failed',
+      { userId: 'owner-uid', error: 'Error: FCM down' },
+    );
   });
 
   it('should drop openings posted more than 30 days ago', async () => {

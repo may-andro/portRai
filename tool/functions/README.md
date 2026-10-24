@@ -2,17 +2,20 @@
 
 Cloud Functions for PortRai, written in TypeScript and deployed as the `portrai` codebase.
 
-| Function           | Trigger                             | Feature                       |
-| ------------------ | ----------------------------------- | ----------------------------- |
-| `fetchJobOpenings` | Every Monday 06:00 Europe/Amsterdam | [Job openings](#job-openings) |
+| Function                        | Trigger                                                                   | Feature                                 |
+| ------------------------------- | ------------------------------------------------------------------------- | --------------------------------------- |
+| `fetchJobOpenings`              | Every Monday 06:00 Europe/Amsterdam                                       | [Job openings](#job-openings)           |
+| `portfolioUpdates-<collection>` | A write to `<collection>/{locale}`, one function per portfolio collection | [Portfolio updates](#portfolio-updates) |
 
 ## Structure
 
 ```
 src/
   index.ts          # initializes Firebase and exports every function
-  shared/           # code any feature can use: HTTP JSON, JSON parsing, Gemini, the region
+  shared/           # code any feature can use: HTTP JSON, JSON parsing, Gemini, push
+                    # notifications, the region
   job_opening/      # one folder per feature, with its function in fetch_job_openings.ts
+  portfolio_update/ # the portfolio update triggers in portfolio_updates.ts
 test/               # mirrors src/
 ```
 
@@ -58,6 +61,8 @@ search turned on.
   regions.
 - Writes the kept jobs to `users/{uid}/job_openings/{dedupeKey}` for every user whose
   `jobSearch.enabled` is `true`.
+- Notifies each user's devices when the run stored openings the user did not have yet. See
+  [New job notifications](#new-job-notifications).
 - Lets openings expire 14 days after the last run that found them.
 
 ### How it works
@@ -332,6 +337,50 @@ gcloud firestore fields ttls update expiresAt \
 TTL deletion usually runs within a day of `expiresAt`, so expired openings can stay readable
 for a short time.
 
+#### New job notifications
+
+Before writing a user's openings, the run checks which of them the user already has. When some
+are new, it sends one notification to each of the user's devices, such as "3 new job openings
+match your portfolio.", in the device's language (`en`, `es` or `nl`, English otherwise). A run
+with no new openings for a user sends nothing. A newer notification replaces the one shown.
+
+The app registers a device while the user is signed in on it and removes it when they sign out,
+so only the signed-in user's devices receive these notifications:
+
+| Path                          | Field       | Type      | Description                         |
+| ----------------------------- | ----------- | --------- | ----------------------------------- |
+| `users/{uid}/devices/{token}` | `locale`    | string    | The app's language on the device    |
+|                               | `platform`  | string    | `android`, `ios` or `web`           |
+|                               | `updatedAt` | timestamp | When the device was last registered |
+
+The notification's data holds `kind: job_openings`. Devices whose token is no longer registered
+are deleted. Openings are stored before the notification is sent, so a failed send is logged and
+the run still succeeds. The result reports `notifiedUserCount`, the users told on at least one
+device.
+
+## Portfolio updates
+
+`portfolioUpdates-<collection>` notifies the app's users that the portfolio changed. There is
+one function for each portfolio collection: `profile`, `experiences`, `expertise`, `projects`,
+`services` and `testimonials`.
+
+- Runs when a document `<collection>/{locale}` is created or changed, in `europe-west3`.
+- Sends one notification to the topic `portfolio_updates_<locale>`, such as "Portfolio updated
+  — Take a look at what's new.", in that locale (`en`, `es` or `nl`, English otherwise). The
+  app subscribes to the topic of its language when the user turns notifications on.
+- Sends nothing when the document was deleted, when its content did not change, or when the
+  locale is not two lowercase letters.
+- Sends to a topic at most once every 6 hours, so one import that writes many documents gives
+  one notification. The last send to each topic is kept at `notification_sends/{topic}` as
+  `sentAt`; a transaction claims the send, so triggers running at the same time cannot both send.
+- The notification's data holds `kind: portfolio_update`. A newer notification replaces the one
+  shown.
+- Logs the outcome of each change: `sent`, `unchanged`, `deleted`, `unknown_locale` or
+  `cooling_down`. A failed send is not retried.
+
+The functions run as the `notifications` service account (see
+[Service account](#service-account)).
+
 ## Getting Started
 
 The commands below read the project ID from `PROJECT_ID`. Set it first:
@@ -346,32 +395,61 @@ export PROJECT_ID=<your-firebase-project-id>
 - A Firebase project on the Blaze plan, with the Cloud Scheduler API on. `.firebaserc` sets the
   project the Firebase CLI deploys to.
 - The Agent Platform API (`aiplatform.googleapis.com`) on, and the `job-openings` service
-  account with its two roles. See [Service account](#service-account).
+  account with its three roles. See [Service account](#service-account).
+- The Eventarc API on, and the `notifications` service account with its roles.
+- A Cloud Firestore database in a location that can trigger functions in `europe-west3`.
 - The Firebase CLI, signed in to an account that can deploy to the project.
 
 ### Service account
 
-The function runs as its own service account, `job-openings`, which may only read and write
-Firestore and call Gemini. It calls Gemini as that account, so there is no API key to store.
-The code builds the account's full email from the project it is deployed to.
+The job openings function runs as its own service account, `job-openings`, which may only read
+and write Firestore, call Gemini and send notifications. It calls Gemini as that account, so
+there is no API key to store. The code builds the account's full email from the project it is
+deployed to.
 
-Enable the API, create the account and grant its two roles once:
+Enable the API, create the account and grant its three roles once:
 
 ```bash
 gcloud services enable aiplatform.googleapis.com --project="$PROJECT_ID"
 gcloud iam service-accounts create job-openings \
   --display-name="Job openings function" --project="$PROJECT_ID"
-for role in roles/aiplatform.user roles/datastore.user; do
+for role in roles/aiplatform.user roles/datastore.user roles/firebasecloudmessaging.admin; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" \
     --member="serviceAccount:job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
     --role="$role"
 done
 ```
 
-| Role                    | Console name                            | Needed for                    |
-| ----------------------- | --------------------------------------- | ----------------------------- |
-| `roles/aiplatform.user` | Vertex AI User (or Agent Platform User) | Calling Gemini                |
-| `roles/datastore.user`  | Cloud Datastore User                    | Reading and writing Firestore |
+| Role                                 | Console name                            | Needed for                    |
+| ------------------------------------ | --------------------------------------- | ----------------------------- |
+| `roles/aiplatform.user`              | Vertex AI User (or Agent Platform User) | Calling Gemini                |
+| `roles/datastore.user`               | Cloud Datastore User                    | Reading and writing Firestore |
+| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin      | Sending notifications         |
+
+The portfolio update functions run as the `notifications` service account, which may only read
+and write Firestore, send notifications and receive the Firestore events that start them:
+
+```bash
+gcloud services enable eventarc.googleapis.com --project="$PROJECT_ID"
+gcloud iam service-accounts create notifications \
+  --display-name="Notification functions" --project="$PROJECT_ID"
+for role in roles/datastore.user roles/firebasecloudmessaging.admin \
+  roles/eventarc.eventReceiver roles/run.invoker; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:notifications@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="$role"
+done
+```
+
+| Role                                 | Console name                       | Needed for                               |
+| ------------------------------------ | ---------------------------------- | ---------------------------------------- |
+| `roles/datastore.user`               | Cloud Datastore User               | Reading and writing `notification_sends` |
+| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Sending notifications                    |
+| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events           |
+| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the functions     |
+
+Firestore triggers must run in a region the database's location supports. Check the location
+with `gcloud firestore databases describe --project="$PROJECT_ID" --format="value(locationId)"`.
 
 The deploy lets the account start the function from Cloud Scheduler, so it needs no other
 role. Deploying needs permission to act as the account, which project Owners have.
@@ -441,6 +519,7 @@ for role in roles/cloudfunctions.developer roles/cloudscheduler.admin \
 done
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
 for account in "job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
+  "notifications@${PROJECT_ID}.iam.gserviceaccount.com" \
   "${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
   "${PROJECT_ID}@appspot.gserviceaccount.com"; do
   gcloud iam service-accounts add-iam-policy-binding "$account" \
@@ -452,13 +531,13 @@ base64 < key.json | gh secret set FUNCTIONS_DEPLOY_SERVICE_ACCOUNT
 rm key.json
 ```
 
-| Role                                      | Needed for                                                                                                                                                                                |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `roles/cloudfunctions.developer`          | Creating and updating functions                                                                                                                                                           |
-| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                                                                                                                             |
-| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                                                                                                                           |
-| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                                                                                                                            |
-| `roles/firebase.viewer`                   | Reading the Firebase project                                                                                                                                                              |
-| `roles/iam.serviceAccountUser`            | Running functions as `job-openings`, building them as the default compute account and deploying scheduled functions, which the Firebase CLI checks against the App Engine default account |
+| Role                                      | Needed for                                                                                                                                                                                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `roles/cloudfunctions.developer`          | Creating and updating functions                                                                                                                                                                               |
+| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                                                                                                                                                 |
+| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                                                                                                                                               |
+| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                                                                                                                                                |
+| `roles/firebase.viewer`                   | Reading the Firebase project                                                                                                                                                                                  |
+| `roles/iam.serviceAccountUser`            | Running functions as `job-openings` and `notifications`, building them as the default compute account and deploying scheduled functions, which the Firebase CLI checks against the App Engine default account |
 
 The workflow also reads the `FIREBASE_PROJECT_ID` secret that the other deploys use.
