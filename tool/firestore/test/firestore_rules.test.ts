@@ -51,6 +51,11 @@ beforeEach(async () => {
       plan: 'server-only',
     });
     await setDoc(doc(db, 'users/owner/job_openings/job-1'), { score: 82 });
+    await setDoc(doc(db, 'users/owner/devices/token-1'), {
+      locale: 'en',
+      platform: 'android',
+      updatedAt: Timestamp.now(),
+    });
     await setDoc(doc(db, 'other/document'), { value: 1 });
   });
 });
@@ -191,6 +196,65 @@ describe('users/{userId}/job_openings', () => {
     );
     await assertFails(
       deleteDoc(doc(owner(), 'users/owner/job_openings/job-1')),
+    );
+  });
+});
+
+describe('users/{userId}/devices', () => {
+  const device = () => ({
+    locale: 'es',
+    platform: 'ios',
+    updatedAt: serverTimestamp(),
+  });
+
+  it('should let the user register and refresh a device with the server time', async () => {
+    await assertSucceeds(
+      setDoc(doc(owner(), 'users/owner/devices/token-2'), device()),
+    );
+    await assertSucceeds(
+      setDoc(doc(owner(), 'users/owner/devices/token-1'), device()),
+    );
+  });
+
+  it('should let the user read and remove their own device', async () => {
+    await assertSucceeds(getDoc(doc(owner(), 'users/owner/devices/token-1')));
+    await assertSucceeds(
+      deleteDoc(doc(owner(), 'users/owner/devices/token-1')),
+    );
+  });
+
+  it('should not let the user list their devices', async () => {
+    await assertFails(getDocs(collection(owner(), 'users/owner/devices')));
+  });
+
+  it("should not let anyone read, register or remove another user's device", async () => {
+    await assertFails(getDoc(doc(stranger(), 'users/owner/devices/token-1')));
+    await assertFails(
+      setDoc(doc(stranger(), 'users/owner/devices/token-2'), device()),
+    );
+    await assertFails(deleteDoc(doc(guest(), 'users/owner/devices/token-1')));
+  });
+
+  it.each([
+    ['an unknown platform', { platform: 'watch' }],
+    ['a client-chosen time', { updatedAt: Timestamp.now() }],
+    ['an extra field', { userId: 'owner' }],
+    ['a long locale', { locale: 'x'.repeat(11) }],
+  ])('should not accept a device with %s', async (_, change) => {
+    await assertFails(
+      setDoc(doc(owner(), 'users/owner/devices/token-2'), {
+        ...device(),
+        ...change,
+      }),
+    );
+  });
+
+  it('should not accept a device without a locale', async () => {
+    await assertFails(
+      setDoc(doc(owner(), 'users/owner/devices/token-2'), {
+        platform: 'ios',
+        updatedAt: serverTimestamp(),
+      }),
     );
   });
 });

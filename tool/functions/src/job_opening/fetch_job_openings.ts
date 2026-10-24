@@ -1,4 +1,5 @@
 import { getFirestore } from 'firebase-admin/firestore';
+import { getMessaging } from 'firebase-admin/messaging';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
@@ -9,6 +10,7 @@ import {
   serviceAccountEmail,
 } from '../shared/function_options.js';
 import { createGeminiGenerateJson } from '../shared/gemini.js';
+import { cloudMessagingSender } from '../shared/messaging.js';
 import { GeminiJobPostExtractor } from './extract/job_post_extractor.js';
 import { ArbeitnowFeed } from './feed/arbeitnow_feed.js';
 import { AshbyFeed } from './feed/ashby_feed.js';
@@ -24,11 +26,14 @@ import { LeverFeed } from './feed/lever_feed.js';
 import { RemoteOkFeed } from './feed/remoteok_feed.js';
 import { RemotiveFeed } from './feed/remotive_feed.js';
 import { loadRegions } from './match/region_filter.js';
+import { notifyNewJobOpenings } from './notify/notify_new_job_openings.js';
 import { loadPortfolioProfile } from './profile/portfolio_profile.js';
 import { GeminiJobScorer } from './score/job_scorer.js';
 import {
+  deleteUserDevices,
   firestoreReadDocument,
   listJobSearchUserIds,
+  listUserDevices,
   loadJobFits,
   saveJobFits,
   writeJobOpenings,
@@ -41,7 +46,8 @@ export const fetchJobOpenings = onSchedule(
     schedule: 'every monday 06:00',
     timeZone: 'Europe/Amsterdam',
     region: functionRegion,
-    // Only allowed to read and write Firestore and to call Gemini.
+    // Only allowed to read and write Firestore, to call Gemini and to send
+    // notifications.
     serviceAccount: serviceAccountEmail('job-openings'),
     // Feeds for at most 4 minutes, Gemini scoring until 11 minutes into the
     // run, then the writes.
@@ -53,6 +59,7 @@ export const fetchJobOpenings = onSchedule(
     const db = getFirestore();
     const generateJson = createGeminiGenerateJson(projectId());
     const readDocument = firestoreReadDocument(db);
+    const sender = cloudMessagingSender(getMessaging());
     // The board feeds read the company list when they start, alongside the
     // other feeds.
     const loadBoards = companyBoardsLoader(readDocument);
@@ -89,6 +96,17 @@ export const fetchJobOpenings = onSchedule(
       saveJobFits: (fits, now) => saveJobFits(db, fits, now),
       writeJobOpenings: (userId, openings, now) =>
         writeJobOpenings(db, userId, openings, now),
+      notifyNewJobOpenings: (userId, count) =>
+        notifyNewJobOpenings(
+          {
+            listDevices: (deviceUserId) => listUserDevices(db, deviceUserId),
+            deleteDevices: (deviceUserId, tokens) =>
+              deleteUserDevices(db, deviceUserId, tokens),
+            sender,
+          },
+          userId,
+          count,
+        ),
       now: () => new Date(),
       logger,
     });
