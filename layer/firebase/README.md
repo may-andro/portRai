@@ -11,6 +11,7 @@ to all Firebase services with proper initialization and configuration.
 - **Dependency Injection**: Seamless integration with the module injector system
 - **Cross-Platform**: Support for Android, iOS, macOS, and Web platforms
 - **Firebase AI Logic**: Configurable Gemini text generation and streaming, plus single-image generation (`FbAiController.createImageModel`), with typed errors
+- **Cloud Messaging**: Notification permission, device tokens, topics and opened messages through `FbMessagingController`, with typed errors
 
 ## Getting Started
 
@@ -473,6 +474,37 @@ class StorageService {
 }
 ```
 
+### Cloud Messaging
+
+`FbMessagingController` wraps Firebase Cloud Messaging. Its methods throw `MessagingException`
+subtypes that keep the original cause and stack trace.
+
+```dart
+final messaging = serviceLocator<FbMessagingController>();
+
+// Ask once, for example when the user turns notifications on.
+if (await messaging.requestPermission()) {
+  // On iOS this waits for the APNs token before asking for the device token.
+  final token = await messaging.getToken();
+  await messaging.subscribeToTopic('updates');
+}
+
+// The system does not show notifications while the app is in the foreground.
+messaging.foregroundMessages.listen((message) => showBanner(message.title));
+
+// A tapped notification, from the background or from a terminated app.
+messaging.openedMessages.listen((message) => openRoute(message.data['route']));
+final initialMessage = await messaging.getInitialMessage();
+```
+
+Messages arrive as `FbPushMessage`: the notification's `title` and `body`, and its `data` as a
+map of strings. `onTokenRefresh` emits new tokens, and `deleteToken` stops delivery to the
+current one.
+
+Topics are not supported on the web. iOS needs an APNs key uploaded to the Firebase project and
+the Push Notifications capability; Android 13 and later needs the `POST_NOTIFICATIONS`
+permission, which `requestPermission` asks for.
+
 ### App Check
 
 ```dart
@@ -503,6 +535,7 @@ This module provides access to the following Firebase services:
 | **Firebase Storage** | Cloud file storage |
 | **App Check** | App attestation and security |
 | **Firebase AI Logic** | Gemini text generation and streamed responses |
+| **Cloud Messaging** | Push notifications, device tokens and topics |
 
 ## Best Practices
 
@@ -544,6 +577,7 @@ This module provides access to the following Firebase services:
 | `firebase_storage` | File storage |
 | `firebase_app_check` | App security |
 | `firebase_ai` | Firebase AI Logic SDK |
+| `firebase_messaging` | Cloud Messaging |
 | `http` | Owned AI transport and typed network failures |
 | `module_injector` | Dependency injection |
 | `core` | Core utilities |

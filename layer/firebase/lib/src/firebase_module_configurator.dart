@@ -10,6 +10,7 @@ import 'package:firebase/src/auth/fb_auth_controller.dart';
 import 'package:firebase/src/crashlytics/fb_crashlytics_controller.dart';
 import 'package:firebase/src/firestore/fb_firestore_controller.dart';
 import 'package:firebase/src/function/fb_function_controller.dart';
+import 'package:firebase/src/messaging/fb_messaging_controller.dart';
 import 'package:firebase/src/remote_config/fb_remote_config_controller.dart';
 import 'package:firebase/src/storage/fb_storage_controller.dart';
 import 'package:firebase_ai/firebase_ai.dart';
@@ -18,6 +19,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:module_injector/module_injector.dart';
@@ -81,6 +83,7 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
     _injectFirestore(serviceLocator);
     _injectStorage(serviceLocator);
     _injectFunctions(serviceLocator);
+    _injectMessaging(serviceLocator);
     _injectAi(serviceLocator);
   }
 
@@ -155,6 +158,17 @@ class FirebaseModuleConfigurator implements ModuleConfigurator {
       () => FbStorageController(
         serviceLocator.get<FirebaseStorage>(),
         storageBucketUrl,
+      ),
+    );
+  }
+
+  void _injectMessaging(ServiceLocator serviceLocator) {
+    serviceLocator.registerSingleton(() => FirebaseMessaging.instance);
+    serviceLocator.registerFactory(
+      () => FbMessagingController(
+        serviceLocator.get<FirebaseMessaging>(),
+        foregroundMessages: FirebaseMessaging.onMessage,
+        openedMessages: FirebaseMessaging.onMessageOpenedApp,
       ),
     );
   }
