@@ -255,6 +255,24 @@ melos:
         cd tool/legal
         firebase deploy --only hosting:legal
       description: Deploy privacy policy and terms & conditions to Firebase Hosting (portrai-legal)
+    set_ios_profile_secrets:
+      run: |
+        set -e
+        cd app/portrai/ios/.signing
+        for profile in portrai-appstore.mobileprovision portrai_adhoc.mobileprovision; do
+          if [ ! -f "$profile" ]; then
+            echo "Save $profile in app/portrai/ios/.signing first." >&2
+            exit 1
+          fi
+          if ! security cms -D -i "$profile" | grep -q aps-environment; then
+            echo "$profile has no push entitlement. Renew it after turning on Push Notifications for the App ID." >&2
+            exit 1
+          fi
+        done
+        base64 -i portrai-appstore.mobileprovision | gh secret set PORTRAI_IOS_PROVISIONING_PROFILE_BASE64
+        base64 -i portrai_adhoc.mobileprovision | gh secret set PORTRAI_IOS_ADHOC_PROVISIONING_PROFILE_BASE64
+        echo "Updated the App Store and Ad Hoc provisioning profile secrets."
+      description: Check the iOS provisioning profiles in app/portrai/ios/.signing include push, then store them as the GitHub Actions secrets.
     # Firestore Export/Import CLI scripts
     # Import (Firestore -> JSON) all collections in one go
     firestore_import:
