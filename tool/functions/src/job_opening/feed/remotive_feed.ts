@@ -42,9 +42,12 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   const publishedAt = parsePublicationDate(job.publication_date);
   if (!id || !title || !company || !url || !publishedAt) return null;
   const location = stringOrNull(job.candidate_required_location);
-  if (!isWantedJob(query, { title, location, publishedAt })) return null;
-
   const jobType = stringOrNull(job.job_type);
+  const jobTypes = jobType ? [jobType] : [];
+  if (!isWantedJob(query, { title, location, jobTypes, publishedAt })) {
+    return null;
+  }
+
   return {
     source: 'remotive',
     sourceName: 'Remotive',
@@ -54,7 +57,7 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
     url,
     location,
     tags: stringList(job.tags),
-    jobTypes: jobType ? [jobType] : [],
+    jobTypes,
     description: htmlToText(
       typeof job.description === 'string' ? job.description : '',
     ),

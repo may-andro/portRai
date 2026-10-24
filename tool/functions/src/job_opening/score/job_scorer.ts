@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { type GenerateJson, geminiModel } from '../../shared/gemini.js';
+import type { Region } from '../match/region_filter.js';
 import type {
   JobFit,
   MatchedJobOpening,
@@ -20,12 +21,21 @@ const maxOutputTokens = 4096;
 const thinkingBudget = 1024;
 
 export interface JobScorer {
-  score(opening: MatchedJobOpening, profile: PortfolioProfile): Promise<JobFit>;
+  /** The fit of [opening] for a candidate who can work from [regions]. */
+  score(
+    opening: MatchedJobOpening,
+    profile: PortfolioProfile,
+    regions: ReadonlySet<Region>,
+  ): Promise<JobFit>;
   /**
    * The same for two calls of [score] that send the same request, so a fit
    * from an earlier run can stand in for a new call.
    */
-  fitKey(opening: MatchedJobOpening, profile: PortfolioProfile): string;
+  fitKey(
+    opening: MatchedJobOpening,
+    profile: PortfolioProfile,
+    regions: ReadonlySet<Region>,
+  ): string;
 }
 
 /** Scores an opening by asking Gemini how well it fits the portfolio. */
@@ -35,10 +45,11 @@ export class GeminiJobScorer implements JobScorer {
   async score(
     opening: MatchedJobOpening,
     profile: PortfolioProfile,
+    regions: ReadonlySet<Region>,
   ): Promise<JobFit> {
     const text = await this.generateJson({
       systemInstruction: jobFitInstruction,
-      prompt: jobFitPrompt(opening, profile),
+      prompt: jobFitPrompt(opening, profile, regions),
       responseJsonSchema: jobFitSchema,
       maxOutputTokens,
       thinkingBudget,
@@ -47,13 +58,17 @@ export class GeminiJobScorer implements JobScorer {
   }
 
   /** A hash of the model, the instruction and the prompt. */
-  fitKey(opening: MatchedJobOpening, profile: PortfolioProfile): string {
+  fitKey(
+    opening: MatchedJobOpening,
+    profile: PortfolioProfile,
+    regions: ReadonlySet<Region>,
+  ): string {
     return createHash('sha256')
       .update(
         JSON.stringify([
           geminiModel,
           jobFitInstruction,
-          jobFitPrompt(opening, profile),
+          jobFitPrompt(opening, profile, regions),
         ]),
       )
       .digest('hex')

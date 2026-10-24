@@ -58,6 +58,8 @@ export interface JobFit {
   /** Skills the job asks for that the portfolio lacks. */
   missingSkills: string[];
   reasons: string[];
+  /** False when the job is closed to candidates in the preferred regions. */
+  openToCandidate: boolean;
 }
 
 /** A matched opening with its fit, ready to store. */
@@ -65,4 +67,5 @@ export interface ScoredJobOpening extends MatchedJobOpening {
   score: number;
   missingSkills: string[];
   reasons: string[];
+  openToCandidate: boolean;
 }

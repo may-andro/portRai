@@ -32,6 +32,7 @@ function fit(overrides: Partial<JobFit> = {}): JobFit {
     matchedSkills: [],
     missingSkills: ['GraphQL'],
     reasons: ['The core stack is Flutter.'],
+    openToCandidate: true,
     ...overrides,
   };
 }
@@ -80,6 +81,7 @@ describe('syncJobOpenings', () => {
       fetchedCount: 2,
       staleCount: 0,
       otherRegionCount: 0,
+      closedToRegionCount: 0,
       otherRoleCount: 0,
       matchedCount: 1,
       scoredCount: 1,
@@ -500,14 +502,45 @@ describe('syncJobOpenings', () => {
     expect(scoredTitles[0]).toBe('Flutter Developer');
   });
 
-  it('should hand the whole portfolio profile to the scorer', async () => {
-    const deps = dependencies();
+  it('should hand the whole portfolio profile and the regions to the scorer', async () => {
+    const regions = new Set(['europe']);
+    const deps = dependencies({
+      loadRegions: vi.fn().mockResolvedValue(regions),
+    });
 
     await syncJobOpenings(deps);
 
-    expect(vi.mocked(deps.scorer.score).mock.calls[0][1]).toEqual(
-      portfolioProfile(),
-    );
+    const [, profile, scoredRegions] = vi.mocked(deps.scorer.score).mock
+      .calls[0];
+    expect(profile).toEqual(portfolioProfile());
+    expect(scoredRegions).toBe(regions);
+    expect(vi.mocked(deps.scorer.fitKey).mock.calls[0][2]).toBe(regions);
+  });
+
+  it('should drop openings the scorer finds closed to the preferred regions', async () => {
+    const deps = dependencies({
+      feeds: [
+        feed('remotive', [
+          jobOpening({ title: 'Flutter Developer', sourceId: '1' }),
+          jobOpening({ title: 'Senior Flutter Engineer', sourceId: '2' }),
+        ]),
+      ],
+      scorer: scorer(async (opening) =>
+        fit({ openToCandidate: opening.title === 'Flutter Developer' }),
+      ),
+    });
+
+    const result = await syncJobOpenings(deps);
+
+    expect(result).toMatchObject({
+      scoredCount: 2,
+      closedToRegionCount: 1,
+      keptCount: 1,
+    });
+    const [, openings] = vi.mocked(deps.writeJobOpenings).mock.calls[0];
+    expect(openings.map((opening) => opening.title)).toEqual([
+      'Flutter Developer',
+    ]);
   });
 
   it('should drop openings from other regions and other kinds of role before scoring', async () => {
@@ -516,6 +549,16 @@ describe('syncJobOpenings', () => {
         feed('greenhouse', [
           jobOpening({ title: 'Flutter Developer', location: 'Remote - USA' }),
           jobOpening({ title: 'Flutter Developer', location: 'Remote Spain' }),
+          jobOpening({
+            title: 'Flutter Contractor',
+            location: 'Remote - USA',
+            jobTypes: ['Contract'],
+          }),
+          jobOpening({
+            title: 'Senior Flutter Engineer',
+            location: 'Remote',
+            description: 'Flutter role. You must be based in the US.',
+          }),
           jobOpening({ title: 'Product Manager, Flutter', location: 'Remote' }),
         ]),
       ],
@@ -526,12 +569,12 @@ describe('syncJobOpenings', () => {
 
     expect(deps.loadRegions).toHaveBeenCalledWith(portfolioProfile());
     expect(result).toMatchObject({
-      fetchedCount: 3,
-      otherRegionCount: 1,
+      fetchedCount: 5,
+      otherRegionCount: 2,
       otherRoleCount: 1,
-      scoredCount: 1,
+      scoredCount: 2,
     });
-    expect(deps.scorer.score).toHaveBeenCalledTimes(1);
+    expect(deps.scorer.score).toHaveBeenCalledTimes(2);
   });
 
   it('should reuse a stored fit instead of scoring the opening again', async () => {

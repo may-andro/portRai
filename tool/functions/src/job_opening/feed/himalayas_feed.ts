@@ -2,6 +2,7 @@ import type { FetchJson } from '../../shared/fetch_json.js';
 import { isRecord, stringList, stringOrNull } from '../../shared/json_value.js';
 import { settleAll } from '../../shared/settle_all.js';
 import type { JobOpening } from '../job_opening.js';
+import { type Region, regionsOf } from '../match/region_filter.js';
 import { htmlToText } from './html_text.js';
 import { isWantedJob, type JobFeed, type JobSearchQuery } from './job_feed.js';
 
@@ -94,10 +95,15 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   const url = stringOrNull(job.applicationLink);
   const publishedAt = fromUnixSeconds(job.pubDate);
   if (!id || !title || !company || !url || !publishedAt) return null;
-  const location = formatLocations(stringList(job.locationRestrictions));
-  if (!isWantedJob(query, { title, location, publishedAt })) return null;
-
+  const location = formatLocations(
+    stringList(job.locationRestrictions),
+    query.regions,
+  );
   const employmentType = stringOrNull(job.employmentType);
+  const jobTypes = employmentType ? [employmentType] : [];
+  if (!isWantedJob(query, { title, location, jobTypes, publishedAt })) {
+    return null;
+  }
   return {
     source: 'himalayas',
     sourceName: 'Himalayas',
@@ -112,7 +118,7 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
         category.replaceAll('-', ' '),
       ),
     ],
-    jobTypes: employmentType ? [employmentType] : [],
+    jobTypes,
     description: htmlToText(
       typeof job.description === 'string' ? job.description : '',
     ),
@@ -121,11 +127,23 @@ function toJobOpening(job: unknown, query: JobSearchQuery): JobOpening | null {
   };
 }
 
-/** No restriction means the job is open worldwide. */
-function formatLocations(locations: string[]): string {
+/**
+ * No restriction means the job is open worldwide. A long list starts with the
+ * places in [regions], so the region filter sees them before `+N more`.
+ */
+function formatLocations(
+  locations: string[],
+  regions: ReadonlySet<Region>,
+): string {
   if (locations.length === 0) return 'Worldwide';
   if (locations.length <= maxListedLocations) return locations.join(', ');
-  const listed = locations.slice(0, maxListedLocations).join(', ');
+  const isPreferred = (location: string) =>
+    [...regionsOf(location)].some((region) => regions.has(region));
+  const ordered = [
+    ...locations.filter(isPreferred),
+    ...locations.filter((location) => !isPreferred(location)),
+  ];
+  const listed = ordered.slice(0, maxListedLocations).join(', ');
   return `${listed} +${locations.length - maxListedLocations} more`;
 }
 

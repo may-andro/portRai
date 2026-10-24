@@ -1,5 +1,5 @@
 import type { JobOpening, JobSource } from '../job_opening.js';
-import { isLocationInRegions, type Region } from '../match/region_filter.js';
+import { isOpenToRegions, type Region } from '../match/region_filter.js';
 import { isPortfolioKindOfRole } from '../match/role_filter.js';
 
 /**
@@ -23,21 +23,28 @@ export interface JobFeed {
 }
 
 /**
- * Whether a job with this [title], [location] and [publishedAt] can be kept
- * for [query]: published on or after `publishedAfter`, in one of the
- * preferred regions and the kind of role the portfolio holds.
+ * Whether a job with this [title], [location], [jobTypes] and [publishedAt]
+ * can be kept for [query]: published on or after `publishedAfter`, open to
+ * one of the preferred regions and the kind of role the portfolio holds.
+ * Without [jobTypes], a contract job outside those regions is dropped.
  */
 export function isWantedJob(
   query: JobSearchQuery,
   {
     title,
     location,
+    jobTypes,
     publishedAt,
-  }: { title: string; location: string | null; publishedAt: Date },
+  }: {
+    title: string;
+    location: string | null;
+    jobTypes?: readonly string[];
+    publishedAt: Date;
+  },
 ): boolean {
   return (
     publishedAt >= query.publishedAfter &&
-    isLocationInRegions(location, query.regions) &&
+    isOpenToRegions({ location, jobTypes }, query.regions) &&
     isPortfolioKindOfRole(title, query.roles)
   );
 }

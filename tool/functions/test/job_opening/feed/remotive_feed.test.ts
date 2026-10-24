@@ -69,7 +69,12 @@ describe('RemotiveFeed', () => {
         jobs: [
           remotiveJob,
           { ...remotiveJob, id: 2, publication_date: '2026-08-01T10:00:00' },
-          { ...remotiveJob, id: 3, candidate_required_location: 'USA' },
+          {
+            ...remotiveJob,
+            id: 3,
+            candidate_required_location: 'USA',
+            job_type: 'full_time',
+          },
           { ...remotiveJob, id: 4, title: 'Flutter Content Writer' },
         ],
       }),
@@ -84,6 +89,26 @@ describe('RemotiveFeed', () => {
     );
 
     expect(openings.map((opening) => opening.sourceId)).toEqual(['2091158']);
+  });
+
+  it('should keep a contract job from another region', async () => {
+    const feed = new RemotiveFeed(
+      vi.fn().mockResolvedValue({
+        jobs: [
+          {
+            ...remotiveJob,
+            candidate_required_location: 'USA',
+            job_type: 'contract',
+          },
+        ],
+      }),
+    );
+
+    const openings = await feed.fetchJobs(
+      searchQuery({ regions: new Set(['europe']) }),
+    );
+
+    expect(openings).toHaveLength(1);
   });
 
   it('should throw when the response has no jobs list', async () => {

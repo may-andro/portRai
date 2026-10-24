@@ -121,6 +121,8 @@ export function companyBoardsLoader(
 export interface BoardPosting {
   title: string;
   location: string | null;
+  /** The job types the board lists, such as `Contract`, when it has them. */
+  jobTypes?: string[];
   isRemote: boolean;
   /** Null when the board gives no valid date; such a posting is dropped. */
   publishedAt: Date | null;

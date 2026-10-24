@@ -35,7 +35,17 @@ describe('parseJobFit', () => {
       matchedSkills: ['Flutter', 'Dart'],
       missingSkills: ['GraphQL'],
       reasons: ['The core stack is Flutter.'],
+      openToCandidate: true,
     });
+  });
+
+  it('should mark the job closed to the candidate only when the reply says false', () => {
+    expect(
+      parseJobFit(reply({ openToCandidate: false }), skills).openToCandidate,
+    ).toBe(false);
+    expect(
+      parseJobFit(reply({ openToCandidate: 'no' }), skills).openToCandidate,
+    ).toBe(true);
   });
 
   it('should keep only portfolio skills in their portfolio spelling when the reply names others', () => {
@@ -90,16 +100,19 @@ describe('parseJobFit', () => {
 });
 
 describe('jobFitPrompt', () => {
-  it('should hold the portfolio skills, roles and experience and the job fields but not the source links', () => {
+  it('should hold the portfolio skills, roles, experience and regions and the job fields but not the source links', () => {
     const opening = { ...jobOpening(), dedupeKey: 'key', matchedSkills: [] };
     const profile = portfolioProfile();
 
-    const prompt = JSON.parse(jobFitPrompt(opening, profile));
+    const prompt = JSON.parse(
+      jobFitPrompt(opening, profile, new Set(['europe'])),
+    );
 
     expect(prompt).toEqual({
       portfolioSkills: profile.skills,
       portfolioRoles: profile.roles,
       yearsOfExperience: 10,
+      candidateRegions: ['europe'],
       job: {
         title: opening.title,
         company: opening.company,

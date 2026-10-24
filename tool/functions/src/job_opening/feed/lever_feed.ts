@@ -47,10 +47,12 @@ export class LeverFeed implements JobFeed {
       if (!title) return [];
       const categories = isRecord(posting.categories) ? posting.categories : {};
       const location = stringOrNull(categories.location);
+      const commitment = stringOrNull(categories.commitment);
       return [
         {
           title,
           location,
+          jobTypes: commitment ? [commitment] : [],
           isRemote:
             posting.workplaceType === 'remote' ||
             remotePattern.test(location ?? ''),

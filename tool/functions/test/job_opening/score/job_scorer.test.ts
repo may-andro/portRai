@@ -7,6 +7,8 @@ import {
 import { GeminiJobScorer } from '../../../src/job_opening/score/job_scorer.js';
 import { jobOpening, portfolioProfile } from '../fixture.js';
 
+const europe = new Set(['europe'] as const);
+
 describe('GeminiJobScorer', () => {
   it('should send the trusted instruction apart from the job text and parse the reply', async () => {
     const generateJson = vi.fn().mockResolvedValue(
@@ -26,6 +28,7 @@ describe('GeminiJobScorer', () => {
     const fit = await new GeminiJobScorer(generateJson).score(
       opening,
       portfolioProfile({ skills: ['Flutter'] }),
+      europe,
     );
 
     expect(fit.score).toBe(77);
@@ -45,6 +48,7 @@ describe('GeminiJobScorer', () => {
       new GeminiJobScorer(generateJson).score(
         opening,
         portfolioProfile({ skills: ['Flutter'] }),
+        europe,
       ),
     ).rejects.toThrow('HTTP 503');
   });
@@ -58,25 +62,38 @@ describe('GeminiJobScorer', () => {
     };
 
     it('should be the same when the request is the same', () => {
-      expect(scorer.fitKey(opening, portfolioProfile())).toBe(
+      expect(scorer.fitKey(opening, portfolioProfile(), europe)).toBe(
         scorer.fitKey(
           { ...opening, matchedSkills: [], url: 'https://example.com/job' },
           portfolioProfile(),
+          new Set(['europe']),
         ),
       );
     });
 
-    it('should change when the job or the portfolio changes', () => {
-      const key = scorer.fitKey(opening, portfolioProfile());
+    it('should change when the job, the portfolio or the regions change', () => {
+      const key = scorer.fitKey(opening, portfolioProfile(), europe);
 
       expect(
         scorer.fitKey(
           { ...opening, description: 'Now with Kotlin.' },
           portfolioProfile(),
+          europe,
         ),
       ).not.toBe(key);
       expect(
-        scorer.fitKey(opening, portfolioProfile({ yearsOfExperience: 11 })),
+        scorer.fitKey(
+          opening,
+          portfolioProfile({ yearsOfExperience: 11 }),
+          europe,
+        ),
+      ).not.toBe(key);
+      expect(
+        scorer.fitKey(
+          opening,
+          portfolioProfile(),
+          new Set(['europe', 'north_america'] as const),
+        ),
       ).not.toBe(key);
     });
   });

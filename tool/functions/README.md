@@ -49,11 +49,13 @@ search turned on.
 - Drops jobs posted more than 30 days ago, and jobs their source has already expired.
 - Drops jobs limited to regions other than the preferred ones, by default the region of the
   portfolio's country, and jobs that are another kind of role, such as a product manager for a
-  mobile app.
+  mobile app. Contract and freelance jobs are kept wherever they are located, unless they limit
+  who can apply to other regions.
 - Keeps a job when its title names a portfolio role term, or when at least two portfolio skills
   appear in its title, tags or description.
 - Scores up to 120 of those jobs from 0 to 100 with Gemini against the skills, roles and years of
-  experience, and keeps the ones scoring 60 or more.
+  experience, and keeps the ones scoring 60 or more that Gemini finds open to the preferred
+  regions.
 - Writes the kept jobs to `users/{uid}/job_openings/{dedupeKey}` for every user whose
   `jobSearch.enabled` is `true`.
 - Lets openings expire 14 days after the last run that found them.
@@ -171,10 +173,20 @@ which only the function reads, for example `{ "regions": ["europe"] }`. Without 
 the region of the portfolio's `profile.location.country` is used, and when the country is not
 known, every region is kept.
 
-A job's location is matched against region, country, state and city names, and time zones such
-as `CET` or `EST`. A job is dropped only when its location names other regions alone. A job
-without a location, with a worldwide one such as `Anywhere`, with a long list such as `+70 more`
-or with a location that names no known place is kept, and scoring judges it.
+A job's location is matched against region, country, state and city names, US state codes such
+as `Boulder, CO`, and time zones such as `CET` or `EST`. A job is dropped when its location names
+other regions alone, including limited worldwide wording such as `Anywhere in the US` or
+`Worldwide (US time zones)`. A long list such as `Albania, Andorra, Argentina +70 more` is judged
+by the places it names; Himalayas lists the places in the preferred regions first. A job without
+a location, with a worldwide one such as `Anywhere`, or with a location that names no known place
+is kept, and scoring judges it.
+
+The location and description are also read for wording that limits who can apply, such as
+`US only`, `must be based in the US`, `authorized to work in the United States` or `must be a US
+citizen`. A job whose limits name other regions alone is dropped, whatever its location says.
+
+A contract or freelance job, by its job types, is kept wherever it is located, since such work
+can often be done from anywhere. The wording that limits who can apply still drops it.
 
 Titles that name a role other than building software, such as product manager, designer,
 marketing, sales or recruiter, are dropped unless they also name an engineering role, such as
@@ -190,25 +202,27 @@ and logs how many each one dropped there. Jobs a feed already skipped are not in
 
 Keyword matching is a cheap first filter. Gemini (`gemini-2.5-flash` through the Agent
 Platform, formerly Vertex AI, in the `global` location) then reads each matched job with the
-portfolio's skills, roles and years of experience and replies with JSON:
+portfolio's skills, roles and years of experience and the preferred regions, and replies with
+JSON:
 
-| Field           | Kept as                                                                          |
-| --------------- | -------------------------------------------------------------------------------- |
-| `score`         | An integer from 0 to 100, rounded and clamped                                    |
-| `matchedSkills` | Only portfolio skills, in their portfolio spelling, added to the keyword matches |
-| `missingSkills` | At most 8 skills the job asks for that the portfolio lacks                       |
-| `reasons`       | At most 3 sentences of up to 300 characters                                      |
+| Field             | Kept as                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `score`           | An integer from 0 to 100, rounded and clamped                                                                                    |
+| `matchedSkills`   | Only portfolio skills, in their portfolio spelling, added to the keyword matches                                                 |
+| `missingSkills`   | At most 8 skills the job asks for that the portfolio lacks                                                                       |
+| `reasons`         | At most 3 sentences of up to 300 characters                                                                                      |
+| `openToCandidate` | False when the job states that candidates must live in, or be authorized to work in, other regions; anything else counts as true |
 
-- **Threshold:** openings scoring below 60 are not stored. 80 or more means the job's core
-  stack is in the portfolio.
+- **Threshold:** openings scoring below 60, or that Gemini finds closed to the preferred regions,
+  are not stored. 80 or more means the job's core stack is in the portfolio.
 - **Cost:** a run scores at most the 120 best matches, role-title matches first, then by matched
   skills and then by date, 2 at a time. Gemini may think with up to 1,024 tokens before
   replying to each.
 - **Reuse:** each fit is stored under a hash of the model, the instructions and the prompt (see
   [Stored fits](#stored-fits)). A matched job whose request is unchanged since an earlier run
   reuses that fit without a Gemini call and does not count towards the 120. A change to the job's
-  text or to the portfolio's skills, roles or years of experience changes the hash, so the job is
-  scored again.
+  text, to the portfolio's skills, roles or years of experience, or to the preferred regions
+  changes the hash, so the job is scored again.
 - **Retries:** a throttled (`429`), timed-out or server-error (`5xx`) call is retried up to 3
   times, after about 5, 10 and 20 seconds. Each attempt gets 45 seconds and each opening 150 seconds in total.
   Scoring stops starting new openings 11 minutes after the run starts, so the run ends before
@@ -283,13 +297,14 @@ Each new fit is stored at `job_fits/{fitKey}`, whether or not the job scored hig
 kept. Only the function reads and writes this collection; the Firestore rules give clients no
 access to it.
 
-| Field           | Type      | Description                     |
-| --------------- | --------- | ------------------------------- |
-| `score`         | number    | Gemini's fit score, 0 to 100    |
-| `matchedSkills` | string[]  | As Gemini returned them         |
-| `missingSkills` | string[]  | As Gemini returned them         |
-| `reasons`       | string[]  | As Gemini returned them         |
-| `expiresAt`     | timestamp | When it was scored plus 30 days |
+| Field             | Type      | Description                     |
+| ----------------- | --------- | ------------------------------- |
+| `score`           | number    | Gemini's fit score, 0 to 100    |
+| `matchedSkills`   | string[]  | As Gemini returned them         |
+| `missingSkills`   | string[]  | As Gemini returned them         |
+| `reasons`         | string[]  | As Gemini returned them         |
+| `openToCandidate` | boolean   | As Gemini returned it           |
+| `expiresAt`       | timestamp | When it was scored plus 30 days |
 
 Jobs older than 30 days are dropped before scoring, so a fit is not needed for longer.
 
