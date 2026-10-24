@@ -6,15 +6,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/notification/domain/_domain.dart';
 import 'package:portrai/src/feature/notification/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/feature/user/user.dart';
+import 'package:use_case/use_case.dart';
 
-import '../../../../../mock/feature/auth/domain/use_case/mock_get_signed_in_user_stream_use_case.dart';
-import '../../../../../mock/feature/locale/domain/use_case/mock_get_locale_stream_use_case.dart';
-import '../../../../../mock/feature/notification/domain/use_case/mock_get_device_token_refresh_stream_use_case.dart';
-import '../../../../../mock/feature/notification/domain/use_case/mock_get_foreground_push_message_stream_use_case.dart';
+import '../../../../../mock/feature/auth/domain/use_case/mock_watch_signed_in_user_use_case.dart';
+import '../../../../../mock/feature/locale/domain/use_case/mock_watch_locale_use_case.dart';
 import '../../../../../mock/feature/notification/domain/use_case/mock_get_initial_push_message_use_case.dart';
-import '../../../../../mock/feature/notification/domain/use_case/mock_get_opened_push_message_stream_use_case.dart';
 import '../../../../../mock/feature/notification/domain/use_case/mock_reset_device_token_use_case.dart';
 import '../../../../../mock/feature/notification/domain/use_case/mock_sync_notifications_use_case.dart';
+import '../../../../../mock/feature/notification/domain/use_case/mock_watch_device_token_refreshes_use_case.dart';
+import '../../../../../mock/feature/notification/domain/use_case/mock_watch_foreground_push_messages_use_case.dart';
+import '../../../../../mock/feature/notification/domain/use_case/mock_watch_opened_push_messages_use_case.dart';
 
 const _languageCodes = ['en', 'es'];
 const _owner = AuthUserEntity(id: 'owner-uid', email: null);
@@ -51,14 +52,15 @@ void main() {
         syncNotificationsUseCase,
         resetDeviceTokenUseCase,
         getInitialPushMessageUseCase,
-        MockGetOpenedPushMessageStreamUseCase()
-          ..stubCall(openedMessages.stream),
-        MockGetForegroundPushMessageStreamUseCase()
-          ..stubCall(foregroundMessages.stream),
-        MockGetDeviceTokenRefreshStreamUseCase()
-          ..stubCall(tokenRefreshes.stream),
-        MockGetLocaleStreamUseCase()..stubCall(locales.stream),
-        MockGetSignedInUserStreamUseCase()..stubCall(signedInUsers.stream),
+        MockWatchOpenedPushMessagesUseCase()
+          ..stubCall(openedMessages.stream.map(Right.new)),
+        MockWatchForegroundPushMessagesUseCase()
+          ..stubCall(foregroundMessages.stream.map(Right.new)),
+        MockWatchDeviceTokenRefreshesUseCase()
+          ..stubCall(tokenRefreshes.stream.map(Right.new)),
+        MockWatchLocaleUseCase()..stubCall(locales.stream.map(Right.new)),
+        MockWatchSignedInUserUseCase()
+          ..stubCall(signedInUsers.stream.map(Right.new)),
       );
       addTearDown(bloc.close);
       return bloc;

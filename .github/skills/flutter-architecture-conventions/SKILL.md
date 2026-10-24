@@ -6,6 +6,7 @@ description: 'Architecture and code-organization conventions for this Flutter ap
 
 ## Use cases
 Every domain use case must extend `BaseUseCase`/`BaseNoParamUseCase` (from the `use_case` package) with a sealed `Failure` hierarchy returning `Either`. Never write a plain class with a bare `call()` method - this loses automatic logging/interceptor support and error-mapping consistency.
+A use case that returns a `Stream` always extends `BaseStreamUseCase`/`BaseNoParamStreamUseCase`, which emits an `Either` for every value and turns a stream error into a `Left` instead of ending the stream. Name it `Watch<Subject>UseCase` (for example `WatchLocaleUseCase`, `WatchInternetConnectionUseCase`), never `Get<Subject>StreamUseCase`. Listeners skip a `Left` and keep listening.
 Use cases belong to the owning feature's `domain/use_case/`, never the app's `utility/` folder.
 Name injected use case fields after their full type in lower camel case, preserving the
 `UseCase` suffix and subject (for example `_getLocalAssistantAvailabilityUseCase`, not
@@ -28,9 +29,24 @@ class GetFooUseCase extends BaseNoParamUseCase<Foo, GetFooFailure> {
   GetFooFailure mapErrorToFailure(Object e, StackTrace st) => ...;
 }
 
+@register
+class WatchFooUseCase extends BaseNoParamStreamUseCase<Foo, WatchFooFailure> {
+  @protected
+  @override
+  Stream<Foo> execute() => _fooRepository.fooChanges;
+
+  @protected
+  @override
+  WatchFooFailure mapErrorToFailure(Object e, StackTrace st) => ...;
+}
+
 // ❌ Wrong
 class GetFooUseCase {
   FutureOr<Foo> call() async { ... }
+}
+
+class GetFooStreamUseCase {
+  Stream<Foo> call() => _fooRepository.fooChanges;
 }
 ```
 

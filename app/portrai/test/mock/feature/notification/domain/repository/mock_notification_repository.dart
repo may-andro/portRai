@@ -49,4 +49,16 @@ extension MockNotificationRepositoryStub on MockNotificationRepository {
   void stubGetInitialMessage(PushMessageEntity? message) {
     when(getInitialMessage).thenAnswer((_) async => message);
   }
+
+  void stubDeviceTokenRefreshes(Stream<String> tokens) {
+    when(() => deviceTokenRefreshes).thenAnswer((_) => tokens);
+  }
+
+  void stubOpenedMessages(Stream<PushMessageEntity> messages) {
+    when(() => openedMessages).thenAnswer((_) => messages);
+  }
+
+  void stubForegroundMessages(Stream<PushMessageEntity> messages) {
+    when(() => foregroundMessages).thenAnswer((_) => messages);
+  }
 }

@@ -19,11 +19,11 @@ class NotificationListenerBloc
     this._syncNotificationsUseCase,
     this._resetDeviceTokenUseCase,
     this._getInitialPushMessageUseCase,
-    this._getOpenedPushMessageStreamUseCase,
-    this._getForegroundPushMessageStreamUseCase,
-    this._getDeviceTokenRefreshStreamUseCase,
-    this._getLocaleStreamUseCase,
-    this._getSignedInUserStreamUseCase,
+    this._watchOpenedPushMessagesUseCase,
+    this._watchForegroundPushMessagesUseCase,
+    this._watchDeviceTokenRefreshesUseCase,
+    this._watchLocaleUseCase,
+    this._watchSignedInUserUseCase,
   ) : super(const NotificationListenerIdleState()) {
     on<NotificationListenerStartEvent>(
       _mapNotificationListenerStartEventToState,
@@ -39,12 +39,11 @@ class NotificationListenerBloc
   final SyncNotificationsUseCase _syncNotificationsUseCase;
   final ResetDeviceTokenUseCase _resetDeviceTokenUseCase;
   final GetInitialPushMessageUseCase _getInitialPushMessageUseCase;
-  final GetOpenedPushMessageStreamUseCase _getOpenedPushMessageStreamUseCase;
-  final GetForegroundPushMessageStreamUseCase
-  _getForegroundPushMessageStreamUseCase;
-  final GetDeviceTokenRefreshStreamUseCase _getDeviceTokenRefreshStreamUseCase;
-  final GetLocaleStreamUseCase _getLocaleStreamUseCase;
-  final GetSignedInUserStreamUseCase _getSignedInUserStreamUseCase;
+  final WatchOpenedPushMessagesUseCase _watchOpenedPushMessagesUseCase;
+  final WatchForegroundPushMessagesUseCase _watchForegroundPushMessagesUseCase;
+  final WatchDeviceTokenRefreshesUseCase _watchDeviceTokenRefreshesUseCase;
+  final WatchLocaleUseCase _watchLocaleUseCase;
+  final WatchSignedInUserUseCase _watchSignedInUserUseCase;
 
   final List<StreamSubscription<Object?>> _subscriptions = [];
   List<String> _supportedLanguageCodes = const [];
@@ -59,24 +58,31 @@ class NotificationListenerBloc
     Emitter<NotificationListenerState> emit,
   ) async {
     _supportedLanguageCodes = event.supportedLanguageCodes;
+    // A failed update is ignored, and the stream keeps listening.
     _subscriptions.addAll([
-      _getOpenedPushMessageStreamUseCase().listen(
-        (message) => add(PushMessageOpenedEvent(message)),
-      ),
-      _getForegroundPushMessageStreamUseCase().listen(
-        (message) => add(PushMessageReceivedEvent(message)),
-      ),
-      _getDeviceTokenRefreshStreamUseCase().listen(
-        (_) => add(const NotificationsSyncRequestedEvent()),
-      ),
-      _getLocaleStreamUseCase().listen(
-        (_) => add(const NotificationsSyncRequestedEvent()),
-      ),
+      _watchOpenedPushMessagesUseCase().listen((messageEither) {
+        if (messageEither.isRight) {
+          add(PushMessageOpenedEvent(messageEither.right));
+        }
+      }),
+      _watchForegroundPushMessagesUseCase().listen((messageEither) {
+        if (messageEither.isRight) {
+          add(PushMessageReceivedEvent(messageEither.right));
+        }
+      }),
+      _watchDeviceTokenRefreshesUseCase().listen((tokenEither) {
+        if (tokenEither.isRight) add(const NotificationsSyncRequestedEvent());
+      }),
+      _watchLocaleUseCase().listen((localeEither) {
+        if (localeEither.isRight) add(const NotificationsSyncRequestedEvent());
+      }),
       // The first event is the restored session, which also starts the
       // first sync.
-      _getSignedInUserStreamUseCase().listen(
-        (user) => add(SignedInStatusChangedEvent(isSignedIn: user != null)),
-      ),
+      _watchSignedInUserUseCase().listen((userEither) {
+        if (userEither.isRight) {
+          add(SignedInStatusChangedEvent(isSignedIn: userEither.right != null));
+        }
+      }),
     ]);
 
     final initialMessageEither = await _getInitialPushMessageUseCase();
