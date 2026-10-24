@@ -312,7 +312,10 @@ class _OrbitDialWidgetState extends State<_OrbitDialWidget>
     // Nodes fade as they turn towards the edges.
     final nearness = 1 - offset.abs() * layout.step / layout.edgeAngle;
 
+    // Keyed, as the nodes are reordered while turning and each must keep
+    // its own scale animation.
     return Positioned(
+      key: ValueKey(index),
       left: nodeCenter.dx - nodeSize / 2,
       top: nodeCenter.dy - nodeSize / 2,
       width: nodeSize,
