@@ -1,4 +1,5 @@
 export 'app_locale_configurator.dart';
+export 'domain/use_case/_use_case.dart';
 export 'locale_module_configurator.dart';
 export 'presentation/extension/locale_code_extension.dart';
 export 'presentation/screen/locale_selection/locale_selection_screen.dart';

@@ -24,6 +24,7 @@ import 'package:portrai/src/feature/force_update/force_update_module_configurato
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
+import 'package:portrai/src/feature/notification/notification.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
@@ -72,6 +73,7 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
   UserModuleConfigurator(),
   AuthModuleConfigurator(),
   JobOpeningModuleConfigurator(),
+  NotificationModuleConfigurator(),
   ForceUpdateModuleConfigurator(),
   ConnectivityModuleConfigurator(),
   LocaleModuleConfigurator(),

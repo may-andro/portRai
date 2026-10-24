@@ -189,6 +189,15 @@ The switch merges into `users/{uid}`, so other fields on that document are kept.
 shows its job board's name and links to its page there, as the boards' terms require. Openings
 expire 14 days after the last run that found them.
 
+### Notifications
+
+`notification` keeps push notifications in step with the app on Android and iOS. Once the
+Settings switch allows notifications, the device receives "Portfolio updated" notifications in
+the app's language. While a user is signed in, the device is registered as theirs, so it also
+receives their "New jobs for you" notifications; signing out replaces the device token, so they
+stop. Tapping a notification opens the job openings or the portfolio. See the
+[notification README](lib/src/feature/notification/README.md).
+
 ### Remote Assistant
 
 The remote screen uses `/remote-assistant` and the independent, default-off

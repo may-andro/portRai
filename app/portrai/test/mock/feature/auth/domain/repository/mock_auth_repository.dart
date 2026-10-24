@@ -31,6 +31,10 @@ extension MockAuthRepositoryStub on MockAuthRepository {
     when(getSignedInUser).thenThrow(error);
   }
 
+  void stubSignedInUserChanges(Stream<AuthUserEntity?> changes) {
+    when(() => signedInUserChanges).thenAnswer((_) => changes);
+  }
+
   void stubSignOut() {
     when(signOut).thenAnswer((_) async {});
   }

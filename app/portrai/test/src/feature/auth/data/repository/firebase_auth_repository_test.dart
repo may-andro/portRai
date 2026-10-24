@@ -108,6 +108,19 @@ void main() {
       );
     });
 
+    test('should map every auth state when signed-in user changes are '
+        'listened to', () async {
+      final user = MockUser()
+        ..stubAccount(userId: 'owner-uid', email: 'owner@example.com');
+      authController.stubAuthStateChanges([null, user, null]);
+
+      expect(await repository.signedInUserChanges.toList(), [
+        null,
+        const AuthUserEntity(id: 'owner-uid', email: 'owner@example.com'),
+        null,
+      ]);
+    });
+
     test('should return null when the first auth state has no user', () async {
       authController.stubAuthStateChanges([null]);
 

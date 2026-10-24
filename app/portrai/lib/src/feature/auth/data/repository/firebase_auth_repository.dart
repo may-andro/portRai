@@ -39,6 +39,11 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
+  Stream<AuthUserEntity?> get signedInUserChanges => _authController
+      .authStateChanges
+      .map((user) => user == null ? null : _userMapper.map(user));
+
+  @override
   Future<void> signOut() async {
     try {
       await _authController.signOut();

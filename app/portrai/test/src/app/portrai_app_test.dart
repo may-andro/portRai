@@ -9,19 +9,28 @@ import 'package:portrai/src/feature/force_update/domain/use_case/is_app_update_r
 import 'package:portrai/src/feature/force_update/presentation/bloc/force_update_bloc.dart';
 import 'package:portrai/src/feature/locale/domain/use_case/get_locale_use_case.dart';
 import 'package:portrai/src/feature/locale/domain/use_case/update_locale_use_case.dart';
+import 'package:portrai/src/feature/notification/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../mock/feature/auth/domain/use_case/mock_get_signed_in_user_stream_use_case.dart';
 import '../../mock/feature/connectivity/domain/use_case/mock_check_internet_connection_use_case.dart';
 import '../../mock/feature/connectivity/domain/use_case/mock_watch_internet_connection_use_case.dart';
 import '../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../mock/feature/force_update/domain/use_case/mock_get_app_store_url_use_case.dart';
 import '../../mock/feature/force_update/domain/use_case/mock_is_app_update_required_use_case.dart';
 import '../../mock/feature/force_update/presentation/tracking/mock_force_update_tracking_delegate.dart';
+import '../../mock/feature/locale/domain/use_case/mock_get_locale_stream_use_case.dart';
 import '../../mock/feature/locale/domain/use_case/mock_get_locale_use_case.dart';
 import '../../mock/feature/locale/domain/use_case/mock_update_locale_use_case.dart';
 import '../../mock/feature/locale/test_data/locale_test_data.dart';
+import '../../mock/feature/notification/domain/use_case/mock_get_device_token_refresh_stream_use_case.dart';
+import '../../mock/feature/notification/domain/use_case/mock_get_foreground_push_message_stream_use_case.dart';
+import '../../mock/feature/notification/domain/use_case/mock_get_initial_push_message_use_case.dart';
+import '../../mock/feature/notification/domain/use_case/mock_get_opened_push_message_stream_use_case.dart';
+import '../../mock/feature/notification/domain/use_case/mock_reset_device_token_use_case.dart';
+import '../../mock/feature/notification/domain/use_case/mock_sync_notifications_use_case.dart';
 import '../../mock/utility/mock_module_route_controller.dart';
 
 void main() {
@@ -44,6 +53,21 @@ void main() {
             ..stubCall(const Right(true)),
           watchInternetConnectionUseCase: MockWatchInternetConnectionUseCase()
             ..stubCall(const Stream.empty()),
+        ),
+      );
+      appServiceLocator.registerFactory<NotificationListenerBloc>(
+        () => NotificationListenerBloc(
+          MockSyncNotificationsUseCase()..stubCall(),
+          MockResetDeviceTokenUseCase()..stubCall(),
+          MockGetInitialPushMessageUseCase()..stubCall(null),
+          MockGetOpenedPushMessageStreamUseCase()
+            ..stubCall(const Stream.empty()),
+          MockGetForegroundPushMessageStreamUseCase()
+            ..stubCall(const Stream.empty()),
+          MockGetDeviceTokenRefreshStreamUseCase()
+            ..stubCall(const Stream.empty()),
+          MockGetLocaleStreamUseCase()..stubCall(const Stream.empty()),
+          MockGetSignedInUserStreamUseCase()..stubCall(const Stream.empty()),
         ),
       );
       final getLocaleUseCase = MockGetLocaleUseCase()
