@@ -6,6 +6,7 @@ Cloud Functions for PortRai, written in TypeScript and deployed as the `portrai`
 | ------------------------------- | ------------------------------------------------------------------------- | --------------------------------------- |
 | `fetchJobOpenings`              | Every Monday 06:00 Europe/Amsterdam                                       | [Job openings](#job-openings)           |
 | `portfolioUpdates-<collection>` | A write to `<collection>/{locale}`, one function per portfolio collection | [Portfolio updates](#portfolio-updates) |
+| `sendPortfolioUpdates`          | Every 5 minutes                                                           | [Portfolio updates](#portfolio-updates) |
 
 ## Structure
 
@@ -360,27 +361,31 @@ device.
 
 ## Portfolio updates
 
-`portfolioUpdates-<collection>` notifies the app's users that the portfolio changed. There is
-one function for each portfolio collection: `profile`, `experiences`, `expertise`, `projects`,
+`portfolioUpdates-<collection>` records each change to the portfolio, and
+`sendPortfolioUpdates` notifies the app's users of them. There is one `portfolioUpdates`
+function for each portfolio collection: `profile`, `experiences`, `expertise`, `projects`,
 `services` and `testimonials`.
 
-- Runs when a document `<collection>/{locale}` is created or changed, in `us-central1`, the
-  region of the Cloud Firestore database.
-- Sends one notification to the topic `portfolio_updates_<locale>`, such as "Portfolio updated
-  — Take a look at what's new.", in that locale (`en`, `es` or `nl`, English otherwise). The
-  app subscribes to the topic of its language when the user turns notifications on.
-- Records the change time of the collection in `portfolio_versions/{locale}`, such as
-  `{ profile: <time>, projects: <time> }`, on every change, without the cooldown. The app
-  compares these times with its caches and refreshes only the collections that changed.
-- Sends nothing and records nothing when the document was deleted, when its content did not
-  change, or when the locale is not two lowercase letters.
-- Sends to a topic at most once every 6 hours, so one import that writes many documents gives
-  one notification. The last send to each topic is kept at `notification_sends/{topic}` as
-  `sentAt`; a transaction claims the send, so triggers running at the same time cannot both send.
-- The notification's data holds `kind: portfolio_update`. A newer notification replaces the one
-  shown.
-- Logs the outcome of each change: `sent`, `unchanged`, `deleted`, `unknown_locale` or
-  `cooling_down`. A failed send is not retried.
+- `portfolioUpdates-<collection>` runs when a document `<collection>/{locale}` is created or
+  changed, in `us-central1`, the region of the Cloud Firestore database. In one write, it:
+  - records the change time of the collection in `portfolio_versions/{locale}`, such as
+    `{ profile: <time>, projects: <time> }`. The app compares these times with its caches and
+    refreshes only the collections that changed.
+  - adds the collection to the batch of the locale, `portfolio_update_batches/{locale}`, as
+    `{ collections: [...], lastChangedAt: <time> }`.
+- It records nothing when the document was deleted, when its content did not change, such as an
+  import of the same data, or when the locale is not two lowercase letters. It logs the outcome:
+  `recorded`, `unchanged`, `deleted` or `unknown_locale`.
+- `sendPortfolioUpdates` runs every 5 minutes. It sends each batch with no change in the last
+  2 minutes as one notification to the topic `portfolio_updates_<locale>`, so one import that
+  writes many documents gives one notification, 2 to 7 minutes after its last write. The app
+  subscribes to the topic of its language when the user turns notifications on.
+- The notification names the changed sections as the app does, in the locale (`en`, `es` or
+  `nl`, English otherwise), such as "Portfolio updated — Updated: Projects and Services.".
+- A transaction deletes each batch before it is sent, so it is sent once. A change made after
+  that starts a new batch. A failed send is logged and not retried.
+- The notification's data holds `kind: portfolio_update` and the changed collections, such as
+  `sections: projects,services`. A newer notification replaces the one shown.
 
 The functions run as the `notifications` service account (see
 [Service account](#service-account)).
@@ -445,12 +450,12 @@ for role in roles/datastore.user roles/firebasecloudmessaging.admin \
 done
 ```
 
-| Role                                 | Console name                       | Needed for                               |
-| ------------------------------------ | ---------------------------------- | ---------------------------------------- |
-| `roles/datastore.user`               | Cloud Datastore User               | Reading and writing `notification_sends` |
-| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Sending notifications                    |
-| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events           |
-| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the functions     |
+| Role                                 | Console name                       | Needed for                                               |
+| ------------------------------------ | ---------------------------------- | -------------------------------------------------------- |
+| `roles/datastore.user`               | Cloud Datastore User               | Reading and writing the batches                          |
+| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Sending notifications                                    |
+| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events                           |
+| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc and Cloud Scheduler start the functions |
 
 Firestore triggers must run in the database's region, set by `firestoreTriggerRegion`. Check the
 location with `gcloud firestore databases describe --project="$PROJECT_ID" --format="value(locationId)"`.

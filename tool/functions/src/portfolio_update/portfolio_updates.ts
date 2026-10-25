@@ -1,53 +1,79 @@
-import { type Firestore, getFirestore } from 'firebase-admin/firestore';
+import {
+  FieldValue,
+  type Firestore,
+  getFirestore,
+} from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import * as logger from 'firebase-functions/logger';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import {
   firestoreTriggerRegion,
+  functionRegion,
   serviceAccountEmail,
 } from '../shared/function_options.js';
 import { cloudMessagingSender } from '../shared/messaging.js';
 import {
-  notifyPortfolioUpdate,
+  type PortfolioCollection,
+  type PortfolioUpdateBatch,
+  notifyPortfolioUpdates,
   portfolioCollections,
+  portfolioUpdateBatchesCollection,
   portfolioVersionsCollection,
+  recordPortfolioChange,
 } from './notify_portfolio_update.js';
 
-/** The last send to each topic, at `notification_sends/{topic}`. */
-const sendsCollection = 'notification_sends';
-
 /**
- * Records a send to [topic] in a transaction, so two triggers running at the
- * same time cannot both claim it.
+ * Sets the change time of one collection, keeping the others, and adds the
+ * collection to the batch of [locale] in the same write.
  */
-function claimSend(db: Firestore) {
-  return (topic: string, now: Date, cooldownMs: number) =>
-    db.runTransaction(async (transaction) => {
-      const ref = db.collection(sendsCollection).doc(topic);
-      const sentAt = (await transaction.get(ref)).get('sentAt');
-      if (
-        sentAt !== undefined &&
-        now.getTime() - sentAt.toDate().getTime() < cooldownMs
-      ) {
-        return false;
-      }
-      transaction.set(ref, { sentAt: now });
-      return true;
-    });
-}
-
-/** Sets the change time of one collection, keeping the others. */
 function recordChange(db: Firestore) {
-  return async (locale: string, collection: string, now: Date) => {
-    await db
-      .collection(portfolioVersionsCollection)
-      .doc(locale)
-      .set({ [collection]: now }, { merge: true });
+  return async (locale: string, collection: PortfolioCollection, now: Date) => {
+    const batch = db.batch();
+    batch.set(
+      db.collection(portfolioVersionsCollection).doc(locale),
+      { [collection]: now },
+      { merge: true },
+    );
+    batch.set(
+      db.collection(portfolioUpdateBatchesCollection).doc(locale),
+      { collections: FieldValue.arrayUnion(collection), lastChangedAt: now },
+      { merge: true },
+    );
+    await batch.commit();
   };
 }
 
-function portfolioUpdateTrigger(collection: string) {
+/**
+ * Deletes each quiet batch in a transaction, so a batch is sent once and a
+ * change added after the query keeps its batch for the next run.
+ */
+function claimQuietBatches(db: Firestore) {
+  return async (changedBefore: Date) => {
+    const quiet = await db
+      .collection(portfolioUpdateBatchesCollection)
+      .where('lastChangedAt', '<=', changedBefore)
+      .get();
+    const batches: PortfolioUpdateBatch[] = [];
+    for (const { ref } of quiet.docs) {
+      const collections = await db.runTransaction(async (transaction) => {
+        const snapshot = await transaction.get(ref);
+        const lastChangedAt = snapshot.get('lastChangedAt');
+        if (!snapshot.exists || lastChangedAt.toDate() > changedBefore) {
+          return undefined;
+        }
+        transaction.delete(ref);
+        const stored: unknown = snapshot.get('collections');
+        return Array.isArray(stored) ? stored : [];
+      });
+      if (collections) batches.push({ locale: ref.id, collections });
+    }
+    return batches;
+  };
+}
+
+function portfolioUpdateTrigger(collection: PortfolioCollection) {
   return onDocumentWritten(
     {
       document: `${collection}/{locale}`,
@@ -57,13 +83,8 @@ function portfolioUpdateTrigger(collection: string) {
       retry: false,
     },
     async (event) => {
-      const db = getFirestore();
-      const outcome = await notifyPortfolioUpdate(
-        {
-          recordChange: recordChange(db),
-          claimSend: claimSend(db),
-          sender: cloudMessagingSender(getMessaging()),
-        },
+      const outcome = await recordPortfolioChange(
+        { recordChange: recordChange(getFirestore()) },
         {
           collection,
           locale: event.params.locale,
@@ -87,4 +108,36 @@ export const portfolioUpdates = Object.fromEntries(
     collection,
     portfolioUpdateTrigger(collection),
   ]),
+);
+
+/** Sends one notification per locale for the changes that have gone quiet. */
+export const sendPortfolioUpdates = onSchedule(
+  {
+    schedule: 'every 5 minutes',
+    region: functionRegion,
+    // Only allowed to read and write Firestore and to send notifications.
+    serviceAccount: serviceAccountEmail('notifications'),
+    retryCount: 0,
+  },
+  async () => {
+    const db = getFirestore();
+    const sends = await notifyPortfolioUpdates(
+      {
+        claimQuietBatches: claimQuietBatches(db),
+        sender: cloudMessagingSender(getMessaging()),
+      },
+      new Date(),
+    );
+    for (const { locale, collections, error } of sends) {
+      if (error === undefined) {
+        logger.info('Sent a portfolio update', { locale, collections });
+      } else {
+        logger.error('A portfolio update failed to send', {
+          locale,
+          collections,
+          error: String(error),
+        });
+      }
+    }
+  },
 );
