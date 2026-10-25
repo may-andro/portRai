@@ -369,8 +369,11 @@ one function for each portfolio collection: `profile`, `experiences`, `expertise
 - Sends one notification to the topic `portfolio_updates_<locale>`, such as "Portfolio updated
   — Take a look at what's new.", in that locale (`en`, `es` or `nl`, English otherwise). The
   app subscribes to the topic of its language when the user turns notifications on.
-- Sends nothing when the document was deleted, when its content did not change, or when the
-  locale is not two lowercase letters.
+- Records the change time of the collection in `portfolio_versions/{locale}`, such as
+  `{ profile: <time>, projects: <time> }`, on every change, without the cooldown. The app
+  compares these times with its caches and refreshes only the collections that changed.
+- Sends nothing and records nothing when the document was deleted, when its content did not
+  change, or when the locale is not two lowercase letters.
 - Sends to a topic at most once every 6 hours, so one import that writes many documents gives
   one notification. The last send to each topic is kept at `notification_sends/{topic}` as
   `sentAt`; a transaction claims the send, so triggers running at the same time cannot both send.

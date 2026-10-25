@@ -36,6 +36,10 @@ class AssetProfileRepositoryImpl implements ProfileRepository {
     return _cacheDelegateRepository.cacheProfile(profile);
   }
 
+  /// The bundled profile does not change while the app runs.
+  @override
+  Future<void> refreshProfile() async {}
+
   @override
   Future<ProfileEntity> getProfile() async {
     final source = (await _getAssetSourceUseCase()).right;

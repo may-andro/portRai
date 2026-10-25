@@ -19,4 +19,12 @@ extension MockServiceRepositoryStub on MockServiceRepository {
   void stubCacheServicesThrows(List<ServiceEntity> services, Object error) {
     when(() => cacheServices(services)).thenThrow(error);
   }
+
+  void stubRefreshServices() {
+    when(() => refreshServices()).thenAnswer((_) async {});
+  }
+
+  void stubRefreshServicesThrows(Object error) {
+    when(() => refreshServices()).thenThrow(error);
+  }
 }

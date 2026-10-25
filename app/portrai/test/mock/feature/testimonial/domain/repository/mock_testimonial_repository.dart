@@ -33,4 +33,12 @@ extension MockTestimonialRepositoryStub on MockTestimonialRepository {
   void stubGetTestimonialsThrows(Object error) {
     when(() => getTestimonials()).thenThrow(error);
   }
+
+  void stubRefreshTestimonials() {
+    when(() => refreshTestimonials()).thenAnswer((_) async {});
+  }
+
+  void stubRefreshTestimonialsThrows(Object error) {
+    when(() => refreshTestimonials()).thenThrow(error);
+  }
 }

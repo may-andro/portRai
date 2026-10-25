@@ -36,6 +36,10 @@ class AssetExperienceRepositoryImpl implements ExperienceRepository {
     return _cacheDelegateRepository.cacheExperiences(experiences);
   }
 
+  /// The bundled experiences do not change while the app runs.
+  @override
+  Future<void> refreshExperiences() async {}
+
   @override
   Future<ExperienceEntity> getExperience(String id) async {
     final source = (await _getAssetSourceUseCase()).right;

@@ -192,5 +192,50 @@ void main() {
         expect(reportedError.tag, 'RemoteServiceRepositoryImpl');
       },
     );
+
+    test(
+      'should replace the cached services with the remote ones when refreshed',
+      () async {
+        firestoreController.stubGetDocumentFromCollection({
+          'services': [
+            {
+              'title': service.title,
+              'description': service.description,
+              'image': service.image,
+              'detail': service.detail,
+            },
+          ],
+        });
+        cacheRepository
+          ..stubRefreshServices()
+          ..stubCacheServices([service]);
+
+        await repository.refreshServices();
+
+        verifyInOrder([
+          () => cacheRepository.refreshServices(),
+          () => cacheRepository.cacheServices([service]),
+        ]);
+      },
+    );
+
+    test(
+      'should keep the cached services when loading the remote ones fails',
+      () async {
+        firestoreController.stubGetDocumentFromCollectionThrows(
+          FirestoreTimeoutException(
+            'get-services',
+            Exception('timeout'),
+            StackTrace.current,
+          ),
+        );
+
+        await expectLater(
+          () => repository.refreshServices(),
+          throwsA(isA<ServiceNetworkException>()),
+        );
+        verifyNever(() => cacheRepository.refreshServices());
+      },
+    );
   });
 }

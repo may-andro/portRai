@@ -30,6 +30,25 @@ class CacheProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
+  /// Drops the cached projects of the current locale, so the next read loads
+  /// them again.
+  @override
+  Future<void> refreshProjects() async {
+    try {
+      await _projectCache.delete({'locale': _appLocale.languageCode});
+    } on DBNotInitialisedException catch (e, stackTrace) {
+      throw ProjectCacheException(
+        cause: 'Database not initialized: $e',
+        stackTrace: stackTrace,
+      );
+    } catch (e, stackTrace) {
+      throw ProjectCacheException(
+        cause: 'Unexpected error while clearing projects: $e',
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<List<ProjectEntity>> getProjects() async {
     try {

@@ -51,6 +51,18 @@ void main() {
           verifyNever(() => unselected.cacheProfile(profile));
         },
       );
+
+      test(
+        'should delegate refreshes to the selected source when requested',
+        () async {
+          selected.stubRefreshProfile();
+
+          await repository.refreshProfile();
+
+          verify(() => selected.refreshProfile()).called(1);
+          verifyNever(() => unselected.refreshProfile());
+        },
+      );
     });
   }
 }

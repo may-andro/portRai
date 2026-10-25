@@ -34,6 +34,25 @@ class CacheExperienceRepositoryImpl implements ExperienceRepository {
     }
   }
 
+  /// Drops the cached experiences of the current locale, so the next read
+  /// loads them again.
+  @override
+  Future<void> refreshExperiences() async {
+    try {
+      await _experienceCache.delete({'locale': _appLocale.languageCode});
+    } on DBNotInitialisedException catch (e, stackTrace) {
+      throw ExperienceCacheException(
+        cause: 'Database not initialized: $e',
+        stackTrace: stackTrace,
+      );
+    } catch (e, stackTrace) {
+      throw ExperienceCacheException(
+        cause: 'Unexpected error while clearing experiences: $e',
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<ExperienceEntity> getExperience(String id) async {
     try {

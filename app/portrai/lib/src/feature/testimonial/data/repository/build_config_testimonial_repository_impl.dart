@@ -31,6 +31,11 @@ class BuildConfigTestimonialRepositoryImpl implements TestimonialRepository {
     return _delegateRepository.getTestimonials();
   }
 
+  @override
+  Future<void> refreshTestimonials() {
+    return _delegateRepository.refreshTestimonials();
+  }
+
   TestimonialRepository get _delegateRepository {
     switch (_buildConfig.buildEnvironment) {
       case BuildEnvironment.prod:

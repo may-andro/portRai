@@ -65,6 +65,18 @@ void main() {
           verifyNever(() => unselected.cacheTestimonials([testimonial]));
         },
       );
+
+      test(
+        'should delegate refreshes to the selected source when requested',
+        () async {
+          selected.stubRefreshTestimonials();
+
+          await repository.refreshTestimonials();
+
+          verify(() => selected.refreshTestimonials()).called(1);
+          verifyNever(() => unselected.refreshTestimonials());
+        },
+      );
     });
   }
 }

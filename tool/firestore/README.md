@@ -15,6 +15,7 @@ Firestore emulator.
 | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `profile`, `experiences`, `expertise`, `projects`, `services`, `testimonials` `/{id}` | Anyone can read a document by ID. Listing and writing are refused                 |
 | `app_config/{id}`                                                                     | Anyone can read a document by ID. Listing and writing are refused                 |
+| `portfolio_versions/{locale}`                                                         | Anyone can read a document by ID. Listing and writing are refused                 |
 | `users/{uid}`                                                                         | The signed-in user can read it and write only its `jobSearch` map                 |
 | `users/{uid}/job_openings/{id}`                                                       | The signed-in user can list and read them. Writing is refused                     |
 | `users/{uid}/devices/{token}`                                                         | The signed-in user can register, read and remove one by token. Listing is refused |

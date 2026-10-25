@@ -54,3 +54,15 @@ class PortfolioUnauthorizedException extends PortfolioException {
     return result;
   }
 }
+
+class PortfolioCacheException extends PortfolioException {
+  const PortfolioCacheException({super.cause, super.stackTrace});
+
+  @override
+  String toString() {
+    var result = 'PortfolioCacheException';
+    if (cause != null) result += ' | Cause: $cause';
+    if (stackTrace != null) result += '\nStackTrace: $stackTrace';
+    return result;
+  }
+}

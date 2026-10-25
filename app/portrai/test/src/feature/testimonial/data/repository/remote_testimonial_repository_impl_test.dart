@@ -198,5 +198,35 @@ void main() {
         );
       },
     );
+
+    test(
+      'should replace the cached testimonials with the remote ones when refreshed',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(firestoreDocument);
+        cacheDelegateRepository
+          ..stubRefreshTestimonials()
+          ..stubCacheTestimonials(testimonials);
+
+        await repository.refreshTestimonials();
+
+        verifyInOrder([
+          () => cacheDelegateRepository.refreshTestimonials(),
+          () => cacheDelegateRepository.cacheTestimonials(testimonials),
+        ]);
+      },
+    );
+
+    test(
+      'should keep the cached testimonials when loading the remote ones fails',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(null);
+
+        await expectLater(
+          repository.refreshTestimonials,
+          throwsA(isA<TestimonialNotFoundException>()),
+        );
+        verifyNever(() => cacheDelegateRepository.refreshTestimonials());
+      },
+    );
   });
 }

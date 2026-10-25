@@ -142,5 +142,31 @@ void main() {
         );
       },
     );
+
+    test(
+      'should delete the cached testimonials of the current locale when refreshed',
+      () async {
+        testimonialCache.stubDelete(locale: localeCode);
+
+        await repository.refreshTestimonials();
+
+        verify(() => testimonialCache.delete({'locale': localeCode})).called(1);
+      },
+    );
+
+    test(
+      'should throw a cache exception when deleting the cached testimonials fails',
+      () {
+        testimonialCache.stubDeleteThrows(
+          locale: localeCode,
+          error: Exception('delete failed'),
+        );
+
+        expect(
+          repository.refreshTestimonials,
+          throwsA(isA<TestimonialCacheException>()),
+        );
+      },
+    );
   });
 }

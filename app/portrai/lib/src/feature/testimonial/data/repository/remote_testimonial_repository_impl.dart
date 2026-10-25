@@ -102,6 +102,14 @@ class RemoteTestimonialRepositoryImpl implements TestimonialRepository {
     return testimonials;
   }
 
+  /// Loads the testimonials first, so the cached ones stay when loading fails.
+  @override
+  Future<void> refreshTestimonials() async {
+    final testimonials = await _loadTestimonialsFromRemote();
+    await _cacheDelegateRepository.refreshTestimonials();
+    await cacheTestimonials(testimonials);
+  }
+
   Future<List<TestimonialEntity>> _loadTestimonialsFromRemote() async {
     try {
       final locale = _appLocale.languageCode;

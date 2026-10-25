@@ -95,5 +95,28 @@ void main() {
         );
       },
     );
+
+    test(
+      'should delete the cached services of the current locale when refreshed',
+      () async {
+        cache.stubDelete(locale: 'en');
+
+        await repository.refreshServices();
+
+        verify(() => cache.delete({'locale': 'en'})).called(1);
+      },
+    );
+
+    test(
+      'should throw a cache exception when deleting the cached services fails',
+      () {
+        cache.stubDeleteThrows(locale: 'en', error: Exception('delete failed'));
+
+        expect(
+          () => repository.refreshServices(),
+          throwsA(isA<ServiceCacheException>()),
+        );
+      },
+    );
   });
 }

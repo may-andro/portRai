@@ -22,4 +22,12 @@ extension MockProfileRepositoryStub on MockProfileRepository {
   }) {
     when(() => cacheProfile(profile)).thenThrow(error);
   }
+
+  void stubRefreshProfile() {
+    when(refreshProfile).thenAnswer((_) async {});
+  }
+
+  void stubRefreshProfileThrows(Object error) {
+    when(refreshProfile).thenThrow(error);
+  }
 }

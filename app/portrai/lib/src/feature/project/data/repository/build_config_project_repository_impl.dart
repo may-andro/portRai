@@ -31,6 +31,11 @@ class BuildConfigProjectRepositoryImpl implements ProjectRepository {
     return _delegateRepository.getProject(id);
   }
 
+  @override
+  Future<void> refreshProjects() {
+    return _delegateRepository.refreshProjects();
+  }
+
   ProjectRepository get _delegateRepository {
     switch (_buildConfig.buildEnvironment) {
       case BuildEnvironment.prod:

@@ -35,6 +35,10 @@ class AssetExpertiseRepositoryImpl implements ExpertiseRepository {
     return _cacheDelegateRepository.cacheAllExpertise(expertiseList);
   }
 
+  /// The bundled expertise does not change while the app runs.
+  @override
+  Future<void> refreshAllExpertise() async {}
+
   @override
   Future<List<ExpertiseEntity>> getAllExpertise() async {
     final source = (await _getAssetSourceUseCase()).right;

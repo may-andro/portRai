@@ -22,4 +22,12 @@ extension MockExpertiseRepositoryStub on MockExpertiseRepository {
   void stubGetAllExpertiseThrows(Object error) {
     when(() => getAllExpertise()).thenThrow(error);
   }
+
+  void stubRefreshAllExpertise() {
+    when(() => refreshAllExpertise()).thenAnswer((_) async {});
+  }
+
+  void stubRefreshAllExpertiseThrows(Object error) {
+    when(() => refreshAllExpertise()).thenThrow(error);
+  }
 }

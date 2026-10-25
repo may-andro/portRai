@@ -35,6 +35,10 @@ class AssetProjectRepositoryImpl implements ProjectRepository {
     return _cacheDelegateRepository.cacheProjects(projects);
   }
 
+  /// The bundled projects do not change while the app runs.
+  @override
+  Future<void> refreshProjects() async {}
+
   @override
   Future<List<ProjectEntity>> getProjects() async {
     final source = (await _getAssetSourceUseCase()).right;

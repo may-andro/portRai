@@ -185,5 +185,35 @@ void main() {
         );
       },
     );
+
+    test(
+      'should replace the cached projects with the remote ones when refreshed',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(firestoreDocument);
+        cacheDelegateRepository
+          ..stubRefreshProjects()
+          ..stubCacheProjects(projects);
+
+        await repository.refreshProjects();
+
+        verifyInOrder([
+          () => cacheDelegateRepository.refreshProjects(),
+          () => cacheDelegateRepository.cacheProjects(projects),
+        ]);
+      },
+    );
+
+    test(
+      'should keep the cached projects when loading the remote ones fails',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(null);
+
+        await expectLater(
+          repository.refreshProjects,
+          throwsA(isA<ProjectNotFoundException>()),
+        );
+        verifyNever(() => cacheDelegateRepository.refreshProjects());
+      },
+    );
   });
 }

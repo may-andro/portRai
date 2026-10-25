@@ -170,5 +170,35 @@ void main() {
         );
       },
     );
+
+    test(
+      'should replace the cached profile with the remote one when refreshed',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(firestoreDocument);
+        cacheDelegateRepository
+          ..stubRefreshProfile()
+          ..stubCacheProfile(profile);
+
+        await repository.refreshProfile();
+
+        verifyInOrder([
+          () => cacheDelegateRepository.refreshProfile(),
+          () => cacheDelegateRepository.cacheProfile(profile),
+        ]);
+      },
+    );
+
+    test(
+      'should keep the cached profile when loading the remote one fails',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(null);
+
+        await expectLater(
+          repository.refreshProfile,
+          throwsA(isA<ProfileNotFoundException>()),
+        );
+        verifyNever(() => cacheDelegateRepository.refreshProfile());
+      },
+    );
   });
 }

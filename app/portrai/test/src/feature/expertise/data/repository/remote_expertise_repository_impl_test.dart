@@ -194,5 +194,35 @@ void main() {
         );
       },
     );
+
+    test(
+      'should replace the cached expertise with the remote one when refreshed',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(firestoreDocument);
+        cacheDelegateRepository
+          ..stubRefreshAllExpertise()
+          ..stubCacheAllExpertise(expertiseList);
+
+        await repository.refreshAllExpertise();
+
+        verifyInOrder([
+          () => cacheDelegateRepository.refreshAllExpertise(),
+          () => cacheDelegateRepository.cacheAllExpertise(expertiseList),
+        ]);
+      },
+    );
+
+    test(
+      'should keep the cached expertise when loading the remote one fails',
+      () async {
+        firestoreController.stubGetDocumentFromCollection(null);
+
+        await expectLater(
+          repository.refreshAllExpertise,
+          throwsA(isA<ExpertiseNotFoundException>()),
+        );
+        verifyNever(() => cacheDelegateRepository.refreshAllExpertise());
+      },
+    );
   });
 }

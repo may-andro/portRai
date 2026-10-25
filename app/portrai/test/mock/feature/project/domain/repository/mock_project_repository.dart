@@ -30,4 +30,12 @@ extension MockProjectRepositoryStub on MockProjectRepository {
   void stubGetProjectsThrows(Object error) {
     when(() => getProjects()).thenThrow(error);
   }
+
+  void stubRefreshProjects() {
+    when(refreshProjects).thenAnswer((_) async {});
+  }
+
+  void stubRefreshProjectsThrows(Object error) {
+    when(refreshProjects).thenThrow(error);
+  }
 }

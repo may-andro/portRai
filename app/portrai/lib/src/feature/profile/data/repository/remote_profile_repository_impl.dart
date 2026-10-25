@@ -55,6 +55,14 @@ class RemoteProfileRepositoryImpl implements ProfileRepository {
     }
   }
 
+  /// Loads the profile first, so the cached one stays when loading fails.
+  @override
+  Future<void> refreshProfile() async {
+    final profile = await _loadProfileFromRemote();
+    await _cacheDelegateRepository.refreshProfile();
+    await cacheProfile(profile);
+  }
+
   Future<ProfileEntity> _loadProfileFromRemote() async {
     try {
       final locale = _appLocale.languageCode;

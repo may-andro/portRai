@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/feature/notification/domain/_domain.dart';
 import 'package:portrai/src/feature/notification/presentation/bloc/notification_listener_event.dart';
 import 'package:portrai/src/feature/notification/presentation/bloc/notification_listener_state.dart';
+import 'package:portrai/src/feature/portfolio/portfolio.dart';
 
 /// Keeps this device's notifications in step with the app for as long as it
 /// runs, and reports the notifications the user taps or receives in the
@@ -24,6 +25,7 @@ class NotificationListenerBloc
     this._watchDeviceTokenRefreshesUseCase,
     this._watchLocaleUseCase,
     this._watchSignedInUserUseCase,
+    this._syncPortfolioUseCase,
   ) : super(const NotificationListenerIdleState()) {
     on<NotificationListenerStartEvent>(
       _mapNotificationListenerStartEventToState,
@@ -44,6 +46,7 @@ class NotificationListenerBloc
   final WatchDeviceTokenRefreshesUseCase _watchDeviceTokenRefreshesUseCase;
   final WatchLocaleUseCase _watchLocaleUseCase;
   final WatchSignedInUserUseCase _watchSignedInUserUseCase;
+  final SyncPortfolioUseCase _syncPortfolioUseCase;
 
   final List<StreamSubscription<Object?>> _subscriptions = [];
   List<String> _supportedLanguageCodes = const [];
@@ -88,6 +91,7 @@ class NotificationListenerBloc
     final initialMessageEither = await _getInitialPushMessageUseCase();
     if (initialMessageEither.isRight) {
       if (initialMessageEither.right case final message?) {
+        _syncPortfolioIfUpdated(message);
         emit(PushMessageOpenedState(message, ++_sequence));
       }
     }
@@ -116,12 +120,26 @@ class NotificationListenerBloc
   void _mapPushMessageOpenedEventToState(
     PushMessageOpenedEvent event,
     Emitter<NotificationListenerState> emit,
-  ) => emit(PushMessageOpenedState(event.message, ++_sequence));
+  ) {
+    _syncPortfolioIfUpdated(event.message);
+    emit(PushMessageOpenedState(event.message, ++_sequence));
+  }
 
   void _mapPushMessageReceivedEventToState(
     PushMessageReceivedEvent event,
     Emitter<NotificationListenerState> emit,
-  ) => emit(PushMessageReceivedState(event.message, ++_sequence));
+  ) {
+    _syncPortfolioIfUpdated(event.message);
+    emit(PushMessageReceivedState(event.message, ++_sequence));
+  }
+
+  // Runs alongside opening or showing the message; screens reload the
+  // sections it refreshes.
+  void _syncPortfolioIfUpdated(PushMessageEntity message) {
+    if (message.kind == PushMessageKind.portfolioUpdate) {
+      unawaited(Future.value(_syncPortfolioUseCase()));
+    }
+  }
 
   Future<void> _sync() => _pendingSync = _pendingSync.then(
     (_) => _syncNotificationsUseCase(_supportedLanguageCodes),

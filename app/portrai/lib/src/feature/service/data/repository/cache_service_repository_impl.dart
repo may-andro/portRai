@@ -30,6 +30,25 @@ class CacheServiceRepositoryImpl implements ServiceRepository {
     }
   }
 
+  /// Drops the cached services of the current locale, so the next read loads
+  /// them again.
+  @override
+  Future<void> refreshServices() async {
+    try {
+      await _serviceCache.delete({'locale': _appLocale.languageCode});
+    } on DBNotInitialisedException catch (e, stackTrace) {
+      throw ServiceCacheException(
+        cause: 'Database not initialized: $e',
+        stackTrace: stackTrace,
+      );
+    } catch (e, stackTrace) {
+      throw ServiceCacheException(
+        cause: 'Unexpected error while clearing services: $e',
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<List<ServiceEntity>> getServices() async {
     try {

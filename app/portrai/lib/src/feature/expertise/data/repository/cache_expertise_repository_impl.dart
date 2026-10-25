@@ -35,6 +35,25 @@ class CacheExpertiseRepositoryImpl implements ExpertiseRepository {
     }
   }
 
+  /// Drops the cached expertise of the current locale, so the next read loads
+  /// it again.
+  @override
+  Future<void> refreshAllExpertise() async {
+    try {
+      await _expertiseCache.delete({'locale': _appLocale.languageCode});
+    } on DBNotInitialisedException catch (e, stackTrace) {
+      throw ExpertiseCacheException(
+        cause: 'Database not initialized: $e',
+        stackTrace: stackTrace,
+      );
+    } catch (e, stackTrace) {
+      throw ExpertiseCacheException(
+        cause: 'Unexpected error while clearing expertise: $e',
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<List<ExpertiseEntity>> getAllExpertise() async {
     try {

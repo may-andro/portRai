@@ -7,6 +7,7 @@ import 'package:portrai/src/feature/connectivity/connectivity.dart';
 import 'package:portrai/src/feature/force_update/force_update.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
 import 'package:portrai/src/feature/notification/notification.dart';
+import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
@@ -75,10 +76,12 @@ class _PortraiAppState extends State<PortraiApp> {
               child: SystemLocaleObserverWidget(
                 child: ForceUpdateListenerWidget(
                   child: ConnectivityListenerWidget(
-                    child: NotificationListenerWidget(
-                      child: ScreenFooterProviderWidget(
-                        footer: const FooterWidget(),
-                        child: child ?? const SizedBox.shrink(),
+                    child: PortfolioUpdateListenerWidget(
+                      child: NotificationListenerWidget(
+                        child: ScreenFooterProviderWidget(
+                          footer: const FooterWidget(),
+                          child: child ?? const SizedBox.shrink(),
+                        ),
                       ),
                     ),
                   ),

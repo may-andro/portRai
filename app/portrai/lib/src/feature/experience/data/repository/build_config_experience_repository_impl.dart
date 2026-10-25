@@ -31,6 +31,11 @@ class BuildConfigExperienceRepositoryImpl implements ExperienceRepository {
     return _delegateRepository.getExperiences();
   }
 
+  @override
+  Future<void> refreshExperiences() {
+    return _delegateRepository.refreshExperiences();
+  }
+
   ExperienceRepository get _delegateRepository {
     switch (_buildConfig.buildEnvironment) {
       case BuildEnvironment.prod:
