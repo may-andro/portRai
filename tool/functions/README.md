@@ -460,8 +460,8 @@ done
 Firestore triggers must run in the database's region, set by `firestoreTriggerRegion`. Check the
 location with `gcloud firestore databases describe --project="$PROJECT_ID" --format="value(locationId)"`.
 
-The deploy lets the account start the function from Cloud Scheduler, so it needs no other
-role. Deploying needs permission to act as the account, which project Owners have.
+Cloud Scheduler starts `sendPortfolioUpdates` as this account, which `roles/run.invoker` allows.
+Deploying needs permission to act as the account, which project Owners have.
 
 Before changing the model, check that it is offered in the `global` location and has capacity
 there. A model with little shared capacity answers most calls with `429 RESOURCE_EXHAUSTED`, even
@@ -550,3 +550,39 @@ rm key.json
 | `roles/iam.serviceAccountUser`            | Running functions as `job-openings` and `notifications`, building them as the default compute account and deploying scheduled functions, which the Firebase CLI checks against the App Engine default account |
 
 The workflow also reads the `FIREBASE_PROJECT_ID` secret that the other deploys use.
+
+#### Owner-only setup
+
+The deploy account may not change IAM policies, so a project Owner grants these once. When one is
+missing, the deploy fails with the message below. Grant the roles, then re-run the failed job.
+
+- **The first 2nd-gen or Firestore-triggered function in the project** fails with "We failed to
+  modify the IAM policy for the project". Grant the Google service agents their roles:
+
+  ```bash
+  PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com" \
+    --role=roles/iam.serviceAccountTokenCreator
+  for role in roles/run.invoker roles/eventarc.eventReceiver; do
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+      --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" --role="$role"
+  done
+  ```
+
+  The Eventarc service agent can take a few minutes to get its permissions after that. Until
+  then, the deploy fails with "Permission denied while using the Eventarc Service Agent".
+
+- **Each new scheduled function** fails with "Failed to set the IAM Policy on the Service". The
+  Firebase CLI lets the function's account call its Cloud Run service, which the deploy account
+  may not do. The first deploy still creates the service, so grant it, with the service named
+  after the function in lowercase:
+
+  ```bash
+  gcloud run services add-iam-policy-binding <function-name-in-lowercase> \
+    --region=europe-west3 --project="$PROJECT_ID" \
+    --member="serviceAccount:<account>@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role=roles/run.invoker
+  ```
+
+  `fetchJobOpenings` runs as `job-openings`, and `sendPortfolioUpdates` as `notifications`.
