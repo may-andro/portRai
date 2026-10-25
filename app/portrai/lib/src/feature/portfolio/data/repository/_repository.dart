@@ -1,1 +1,1 @@
-export 'firestore_portfolio_sync_repository.dart';
+export 'firestore_portfolio_update_repository.dart';

@@ -5,18 +5,18 @@ import 'package:portrai/src/feature/portfolio/presentation/_presentation.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../mock/feature/portfolio/domain/use_case/mock_sync_portfolio_use_case.dart';
+import '../../../../../mock/feature/portfolio/domain/use_case/mock_update_portfolio_use_case.dart';
 
 void main() {
   group('PortfolioUpdateListenerWidget', () {
-    late MockSyncPortfolioUseCase syncPortfolioUseCase;
+    late MockUpdatePortfolioUseCase updatePortfolioUseCase;
 
     setUp(() async {
       await appServiceLocator.reset();
-      syncPortfolioUseCase = MockSyncPortfolioUseCase()
+      updatePortfolioUseCase = MockUpdatePortfolioUseCase()
         ..stubCall(const Right({}));
       appServiceLocator.registerFactory<PortfolioUpdateListenerBloc>(
-        () => PortfolioUpdateListenerBloc(syncPortfolioUseCase),
+        () => PortfolioUpdateListenerBloc(updatePortfolioUseCase),
       );
     });
 
@@ -33,13 +33,13 @@ void main() {
       await tester.pump();
 
       expect(find.text('Portfolio'), findsOneWidget);
-      verify(() => syncPortfolioUseCase()).called(1);
+      verify(() => updatePortfolioUseCase()).called(1);
 
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pump();
 
-      verify(() => syncPortfolioUseCase()).called(1);
+      verify(() => updatePortfolioUseCase()).called(1);
     });
   });
 }

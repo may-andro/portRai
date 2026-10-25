@@ -11,7 +11,7 @@ services, experiences and testimonials features, and keeps their cached data up 
   updates when the app starts and whenever it returns to the foreground. A tapped or received
   "Portfolio updated" notification checks too (see the
   [`notification`](../notification/README.md) feature).
-- `SyncPortfolioUseCase` reads when each section of the app's language last changed and
+- `UpdatePortfolioUseCase` reads when each section of the app's language last changed and
   refreshes only the sections that changed after the change they were last refreshed for. Each
   refresh loads the section first and then replaces its cache, so a section that fails to load
   keeps its cache and is tried again on the next check. Checks run one after another.
@@ -36,7 +36,7 @@ The [functions](../../../../../../tool/functions/README.md) write the change tim
 | `testimonials` | timestamp | When the testimonials last changed |
 
 A field is missing until its section first changes, and the app then keeps its cache. The change
-time each section was last refreshed for is stored on the device in `portfolio_sync_cache`, keyed
+time each section was last refreshed for is stored on the device in `portfolio_update_cache`, keyed
 by `<language>/<section>`.
 
 ## Testing

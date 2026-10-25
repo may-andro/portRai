@@ -8,11 +8,11 @@ import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 
 /// Reads the change times the portfolio functions write to
 /// `portfolio_versions/{locale}`, one field per section.
-@RegisterSingleton(as: PortfolioSyncRepository)
-class FirestorePortfolioSyncRepository implements PortfolioSyncRepository {
-  FirestorePortfolioSyncRepository(
+@RegisterSingleton(as: PortfolioUpdateRepository)
+class FirestorePortfolioUpdateRepository implements PortfolioUpdateRepository {
+  FirestorePortfolioUpdateRepository(
     this._firestoreController,
-    this._portfolioSyncCache,
+    this._portfolioUpdateCache,
     this._appLocale,
     this._buildConfig,
   );
@@ -20,7 +20,7 @@ class FirestorePortfolioSyncRepository implements PortfolioSyncRepository {
   static const _collection = 'portfolio_versions';
 
   final FbFirestoreController _firestoreController;
-  final PortfolioSyncCache _portfolioSyncCache;
+  final PortfolioUpdateCache _portfolioUpdateCache;
   final AppLocale _appLocale;
   final BuildConfig _buildConfig;
 
@@ -57,24 +57,24 @@ class FirestorePortfolioSyncRepository implements PortfolioSyncRepository {
   }
 
   @override
-  Future<Map<PortfolioSection, DateTime>> getSyncedChangeTimes() async {
-    final syncedTimes = await _readSyncedTimes();
+  Future<Map<PortfolioSection, DateTime>> getAppliedChangeTimes() async {
+    final appliedTimes = await _readAppliedTimes();
     return {
       for (final section in PortfolioSection.values)
-        if (syncedTimes[_key(section)] case final int milliseconds)
+        if (appliedTimes[_key(section)] case final int milliseconds)
           section: DateTime.fromMillisecondsSinceEpoch(milliseconds),
     };
   }
 
   @override
-  Future<void> setSyncedChangeTime(
+  Future<void> setAppliedChangeTime(
     PortfolioSection section,
     DateTime changedAt,
   ) async {
-    final syncedTimes = await _readSyncedTimes();
+    final appliedTimes = await _readAppliedTimes();
     try {
-      await _portfolioSyncCache.put({
-        ...syncedTimes,
+      await _portfolioUpdateCache.put({
+        ...appliedTimes,
         _key(section): changedAt.millisecondsSinceEpoch,
       });
     } catch (e, st) {
@@ -91,9 +91,9 @@ class FirestorePortfolioSyncRepository implements PortfolioSyncRepository {
     _refreshedSectionsController.add(sections);
   }
 
-  Future<Map<String, int>> _readSyncedTimes() async {
+  Future<Map<String, int>> _readAppliedTimes() async {
     try {
-      return await _portfolioSyncCache.get() ?? const {};
+      return await _portfolioUpdateCache.get() ?? const {};
     } catch (e, st) {
       throw PortfolioCacheException(cause: e, stackTrace: st);
     }

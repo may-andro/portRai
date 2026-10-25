@@ -13,7 +13,7 @@ class WatchRefreshedPortfolioSectionsUnknownFailure
   const WatchRefreshedPortfolioSectionsUnknownFailure({super.cause});
 }
 
-/// The sections each sync refreshed, so screens showing them can reload.
+/// The sections each update refreshed, so screens showing them can reload.
 @register
 class WatchRefreshedPortfolioSectionsUseCase
     extends
@@ -21,14 +21,14 @@ class WatchRefreshedPortfolioSectionsUseCase
           Set<PortfolioSection>,
           WatchRefreshedPortfolioSectionsFailure
         > {
-  WatchRefreshedPortfolioSectionsUseCase(this._portfolioSyncRepository);
+  WatchRefreshedPortfolioSectionsUseCase(this._portfolioUpdateRepository);
 
-  final PortfolioSyncRepository _portfolioSyncRepository;
+  final PortfolioUpdateRepository _portfolioUpdateRepository;
 
   @protected
   @override
   Stream<Set<PortfolioSection>> execute() =>
-      _portfolioSyncRepository.refreshedSections;
+      _portfolioUpdateRepository.refreshedSections;
 
   @protected
   @override

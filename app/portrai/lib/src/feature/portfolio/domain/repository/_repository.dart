@@ -1,1 +1,1 @@
-export 'portfolio_sync_repository.dart';
+export 'portfolio_update_repository.dart';

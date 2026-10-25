@@ -4,8 +4,8 @@ import 'package:module_injector/module_injector.dart';
 /// The change time each section was last refreshed for, in milliseconds
 /// since the epoch, keyed by `<locale>/<section>`.
 @registerSingleton
-class PortfolioSyncCache extends KeyValueCache<Map<String, int>> {
-  PortfolioSyncCache() : super('portfolio_sync_cache');
+class PortfolioUpdateCache extends KeyValueCache<Map<String, int>> {
+  PortfolioUpdateCache() : super('portfolio_update_cache');
 
   @override
   Map<String, int> deserializeValue(Map<String, dynamic> map) {

@@ -1,10 +1,10 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 
-class MockPortfolioSyncRepository extends Mock
-    implements PortfolioSyncRepository {}
+class MockPortfolioUpdateRepository extends Mock
+    implements PortfolioUpdateRepository {}
 
-extension MockPortfolioSyncRepositoryStub on MockPortfolioSyncRepository {
+extension MockPortfolioUpdateRepositoryStub on MockPortfolioUpdateRepository {
   void stubGetChangeTimes(Map<PortfolioSection, DateTime> changeTimes) {
     when(getChangeTimes).thenAnswer((_) async => changeTimes);
   }
@@ -13,12 +13,12 @@ extension MockPortfolioSyncRepositoryStub on MockPortfolioSyncRepository {
     when(getChangeTimes).thenThrow(error);
   }
 
-  void stubGetSyncedChangeTimes(Map<PortfolioSection, DateTime> changeTimes) {
-    when(getSyncedChangeTimes).thenAnswer((_) async => changeTimes);
+  void stubGetAppliedChangeTimes(Map<PortfolioSection, DateTime> changeTimes) {
+    when(getAppliedChangeTimes).thenAnswer((_) async => changeTimes);
   }
 
-  void stubSetSyncedChangeTime() {
-    when(() => setSyncedChangeTime(any(), any())).thenAnswer((_) async {});
+  void stubSetAppliedChangeTime() {
+    when(() => setAppliedChangeTime(any(), any())).thenAnswer((_) async {});
   }
 
   void stubReportRefreshedSections() {

@@ -2,18 +2,18 @@ import 'package:core/core.dart';
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/portfolio/data/repository/firestore_portfolio_sync_repository.dart';
+import 'package:portrai/src/feature/portfolio/data/repository/firestore_portfolio_update_repository.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
 
-import '../../../../../mock/feature/portfolio/data/cache/mock_portfolio_sync_cache.dart';
+import '../../../../../mock/feature/portfolio/data/cache/mock_portfolio_update_cache.dart';
 import '../../../../../mock/utility/mock_fb_firestore_controller.dart';
 
 void main() {
   final changedAt = DateTime.utc(2026, 10, 24, 10);
 
-  group('FirestorePortfolioSyncRepository', () {
+  group('FirestorePortfolioUpdateRepository', () {
     late MockFbFirestoreController firestoreController;
-    late MockPortfolioSyncCache portfolioSyncCache;
+    late MockPortfolioUpdateCache portfolioUpdateCache;
 
     setUpAll(() {
       registerFallbackValue(<String, int>{});
@@ -21,15 +21,15 @@ void main() {
 
     setUp(() {
       firestoreController = MockFbFirestoreController();
-      portfolioSyncCache = MockPortfolioSyncCache();
+      portfolioUpdateCache = MockPortfolioUpdateCache();
     });
 
-    FirestorePortfolioSyncRepository buildRepository({
+    FirestorePortfolioUpdateRepository buildRepository({
       BuildEnvironment buildEnvironment = BuildEnvironment.prod,
     }) {
-      return FirestorePortfolioSyncRepository(
+      return FirestorePortfolioUpdateRepository(
         firestoreController,
-        portfolioSyncCache,
+        portfolioUpdateCache,
         AppLocale('es'),
         BuildConfig(buildEnvironment: buildEnvironment),
       );
@@ -107,46 +107,47 @@ void main() {
       });
     }
 
-    test('should read the synced change times of the current locale only '
+    test('should read the applied change times of the current locale only '
         'when asked', () async {
-      portfolioSyncCache.stubGet({
+      portfolioUpdateCache.stubGet({
         'es/profile': changedAt.millisecondsSinceEpoch,
         'en/projects': changedAt.millisecondsSinceEpoch,
       });
 
-      final syncedChangeTimes = await buildRepository().getSyncedChangeTimes();
+      final appliedChangeTimes = await buildRepository()
+          .getAppliedChangeTimes();
 
-      expect(syncedChangeTimes, {
+      expect(appliedChangeTimes, {
         PortfolioSection.profile: DateTime.fromMillisecondsSinceEpoch(
           changedAt.millisecondsSinceEpoch,
         ),
       });
     });
 
-    test('should keep the other synced times when one is set', () async {
-      portfolioSyncCache
+    test('should keep the other applied times when one is set', () async {
+      portfolioUpdateCache
         ..stubGet({'en/projects': 1})
         ..stubPut();
 
-      await buildRepository().setSyncedChangeTime(
+      await buildRepository().setAppliedChangeTime(
         PortfolioSection.profile,
         changedAt,
       );
 
       verify(
-        () => portfolioSyncCache.put({
+        () => portfolioUpdateCache.put({
           'en/projects': 1,
           'es/profile': changedAt.millisecondsSinceEpoch,
         }),
       ).called(1);
     });
 
-    test('should throw PortfolioCacheException when the synced times cannot '
+    test('should throw PortfolioCacheException when the applied times cannot '
         'be read', () async {
-      portfolioSyncCache.stubGetThrows(Exception('storage failed'));
+      portfolioUpdateCache.stubGetThrows(Exception('storage failed'));
 
       await expectLater(
-        buildRepository().getSyncedChangeTimes,
+        buildRepository().getAppliedChangeTimes,
         throwsA(isA<PortfolioCacheException>()),
       );
     });

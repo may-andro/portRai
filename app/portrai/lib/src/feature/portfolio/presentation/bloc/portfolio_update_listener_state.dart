@@ -7,7 +7,7 @@ sealed class PortfolioUpdateListenerState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Syncing has no visible state; screens reload the refreshed sections.
+/// Updating has no visible state; screens reload the refreshed sections.
 class PortfolioUpdateListenerIdleState extends PortfolioUpdateListenerState {
   const PortfolioUpdateListenerIdleState();
 }

@@ -301,7 +301,7 @@ void main() {
     );
 
     test(
-      'should reload the shown portfolio in place when a sync refreshes sections',
+      'should reload the shown portfolio in place when an update refreshes sections',
       () async {
         final refreshedSections =
             StreamController<Set<PortfolioSection>>.broadcast();
@@ -325,7 +325,7 @@ void main() {
     );
 
     test(
-      'should keep the shown portfolio when reloading after a sync fails',
+      'should keep the shown portfolio when reloading after an update fails',
       () async {
         final refreshedSections =
             StreamController<Set<PortfolioSection>>.broadcast();

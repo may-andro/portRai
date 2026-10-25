@@ -9,20 +9,20 @@ import 'package:portrai/src/feature/portfolio/presentation/bloc/portfolio_update
 @register
 class PortfolioUpdateListenerBloc
     extends Bloc<PortfolioUpdateListenerEvent, PortfolioUpdateListenerState> {
-  PortfolioUpdateListenerBloc(this._syncPortfolioUseCase)
+  PortfolioUpdateListenerBloc(this._updatePortfolioUseCase)
     : super(const PortfolioUpdateListenerIdleState()) {
     on<PortfolioUpdateCheckRequestedEvent>(
       _mapPortfolioUpdateCheckRequestedEventToState,
     );
   }
 
-  final SyncPortfolioUseCase _syncPortfolioUseCase;
+  final UpdatePortfolioUseCase _updatePortfolioUseCase;
 
-  // A failed sync keeps the caches and is tried again on the next request.
+  // A failed update keeps the caches and is tried again on the next request.
   Future<void> _mapPortfolioUpdateCheckRequestedEventToState(
     PortfolioUpdateCheckRequestedEvent event,
     Emitter<PortfolioUpdateListenerState> emit,
   ) async {
-    await _syncPortfolioUseCase();
+    await _updatePortfolioUseCase();
   }
 }

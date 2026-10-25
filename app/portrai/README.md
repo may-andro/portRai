@@ -193,7 +193,7 @@ expire 14 days after the last run that found them.
 
 The portfolio sections are cached per language. `PortfolioUpdateListenerWidget` checks for
 changes when the app starts and whenever it returns to the foreground, and a "Portfolio updated"
-notification checks too. `SyncPortfolioUseCase` compares when each section last changed, from
+notification checks too. `UpdatePortfolioUseCase` compares when each section last changed, from
 `portfolio_versions/{locale}`, with the change it was last refreshed for, and refreshes only the
 sections that changed. An open portfolio screen then reloads in place. See the
 [portfolio README](lib/src/feature/portfolio/README.md).

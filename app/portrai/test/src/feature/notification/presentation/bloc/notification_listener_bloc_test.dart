@@ -16,7 +16,7 @@ import '../../../../../mock/feature/notification/domain/use_case/mock_sync_notif
 import '../../../../../mock/feature/notification/domain/use_case/mock_watch_device_token_refreshes_use_case.dart';
 import '../../../../../mock/feature/notification/domain/use_case/mock_watch_foreground_push_messages_use_case.dart';
 import '../../../../../mock/feature/notification/domain/use_case/mock_watch_opened_push_messages_use_case.dart';
-import '../../../../../mock/feature/portfolio/domain/use_case/mock_sync_portfolio_use_case.dart';
+import '../../../../../mock/feature/portfolio/domain/use_case/mock_update_portfolio_use_case.dart';
 
 const _languageCodes = ['en', 'es'];
 const _owner = AuthUserEntity(id: 'owner-uid', email: null);
@@ -39,7 +39,7 @@ void main() {
     late StreamController<String> tokenRefreshes;
     late StreamController<AppLocale> locales;
     late StreamController<AuthUserEntity?> signedInUsers;
-    late MockSyncPortfolioUseCase syncPortfolioUseCase;
+    late MockUpdatePortfolioUseCase updatePortfolioUseCase;
 
     setUp(() {
       syncNotificationsUseCase = MockSyncNotificationsUseCase()..stubCall();
@@ -51,7 +51,7 @@ void main() {
       tokenRefreshes = StreamController.broadcast();
       locales = StreamController.broadcast();
       signedInUsers = StreamController.broadcast();
-      syncPortfolioUseCase = MockSyncPortfolioUseCase()
+      updatePortfolioUseCase = MockUpdatePortfolioUseCase()
         ..stubCall(const Right({}));
     });
 
@@ -69,7 +69,7 @@ void main() {
         MockWatchLocaleUseCase()..stubCall(locales.stream.map(Right.new)),
         MockWatchSignedInUserUseCase()
           ..stubCall(signedInUsers.stream.map(Right.new)),
-        syncPortfolioUseCase,
+        updatePortfolioUseCase,
       );
       addTearDown(bloc.close);
       return bloc;
@@ -175,7 +175,7 @@ void main() {
       await states;
     });
 
-    test('should sync the portfolio when a portfolio update is tapped or '
+    test('should update the portfolio when a portfolio update is tapped or '
         'received', () async {
       await startBloc();
 
@@ -184,22 +184,22 @@ void main() {
       foregroundMessages.add(_portfolioMessage);
       await pumpEventQueue();
 
-      verify(() => syncPortfolioUseCase()).called(2);
+      verify(() => updatePortfolioUseCase()).called(2);
     });
 
     test(
-      'should sync the portfolio when a portfolio update opened the app',
+      'should update the portfolio when a portfolio update opened the app',
       () async {
         getInitialPushMessageUseCase.stubCall(_portfolioMessage);
 
         await startBloc();
 
-        verify(() => syncPortfolioUseCase()).called(1);
+        verify(() => updatePortfolioUseCase()).called(1);
       },
     );
 
     test(
-      'should not sync the portfolio when another message arrives',
+      'should not update the portfolio when another message arrives',
       () async {
         await startBloc();
 
@@ -207,7 +207,7 @@ void main() {
         foregroundMessages.add(_jobsMessage);
         await pumpEventQueue();
 
-        verifyNever(() => syncPortfolioUseCase());
+        verifyNever(() => updatePortfolioUseCase());
       },
     );
   });

@@ -25,7 +25,7 @@ class NotificationListenerBloc
     this._watchDeviceTokenRefreshesUseCase,
     this._watchLocaleUseCase,
     this._watchSignedInUserUseCase,
-    this._syncPortfolioUseCase,
+    this._updatePortfolioUseCase,
   ) : super(const NotificationListenerIdleState()) {
     on<NotificationListenerStartEvent>(
       _mapNotificationListenerStartEventToState,
@@ -46,7 +46,7 @@ class NotificationListenerBloc
   final WatchDeviceTokenRefreshesUseCase _watchDeviceTokenRefreshesUseCase;
   final WatchLocaleUseCase _watchLocaleUseCase;
   final WatchSignedInUserUseCase _watchSignedInUserUseCase;
-  final SyncPortfolioUseCase _syncPortfolioUseCase;
+  final UpdatePortfolioUseCase _updatePortfolioUseCase;
 
   final List<StreamSubscription<Object?>> _subscriptions = [];
   List<String> _supportedLanguageCodes = const [];
@@ -91,7 +91,7 @@ class NotificationListenerBloc
     final initialMessageEither = await _getInitialPushMessageUseCase();
     if (initialMessageEither.isRight) {
       if (initialMessageEither.right case final message?) {
-        _syncPortfolioIfUpdated(message);
+        _updatePortfolioIfChanged(message);
         emit(PushMessageOpenedState(message, ++_sequence));
       }
     }
@@ -121,7 +121,7 @@ class NotificationListenerBloc
     PushMessageOpenedEvent event,
     Emitter<NotificationListenerState> emit,
   ) {
-    _syncPortfolioIfUpdated(event.message);
+    _updatePortfolioIfChanged(event.message);
     emit(PushMessageOpenedState(event.message, ++_sequence));
   }
 
@@ -129,15 +129,15 @@ class NotificationListenerBloc
     PushMessageReceivedEvent event,
     Emitter<NotificationListenerState> emit,
   ) {
-    _syncPortfolioIfUpdated(event.message);
+    _updatePortfolioIfChanged(event.message);
     emit(PushMessageReceivedState(event.message, ++_sequence));
   }
 
   // Runs alongside opening or showing the message; screens reload the
   // sections it refreshes.
-  void _syncPortfolioIfUpdated(PushMessageEntity message) {
+  void _updatePortfolioIfChanged(PushMessageEntity message) {
     if (message.kind == PushMessageKind.portfolioUpdate) {
-      unawaited(Future.value(_syncPortfolioUseCase()));
+      unawaited(Future.value(_updatePortfolioUseCase()));
     }
   }
 

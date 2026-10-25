@@ -14,33 +14,33 @@ import 'package:portrai/src/feature/service/service.dart';
 import 'package:portrai/src/feature/testimonial/testimonial.dart';
 import 'package:use_case/use_case.dart';
 
-sealed class SyncPortfolioFailure extends BasicFailure {
-  const SyncPortfolioFailure({super.cause});
+sealed class UpdatePortfolioFailure extends BasicFailure {
+  const UpdatePortfolioFailure({super.cause});
 }
 
-class SyncPortfolioNetworkFailure extends SyncPortfolioFailure {
-  const SyncPortfolioNetworkFailure({super.cause});
+class UpdatePortfolioNetworkFailure extends UpdatePortfolioFailure {
+  const UpdatePortfolioNetworkFailure({super.cause});
 }
 
-class SyncPortfolioDataFailure extends SyncPortfolioFailure {
-  const SyncPortfolioDataFailure({super.cause});
+class UpdatePortfolioDataFailure extends UpdatePortfolioFailure {
+  const UpdatePortfolioDataFailure({super.cause});
 }
 
-class SyncPortfolioUnknownFailure extends SyncPortfolioFailure {
-  const SyncPortfolioUnknownFailure({super.cause});
+class UpdatePortfolioUnknownFailure extends UpdatePortfolioFailure {
+  const UpdatePortfolioUnknownFailure({super.cause});
 }
 
 /// Refreshes the cached sections of the current locale that changed since
 /// they were last refreshed, and returns them. A section that fails to
-/// refresh keeps its cache and is tried again on the next sync.
+/// refresh keeps its cache and is tried again on the next update.
 ///
-/// Registered once, so syncs run one after another and never refresh the
+/// Registered once, so updates run one after another and never refresh the
 /// same section twice at once.
 @registerSingleton
-class SyncPortfolioUseCase
-    extends BaseNoParamUseCase<Set<PortfolioSection>, SyncPortfolioFailure> {
-  SyncPortfolioUseCase(
-    this._portfolioSyncRepository,
+class UpdatePortfolioUseCase
+    extends BaseNoParamUseCase<Set<PortfolioSection>, UpdatePortfolioFailure> {
+  UpdatePortfolioUseCase(
+    this._portfolioUpdateRepository,
     this._refreshProfileUseCase,
     this._refreshExperiencesUseCase,
     this._refreshAllExpertiseUseCase,
@@ -50,9 +50,9 @@ class SyncPortfolioUseCase
     this._logReporter,
   );
 
-  static const _tag = 'SyncPortfolioUseCase';
+  static const _tag = 'UpdatePortfolioUseCase';
 
-  final PortfolioSyncRepository _portfolioSyncRepository;
+  final PortfolioUpdateRepository _portfolioUpdateRepository;
   final RefreshProfileUseCase _refreshProfileUseCase;
   final RefreshExperiencesUseCase _refreshExperiencesUseCase;
   final RefreshAllExpertiseUseCase _refreshAllExpertiseUseCase;
@@ -61,26 +61,27 @@ class SyncPortfolioUseCase
   final RefreshTestimonialsUseCase _refreshTestimonialsUseCase;
   final LogReporter _logReporter;
 
-  Future<void> _pendingSync = Future.value();
+  Future<void> _pendingUpdate = Future.value();
 
   @protected
   @override
-  Future<Either<SyncPortfolioFailure, Set<PortfolioSection>>> execute() {
-    final sync = _pendingSync.then((_) => _sync());
-    _pendingSync = sync.then((_) {}, onError: (_) {});
-    return sync;
+  Future<Either<UpdatePortfolioFailure, Set<PortfolioSection>>> execute() {
+    final update = _pendingUpdate.then((_) => _update());
+    _pendingUpdate = update.then((_) {}, onError: (_) {});
+    return update;
   }
 
-  Future<Either<SyncPortfolioFailure, Set<PortfolioSection>>> _sync() async {
-    final changeTimes = await _portfolioSyncRepository.getChangeTimes();
-    final syncedChangeTimes = await _portfolioSyncRepository
-        .getSyncedChangeTimes();
+  Future<Either<UpdatePortfolioFailure, Set<PortfolioSection>>>
+  _update() async {
+    final changeTimes = await _portfolioUpdateRepository.getChangeTimes();
+    final appliedChangeTimes = await _portfolioUpdateRepository
+        .getAppliedChangeTimes();
 
     final refreshedSections = <PortfolioSection>{};
     for (final MapEntry(key: section, value: changedAt)
         in changeTimes.entries) {
-      final syncedChangedAt = syncedChangeTimes[section];
-      if (syncedChangedAt != null && !changedAt.isAfter(syncedChangedAt)) {
+      final appliedChangedAt = appliedChangeTimes[section];
+      if (appliedChangedAt != null && !changedAt.isAfter(appliedChangedAt)) {
         continue;
       }
       final refreshEither = await _refresh(section);
@@ -92,12 +93,12 @@ class SyncPortfolioUseCase
         );
         continue;
       }
-      await _portfolioSyncRepository.setSyncedChangeTime(section, changedAt);
+      await _portfolioUpdateRepository.setAppliedChangeTime(section, changedAt);
       refreshedSections.add(section);
     }
 
     if (refreshedSections.isNotEmpty) {
-      _portfolioSyncRepository.reportRefreshedSections(refreshedSections);
+      _portfolioUpdateRepository.reportRefreshedSections(refreshedSections);
     }
     return Right(refreshedSections);
   }
@@ -115,14 +116,14 @@ class SyncPortfolioUseCase
 
   @protected
   @override
-  SyncPortfolioFailure mapErrorToFailure(Object e, StackTrace st) {
+  UpdatePortfolioFailure mapErrorToFailure(Object e, StackTrace st) {
     return switch (e) {
-      PortfolioNetworkException() ||
-      PortfolioUnauthorizedException() => SyncPortfolioNetworkFailure(cause: e),
+      PortfolioNetworkException() || PortfolioUnauthorizedException() =>
+        UpdatePortfolioNetworkFailure(cause: e),
       PortfolioNotFoundException() ||
       PortfolioParsingException() ||
-      PortfolioCacheException() => SyncPortfolioDataFailure(cause: e),
-      _ => SyncPortfolioUnknownFailure(cause: e),
+      PortfolioCacheException() => UpdatePortfolioDataFailure(cause: e),
+      _ => UpdatePortfolioUnknownFailure(cause: e),
     };
   }
 }
