@@ -27,6 +27,9 @@ nothing.
 
 - The system does not show notifications while the app is in the foreground, so the listener
   shows their title and text in a snackbar.
+- A `portfolio_update` message that is tapped or arrives in the foreground also runs
+  `UpdatePortfolioUseCase` of the [`portfolio`](../portfolio/README.md) feature, which refreshes
+  the cached sections that changed.
 
 The repository subscribes and registers again only when the language, user or token changed
 since the last time in the same run.

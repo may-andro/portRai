@@ -23,8 +23,12 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     this._isFeatureEnabledUseCase,
     this._isLocalAssistantSupportedUseCase,
     this._getGuestUserUseCase,
+    this._watchRefreshedPortfolioSectionsUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
+    on<PortfolioSectionsRefreshedEvent>(
+      _mapPortfolioSectionsRefreshedEventToState,
+    );
     on<ScreenVisibleEvent>(_mapScreenVisibleEventToState);
     on<DrawerClickEvent>(_mapDrawerClickEventToState);
     on<SectionNavigationEvent>(_mapSectionNavigationEventToState);
@@ -38,6 +42,9 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
   final GetGuestUserUseCase _getGuestUserUseCase;
+  final WatchRefreshedPortfolioSectionsUseCase
+  _watchRefreshedPortfolioSectionsUseCase;
+  StreamSubscription<Object?>? _refreshedSectionsSubscription;
   int _availabilityRevision = 0;
 
   @override
@@ -47,6 +54,13 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     LoadPortfolioEvent event,
     Emitter<PortfolioState> emit,
   ) async {
+    // A failed update is ignored, and the stream keeps listening.
+    _refreshedSectionsSubscription ??= _watchRefreshedPortfolioSectionsUseCase()
+        .listen((sectionsEither) {
+          if (sectionsEither.isRight) {
+            add(const PortfolioSectionsRefreshedEvent());
+          }
+        });
     emit(const LoadingState());
     try {
       final result = await _getPortfolioUseCase();
@@ -65,6 +79,17 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     } catch (e) {
       emit(const ErrorState(UnknownFailure()));
     }
+  }
+
+  // Reloads in place, keeping the shown portfolio when reloading fails.
+  Future<void> _mapPortfolioSectionsRefreshedEventToState(
+    PortfolioSectionsRefreshedEvent event,
+    Emitter<PortfolioState> emit,
+  ) async {
+    if (state is! LoadedState) return;
+    final portfolioEither = await _getPortfolioUseCase();
+    if (portfolioEither.isLeft || state is! LoadedState) return;
+    emit((state as LoadedState).copyWith(portfolio: portfolioEither.right));
   }
 
   FutureOr<void> _mapSectionNavigationEventToState(
@@ -146,5 +171,11 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     } else {
       _trackingDelegate.trackDrawerClose();
     }
+  }
+
+  @override
+  Future<void> close() async {
+    await _refreshedSectionsSubscription?.cancel();
+    await super.close();
   }
 }

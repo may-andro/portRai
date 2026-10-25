@@ -189,6 +189,15 @@ The switch merges into `users/{uid}`, so other fields on that document are kept.
 shows its job board's name and links to its page there, as the boards' terms require. Openings
 expire 14 days after the last run that found them.
 
+### Portfolio Updates
+
+The portfolio sections are cached per language. `PortfolioUpdateListenerWidget` checks for
+changes when the app starts and whenever it returns to the foreground, and a "Portfolio updated"
+notification checks too. `UpdatePortfolioUseCase` compares when each section last changed, from
+`portfolio_versions/{locale}`, with the change it was last refreshed for, and refreshes only the
+sections that changed. An open portfolio screen then reloads in place. See the
+[portfolio README](lib/src/feature/portfolio/README.md).
+
 ### Notifications
 
 `notification` keeps push notifications in step with the app on Android and iOS. Once the

@@ -30,6 +30,25 @@ class CacheProfileRepositoryImpl implements ProfileRepository {
     }
   }
 
+  /// Drops the cached profile of the current locale, so the next read loads
+  /// it again.
+  @override
+  Future<void> refreshProfile() async {
+    try {
+      await _profileCache.delete({'locale': _appLocale.languageCode});
+    } on DBNotInitialisedException catch (e, stackTrace) {
+      throw ProfileCacheException(
+        cause: 'Database not initialized: $e',
+        stackTrace: stackTrace,
+      );
+    } catch (e, stackTrace) {
+      throw ProfileCacheException(
+        cause: 'Unexpected error while clearing Profile: $e',
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<ProfileEntity> getProfile() async {
     try {

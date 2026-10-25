@@ -22,4 +22,12 @@ extension MockServiceCacheStub on MockServiceCache {
   void stubQueryThrows(Object error) {
     when(() => query(conditions: any(named: 'conditions'))).thenThrow(error);
   }
+
+  void stubDelete({required String locale}) {
+    when(() => delete({'locale': locale})).thenAnswer((_) async {});
+  }
+
+  void stubDeleteThrows({required String locale, required Object error}) {
+    when(() => delete({'locale': locale})).thenThrow(error);
+  }
 }

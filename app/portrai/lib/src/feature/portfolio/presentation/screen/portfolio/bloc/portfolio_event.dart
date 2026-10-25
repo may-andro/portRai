@@ -13,6 +13,11 @@ class LoadPortfolioEvent extends PortfolioEvent {
   const LoadPortfolioEvent();
 }
 
+/// An update refreshed cached sections, so the shown portfolio may be outdated.
+final class PortfolioSectionsRefreshedEvent extends PortfolioEvent {
+  const PortfolioSectionsRefreshedEvent();
+}
+
 final class ScreenVisibleEvent extends PortfolioEvent {
   const ScreenVisibleEvent();
 }

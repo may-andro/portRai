@@ -49,6 +49,10 @@ service cloud.firestore {
     match /app_config/{configId} {
       allow get: if true;
     }
+    // When each portfolio collection last changed, written by functions only.
+    match /portfolio_versions/{locale} {
+      allow get: if true;
+    }
 
     // Private to each signed-in user. The user may change only `jobSearch`.
     match /users/{userId} {

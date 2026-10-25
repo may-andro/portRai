@@ -126,5 +126,31 @@ void main() {
         );
       },
     );
+
+    test(
+      'should delete the cached expertise of the current locale when refreshed',
+      () async {
+        expertiseCache.stubDelete(locale: localeCode);
+
+        await repository.refreshAllExpertise();
+
+        verify(() => expertiseCache.delete({'locale': localeCode})).called(1);
+      },
+    );
+
+    test(
+      'should throw a cache exception when deleting the cached expertise fails',
+      () {
+        expertiseCache.stubDeleteThrows(
+          locale: localeCode,
+          error: Exception('delete failed'),
+        );
+
+        expect(
+          repository.refreshAllExpertise,
+          throwsA(isA<ExpertiseCacheException>()),
+        );
+      },
+    );
   });
 }

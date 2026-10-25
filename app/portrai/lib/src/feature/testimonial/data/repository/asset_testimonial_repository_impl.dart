@@ -35,6 +35,10 @@ class AssetTestimonialRepositoryImpl implements TestimonialRepository {
     return _cacheDelegateRepository.cacheTestimonials(testimonials);
   }
 
+  /// The bundled testimonials do not change while the app runs.
+  @override
+  Future<void> refreshTestimonials() async {}
+
   @override
   Future<TestimonialEntity> getTestimonial(String id) async {
     final source = (await _getAssetSourceUseCase()).right;

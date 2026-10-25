@@ -119,5 +119,31 @@ void main() {
         expect(repository.getProjects, throwsA(isA<ProjectCacheException>()));
       },
     );
+
+    test(
+      'should delete the cached projects of the current locale when refreshed',
+      () async {
+        projectCache.stubDelete(locale: localeCode);
+
+        await repository.refreshProjects();
+
+        verify(() => projectCache.delete({'locale': localeCode})).called(1);
+      },
+    );
+
+    test(
+      'should throw a cache exception when deleting the cached projects fails',
+      () {
+        projectCache.stubDeleteThrows(
+          locale: localeCode,
+          error: Exception('delete failed'),
+        );
+
+        expect(
+          repository.refreshProjects,
+          throwsA(isA<ProjectCacheException>()),
+        );
+      },
+    );
   });
 }

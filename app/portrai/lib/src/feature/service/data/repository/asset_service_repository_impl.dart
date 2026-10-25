@@ -36,6 +36,10 @@ class AssetServiceRepositoryImpl implements ServiceRepository {
     return _cacheDelegateRepository.cacheServices(services);
   }
 
+  /// The bundled services do not change while the app runs.
+  @override
+  Future<void> refreshServices() async {}
+
   @override
   Future<List<ServiceEntity>> getServices() async {
     final source = (await _getAssetSourceUseCase()).right;

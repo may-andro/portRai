@@ -86,6 +86,14 @@ class RemoteProjectRepositoryImpl implements ProjectRepository {
     return project;
   }
 
+  /// Loads the projects first, so the cached ones stay when loading fails.
+  @override
+  Future<void> refreshProjects() async {
+    final projectList = await _loadProjectsFromRemote();
+    await _cacheDelegateRepository.refreshProjects();
+    await cacheProjects(projectList);
+  }
+
   Future<List<ProjectEntity>> _loadProjectsFromRemote() async {
     try {
       final locale = _appLocale.languageCode;

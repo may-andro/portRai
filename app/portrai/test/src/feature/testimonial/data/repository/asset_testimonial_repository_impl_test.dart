@@ -214,5 +214,11 @@ void main() {
         verifyZeroInteractions(cacheDelegateRepository);
       },
     );
+
+    test('should leave the cache untouched when refreshed', () async {
+      await repository.refreshTestimonials();
+
+      verifyZeroInteractions(cacheDelegateRepository);
+    });
   });
 }

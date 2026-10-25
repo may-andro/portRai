@@ -6,4 +6,7 @@ abstract class ProjectRepository {
   Future<ProjectEntity> getProject(String id);
 
   Future<void> cacheProjects(List<ProjectEntity> projects);
+
+  /// Replaces the cached projects of the current locale with the latest ones.
+  Future<void> refreshProjects();
 }

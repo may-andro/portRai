@@ -26,4 +26,12 @@ extension MockExperienceRepositoryStub on MockExperienceRepository {
   void stubGetExperiencesThrows(Object error) {
     when(getExperiences).thenThrow(error);
   }
+
+  void stubRefreshExperiences() {
+    when(refreshExperiences).thenAnswer((_) async {});
+  }
+
+  void stubRefreshExperiencesThrows(Object error) {
+    when(refreshExperiences).thenThrow(error);
+  }
 }

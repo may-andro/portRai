@@ -13,6 +13,7 @@ function notifier(
   overrides: Partial<PortfolioUpdateNotifier> = {},
 ): PortfolioUpdateNotifier {
   return {
+    recordChange: vi.fn().mockResolvedValue(undefined),
     claimSend: vi.fn().mockResolvedValue(true),
     sender: {
       sendToTokens: vi.fn(),
@@ -42,6 +43,7 @@ describe('notifyPortfolioUpdate', () => {
     const deps = notifier();
 
     const outcome = await notifyPortfolioUpdate(deps, {
+      collection: 'projects',
       locale: 'es',
       before: { title: 'Old' },
       after: { title: 'New' },
@@ -49,6 +51,7 @@ describe('notifyPortfolioUpdate', () => {
     });
 
     expect(outcome).toBe('sent');
+    expect(deps.recordChange).toHaveBeenCalledWith('es', 'projects', now);
     expect(deps.claimSend).toHaveBeenCalledWith(
       'portfolio_updates_es',
       now,
@@ -62,6 +65,7 @@ describe('notifyPortfolioUpdate', () => {
 
   it('should send when a locale document is created', async () => {
     const outcome = await notifyPortfolioUpdate(notifier(), {
+      collection: 'profile',
       locale: 'nl',
       before: undefined,
       after: { title: 'New' },
@@ -81,6 +85,7 @@ describe('notifyPortfolioUpdate', () => {
       const deps = notifier();
 
       const outcome = await notifyPortfolioUpdate(deps, {
+        collection: 'profile',
         locale,
         before,
         after,
@@ -88,15 +93,17 @@ describe('notifyPortfolioUpdate', () => {
       });
 
       expect(outcome).toBe(expected);
+      expect(deps.recordChange).not.toHaveBeenCalled();
       expect(deps.claimSend).not.toHaveBeenCalled();
       expect(deps.sender.sendToTopic).not.toHaveBeenCalled();
     },
   );
 
-  it('should send nothing when the topic was sent to recently', async () => {
+  it('should record the change but send nothing when the topic was sent to recently', async () => {
     const deps = notifier({ claimSend: vi.fn().mockResolvedValue(false) });
 
     const outcome = await notifyPortfolioUpdate(deps, {
+      collection: 'services',
       locale: 'en',
       before: { title: 'Old' },
       after: { title: 'New' },
@@ -104,6 +111,7 @@ describe('notifyPortfolioUpdate', () => {
     });
 
     expect(outcome).toBe('cooling_down');
+    expect(deps.recordChange).toHaveBeenCalledWith('en', 'services', now);
     expect(deps.sender.sendToTopic).not.toHaveBeenCalled();
   });
 });

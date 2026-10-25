@@ -58,6 +58,18 @@ void main() {
           verifyNever(() => unselected.cacheAllExpertise([expertise]));
         },
       );
+
+      test(
+        'should delegate refreshes to the selected source when requested',
+        () async {
+          selected.stubRefreshAllExpertise();
+
+          await repository.refreshAllExpertise();
+
+          verify(() => selected.refreshAllExpertise()).called(1);
+          verifyNever(() => unselected.refreshAllExpertise());
+        },
+      );
     });
   }
 }

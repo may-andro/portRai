@@ -111,5 +111,31 @@ void main() {
         );
       },
     );
+
+    test(
+      'should delete the cached profile of the current locale when refreshed',
+      () async {
+        profileCache.stubDelete(locale: localeCode);
+
+        await repository.refreshProfile();
+
+        verify(() => profileCache.delete({'locale': localeCode})).called(1);
+      },
+    );
+
+    test(
+      'should throw ProfileCacheException when deleting the cached profile fails',
+      () {
+        profileCache.stubDeleteThrows(
+          locale: localeCode,
+          error: Exception('delete failed'),
+        );
+
+        expect(
+          repository.refreshProfile,
+          throwsA(isA<ProfileCacheException>()),
+        );
+      },
+    );
   });
 }

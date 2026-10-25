@@ -94,6 +94,14 @@ class RemoteExperienceRepositoryImpl implements ExperienceRepository {
     return experiences;
   }
 
+  /// Loads the experiences first, so the cached ones stay when loading fails.
+  @override
+  Future<void> refreshExperiences() async {
+    final experiences = await _loadExperiencesFromRemote();
+    await _cacheDelegateRepository.refreshExperiences();
+    await cacheExperiences(experiences);
+  }
+
   /// Loads experiences from Firestore based on app locale
   Future<List<ExperienceEntity>> _loadExperiencesFromRemote() async {
     try {

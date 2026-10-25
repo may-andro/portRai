@@ -34,6 +34,25 @@ class CacheTestimonialRepositoryImpl implements TestimonialRepository {
     }
   }
 
+  /// Drops the cached testimonials of the current locale, so the next read
+  /// loads them again.
+  @override
+  Future<void> refreshTestimonials() async {
+    try {
+      await _testimonialCache.delete({'locale': _appLocale.languageCode});
+    } on DBNotInitialisedException catch (e, stackTrace) {
+      throw TestimonialCacheException(
+        cause: 'Database not initialized: $e',
+        stackTrace: stackTrace,
+      );
+    } catch (e, stackTrace) {
+      throw TestimonialCacheException(
+        cause: 'Unexpected error while clearing testimonials: $e',
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<TestimonialEntity> getTestimonial(String id) async {
     try {

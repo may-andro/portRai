@@ -26,6 +26,11 @@ class BuildConfigProfileRepositoryImpl implements ProfileRepository {
     return _delegateRepository.getProfile();
   }
 
+  @override
+  Future<void> refreshProfile() {
+    return _delegateRepository.refreshProfile();
+  }
+
   ProfileRepository get _delegateRepository {
     switch (_buildConfig.buildEnvironment) {
       case BuildEnvironment.prod:

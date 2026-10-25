@@ -56,6 +56,18 @@ void main() {
           verifyNever(() => unselected.cacheServices([service]));
         },
       );
+
+      test(
+        'should delegate refreshes to the selected source when requested',
+        () async {
+          selected.stubRefreshServices();
+
+          await repository.refreshServices();
+
+          verify(() => selected.refreshServices()).called(1);
+          verifyNever(() => unselected.refreshServices());
+        },
+      );
     });
   }
 }

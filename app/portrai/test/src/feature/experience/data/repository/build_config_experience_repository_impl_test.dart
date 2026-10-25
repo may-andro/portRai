@@ -78,6 +78,18 @@ void main() {
           verifyNever(() => unselected.cacheExperiences([experience]));
         },
       );
+
+      test(
+        'should delegate refreshes to the selected source when requested',
+        () async {
+          selected.stubRefreshExperiences();
+
+          await repository.refreshExperiences();
+
+          verify(() => selected.refreshExperiences()).called(1);
+          verifyNever(() => unselected.refreshExperiences());
+        },
+      );
     });
   }
 }

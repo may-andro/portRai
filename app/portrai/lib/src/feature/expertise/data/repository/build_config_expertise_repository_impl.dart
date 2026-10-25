@@ -26,6 +26,11 @@ class BuildConfigExpertiseRepositoryImpl implements ExpertiseRepository {
     return _delegateRepository.getAllExpertise();
   }
 
+  @override
+  Future<void> refreshAllExpertise() {
+    return _delegateRepository.refreshAllExpertise();
+  }
+
   ExpertiseRepository get _delegateRepository {
     switch (_buildConfig.buildEnvironment) {
       case BuildEnvironment.prod:

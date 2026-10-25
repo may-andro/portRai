@@ -56,6 +56,14 @@ class RemoteServiceRepositoryImpl implements ServiceRepository {
     return services;
   }
 
+  /// Loads the services first, so the cached ones stay when loading fails.
+  @override
+  Future<void> refreshServices() async {
+    final services = await _loadServiceFromRemote();
+    await _cacheDelegateRepository.refreshServices();
+    await cacheServices(services);
+  }
+
   Future<List<ServiceEntity>> _loadServiceFromRemote() async {
     try {
       final locale = _appLocale.languageCode;

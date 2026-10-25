@@ -6,4 +6,8 @@ abstract class ExperienceRepository {
   Future<List<ExperienceEntity>> getExperiences();
 
   Future<void> cacheExperiences(List<ExperienceEntity> experiences);
+
+  /// Replaces the cached experiences of the current locale with the latest
+  /// ones.
+  Future<void> refreshExperiences();
 }

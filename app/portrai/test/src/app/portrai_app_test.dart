@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/force_update/presentation/bloc/force_update_
 import 'package:portrai/src/feature/locale/domain/use_case/get_locale_use_case.dart';
 import 'package:portrai/src/feature/locale/domain/use_case/update_locale_use_case.dart';
 import 'package:portrai/src/feature/notification/presentation/bloc/notification_listener_bloc.dart';
+import 'package:portrai/src/feature/portfolio/presentation/bloc/portfolio_update_listener_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 import 'package:use_case/use_case.dart';
@@ -31,6 +32,7 @@ import '../../mock/feature/notification/domain/use_case/mock_sync_notifications_
 import '../../mock/feature/notification/domain/use_case/mock_watch_device_token_refreshes_use_case.dart';
 import '../../mock/feature/notification/domain/use_case/mock_watch_foreground_push_messages_use_case.dart';
 import '../../mock/feature/notification/domain/use_case/mock_watch_opened_push_messages_use_case.dart';
+import '../../mock/feature/portfolio/domain/use_case/mock_update_portfolio_use_case.dart';
 import '../../mock/utility/mock_module_route_controller.dart';
 
 void main() {
@@ -67,6 +69,12 @@ void main() {
             ..stubCall(const Stream.empty()),
           MockWatchLocaleUseCase()..stubCall(const Stream.empty()),
           MockWatchSignedInUserUseCase()..stubCall(const Stream.empty()),
+          MockUpdatePortfolioUseCase()..stubCall(const Right({})),
+        ),
+      );
+      appServiceLocator.registerFactory<PortfolioUpdateListenerBloc>(
+        () => PortfolioUpdateListenerBloc(
+          MockUpdatePortfolioUseCase()..stubCall(const Right({})),
         ),
       );
       final getLocaleUseCase = MockGetLocaleUseCase()

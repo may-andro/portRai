@@ -26,6 +26,7 @@ const portfolioCollections = [
   'services',
   'testimonials',
   'app_config',
+  'portfolio_versions',
 ];
 
 let environment: RulesTestEnvironment;

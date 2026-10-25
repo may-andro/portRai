@@ -211,5 +211,11 @@ void main() {
         verifyZeroInteractions(cacheDelegateRepository);
       },
     );
+
+    test('should leave the cache untouched when refreshed', () async {
+      await repository.refreshAllExpertise();
+
+      verifyZeroInteractions(cacheDelegateRepository);
+    });
   });
 }

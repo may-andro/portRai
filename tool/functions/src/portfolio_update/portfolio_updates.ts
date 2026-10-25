@@ -11,6 +11,7 @@ import { cloudMessagingSender } from '../shared/messaging.js';
 import {
   notifyPortfolioUpdate,
   portfolioCollections,
+  portfolioVersionsCollection,
 } from './notify_portfolio_update.js';
 
 /** The last send to each topic, at `notification_sends/{topic}`. */
@@ -36,6 +37,16 @@ function claimSend(db: Firestore) {
     });
 }
 
+/** Sets the change time of one collection, keeping the others. */
+function recordChange(db: Firestore) {
+  return async (locale: string, collection: string, now: Date) => {
+    await db
+      .collection(portfolioVersionsCollection)
+      .doc(locale)
+      .set({ [collection]: now }, { merge: true });
+  };
+}
+
 function portfolioUpdateTrigger(collection: string) {
   return onDocumentWritten(
     {
@@ -49,10 +60,12 @@ function portfolioUpdateTrigger(collection: string) {
       const db = getFirestore();
       const outcome = await notifyPortfolioUpdate(
         {
+          recordChange: recordChange(db),
           claimSend: claimSend(db),
           sender: cloudMessagingSender(getMessaging()),
         },
         {
+          collection,
           locale: event.params.locale,
           before: event.data?.before.data(),
           after: event.data?.after.data(),

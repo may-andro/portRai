@@ -56,6 +56,14 @@ class RemoteExpertiseRepositoryImpl implements ExpertiseRepository {
     return expertiseList;
   }
 
+  /// Loads the expertise first, so the cached one stays when loading fails.
+  @override
+  Future<void> refreshAllExpertise() async {
+    final expertiseList = await _loadExpertiseFromRemote();
+    await _cacheDelegateRepository.refreshAllExpertise();
+    await cacheAllExpertise(expertiseList);
+  }
+
   Future<List<ExpertiseEntity>> _loadExpertiseFromRemote() async {
     try {
       final locale = _appLocale.languageCode;

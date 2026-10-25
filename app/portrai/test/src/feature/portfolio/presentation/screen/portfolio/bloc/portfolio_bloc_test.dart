@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -12,6 +14,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
+import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_watch_refreshed_portfolio_sections_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/tracking/mock_portfolio_tracking_delegate.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
@@ -25,6 +28,8 @@ void main() {
     late MockIsFeatureEnabledUseCase isFeatureEnabledUseCase;
     late MockIsLocalAssistantSupportedUseCase local;
     late MockGetGuestUserUseCase getGuestUserUseCase;
+    late MockWatchRefreshedPortfolioSectionsUseCase
+    watchRefreshedPortfolioSectionsUseCase;
 
     PortfolioBloc buildBloc() => PortfolioBloc(
       getPortfolioUseCase,
@@ -32,10 +37,14 @@ void main() {
       isFeatureEnabledUseCase,
       local,
       getGuestUserUseCase,
+      watchRefreshedPortfolioSectionsUseCase,
     );
 
     setUp(() {
       getGuestUserUseCase = MockGetGuestUserUseCase()..stubCall(null);
+      watchRefreshedPortfolioSectionsUseCase =
+          MockWatchRefreshedPortfolioSectionsUseCase()
+            ..stubCall(const Stream.empty());
       getPortfolioUseCase = MockGetPortfolioUseCase();
       trackingDelegate = MockPortfolioTrackingDelegate();
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase()
@@ -288,6 +297,53 @@ void main() {
         verify(
           () => trackingDelegate.trackViewEvent('portfolio_projects_section'),
         ).called(1);
+      },
+    );
+
+    test(
+      'should reload the shown portfolio in place when an update refreshes sections',
+      () async {
+        final refreshedSections =
+            StreamController<Set<PortfolioSection>>.broadcast();
+        addTearDown(refreshedSections.close);
+        watchRefreshedPortfolioSectionsUseCase.stubCall(
+          refreshedSections.stream.map(Right.new),
+        );
+        getPortfolioUseCase.stubCall(Right(portfolio));
+        final bloc = buildBloc()..add(const LoadPortfolioEvent());
+        addTearDown(bloc.close);
+        await pumpEventQueue();
+        final refreshedPortfolio = createPortfolioEntity(projects: const []);
+        getPortfolioUseCase.stubCall(Right(refreshedPortfolio));
+
+        refreshedSections.add({PortfolioSection.projects});
+        await pumpEventQueue();
+
+        final state = bloc.state as LoadedState;
+        expect(state.portfolio, refreshedPortfolio);
+      },
+    );
+
+    test(
+      'should keep the shown portfolio when reloading after an update fails',
+      () async {
+        final refreshedSections =
+            StreamController<Set<PortfolioSection>>.broadcast();
+        addTearDown(refreshedSections.close);
+        watchRefreshedPortfolioSectionsUseCase.stubCall(
+          refreshedSections.stream.map(Right.new),
+        );
+        getPortfolioUseCase.stubCall(Right(portfolio));
+        final bloc = buildBloc()..add(const LoadPortfolioEvent());
+        addTearDown(bloc.close);
+        await pumpEventQueue();
+        getPortfolioUseCase.stubCall(const Left(GetPortfolioUnknownFailure()));
+
+        refreshedSections.add({PortfolioSection.profile});
+        await pumpEventQueue();
+
+        expect(bloc.state, isA<LoadedState>());
+        expect((bloc.state as LoadedState).portfolio, portfolio);
       },
     );
   });

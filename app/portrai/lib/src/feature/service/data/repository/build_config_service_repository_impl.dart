@@ -26,6 +26,11 @@ class BuildConfigServiceRepositoryImpl implements ServiceRepository {
     return _delegateRepository.getServices();
   }
 
+  @override
+  Future<void> refreshServices() {
+    return _delegateRepository.refreshServices();
+  }
+
   ServiceRepository get _delegateRepository {
     switch (_buildConfig.buildEnvironment) {
       case BuildEnvironment.prod:

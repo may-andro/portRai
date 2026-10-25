@@ -22,4 +22,12 @@ extension MockProfileCacheStub on MockProfileCache {
   void stubPutThrows(Object error) {
     when(() => put(any())).thenThrow(error);
   }
+
+  void stubDelete({required String locale}) {
+    when(() => delete({'locale': locale})).thenAnswer((_) async {});
+  }
+
+  void stubDeleteThrows({required String locale, required Object error}) {
+    when(() => delete({'locale': locale})).thenThrow(error);
+  }
 }

@@ -176,5 +176,11 @@ void main() {
         verifyZeroInteractions(cacheRepository);
       },
     );
+
+    test('should leave the cache untouched when refreshed', () async {
+      await repository.refreshServices();
+
+      verifyZeroInteractions(cacheRepository);
+    });
   });
 }
