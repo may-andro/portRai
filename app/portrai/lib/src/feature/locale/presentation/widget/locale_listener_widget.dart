@@ -11,7 +11,12 @@ class LocaleListenerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appLocale = appServiceLocator.get<AppLocale>();
-    final localeStream = appServiceLocator.get<GetLocaleStreamUseCase>().call();
+    // A failed update is skipped, so the last locale stays in use.
+    final localeStream = appServiceLocator
+        .get<WatchLocaleUseCase>()
+        .call()
+        .where((localeEither) => localeEither.isRight)
+        .map((localeEither) => localeEither.right);
 
     return StreamBuilder<AppLocale>(
       stream: localeStream,

@@ -71,4 +71,26 @@ extension MockFbFirestoreControllerStub on MockFbFirestoreController {
       ),
     ).thenThrow(error);
   }
+
+  /// Stubs `addDocumentToCollection(...)` to complete normally.
+  void stubAddDocumentToCollection() {
+    when(
+      () => addDocumentToCollection(
+        collectionPath: any(named: 'collectionPath'),
+        documentPath: any(named: 'documentPath'),
+        data: any(named: 'data'),
+      ),
+    ).thenAnswer((_) async {});
+  }
+
+  /// Stubs `addDocumentToCollection(...)` to throw [error].
+  void stubAddDocumentToCollectionThrows(Object error) {
+    when(
+      () => addDocumentToCollection(
+        collectionPath: any(named: 'collectionPath'),
+        documentPath: any(named: 'documentPath'),
+        data: any(named: 'data'),
+      ),
+    ).thenThrow(error);
+  }
 }

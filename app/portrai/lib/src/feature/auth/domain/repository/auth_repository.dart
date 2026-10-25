@@ -7,5 +7,8 @@ abstract class AuthRepository {
   /// restored session on app start instead of reporting it as signed out.
   Future<AuthUserEntity?> getSignedInUser();
 
+  /// The signed-in user, or null, now and after every sign-in and sign-out.
+  Stream<AuthUserEntity?> get signedInUserChanges;
+
   Future<void> signOut();
 }

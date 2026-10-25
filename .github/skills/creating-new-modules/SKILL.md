@@ -92,6 +92,7 @@ packages — no `pubspec.yaml`, they're part of the `portrai` app package.
        use_case/
          _use_case.dart
          get_<feature>_use_case.dart      // extends BaseUseCase/BaseNoParamUseCase (see architecture skill)
+         watch_<feature>_use_case.dart    // streams: extends BaseStreamUseCase/BaseNoParamStreamUseCase
      presentation/
        _presentation.dart                // exports route/_route.dart (if any) + screen/_screen.dart
        route/                            // only if the feature has a screen
