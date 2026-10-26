@@ -1,148 +1,184 @@
-# PortRai Design System Storybook
+# Storybook
 
-Interactive component library for exploring and documenting the PortRai Design System, built with
-[Widgetbook](https://www.widgetbook.io/).
+A [Widgetbook](https://www.widgetbook.io/) web app that showcases the foundations and components
+of the [design_system](../../layer/design_system/README.md) layer, with knobs to change their
+properties and addons to switch theme, viewport and text scale.
 
 **Live URL:** https://portrai-storybook.web.app
 
 ## Features
 
-An interactive showcase of design system components following Atomic Design:
-- **Atoms** - Basic building blocks (buttons, text, icons, cards, etc.)
-- **Molecules** - Component combinations (text fields, tags, chips, etc.)
-- **Organisms** - Complex patterns (dialogs, lists, forms, etc.)
-- Interactive knobs for real-time property adjustment on every component
-- Multiple cultural theme variants
-- Responsive device preview
-- Light/dark mode toggle
-- Global extension system for consistency across use cases
+- Foundation use cases: color schemes (brand, surface, accent pairs, outline, utility, neutral,
+  semantic), `DSRadius`, `DSSpace`, `DSElevation` and `DSTextStyle`
+- Component use cases grouped as atoms, molecules and organisms, such as buttons, text fields,
+  tags, cards, dialogs and bullet point lists
+- Knobs on most use cases (all components except the dialogs, and the dimension foundations) for
+  properties such as colors, text, sizes and flags
+- Theme addon with a light and a dark theme for each of the 12 `DesignSystem` themes
+- Viewport addon with no frame or any of Widgetbook's iOS and Android device viewports
+- Text scale addon
+- App bar with the design system logo and the app version from `package_info_plus`
 
 ## Getting Started
 
-### Installation
-```bash
-# From project root
-melos bootstrap
+### Prerequisites
 
-# Run storybook in Chrome
-cd app/storybook
-flutter run -d chrome
+The Flutter, Dart and Melos versions in the root
+[Getting Started](../../README.md#getting-started) section.
+
+### Installation
+
+```bash
+# From the workspace root
+melos bootstrap
 ```
 
 ## Architecture
 
+Storybook's code uses `design_system`, Widgetbook and `package_info_plus`. `main.dart` builds `Widgetbook.material`
+with the generated `directories`, a home screen and the addons, and wraps each use case in
+`DSThemeBuilderWidget` for the selected theme and brightness. See the root
+[Architecture](../../README.md#architecture) section for the layer structure.
+
 ```text
 lib/
-├── src/
-│   ├── component/        # Use cases (atoms, molecules, organisms)
-│   └── extensions/       # Global helpers
-└── main.dart
+├── main.dart                     # StorybookApp: Widgetbook, addons and themes
+├── main.directories.g.dart       # Generated use case tree
+└── src/
+    ├── foundation/               # color, dimen and typography use cases
+    ├── component/
+    │   ├── atom/
+    │   ├── molecule/
+    │   └── organism/
+    ├── extensions/               # BuildContext helpers shared by use cases
+    └── widget/                   # HomeScreen
 ```
 
 ## Development
 
-### Adding a Component
-1. Create a use case file in `lib/src/component/{atom|molecule|organism}/`
-2. Use `@UseCase` annotation and global extensions
-3. Run `flutter pub run build_runner build --delete-conflicting-outputs`
+### Running the App
+
+The app has a web target only:
+
+```bash
+cd app/storybook
+flutter run -d chrome
+```
+
+### Adding a Use Case
+
+1. Add a `*_use_case.dart` file under `lib/src/foundation/` or
+   `lib/src/component/{atom|molecule|organism}/`.
+2. Annotate a builder function with `@UseCase`, naming the widget type it shows.
+3. Regenerate `main.directories.g.dart` (see [Code Generation](#code-generation)).
 
 ```dart
 import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
+
 import '../../extensions/extensions.dart';
 
-@UseCase(name: 'My Widget', type: MyWidget)
-Widget buildMyWidget(BuildContext context) {
+@UseCase(name: 'Divider', type: DSHorizontalDividerWidget)
+Widget buildDivider(BuildContext context) {
   final colorMap = context.brandColorsMap;
-  final color = colorMap[context.knobs.object.dropdown(
+  final colorName = context.knobs.object.dropdown(
     label: 'Color',
     options: colorMap.keys.toList(),
-  )]!;
+  );
 
-  return Center(child: MyWidget(color: color));
+  return Center(
+    child: DSHorizontalDividerWidget(thickness: 1, color: colorMap[colorName]!),
+  );
 }
 ```
 
-### Global Extensions
-Centralized helpers to avoid duplication:
+Dialog use cases read theme values from the use case `context` before calling `showDialog` and
+use those values inside the dialog builder.
 
-```dart
-context.brandColorsMap          // Brand colors
-context.semanticColorsMap       // Error, Success, Warning, Info
-context.typographyStylesMap     // Text styles
-context.elevationOptionsMap     // Elevation levels
-context.radiusOptionsMap        // Border radius options
-CommonIcons.commonIcons         // Icon set
+### Extensions
+
+`lib/src/extensions/widgetbook_extensions.dart` defines `BuildContext` helpers that map labels to
+design system values for knob options:
+
+| Helper                                               | Values                                         |
+| ---------------------------------------------------- | ---------------------------------------------- |
+| `brandColorsMap`                                     | Brand colors                                   |
+| `semanticColorsMap`                                  | Error, success, warning and info colors        |
+| `surfaceColorsMap`                                   | Surface colors                                 |
+| `neutralColorsMap`                                   | White, grey 1 to 10 and black                  |
+| `allColorsMap`                                       | All of the above plus the outline colors       |
+| `containerColorsMap`, `getContainerTextColor`        | Container backgrounds and their text colors    |
+| `typographyStylesMap`, `allTypographyStyles`         | The 15 `DSTextStyle` levels                    |
+| `elevationOptionsMap`                                | Elevation none and levels 1 to 3               |
+| `radiusOptionsMap`                                   | Radius levels 1 to 3 and circular              |
+| `CommonIcons.commonIcons`                            | A list of 20 Material icons                    |
+
+### Code Generation
+
+`widgetbook_generator` writes `lib/main.directories.g.dart` from the `@UseCase` and `@App`
+annotations. The file is committed.
+
+```bash
+# From the workspace root
+melos run gen --scope=storybook
+
+# Or from app/storybook
+dart run build_runner build
 ```
 
-See [extension documentation](lib/src/extensions/README.md) for details.
+### Testing
 
-### Best Practices
-- Use global extensions instead of hardcoded values
-- Add knobs for all configurable properties
-- Capture theme values before `showDialog` calls
-- Test across multiple themes
+`test/widget_test.dart` checks that `StorybookApp` renders a `Widgetbook`.
+
+```bash
+cd app/storybook
+flutter test
+```
+
+## Configuration
+
+`firebase.json` serves `build/web` on the `storybook` hosting target, rewrites every path to
+`index.html`, caches JS and CSS files for a year as immutable, and sends `index.html` with
+`no-cache`. `.firebaserc` maps the target to the `portrai-storybook` site in the `portrai-96f2b`
+project.
 
 ## Deployment
 
-Three CI workflows handle storybook deployments automatically.
+Three workflows build and deploy the storybook. Each runs `_storybook_quality.yaml` first (format
+check, `flutter analyze` and `flutter test --exclude-tags golden --coverage`), then builds with
+`_build_web.yaml` in release mode after code generation, then deploys with
+`_deploy_firebase.yaml` to the `storybook` hosting target.
 
-### PR Preview - `storybook_pr.yaml`
-Triggers on every pull request that touches `app/storybook/**` or `layer/design_system/**`.
+| Workflow                   | Trigger                                                          | Hosting channel |
+| -------------------------- | ---------------------------------------------------------------- | --------------- |
+| `storybook_pr.yaml`        | Pull request changing `app/storybook/**`, `layer/design_system/**`, the storybook workflows or the `setup-flutter-module` action | `preview`       |
+| `storybook_review.yaml`    | Tag matching `*+*-review-storybook`                              | `review`        |
+| `storybook_production.yaml`| Tag matching `*+*-prod-storybook`                                | `live`          |
 
-| Step | Action |
-|---|---|
-| Quality | Format, analysis, tests |
-| Build | Flutter web (preview) |
-| Deploy | Firebase Hosting -> `preview` channel |
-
-The preview URL is posted as a comment on the PR.
-
-### Review Release - `storybook_review.yaml`
-Triggers on tags matching `*+*-review-storybook` (e.g. `1.0.0+1-review-storybook`).
+On pull requests, the Firebase Hosting deploy action comments the preview URL on the PR.
 
 ```bash
 git tag 1.0.0+1-review-storybook
 git push origin 1.0.0+1-review-storybook
-```
 
-Deploys to the `review` channel - useful for stakeholder sign-off before production.
-
-### Production Release - `storybook_production.yaml`
-Triggers on tags matching `*+*-prod-storybook` (e.g. `1.0.0+1-prod-storybook`).
-
-```bash
 git tag 1.0.0+1-prod-storybook
 git push origin 1.0.0+1-prod-storybook
 ```
 
-| Step | Action |
-|---|---|
-| Quality | Format, analysis, tests |
-| Build | Flutter web (release) |
-| Deploy | Firebase Hosting -> `live` channel |
+The production workflow also runs `_storybook_release_notes.yaml`, which creates a GitHub release
+named `Storybook <tag>` listing the commit subjects since the previous `*+*-prod-storybook` tag.
 
-**Live URL after deploy:** https://portrai-storybook.web.app
+### Manual Deploy
 
-### Manual Deploy (without CI)
 ```bash
-melos deploy_widgetbook
+melos run deploy_widgetbook
 ```
 
-Or manually from this directory:
-```bash
-flutter build web --release
-firebase deploy --only hosting:storybook
-```
+The script runs `flutter clean`, `flutter pub get` and `flutter build web --release` in
+`app/storybook`, then `firebase deploy --only hosting:storybook`.
 
 ## Contributing
 
-See the root [Contributing](../../README.md#contributing) section for the development workflow,
-code style, and branch/PR conventions.
-
-## Links
-- [Extension Guide](lib/src/extensions/README.md)
-- [Design System](../../layer/design_system/)
-- [Widgetbook Docs](https://docs.widgetbook.io/)
-- [Firebase Console](https://console.firebase.google.com/project/portrai-96f2b/hosting)
+See the root [Contributing](../../README.md#contributing) section.
