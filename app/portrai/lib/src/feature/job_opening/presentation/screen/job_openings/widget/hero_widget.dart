@@ -23,6 +23,7 @@ class _HeroWidget extends StatelessWidget {
       color: palette.background.color,
       child: PageChromeWidget(
         closeColor: palette.neutral.grey10.color,
+        actions: const [_SignOutButtonWidget()],
         child: JobOpeningPageColumnWidget(
           verticalPadding: context.space(factor: isWide ? 5 : 3),
           child: isWide

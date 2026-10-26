@@ -74,6 +74,13 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Acme · Europe'), findsOneWidget);
+    expect(
+      tester
+          .widget<JobFitScoreWidget>(find.byType(JobFitScoreWidget))
+          .isAnimated,
+      isFalse,
+    );
+    expect(find.byIcon(Icons.arrow_outward_rounded), findsNothing);
     expect(find.text('Remotive'), findsOneWidget);
   });
 
@@ -97,7 +104,7 @@ void main() {
     expect(find.text('Updated Oct 19, 2026'), findsOneWidget);
   });
 
-  testWidgets('should show at most four skills and the number of the rest', (
+  testWidgets('should leave the skills out of the compact card when loaded', (
     tester,
   ) async {
     await pumpContent(
@@ -105,16 +112,13 @@ void main() {
       JobOpeningsState(
         status: JobOpeningsStatus.loaded,
         jobOpenings: [
-          jobOpeningEntityFixture(
-            matchedSkills: ['A1', 'B2', 'C3', 'D4', 'E5', 'F6'],
-          ),
+          jobOpeningEntityFixture(matchedSkills: ['Riverpod', 'Bloc']),
         ],
       ),
     );
 
-    expect(find.text('D4'), findsOneWidget);
-    expect(find.text('E5'), findsNothing);
-    expect(find.text('+2'), findsOneWidget);
+    expect(find.byType(DSTagWidget), findsNothing);
+    expect(find.text('Riverpod'), findsNothing);
   });
 
   testWidgets('should open the opening and track the click when it is '
@@ -168,52 +172,6 @@ void main() {
         .onRetryClicked!();
 
     verify(() => bloc.add(const JobOpeningsRetryClickEvent())).called(1);
-  });
-
-  testWidgets('should hide the switch when the setting is unknown', (
-    tester,
-  ) async {
-    await pumpContent(
-      tester,
-      const JobOpeningsState(status: JobOpeningsStatus.loaded),
-    );
-
-    expect(find.byType(Switch), findsNothing);
-    expect(find.text('Sign out'), findsOneWidget);
-  });
-
-  testWidgets('should dispatch the new value when the switch is toggled', (
-    tester,
-  ) async {
-    final bloc = await pumpContent(
-      tester,
-      const JobOpeningsState(
-        status: JobOpeningsStatus.loaded,
-        isJobSearchEnabled: true,
-      ),
-    );
-
-    await tester.tap(find.byType(Switch));
-    await tester.pump();
-
-    verify(
-      () => bloc.add(const JobSearchToggleClickEvent(isEnabled: false)),
-    ).called(1);
-  });
-
-  testWidgets('should disable the switch while the setting is saving', (
-    tester,
-  ) async {
-    await pumpContent(
-      tester,
-      const JobOpeningsState(
-        status: JobOpeningsStatus.loaded,
-        isJobSearchEnabled: true,
-        isUpdatingJobSearch: true,
-      ),
-    );
-
-    expect(tester.widget<Switch>(find.byType(Switch)).onChanged, isNull);
   });
 
   testWidgets('should dispatch sign out when sign out is tapped', (
@@ -272,25 +230,6 @@ void main() {
     expect(second.dx, greaterThan(first.dx));
   });
 
-  for (final (isEnabled, status) in [
-    (true, 'Active · Next search on Monday'),
-    (false, 'Paused · No new searches'),
-  ]) {
-    testWidgets('should show "$status" when job search is '
-        '${isEnabled ? 'on' : 'off'}', (tester) async {
-      await pumpContent(
-        tester,
-        JobOpeningsState(
-          status: JobOpeningsStatus.loaded,
-          isJobSearchEnabled: isEnabled,
-        ),
-      );
-
-      expect(find.text(status), findsOneWidget);
-      expect(tester.widget<Switch>(find.byType(Switch)).value, isEnabled);
-    });
-  }
-
   testWidgets('should show the Lottie loader at the app-wide size while '
       'loading', (tester) async {
     await pumpContent(tester, const JobOpeningsState());
@@ -301,7 +240,7 @@ void main() {
     expect(loader.size, 144);
   });
 
-  testWidgets('should show the job search section while the matches load', (
+  testWidgets('should show sign out in the header while the matches load', (
     tester,
   ) async {
     await pumpContent(tester, const JobOpeningsState());
@@ -379,8 +318,155 @@ void main() {
       ),
     );
 
-    expect(find.text('Contract'), findsOneWidget);
-    expect(find.text('Freelance'), findsOneWidget);
+    expect(find.textContaining('Contract · Posted'), findsOneWidget);
+    expect(find.textContaining('Freelance · Posted'), findsOneWidget);
+  });
+
+  testWidgets('should show the platform logo behind Flutter, Android and iOS '
+      'openings', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          jobOpeningEntityFixture(id: '1'),
+          jobOpeningEntityFixture(
+            id: '2',
+            title: 'Android Engineer',
+            tags: [],
+            matchedSkills: ['Kotlin'],
+          ),
+          jobOpeningEntityFixture(
+            id: '3',
+            title: 'iOS Engineer',
+            tags: [],
+            matchedSkills: ['Swift'],
+          ),
+          jobOpeningEntityFixture(
+            id: '4',
+            title: 'Backend Engineer',
+            tags: [],
+            matchedSkills: ['Go'],
+          ),
+        ],
+      ),
+    );
+
+    bool isBackgroundLogo(Widget widget) => switch (widget) {
+      FlutterLogo(:final size) => size == 120,
+      Icon(:final size) => size == 120,
+      _ => false,
+    };
+    final backgroundLogos = tester
+        .widgetList(find.byWidgetPredicate(isBackgroundLogo))
+        .map((widget) => widget is Icon ? widget.icon : widget.runtimeType);
+    expect(backgroundLogos, [
+      FlutterLogo,
+      Icons.android_rounded,
+      Icons.apple_rounded,
+    ]);
+  });
+
+  testWidgets('should dispatch the search when text is typed', (tester) async {
+    final bloc = await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [jobOpeningEntityFixture()],
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField), 'acme');
+    await tester.pump();
+
+    verify(
+      () => bloc.add(const JobOpeningsSearchChangedEvent('acme')),
+    ).called(1);
+  });
+
+  testWidgets('should offer only the filters that match an opening', (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          jobOpeningEntityFixture(id: '1', score: 85),
+          jobOpeningEntityFixture(id: '2', score: 72),
+        ],
+      ),
+    );
+
+    final chipLabels = find.descendant(
+      of: find.byType(FilterChip),
+      matching: find.byType(DSTextWidget),
+    );
+    expect(
+      tester.widgetList<DSTextWidget>(chipLabels).map((text) => text.data),
+      ['Flutter', '2', 'Strong fit', '1'],
+    );
+  });
+
+  testWidgets('should dispatch the filter when its chip is tapped', (
+    tester,
+  ) async {
+    final bloc = await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [jobOpeningEntityFixture()],
+      ),
+    );
+
+    await tester.tap(find.widgetWithText(FilterChip, 'Flutter'));
+    await tester.pump();
+
+    verify(
+      () => bloc.add(
+        const JobOpeningsFilterClickEvent(JobOpeningsFilter.flutter),
+      ),
+    ).called(1);
+  });
+
+  testWidgets('should show only the matching openings and their count when '
+      'narrowed', (tester) async {
+    await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [
+          jobOpeningEntityFixture(id: '1', title: 'First'),
+          jobOpeningEntityFixture(id: '2', title: 'Second', company: 'Globex'),
+        ],
+        searchQuery: 'globex',
+      ),
+    );
+
+    expect(find.text('First'), findsNothing);
+    expect(find.text('Second'), findsOneWidget);
+    expect(find.text('Showing 1 of 2'), findsOneWidget);
+  });
+
+  testWidgets('should offer to clear the filters when nothing matches', (
+    tester,
+  ) async {
+    final bloc = await pumpContent(
+      tester,
+      JobOpeningsState(
+        status: JobOpeningsStatus.loaded,
+        jobOpenings: [jobOpeningEntityFixture()],
+        filters: const {JobOpeningsFilter.android},
+      ),
+    );
+
+    expect(find.text('No jobs match your search and filters.'), findsOneWidget);
+    final clearButton = find.widgetWithText(DSButtonWidget, 'Clear filters');
+    await tester.ensureVisible(clearButton.last);
+    await tester.tap(clearButton.last);
+    await tester.pump();
+
+    verify(() => bloc.add(const JobOpeningsClearFiltersClickEvent())).called(1);
   });
 
   testWidgets('should build only the cards in view when there are many '
@@ -461,6 +547,8 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('footer', skipOffstage: false),
       200,
+      // The search field has a scrollable of its own.
+      scrollable: find.byType(Scrollable).first,
     );
     expect(
       tester.getTopLeft(find.text('footer', skipOffstage: false)).dy,

@@ -74,4 +74,53 @@ void main() {
       });
     }
   });
+
+  group('platforms', () {
+    for (final (title, tags, matchedSkills, platforms) in [
+      (
+        'Senior Flutter Developer',
+        <String>[],
+        <String>[],
+        [JobOpeningPlatform.flutter],
+      ),
+      (
+        'Mobile Engineer (Android & iOS)',
+        ['flutter'],
+        <String>[],
+        [
+          JobOpeningPlatform.flutter,
+          JobOpeningPlatform.android,
+          JobOpeningPlatform.ios,
+        ],
+      ),
+      (
+        'Senior Android Engineer',
+        <String>[],
+        ['Kotlin'],
+        [JobOpeningPlatform.android],
+      ),
+      (
+        'Mobile Engineer',
+        <String>[],
+        ['Jetpack Compose'],
+        [JobOpeningPlatform.android],
+      ),
+      ('iOS Engineer', <String>[], <String>[], [JobOpeningPlatform.ios]),
+      ('Mobile Engineer', <String>[], ['SwiftUI'], [JobOpeningPlatform.ios]),
+      ('Backend Engineer', ['go'], ['Kotlin'], <JobOpeningPlatform>[]),
+    ]) {
+      test(
+        'should read $platforms when "$title" has $tags and $matchedSkills',
+        () {
+          final jobOpening = jobOpeningEntityFixture(
+            title: title,
+            tags: tags,
+            matchedSkills: matchedSkills,
+          );
+
+          expect(jobOpening.platforms, platforms);
+        },
+      );
+    }
+  });
 }

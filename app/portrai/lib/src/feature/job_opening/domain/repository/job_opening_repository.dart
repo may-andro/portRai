@@ -8,13 +8,4 @@ abstract class JobOpeningRepository {
     required String userId,
     required String id,
   });
-
-  /// Whether the weekly run includes [userId]. False when the user has no
-  /// document yet.
-  Future<bool> isJobSearchEnabled(String userId);
-
-  Future<void> setJobSearchEnabled({
-    required String userId,
-    required bool isEnabled,
-  });
 }

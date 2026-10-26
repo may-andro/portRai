@@ -559,8 +559,6 @@
   "jobOpeningsCardDescription": "Remote vacatures die elke week bij je portfolio passen",
   "jobOpeningsTitle": "Vacatures",
   "jobOpeningsDescription": "Remote vacatures die bij de vaardigheden in je portfolio passen. Elke maandag worden nieuwe gezocht, beoordeeld op hoe goed ze passen en 14 dagen bewaard.",
-  "jobSearchToggleTitle": "Wekelijkse vacaturezoektocht",
-  "jobSearchToggleDescription": "Zoek elke maandag naar nieuwe passende vacatures",
   "jobOpeningsEmpty": "Op dit moment geen passende vacatures. Elke maandag worden nieuwe gezocht.",
   "jobOpeningScore": "{score}% match",
   "jobOpeningTitle": "Vacature",
@@ -574,10 +572,6 @@
   "errorJobOpeningsNetwork": "Kan vacatures niet laden. Controleer je internetverbinding",
   "errorJobOpeningsUnknown": "Kan vacatures niet laden. Probeer het opnieuw",
   "errorJobOpeningNotFound": "Deze vacature is niet meer beschikbaar",
-  "errorJobSearchUnavailable": "Kan je instelling voor vacaturezoeken niet lezen",
-  "errorJobSearchPermissionDenied": "Je kunt deze instelling voor vacaturezoeken niet wijzigen",
-  "errorJobSearchNetwork": "Kan vacaturezoeken niet bijwerken. Controleer je internetverbinding",
-  "errorJobSearchUnknown": "Kan vacaturezoeken niet bijwerken. Probeer het opnieuw",
   "jobOpeningsMatchCount": "{count, plural, =1{1 match} other{{count} matches}}",
   "jobOpeningsBestFit": "Beste match {score}%",
   "jobOpeningsUpdatedOn": "Bijgewerkt op {date}",
@@ -588,8 +582,6 @@
   "jobOpeningSkillsTitle": "Vaardigheden",
   "jobOpeningApplyTitle": "Klaar om te solliciteren?",
   "jobOpeningApplyDescription": "Deze vacature staat op {source}. Solliciteren opent de pagina daar.",
-  "jobSearchStatusActive": "Actief · Volgende zoektocht op maandag",
-  "jobSearchStatusPaused": "Gepauzeerd · Geen nieuwe zoektochten",
   "jobOpeningsMatchesTitle": "Jouw matches",
   "signInWelcomeTitle": "Welkom terug",
   "signInWelcomeDescription": "Jouw privéruimte in het portfolio, alleen voor jouw account.",
@@ -747,5 +739,41 @@
   "themeTaglineXmas": "Sneeuwval en warme winterlichtjes",
   "@themeTaglineXmas": {
     "description": "Short description of the Christmas theme"
+  },
+  "jobOpeningsSearchHint": "Zoek op functie, bedrijf of vaardigheid",
+  "@jobOpeningsSearchHint": {
+    "description": "Hint in the search field above the job list"
+  },
+  "jobOpeningsFilterFlutter": "Flutter",
+  "@jobOpeningsFilterFlutter": {
+    "description": "Filter chip for Flutter jobs"
+  },
+  "jobOpeningsFilterAndroid": "Android",
+  "@jobOpeningsFilterAndroid": {
+    "description": "Filter chip for Android jobs"
+  },
+  "jobOpeningsFilterIos": "iOS",
+  "@jobOpeningsFilterIos": {
+    "description": "Filter chip for iOS jobs"
+  },
+  "jobOpeningsFilterRecent": "Nieuw",
+  "@jobOpeningsFilterRecent": {
+    "description": "Filter chip for jobs posted in the last few days"
+  },
+  "jobOpeningsNoResults": "Geen vacatures passen bij je zoekopdracht en filters.",
+  "@jobOpeningsNoResults": {
+    "description": "Shown when the search and filters leave no jobs"
+  },
+  "jobOpeningsClearFilters": "Filters wissen",
+  "@jobOpeningsClearFilters": {
+    "description": "Button that clears the search and every filter"
+  },
+  "jobOpeningsShowingCount": "{visible} van {total} getoond",
+  "@jobOpeningsShowingCount": {
+    "description": "How many jobs the search and filters leave, out of all of them",
+    "placeholders": {
+      "visible": { "type": "int", "example": "5" },
+      "total": { "type": "int", "example": "23" }
+    }
   }
 }

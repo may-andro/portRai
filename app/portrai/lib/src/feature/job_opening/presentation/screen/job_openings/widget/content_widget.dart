@@ -17,7 +17,8 @@ import 'package:portrai/src/widget/screen_content_widget.dart';
 part 'grid_widget.dart';
 part 'hero_widget.dart';
 part 'job_opening_card_widget.dart';
-part 'job_search_widget.dart';
+part 'search_widget.dart';
+part 'sign_out_button_widget.dart';
 part 'status_widget.dart';
 
 class ContentWidget extends StatelessWidget {
@@ -37,19 +38,6 @@ class ContentWidget extends StatelessWidget {
           builder: (context, state) =>
               SliverToBoxAdapter(child: _HeroWidget(state: state)),
         ),
-        BlocBuilder<JobOpeningsBloc, JobOpeningsState>(
-          buildWhen: (previous, current) =>
-              previous.isJobSearchEnabled != current.isJobSearchEnabled ||
-              previous.isUpdatingJobSearch != current.isUpdatingJobSearch ||
-              previous.isSigningOut != current.isSigningOut ||
-              previous.isSignedOut != current.isSignedOut,
-          builder: (context, state) => SliverToBoxAdapter(
-            child: JobOpeningBandWidget(
-              isAlternate: true,
-              child: _JobSearchWidget(state: state),
-            ),
-          ),
-        ),
         // A sliver, so only the cards in view are built.
         JobOpeningBandSliverWidget(
           sliver: SliverMainAxisGroup(
@@ -67,7 +55,9 @@ class ContentWidget extends StatelessWidget {
                 buildWhen: (previous, current) =>
                     previous.status != current.status ||
                     previous.jobOpenings != current.jobOpenings ||
-                    previous.loadFailure != current.loadFailure,
+                    previous.loadFailure != current.loadFailure ||
+                    previous.searchQuery != current.searchQuery ||
+                    previous.filters != current.filters,
                 contentOf: (state) => switch (state.status) {
                   JobOpeningsStatus.loading => const ScreenLoadingContent(),
                   JobOpeningsStatus.failed => ScreenErrorContent(
@@ -79,9 +69,7 @@ class ContentWidget extends StatelessWidget {
                     const ScreenLoadedContent.slivers([
                       SliverToBoxAdapter(child: _EmptyWidget()),
                     ]),
-                  JobOpeningsStatus.loaded => ScreenLoadedContent.slivers([
-                    _GridWidget(jobOpenings: state.jobOpenings),
-                  ]),
+                  JobOpeningsStatus.loaded => _loadedContentOf(state),
                 },
               ),
             ],
@@ -89,5 +77,16 @@ class ContentWidget extends StatelessWidget {
         ),
       ]),
     );
+  }
+
+  ScreenLoadedContent _loadedContentOf(JobOpeningsState state) {
+    final visibleJobOpenings = state.visibleJobOpenings(DateTime.now());
+    return ScreenLoadedContent.slivers([
+      SliverToBoxAdapter(child: _SearchWidget(state: state)),
+      if (visibleJobOpenings.isEmpty)
+        const SliverToBoxAdapter(child: _NoResultsWidget())
+      else
+        _GridWidget(jobOpenings: visibleJobOpenings),
+    ]);
   }
 }

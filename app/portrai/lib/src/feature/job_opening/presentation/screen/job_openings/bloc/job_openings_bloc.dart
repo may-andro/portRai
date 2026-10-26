@@ -10,21 +10,21 @@ import 'package:portrai/src/feature/job_opening/presentation/screen/job_openings
 class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
   JobOpeningsBloc(
     this._getJobOpeningsUseCase,
-    this._isJobSearchEnabledUseCase,
-    this._setJobSearchEnabledUseCase,
     this._signOutUseCase,
     this._trackingDelegate,
   ) : super(const JobOpeningsState()) {
     on<JobOpeningsStartedEvent>(_mapJobOpeningsStartedEventToState);
     on<JobOpeningsRetryClickEvent>(_mapJobOpeningsRetryClickEventToState);
     on<JobOpeningClickEvent>(_mapJobOpeningClickEventToState);
-    on<JobSearchToggleClickEvent>(_mapJobSearchToggleClickEventToState);
+    on<JobOpeningsSearchChangedEvent>(_mapJobOpeningsSearchChangedEventToState);
+    on<JobOpeningsFilterClickEvent>(_mapJobOpeningsFilterClickEventToState);
+    on<JobOpeningsClearFiltersClickEvent>(
+      _mapJobOpeningsClearFiltersClickEventToState,
+    );
     on<SignOutClickEvent>(_mapSignOutClickEventToState);
   }
 
   final GetJobOpeningsUseCase _getJobOpeningsUseCase;
-  final IsJobSearchEnabledUseCase _isJobSearchEnabledUseCase;
-  final SetJobSearchEnabledUseCase _setJobSearchEnabledUseCase;
   final SignOutUseCase _signOutUseCase;
   final JobOpeningsTrackingDelegate _trackingDelegate;
 
@@ -33,17 +33,14 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
     Emitter<JobOpeningsState> emit,
   ) async {
     _trackingDelegate.trackScreenView();
-    await Future.wait([_loadJobOpenings(emit), _loadJobSearch(emit)]);
+    await _loadJobOpenings(emit);
   }
 
   Future<void> _mapJobOpeningsRetryClickEventToState(
     JobOpeningsRetryClickEvent event,
     Emitter<JobOpeningsState> emit,
   ) async {
-    await Future.wait([
-      _loadJobOpenings(emit),
-      if (state.isJobSearchEnabled == null) _loadJobSearch(emit),
-    ]);
+    await _loadJobOpenings(emit);
   }
 
   void _mapJobOpeningClickEventToState(
@@ -53,33 +50,35 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
     _trackingDelegate.trackJobOpeningClick();
   }
 
-  Future<void> _mapJobSearchToggleClickEventToState(
-    JobSearchToggleClickEvent event,
+  void _mapJobOpeningsSearchChangedEventToState(
+    JobOpeningsSearchChangedEvent event,
     Emitter<JobOpeningsState> emit,
-  ) async {
-    if (state.isUpdatingJobSearch) return;
+  ) {
+    emit(state.copyWith(searchQuery: event.searchQuery));
+  }
 
-    _trackingDelegate.trackJobSearchToggle(isEnabled: event.isEnabled);
-    emit(state.copyWith(isUpdatingJobSearch: true, clearActionFailure: true));
-
-    final setJobSearchEnabledEither = await _setJobSearchEnabledUseCase(
-      event.isEnabled,
-    );
-    if (setJobSearchEnabledEither.isLeft) {
-      emit(
-        state.copyWith(
-          isUpdatingJobSearch: false,
-          actionFailure: setJobSearchEnabledEither.left,
-        ),
-      );
-      return;
-    }
+  void _mapJobOpeningsFilterClickEventToState(
+    JobOpeningsFilterClickEvent event,
+    Emitter<JobOpeningsState> emit,
+  ) {
+    final filter = event.filter;
+    final isSelected = !state.filters.contains(filter);
+    if (isSelected) _trackingDelegate.trackFilterSelection(filter.name);
     emit(
       state.copyWith(
-        isUpdatingJobSearch: false,
-        isJobSearchEnabled: event.isEnabled,
+        filters: isSelected
+            ? {...state.filters, filter}
+            : ({...state.filters}..remove(filter)),
       ),
     );
+  }
+
+  void _mapJobOpeningsClearFiltersClickEventToState(
+    JobOpeningsClearFiltersClickEvent event,
+    Emitter<JobOpeningsState> emit,
+  ) {
+    _trackingDelegate.trackClearFiltersClick();
+    emit(state.copyWith(searchQuery: '', filters: const {}));
   }
 
   Future<void> _mapSignOutClickEventToState(
@@ -121,14 +120,5 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
         jobOpenings: jobOpeningsEither.right,
       ),
     );
-  }
-
-  Future<void> _loadJobSearch(Emitter<JobOpeningsState> emit) async {
-    final isJobSearchEnabledEither = await _isJobSearchEnabledUseCase();
-    // A setting that cannot be read leaves the switch hidden; the list still
-    // shows.
-    if (isJobSearchEnabledEither.isRight) {
-      emit(state.copyWith(isJobSearchEnabled: isJobSearchEnabledEither.right));
-    }
   }
 }

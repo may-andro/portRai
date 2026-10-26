@@ -236,7 +236,11 @@ restored session on app start and returns an `AuthUserEntity`. `AuthUserEntity` 
 `job_opening` shows the remote jobs that the weekly Cloud Function in
 [`tool/functions`](../../tool/functions/README.md) matched to the portfolio and scored with Gemini.
 With `feature_job_openings` on, Settings shows a Job openings card that opens `/job-openings`: a
-list sorted by score and then by date, with the "Weekly job search" switch and a sign-out button.
+list sorted by score and then by date, with sign-out in the header. The list can be searched by
+title, company, location, source or skill, and narrowed with filter chips for the platform
+(Flutter, Android, iOS), contract or freelance work, a strong fit and new openings. Chips in one
+group widen the list; chips in different groups narrow it. A Flutter, Android or iOS opening shows
+that platform's logo behind its card.
 `/job-openings/:id` shows the score, the reasons, matched and missing skills, the description and
 an Apply button that opens the job on its board. Both routes require sign-in.
 
@@ -252,15 +256,13 @@ On web, Android and iOS, an opening can also offer:
 
 The data is private to the signed-in user and is read from Firestore without a cache:
 
-| Path                              | Access | Content                                        |
-| --------------------------------- | ------ | ---------------------------------------------- |
-| `users/{uid}/job_openings/{id}`   | Read   | Openings written by the function               |
-| `users/{uid}.jobSearch.enabled`   | Write  | The switch; the function runs only for `true`  |
-| `users/{uid}.jobSearch.updatedAt` | Write  | Set to the server time when the switch changes |
+| Path                            | Access | Content                          |
+| ------------------------------- | ------ | -------------------------------- |
+| `users/{uid}/job_openings/{id}` | Read   | Openings written by the function |
 
-The switch merges into `users/{uid}`, so other fields on that document are kept. Each opening
-shows its job board's name and links to its page there. Openings expire 14 days after the last
-run that found them.
+The function runs only for users whose `users/{uid}.jobSearch.enabled` is `true` (see
+[`tool/functions`](../../tool/functions/README.md)). Each opening shows its job board's name and
+links to its page there. Openings expire 14 days after the last run that found them.
 
 ### Notifications
 
