@@ -43,33 +43,41 @@ class PageCloseButtonWidget extends StatelessWidget {
 }
 
 /// Wraps full-bleed page content (such as a hero) with the navigation chrome
-/// for the current platform, see [PageChrome]. The close button overlays the
-/// content, so it adds no height.
+/// for the current platform, see [PageChrome]. Without the logo header, the
+/// close button and [actions] overlay the content, so they add no height.
 class PageChromeWidget extends StatelessWidget {
   const PageChromeWidget({
     required this.child,
     required this.closeColor,
+    this.actions = const [],
     super.key,
   });
 
   final Widget child;
   final Color closeColor;
 
+  /// Shown at the end of the header on every platform, before the close
+  /// button.
+  final List<Widget> actions;
+
   @override
   Widget build(BuildContext context) {
     final chrome = PageChrome.current;
+    final hasCloseButton =
+        chrome == PageChrome.close && Navigator.of(context).canPop();
     return Stack(
       children: [
         Column(
           children: [
             if (chrome == PageChrome.header)
-              const PageHeaderWidget()
+              PageHeaderWidget(actions: actions)
             else
               SizedBox(height: MediaQuery.paddingOf(context).top),
             child,
           ],
         ),
-        if (chrome == PageChrome.close && Navigator.of(context).canPop())
+        if (chrome != PageChrome.header &&
+            (hasCloseButton || actions.isNotEmpty))
           Positioned.fill(
             child: SafeArea(
               bottom: false,
@@ -77,7 +85,14 @@ class PageChromeWidget extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: EdgeInsets.only(right: context.space()),
-                  child: PageCloseButtonWidget(color: closeColor),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...actions,
+                      if (hasCloseButton)
+                        PageCloseButtonWidget(color: closeColor),
+                    ],
+                  ),
                 ),
               ),
             ),
