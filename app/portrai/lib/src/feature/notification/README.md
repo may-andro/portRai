@@ -48,6 +48,9 @@ may write (see the [Firestore rules](../../../../../../tool/firestore/README.md)
 The [functions](../../../../../../tool/functions/README.md) send to these devices and topics.
 iOS needs the Push Notifications capability (`aps-environment` in `Runner.entitlements`), an
 APNs key uploaded to the Firebase project, and provisioning profiles that include push.
+On Android, notifications shown while the app is in the background use the white
+`ic_notification` icon, cut from the shape of `assets/launcher/logo.png`, and the
+`notification_accent` color, both set in `AndroidManifest.xml`.
 
 ## Testing
 
