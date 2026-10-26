@@ -21,10 +21,7 @@ class NoCrossModuleInternalImportsTest extends AnalysisRuleTest {
 
     super.setUp();
 
-    newFile(
-      '$testPackageLibPath/src/some_internal.dart',
-      'class Internal {}',
-    );
+    newFile('$testPackageLibPath/src/some_internal.dart', 'class Internal {}');
   }
 
   Future<void> test_crossModuleSrcImport() async {
