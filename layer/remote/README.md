@@ -1,29 +1,24 @@
-# Remote Module
+# Remote
 
-A robust HTTP client service module for Flutter applications that provides a clean abstraction layer
-for REST API communications with comprehensive error handling and automatic retry capabilities.
+A REST client interface backed by [Dio](https://pub.dev/packages/dio), with retries, optional
+request logging, and Dio errors mapped to a sealed `RemoteApiException` hierarchy.
 
 ## Features
-
-- **Clean REST API Interface**: Simple abstraction over HTTP operations with type-safe responses
-- **Comprehensive Error Handling**: Structured exception hierarchy for different API error
-  scenarios
-- **Automatic Retry Logic**: Built-in smart retry mechanism for failed requests
-- **Request/Response Logging**: Optional pretty logging for debugging and development
-- **Timeout Management**: Configurable connection, send, and receive timeouts
-- **Type Safety**: Generic method signatures for type-safe API responses
-- **Dependency Injection**: Seamless integration with the module injection system
+- `RestApiService` interface with generic `get<T>` and `post<T>` methods that return the
+  decoded response body.
+- One shared `Dio` instance with a base URL and 10-second send and receive timeouts.
+- Retries through `dio_smart_retry`'s `RetryInterceptor` with its default settings (3 retries,
+  after 1, 3 and 5 seconds).
+- Optional request and response logging through `pretty_dio_logger`.
+- `DioException`s are rethrown as `RemoteApiException` subtypes; other errors are rethrown
+  unchanged.
 
 ## Getting Started
-
 ### Installation
-
-This module is part of the workspace and can be imported directly.
 
 ```yaml
 dependencies:
-  remote:
-    path: layer/remote
+  remote: any
 ```
 
 ```dart
@@ -31,274 +26,123 @@ import 'package:remote/remote.dart';
 ```
 
 ### Module Configuration
-
-Configure the remote module in your application:
-
-```dart
-import 'package:module_injector/module_injector.dart';
-import 'package:remote/remote.dart';
-
-final remoteConfigurator = RemoteModuleConfigurator(
-  true,
-  'https://api.example.com',
-);
-
-await ModuleInjectorController().configure([remoteConfigurator]);
-```
-
-#### RemoteModuleConfigurator Parameters
+`RemoteModuleConfigurator` takes two positional arguments:
 
 ```dart
 RemoteModuleConfigurator(
-  bool isLoggingEnabled, // Enable/disable request/response logging
-  String baseUrl,        // Base URL for all API calls
+  bool isLoggingEnabled, // adds PrettyDioLogger with request headers and bodies
+  String baseUrl,        // BaseOptions.baseUrl for every request
 )
 ```
 
-#### Default Configuration
+```dart
+final configurators = <ModuleConfigurator>[
+  RemoteModuleConfigurator(true, 'https://api.example.com'),
+];
 
-The module automatically configures:
+await ModuleInjectorController()
+    .setUpDIGraph(configurators: configurators)
+    .drain<void>();
+```
 
-- **Connection Timeout**: 10 seconds
-- **Send Timeout**: 10 seconds
-- **Receive Timeout**: 10 seconds
-- **Automatic Retry**: Enabled with smart retry logic
-- **Pretty Logging**: Optional (controlled by `isLoggingEnabled`)
+`registerDependencies` registers `RestApiService` as a singleton. The `Dio` instance is not
+registered, so its options and interceptors cannot be changed from outside the layer.
 
 ## Usage
 
-### Basic Setup
-
-Configure the remote module in your application:
-
 ```dart
-import 'package:remote/remote.dart';
+class ItemRepository {
+  ItemRepository(this._restApiService);
 
-// Configure the module with base URL and logging
-final remoteConfigurator = RemoteModuleConfigurator(
-  true, // Enable logging for development
-  'https://api.example.com', // Your API base URL
-);
+  final RestApiService _restApiService;
 
-// Add to your module configurators
-await ModuleInjectorController().configure([remoteConfigurator]);
-```
-
-### Making API Calls
-
-```dart
-import 'package:module_injector/module_injector.dart';
-import 'package:remote/remote.dart';
-
-class UserRepository {
-  late final RestApiService _apiService;
-
-  UserRepository() {
-    _apiService = ModuleInjectorController().serviceLocator.get<RestApiService>();
+  Future<Map<String, dynamic>?> getItem(String id) {
+    return _restApiService.get<Map<String, dynamic>>('/items/$id');
   }
 
-  // GET request example
-  Future<User?> getUser(int userId) async {
-    try {
-      final response = await _apiService.get<Map<String, dynamic>>(
-        '/users/$userId',
-      );
-
-      if (response != null) {
-        return User.fromJson(response);
-      }
-      return null;
-    } on RemoteApiException catch (e) {
-      // Handle API-specific errors
-      throw UserFetchException('Failed to fetch user: $e');
-    }
-  }
-
-  // POST request example
-  Future<User?> createUser(CreateUserRequest request) async {
-    try {
-      final response = await _apiService.post<Map<String, dynamic>>(
-        '/users',
-        queryParameters: request.toJson(),
-      );
-
-      if (response != null) {
-        return User.fromJson(response);
-      }
-      return null;
-    } on ApiAuthenticationException {
-      throw AuthenticationRequiredException();
-    } on ApiClientException catch (e) {
-      throw InvalidUserDataException(e.errorMessage);
-    } on ApiServerException {
-      throw ServerUnavailableException();
-    }
-  }
-
-  // GET with query parameters
-  Future<List<User>> getUsers({
-    int? page,
-    int? limit,
-    String? search,
-  }) async {
-    final queryParams = <String, dynamic>{};
-    if (page != null) queryParams['page'] = page;
-    if (limit != null) queryParams['limit'] = limit;
-    if (search != null) queryParams['search'] = search;
-
-    final response = await _apiService.get<List<dynamic>>(
-      '/users',
-      queryParameters: queryParams,
+  Future<List<dynamic>?> searchItems(String query) {
+    return _restApiService.get<List<dynamic>>(
+      '/items',
+      queryParameters: {'q': query},
     );
-
-    return response?.map((json) => User.fromJson(json)).toList() ?? [];
   }
 }
+
+final repository = ItemRepository(serviceLocator.get<RestApiService>());
 ```
+
+`post<T>` sends `queryParameters` in the URL; it has no request body parameter.
 
 ## API Reference
 
-The module is built on top of [Dio](https://pub.dev/packages/dio) and provides:
+### RestApiService
 
-- **RestApiService**: Abstract interface defining HTTP operations
-- **DioApiService**: Concrete implementation using Dio HTTP client
-- **RemoteApiException**: Base exception type for remote failures
-- **RemoteModuleConfigurator**: Module configurator for dependency registration
+```dart
+abstract class RestApiService {
+  Future<T?> get<T>(String path, {Map<String, dynamic>? queryParameters});
+
+  Future<T?> post<T>(String path, {Map<String, dynamic>? queryParameters});
+}
+```
+
+The registered implementation wraps `Dio.get` and `Dio.post` and returns `response.data`. It is
+internal to the layer and not exported.
+
+### RemoteModuleConfigurator
+Implements `ModuleConfigurator`. All work happens in `registerDependencies`;
+`preDependenciesSetup` and `postDependenciesSetup` do nothing.
 
 ## Exception Handling
 
-The module provides a comprehensive exception hierarchy for different error scenarios:
+All exceptions extend the sealed `RemoteApiException`, which implements `AppException` from
+`core` and carries the original `cause` and `stackTrace`.
 
-### Exception Types
+| Dio error | Exception |
+|-----------|-----------|
+| `connectionTimeout`, `sendTimeout`, `receiveTimeout` | `ApiConnectionTimeoutException` |
+| `badResponse` with status 401 | `ApiAuthenticationException` |
+| `badResponse` with status 400–499 (except 401) | `ApiClientException` |
+| `badResponse` with status 500 and above | `ApiServerException` |
+| `badResponse` with another status or no response | `ApiUnknownException` |
+| Any other type (`connectionError`, `cancel`, `badCertificate`, `unknown`) | `ApiUnknownException` |
 
-```dart
-// Base exception class
-sealed class RemoteApiException implements AppException
+`ApiAuthenticationException`, `ApiClientException` and `ApiServerException` also expose
+`errorMessage`. When the response has a status message, `errorMessage` is read from the
+`message` field of the response body, which must then be a JSON object; otherwise it is an
+empty string.
 
-// Network-related errors
-class ApiNetworkException extends RemoteApiException
-
-// Authentication errors (HTTP 401)
-class ApiAuthenticationException extends RemoteApiException
-
-// Client errors (HTTP 4xx)
-class ApiClientException extends RemoteApiException
-
-// Server errors (HTTP 5xx)
-class ApiServerException extends RemoteApiException
-
-// Connection timeout errors
-class ApiConnectionTimeoutException extends RemoteApiException
-
-// Unknown errors
-class ApiUnknownException extends RemoteApiException
-```
-
-### Error Handling Examples
+`ApiNetworkException` is part of the hierarchy but the Dio mapping never produces it.
 
 ```dart
 try {
-  final user = await userRepository.getUser(123);
+  await restApiService.get<Map<String, dynamic>>('/items/1');
+} on ApiConnectionTimeoutException {
+  // retry later
 } on ApiAuthenticationException catch (e) {
-  // Handle authentication failure
-  navigationService.navigateToLogin();
-} on ApiConnectionTimeoutException catch (e) {
-  // Handle timeout
-  showErrorMessage('Connection timeout. Please try again.');
-} on ApiServerException catch (e) {
-  // Handle server errors
-  showErrorMessage('Server is temporarily unavailable.');
-} on ApiClientException catch (e) {
-  // Handle client errors (validation, not found, etc.)
-  showErrorMessage('Error: ${e.errorMessage}');
+  // e.errorMessage
 } on RemoteApiException catch (e) {
-  // Handle any other API errors
-  showErrorMessage('An unexpected error occurred.');
+  // e.cause, e.stackTrace
 }
 ```
-
-## Advanced Usage
-
-### Custom Headers
-
-```dart
-// Access the underlying Dio instance for advanced configuration
-final dio = serviceLocator.get<Dio>();
-dio.options.headers['Authorization'] = '******';
-dio.options.headers['Content-Type'] = 'application/json';
-```
-
-### Interceptors
-
-```dart
-// Add custom interceptors during configuration
-class CustomRemoteConfigurator extends RemoteModuleConfigurator {
-  CustomRemoteConfigurator(super.isLoggingEnabled, super.baseUrl);
-
-  @override
-  FutureOr<void> registerDependencies(ServiceLocator serviceLocator) {
-    super.registerDependencies(serviceLocator);
-
-    final dio = serviceLocator.get<Dio>();
-    dio.interceptors.add(AuthInterceptor());
-    dio.interceptors.add(CacheInterceptor());
-  }
-}
-```
-
-## Best Practices
-
-1. **Error Handling**: Always wrap API calls in try-catch blocks and handle specific exception
-   types
-2. **Type Safety**: Use generic types for API responses to maintain type safety
-3. **Timeouts**: Configure appropriate timeouts based on your API characteristics
-4. **Logging**: Enable logging in development, disable in production
-5. **Authentication**: Handle authentication errors gracefully with automatic login redirects
-6. **Retry Logic**: The built-in retry mechanism handles transient failures automatically
-7. **Base URL**: Use environment-specific base URLs (dev, staging, production)
-
-## Contributing
-
-This module follows the workspace development patterns. Ensure all changes include appropriate
-tests and maintain backward compatibility.
 
 ## Dependencies
-
-- **dio**: HTTP client for Dart/Flutter
-- **dio_smart_retry**: Automatic retry functionality
-- **pretty_dio_logger**: Request/response logging
-- **module_injector**: Dependency injection framework
-- **core**: Core utilities and types
+- `dio`: HTTP client.
+- `dio_smart_retry`: `RetryInterceptor`.
+- `pretty_dio_logger`: request and response logging.
+- `core`: `AppException`.
+- `module_injector`: `ModuleConfigurator` and `ServiceLocator`.
 
 ## Testing
 
-The module includes comprehensive test coverage with HTTP mocking:
-
-```dart
-// Example test setup
-late DioApiService dioApiService;
-late DioAdapter dioAdapter;
-late Dio dio;
-
-setUp(() {
-  dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
-  dioAdapter = DioAdapter(dio: dio);
-  dio.httpClientAdapter = dioAdapter;
-  dioApiService = DioApiService(dio);
-});
-
-test('should return response when status code is 200', () async {
-  const path = '/users/1';
-  const response = {'id': 1, 'name': 'John Doe'};
-  dioAdapter.onGet(path, (request) => request.reply(200, response));
-
-  final result = await dioApiService.get<Map<String, dynamic>>(path);
-  expect(result, equals(response));
-});
+```bash
+melos run test --scope=remote
 ```
 
-Run tests with:
+Or, from `layer/remote`:
 
 ```bash
 flutter test
 ```
+
+The tests use `http_mock_adapter` to stub Dio responses and check the exception mapping for
+`get` and `post`. The package exports no test fakes.
