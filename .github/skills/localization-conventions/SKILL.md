@@ -6,17 +6,19 @@ description: Use when adding user-facing text, a new translation key, or a new s
 
 Config: `app/portrai/l10n.yaml`. Source of truth: ARB files in
 `app/portrai/lib/l10n/arb/`. Generated output (`app_localizations*.dart`,
-`AppLocalizations`) lives in `app/portrai/lib/l10n/generated/` — **never
-edit generated files by hand**, they're rebuilt by `flutter gen-l10n`
-(driven by `l10n.yaml`: `arb-dir: lib/l10n/arb`,
-`template-arb-file: app_en.arb`, `output-class: AppLocalizations`).
+`AppLocalizations`) lives in `app/portrai/lib/l10n/generated/` and is
+git-ignored — **never edit generated files by hand**, they're rebuilt by
+`flutter gen-l10n` (driven by `l10n.yaml`: `arb-dir: lib/l10n/arb`,
+`template-arb-file: app_en.arb`, `output-dir: lib/l10n/generated`,
+`output-class: AppLocalizations`, `nullable-getter: false`).
 
 ## Supported languages
 
-Three ARB files exist today: `app_en.arb` (template/source of truth),
+The app has three ARB files: `app_en.arb` (template/source of truth),
 `app_es.arb`, `app_nl.arb`. Every key added to `app_en.arb` must be added
-to `app_es.arb` and `app_nl.arb` too — `gen-l10n` will otherwise fall back
-silently or fail depending on config; don't ship a key in only one locale.
+to `app_es.arb` and `app_nl.arb` too — otherwise `gen-l10n` only warns about
+untranslated messages and those locales show the English text; don't ship a
+key in only one locale.
 
 ## Adding a new key
 
@@ -39,9 +41,11 @@ silently or fail depending on config; don't ship a key in only one locale.
 - Declare `placeholders` (with `type` and an `example`) for any
   interpolated value — don't use raw string concatenation for dynamic
   text.
-- After editing ARB files, regenerate with `flutter gen-l10n` (or just run
+- After editing ARB files, regenerate with `flutter gen-l10n` in
+  `app/portrai` or `melos run gen_l10n` (or just run `flutter pub get`/
   `flutter test`/`flutter run` — Flutter runs `gen-l10n` automatically
-  whenever `l10n.yaml` is present) before using the new getter.
+  because `app/portrai/pubspec.yaml` sets `generate: true`) before using
+  the new getter.
 
 ## Using a translated string
 
@@ -49,14 +53,17 @@ silently or fail depending on config; don't ship a key in only one locale.
 Text(context.localizations.companyName);
 ```
 
-Access via `context.localizations` (a `BuildContext` extension), not by
-constructing `AppLocalizations.of(context)` directly at call sites.
+Access via `context.localizations` (a `BuildContext` extension in
+`app/portrai/lib/l10n/extension/l10n_extension.dart`, exported by
+`package:portrai/l10n/l10n.dart`), not by constructing
+`AppLocalizations.of(context)` directly at call sites.
 
 ## Failure messages
 
 Domain `Failure`s that need a user-facing message are annotated
 `@Localizable('<arbKey>')` and resolved through the generated
-`FailureTranslator.translate(context, failure)` — the `<arbKey>` must
+`FailureTranslator.translate(context, failure)`
+(`app/portrai/lib/generated/failure_translator.g.dart`) — the `<arbKey>` must
 exist in every locale ARB file. See `error-handling-conventions` for the
 full pattern; don't add a raw string message field to a `Failure` instead
 of an ARB key.
