@@ -38,7 +38,10 @@ class NoCrossFeaturePrivateImportsTest extends AnalysisRuleTest {
       '$testPackageLibPath/src/feature/project/presentation/screen/project/widget/_widget.dart',
       'class ProjectWidget {}',
     );
-    newFile('$testPackageLibPath/src/utility/_utility.dart', 'class Utility {}');
+    newFile(
+      '$testPackageLibPath/src/utility/_utility.dart',
+      'class Utility {}',
+    );
   }
 
   Future<void> test_crossFeaturePrivateImport() async {
@@ -92,7 +95,6 @@ import 'package:test/src/utility/_utility.dart';
 Utility? f() => null;
 ''');
   }
-
 }
 
 // Regression test for a real bug: a file mirroring the same feature under a
