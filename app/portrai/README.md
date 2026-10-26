@@ -1,183 +1,255 @@
-# Port-Rai Portfolio Application
+# Port-Rai
 
-A professional portfolio application built with Flutter, showcasing projects, experience, skills,
-and expertise. Built with clean architecture, modular design, and comprehensive theming support
-with 12 custom themes. Backend powered by Firebase (Firestore, Analytics, Remote Config), with
-feature flags, offline caching, tracking, error reporting, and localization provided by the
-workspace's shared `layer/*` packages (see the [root README](../../README.md) for the full
-architecture).
+A Flutter portfolio app that presents a profile, experience, expertise, projects, services and
+testimonials, with optional on-device and cloud AI assistants. It runs on Android, iOS, web and
+macOS and is built on the workspace's shared `layer/*` packages (see the
+[root README](../../README.md) for the full architecture).
 
 ## Features
 
-### Portfolio Sections
-- **Profile**: Professional introduction and contact information
-- **Experience**: Work history and career progression
-- **Projects**: Portfolio of completed projects with details and media
-- **Skills**: Technical and soft skills showcase
-- **Expertise**: Areas of specialization and proficiency
-- **Services**: Professional services offered
-- **Testimonials**: Client feedback and recommendations
-- **On-device AI Assistant**: Ask questions about portfolio content using a local language model
+### Portfolio
+- **Profile**: introduction, contact details, education and links
+- **Experience**: work history with dates, responsibilities and achievements
+- **Expertise**: areas of specialization
+- **Projects**: project details, media and locations on a map
+- **Services**: services offered, with technologies and FAQs
+- **Testimonials**: recommendations from colleagues and clients
+- **CV export**: a one-page PDF CV, downloaded on web and shared on mobile and desktop (see the
+  [cv_export README](lib/src/feature/cv_export/README.md))
 
-### Technical Features
-- **Dynamic Content**: Content fetched from Firebase Firestore
-- **Multi-theme Design System**: 12 custom themes with light and dark mode support (Beltane,
-  Carnival, Chuseok, Diwali, Halloween, Hogeras, Hogmanay, Holi, Obon, Pachamama, Sakura,
-  Christmas)
-- **Responsive Layout**: Adaptive UI for mobile, tablet, and desktop
-- **Smooth Animations**: Polished transitions and micro-interactions
-- **Offline Mode**: Comprehensive caching for full functionality without internet connection
-- **On-device AI**: An opt-in assistant. Questions and portfolio context are processed locally,
-  without sending them to a hosted AI service. It is off by default; the AI section in Settings
-  explains that it runs on the device, then downloads the model (revision-pinned Gemma 4 E2B
-  LiteRT-LM bundle, approximately 2.4 GiB, Apache-2.0) only after the user agrees, with download
-  progress and a cancel button. Cancelling mid-download deletes the partial model. Turning the
-  assistant off asks whether to delete the downloaded model or keep it for later. The "Ask AI"
-  button appears on the portfolio only when the assistant is enabled and its model is ready. A
-  successful local inference is required before the model counts as ready. Available on Android,
-  iOS, and macOS; disabled on web.
-  All portfolio fields are available to the assistant, including employment dates, responsibilities,
-  achievements, education, testimonials, and project details. Question-focused local context
-  selection keeps prompts bounded; employment entries carry a ready-written date range and duration.
-- **Feature Flags**: Control features remotely without app updates
-- **Analytics & Tracking**: User behavior insights with Firebase Analytics
-- **Error Reporting**: Automatic error tracking and reporting via Firebase Crashlytics
-- **Localization**: Multi-language support with Flutter intl
-- **Accessibility**: WCAG compliant with screen reader support
+### App
+- **Content**: production builds read the portfolio from Firestore and cache it per language;
+  staging builds read the bundled JSON in [`assets/dashboard`](assets/dashboard/README.md)
+- **Portfolio updates**: only the sections that changed are refreshed
+- **Themes**: 12 festival themes, each with light and dark palettes, one per month
+- **Localization**: English, Spanish and Dutch
+- **Assistants**: an on-device assistant and a Firebase AI assistant, each behind its own flag
+- **Job openings**: a sign-in-protected list of jobs matched to the portfolio
+- **Push notifications**: portfolio updates and job alerts on Android and iOS
+- **Role onboarding**: asks first-time visitors for their role before the portfolio
+- **Force update**: asks for an update when the installed version is below the configured
+  minimum
+- **Feature flags**: Firebase Remote Config, with a developer menu in staging builds
+- **Analytics, tracking and error reporting**: Firebase Analytics and Crashlytics in production
+  builds
 
 ## Getting Started
 
 ### Prerequisites
 - Flutter SDK ^3.47.0
 - Dart SDK ^3.12.0
-- Firebase project with Firestore enabled
-- Android Studio / VS Code / IntelliJ IDEA
+- A Firebase project with Firestore enabled
 
 ### Installation
-1. Navigate to the app directory:
+1. Install dependencies from the workspace root:
    ```bash
-   cd app/portrai
+   melos bootstrap
    ```
-2. Get dependencies:
-   ```bash
-   flutter pub get
-   ```
-3. Configure Firebase:
+2. Configure Firebase:
    - Add `google-services.json` to `android/app/`
    - Add `GoogleService-Info.plist` to `ios/Runner/`
-   - Update Firebase configuration in `lib/firebase_options.dart`
-4. Generate code:
+   - Regenerate `lib/firebase_options.dart` for your project
+3. Generate code:
    ```bash
+   cd app/portrai
    dart run build_runner build --delete-conflicting-outputs
    ```
-5. Run the app:
+4. Run the app:
    ```bash
    flutter run
    ```
 
 ## Architecture
 
-The application follows clean architecture with clear separation of concerns:
-
 ```text
 lib/
-├── src/
-│   ├── feature/             # Feature modules (data/domain/presentation per feature)
-│   │   ├── experience/      # Work experience feature
-│   │   ├── expertise/       # Expertise showcase
-│   │   ├── ai_rate_limit/   # Per-install Firebase AI request budget
-│   │   ├── assistant/       # Shared portfolio context and conversation UI
-│   │   ├── local_assistant/ # On-device inference, model lifecycle and settings
-│   │   ├── remote_assistant/ # Flag-gated cloud inference and independent chat session
-│   │   ├── profile/         # User profile
-│   │   ├── project/         # Projects portfolio
-│   │   ├── service/         # Services offered
-│   │   └── testimonial/     # Client testimonials
-│   ├── module_configurator/ # App-wide dependency injection wiring
-│   ├── route/               # Navigation setup
-│   └── utility/             # App-level utilities
-└── main.dart                # Application entry point
+├── main.dart                # Entry point
+├── firebase_options.dart    # Generated Firebase configuration
+├── l10n/                    # ARB files and generated localizations
+└── src/
+    ├── app/                 # App widgets, initialization and restart
+    ├── error_reporter/      # App error reporting setup
+    ├── feature/             # Feature modules (data/domain/presentation per feature)
+    ├── module_configurator/ # Registration order of every module configurator
+    ├── route/               # Navigation setup
+    ├── utility/             # App-level utilities
+    └── widget/              # Shared page and screen widgets
 ```
 
-### Dependency Flow
+Each feature follows the same dependency flow:
+
 ```text
-Presentation Layer (Bloc)
-    -> Business Logic Layer (Use Cases)
-    -> Data Layer (Repositories)
-    -> Infrastructure (Firebase, Cache, Remote)
+Presentation (Bloc) -> Domain (Use Cases) -> Data (Repositories) -> Layers (Firebase, Cache, Remote)
 ```
 
-See the [creating-new-modules skill](../../.github/skills/creating-new-modules/SKILL.md) and
-[architecture-conventions skill](../../.github/skills/flutter-architecture-conventions/SKILL.md)
+See the [creating-new-modules skill](../../.github/skills/creating-new-modules/SKILL.md) and the
+[architecture conventions skill](../../.github/skills/flutter-architecture-conventions/SKILL.md)
 for the conventions each feature module follows.
+
+### Features
+
+| Feature                | Responsibility                                                         |
+| ---------------------- | ---------------------------------------------------------------------- |
+| `ai_image_gen`         | Images generated by Firebase AI from a source image                    |
+| `ai_rate_limit`        | Per-install Firebase AI request budget                                 |
+| `app_config`           | Remotely managed app configuration                                     |
+| `asset_source`         | Real or template bundled portfolio data                                |
+| `assistant`            | Shared portfolio context and conversation UI                           |
+| `auth`                 | Email and password sign-in                                             |
+| `connectivity`         | Internet reachability                                                  |
+| `cv_export`            | PDF CV generation and tailoring                                        |
+| `design_system`        | Theme selection and the theme gallery                                  |
+| `developer_mode`       | Developer menu in staging builds                                       |
+| `experience`           | Work experience                                                        |
+| `expertise`            | Areas of expertise                                                     |
+| `external_app_handler` | Opening email and external links                                       |
+| `feature_flag`         | App flag definitions and the flag screen                               |
+| `force_update`         | Minimum version check and store links                                  |
+| `job_opening`          | Job openings list and details                                          |
+| `local_assistant`      | On-device inference, model lifecycle and settings                      |
+| `locale`               | App language                                                           |
+| `notification`         | Push notifications                                                     |
+| `onboarding`           | Role onboarding                                                        |
+| `permission`           | Runtime permissions                                                    |
+| `portfolio`            | Portfolio screen and section updates                                   |
+| `profile`              | Profile                                                                |
+| `project`              | Projects                                                               |
+| `remote_assistant`     | Firebase AI inference and its chat session                             |
+| `service`              | Services                                                               |
+| `setting`              | Settings screen                                                        |
+| `splash`               | Splash screen and startup                                              |
+| `testimonial`          | Testimonials                                                           |
+| `user`                 | Guest and signed-in user entities                                      |
+
+### Portfolio Data
+
+The profile, experiences, expertise, projects, services and testimonials repositories pick their
+source from the build environment. Production builds read Firestore through a per-language cache.
+Staging builds read the bundled JSON files, and the developer menu switches between the real files
+and the `*.template.json` files.
+
+### Portfolio Updates
+
+`PortfolioUpdateListenerWidget` checks for changes when the app starts and whenever it returns to
+the foreground, and a "Portfolio updated" notification checks too. `UpdatePortfolioUseCase`
+compares when each section last changed, from `portfolio_versions/{locale}`, with the change it
+was last refreshed for, and refreshes only the sections that changed. An open portfolio screen
+then reloads in place. Staging builds never check. See the
+[portfolio README](lib/src/feature/portfolio/README.md).
 
 ### Assistant Modules
 
-`assistant` owns provider-neutral message/response entities, portfolio context generation, and
-the callback-driven conversation widget. It has no dependency on either inference provider or bloc.
-`local_assistant` consumes that public API and owns on-device inference, model downloads,
-enablement preferences, failures, routes, tracking, and the Settings card.
-`remote_assistant` owns flag-gated Firebase AI generation,
-failures and a singleton in-memory chat session. All three configurators are registered in the
-app, with the shared configurator first. Neither provider depends on the other.
+`assistant` owns provider-neutral message and response entities, portfolio context generation
+and the callback-driven conversation widget. It depends on neither inference provider.
+`local_assistant` owns on-device inference, model downloads, the enablement preference, its route,
+tracking and the Settings card. `remote_assistant` owns Firebase AI generation and a singleton
+in-memory chat session. All three configurators are registered, the shared one first, and neither
+provider depends on the other. See the [assistant README](lib/src/feature/assistant/README.md).
 
-The local assistant uses the `/assistant` route, `feature_ai_assistant` rollout key,
-and `assistant_enabled_cache` preference key.
-There is no automatic cloud fallback or transfer of conversation history between providers.
+The entry point follows the rollout flags:
+
+- With `feature_remote_assistant` on, the portfolio opens the remote chat at `/remote-assistant`.
+  It takes priority over the local assistant.
+- With only `feature_ai_assistant` on, Settings offers the on-device model and the portfolio opens
+  the local chat at `/assistant` once the model is ready.
+- With neither flag on, the entry and the assistant settings are hidden.
+
+There is no fallback or history transfer between the two. Flags are rechecked when a screen
+becomes visible and before each request, without subscriptions or polling.
+
+### Local Assistant
+
+The on-device assistant is off by default and is supported on every platform except web. The AI
+section in Settings explains that it runs on the device and downloads the model only after the
+user agrees, showing progress and a cancel button. The model is the revision-pinned
+`litert-community/gemma-4-E2B-it-litert-lm` LiteRT-LM bundle. Cancelling deletes the partial
+download, and turning the assistant off asks whether to delete or keep the model. The model counts
+as ready only after a successful local inference. Questions and portfolio context stay on the
+device. The preference is stored under `assistant_enabled_cache`.
+
+### Remote Assistant
+
+The remote assistant sends the question, recent chat history and portfolio context to Google
+through Firebase AI when a question is submitted; opening the screen makes no request. Generation
+is supported on Android, iOS and web, and other platforms show an unavailable message inside the
+chat. Clear chat resets only the in-memory session.
+
+| Setting                  | Value                                                       |
+| ------------------------ | ----------------------------------------------------------- |
+| Model                    | `aiAssistantModel` from `app_config`, else `gemini-3.8-flash` |
+| Output tokens            | 4,096                                                       |
+| Temperature              | 0.3                                                         |
+| Question                 | 2,000 characters                                            |
+| Portfolio context        | 100,000 characters                                          |
+| History                  | 12 messages, 24,000 characters                              |
+| Response                 | 12,000 characters                                           |
+| Request deadline         | 60 seconds, no retries                                      |
+
+Oversized input is rejected, not truncated. Older turns stay visible but are left out of the
+history sent with a request. Streamed text is provisional until generation succeeds, and a failed
+partial answer is discarded. Question content and generated text are excluded from logs and
+analytics. Firebase service error messages, such as depleted credits or a disabled API, are shown
+below the localized error.
+
+`feature_remote_assistant_generative_ui` enables the GenUI parser and the app's read-only
+design-system catalog. Generated surfaces stay in the turn that produced them and cannot navigate
+or trigger actions. With the flag off, answers are plain text.
+
+Production use needs App Check enforcement, model availability and quota controls. See the
+[Firebase AI setup guide](../../layer/firebase/README.md#firebase-ai-logic-setup). The automated
+tests make no live AI requests.
 
 ### AI Request Limit
 
-`ai_rate_limit` exposes `ConsumeAiRequestQuotaUseCase`, which reserves one Firebase AI
-request from a per-install budget before a billable call. `AskRemotePortfolioQuestionUseCase`
-calls it for every question; `FirebaseAiImageRepository` calls it only after a cache miss and a
-successful source download. The budget comes from the `aiRateLimit` map of the `app_config`
-document (`maxRequestsPerMinute`, default 10; `maxRequestsPerDay`, default 100; `0` blocks AI
-requests). Only an exhausted budget blocks a request; an unreadable request log does not.
-The log lives in local preferences, so clearing app data or changing the device clock resets it.
-The Firebase AI Logic per-user quota remains the server-side limit.
+`ConsumeAiRequestQuotaUseCase` reserves one request from a per-install budget before each billable
+Firebase AI call. `AskRemotePortfolioQuestionUseCase` calls it for every question, and
+`FirebaseAiImageRepository` calls it after a cache miss and a successful source download. The
+budget comes from the `aiRateLimit` map of the `app_config` document:
 
-The remote assistant model comes from the `aiAssistantModel` field of the same document,
-falling back to `RemoteAssistantRequestLimits.model`.
+| Field                  | Default | Meaning                    |
+| ---------------------- | ------- | -------------------------- |
+| `maxRequestsPerMinute` | 10      | `0` blocks every AI request |
+| `maxRequestsPerDay`    | 100     | `0` blocks every AI request |
+
+Only an exhausted budget blocks a request; an unreadable request log does not. The log is kept in
+local preferences, so clearing app data or changing the device clock resets it. The Firebase AI
+Logic per-user quota remains the server-side limit.
 
 ### Sign-In
 
-`auth` provides email and password sign-in through Firebase Auth. There is no sign-up: accounts
+`auth` provides email and password sign-in through Firebase Auth. There is no sign-up; accounts
 are created in the Firebase console. A `ModuleRoute` with `requiresAuth: true` is guarded by the
-redirect that `AuthModuleConfigurator` registers via `ModuleRouteController.registerAuthRedirect`.
-When nobody is signed in, the guard opens `/sign-in?redirect=<requested location>`, and a
-successful sign-in replaces the sign-in page with that location, without a new browser history
-entry, so Back returns to the page before sign-in. Only in-app paths are followed; anything else opens
-the start page. Without a registered guard, protected routes open the start page. Other features
-read the signed-in user through `GetSignedInUserUseCase`, which waits for a restored session on
-app start. It returns an `AuthUserEntity` with the account id and email. `AuthUserEntity` and
-`GuestUserEntity` both live in the `user` feature and extend its `UserEntity`. `user` also saves
-the guest's role on the device through `GetGuestUserUseCase` and `SaveGuestUserUseCase`.
-Signing out goes through `SignOutUseCase`.
+redirect that `AuthModuleConfigurator` registers through
+`ModuleRouteController.registerAuthRedirect`. When nobody is signed in, the guard opens
+`/sign-in?redirect=<requested location>`, and a successful sign-in replaces the sign-in page with
+that location, so Back returns to the page before sign-in. Only in-app paths are followed. Without
+a registered guard, protected routes open the start page.
+
+Other features read the signed-in user through `GetSignedInUserUseCase`, which waits for a
+restored session on app start and returns an `AuthUserEntity`. `AuthUserEntity` and
+`GuestUserEntity` live in the `user` feature, which also saves the guest's role through
+`GetGuestUserUseCase` and `SaveGuestUserUseCase`. Signing out goes through `SignOutUseCase`.
 
 ### Job Openings
 
 `job_opening` shows the remote jobs that the weekly Cloud Function in
 [`tool/functions`](../../tool/functions/README.md) matched to the portfolio and scored with Gemini.
-The `feature_job_openings` flag (default off) shows a Job openings card in Settings. It opens
-`/job-openings`, a list sorted by score and then by date, with the "Weekly job search" switch and
-a sign-out button. `/job-openings/:id` shows one opening: its score, Gemini's reasons, matched and
-missing skills, the description, and an Apply button that opens the job page on its board. Both
-routes set `requiresAuth`, so they ask for sign-in first.
+With `feature_job_openings` on, Settings shows a Job openings card that opens `/job-openings`: a
+list sorted by score and then by date, with the "Weekly job search" switch and a sign-out button.
+`/job-openings/:id` shows the score, the reasons, matched and missing skills, the description and
+an Apply button that opens the job on its board. Both routes require sign-in.
 
-With the `feature_job_opening_insights` and `feature_remote_assistant` flags on, on web, Android
-and iOS, the opening also offers "Prepare for this role". On request it sends the opening and the
-portfolio through `AskRemotePortfolioQuestionUseCase`, which uses one request from the AI quota,
-and renders the answer as a generated surface from the assistant catalog: the strengths to lead
-with, likely interview topics and how to angle the CV. Nothing is stored; leaving the page
-cancels a request still running.
+On web, Android and iOS, an opening can also offer:
 
-With the `feature_tailored_cv` flag on, on web, Android and iOS, the opening's hero also shows
-a "Tailored CV" button. It opens the CV export with the job, which rewrites the summary and puts
-the most relevant projects and skills first (see the
-[cv_export README](lib/src/feature/cv_export/README.md#tailoring-for-a-job)).
+- **Prepare for this role** (`feature_job_opening_insights` and `feature_remote_assistant`): sends
+  the opening and the portfolio through `AskRemotePortfolioQuestionUseCase`, using one request
+  from the AI budget, and renders the strengths to lead with, likely interview topics and how to
+  angle the CV. Nothing is stored, and leaving the page cancels the request.
+- **Tailored CV** (`feature_tailored_cv`): opens the CV export for the job, with a rewritten
+  summary and the most relevant projects and skills first (see
+  [Tailoring for a job](lib/src/feature/cv_export/README.md#tailoring-for-a-job)).
 
-The data is private to the signed-in user and is read straight from Firestore, with no cache or
-bundled fallback:
+The data is private to the signed-in user and is read from Firestore without a cache:
 
 | Path                              | Access | Content                                        |
 | --------------------------------- | ------ | ---------------------------------------------- |
@@ -186,105 +258,29 @@ bundled fallback:
 | `users/{uid}.jobSearch.updatedAt` | Write  | Set to the server time when the switch changes |
 
 The switch merges into `users/{uid}`, so other fields on that document are kept. Each opening
-shows its job board's name and links to its page there, as the boards' terms require. Openings
-expire 14 days after the last run that found them.
-
-### Portfolio Updates
-
-The portfolio sections are cached per language. `PortfolioUpdateListenerWidget` checks for
-changes when the app starts and whenever it returns to the foreground, and a "Portfolio updated"
-notification checks too. `UpdatePortfolioUseCase` compares when each section last changed, from
-`portfolio_versions/{locale}`, with the change it was last refreshed for, and refreshes only the
-sections that changed. An open portfolio screen then reloads in place. See the
-[portfolio README](lib/src/feature/portfolio/README.md).
+shows its job board's name and links to its page there. Openings expire 14 days after the last
+run that found them.
 
 ### Notifications
 
-`notification` keeps push notifications in step with the app on Android and iOS. Once the
-Settings switch allows notifications, the device receives "Portfolio updated" notifications in
-the app's language. While a user is signed in, the device is registered as theirs, so it also
-receives their "New jobs for you" notifications; signing out replaces the device token, so they
-stop. Tapping a notification opens the job openings or the portfolio. See the
-[notification README](lib/src/feature/notification/README.md).
-
-### Remote Assistant
-
-The remote screen uses `/remote-assistant` and the independent, default-off
-`feature_remote_assistant` flag. Discovery depends only on this flag; the chat screen and
-generation check rollout and Firebase platform support and show unavailability inside chat.
-There is no remote consent preference or user enablement toggle. Questions, recent chat history
-and portfolio information are sent to Google through Firebase only when a question is submitted.
-Opening the screen makes no model request. Clear chat resets only the remote in-memory session.
-
-The shared conversation widget renders streamed text as provisional until generation finishes
-successfully. Failed partial answers are discarded and never become future provider history.
-Disable/reset invalidate pending output. They stop local consumption and close the owned
-transport; they cannot guarantee that server generation or billing stops.
-`feature_remote_assistant_generative_ui` independently enables the official GenUI parser and
-the app's read-only design-system component catalog. When disabled, remote answers retain the existing
-plain-text conversation path. GenUI text events and parsed surfaces stay in their originating
-turn; A2UI protocol chunks are not rendered as chat text. The mode is limited to the design-system
-catalog and is not a project-card, navigation, or action channel.
-Question content and generated text are excluded from remote request/state logging and analytics.
-Actionable Firebase service error messages (such as depleted credits, disabled APIs, or
-unavailable models) appear below the localized error description. These explicit backend
-error-field details are not logged; SDK parsing errors, HTTP client details, arbitrary
-exceptions, and blocked/empty/incomplete response content remain private.
-
-Local and remote chats are independent features. The rollout enabler maintains mutually exclusive
-flags; if both are on, remote takes priority regardless of readiness.
-The portfolio entry opens the active feature directly, with no chooser or context switching.
-Neither flag on hides the entry and assistant settings. Local-only rollout offers setup/chat on
-native platforms; remote rollout always offers direct chat entry. Firebase generation supports
-Android, iOS and web; unsupported platforms show an unavailable message inside chat. An unsupported or
-unready remote assistant never falls back to local while its rollout flag is on.
-
-Settings exposes only on-device model management during local-only rollout. Remote chat entry
-is available only from the portfolio. Visiting Settings or the portfolio does not initialize remote chat or
-load its portfolio context. Both chat toolbars offer a clear-chat control; only the
-on-device chat offers an informational dialog about local processing and in-memory history.
-Each provider's module-internal singleton bloc preserves its own in-memory conversation
-across navigation. Flags are rechecked on screen visibility/return and before each new request
-or enable action, without flag subscriptions or polling. The app does not rewrite rollout flags or the
-other feature's preferences.
-Public routes/cards own module-scoped providers. Portfolio and Settings read rollout flags through
-`IsFeatureEnabledUseCase` and local platform support through `IsLocalAssistantSupportedUseCase`,
-never another feature's bloc/state. Priority is a simple
-remote-first check in portfolio and Settings composition; each provider reads only its own flag.
-See the [assistant reference](lib/src/feature/assistant/README.md) for module boundaries.
-Production use requires validated App Check enforcement, model availability, and quota/spending
-controls, including a successful authorized smoke test. See the
-[Firebase AI setup guide](../../layer/firebase/README.md#firebase-ai-logic-setup).
-No live or billable AI request is required by the automated tests.
-
-Generation uses `gemini-3.8-flash`, a 1,024-token output limit and temperature 0.3.
-Requests are bounded to 2,000 question characters, 100,000 portfolio-context characters,
-12 recent history messages / 24,000 history characters, and 12,000 response characters.
-The absolute request deadline is 60 seconds, with no automatic retries. Oversized input is
-rejected rather than silently truncated; older completed turns remain visible but are excluded
-from the bounded provider history.
+`notification` handles push notifications on Android and iOS. Once the Settings switch allows
+notifications, the device receives "Portfolio updated" notifications in the app's language. While
+a user is signed in, the device is registered to them and also receives their "New jobs for you"
+notifications; signing out replaces the device token. Tapping a notification opens the job
+openings or the portfolio. See the [notification README](lib/src/feature/notification/README.md).
 
 ## Theming
 
-The app supports 12 custom themes, each with unique color palettes and styling.
+`SelectDesignSystemUseCase` assigns one theme to each month:
 
-### Available Themes
-1. Beltane - Celtic spring festival inspired
-2. Carnival - Brazilian carnival vibes
-3. Chuseok - Korean harvest festival
-4. Diwali - Hindu festival of lights
-5. Halloween - Gothic and spooky
-6. Hogeras - Mediterranean coastal
-7. Hogmanay - Scottish New Year
-8. Holi - Indian festival of colors
-9. Obon - Japanese lantern festival
-10. Pachamama - Andean earth festival
-11. Sakura - Japanese cherry blossom
-12. Christmas - Winter holiday theme
-
-### Switching Themes
-Each month has its own theme (`SelectDesignSystemUseCase`), and the app starts with it unless a
-theme was chosen.
+| Month    | Theme     | Month     | Theme     |
+| -------- | --------- | --------- | --------- |
+| January  | Hogmanay  | July      | Obon      |
+| February | Carnival  | August    | Pachamama |
+| March    | Holi      | September | Chuseok   |
+| April    | Sakura    | October   | Halloween |
+| May      | Beltane   | November  | Diwali    |
+| June     | Hogeras   | December  | Xmas      |
 
 Settings > Theme opens a gallery that shows every theme as a card in a deck. The screen takes on
 the theme of the card in front, and applying it saves the choice and restarts the app. A chosen
@@ -293,205 +289,126 @@ again. Choosing the current month's theme clears the saved choice.
 
 ## Supported Platforms
 
-| Platform | Support | Notes |
-|----------|---------|-------|
-| Android  | Yes     | API 30+ |
-| iOS      | Yes     | iOS 15+ |
-| Web      | Yes     | Modern browsers; on-device AI assistant disabled |
-| macOS    | Yes     | Apple Silicon; macOS 12+ |
+| Platform | Minimum   | Notes                     |
+| -------- | --------- | ------------------------- |
+| Android  | API 30    |                           |
+| iOS      | 15.0      |                           |
+| macOS    | 12.0      | No remote assistant       |
+| Web      | -         | No on-device assistant    |
+
+Push notifications are delivered on Android and iOS only.
 
 ## Development
 
 ### Running the App
 ```bash
-# Development mode
-flutter run --debug
-
-# Profile mode (performance profiling)
-flutter run --profile
-
-# Release mode
-flutter run --release
+flutter run                                  # prod environment
+flutter run --dart-define=build_env=staging  # staging environment
 ```
 
 ### Code Generation
 ```bash
-# Generate code (routes, JSON serialization, etc.)
 dart run build_runner build --delete-conflicting-outputs
-
-# Watch mode (auto-regenerate on changes)
 dart run build_runner watch --delete-conflicting-outputs
 ```
 
-### Testing
+### Localization
+ARB files live in `lib/l10n/arb` (`app_en.arb` is the template, plus `app_es.arb` and
+`app_nl.arb`). Localizations are generated into `lib/l10n/generated` on `flutter pub get` or with:
+
 ```bash
-# Run all tests
-flutter test
-
-# Run tests with coverage
-flutter test --coverage
-
-# Run specific test file
-flutter test test/feature/profile/profile_test.dart
+flutter gen-l10n
 ```
 
-### Localization
-```bash
-# Generate localization files
-flutter gen-l10n
+See the [localization conventions](../../.github/skills/localization-conventions/SKILL.md).
 
-# Supported languages: English (en), [add others]
+### Testing
+```bash
+flutter test                                 # all tests
+flutter test test/src/feature/portfolio      # one feature
+flutter test --coverage
 ```
 
 ## Configuration
 
-### Build Variants
-The app supports multiple build configurations:
-- **Development**: Local testing with debug tools
-- **Staging**: Pre-production testing environment
-- **Production**: Live production environment
+### Build Environments
+`build_env` selects a [`BuildEnvironment`](../../layer/core/lib/src/model/build_config.dart) and
+defaults to `prod`. Both environments use the same Firebase project.
 
-### Environment Variables
-Select the build environment using `--dart-define=build_env=staging` or
-`--dart-define=build_env=prod`. The shared
-[`BuildEnvironment`](../../layer/core/lib/src/model/build_config.dart) defines
-the environment-specific behavior. Release workflows select staging for previews
-and prod for production; both currently use the same Firebase project.
+| Behavior                            | `staging` | `prod`    |
+| ----------------------------------- | --------- | --------- |
+| Portfolio data                      | Bundled   | Firestore |
+| Analytics, tracking and Crashlytics | Off       | On        |
+| Remote request logging              | On        | Off       |
+| Feature flag caching                | On        | Off       |
+| Developer menu and debug banner     | On        | Off       |
+| Descriptive splash screen           | On        | Off       |
+
+Release workflows build staging for previews and prod for production.
 
 ### Firebase App Check
+App Check activates before any Firebase service request. Debug builds use registered debug
+tokens; other builds use Play Integrity on Android, App Attest with DeviceCheck fallback on iOS,
+and reCAPTCHA Enterprise on web.
 
-App Check activates before Firebase service requests. Debug builds use registered
-debug tokens; public preview and production builds use Play Integrity on Android,
-App Attest with DeviceCheck fallback on iOS, and reCAPTCHA Enterprise on web.
-
-Set the repository Actions variable `FIREBASE_APP_CHECK_WEB_SITE_KEY` to your
-public Enterprise website key before running preview or production web releases.
-For local non-debug web builds, pass the same value through `--dart-define`.
-Native builds do not need this key.
-
-Register all providers in Firebase Console and update iOS provisioning profiles
-for the App Attest entitlement before distributing builds. Leave enforcement
-disabled until valid client traffic is confirmed. See the
-[Firebase setup and rollout guide](../../layer/firebase/README.md#app-check-setup)
-for signing, domains, local debug tokens, and enforcement steps.
+The web site key is passed as `--dart-define=FIREBASE_APP_CHECK_WEB_SITE_KEY=<key>`. Release
+workflows read it from the repository Actions variable of the same name; native builds do not need
+it. Debug tokens go in the ignored `.env` file (see `.env.example`). See the
+[App Check setup guide](../../layer/firebase/README.md#app-check-setup) for providers, domains,
+debug tokens and enforcement.
 
 ### Feature Flags
-Feature flags are managed through Firebase Remote Config:
-- Configure in Firebase Console
-- Keys defined in `lib/core/config/feature_flags.dart`
-- `feature_ai_assistant` (default off) shows the on-device AI assistant in Settings and on the portfolio when turned on
-- `feature_remote_assistant` (default off) shows direct cloud chat entry without a separate user preference; Firebase platform support is checked inside chat
-- `feature_remote_assistant_generative_ui` (default off) enables parsed, read-only design-system text and card surfaces in remote answers
-- `feature_job_openings` (default off) shows the Job openings card in Settings
-- `feature_tailored_cv` (default off) adds a Tailored CV button on a job opening that opens the CV export tailored for the job
-- `feature_job_opening_insights` (default off) offers generated preparation insights on a job opening; it also needs `feature_remote_assistant`
+Flags are read from Firebase Remote Config. Each feature defines its own flags in
+`lib/src/feature/<feature>/domain/feature_flag/`. Every flag defaults to off.
 
-## Dependencies
-
-### Core Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `flutter_bloc` | State management |
-| `go_router` | Navigation and routing |
-| `firebase` | Backend services |
-| `design_system` | UI components |
-| `cache` | Offline caching |
-| `error_reporter` | Error tracking |
-| `log_reporter` | Logging |
-| `feature_flag` | Feature flags |
-
-### Development Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `build_runner` | Code generation |
-| `json_serializable` | JSON serialization |
-| `flutter_gen_runner` | Asset generation |
-| `mocktail` | Testing mocks |
+| Key                                      | Effect                                                         |
+| ---------------------------------------- | -------------------------------------------------------------- |
+| `feature_ai_assistant`                   | On-device assistant in Settings and on the portfolio           |
+| `feature_remote_assistant`               | Firebase AI chat entry on the portfolio                        |
+| `feature_remote_assistant_generative_ui` | Read-only design-system surfaces in remote answers             |
+| `feature_ai_image_generation`            | Images generated by Firebase AI from a source image            |
+| `feature_job_openings`                   | Job openings card in Settings                                  |
+| `feature_job_opening_insights`           | "Prepare for this role"; also needs `feature_remote_assistant` |
+| `feature_tailored_cv`                    | Tailored CV button on a job opening                            |
+| `feature_language_selector`              | Language selector on the portfolio                             |
+| `feature_role_onboarding`                | Role question for first-time visitors                          |
 
 ## Deployment
 
-The Settings and portfolio footer version labels use installed package metadata.
-Release workflows pass the tag's version and build number through Flutter's
-`--build-name` and `--build-number` options on all platforms, including web's
-generated `version.json`. Local Melos web deployments use the app's `pubspec.yaml`
-version unless build metadata is explicitly overridden.
+The Settings and footer version labels read installed package metadata. Release workflows pass
+the tag's version and build number through `--build-name` and `--build-number` on every platform,
+including web's generated `version.json`. Local builds use the `pubspec.yaml` version.
 
-### Web Deployment
-Set `FIREBASE_APP_CHECK_WEB_SITE_KEY` in the ignored
-`app/portrai/.env.production` file. Keep debug tokens in `.env` only.
+### Web
+Set `FIREBASE_APP_CHECK_WEB_SITE_KEY` and `MAPS_API_KEY_WEB` in the ignored
+`app/portrai/.env.production` file, or export them. Then, from the workspace root:
 
 ```bash
-# Run from the workspace root: build and deploy to Firebase Hosting
 melos run deploy_portrai
 ```
 
-The script loads `.env.production` automatically unless the site key is already
-set in the environment. This trusted local file should contain only shell
-assignments and comments; the debug-token `.env` is never loaded.
+The script builds the prod web app, generates the SQLite web assets, injects the Maps key into
+`index.html` and deploys to the `portrai` Firebase Hosting site. It loads `.env.production` only
+when a key is not already set, and never loads `.env`. See the
+[web deploy README](web/.deploy/README.md).
 
-### Android Deployment
+### Android
 ```bash
-# Build APK
-flutter build apk --release
-
-# Build App Bundle (for Play Store)
 flutter build appbundle --release
 ```
 
-### iOS Deployment
-```bash
-# Build iOS app
-flutter build ios --release
+See the [Play Store README](android/.playstore/README.md) and the
+[signing README](android/.signing/README.md).
 
-# Build IPA (for App Store)
+### iOS
+```bash
 flutter build ipa --release
 ```
 
-## Analytics
-
-The app tracks user interactions using Firebase Analytics:
-- **Screen Views**: Automatic tracking of page navigation
-- **User Actions**: Button clicks, form submissions
-- **Content Views**: Project views, service views
-- **Custom Events**: Feature-specific interactions
-
-View analytics in [Firebase Console](https://console.firebase.google.com).
-
-## Error Reporting
-
-Errors are automatically reported to Firebase Crashlytics:
-- **Crash Reports**: Unhandled exceptions
-- **Non-Fatal Errors**: Handled errors with context
-- **Custom Logs**: Debug information for investigation
+See the [App Store README](ios/.appstore/README.md) and the
+[signing README](ios/.signing/README.md).
 
 ## Contributing
 
 See the root [Contributing](../../README.md#contributing) section for the development workflow,
-code style, and branch/PR conventions (also documented in
-[`.github/skills/pr-and-branch-conventions/SKILL.md`](../../.github/skills/pr-and-branch-conventions/SKILL.md)).
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Author
-
-**Mayank Rai**
-- Portfolio: [Your Website]
-- GitHub: [@yourusername]
-- LinkedIn: [Your LinkedIn]
-
-## Acknowledgments
-
-- Design inspiration from modern portfolio websites
-- Built with [Flutter](https://flutter.dev)
-- Backend powered by [Firebase](https://firebase.google.com)
-- Icons by [Font Awesome](https://fontawesome.com)
-
----
-
-**Version**: 1.0.0
-**Last Updated**: August 2026
-**Flutter Version**: 3.47.0
+code style and branch and PR conventions.
