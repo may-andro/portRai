@@ -8,7 +8,8 @@ export type JobSource =
   | 'arbeitnow'
   | 'greenhouse'
   | 'lever'
-  | 'ashby';
+  | 'ashby'
+  | 'freelancer';
 
 /** A job opening in the one shape every feed is mapped to. */
 export interface JobOpening {
