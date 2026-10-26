@@ -211,6 +211,9 @@ flowchart LR
 
 ### Local assistant
 
+The full design, token budget and caveats are in the
+[local_assistant README](../local_assistant/README.md).
+
 - Rollout flag `feature_ai_assistant`; route `/assistant`, registered only where
   `IsLocalAssistantSupportedUseCase` is true (every platform except web). The enablement
   preference is stored under `assistant_enabled_cache`.
