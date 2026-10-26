@@ -1,33 +1,26 @@
 # Feature Flag
 
-A Flutter package for managing feature flags with automatic remote/local
-resolution, persistent caching with developer overrides, and Firebase Remote
-Config integration. Designed to be embedded by multiple apps in the same
-workspace, each with its own isolated flag cache.
+A Flutter package that resolves boolean feature flags against Firebase Remote Config, with a
+per-app SQLite cache and developer overrides in staging builds.
 
 ## Features
 
-- **Runtime Feature Control**: Enable/disable features without app updates
-- **Automatic Source Detection**: Each flag key is resolved against Firebase
-  Remote Config at runtime - no need to declare upfront whether a flag is
-  "local" or "remote"
-- **Persistent Caching**: Features work offline with intelligent cache
-  management and developer override support
-- **Multi-App Isolation**: Each host app gets its own cache namespace via
-  `appId`, so multiple apps in the same workspace never collide on the same
-  flag key
-- **Firebase Integration**: Built-in Firebase Remote Config support
-- **Type-Safe Implementation**: Sealed exception classes and strong typing
-  throughout
-- **Dependency Injection Ready**: Built-in module configurator for service
-  locator integration
-- **Cross-Platform**: Works on Android, iOS, macOS, and Web platforms
+- Resolves each flag key against Firebase Remote Config at runtime; a key that does not exist
+  remotely falls back to the default value supplied by the host app
+- Caches resolved flags and developer overrides in SQLite when
+  `BuildEnvironment.isFeatureFlagCached` is `true` (staging builds)
+- Reads Remote Config directly, without a cache, when `isFeatureFlagCached` is `false`
+  (production builds)
+- Namespaces the cache database by `appId`, so several apps on one device never share cached
+  flag values
+- Typed exceptions through the sealed `FeatureFlagException` hierarchy
+- `FeatureFlagModuleConfigurator` for service locator registration
 
 ## Getting Started
 
 ### Installation
 
-This module is part of the workspace and can be imported directly:
+The package is a workspace member:
 
 ```yaml
 dependencies:
@@ -40,526 +33,216 @@ import 'package:feature_flag/feature_flag.dart';
 
 ### Module Configuration
 
-`FeatureFlagModuleConfigurator` requires an `appId` - it namespaces the
-underlying SQLite cache so multiple apps embedding this package in the same
-workspace (e.g. `portrai`, `storybook`) never collide on the same flag key.
+Add `FeatureFlagModuleConfigurator` with an `appId`. The `appId` names the cache database
+(`<appId>_feature_flag_db`).
 
 ```dart
-import 'package:feature_flag/feature_flag.dart';
-
 final moduleConfigurators = [
   // ...
-  FeatureFlagModuleConfigurator(appId: 'portrai'),
+  FeatureFlagModuleConfigurator(appId: 'example_app'),
 ];
 ```
 
-Unlike most module configurators, this one does **not** call
-`FeatureFlagController.initFeatureFlags` for you: the full catalog of flag
-keys is only known by the host app's own features, not by this generic
-layer. Call it explicitly once every feature has had a chance to contribute
-its definitions - typically right after your app's module-configurator
-initialization phase completes (mirroring how a route registry is only read
-once every feature has registered its routes):
+The configurator registers `FeatureFlagCache`, the `FeatureFlagDataSource` chain and
+`FeatureFlagController` as singletons. It resolves `FbRemoteConfigController` (from the
+`firebase` layer) and `BuildConfig` (from the `core` layer) from the service locator, so those
+must be registered as well.
+
+The configurator does not call `FeatureFlagController.initFeatureFlags`, because the list of flag
+keys belongs to the host app. Call it once all flag definitions are known, for example after the
+module configurators have finished registering:
 
 ```dart
 final controller = serviceLocator.get<FeatureFlagController>();
 
 await controller.initFeatureFlags(const [
-  FeatureFlagDefinition(key: 'new_dashboard', defaultValue: false),
-  FeatureFlagDefinition(key: 'feature_language_selector', defaultValue: false),
+  FeatureFlagDefinition(key: 'feature_example', defaultValue: false),
+  FeatureFlagDefinition(key: 'feature_other', defaultValue: true),
 ]);
 ```
 
 ## Usage
 
-### Basic Feature Check
+### Checking a Flag
 
 ```dart
-class DashboardPage extends StatelessWidget {
-  final FeatureFlagController controller;
-
-  const DashboardPage({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    try {
-      final isNewDashboardEnabled = controller.isFeatureEnabled('new_dashboard');
-
-      if (isNewDashboardEnabled) {
-        return NewDashboardWidget();
-      }
-      return LegacyDashboardWidget();
-    } on FeatureFlagNotFoundException {
-      // Handle case where flag doesn't exist
-      return LegacyDashboardWidget();
-    } on EmptyFeatureFlagsException {
-      // Handle case where no flags are loaded
-      return LoadingWidget();
-    }
+bool isEnabled(FeatureFlagController controller, String key) {
+  try {
+    return controller.isFeatureEnabled(key);
+  } on FeatureFlagNotFoundException {
+    return false; // key was not part of the definitions
+  } on EmptyFeatureFlagsException {
+    return false; // initFeatureFlags has not loaded any flags
   }
 }
 ```
 
-### Working with All Feature Flags
+### Listing All Flags
 
 ```dart
-// Get all feature flags
 try {
-  final allFlags = controller.getAllFeatureFlags();
-  for (final flag in allFlags) {
-    print('${flag.key}: ${flag.isEnabled}');
+  for (final flag in controller.getAllFeatureFlags()) {
     if (flag.isOverridden) {
-      print('  -> Overridden (remote: ${flag.remoteValue})');
+      // overridden locally; flag.remoteValue holds the remote value, if any
     } else if (!flag.hasRemoteSource) {
-      print('  -> Local only (no matching remote key)');
+      // key is not in Remote Config; flag.isEnabled is the default value
     }
   }
 } on EmptyFeatureFlagsException {
-  print('No feature flags loaded');
+  // no flags loaded
 }
 ```
 
-### Updating Feature Flags (Staging Only)
+### Overriding a Flag
 
 ```dart
-// Update a feature flag for testing
-try {
-  final updatedFlag = FeatureFlag(
-    key: 'new_dashboard',
-    isEnabled: true,
-    isOverridden: true,   // Mark as override
-    hasRemoteSource: true,
-    remoteValue: false,   // Original remote value preserved
-  );
-  await controller.updateFeatureFlag(updatedFlag);
-} on FeatureFlagNotFoundException {
-  print('Feature flag not found');
-} on EmptyFeatureFlagsException {
-  print('No flags loaded');
-}
-```
+final flag = controller
+    .getAllFeatureFlags()
+    .firstWhere((f) => f.key == 'feature_example');
 
-In production (`isFeatureFlagCached == false`), `updateFeatureFlag` and
-`reset` are no-ops on the data source side - there's no cache to write to,
-so calls silently have no lasting effect.
-
-### Resetting Feature Flags
-
-```dart
-// Reset and reload all feature flags (clears cache/overrides), re-resolving
-// against the same definitions passed to initFeatureFlags
-try {
-  await controller.reset();
-  print('Feature flags reset successfully');
-} on FeatureFlagResetException {
-  print('Failed to reset feature flags');
-}
-```
-
-## Architecture
-
-The package uses a layered data source architecture:
-
-```text
-┌─────────────────────────────────┐
-│   FeatureFlagController         │ ← Main API
-└────────────┬────────────────────┘
-             │
-┌────────────▼────────────────────┐
-│ BuildEnvFeatureFlagDataSource   │ ← Routes based on environment
-└────────┬──────────────┬─────────┘
-         │              │
-    ┌────▼───────┐  ┌──▼──────────────┐
-    │   Cache    │  │     Remote      │
-    │ DataSource │─▶│   DataSource    │
-    └────────────┘  └────────┬────────┘
-                              │
-                     ┌────────▼────────┐
-                     │ Firebase Remote │
-                     │     Config      │
-                     └─────────────────┘
-```
-
-### Data Sources
-
-1. **BuildEnvFeatureFlagDataSource**: Routes to cache or remote based on
-   `BuildEnvironment.isFeatureFlagCached`
-2. **CacheFeatureFlagDataSource**: Wraps the remote source with persistent
-   SQLite caching + developer override support
-3. **RemoteFeatureFlagDataSource**: Resolves each flag key against Firebase
-   Remote Config, falling back to the caller-supplied default when the key
-   doesn't exist remotely
-
-### Build Environments
-
-- **Staging** (`isFeatureFlagCached = true`):
-  - Uses cache with override support
-  - Local overrides persist across restarts
-  - Great for testing feature combinations
-
-- **Production** (`isFeatureFlagCached = false`):
-  - Talks to `RemoteFeatureFlagDataSource` directly, bypassing the cache
-  - No local overrides, no persistence - every resolution is fresh
-  - Local-only flags (no remote key) are frozen at their default value
-
-## Key Concepts
-
-### Automatic Remote/Local Resolution
-
-Unlike a design where each flag must declare `source: local` or `source:
-remote` up front, this package resolves that per key, at runtime, against
-whatever currently exists in Firebase Remote Config:
-
-- **Key exists in Firebase Remote Config** -> the flag is "remote": its value
-  always reflects the current remote value (`hasRemoteSource: true`,
-  `remoteValue` populated).
-- **Key doesn't exist in Firebase Remote Config** -> the flag is "local": it
-  falls back to the `FeatureFlagDefinition.defaultValue` the caller supplied,
-  persisted so it's stable across restarts (`hasRemoteSource: false`).
-
-This means the same `FeatureFlagDefinition` can transparently "graduate" from
-local-only to remote-controlled the moment someone adds the matching key to
-the Firebase console - no app code changes required.
-
-### FeatureFlagDefinition
-
-The generic seed the host app supplies - just a key and the value to fall
-back to when that key doesn't exist remotely. Deliberately minimal: display
-metadata (name, description, etc.) is a presentation concern that belongs to
-the app embedding this package, not to this module.
-
-```dart
-class FeatureFlagDefinition extends Equatable {
-  const FeatureFlagDefinition({required this.key, required this.defaultValue});
-
-  final String key;
-  final bool defaultValue;
-}
-```
-
-### Override System
-
-The package supports a powerful override system for development:
-
-```dart
-final flag = FeatureFlag(
-  key: 'feature_key',
-  isEnabled: true,        // Current value
-  isOverridden: true,     // Marked as overridden
-  hasRemoteSource: true,
-  remoteValue: false,     // Original remote value preserved
+await controller.updateFeatureFlag(
+  flag.copyWith(isEnabled: !flag.isEnabled, isOverridden: true),
 );
 ```
 
-**Benefits:**
-- See what's been changed locally
-- Easy to reset to remote values
-- Test feature combinations without affecting remote config
+`updateFeatureFlag` replaces the flag in the controller's in-memory map and passes it to the data
+source. With the cache enabled, a flag with `isOverridden: true` is stored as an override and
+survives restarts. Without the cache, the data source ignores the update, so the change lasts only
+until the next `initFeatureFlags` or `reset`.
 
-### Exception Handling
-
-The package provides specific exception types for different failure scenarios:
-
-| Exception | When Thrown | Handling |
-|-----------|-------------|----------|
-| `FeatureFlagInitializationException` | Initialization failed | Retry or use default values |
-| `FeatureFlagResetException` | Reset operation failed | Alert user |
-| `EmptyFeatureFlagsException` | No flags available | Ensure initialization completed |
-| `FeatureFlagNotFoundException(key)` | Specific flag not found | Use default behavior |
-
-### Environment-Based Behavior
-
-The package automatically adapts based on your build environment:
+### Resetting Flags
 
 ```dart
-// In BuildConfig
-class BuildEnvironment {
-  final bool isFeatureFlagCached;
-  // true in staging  -> cache with overrides
-  // false in production -> direct Firebase fetch, no overrides
+try {
+  await controller.reset();
+} on FeatureFlagResetException {
+  // reset or re-initialization failed
 }
 ```
 
-**No configuration needed - it just works!**
+`reset` clears the in-memory flags, deletes all cached flags (including overrides) when the cache
+is enabled, and calls `initFeatureFlags` again with the definitions from the previous call.
+
+## Key Concepts
+
+### Data Source Chain
+
+```text
+FeatureFlagController
+        |
+BuildEnvFeatureFlagDataSource   (picks a delegate from BuildEnvironment.isFeatureFlagCached)
+        |                 \
+CacheFeatureFlagDataSource  \
+        |                    \
+RemoteFeatureFlagDataSource <-'
+        |
+FbRemoteConfigController
+```
+
+- `BuildEnvFeatureFlagDataSource` delegates to the cache data source when
+  `BuildEnvironment.isFeatureFlagCached` is `true` (only `BuildEnvironment.staging`), otherwise to
+  the remote data source.
+- `RemoteFeatureFlagDataSource` reads `FbRemoteConfigController.getAllConfigsValue()`. A key found
+  there becomes a flag with `hasRemoteSource: true` and `remoteValue` set to the remote boolean; a
+  missing key becomes a flag with `isEnabled` set to `FeatureFlagDefinition.defaultValue`. Its
+  `updateFeatureFlag` and `reset` do nothing.
+- `CacheFeatureFlagDataSource` wraps the remote data source and merges each resolved flag with the
+  cached one:
+  - a cached override wins, with `hasRemoteSource` and `remoteValue` refreshed from the remote
+    result;
+  - otherwise a flag with a remote source takes the remote value;
+  - otherwise (a local-only flag) the cached value is kept, and the default is used only when
+    nothing is cached.
+
+These data source classes and `FeatureFlagCache` are internal; only the classes below are exported.
+
+### Remote and Local Flags
+
+A flag is not declared as remote or local. The same `FeatureFlagDefinition` resolves to a remote
+flag once its key is added to Remote Config, and to its default value while the key is absent.
+
+## API Reference
 
 ### FeatureFlagController
 
-Main controller for managing feature flags:
+| Member | Description | Throws |
+|--------|-------------|--------|
+| `FeatureFlagController(FeatureFlagDataSource dataSource)` | Constructor. | |
+| `Future<void> initFeatureFlags(List<FeatureFlagDefinition> definitions)` | Resolves `definitions` through the data source, loads them into memory and keeps `definitions` for `reset`. | `FeatureFlagInitializationException` |
+| `List<FeatureFlag> getAllFeatureFlags()` | Returns all loaded flags. | `EmptyFeatureFlagsException` |
+| `bool isFeatureEnabled(String key)` | Returns `isEnabled` for `key`. | `EmptyFeatureFlagsException`, `FeatureFlagNotFoundException` |
+| `Future<void> updateFeatureFlag(FeatureFlag flag)` | Replaces a loaded flag and passes it to the data source. | `EmptyFeatureFlagsException`, `FeatureFlagNotFoundException` |
+| `Future<void> reset()` | Clears flags, resets the data source and re-initializes. | `FeatureFlagResetException` |
+
+### FeatureFlagDefinition
 
 ```dart
-class FeatureFlagController {
-  FeatureFlagController(FeatureFlagDataSource dataSource);
-
-  /// Resolves every entry in [definitions] (a flag found in the remote
-  /// source wins, otherwise its default value is used) and loads the
-  /// result into memory. Retains [definitions] internally so reset() can
-  /// re-resolve without the caller supplying them again.
-  /// Throws: FeatureFlagInitializationException
-  Future<void> initFeatureFlags(List<FeatureFlagDefinition> definitions);
-
-  /// Get all feature flags
-  /// Throws: EmptyFeatureFlagsException if empty
-  List<FeatureFlag> getAllFeatureFlags();
-
-  /// Check if feature is enabled
-  /// Throws: FeatureFlagNotFoundException if not found
-  ///         EmptyFeatureFlagsException if no flags loaded
-  bool isFeatureEnabled(String key);
-
-  /// Update feature flag (persists to cache if available)
-  /// Throws: FeatureFlagNotFoundException if not found
-  ///         EmptyFeatureFlagsException if no flags loaded
-  Future<void> updateFeatureFlag(FeatureFlag featureFlag);
-
-  /// Reset and reinitialize all flags (clears cache/overrides), re-resolving
-  /// against the same definitions passed to initFeatureFlags
-  /// Throws: FeatureFlagResetException
-  Future<void> reset();
-}
+const FeatureFlagDefinition({required String key, required bool defaultValue});
 ```
+
+The key to resolve and the value to use when the key is not in Remote Config. Extends `Equatable`.
 
 ### FeatureFlag
 
-Data class representing a resolved feature flag:
-
 ```dart
-class FeatureFlag extends Equatable {
-  const FeatureFlag({
-    required this.key,
-    required this.isEnabled,
-    this.isOverridden = false,
-    this.hasRemoteSource = false,
-    this.remoteValue,
-  });
-
-  final String key;
-  final bool isEnabled;
-  final bool isOverridden;     // Manual override in staging
-  final bool hasRemoteSource;  // Whether this key currently exists in Firebase Remote Config
-  final bool? remoteValue;     // Last known remote value, always null when hasRemoteSource is false
-
-  // JSON serialization support
-  factory FeatureFlag.fromJson(Map<String, dynamic> json);
-  Map<String, dynamic> toJson();
-
-  // Copy with support for immutability
-  FeatureFlag copyWith({...});
-}
+const FeatureFlag({
+  required String key,
+  required bool isEnabled,
+  bool isOverridden = false,
+  bool hasRemoteSource = false,
+  bool? remoteValue,
+});
 ```
 
-### FeatureFlagDataSource
+- `isOverridden`: the value was set by a developer override (cached builds only).
+- `hasRemoteSource`: the key exists in Remote Config.
+- `remoteValue`: the last known remote value; `null` when `hasRemoteSource` is `false`.
 
-Abstract interface for data sources:
+Extends `Equatable` and provides `copyWith`, `fromJson` and `toJson` (generated with
+`json_serializable` into `feature_flag.g.dart`).
 
-```dart
-abstract class FeatureFlagDataSource {
-  FutureOr<List<FeatureFlag>> resolveFeatureFlags(
-    List<FeatureFlagDefinition> definitions,
-  );
-  FutureOr<void> updateFeatureFlag(FeatureFlag featureFlag);
-  FutureOr<void> reset();
-}
-```
+### Exceptions
+
+All extend the sealed `FeatureFlagException`, which implements `AppException` from the `core`
+layer.
+
+| Exception | Thrown by |
+|-----------|-----------|
+| `FeatureFlagInitializationException` | `initFeatureFlags`, when the data source throws |
+| `FeatureFlagResetException` | `reset`, when resetting or re-initializing throws |
+| `EmptyFeatureFlagsException` | `getAllFeatureFlags`, `isFeatureEnabled`, `updateFeatureFlag`, when no flags are loaded |
+| `FeatureFlagNotFoundException` | `isFeatureEnabled`, `updateFeatureFlag`, when the key is not loaded |
+| `FeatureFlagUpdateException` | Not thrown by this package |
 
 ### FeatureFlagModuleConfigurator
 
 ```dart
-class FeatureFlagModuleConfigurator implements ModuleConfigurator {
-  /// [appId] namespaces the cached flag overrides so this package can be
-  /// embedded in multiple apps without their caches colliding.
-  FeatureFlagModuleConfigurator({required String appId});
-}
+FeatureFlagModuleConfigurator({required String appId});
 ```
-
-## Best Practices
-
-### 1. Graceful Degradation
-
-Always provide fallback behavior for missing features:
-
-```dart
-bool isFeatureEnabled(String key) {
-  try {
-    return controller.isFeatureEnabled(key);
-  } on FeatureFlagNotFoundException {
-    return false; // Default behavior
-  } on EmptyFeatureFlagsException {
-    return false; // Not initialized yet
-  }
-}
-```
-
-### 2. Feature Flag Naming
-
-Use descriptive, hierarchical names:
-
-**Good:**
-- `ui.new_dashboard`
-- `feature.analytics.v2`
-- `experiment.onboarding_flow_b`
-
-**Bad:**
-- `flag1`
-- `test`
-- `new_feature`
-
-### 3. Initialization
-
-Initialize early in app lifecycle, once every feature has contributed its
-`FeatureFlagDefinition`s:
-
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Setup DI, run every module configurator's registration phase first
-  final serviceLocator = await setupServiceLocator();
-
-  // Then initialize feature flags with the aggregated definitions list
-  final controller = serviceLocator.get<FeatureFlagController>();
-  await controller.initFeatureFlags(allFeatureFlagDefinitions);
-
-  runApp(MyApp());
-}
-```
-
-### 4. One Cache Per App
-
-Always pass a distinct, stable `appId` per host app
-(`FeatureFlagModuleConfigurator(appId: 'portrai')`) - never share an `appId`
-between two different apps, even if they happen to use the same flag keys.
-
-### 5. Cleanup Old Flags
-
-Remove feature flags once features are stable:
-
-```dart
-// Before: Feature flag check
-if (controller.isFeatureEnabled('new_dashboard')) {
-  return NewDashboard();
-}
-return OldDashboard();
-
-// After: Feature is stable, remove flag
-return NewDashboard();
-```
-
-## Platform Support
-
-| Platform | Support | Notes |
-|----------|---------|-------|
-| Android  | Yes | Full support |
-| iOS      | Yes | Full support |
-| Web      | Yes | Full support |
-| macOS    | Yes | Full support |
-| Linux    | Partial | Not tested |
-| Windows  | Partial | Not tested |
-
-## Contributing
-
-This module follows the workspace development patterns:
-
-1. **Tests Required**: All changes must include appropriate tests
-2. **Backward Compatibility**: Maintain API compatibility
-3. **Code Style**: Follow Dart conventions and workspace style guide
-4. **Documentation**: Update README for API changes
-
-### Development Setup
-
-```bash
-# Run tests
-flutter test
-
-# Run tests with coverage
-flutter test --coverage
-
-# Analyze code
-flutter analyze
-
-# Format code
-dart format .
-```
-
-## License
-
-Part of the workspace - see root LICENSE file.
-
----
-
-**Questions or Issues?** Check the [Contributing Guidelines](../../CONTRIBUTING.md) or open an issue.
 
 ## Dependencies
 
 | Package | Purpose |
 |---------|---------|
-| `cache` | Caching functionality and SQLite support |
-| `core` | Core utilities and build configuration |
-| `firebase` | Firebase Remote Config integration |
-| `module_injector` | Dependency injection framework |
-| `equatable` | Value equality for FeatureFlag/FeatureFlagDefinition objects |
-| `json_annotation` | JSON serialization support |
+| `cache` | `DBCache` base class for the SQLite flag cache |
+| `core` | `BuildConfig` / `BuildEnvironment` and `AppException` |
+| `firebase` | `FbRemoteConfigController` for Remote Config values |
+| `module_injector` | `ModuleConfigurator` and `ServiceLocator` |
+| `equatable` | Value equality for `FeatureFlag` and `FeatureFlagDefinition` |
+| `json_annotation` | JSON serialization annotations for `FeatureFlag` |
 
 ## Testing
 
-### Run Tests
+From the workspace root:
+
+```bash
+melos run test --scope=feature_flag
+```
+
+Or from `layer/feature_flag`:
 
 ```bash
 flutter test
 ```
 
-### Testing with Feature Flags
-
-```dart
-import 'package:feature_flag/feature_flag.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockFeatureFlagDataSource extends Mock implements FeatureFlagDataSource {}
-
-void main() {
-  group('FeatureFlagController', () {
-    late MockFeatureFlagDataSource mockDataSource;
-    late FeatureFlagController controller;
-
-    const definitions = [
-      FeatureFlagDefinition(key: 'feature1', defaultValue: false),
-      FeatureFlagDefinition(key: 'feature2', defaultValue: false),
-    ];
-
-    setUp(() {
-      mockDataSource = MockFeatureFlagDataSource();
-      controller = FeatureFlagController(mockDataSource);
-    });
-
-    test('should initialize feature flags successfully', () async {
-      // Arrange
-      const mockFlags = [
-        FeatureFlag(key: 'feature1', isEnabled: true),
-        FeatureFlag(key: 'feature2', isEnabled: false),
-      ];
-      when(() => mockDataSource.resolveFeatureFlags(definitions))
-          .thenAnswer((_) async => mockFlags);
-
-      // Act
-      await controller.initFeatureFlags(definitions);
-
-      // Assert
-      expect(controller.isFeatureEnabled('feature1'), isTrue);
-      expect(controller.isFeatureEnabled('feature2'), isFalse);
-    });
-
-    test('should throw FeatureFlagNotFoundException for unknown flag', () async {
-      // Arrange
-      when(() => mockDataSource.resolveFeatureFlags(const []))
-          .thenAnswer((_) async => []);
-      await controller.initFeatureFlags(const []);
-
-      // Act & Assert
-      expect(
-        () => controller.isFeatureEnabled('unknown'),
-        throwsA(isA<FeatureFlagNotFoundException>()),
-      );
-    });
-  });
-}
-```
+The tests use `mocktail` with mocks in `test/mock/`. The package does not export test helpers.

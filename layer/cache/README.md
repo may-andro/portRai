@@ -1,28 +1,27 @@
 # Cache
 
-A comprehensive caching solution for Flutter applications that provides multiple caching strategies with automatic expiration management. It helps consumers choose between in-memory, key-value, and database-backed caches based on persistence and query needs.
+Base classes for caching typed values in memory, in key-value storage (SharedPreferences) or in a
+SQLite table, each with an optional time-to-live.
 
 ## Features
 
-- **Multiple Cache Types**: Support for in-memory, key-value (SharedPreferences), and database (SQLite) caching
-- **Automatic Expiration**: Built-in time-to-live (TTL) support with automatic cleanup of expired data
-- **Type Safety**: Generic implementations that maintain type safety across all cache operations
-- **Cross-Platform**: Works on Android, iOS, macOS, and Web platforms
-- **Flexible Storage**: Choose the appropriate cache type based on your data persistence needs
-- **Serialization Support**: Automatic JSON serialization/deserialization for complex objects
+- `MemoryCache<T>`: a single value held in memory for the lifetime of the isolate
+- `KeyValueCache<T>`: a single value stored as JSON in SharedPreferences
+- `DBCache<T>`: many records stored in a SQLite table, with equality queries, upserts by primary
+  key, batched writes and schema migrations
+- Optional time-to-live per cache; expired entries are removed when they are read
+- A `watch()` stream on every cache type that emits after each write and delete
 
 ## Getting Started
 
 ### Installation
 
-This module is part of the workspace and can be added as a workspace dependency:
+The package is part of the workspace:
 
 ```yaml
 dependencies:
   cache: any
 ```
-
-Then import it where needed:
 
 ```dart
 import 'package:cache/cache.dart';
@@ -30,216 +29,239 @@ import 'package:cache/cache.dart';
 
 ### Module Configuration
 
-The cache module automatically configures SharedPreferences dependency injection:
+`CacheModuleConfigurator` implements `ModuleConfigurator` from
+[module_injector](../module_injector/README.md). It registers no dependencies; add it to the
+app's list of module configurators:
 
 ```dart
-import 'package:cache/cache.dart';
-
-// Add to your module configurators
-final configurator = CacheModuleConfigurator();
+const CacheModuleConfigurator(),
 ```
 
 ## Usage
 
 ### Memory Cache
 
+`MemoryCache` is not abstract, so it can be used directly or subclassed to set a time-to-live.
+
 ```dart
-// Create a custom memory cache with expiration
-class UserMemoryCache extends MemoryCache<User> {
+class SettingsMemoryCache extends MemoryCache<Settings> {
   @override
   Duration get timeToLive => const Duration(minutes: 15);
 }
 
-// Usage
-final userCache = UserMemoryCache();
+final cache = SettingsMemoryCache();
+cache.put(settings);
+final Settings? cached = cache.get(); // null when empty or expired
+cache.delete();
 
-// Store data
-userCache.put(User(id: 1, name: 'John Doe'));
-
-// Retrieve data
-final user = userCache.get(); // Returns User or null if expired/not found
-
-// Clear cache
-userCache.delete();
-
-// For simple cases without expiration, you can use MemoryCache directly
-final simpleCache = MemoryCache<String>();
-simpleCache.put('cached value');
+final simpleCache = MemoryCache<String>()..put('value');
 ```
 
 ### Key-Value Cache
 
+A subclass passes the storage key to the constructor and converts the value to and from a JSON
+map. The map is stored as a JSON string under that key.
+
 ```dart
-class UserPreferencesCache extends KeyValueCache<UserPreferences> {
-  UserPreferencesCache({super.adapter}) : super('user_preferences');
+class SettingsCache extends KeyValueCache<Settings> {
+  SettingsCache() : super('settings');
 
   @override
-  UserPreferences deserializeValue(Map<String, dynamic> map) {
-    return UserPreferences.fromJson(map);
-  }
+  Settings deserializeValue(Map<String, dynamic> map) => Settings.fromJson(map);
 
   @override
-  Map<String, dynamic> serializeValue(UserPreferences value) {
-    return value.toJson();
-  }
+  Map<String, dynamic> serializeValue(Settings value) => value.toJson();
 
   @override
   Duration get timeToLive => const Duration(days: 30);
 }
 
-// Usage — defaults to SharedPreferences under the hood
-final prefsCache = UserPreferencesCache();
-await prefsCache.put(UserPreferences(theme: 'dark', notifications: true));
-final preferences = await prefsCache.get();
+final cache = SettingsCache();
+await cache.put(settings);
+final Settings? cached = await cache.get();
+await cache.delete();
 ```
 
 ### Database Cache
 
+A subclass describes the table and converts each record to and from a map of column values.
+
 ```dart
-class UserDBCache extends DBCache<User> {
-  UserDBCache({super.adapter});
+class ItemCache extends DBCache<Item> {
+  @override
+  String get dbName => 'item_cache';
 
   @override
-  String get dbName => 'user_cache';
-
-  @override
-  String get tableName => 'users';
+  String get tableName => 'items';
 
   @override
   int get tableVersion => 1;
 
   @override
-  List<DbColumnDefinition> get columns => [
-    const DbColumnDefinition(name: 'id', nullable: false),
-    const DbColumnDefinition(name: 'name', nullable: false),
-    const DbColumnDefinition(name: 'email', nullable: false),
+  List<DbColumnDefinition> get columns => const [
+    DbColumnDefinition(name: 'id', type: DbColumnType.integer, nullable: false),
+    DbColumnDefinition(name: 'name', nullable: false),
   ];
 
   @override
-  List<String> get primaryKeyColumns => ['id'];
+  List<String> get primaryKeyColumns => const ['id'];
 
   @override
-  Map<String, dynamic> serialize(User model) {
-    return {
-      'id': model.id,
-      'name': model.name,
-      'email': model.email,
-    };
-  }
+  Map<String, dynamic> serialize(Item model) => {'id': model.id, 'name': model.name};
 
   @override
-  User deserialize(Map<String, dynamic> map) {
-    return User(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-    );
-  }
+  Item deserialize(Map<String, dynamic> map) =>
+      Item(id: map['id'] as int, name: map['name'] as String);
 
   @override
   Duration get timeToLive => const Duration(hours: 24);
 }
 
-// Usage — defaults to SQLite under the hood
-final userCache = UserDBCache();
-await userCache.put(User(id: 1, name: 'John', email: 'john@example.com'));
-// Stores several records in one transaction: all of them or none.
-await userCache.putAll([
-  User(id: 2, name: 'Jane', email: 'jane@example.com'),
-  User(id: 3, name: 'Max', email: 'max@example.com'),
-]);
-final users = await userCache.getAll();
-final user = await userCache.get(conditions: {'id': 1});
+final cache = ItemCache();
+await cache.put(Item(id: 1, name: 'First'));
+// Stored in one transaction: all records or none.
+await cache.putAll([Item(id: 2, name: 'Second'), Item(id: 3, name: 'Third')]);
+
+final List<Item> all = await cache.getAll();
+final List<Item> named = await cache.query(conditions: {'name': 'Second'});
+final Item? one = await cache.get(conditions: {'id': 1});
+
+await cache.delete({'id': 1});
+await cache.deleteAll();
 ```
 
-## Cache Types
+### Watching Changes
 
-### 1. MemoryCache
+```dart
+memoryCache.watch().listen((Settings? value) {}); // null after delete()
+keyValueCache.watch().listen((Settings? value) {}); // null after delete()
+itemCache.watch(conditions: {'id': 1}).listen((DbCacheEvent<Item> event) {
+  // event.deleted is true for deletes, which are always forwarded.
+});
+```
 
-Fast in-memory caching for temporary data that doesn't need to persist across app restarts.
+## API Reference
 
-**Best for**: Session data, computed values, frequently accessed temporary objects
+### MemoryCache\<T\>
 
-### 2. KeyValueCache
+| Member | Description |
+|--------|-------------|
+| `T? get()` | Returns the value, or `null` when empty or expired (an expired value is deleted) |
+| `void put(T model)` | Stores the value and the current timestamp |
+| `void delete()` | Clears the value |
+| `Stream<T?> watch()` | Broadcast stream of the value after each `put` and `null` after each `delete` |
 
-Persistent key-value storage using SharedPreferences with automatic JSON serialization.
+### KeyValueCache\<T\>
 
-**Best for**: User preferences, settings, small data objects, authentication tokens
+Constructor: `KeyValueCache(String cacheKey)`. The value is stored under `cacheKey` and its write
+time under `<cacheKey>.expiration`.
 
-### 3. DBCache
+| Member | Description |
+|--------|-------------|
+| `T deserializeValue(Map<String, dynamic> map)` | Required: builds the value from the stored JSON map |
+| `Map<String, dynamic> serializeValue(T value)` | Required: converts the value to a JSON map |
+| `Future<T?> get()` | Returns the value, or `null` when absent or expired (an expired value is deleted) |
+| `Future<bool> put(T value)` | Stores the value and the current timestamp |
+| `Future<bool> delete()` | Removes the value and its timestamp |
+| `Stream<T?> watch()` | Broadcast stream of the value after each `put` and `null` after each `delete` |
 
-SQLite-based caching for complex data structures and bulk operations.
+### DBCache\<T\>
 
-**Best for**: Large datasets, complex queries, relational data, offline data storage
+| Member | Description |
+|--------|-------------|
+| `String get dbName` | Required: database file name, without extension |
+| `String get tableName` | Required: table name |
+| `int get tableVersion` | Required: schema version; raise it when the columns change |
+| `List<DbColumnDefinition> get columns` | Required: the table's columns |
+| `List<String> get primaryKeyColumns` | Columns of the primary key; defaults to none. With a key, writes replace the record with the same key |
+| `Map<int, DbMigration> get migrations` | Migration steps keyed by the version they migrate to; defaults to none |
+| `Map<String, dynamic> serialize(T model)` | Required: converts a model to column values |
+| `T deserialize(Map<String, dynamic> map)` | Required: builds a model from column values |
+| `Future<void> put(T model)` | Inserts or replaces one record |
+| `Future<void> putAll(Iterable<T> models)` | Inserts or replaces all records in one transaction; does nothing for an empty list |
+| `Future<List<T>> getAll()` | Returns every non-expired record |
+| `Future<List<T>> query({Map<String, Object?> conditions})` | Returns non-expired records whose columns equal every condition |
+| `Future<T?> get({Map<String, Object?> conditions})` | Returns the first matching record, or `null` when none matches or it has expired |
+| `Future<void> delete(Map<String, Object?> conditions)` | Deletes every matching record |
+| `Future<void> deleteAll()` | Deletes every record |
+| `Stream<DbCacheEvent<T>> watch({Map<String, Object?> conditions})` | Emits each matching non-expired write, and every delete |
+
+Supporting types exported with `DBCache`:
+
+- `DbColumnDefinition({required String name, DbColumnType type = DbColumnType.text, bool nullable = true})`
+- `DbColumnType`: `integer`, `real`, `text`, `blob`
+- `DbMigration`: `List<Map<String, dynamic>> Function(List<Map<String, dynamic>> records)`
+- `DbCacheEvent<T>`: `value` (`null` for deletes) and `deleted`
+- `DBNotInitialisedException`: thrown by any `DBCache` call when the database fails to open;
+  `cause` holds the original error, and the next call retries opening it
 
 ## Key Concepts
 
-### Time-to-Live (TTL)
+### Time-to-Live
 
-All cache types support automatic expiration through the `timeToLive` property:
+Each cache overrides `Duration get timeToLive`. The default, `Duration.zero`, means entries never
+expire. An entry is expired when its write time plus `timeToLive` is in the past.
+
+- `MemoryCache` and `KeyValueCache` delete an expired value on `get()` and return `null`.
+- `DBCache` stores each record's write time in an extra `cachedTimestamp` column, added to the
+  table automatically. `getAll()` and `query()` leave expired records out and delete them without
+  waiting; `get()` deletes an expired match and returns `null`.
+
+### Initialization
+
+`KeyValueCache` and `DBCache` open their storage on the first call and share that one operation
+between concurrent callers. If opening fails, the next call tries again.
+
+### Schema Migrations
+
+When `tableVersion` increases:
+
+- With no `migrations`, the table is dropped and recreated empty.
+- Otherwise every record is read, passed through each migration step whose version is above the
+  old version and at most the new one, in ascending order, and written into the recreated table.
 
 ```dart
 @override
-Duration get timeToLive => const Duration(minutes: 30);
+Map<int, DbMigration> get migrations => {
+  2: (records) => records.map((record) => {...record, 'count': 0}).toList(),
+};
 ```
-
-### Expiration Handling
-
-- Expired data is automatically detected and removed when accessed
-- The `isExpired` property checks if cached data has exceeded its TTL
-- `lastCachedTimestamp` tracks when data was last stored
-
-### Thread Safety
-
-- MemoryCache: Thread-safe for single-isolate usage
-- KeyValueCache: Thread-safe through the underlying adapter (SharedPreferences by default)
-- DBCache: Thread-safe through SQLite transactions
-
-## Best Practices
-
-1. **Choose the Right Cache Type**:
-   - Use MemoryCache for temporary, frequently accessed data
-   - Use KeyValueCache for simple persistent data
-   - Use DBCache for complex data with query requirements
-
-2. **Set Appropriate TTL**:
-   - Consider data freshness requirements
-   - Balance between performance and data accuracy
-   - Use longer TTL for static data, shorter for dynamic data
-
-3. **Handle Null Returns**:
-   - Always check for null returns from cache operations
-   - Implement fallback data fetching strategies
-
-4. **Error Handling**:
-   - Catch `DBNotInitialisedException` for database operations
-   - Implement retry logic for critical cache operations
-
-## Contributing
-
-This module follows the workspace development patterns. Ensure all changes include appropriate tests and maintain backward compatibility.
 
 ## Platform Support
 
 | Platform | MemoryCache | KeyValueCache | DBCache |
 |----------|-------------|---------------|---------|
-| Android  | Yes          | Yes            | Yes      |
-| iOS      | Yes          | Yes            | Yes      |
-| macOS    | Yes          | Yes            | Yes      |
-| Web      | Yes          | Yes            | Yes      |
+| Android  | Yes         | Yes           | Yes     |
+| iOS      | Yes         | Yes           | Yes     |
+| macOS    | Yes         | Yes           | Yes     |
+| Web      | Yes         | Yes           | Yes     |
+
+On native platforms, `DBCache` opens `<dbName>.db` in the sqflite databases directory. On the web
+it uses the `sqflite_common_ffi_web` database factory; the app's web build needs the files
+generated by `dart run sqflite_common_ffi_web:setup`.
 
 ## Dependencies
 
-- `shared_preferences`: Key-value persistent storage
-- `sqflite`: SQLite database for mobile platforms
-- `sqflite_common_ffi_web`: SQLite support for web platform
-- `module_injector`: Dependency injection framework
-- `core`: Core utilities and types
+| Package | Purpose |
+|---------|---------|
+| `shared_preferences` | Storage behind `KeyValueCache` |
+| `sqflite` | SQLite storage behind `DBCache` |
+| `sqflite_common_ffi_web` | SQLite database factory for the web |
+| `module_injector` | `ModuleConfigurator` interface for `CacheModuleConfigurator` |
+| `meta` | `@visibleForTesting` and `@protected` annotations |
 
 ## Testing
 
-The module includes comprehensive test coverage with mocked dependencies:
+```bash
+melos run test --scope=cache
+```
+
+Or from `layer/cache`:
 
 ```bash
 flutter test
 ```
+
+The tests cover `MemoryCache`, `KeyValueCache` (with an in-memory storage adapter) and `DBCache`
+(against SQLite through the `sqflite_common_ffi` database factory). The package exports no test
+helpers.

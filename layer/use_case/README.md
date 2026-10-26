@@ -1,201 +1,253 @@
 # Use Case
 
-A Flutter package that provides base classes and utilities for implementing the Use Case pattern in clean architecture applications. This module helps organize business logic into discrete, testable units while providing error handling and interception capabilities.
+A Flutter package with base classes for use cases that return `Either<Failure, Output>`, a global
+interceptor hook for observing every use case call, and a code generator that maps annotated
+failures to localized messages.
 
 ## Features
 
-- **Base Use Case Classes**: Abstract base classes for implementing use cases with and without parameters
-- **Error Handling**: Built-in failure handling with typed error responses using Either pattern
-- **Interceptor System**: Extensible interceptor system for cross-cutting concerns like logging, analytics, and monitoring
-- **Dependency Injection**: Seamless integration with the module injector system
-- **Type Safety**: Strongly typed inputs, outputs, and failures
+- Base classes for `Future` and `Stream` use cases, with and without input
+- Exceptions thrown by a use case are converted to a typed `Left` through `mapErrorToFailure`
+- `UseCaseInterceptor` callbacks for every call, result and error
+- `Failure` base types: `BasicFailure`, `UnknownFailure`, `NoFailure`
+- `@Localizable` annotation and a `build_runner` builder that generates a `FailureTranslator`
+- Re-exports `package:either_dart/either.dart`
 
 ## Getting Started
 
 ### Installation
 
-Add this package to your `pubspec.yaml`:
+The package is a workspace member:
 
 ```yaml
 dependencies:
-  use_case:
-    path: ../use_case
+  use_case: any
+```
+
+```dart
+import 'package:use_case/use_case.dart';
 ```
 
 ### Module Configuration
 
-Configure the module in your dependency injection setup:
+Add `UseCaseModuleConfigurator` to the app's module configurators. It registers
+`UseCaseInterceptorController` as a factory.
 
 ```dart
-import 'package:use_case/use_case.dart';
+final moduleConfigurators = [
+  // ...
+  UseCaseModuleConfigurator(),
+];
+```
 
-// The module automatically registers the UseCaseInterceptorController
-// Register your interceptors:
-final interceptorController = serviceLocator<UseCaseInterceptorController>();
-interceptorController.register(LoggingInterceptor());
+Register interceptors through the controller:
+
+```dart
+serviceLocator.get<UseCaseInterceptorController>().register(LoggingInterceptor());
 ```
 
 ## Usage
 
-### Basic Use Case with Parameters
+### Use Case with Input
 
-Create a use case that takes input parameters:
+Subclasses implement `execute` and `mapErrorToFailure`. Callers invoke the use case with `call`.
 
 ```dart
-import 'package:use_case/use_case.dart';
+class GetItemFailure extends BasicFailure {
+  const GetItemFailure({super.cause});
+}
 
-class GetUserUseCase extends BaseUseCase<User, GetUserParams, UserFailure> {
-  GetUserUseCase(this._repository);
+class GetItemUseCase extends BaseUseCase<Item, String, GetItemFailure> {
+  GetItemUseCase(this._repository);
 
-  final UserRepository _repository;
+  final ItemRepository _repository;
 
   @override
-  Future<Either<UserFailure, User>> execute(GetUserParams input) async {
-    try {
-      final user = await _repository.getUser(input.userId);
-      return Right(user);
-    } catch (e) {
-      return Left(UserFailure(message: 'Failed to get user'));
-    }
+  Future<Either<GetItemFailure, Item>> execute(String id) async {
+    return Right(await _repository.getItem(id));
+  }
+
+  @override
+  GetItemFailure mapErrorToFailure(Object e, StackTrace st) {
+    return GetItemFailure(cause: e);
   }
 }
 
-class GetUserParams {
-  const GetUserParams({required this.userId});
-  final String userId;
-}
+final result = await getItemUseCase('item-1');
+result.fold(
+  (failure) => print(failure),
+  (item) => print(item),
+);
 ```
 
-### Use Case without Parameters
+`execute` returns `FutureOr<Either<F, O>>`, so it may be synchronous. It may also return a `Left`
+directly; only thrown errors go through `mapErrorToFailure`.
 
-Create a use case that doesn't require input parameters:
+### Use Case without Input
 
 ```dart
-import 'package:use_case/use_case.dart';
+class GetItemsUseCase extends BaseNoParamUseCase<List<Item>, UnknownFailure> {
+  GetItemsUseCase(this._repository);
 
-class GetCurrentUserUseCase extends BaseNoParamUseCase<User, UserFailure> {
-  GetCurrentUserUseCase(this._repository);
-
-  final UserRepository _repository;
+  final ItemRepository _repository;
 
   @override
-  Future<Either<UserFailure, User>> execute() async {
-    try {
-      final user = await _repository.getCurrentUser();
-      return Right(user);
-    } catch (e) {
-      return Left(UserFailure(message: 'Failed to get current user'));
-    }
+  Future<Either<UnknownFailure, List<Item>>> execute() async {
+    return Right(await _repository.getItems());
+  }
+
+  @override
+  UnknownFailure mapErrorToFailure(Object e, StackTrace st) {
+    return UnknownFailure(cause: e);
   }
 }
 ```
 
-### Custom Failure Types
+### Stream Use Cases
 
-Define custom failure types by extending the base failure classes:
+`BaseStreamUseCase<I, O, F>` and `BaseNoParamStreamUseCase<O, F>` take an `execute` that returns
+`Stream<O>`. `call` returns `Stream<Either<F, O>>`: each value is wrapped in `Right`, and each error
+is mapped to a `Left` through `mapErrorToFailure` without closing the stream. Note the type
+parameter order: the stream base class takes input first (`I, O, F`), while `BaseUseCase` takes
+output first (`O, I, F`).
 
 ```dart
-import 'package:use_case/use_case.dart';
+class WatchItemsUseCase extends BaseStreamUseCase<String, List<Item>, UnknownFailure> {
+  WatchItemsUseCase(this._repository);
 
-class UserFailure extends BasicFailure {
-  const UserFailure({super.message, super.cause});
-}
+  final ItemRepository _repository;
 
-class NetworkFailure extends BasicFailure {
-  const NetworkFailure({super.message, super.cause});
-}
-
-// For use cases that don't fail, use NoFailure
-class AlwaysSuccessUseCase extends BaseNoParamUseCase<String, NoFailure> {
   @override
-  Future<Either<NoFailure, String>> execute() async {
-    return const Right('Success');
+  Stream<List<Item>> execute(String parentId) => _repository.watchItems(parentId);
+
+  @override
+  UnknownFailure mapErrorToFailure(Object e, StackTrace st) {
+    return UnknownFailure(cause: e);
   }
 }
 ```
 
 ### Interceptors
 
-Create custom interceptors to handle cross-cutting concerns:
-
 ```dart
-import 'package:use_case/use_case.dart';
-
 class LoggingInterceptor implements UseCaseInterceptor {
   @override
-  void onCall<Param>(String tag, Param param) {
-    print('UseCase called: $tag with params: $param');
-  }
+  void onCall<Param>(String tag, Param param) => print('call $tag: $param');
 
   @override
-  void onSuccess<Output>(String tag, Output result) {
-    print('UseCase succeeded: $tag with result: $result');
-  }
+  void onSuccess<Output>(String tag, Output result) => print('result $tag: $result');
 
   @override
-  void onError(String tag, Object error, StackTrace? stackTrace) {
-    print('UseCase failed: $tag with error: $error');
-  }
+  void onError(String tag, Object error, StackTrace? stackTrace) =>
+      print('error $tag: $error');
 }
 ```
 
+- `tag` is `<runtimeType>_<microsecondsSinceEpoch>`, created once per call.
+- `param` is the input, or `null` for no-input use cases.
+- `onSuccess` receives the returned `Either` (including a `Left` returned by `execute`), and for
+  streams each `Right` value.
+- `onError` is called when `execute` throws or a stream emits an error.
+
+Interceptors are stored in a static list shared by all use cases, so a registered interceptor
+applies to every use case in the process.
+
+### Localized Failures
+
+Annotate failure classes with `@Localizable` and a localization key:
+
+```dart
+@Localizable('errorItemNotFound')
+class ItemNotFoundFailure extends BasicFailure {
+  const ItemNotFoundFailure({super.cause});
+}
+```
+
+The `use_case|failure_translator` builder has `auto_apply: none`, so enable it in the consuming
+package's `build.yaml`:
+
+```yaml
+targets:
+  $default:
+    builders:
+      use_case|failure_translator:
+        enabled: true
+        generate_for:
+          - lib/**
+```
+
+Running `build_runner` (`melos run gen`) scans `lib/**.dart` and writes
+`lib/generated/failure_translator.g.dart` with a `FailureTranslator` class:
+
+- `static String translate(BuildContext context, Failure failure)` returns
+  `context.localizations.<key>` for annotated failures, `context.localizations.errorGeneric` for
+  `UnknownFailure` and unmatched failures, and `''` for `NoFailure`.
+- `static String getFallbackMessage(Failure failure)` returns a readable name derived from the
+  class name (for example `Item Not Found`), without needing a `BuildContext`.
+
+The generated file imports `package:flutter/material.dart` and `package:<package>/l10n/l10n.dart`.
+That library must expose `context.localizations` with an `errorGeneric` entry and one entry per
+annotation key. No file is written when no annotated failures are found.
+
 ## API Reference
 
-### Base Classes
+### Use Case Base Classes
 
-- **`BaseUseCase<O, I, F>`**: Abstract base class for use cases that require input parameters
-  - `O`: Output type
-  - `I`: Input parameter type
-  - `F`: Failure type (must extend `Failure`)
-  - `call(I input)`: Execute the use case with input parameters
+| Class | `call` signature | `execute` to implement |
+|-------|------------------|------------------------|
+| `BaseUseCase<O, I, F>` | `FutureOr<Either<F, O>> call(I input)` | `FutureOr<Either<F, O>> execute(I input)` |
+| `BaseNoParamUseCase<O, F>` | `FutureOr<Either<F, O>> call()` | `FutureOr<Either<F, O>> execute()` |
+| `BaseStreamUseCase<I, O, F>` | `Stream<Either<F, O>> call(I input)` | `Stream<O> execute(I input)` |
+| `BaseNoParamStreamUseCase<O, F>` | `Stream<Either<F, O>> call()` | `Stream<O> execute()` |
 
-- **`BaseNoParamUseCase<O, F>`**: Abstract base class for use cases without input parameters
-  - `O`: Output type
-  - `F`: Failure type (must extend `Failure`)
-  - `call()`: Execute the use case without parameters
+`F` must extend `Failure`. Every class also requires `F mapErrorToFailure(Object e, StackTrace st)`.
+`execute` and `mapErrorToFailure` are `@protected`.
 
-### Failure Types
+### Failures
 
-- **`Failure`**: Base interface for all failures
-- **`BasicFailure`**: Abstract base class providing message and cause properties
-- **`NoFailure`**: Used for use cases that cannot fail
-- **`UnknownFailure`**: Generic failure type for unexpected errors
+- `Failure`: abstract base type.
+- `BasicFailure`: abstract, extends `Equatable`, with an optional `Object? cause` that is used for
+  equality and `toString`.
+- `UnknownFailure`: concrete `BasicFailure` with `cause`.
+- `NoFailure`: for use cases that do not fail.
 
-### Interceptor System
+### Interceptors
 
-- **`UseCaseInterceptor`**: Interface for implementing custom interceptors
-  - `onCall<Param>(String tag, Param param)`: Called when use case starts
-  - `onSuccess<Output>(String tag, Output result)`: Called on successful completion
-  - `onError(String tag, Object error, StackTrace? stackTrace)`: Called on failure
+- `UseCaseInterceptor`: `onCall<Param>(String tag, Param param)`,
+  `onSuccess<Output>(String tag, Output result)`,
+  `onError(String tag, Object error, StackTrace? stackTrace)`.
+- `UseCaseInterceptorController`: `register(UseCaseInterceptor interceptor)`.
 
-- **`UseCaseInterceptorController`**: Manages interceptor registration
-  - `register(UseCaseInterceptor interceptor)`: Register a new interceptor
+### Code Generation
+
+- `Localizable(String key)`: annotation read by the `failure_translator` builder.
 
 ### Module Configuration
 
-- **`UseCaseModuleConfigurator`**: Handles dependency injection setup for the module
-
-## Best Practices
-
-1. **Single Responsibility**: Each use case should handle one specific business operation
-2. **Error Handling**: Always handle potential failures and return appropriate failure types
-3. **Testability**: Use dependency injection to make use cases easily testable
-4. **Type Safety**: Define specific failure types for different error scenarios
-5. **Interceptors**: Use interceptors for logging, analytics, and other cross-cutting concerns
+- `UseCaseModuleConfigurator`: registers `UseCaseInterceptorController`.
 
 ## Dependencies
 
-This package depends on:
-
-- `either_dart`: For functional error handling with Either type
-- `equatable`: For value equality in failure types
-- `meta`: For annotations like `@protected`
-- `module_injector`: For dependency injection integration
+| Package | Purpose |
+|---------|---------|
+| `either_dart` | `Either`, `Left`, `Right` (re-exported) |
+| `equatable` | Value equality for `BasicFailure` |
+| `meta` | `@protected` |
+| `module_injector` | `ModuleConfigurator` and `ServiceLocator` |
+| `analyzer`, `build`, `glob`, `source_gen` | The `failure_translator` builder |
 
 ## Testing
 
-Run the package tests with:
+From the workspace root:
+
+```bash
+melos run test --scope=use_case
+```
+
+Or from `layer/use_case`:
 
 ```bash
 flutter test
 ```
+
+The package does not export test helpers.
