@@ -1,4 +1,4 @@
-name: Storybook PR Preview
+name: storybook
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,6 +11,7 @@ on:
     paths:
       - 'app/storybook/**'
       - 'layer/design_system/**'
+      - '.github/workflows/storybook.yaml'
       - '.github/workflows/storybook_*.yaml'
       - '.github/workflows/_storybook_*.yaml'
       - '.github/actions/setup-flutter-module/**'
