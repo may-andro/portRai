@@ -153,7 +153,7 @@ check, `flutter analyze` and `flutter test --exclude-tags golden --coverage`), t
 
 | Workflow                   | Trigger                                                          | Hosting channel |
 | -------------------------- | ---------------------------------------------------------------- | --------------- |
-| `storybook_pr.yaml`        | Pull request changing `app/storybook/**`, `layer/design_system/**`, the storybook workflows or the `setup-flutter-module` action | `preview`       |
+| `storybook.yaml`        | Pull request changing `app/storybook/**`, `layer/design_system/**`, the storybook workflows or the `setup-flutter-module` action | `preview`       |
 | `storybook_review.yaml`    | Tag matching `*+*-review-storybook`                              | `review`        |
 | `storybook_production.yaml`| Tag matching `*+*-prod-storybook`                                | `live`          |
 
