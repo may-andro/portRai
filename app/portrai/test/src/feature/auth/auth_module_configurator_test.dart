@@ -9,6 +9,7 @@ import 'package:portrai/src/route/route.dart';
 import 'package:use_case/use_case.dart';
 
 import '../../../mock/feature/auth/domain/use_case/mock_get_signed_in_user_use_case.dart';
+import '../../../mock/utility/fake_build_context.dart';
 import '../../../mock/utility/mock_module_route_controller.dart';
 import '../../../mock/utility/mock_service_locator.dart';
 
@@ -58,10 +59,7 @@ void main() {
         ),
       );
 
-      final redirectPath = await authRedirect(
-        _FakeBuildContext(),
-        requestedUri,
-      );
+      final redirectPath = await authRedirect(FakeBuildContext(), requestedUri);
 
       expect(redirectPath, isNull);
     });
@@ -69,10 +67,7 @@ void main() {
     test('should redirect to sign in when nobody is signed in', () async {
       getSignedInUserUseCase.stubCall(const Right(null));
 
-      final redirectPath = await authRedirect(
-        _FakeBuildContext(),
-        requestedUri,
-      );
+      final redirectPath = await authRedirect(FakeBuildContext(), requestedUri);
 
       expect(
         redirectPath,
@@ -85,10 +80,7 @@ void main() {
         const Left(GetSignedInUserUnknownFailure()),
       );
 
-      final redirectPath = await authRedirect(
-        _FakeBuildContext(),
-        requestedUri,
-      );
+      final redirectPath = await authRedirect(FakeBuildContext(), requestedUri);
 
       expect(
         redirectPath,
@@ -97,7 +89,5 @@ void main() {
     });
   });
 }
-
-class _FakeBuildContext extends Fake implements BuildContext {}
 
 FutureOr<String?> _noRedirect(BuildContext context, Uri requestedUri) => null;

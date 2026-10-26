@@ -1,27 +1,21 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/utility/app_bloc_observer.dart';
 
+import '../../mock/utility/mock_bloc.dart';
 import '../../mock/utility/mock_log_reporter.dart';
-
-class _MockBloc extends Mock implements BlocBase<int> {
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      'MockBloc';
-}
 
 void main() {
   group('AppBlocObserver', () {
     late AppBlocObserver observer;
     late MockLogReporter mockLogReporter;
-    late _MockBloc mockBloc;
+    late MockBloc mockBloc;
 
     setUp(() {
       mockLogReporter = MockLogReporter();
       observer = AppBlocObserver(mockLogReporter);
-      mockBloc = _MockBloc();
+      mockBloc = MockBloc();
     });
 
     test(
