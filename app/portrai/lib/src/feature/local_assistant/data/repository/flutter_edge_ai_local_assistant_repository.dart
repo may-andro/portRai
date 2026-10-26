@@ -315,10 +315,11 @@ class FlutterEdgeAiLocalAssistantRepository
     // The small model occasionally collapses into a repeated character on a
     // long prompt. Retry once with livelier sampling and a shorter context.
     var answer = '';
-    for (final (temperature, bytes) in [
+    final attempts = [
       (0.2, maxBytes),
       (0.7, maxBytes < 6000 ? maxBytes : 6000),
-    ]) {
+    ];
+    for (final (index, (temperature, bytes)) in attempts.indexed) {
       // A retry starts a fresh answer, so the abandoned text is withdrawn.
       if (answer.isNotEmpty) onPartialAnswer?.call('');
       final selectedContext = LocalAssistantContextSelector().select(
@@ -344,10 +345,22 @@ class FlutterEdgeAiLocalAssistantRepository
         ),
         selectedContext,
       );
+      final isDegenerate = _isDegenerate(answer);
       if (kDebugMode) {
-        debugPrint('[Assistant] Q: $question\n[Assistant] A: $answer');
+        // How often answers loop, and how, decides whether the sampling or
+        // the fact budget needs tuning.
+        final outcome = !isDegenerate
+            ? 'accepted'
+            : '${_repeatedRun.hasMatch(answer) ? 'repeated a character' : 'repeated a phrase'}, '
+                  '${index < attempts.length - 1 ? 'retrying' : 'giving up'}';
+        debugPrint(
+          '[Assistant] Q: $question\n[Assistant] A: $answer\n'
+          '[Assistant] Attempt ${index + 1} of ${attempts.length} '
+          '(temperature $temperature, '
+          '${utf8.encode(selectedContext).length} bytes of facts): $outcome',
+        );
       }
-      if (!_isDegenerate(answer)) break;
+      if (!isDegenerate) break;
     }
     if (answer.isEmpty || _isDegenerate(answer)) {
       throw StateError('The on-device model did not return a usable answer.');

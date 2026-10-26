@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -514,6 +515,32 @@ void main() {
 
       expect(answer, 'He is a Flutter developer.');
       expect(answers, isEmpty);
+    });
+
+    test('should log each attempt and why it was retried', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final answers = [
+        'Mayank Rai Mayank Rai Mayank Rai Mayank Rai Mayank Rai',
+        'He is a Flutter developer.',
+      ];
+      chat.stubStreamedAnswer(() => [answers.removeAt(0)]);
+      final logs = <String>[];
+      final originalDebugPrint = debugPrint;
+      debugPrint = (message, {wrapWidth}) => logs.add(message ?? '');
+      addTearDown(() => debugPrint = originalDebugPrint);
+
+      await repository.answer(
+        question: 'Who is he?',
+        portfolioContext: jsonEncode({
+          'profile': {'name': 'Mayank Rai'},
+        }),
+      );
+
+      expect(logs, hasLength(2));
+      expect(logs.first, contains('Attempt 1 of 2 (temperature 0.2, '));
+      expect(logs.first, endsWith('repeated a phrase, retrying'));
+      expect(logs.last, contains('Attempt 2 of 2 (temperature 0.7, '));
+      expect(logs.last, endsWith('accepted'));
     });
 
     test(
