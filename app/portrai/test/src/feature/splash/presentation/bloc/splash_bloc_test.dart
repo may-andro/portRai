@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
+import 'package:use_case/use_case.dart';
 
-import '../../../../../mock/feature/connectivity/domain/repository/mock_connectivity_repository.dart';
+import '../../../../../mock/feature/connectivity/domain/use_case/mock_check_internet_connection_use_case.dart';
 
 class _NoOpModuleConfigurator extends ModuleConfigurator {
   @override
@@ -52,18 +53,18 @@ class _FailingOnceModuleConfigurator extends _NoOpModuleConfigurator {
 
 void main() {
   group('SplashBloc', () {
-    late MockConnectivityRepository connectivityRepository;
+    late MockCheckInternetConnectionUseCase checkInternetConnectionUseCase;
 
     setUp(() {
-      connectivityRepository = MockConnectivityRepository()
-        ..stubIsConnected(true);
+      checkInternetConnectionUseCase = MockCheckInternetConnectionUseCase()
+        ..stubCall(const Right(true));
     });
 
     blocTest<SplashBloc, SplashState>(
       'should emit setup progress updates and completion when initialization succeeds',
       build: () => SplashBloc(ModuleInjectorController(), [
         _NoOpModuleConfigurator(),
-      ], connectivityRepository: connectivityRepository),
+      ], checkInternetConnectionUseCase: checkInternetConnectionUseCase),
       act: (bloc) => bloc.add(InitEvent()),
       expect: () => const [
         SetUpProgressState([InjectionStatus.start], 0.25),
@@ -85,7 +86,7 @@ void main() {
       'should emit an error state when initialization throws an injection exception',
       build: () => SplashBloc(ModuleInjectorController(), [
         _ThrowingRegisterModuleConfigurator(),
-      ], connectivityRepository: connectivityRepository),
+      ], checkInternetConnectionUseCase: checkInternetConnectionUseCase),
       act: (bloc) => bloc.add(InitEvent()),
       expect: () => const [
         SetUpProgressState([InjectionStatus.start], 0.25),
@@ -99,22 +100,22 @@ void main() {
 
     blocTest<SplashBloc, SplashState>(
       'should complete without checking the internet when set up succeeds',
-      setUp: () => connectivityRepository.stubIsConnected(false),
+      setUp: () => checkInternetConnectionUseCase.stubCall(const Right(false)),
       build: () => SplashBloc(ModuleInjectorController(), [
         _NoOpModuleConfigurator(),
-      ], connectivityRepository: connectivityRepository),
+      ], checkInternetConnectionUseCase: checkInternetConnectionUseCase),
       act: (bloc) => bloc.add(InitEvent()),
       skip: 4,
       expect: () => const [SetUpCompetedState(DesignSystem.hogmanay)],
-      verify: (_) => verifyNever(connectivityRepository.isConnected),
+      verify: (_) => verifyNever(checkInternetConnectionUseCase.call),
     );
 
     blocTest<SplashBloc, SplashState>(
       'should emit no internet state when set up fails without internet',
-      setUp: () => connectivityRepository.stubIsConnected(false),
+      setUp: () => checkInternetConnectionUseCase.stubCall(const Right(false)),
       build: () => SplashBloc(ModuleInjectorController(), [
         _ThrowingRegisterModuleConfigurator(),
-      ], connectivityRepository: connectivityRepository),
+      ], checkInternetConnectionUseCase: checkInternetConnectionUseCase),
       act: (bloc) => bloc.add(InitEvent()),
       expect: () => const [
         SetUpProgressState([InjectionStatus.start], 0.25),
@@ -131,12 +132,12 @@ void main() {
       'internet',
       build: () => SplashBloc(ModuleInjectorController(), [
         _FailingOnceModuleConfigurator(),
-      ], connectivityRepository: connectivityRepository),
+      ], checkInternetConnectionUseCase: checkInternetConnectionUseCase),
       act: (bloc) async {
-        connectivityRepository.stubIsConnected(false);
+        checkInternetConnectionUseCase.stubCall(const Right(false));
         bloc.add(InitEvent());
         await pumpEventQueue();
-        connectivityRepository.stubIsConnected(true);
+        checkInternetConnectionUseCase.stubCall(const Right(true));
         bloc.add(RetryClickEvent());
       },
       skip: 3,
@@ -160,10 +161,10 @@ void main() {
 
     blocTest<SplashBloc, SplashState>(
       'should initialize when retry is clicked and internet is back',
-      setUp: () => connectivityRepository.stubIsConnected(true),
+      setUp: () => checkInternetConnectionUseCase.stubCall(const Right(true)),
       build: () => SplashBloc(ModuleInjectorController(), [
         _NoOpModuleConfigurator(),
-      ], connectivityRepository: connectivityRepository),
+      ], checkInternetConnectionUseCase: checkInternetConnectionUseCase),
       seed: () => const SetUpNoInternetState(),
       act: (bloc) => bloc.add(RetryClickEvent()),
       expect: () => const [
