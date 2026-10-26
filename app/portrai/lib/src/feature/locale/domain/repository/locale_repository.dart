@@ -5,5 +5,8 @@ abstract class LocaleRepository {
 
   Future<AppLocale> get appLocale;
 
+  /// The locale in use: the start locale until [updateAppLocale] changes it.
+  AppLocale get currentAppLocale;
+
   Future<void> updateAppLocale(AppLocale appLocale);
 }

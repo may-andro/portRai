@@ -15,6 +15,13 @@ class LocaleModuleConfigurator extends SimpleModuleConfigurator {
   @override
   Future<void> postDependenciesSetup(ServiceLocator sl) async {
     final appLocale = sl.get<AppLocale>();
+    // The repository is built with the start locale, then serves the locale
+    // in use, so every later AppLocale lookup follows language changes.
+    final localeRepository = sl.get<LocaleRepository>();
+    sl.registerFactory<AppLocale>(
+      () => localeRepository.currentAppLocale,
+      shouldOverride: true,
+    );
     final appLocaleEither = await sl.get<GetLocaleUseCase>().call();
 
     if (appLocaleEither.isRight) {

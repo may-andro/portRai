@@ -1,7 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/locale/data/repository/locale_repository_impl.dart';
-import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../mock/feature/locale/data/cache/fake_app_locale_cache.dart';
 import '../../../../../mock/feature/locale/test_data/locale_test_data.dart';
@@ -12,18 +11,13 @@ void main() {
     late LocaleRepositoryImpl repository;
     late AppLocale fallbackLocale;
 
-    setUp(() async {
-      await appServiceLocator.reset();
+    setUp(() {
       fallbackLocale = createEnglishLocale();
       cache = FakeAppLocaleCache();
       repository = LocaleRepositoryImpl(fallbackLocale, cache);
-      appServiceLocator.registerSingleton<AppLocale>(() => fallbackLocale);
     });
 
-    tearDown(() async {
-      Intl.defaultLocale = null;
-      await appServiceLocator.reset();
-    });
+    tearDown(() => Intl.defaultLocale = null);
 
     test('should return the cached locale when one exists', () async {
       await cache.put(createDutchLocale());
@@ -31,6 +25,10 @@ void main() {
       final result = await repository.appLocale;
 
       expect(result, createDutchLocale());
+    });
+
+    test('should serve the start locale when nothing was updated', () {
+      expect(repository.currentAppLocale, fallbackLocale);
     });
 
     test('should return the fallback locale when the cache is empty', () async {
@@ -48,7 +46,7 @@ void main() {
         await repository.updateAppLocale(updatedLocale);
 
         expect(await cache.get(), updatedLocale);
-        expect(appServiceLocator.get<AppLocale>(), updatedLocale);
+        expect(repository.currentAppLocale, updatedLocale);
         expect(Intl.defaultLocale, updatedLocale.languageCode);
         expect(await streamValue, updatedLocale);
       },
