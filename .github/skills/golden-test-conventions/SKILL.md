@@ -4,9 +4,11 @@ description: Use when adding or updating a golden test for a design_system widge
 
 # Golden Test Conventions
 
-Golden tests live only in `layer/design_system/test/src/**` (component and
-theme tests), using the `alchemist` package via two shared helpers in
-`layer/design_system/test/util/alchemist_utils.dart`.
+Golden tests live only in `layer/design_system/test/src/**` (the component
+tests under `test/src/component/`), using the `alchemist` package via two
+shared helpers in `layer/design_system/test/util/alchemist_utils.dart`.
+`alchemist`'s `goldenTest` tags every test `golden`, so the melos scripts
+select them with `--tags golden`.
 
 ## Writing a golden test
 
@@ -39,7 +41,7 @@ void main() {
 }
 ```
 
-- The `(theme) => [...]` callback receives the current `DSTheme` for the
+- The `(theme) => [...]` callback receives the `DSTheme` for the
   design system/brightness combination being rendered — always source
   colors from `theme.colorPalette`, never hardcode a `Color`.
 - Add one `TestCase(description, widget)` per meaningful visual
@@ -55,20 +57,25 @@ Test file path mirrors the widget's `lib/src/...` path under
 `test/src/...` (e.g.
 `lib/src/component/atom/button/ds_icon_button_widget.dart` →
 `test/src/component/atom/button/ds_icon_button_widget_test.dart`), per
-`flutter-testing-conventions`. Golden PNGs are written to a sibling
-`goldens/<platform>/` folder and are checked into git — never manually
-edit or hand-craft a golden PNG.
+`flutter-testing-conventions`. Golden PNGs are written to sibling
+`goldens/macos/` (platform goldens) and `goldens/ci/` (alchemist's CI
+goldens, with text rendered as blocks) folders, shared by every test file in
+that directory, and are checked into git — never manually edit or
+hand-craft a golden PNG.
 
 ## CI behavior
 
 `test/flutter_test_config.dart` disables `PlatformGoldensConfig` when the
-`CI` Dart define is set, so golden **comparisons** only run locally
-(typically on macOS, matching the `runs-on: macos-latest` requirement
-called out in `ci-workflow-conventions` for this package) — CI still runs
-the tests but skips platform-specific pixel comparison. Regenerate goldens
-locally with alchemist's update mode after an intentional visual change,
-then commit the updated PNGs alongside the code change; don't regenerate
-speculatively.
+`CI` Dart define is set, so the `goldens/macos/` **comparisons** only run
+locally (on macOS). CI (`.github/workflows/design_system.yaml`, on
+`runs-on: macos-latest` as called out in `ci-workflow-conventions`) runs
+`flutter test --dart-define=CI=true`, which still compares against the
+`goldens/ci/` images. `melos run test_golden` runs the golden tests locally
+and `melos run test_golden_ci` runs them with the CI define; `melos run test`
+excludes the `golden` tag. Regenerate goldens locally with
+`melos run update_golden` (`flutter test --tags golden --update-goldens`)
+after an intentional visual change, then commit the updated PNGs alongside
+the code change; don't regenerate speculatively.
 
 ## Don't invent
 
@@ -76,8 +83,8 @@ Don't add a bespoke `goldenTest(...)` call bypassing `alchemist_utils.dart`
 for a `design_system` widget — the shared helpers guarantee every widget is
 checked against all design systems and both brightnesses consistently.
 Golden tests belong to `design_system` only; don't add golden testing to
-app feature widgets without discussing it first, since the app currently
-has none.
+app feature widgets without discussing it first, since the app has none
+(`app/portrai` doesn't depend on `alchemist`).
 
 ## Related skills
 
