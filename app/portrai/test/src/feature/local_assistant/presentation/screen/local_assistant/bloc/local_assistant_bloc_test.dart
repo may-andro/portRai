@@ -321,7 +321,33 @@ void main() {
       verify(() => isSupported()).called(1);
       verify(() => getContext()).called(1);
       verifyNever(() => resetSession());
+      verifyNever(() => prepare(any()));
     },
+  );
+
+  blocTest<LocalAssistantBloc, LocalAssistantState>(
+    'should load an installed model when started and enabled',
+    build: () {
+      final bloc = createBloc();
+      when(() => isDownloaded()).thenAnswer((_) => const Right(true));
+      when(() => getEnabled()).thenAnswer((_) => const Right(true));
+      return bloc;
+    },
+    act: (bloc) => bloc.add(const LocalAssistantStartedEvent()),
+    expect: () => [
+      const LocalAssistantState(isModelDownloaded: true),
+      const LocalAssistantState(
+        status: LocalAssistantReady(),
+        isModelDownloaded: true,
+      ),
+      const LocalAssistantState(
+        status: LocalAssistantReady(),
+        portfolioContext: 'Context',
+        isModelDownloaded: true,
+        isLoadingContext: false,
+      ),
+    ],
+    verify: (_) => verify(() => prepare(any())).called(1),
   );
 
   blocTest<LocalAssistantBloc, LocalAssistantState>(
