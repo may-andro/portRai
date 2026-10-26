@@ -174,7 +174,8 @@ that fits the data, and put each A2UI message in its own `json` code block. It a
 suggestion and map instructions only for the components that are registered. When the guest user
 has a saved role, it adds a fixed instruction: developers get projects, technologies and
 architecture first; recruiters get availability, experience, career history and contact first.
-A turn that ends with no text and no surface returns `RemoteAssistantIncompleteFailure`.
+A turn that ends with no text and no surface returns
+`AskRemotePortfolioQuestionIncompleteFailure`.
 
 ```mermaid
 flowchart LR

@@ -29,7 +29,8 @@ const _maxDescriptionCharacters = 8000;
 extension JobOpeningInsightsGenuiControllerExtension
     on AssistantGenuiController {
   /// Generates the insights for [jobOpening] into this controller's surfaces.
-  Future<Either<RemoteAssistantFailure, void>> sendJobOpeningInsightsRequest({
+  Future<Either<AskRemotePortfolioQuestionFailure, void>>
+  sendJobOpeningInsightsRequest({
     required AskRemotePortfolioQuestionUseCase
     askRemotePortfolioQuestionUseCase,
     required JobOpeningEntity jobOpening,
@@ -54,13 +55,13 @@ extension JobOpeningInsightsGenuiControllerExtension
       );
       if (result.isLeft) return result;
       if (activeSurfaceIds.isEmpty) {
-        return const Left(RemoteAssistantIncompleteFailure());
+        return const Left(AskRemotePortfolioQuestionIncompleteFailure());
       }
       return result;
     } on AssistantGenuiResponseException {
-      return const Left(RemoteAssistantIncompleteFailure());
+      return const Left(AskRemotePortfolioQuestionIncompleteFailure());
     } on AssistantGenuiTurnCancelledException {
-      return const Left(RemoteAssistantIncompleteFailure());
+      return const Left(AskRemotePortfolioQuestionIncompleteFailure());
     }
   }
 }

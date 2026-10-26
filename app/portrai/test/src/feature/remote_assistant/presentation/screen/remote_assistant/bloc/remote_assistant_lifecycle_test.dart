@@ -25,7 +25,8 @@ void main() {
         const TestWidgetWrapper(child: RemoteAssistantScreen()),
       );
       await tester.pumpAndSettle();
-      final completion = Completer<Either<RemoteAssistantFailure, void>>();
+      final completion =
+          Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
       late AskRemotePortfolioQuestionParams request;
       when(() => fixture.askRemote(any())).thenAnswer((invocation) {
         request =
@@ -92,7 +93,8 @@ void main() {
         final fixture = AssistantTestFixture();
         fixture.start();
         await pumpEventQueue();
-        final completion = Completer<Either<RemoteAssistantFailure, void>>();
+        final completion =
+            Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
         late AskRemotePortfolioQuestionParams request;
         when(() => fixture.askRemote(any())).thenAnswer((invocation) {
           request =

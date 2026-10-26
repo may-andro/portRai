@@ -1,7 +1,7 @@
 import 'package:firebase/firebase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/extension/remote_assistant_error_extension.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_portfolio_question_use_case.dart';
 import 'package:portrai/src/utility/log_use_case_interceptor.dart';
 
 import '../../mock/utility/mock_log_reporter.dart';
@@ -51,7 +51,10 @@ void main() {
             StackTrace.current,
             serviceMessage: details,
           );
-          final failure = exception.toRemoteAssistantFailure();
+          final failure = AskRemotePortfolioQuestionUnknownFailure(
+            cause: exception,
+            serviceMessage: exception.serviceMessage,
+          );
           interceptor.onError('RemoteUseCase', failure, null);
           final message =
               verify(

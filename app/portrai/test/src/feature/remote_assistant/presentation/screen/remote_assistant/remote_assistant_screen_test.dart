@@ -8,7 +8,6 @@ import 'package:genui/genui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/widget/content_widget.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
@@ -75,15 +74,20 @@ void main() {
           'should show localized fallback and only explicit service details when $path fails in ${locale.languageCode} with details=$serviceMessage',
           (tester) async {
             final failure = serviceMessage == null
-                ? AiSdkException(
-                    StateError('secret response and prompt'),
-                    StackTrace.current,
-                  ).toRemoteAssistantFailure()
-                : AiServerException(
-                    StateError('secret raw SDK body'),
-                    StackTrace.current,
+                ? AskRemotePortfolioQuestionUnknownFailure(
+                    cause: AiSdkException(
+                      StateError('secret response and prompt'),
+                      StackTrace.current,
+                    ),
+                  )
+                : AskRemotePortfolioQuestionUnknownFailure(
+                    cause: AiServerException(
+                      StateError('secret raw SDK body'),
+                      StackTrace.current,
+                      serviceMessage: serviceMessage,
+                    ),
                     serviceMessage: serviceMessage,
-                  ).toRemoteAssistantFailure();
+                  );
             final bloc = MockRemoteAssistantBloc()
               ..stubState(
                 RemoteAssistantState(
@@ -213,7 +217,8 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Cloud answer'), findsOneWidget);
-      final completion = Completer<Either<RemoteAssistantFailure, void>>();
+      final completion =
+          Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
       late AskRemotePortfolioQuestionParams request;
       when(() => fixture.askRemote(any())).thenAnswer((invocation) {
         request =

@@ -311,7 +311,8 @@ void main() {
     test('should show the failure when the insights cannot be '
         'generated', () async {
       when(() => askRemotePortfolioQuestionUseCase(any())).thenAnswer(
-        (_) => Future.value(const Left(RemoteAssistantQuotaFailure())),
+        (_) =>
+            Future.value(const Left(AskRemotePortfolioQuestionQuotaFailure())),
       );
       final bloc = buildBloc()
         ..emit(
@@ -330,7 +331,10 @@ void main() {
         (state) => state.insightsStatus == JobOpeningInsightsStatus.failed,
       );
 
-      expect(bloc.state.insightsFailure, const RemoteAssistantQuotaFailure());
+      expect(
+        bloc.state.insightsFailure,
+        const AskRemotePortfolioQuestionQuotaFailure(),
+      );
       expect(bloc.state.insightsController, isNull);
       expect(bloc.state.insightsSurfaceIds, isEmpty);
     });
@@ -357,7 +361,7 @@ void main() {
 
       expect(
         bloc.state.insightsFailure,
-        const RemoteAssistantIncompleteFailure(),
+        const AskRemotePortfolioQuestionIncompleteFailure(),
       );
     });
 
@@ -383,12 +387,16 @@ void main() {
         (state) => state.insightsStatus == JobOpeningInsightsStatus.failed,
       );
 
-      expect(bloc.state.insightsFailure, const GetAssistantContextUnknownFailure());
+      expect(
+        bloc.state.insightsFailure,
+        const GetAssistantContextUnknownFailure(),
+      );
       verifyNever(() => askRemotePortfolioQuestionUseCase(any()));
     });
 
     test('should cancel the request when closed while generating', () async {
-      final answer = Completer<Either<RemoteAssistantFailure, void>>();
+      final answer =
+          Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
       when(
         () => askRemotePortfolioQuestionUseCase(any()),
       ).thenAnswer((_) => answer.future);
