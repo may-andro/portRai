@@ -1,32 +1,35 @@
 # Design System
 
-A scalable, multi-theme design system for Flutter built on atomic design (atoms → molecules →
-organisms), fully golden-tested across all 12 built-in themes in both light and dark mode.
+Themed Flutter widgets organized as atoms, molecules and organisms, plus the color, dimension and
+typography tokens of 12 design systems, each with a light and a dark palette.
 
 ## Features
 
-- Atomic-design component layers for atoms, molecules, and organisms
-- 12 built-in themes with light and dark brightness variants
-- Shared foundation APIs for colour, spacing, radius, elevation, and typography
-- Responsive helpers exposed through `BuildContext`
-- Generated asset helpers for branded imagery
-- Comprehensive golden-test coverage for the component library
+- Atom, molecule and organism widgets, all prefixed `DS`
+- 12 design systems, each with light and dark color palettes, typography and dimensions
+- `BuildContext` extensions for theme tokens, responsive spacing and breakpoints
+- Lottie-based animated icons and illustrations recolored from the active theme
+- Golden tests for the widgets across every design system and both brightnesses
 
 ## Getting Started
 
 ### Installation
 
+The package is part of the workspace:
+
 ```yaml
 dependencies:
-  design_system:
-    path: layer/design_system
+  design_system: any
 ```
 
 ```dart
 import 'package:design_system/design_system.dart';
 ```
 
-The top-level `design_system.dart` re-exports everything.
+`design_system.dart` exports every component, the `DesignSystem` enum, the foundation tokens,
+the theme classes, the `BuildContext` extensions and `package:flutter_animate`.
+
+The layer has no `ModuleConfigurator`.
 
 ## Usage
 
@@ -34,54 +37,67 @@ The top-level `design_system.dart` re-exports everything.
 
 ```dart
 DSThemeBuilderWidget(
-  brightness: Brightness.light,
   designSystem: DesignSystem.sakura,
-  child: MyWidget(),
+  brightness: Brightness.light,
+  child: child,
 )
 ```
+
+`DSThemeBuilderWidget` provides the `DSTheme` to its subtree, applies a Material 3 `ThemeData`
+whose `ColorScheme` is built from the active palette, and clamps text scaling between 0.75 and
+1.5.
 
 ### Reading Theme Values from `BuildContext`
 
 ```dart
-// Colour
-context.colorPalette.brand.primary.color
+context.theme                        // DSTheme
+context.colorPalette.brand.primary   // DSColor; .color gives the Flutter Color
+context.typography.titleLarge        // DSTextStyle
+context.dimen.radiusLevel2           // DSRadius
 
-// Typography
-context.typography.titleLarge
-
-// Spacing (responsive — grows on tablet/desktop)
+// factor * (grid + 0 on mobile, 4 on tablet, 8 on desktop) * text scale
 context.space(factor: 2)
 
-// Responsive breakpoint
-context.deviceResolution   // mobile | tablet | desktop
+context.deviceResolution             // DSDeviceResolution.mobile | tablet | desktop
 context.isDesktop
+context.screenHorizontalPadding      // space(3) mobile, space(5) tablet, 15% of width desktop
+context.showSnackBar(snackBar: const DSSnackBar(message: 'Saved', type: DSSnackBarType.success));
 ```
 
-### Responsive `screenHorizontalPadding`
+### Using Components
 
 ```dart
-// Returns EdgeInsets adjusted for the current breakpoint
-context.screenHorizontalPadding
+DSButtonWidget(
+  label: 'Continue',
+  onPressed: onContinue,
+  variant: DSButtonVariant.secondary,
+  size: DSButtonSize.medium,
+)
+
+DSTextWidget(
+  'Title',
+  color: context.colorPalette.surface.onSurface,
+  style: context.typography.titleLarge,
+)
 ```
 
 ## Key Concepts
 
 ### Architecture
 
-The design system is structured around atomic design:
-
 ```text
-lib/src/component/
-├── atom/          # Indivisible building blocks (Button, Text, Icon, Card …)
-├── molecule/      # Composed atoms forming a focused pattern (TabItem, Tag, SnackBar …)
-└── organism/      # Full sections assembled from molecules (Dialog, ErrorCard, Carousel …)
+lib/src/
+├── component/
+│   ├── atom/        # Single-purpose widgets (button, text, icon, card, Lottie, ...)
+│   ├── molecule/    # Widgets composed of atoms (app bar, tag, text field, ...)
+│   └── organism/    # Larger compositions (dialog, error card, carousel, ...)
+├── design_system/   # One folder per DesignSystem value: color, dimen, typography
+├── extension/       # BuildContext and DSColorPalette extensions
+├── foundation/      # Token types: color, dimen, typography
+└── theme/           # DSTheme and DSThemeBuilderWidget
 ```
 
-Each layer exports a single barrel file (`atom.dart`, `molecule.dart`, `organism.dart`).
-
-```dart
-import 'package:design_system/design_system.dart';
-```
+Each component level has a barrel file (`atom.dart`, `molecule.dart`, `organism.dart`).
 
 ### Components
 
@@ -89,204 +105,170 @@ import 'package:design_system/design_system.dart';
 
 | Widget | Description |
 |--------|-------------|
-| `DSButtonWidget` | Primary, secondary, error, text variants · 4 sizes · icon support · loading/disabled |
-| `DSIconButtonWidget` | Icon-only button with 3 sizes and elevation support |
-| `DSTextWidget` | Themed text with full typography scale, italic, decoration, truncation |
-| `DSIconWidget` | Themed icon with `small / medium / large` sizes |
-| `DSCardWidget` | Rounded, elevated card with optional tap, custom radius, opacity |
-| `DSHorizontalDividerWidget` | Horizontal rule with configurable thickness and colour |
-| `DSVerticalDividerWidget` | Vertical rule with configurable thickness and colour |
-| `DSLoadingWidget` | Animated staggered-dots loading indicator |
-| `DSResponsiveContainerWidget` | Builder that switches on `mobile / tablet / desktop` |
-| `DSVisibilityDetectorWidget` | Fires a callback when the widget enters/leaves the viewport |
-| `DSOffscreenPauseWidget` | Pauses the animations below it while none of it is on screen |
+| `DSButtonWidget` | Button with `primary`, `secondary`, `error` and `text` variants, `regular` or `rounded` border, 4 sizes (`extraSmall` to `large`), optional icon, loading and disabled states |
+| `DSIconButtonWidget` | Icon-only button with 3 sizes, optional elevation and loading state |
+| `DSTextWidget` | Text in a `DSTextStyle` and `DSColor`, with italic, decoration, alignment and overflow options |
+| `DSIconWidget` | Icon in `small`, `medium` or `large` size |
+| `DSCardWidget` | Card with optional tap, radius, elevation, margin and background opacity |
+| `DSHorizontalDividerWidget` | Horizontal divider with a thickness and color |
+| `DSVerticalDividerWidget` | Vertical divider with a thickness and color |
+| `DSHorizontalSpacerWidget` | Horizontal gap of `context.space(factor: factor)` |
+| `DSVerticalSpacerWidget` | Vertical gap of `context.space(factor: factor)` |
+| `DSLoadingWidget` | Loading indicator: staggered dots (`DSLoadingStyle.dots`) or a recolored Lottie loader (`DSLoadingStyle.lottie`) |
+| `DSResponsiveContainerWidget` | Builds a different child for mobile, tablet and desktop |
+| `DSResponsiveWidthContainerWidget` | Builds a different child for the `xs`, `s`, `m`, `l` and `xl` window widths |
+| `DSVisibilityDetectorWidget` | Calls back when the child's visibility in the viewport changes |
+| `DSOffscreenPauseWidget` | Pauses the child's animations while none of it is on screen |
+| `DSCircularLogoWidget` | The bundled logo in a circle, with `white` and `black` variants |
+| `DSImage` | Static accessors for the bundled `logo` and `avatar` images |
+| `DSLottieWidget` | Plays a bundled Lottie asset once visible, with color overrides |
+| `DSLottieIconWidget` | Animated icon from `DSLottieIcon`, recolored to one color |
+| `DSLottieIllustrationWidget` | Animated scene from `DSLottieIllustration`, recolored from the theme |
+| `DSLottieBackgroundWidget` | Faded, optionally greyscale illustration that fills its parent |
+| `DSLottieDataWidget` | Plays a Lottie animation given as JSON bytes |
+| `DSBrandIconWidget` | Animated brand icon from `DSBrandIcon`, in the theme's brand colors |
+| `DSBrandIconButtonWidget` | Circular button showing an animated brand icon |
 
 #### Molecules
 
 | Widget | Description |
 |--------|-------------|
-| `DSAppBarWidget` | Branded app bar with optional back button and action slots |
-| `DSDetailSectionWidget` | Titled section header above arbitrary child content |
-| `DSExpandableCardWidget` | Animated collapsible card with chevron header |
-| `DSFestiveBackdropWidget` | Animated, painted backdrop that follows the active festive design system (circle or rectangle) |
-| `DSGradientBlobWidget` | Pulsating radial-gradient decorative blob |
-| `DSHoverableContainerWidget` | `MouseRegion` builder exposing hover state |
-| `DSInfoChipWidget` | Icon + label pill using secondary container colours |
-| `DSLabeledInfoRowWidget` | Icon-in-circle, label/value row, optional tappable chevron |
-| `DSPositionIndicatorWidget` | Scrollable dot-row position indicator |
-| `DSQuoteTextWidget` | `❝` glyph + capped body text for blockquotes |
-| `DSSnackBar` | Data class → `SnackBar`; success / error / info colour variants |
-| `DSTabItemWidget` | Animated navigation tab with selected/hover underline |
-| `DSTagWidget` | Rounded skill/category badge in primary-container colours |
-| `DSTextFieldWidget` | Full-featured text field; normal / password types, validation states |
-| `DSTitleDescriptionWidget` | Fixed-height title + description pair for grids and cards |
-| `DSNetworkImageWidget` | Cached network image, decoded at the size it is shown, with auto-retry on reconnect |
+| `DSAppBarWidget` | App bar with the animated logo, optional back button and actions |
+| `DSArchPortraitWidget` | Arched frame whose child can rise above the arch |
+| `DSAvailabilityBadgeWidget` | Pill badge with a pulsing status dot |
+| `DSAvatarNameWidget` | Circular network image next to a caption and a name |
+| `DSDetailSectionWidget` | Title above arbitrary child content |
+| `DSExpandableCardWidget` | Card that expands and collapses its content on tap |
+| `DSFestiveBackdropWidget` | Animated circular or rectangular backdrop whose effect follows the active design system |
+| `DSFloatingShapesBackgroundWidget` | Background of drifting rings, dots, plus signs and diamonds |
+| `DSGradientBlobWidget` | Pulsing radial-gradient blob |
+| `DSHoverableContainerWidget` | Builder that receives the hover state |
+| `DSIconInfoTileWidget` | Gradient tile with an icon badge, a label and a value |
+| `DSInfoChipWidget` | Icon and label pill in the secondary container colors |
+| `DSLabeledInfoRowWidget` | Icon in a circle, label and value, with a chevron when tappable |
+| `DSNetworkImageWidget` | Cached network image, decoded at its displayed size, that retries after the device reconnects |
+| `DSPositionIndicatorWidget` | Row of dots marking the current index |
+| `DSQuoteTextWidget` | Quote glyph followed by text capped at `maxLines` |
+| `DSSkillCardWidget` | Card with an animated progress meter that highlights on hover |
+| `DSSnackBar` | Data class converted to a `SnackBar`, with `success`, `error` and `info` types |
+| `DSSpotlightCardWidget` | Tappable card with a corner glow that grows on hover |
+| `DSTabItemWidget` | Tab label with selected and hover underlines |
+| `DSTagWidget` | Rounded label in the primary container colors |
+| `DSTextFieldWidget` | Text field with `normal` and `password` types and error, success and helper messages |
+| `DSTitleDescriptionWidget` | Title and description with fixed line counts |
 
 #### Organisms
 
 | Widget | Description |
 |--------|-------------|
-| `DSBulletPointListWidget` | Vertically stacked bullet-point list |
-| `DSCarousalWidget` | Carousel slider wrapping `carousel_slider` |
-| `DSDialogWidget` | Themed, rounded modal dialog with responsive sizing |
-| `DSErrorCardWidget` | Error state card with icon, title, message, and optional retry button (title and retry label are overridable for translation) |
-| `DSSectionContainerWidget` | Visibility-triggered section with animated title, background theming, and responsive padding |
-| `DSStaggeredGridWidget` | Masonry grid layout via `flutter_staggered_grid_view` |
+| `DSBulletPointListWidget` | List of bullet points |
+| `DSCarousalWidget` | Carousel built on `carousel_slider` |
+| `DSDialogWidget` | Rounded dialog with an optional maximum width |
+| `DSErrorCardWidget` | Error icon, title, message and optional retry button; title and retry label can be replaced |
+| `DSSectionContainerWidget` | Section with a surface or inverse background, an optional animated title and action, entry animations on visibility and responsive padding |
+| `DSStaggeredGridWidget` | Masonry grid built on `flutter_staggered_grid_view` |
 
 ### Theming
 
-The design system ships 12 built-in themes, each with its own colour palette, typography, and
-spacing:
+`DesignSystem` has 12 values:
 
-| Theme | Inspiration |
-|-------|-------------|
-| `beltane` | Celtic spring festival |
-| `carnival` | Brazilian carnival |
-| `chuseok` | Korean harvest festival |
-| `diwali` | Hindu festival of lights |
-| `halloween` | Gothic Halloween |
-| `hogeras` | Mediterranean coastal |
-| `hogmanay` | Scottish New Year |
-| `holi` | Indian festival of colours |
-| `obon` | Japanese lantern festival |
-| `pachamama` | Andean earth festival |
-| `sakura` | Japanese cherry blossom |
-| `xmas` | Christmas |
+`beltane`, `carnival`, `chuseok`, `diwali`, `halloween`, `hogeras`, `hogmanay`, `holi`, `obon`,
+`pachamama`, `sakura`, `xmas`
 
-Each theme is available in light and dark brightness.
+Each value has a light and a dark `DSColorPalette`, a `DSTypography` and a `DSDimen` under
+`lib/src/design_system/<name>/`. A `DSTheme` combines one `DesignSystem` with one `Brightness`.
 
 ### Foundation
 
-```text
-lib/src/foundation/
-├── color/        # DSColor, DSColorPalette
-├── dimen/        # DSRadius, DSElevation, DSGrid, DSDimen
-└── typography/   # DSTextStyle, DSTypography
-```
+| Type | Contents |
+|------|----------|
+| `DSColor` | A color token; `.color` returns the Flutter `Color` |
+| `DSColorPalette` | `brand`, `semantic`, `neutral`, `surface`, `outline` and `utility` color schemes |
+| `DSTypography` | `display`, `headline`, `title`, `body` and `label` styles in large, medium and small, each with an `emphasized` variant |
+| `DSDimen` | Radius levels 1-3 and circular, elevation none and levels 1-3, and the spacing grid |
 
-Access via `context.colorPalette`, `context.dimen`, `context.typography`.
+`DsColorRolesExtension` on `DSColorPalette` adds role names such as `primaryAction`, `textPrimary`,
+`border` and `error`.
 
-### Assets
+### Animated Icons and Illustrations
 
-```dart
-DSImage.logo()          // branded logo widget
-DSImage.logoPath        // asset path (for Image.asset)
-```
+`DSLottieWidget` and the widgets built on it start playing when at least 50% of the widget is
+visible (`visibilityThreshold`). `playback` takes a `DSLottiePlayback`:
 
-### Animated Brand Icons
-
-Lottie animations start when they are at least 50% visible and are recolored with the active
-theme's brand colors. `playback` is `DSLottiePlayback.once` (default, plays a single time) or
-`DSLottiePlayback.loop` (loops while visible, pauses when scrolled away). Asset accessors are
-generated by flutter_gen (`Assets.lottie.*`) via `dart run build_runner build`.
+- `once`: plays a single time, the first time it becomes visible
+- `loop`: loops while visible and pauses when scrolled out of view
+- `trigger`: stays on the first frame and plays once each time `trigger` changes
 
 ```dart
 DSBrandIconWidget(brand: DSBrandIcon.linkedin, size: 24)
 DSBrandIconWidget(brand: DSBrandIcon.linkedin, size: 24, playback: DSLottiePlayback.loop)
-DSBrandIcon.fromName('GitHub')   // null when the brand has no animation
-DSBrandIcon.resume, DSBrandIcon.website   // generic marks on the same brand circle
+DSBrandIcon.fromName('GitHub') // null when no brand icon has that name
+
+DSLottieIconWidget(
+  icon: DSLottieIcon.paperPlane,
+  size: 24,
+  color: Colors.white,
+  playback: DSLottiePlayback.trigger,
+  trigger: sendCount,
+)
+
+DSLottieIllustrationWidget(illustration: DSLottieIllustration.contactUs, width: 200)
+DSLottieBackgroundWidget(illustration: DSLottieIllustration.heroOrbs)
+DSLoadingWidget(size: 24, style: DSLoadingStyle.lottie)
 ```
 
-To add a brand (App Store, Play Store, ...): put the Lottie JSON in `assets/lottie/`, run
-build_runner, and add a `DSBrandIcon` value with its theme color overrides
-(layer key paths such as `['circle behind Logo', '**', 'Fill 1']`).
+`DSBrandIconWidget` paints the brand circle with `brand.primary` and the mark with
+`brand.onPrimary` unless `color` and `onColor` are given. `DSLottieIllustrationWidget` recolors
+the scenes that have a theme mapping (`useThemeColors`, on by default); `colorOverrides` apply on
+top.
 
-Other Lottie atoms:
-
-```dart
-DSLottieIconWidget(icon: DSLottieIcon.medal, size: 32, color: Colors.white, playback: DSLottiePlayback.loop)
-// Replays each time `trigger` changes (e.g. a send button)
-DSLottieIconWidget(icon: DSLottieIcon.paperPlane, playback: DSLottiePlayback.trigger, trigger: sendCount)
-DSLottieIllustrationWidget(illustration: DSLottieIllustration.contactUs)
-// Role scenes: developerRole, recruiterRole (header recolored with the brand) and explorerRole
-// techStack: a workstation scene with the stack badges
-// computerWindow: a browser window going from wireframe to code to finished UI
-// talentSearch: a profile card being picked out of a candidate search
-// signIn: a phone showing a profile card, with turning gears beside it
-// binoculars: a person looking out through binoculars
-DSLottieIllustrationWidget(illustration: DSLottieIllustration.recruiterRole, width: 200)
-DSLottieBackgroundWidget(illustration: DSLottieIllustration.heroOrbs, colorOverrides: [...])
-DSLoadingWidget(style: DSLoadingStyle.lottie)
-```
-
-## Platform Support
-
-| Platform | Supported |
-|----------|-----------|
-| Android  | Yes |
-| iOS      | Yes |
-| Web      | Yes |
-| macOS    | Yes |
+To add a brand icon: put the Lottie JSON in `assets/lottie/`, regenerate the asset accessors with
+`dart run build_runner build` (flutter_gen writes `lib/assets/assets.gen.dart`), and add a
+`DSBrandIcon` value with its asset and color overrides, given as layer key paths such as
+`['circle behind Logo', '**', 'Fill 1']`.
 
 ## Dependencies
 
 | Package | Purpose |
 |---------|---------|
-| `core` | Workspace utilities |
-| `flutter_animate` | Animation primitives |
-| `carousel_slider` | Carousel organism |
-| `extended_image` | Cached network images |
-| `flutter_staggered_grid_view` | Masonry grid organism |
-| `loading_animation_widget` | Loading dots atom |
-| `lottie` | Animated brand icons |
-| `visibility_detector` | Viewport visibility callbacks |
-| `adaptive_breakpoints` | Responsive breakpoint detection |
+| `flutter_animate` | Animations; re-exported by `design_system.dart` |
+| `adaptive_breakpoints` | Window size classes behind `deviceResolution` and `deviceWidth` |
+| `lottie` | Lottie icons, illustrations and loader |
+| `loading_animation_widget` | Staggered-dots loading indicator |
+| `visibility_detector` | Visibility callbacks for `DSVisibilityDetectorWidget` and Lottie playback |
+| `extended_image` | Image caching for `DSNetworkImageWidget` |
+| `connectivity_plus` | Reconnect detection for `DSNetworkImageWidget` |
+| `carousel_slider` | `DSCarousalWidget` |
+| `flutter_staggered_grid_view` | `DSStaggeredGridWidget` |
+| `alchemist` | Golden tests |
+
+`flutter_gen_runner` and `build_runner` (dev dependencies) generate the asset accessors.
 
 ## Testing
 
-Golden tests use **[alchemist](https://pub.dev/packages/alchemist)** and cover every component
-across all 12 themes × 2 brightnesses × 2 variants (macOS + CI).
-
-```text
-test/src/component/
-├── atom/
-│   ├── button/    ds_button_widget_test.dart
-│   │              ds_icon_button_widget_test.dart
-│   ├── container/ ds_card_widget_test.dart
-│   ├── divider/   ds_horizontal_divider_widget_test.dart
-│   │              ds_vertical_divider_widget_test.dart
-│   ├── icon/      ds_icon_widget_test.dart
-│   ├── loading/   ds_loading_widget_test.dart
-│   └── text/      ds_text_widget_test.dart
-├── molecule/
-│   ├── ds_app_bar_widget_test.dart
-│   ├── ds_detail_section_widget_test.dart
-│   ├── ds_expandable_card_widget_test.dart
-│   ├── ds_gradient_blob_widget_test.dart
-│   ├── ds_info_chip_widget_test.dart
-│   ├── ds_labeled_info_row_widget_test.dart
-│   ├── ds_position_indicator_widget_test.dart
-│   ├── ds_quote_text_widget_test.dart
-│   ├── ds_snack_bar_widget_test.dart
-│   ├── ds_tab_item_widget_test.dart
-│   ├── ds_tag_widget_test.dart
-│   ├── ds_text_field_widget_test.dart
-│   └── ds_title_description_widget_test.dart
-└── organism/
-    ├── ds_bullet_point_list_widget_test.dart
-    ├── ds_carousal_widget_test.dart
-    ├── ds_dialog_widget_test.dart
-    ├── ds_error_card_widget_test.dart
-    └── ds_staggered_grid_widget_test.dart
-```
-
-Update golden baselines:
+Run the non-golden tests:
 
 ```bash
-# From workspace root (via melos)
-melos update_golden
-
-# Or directly
-cd layer/design_system
-flutter test --update-goldens
+melos run test --scope=design_system
 ```
 
-Run golden comparison (CI mode):
+Golden tests use [alchemist](https://pub.dev/packages/alchemist) through
+`groupGoldenForBrightnessAndDS` in `test/util/alchemist_utils.dart`, which renders each test case
+for every `DesignSystem` value in light and dark. Golden files are stored under each test
+folder's `goldens/macos/` and `goldens/ci/`. With `--dart-define=CI=true`,
+`test/flutter_test_config.dart` turns off the platform (macOS) golden comparison.
 
 ```bash
-flutter test --dart-define=CI=true
+melos run test_golden --scope=design_system      # compare goldens
+melos run test_golden_ci --scope=design_system   # compare with CI=true
+melos run update_golden --scope=design_system    # regenerate goldens
 ```
 
-> **Not covered by goldens:** `DSNetworkImageWidget` (requires `connectivity_plus` native plugin)
-> and `DSSectionContainerWidget` (async `VisibilityDetector` timers incompatible with
-> `pumpAndSettle`).
+Or from `layer/design_system`:
+
+```bash
+flutter test --tags golden
+flutter test --tags golden --update-goldens
+```
+
+The test helpers under `test/util/` are not exported.
