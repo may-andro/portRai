@@ -68,7 +68,7 @@ Foundation Layers (design_system, core, module_injector)
 
 ### Apps
 
-- **[portrai](app/portrai/README.md)**: Portfolio app for Android, iOS, web and macOS
+- **[portrai](app/portrai/README.md)**: Portfolio app for Android, iOS and web
 - **[storybook](app/storybook/README.md)**: Component library and design system documentation
 
 ### Layers

@@ -1,8 +1,8 @@
 # Port-Rai
 
 A Flutter portfolio app that presents a profile, experience, expertise, projects, services and
-testimonials, with optional on-device and cloud AI assistants. It runs on Android, iOS, web and
-macOS and is built on the workspace's shared `layer/*` packages (see the
+testimonials, with optional on-device and cloud AI assistants. It runs on Android, iOS and web
+and is built on the workspace's shared `layer/*` packages (see the
 [root README](../../README.md) for the full architecture).
 
 ## Features
@@ -159,7 +159,7 @@ becomes visible and before each request, without subscriptions or polling.
 
 ### Local Assistant
 
-The on-device assistant is off by default and is supported on every platform except web. The AI
+The on-device assistant is off by default and runs on Android and iOS. The AI
 section in Settings explains that it runs on the device and downloads the model only after the
 user agrees, showing progress and a cancel button. The model is the revision-pinned
 `litert-community/gemma-4-E2B-it-litert-lm` LiteRT-LM bundle. Cancelling deletes the partial
@@ -293,10 +293,10 @@ again. Choosing the current month's theme clears the saved choice.
 | -------- | --------- | ------------------------- |
 | Android  | API 30    |                           |
 | iOS      | 15.0      |                           |
-| macOS    | 12.0      | No remote assistant       |
 | Web      | -         | No on-device assistant    |
 
-Push notifications are delivered on Android and iOS only.
+Push notifications are delivered on Android and iOS only. The project has a macOS runner, but
+`lib/firebase_options.dart` has no macOS configuration, so the app does not start on macOS.
 
 ## Development
 
