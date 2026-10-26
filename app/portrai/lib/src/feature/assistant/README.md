@@ -249,8 +249,8 @@ The full design, token budget and caveats are in the
   the selected facts replaced with "(no link listed in the portfolio)". An answer that loops on a
   character or phrase is generated once more with a higher temperature and at most 6,000 bytes of
   facts.
-- Clear chat and turning the assistant off invalidate pending output and clear follow-up context;
-  native generation is not cancelled. A question asked while an earlier generation is still
+- Clear chat and turning the assistant off stop the answer being generated, invalidate pending
+  output and clear follow-up context. A question asked while an earlier generation is still
   running returns `AskLocalPortfolioQuestionBusyFailure`.
 - The chat toolbar has a clear-chat button and an information dialog about on-device processing.
 

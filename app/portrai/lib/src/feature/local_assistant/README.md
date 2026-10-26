@@ -153,8 +153,8 @@ factBudget     = min(availableBytes, 10000)
   "(no link listed in the portfolio)".
 - **One question at a time.** A question asked while an earlier generation runs returns
   `AskLocalPortfolioQuestionBusyFailure`.
-- **No native cancellation.** Clear chat and turning the assistant off discard pending output and
-  the follow-up context, but the native generation runs until it finishes.
+- **Stopping.** Clear chat and turning the assistant off stop the answer being generated and
+  discard the follow-up context. Clear chat lets a model load in progress finish and keeps it.
 - **First question latency.** An installed model starts loading when the chat opens. A question
   the model has to answer before the load finishes waits for it.
 - **Memory while the chat is open.** Opening the chat loads the model even when every question is

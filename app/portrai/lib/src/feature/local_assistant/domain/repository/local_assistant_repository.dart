@@ -31,8 +31,8 @@ abstract interface class LocalAssistantRepository {
     void Function(String partialAnswer)? onPartialAnswer,
   });
 
-  /// Invalidates pending results and clears follow-up context. Native generation
-  /// may continue; this does not guarantee cancellation of native work.
+  /// Stops the answer being generated, invalidates pending results and clears
+  /// follow-up context. A model load in progress continues and is kept.
   Future<void> resetSession();
 
   Future<void> dispose();
