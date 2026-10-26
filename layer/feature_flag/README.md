@@ -123,7 +123,7 @@ try {
 `reset` clears the in-memory flags, deletes all cached flags (including overrides) when the cache
 is enabled, and calls `initFeatureFlags` again with the definitions from the previous call.
 
-## Key Concepts
+## API Reference
 
 ### Data Source Chain
 
@@ -160,8 +160,6 @@ These data source classes and `FeatureFlagCache` are internal; only the classes 
 
 A flag is not declared as remote or local. The same `FeatureFlagDefinition` resolves to a remote
 flag once its key is added to Remote Config, and to its default value while the key is absent.
-
-## API Reference
 
 ### FeatureFlagController
 
