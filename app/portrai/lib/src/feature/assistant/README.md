@@ -1,165 +1,187 @@
 # Portfolio Assistant
 
-The `assistant` feature provides provider-neutral message and response entities,
-portfolio context generation, and the callback-driven conversation widget.
-It does not import either provider, resolve their blocs, or select an inference engine.
+The `assistant` feature is the shared base of the two portfolio assistants. It provides
+provider-neutral message and response entities, portfolio context generation, the
+callback-driven conversation widget and the read-only generative UI catalog. It imports neither
+`local_assistant` (on-device inference) nor `remote_assistant` (Firebase AI), and neither of those
+imports the other. The `job_opening` feature also uses `AssistantGenuiController` with
+`AskRemotePortfolioQuestionUseCase` for its insights.
 
 ## Features
 
-- Portfolio-only context assembled by `GetAssistantContextUseCase`, including computed
-  career overview, record digests, profile, experiences, projects, expertise, services
-  and testimonials.
-- Typed text responses and shared suggestions, message bubbles and chat input.
-- Provisional streamed responses supplied by the caller, without provider-specific state.
-- A read-only GenUI catalog of design-system components for structured answers.
+- `AssistantMessageEntity` (`content`, `isUser`) and the sealed `AssistantResponseEntity`, whose
+  only subtype is `AssistantTextResponseEntity` (`text`).
+- `GetAssistantContextUseCase` builds the portfolio context as one JSON string from
+  `GetPortfolioUseCase`. A portfolio that fails to load returns `UnknownAssistantFailure`.
+- `AssistantConversationWidget` renders a conversation without owning a provider or lifecycle:
+  starter suggestions before the first message, message bubbles, a loading indicator while a
+  question is sent, an optional header and error text, and the text input. The caller supplies
+  the messages, `onSubmit`, optional `suggestions` and an optional `messageContentBuilder` that
+  replaces a bubble's text.
+- `createAssistantCatalog()` and `AssistantGenuiController`, which render structured answers
+  with design-system components (see [Generative UI](#generative-ui)).
+- `assistantUrlsFrom`, `assistantContactLinksFrom` and `assistantLocationsFrom`, which collect
+  the links and coordinates in the portfolio context that a generated answer may use.
 
-## Getting Started
+## Key Concepts
 
-Register `AssistantModuleConfigurator` before the provider configurators. Import
-`assistant.dart` from consumers, not private feature barrels.
+### Modules
 
-The app registers independent `local_assistant` and `remote_assistant` modules.
-Both consume this API; neither provider imports the other.
+`AssistantModuleConfigurator`, `LocalAssistantModuleConfigurator` and
+`RemoteAssistantModuleConfigurator` are registered in that order. Consumers import the public
+barrels `assistant.dart`, `local_assistant.dart` and `remote_assistant.dart`.
 
-## Usage
+Each provider keeps its bloc, events and states internal. `LocalAssistantBloc` and
+`RemoteAssistantBloc` are singletons, and their screens use `ScreenScaffoldWidget` with
+`isRetained: true`, so each conversation survives navigation. The two conversations are
+independent: there is no fallback, chooser or history transfer between them.
 
-The portfolio's `AssistantLauncherWidget` composes discovery:
+| Module             | Public API used by other features                                                                                                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `local_assistant`  | `LocalAssistantFeatureFlags`, `IsLocalAssistantSupportedUseCase`, `LocalAssistantScreen`, `LocalAssistantCardWidget`, `LocalAssistantVisibilityWidget` |
+| `remote_assistant` | `RemoteAssistantFeatureFlags`, `IsRemoteAssistantSupportedUseCase`, `AskRemotePortfolioQuestionUseCase`, `RemoteAssistantScreen`                  |
 
-| Local rollout | Cloud rollout | Offered |
-|---------------|---------------|----------------------------------|
-| Off | Off | No launcher |
-| On | Off | On-device setup/chat directly |
-| Off | On | Cloud chat directly |
-| On | On | Cloud chat directly, never local fallback |
+### Entry points
 
-Offering a provider does not require local user enablement or model readiness.
-The rollout enabler maintains mutually exclusive flags. If both are on, cloud takes
-priority based on its flag alone, even if unsupported or in error.
-The app never rewrites flags or preferences to enforce exclusivity. On-device is hidden
-on web; cloud discovery depends only on its flag. Firebase generation supports configured
-Android, iOS and web apps; unsupported platforms show an unavailable message inside cloud chat
-rather than hiding its entry or exposing the other chat.
+The portfolio and Settings blocs read the rollout flags through `IsFeatureEnabledUseCase` when
+the screen loads and whenever it becomes visible again. The remote flag is checked first:
 
-Settings exposes only local model management during local-only rollout. Remote chat entry
-appears only on the portfolio, based on the cloud flag rather than platform support, context
-retrieval or session readiness. Both chat toolbars offer a clear-chat control; only the
-on-device chat offers an informational dialog about local processing and in-memory history.
-Conversations remain in independent singleton blocs across navigation. There is no
-chooser, context switch, automatic fallback or transfer of history between features.
+| `feature_remote_assistant` | `feature_ai_assistant` | Portfolio `AssistantLauncherWidget` | Settings AI section |
+| -------------------------- | ---------------------- | ----------------------------------- | ------------------- |
+| On                         | Any                    | Opens `/remote-assistant`           | Hidden              |
+| Off                        | On, not web            | Opens `/assistant`                  | Shown               |
+| Off                        | Off, or web            | Hidden                              | Hidden              |
+| Fails to read              | Any                    | Hidden                              | Hidden              |
 
-Provider blocs, events and states are module-internal. Routes and public cards own
-`BlocProvider.value` for their module's retained singleton; there are no app-wide assistant
-bloc providers. Portfolio and Settings blocs read rollout flags directly through
-`IsFeatureEnabledUseCase` and use the public feature-owned
-`IsLocalAssistantSupportedUseCase` boolean platform check for local discovery, refreshing on
-visibility/return. The local route is registered only on supported platforms, and local
-domain operations recheck platform support before native model access. The repository checks
-the local rollout flag and propagates native SDK errors. Visiting Settings or the portfolio
-does not initialize remote chat or load its context. The local provider-owned visibility widget
-still rechecks its retained session.
-Remote chat rechecks rollout and platform support on chat visibility/return and before requests,
-invalidating retained output when unavailable, without exposing its bloc to hosts.
-Priority is a simple remote-first check in the portfolio and Settings composition.
-A failed remote flag check hides both providers, rather than falling back to local.
-The shared assistant module remains provider-neutral, and providers do not import siblings.
+The launcher does not depend on the local model being enabled or downloaded; the local screen
+shows the setup when it is not ready. The remote entry depends only on its flag. The remote chat
+itself shows an unavailable message on platforms other than Android, iOS and web.
 
-## Configuration
+`LocalAssistantVisibilityWidget` wraps the portfolio and Settings screens and sends the retained
+local bloc a recheck whenever they become visible. Visiting them never starts the remote chat or
+loads its context.
+
+### Portfolio context
+
+`GetAssistantContextUseCase` returns a JSON object with these keys:
+
+| Key            | Content                                                                                                                                                                                   |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `asOf`         | Today's date                                                                                                                                                                              |
+| `overview`     | Computed career lines, then education and spoken languages                                                                                                                                |
+| `digest`       | One line per profile, experience, project, skill group and service                                                                                                                        |
+| `profile`      | Profile fields, including availability, working hours, location with coordinates, languages, educations, certifications, social links and resume                                           |
+| `experiences`  | Every role with dates, an employment summary, coordinates and the titles of its projects                                                                                                  |
+| `projects`     | Every project with a `links` sentence per market (missing links written as "not found"), markets with coordinates, metrics and the company and position of its experience              |
+| `expertises`   | Skill groups with each skill's level, years and last use where given                                                                                                                      |
+| `services`     | Services with deliverables, linked projects, process and FAQ                                                                                                                              |
+| `testimonials` | Testimonials with their experience and the linked projects of that experience                                                                                                             |
+
+The overview states figures the models would otherwise have to calculate: role and company
+counts, total experience, shortest, longest, first and current role, time per company, country
+and city, roles by work mode (the bracketed tag in a location such as `[Remote]`), career gaps and
+job changes, leadership roles, every role in chronological order and by length, and time per
+technology. Durations count whole months, and overlapping roles count each month once.
 
 ### Generative UI
 
-The remote chat can render structured answers (metrics, tags, info rows, cards)
-instead of plain text. It uses the published experimental `genui` **0.10.4**
-package, which implements A2UI **v0.9**, with `json_schema_builder` **^0.1.6**
-(0.1.3 lacks the `SchemaRegistry` the runtime needs). The feature is behind the
-default-off flag `feature_remote_assistant_generative_ui`. With the flag off, remote
-answers are plain text and none of the code below runs. The local assistant never
-uses it.
+With `feature_remote_assistant_generative_ui` on, remote answers can include design-system
+surfaces. The model returns text and A2UI messages that describe a UI; the app builds widgets
+only from the components its catalog registers. The local assistant does not use this. The app
+uses `genui` 0.10.4 (A2UI v0.9) and `json_schema_builder` ^0.1.6.
 
-The model does not return widgets. It returns text and A2UI JSON messages that
-describe a UI. The app builds widgets only from components its catalog allows.
+| Package type                | Role                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `Catalog`, `CatalogItem`    | The components the model may use, each with a name, a JSON schema and a widget builder                       |
+| `PromptBuilder.chat`        | Turns the catalog into the system prompt that explains the A2UI format                                       |
+| `A2uiTransportAdapter`      | Splits streamed model output into prose (`incomingText`) and A2UI messages (`incomingMessages`)              |
+| `SurfaceController`         | Holds the components and data model of every surface and applies incoming messages                           |
+| `Surface`                   | Renders one surface from `surfaceController.contextFor(surfaceId)`                                           |
+| `DataModel`, `BoundString`  | A JSON store per surface; a string property such as `{"path": "/message"}` binds to it                       |
 
-#### Concepts
-
-| Concept | Package type | Role |
-| --- | --- | --- |
-| Catalog | `Catalog`, `CatalogItem` | The components the model may use. Each item has a name, a JSON schema and a widget builder. The schemas become the model prompt, and anything outside the catalog is rejected. |
-| Transport adapter | `A2uiTransportAdapter` | Splits streamed model output into prose (`incomingText`) and parsed A2UI messages (`incomingMessages`). It copes with chunks that split a JSON message. Single use: it cannot take input after `flush()`. |
-| Surface controller | `SurfaceController` | Holds the state of every surface: components and data. Applies `createSurface`, `updateComponents`, `updateDataModel` and `deleteSurface`. |
-| Surface | `Surface` widget | Renders one surface from `controller.contextFor(surfaceId)` and rebuilds when the controller changes. |
-| Data model | `DataModel`, `BoundString` | A JSON store per surface. A string property such as `{"path": "/message"}` binds to it and updates when `updateDataModel` changes the value. |
-| Prompt builder | `PromptBuilder.chat` | Turns the catalog into the system prompt that explains the A2UI format. |
-
-The package also provides a `Conversation` facade that bundles controller,
-transport and chat history. The app does not use it: chat history, Firebase calls,
-flags, limits and errors stay in the app's own bloc and use case.
+The package's `Conversation` facade is not used; history, requests, flags, limits and errors stay
+in `RemoteAssistantBloc` and `AskRemotePortfolioQuestionUseCase`.
 
 #### Catalog
 
-`createAssistantCatalog()` exposes read-only design-system components under catalog
-ID `dev.portrai.assistant`. Components live in `presentation/catalog/item/`.
+`createAssistantCatalog()` builds the catalog `dev.portrai.assistant`. Its items live in
+`presentation/catalog/item/`.
 
 Always registered:
 
-| Component | Renders |
-| --- | --- |
-| `DSText` | Text with `variant` `heading`, `title`, `body` or `caption` |
-| `DSMetric` | A highlighted value with a label |
-| `DSStatGrid` | Two to four `DSMetric` components side by side |
-| `DSBulletList` | A bulleted list of literal strings |
-| `DSLabeledInfoRow` | An icon with a label and value |
-| `DSTag`, `DSInfoChip` | Skill badges and icon and label pills |
-| `DSTimeline` | A vertical timeline of up to 8 entries (`period`, `title`, `subtitle`), for career or education history |
-| `DSEducationList` | Up to six degrees or certificates with institution, degree and period |
-| `DSSkillBars` | Up to 10 horizontal bars comparing skills by a numeric value, scaled to the largest, with an optional display label |
-| `DSProgressRing` | A circular gauge for one value from 0 to 100, with an optional caption |
-| `DSComparison` | A table with two to four columns and up to eight rows for side-by-side comparisons |
-| `DSQuote` | A quotation such as a testimonial, with optional author and role |
-| `DSCallout` | A highlighted note with an `info`, `success` or `warning` style, for example availability |
-| `DSCodeBlock` | A short code or command snippet, at most 40 lines, scrolling sideways |
-| `DSProjectCard` | A project card with title, description, up to eight technology tags, an optional banner and an optional action such as `DSLinkButton`. The banner renders only when its URL is in the portfolio context |
+| Component                   | Renders                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `DSText`                    | Text with `variant` `heading`, `title`, `body` or `caption`                                   |
+| `DSMetric`                  | A highlighted value with a label                                                              |
+| `DSStatGrid`                | Up to four `DSMetric` components side by side                                                 |
+| `DSBulletList`              | A bulleted list of literal strings                                                            |
+| `DSLabeledInfoRow`          | An icon with a label and value                                                                |
+| `DSTag`, `DSInfoChip`       | A badge, and an icon and label pill                                                           |
+| `DSTimeline`                | Up to 8 entries with `period`, `title` and `subtitle`                                         |
+| `DSEducationList`           | Up to six entries with institution, degree and period                                         |
+| `DSSkillBars`               | Up to 10 bars scaled to the largest value, each with an optional display label                |
+| `DSProgressRing`            | A circular gauge for a value from 0 to 100, with an optional caption                          |
+| `DSComparison`              | A table of up to four columns and eight rows                                                  |
+| `DSQuote`                   | A quotation with optional author and role                                                     |
+| `DSCallout`                 | A note styled `info`, `success` or `warning`                                                  |
+| `DSCodeBlock`               | A snippet of at most 40 lines that scrolls sideways                                           |
+| `DSProjectCard`             | Title, description, up to eight tags, an optional banner and an optional action component; the banner renders only for a URL in the portfolio context |
+| `DSColumn`, `DSWrap`        | Vertical and wrapping layouts of child component IDs                                          |
+| `DSCard`, `DSExpandable`    | A card around one child, and a title that expands to one child                                |
+| `DSCarousel`                | A horizontally scrolling row of up to ten children                                            |
+| `DSTabs`                    | Up to five titled tabs, each showing one child                                                |
+| `DSDivider`                 | A horizontal divider                                                                          |
 
-Layout:
+Registered only when the caller supplies what they need:
 
-| Component | Renders |
-| --- | --- |
-| `DSColumn`, `DSWrap` | Vertical and wrapping layouts of child component IDs |
-| `DSCard`, `DSExpandable` | A grouped card and a title that expands to one child |
-| `DSCarousel` | A horizontally scrolling row of up to ten child cards |
-| `DSTabs` | Up to five titled tabs, each showing one child component |
-| `DSDivider` | A horizontal divider |
+| Component                     | Registered when                                            | Renders                                                                                                   |
+| ----------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `DSImage`                     | `allowedUrls` is not empty                                 | An `avatar`, `logo` or `banner` image, only for an allowed URL                                            |
+| `DSLinkButton`, `DSContactCard` | Allowed URLs or contact links exist and `onOpenLink` is set | A button, or up to five `email`, `phone` or `website` buttons, opening only allowed links               |
+| `DSSuggestionChips`           | `onAskQuestion` is set                                     | Up to four tappable follow-up questions                                                                   |
+| `DSMap`                       | `allowedLocations` is not empty                            | A Google map with up to 12 markers, only for allowed coordinates, framed to fit them; Android, iOS and web only |
 
-Registered only when the host supplies the data or callback they need:
+`RemoteAssistantBloc` derives the allowed content once per portfolio context: every HTTPS URL in
+it (`assistantUrlsFrom`), `mailto:` and `tel:` links for the profile email and phone
+(`assistantContactLinksFrom`), and every latitude and longitude pair, which covers the profile
+location, experiences and project markets (`assistantLocationsFrom`). Anything else renders
+nothing. String properties accept a literal or a data-model reference, child properties are
+component IDs, and icons come from a fixed name list with an info icon for unknown names. No
+basic catalog or client functions are registered.
 
-| Component | Registered when | Renders |
-| --- | --- | --- |
-| `DSImage` | The portfolio context has HTTPS URLs | A portfolio image (`avatar`, `logo`, `banner`), only for URLs present in that context |
-| `DSMap` | The portfolio context has coordinates | An interactive Google map with one marker per place, framed to fit them all (profile and experience locations, plus the project markets, the countries where a product is offered), only for coordinates present in that context. Android, iOS and web only |
-| `DSLinkButton` | There are allowed links and an `onOpenLink` callback | A button that opens one allowed link |
-| `DSContactCard` | Same as `DSLinkButton` | Up to five contact buttons (`email`, `phone`, `website`) for allowed links |
-| `DSSuggestionChips` | An `onAskQuestion` callback is supplied | Up to four tappable follow-up questions |
+#### Controller
 
-Allowed links are the HTTPS URLs in the portfolio context plus the profile
-`mailto:` and `tel:` links (`assistantUrlsFrom`, `assistantContactLinksFrom`).
-Any other URL renders nothing. Taps never reach a use case from the widget:
-`RemoteAssistantBloc` handles `OpenRemoteAssistantLinkClickEvent` with
-`OpenExternalUrlUseCase`, and `SendRemoteAssistantQuestionClickEvent` for
-suggestion chips.
+`AssistantGenuiController` (`presentation/controller/`) builds the catalog from the allowed
+content and callbacks, owns a `SurfaceController` (`surfaceController`) and builds `systemPrompt`
+with `PromptBuilder.chat`. `send<T>(message, generate:, onText:, onSurfaceUpdate:)` runs one turn;
+the caller's `generate(message, systemPrompt, onDelta)` performs the request, forwards streamed
+deltas and returns its own result.
 
-String properties accept a literal or a data-model reference. Child properties are
-component IDs built by `CatalogItemContext.buildChild`. Icons come from a fixed
-name list, and unknown names fall back to an info icon. No basic catalog, client
-functions, navigation or genui user actions are registered.
+- Each turn uses a fresh `A2uiTransportAdapter`, and a send while a turn is active fails.
+- Parser, framework and generation errors complete the turn with
+  `AssistantGenuiResponseException`, without logging generated content. Framework validation
+  errors, such as an unknown component, are also emitted on `frameworkErrors`.
+- `acquireSurface()` counts mounted `Surface` widgets. `reset()` throws while any is mounted;
+  `dispose()` defers disposing the surface controller until the last one is released.
+- `reset()` and `dispose()` invalidate the active turn and ignore later deltas. They do not
+  cancel the backend request.
 
-#### Flow
+`RemoteAssistantGenuiControllerExtension.sendPortfolioQuestion` (in `remote_assistant`) sends a
+text question through `AskRemotePortfolioQuestionUseCase`. It appends a response-style
+instruction to the catalog prompt: answer inside one surface, use plain text, pick the component
+that fits the data, and put each A2UI message in its own `json` code block. It adds image, link,
+suggestion and map instructions only for the components that are registered. When the guest user
+has a saved role, it adds a fixed instruction: developers get projects, technologies and
+architecture first; recruiters get availability, experience, career history and contact first.
+A turn that ends with no text and no surface returns `RemoteAssistantIncompleteFailure`.
 
 ```mermaid
 flowchart LR
   User[User question] --> Bloc[RemoteAssistantBloc]
   Bloc --> GC[AssistantGenuiController]
   GC -->|catalog prompt| UC[AskRemotePortfolioQuestionUseCase]
-  UC -->|question, portfolio, history, prompt| Gemini[Gemini via Firebase AI]
-  Gemini -->|streamed deltas| UC
-  UC -->|onDelta| TA[A2uiTransportAdapter]
+  UC -->|question, context, history, prompt| Gemini[Gemini via Firebase AI]
+  Gemini -->|streamed deltas| TA[A2uiTransportAdapter]
   TA -->|prose| Bubble[Answer text]
   TA -->|A2UI messages| SC[SurfaceController]
   SC --> Surface[Surface widgets]
@@ -167,177 +189,95 @@ flowchart LR
   Surface --> Chat
 ```
 
-```mermaid
-sequenceDiagram
-  participant B as RemoteAssistantBloc
-  participant G as AssistantGenuiController
-  participant U as Use case and Firebase
-  participant T as A2uiTransportAdapter
-  participant S as SurfaceController
-  participant W as Surface widget
-  B->>G: new controller for the turn
-  B->>G: sendPortfolioQuestion
-  G->>T: create adapter for this turn
-  G->>U: generate(question, systemPrompt)
-  loop streamed deltas
-    U-->>T: addChunk(delta)
-    T-->>B: incomingText as prose
-    T-->>S: incomingMessages as A2UI
-    S-->>W: surface updates
-  end
-  G->>T: flush
-  G-->>B: result or typed failure
-  B->>B: store trimmed text and surface IDs
-```
-
-Each A2UI message must sit in its own ```` ```json ```` block. The response-style
-instruction appended by `sendPortfolioQuestion` tells the model to answer inside
-one surface, avoid markdown, choose the component that fits the data and never
-repeat surface content as text.
-
-When the user has a saved role (see the onboarding feature), the remote assistant
-bloc passes it as `userRole` and `sendPortfolioQuestion` appends a short,
-enum-derived emphasis instruction (developer: projects, tech and code;
-recruiter: availability, experience and contact). It never widens what the
-portfolio grounding allows.
-
-#### Classes
-
-`AssistantGenuiController` (`presentation/controller/`) is a per-turn lifecycle
-object, like Flutter's `ScrollController`: a widget or bloc creates and disposes it.
-It owns a `SurfaceController`, exposed as `surfaceController`, builds `systemPrompt`
-with `PromptBuilder.chat`, and offers `send<T>(message, generate:, onText:,
-onSurfaceUpdate:)`. `generate(message, systemPrompt, onDelta)` is supplied by the
-caller, forwards deltas and returns its domain result, including `Either`.
-
-- Each turn gets a fresh adapter, and concurrent sends are rejected.
-- A scoped error zone turns internal parser errors and generation exceptions into
-  `AssistantGenuiResponseException`, without logging generated payloads.
-- Framework validation errors (for example an unknown component) arrive on
-  `surfaceController.onSubmit` and are reported through `frameworkErrors`.
-- `acquireSurface()` counts mounted `Surface` widgets so the controller is not
-  disposed while one is on screen. Unmount surfaces before `reset()` or `dispose()`.
-- `reset()` replaces the surface controller. Both invalidate pending sends and
-  ignore late deltas. Backend generation itself is not cancelled.
-
-`RemoteAssistantGenuiControllerExtension.sendPortfolioQuestion`
-(`remote_assistant/presentation/controller/`) connects the controller to
-`AskRemotePortfolioQuestionUseCase` with a known text question, authoritative
-portfolio context and typed history, not arbitrary framework messages.
-
 #### Remote chat integration
 
-- `RemoteAssistantBloc` creates a controller per question when the flag is on,
-  records `RemoteAssistantSurface(messageIndex, genuiController, surfaceId)` in
-  state, and disposes controllers on clear chat, failure, flag change and close.
-- Completed history sent to the model contains only text, never surfaces.
-- The chat shows each answer's trimmed text followed by its `Surface` widgets.
-- On a failure the partial text and surfaces are discarded and a typed remote
-  failure is shown.
+- `RemoteAssistantBloc` creates a controller per question and records each surface as
+  `RemoteAssistantSurface(messageIndex, genuiController, surfaceId)`. The chat shows an answer's
+  text followed by its `Surface` widgets.
+- Link taps dispatch `OpenRemoteAssistantLinkClickEvent`, handled with `OpenExternalUrlUseCase`;
+  suggestion chips dispatch `SendRemoteAssistantQuestionClickEvent`.
+- History sent to the model contains only non-empty text messages, never surfaces. The chat keeps
+  the latest 12 messages and their surfaces.
+- A failed question discards its partial text and surfaces. A framework error clears the
+  conversation and shows an incomplete-answer error.
+- Controllers are disposed on clear chat, failure, a flag or mode change, and when the bloc
+  closes.
+- `systemPrompt` may be up to 80,000 characters; a longer one is rejected, not truncated.
+  `FirebaseRemoteAssistantRepository` appends it after its grounding instruction as
+  presentation instructions that must not override it, and recreates the cached model when the
+  prompt changes.
 
-#### Firebase request
+### Local assistant
 
-The use case's optional `systemPrompt` accepts trusted framework instructions up to
-80,000 characters. The genui base prompt is about 19,000 characters and each catalog
-item adds roughly 1,000 to 1,600, so the full catalog is about 50,000 before the
-response-style instructions. Oversized prompts are rejected, never truncated. Firebase keeps
-its portfolio grounding instructions and appends the framework prompt as
-subordinate presentation instructions. A null prompt keeps the text-only model
-configuration, and a changed prompt closes and recreates the cached model. The
-model uses `ThinkingLevel.low` and a 4096 token output limit, because thinking
-tokens share that budget and can end a response with `maxTokens`. Request
-parameters stay metadata-only in diagnostics.
+- Rollout flag `feature_ai_assistant`; route `/assistant`, registered only where
+  `IsLocalAssistantSupportedUseCase` is true (every platform except web). The enablement
+  preference is stored under `assistant_enabled_cache`.
+- The model is `litert-community/gemma-4-E2B-it-litert-lm` (`gemma-4-E2B-it.litertlm`) at a
+  pinned revision, installed and run with `flutter_edge_ai` and its LiteRT-LM engine.
+- Settings and the setup screen show `LocalAssistantCardWidget`. Enabling asks for consent before
+  a download (not for a model that is already on the device) and for the notification permission
+  through the [`permission`](../permission/README.md) feature; either answer continues. While
+  notifications are allowed, the download shows its progress in a notification and, on Android,
+  runs in the foreground so it continues in the background. Turning the assistant off during a
+  download cancels it and deletes the partial file; turning a ready assistant off asks whether to
+  keep or delete the model.
+- `LocalAssistantModelDownload.process` allows one download per app process. An in-app restart
+  disposes the repository but not the download, and the next repository joins it with the
+  progress reached so far. If the assistant is enabled and the model is missing at launch, the
+  download resumes.
+- After a download the model is loaded and must answer a short readiness prompt before the chat
+  becomes ready. An installed model is marked ready at launch and loaded on the first question
+  the model has to answer.
+- Each question uses a freshly built portfolio context. `LocalAssistantDirectAnswerer` answers
+  greetings, contact details and social links, salary (with the hourly rate), personal topics,
+  projects by store or technology, the service list, time per place, company or technology,
+  total experience, the overview's role facts and spoken languages directly from the context,
+  without the model. It skips questions that name a product or another record, and also answers
+  short follow-ups such as "and at Stuart?".
+- Other questions go to the model with facts chosen by `LocalAssistantContextSelector`, at most
+  10,000 bytes: matching records and digest lines first, the short overview lines after them, and
+  the long career lists and technology totals only for career questions. IDs, image URLs and
+  coordinates are left out, null fields are dropped and empty lists are written as
+  "none listed". The previous question is included only when the new one uses a pronoun or
+  continuation and names no company, project, technology or person.
+- Generated text streams into the chat, is stripped of markdown, and has links that are not in
+  the selected facts replaced with "(no link listed in the portfolio)". An answer that loops on a
+  character or phrase is generated once more with a higher temperature and at most 6,000 bytes of
+  facts.
+- Clear chat and turning the assistant off invalidate pending output and clear follow-up context;
+  native generation is not cancelled. A question asked while an earlier generation is still
+  running returns `BusyLocalAssistantFailure`.
+- The chat toolbar has a clear-chat button and an information dialog about on-device processing.
 
-### On-device
+### Remote assistant
 
-- Default-off rollout key: `feature_ai_assistant`.
-- Compatibility route: `/assistant`; preference cache key: `assistant_enabled_cache`.
-- Gemma 4 E2B via `flutter_edge_ai` and LiteRT-LM; the pinned model ID, file and
-  revision live in `FlutterEdgeAiLocalAssistantRepository`.
-- Explicit model download confirmation, progress, cancellation, keep/delete and retry
-  controls remain available from Settings and the setup screen.
-- The app process runs at most one model download. An in-app restart disposes the repository
-  but not its download, and the next repository joins it with the progress reached so far.
-  If the assistant is enabled and the model is still missing at launch, the download resumes,
-  attaching to the one still running if there is one.
-- Agreeing to the download asks for notification permission through the `permission` feature;
-  either answer continues the download. While the app may show notifications, the download shows
-  its progress in one and, on Android, runs in the foreground, so it continues in the
-  background. The app's notification setting is on the Settings screen.
-- Installed models load lazily on a question. A readiness inference probes engine support.
-- Contact details, social links, tenure per place, company and technology, total
-  experience and the career overview are answered from the computed context without
-  loading the model, unless the question names a product or another record. Every
-  other question goes to the model with a bounded selection of facts: matching
-  records and digest lines first, employment summaries and the short overview lines
-  after them, long career lists and technology totals only for career questions, and
-  never ids, image URLs or coordinates. Null fields are left out and empty lists are
-  stated as "none listed", so missing portfolio facts are not guessed. A question
-  with a pronoun counts as a follow-up only when it names no company, project,
-  technology or person. Generated text is stripped of markdown, and an answer that
-  loops on a character or phrase is generated once more.
-- Disable and reset invalidate late output and clear follow-up context. Reset retains
-  enablement and downloaded files. Invalidating output does not guarantee cancellation
-  of native generation; download cancellation waits for cleanup.
-- If native generation is still finishing after reset, a new request reports a localized
-  busy failure instead of starting a concurrent native request.
+- Rollout flag `feature_remote_assistant`; route `/remote-assistant`, always registered.
+  `RemoteAssistantBloc` rechecks the flag and platform support whenever the screen becomes
+  visible and before each question. When either fails, the chat shows an unavailable message,
+  clears the conversation and resets the session.
+- Opening the chat loads the portfolio context; the model is called only for a question. There
+  is no consent, enablement preference or provider badge, and the toolbar has only clear chat.
+- `AskRemotePortfolioQuestionUseCase` checks platform support, validates the input limits and
+  reserves one request from the per-install budget before calling the repository, which checks
+  the flag again. The model, limits and budget are listed in the app README under
+  [Remote Assistant](../../../../README.md#remote-assistant) and
+  [AI Request Limit](../../../../README.md#ai-request-limit).
+- The guest user's saved role selects the starter suggestions and the role instruction.
+- Clear chat resets only the remote session. Resetting stops reading the stream but cannot
+  cancel a request already sent.
+- Logs and analytics exclude questions and generated text.
 
-### Cloud
+Production use needs App Check enforcement, model availability and quota controls; see the
+[Firebase AI setup guide](../../../../../../layer/firebase/README.md#firebase-ai-logic-setup).
+Known gaps in the portfolio data are listed in [DATA_GAPS.md](DATA_GAPS.md).
 
-- Independent default-off rollout key: `feature_remote_assistant`.
-- Route: `/remote-assistant`; its entry is flag-only. Runtime rollout and platform guards show
-  unavailability inside chat.
-- Questions, bounded recent completed history and portfolio context are sent to Google
-  through Firebase. The remote chat has no provider badge or disclosure control.
-- There is no saved remote consent, enablement preference or user activation toggle.
-- Opening the screen loads portfolio context but never calls the model until a question.
-- Clear chat resets only the remote in-memory session.
-- Failed partial responses never enter future provider history.
-- Flag-off rechecks/reset stop local consumption and close the owned transport, but cannot undo
-  requests already sent or guarantee server cancellation or cessation of billing.
-- Request/state logging and analytics exclude cloud prompts and generated content.
+## Configuration
 
-Both routes, enable actions and new requests check rollout and platform availability.
-Flags are rechecked on screen visibility/return and before new requests, without notifications
-or polling. The app-level local access policy also guards direct local routes and requests
-for their own rollout. Explicit provider routes retain independent access; discovery and
-Settings select remote first without a shared policy registry. Local disable and both providers' reset/flag-off rechecks
-invalidate late output; they do not guarantee
-native or server cancellation. Repository exceptions map to localized failures in use cases.
-
-Production cloud use requires separately validated Firebase App Check enforcement, model
-availability and spending controls, plus an authorized release smoke test. Automated tests
-do not make live or billable requests or prove console enforcement.
-See the [Firebase AI setup guide](../../../../../../layer/firebase/README.md#firebase-ai-logic-setup).
-
-## Testing
-
-From `app/portrai`:
-
-```bash
-flutter gen-l10n
-dart run build_runner build
-flutter analyze lib test
-flutter test test/src/feature/assistant test/src/feature/local_assistant \
-  test/src/feature/remote_assistant test/src/feature/setting test/src/feature/portfolio
-```
-
-Tests use deterministic fixtures and mocked inference. They cover discovery combinations,
-unsupported platforms, flag-only cloud activation, direct-route guards, pending-request invalidation,
-local download consent, and independent sessions. No model download or live AI generation is needed.
-`local_assistant_portfolio_evaluation_test.dart` runs the on-device answer routing and fact
-selection over the real portfolio in `assets/dashboard`. Those files are git-ignored, so the test
-is skipped where they are absent, such as CI; run it locally after changing the selector, the
-direct answers or the portfolio data.
-The catalog widget tests feed real v0.9 messages through `A2uiParserTransformer`
-and `SurfaceController` into `Surface`, covering DS composition, literal text,
-binding updates, surface deletion and unsupported-component error reporting.
-Controller tests exercise the actual adapter/parser/controller/surface pipeline,
-callback results, parser and generation errors, sequential turns and late-delta invalidation.
-Remote repository tests connect mocked Firebase streams through the real portfolio
-use case and controller to the official surface controller, with no live requests.
-
-Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md).
+| Flag                                     | Default | Effect                                         |
+| ---------------------------------------- | ------- | ---------------------------------------------- |
+| `feature_ai_assistant`                   | Off     | On-device assistant in Settings and on the portfolio |
+| `feature_remote_assistant`               | Off     | Remote chat entry on the portfolio             |
+| `feature_remote_assistant_generative_ui` | Off     | Design-system surfaces in remote answers       |
 
 ### Maps API Key
 
@@ -352,3 +292,25 @@ Portfolio information limitations are documented in [DATA_GAPS.md](DATA_GAPS.md)
 Get an Android SHA-1 with `keytool -list -v -alias <alias> -keystore <keystore>` or `./gradlew signingReport` in `android`. The debug keystore is `~/.android/debug.keystore` with alias `androiddebugkey` and password `android`.
 
 CI reads the keys from the `MAPS_API_KEY_ANDROID`, `MAPS_API_KEY_IOS` and `MAPS_API_KEY_WEB` repository secrets and passes them to the build workflows as `MAPS_API_KEY`.
+
+## Testing
+
+From `app/portrai`:
+
+```bash
+flutter test test/src/feature/assistant test/src/feature/local_assistant test/src/feature/remote_assistant
+```
+
+The portfolio and Settings tests cover the entry points:
+
+```bash
+flutter test test/src/feature/portfolio test/src/feature/setting
+```
+
+The tests use fixtures and mocked inference and make no model download or live AI request. The
+catalog tests feed A2UI v0.9 messages through `A2uiParserTransformer` and `SurfaceController`
+into `Surface`. The controller and remote repository tests run the real adapter, parser and
+surface controller against mocked generation and mocked Firebase streams.
+`local_assistant_portfolio_evaluation_test.dart` runs the direct answers and fact selection over
+the portfolio in `assets/dashboard`. Those files are git-ignored and the test is skipped when
+they are absent; CI creates them from the `*.template.json` files.
