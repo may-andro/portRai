@@ -52,7 +52,7 @@ See [`.github/skills/creating-new-modules/SKILL.md`](skills/creating-new-modules
 ## README Conventions
 See [`.github/skills/readme-conventions/SKILL.md`](skills/readme-conventions/SKILL.md).
 
-- Plain headings, no emoji, single Title Case H1 — most existing layer READMEs already follow this; `feature_flag`/root/`app/portrai` are outliers, don't copy their emoji style for new docs.
+- Plain headings, no emoji, single Title Case H1; describe behavior factually, with no history or circumstantial details.
 - Layer READMEs: `Features → Getting Started → Usage → API Reference/Key Concepts → Platform Support → Dependencies → Testing`.
 - App READMEs: `Features → Getting Started → Architecture → Development → Configuration → Deployment → Contributing`, linking to the root README instead of duplicating it.
 
@@ -61,12 +61,12 @@ See [`.github/skills/import-boundary-conventions/SKILL.md`](skills/import-bounda
 
 - Never import another package's `lib/src/**` — only its public top-level barrel.
 - Never import another app feature's private underscore-prefixed barrel files (`_bloc.dart`, etc.) — only its public feature barrel.
-- Enforced by the `portrai_analyzer` plugin rules, wired into root `analysis_options.yaml` via `plugins:` (flags violations as `info`-level, non-blocking).
+- Enforced by the `portrai_analyzer` plugin rules, wired into root `analysis_options.yaml` via `plugins:`; CI runs `dart analyze --fatal-infos .`, so a violation fails the check.
 
 ## CI Workflows
 See [`.github/skills/ci-workflow-conventions/SKILL.md`](skills/ci-workflow-conventions/SKILL.md).
 
-- One `.github/workflows/<name>.yaml` per layer/app, triggered on PRs touching that path, using the shared `setup-flutter-module` + `flutter-quality-checks` composite actions.
+- One `.github/workflows/<name>.yaml` per layer/app, triggered on PRs touching that path, using the shared `setup-flutter-module` + `flutter-quality-checks` composite actions (`setup-dart-module` + `dart-quality-checks` for Dart tools).
 - Release pipelines are tag-triggered and chain `extract-version → quality → build-<platform> → deploy-<platform>` via reusable `_build_*`/`_deploy_*` workflows.
 
 ## Dependency Injection Annotations
@@ -103,7 +103,7 @@ See [`.github/skills/design-system-change-conventions/SKILL.md`](skills/design-s
 See [`.github/skills/golden-test-conventions/SKILL.md`](skills/golden-test-conventions/SKILL.md).
 
 - `design_system` widget tests use `groupGoldenForBrightnessAndDS` from `test/util/alchemist_utils.dart`, covering every design system × brightness.
-- CI skips golden pixel comparison outside macOS; don't add golden tests to app features.
+- CI runs them with `--dart-define=CI=true`, which compares against `goldens/ci/` and skips only the `goldens/macos/` comparison; don't add golden tests to app features.
 
 ## Localization
 See [`.github/skills/localization-conventions/SKILL.md`](skills/localization-conventions/SKILL.md).
@@ -115,7 +115,7 @@ See [`.github/skills/localization-conventions/SKILL.md`](skills/localization-con
 See [`.github/skills/release-versioning-conventions/SKILL.md`](skills/release-versioning-conventions/SKILL.md).
 
 - Releases are triggered by pushing a `<version>+<build>-<suffix>` tag (`-review`, `-prod`, `-review-storybook`, `-prod-storybook`) or `legal-<version>`.
-- Keep the tag's version/build in sync with the matching `pubspec.yaml` `version:` field before tagging.
+- The tag's version matches the `pubspec.yaml` `version:`; the build number comes from the tag. For Portrai, `melos run prepare_portrai_release` proposes the next tag.
 
 ## Naming
 See [`.github/skills/naming-conventions/SKILL.md`](skills/naming-conventions/SKILL.md).
