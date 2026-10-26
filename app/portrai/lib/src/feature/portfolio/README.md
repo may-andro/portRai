@@ -5,20 +5,28 @@ services, experiences and testimonials features, and keeps their cached data up 
 
 ## Features
 
-- `GetPortfolioUseCase` reads the six sections at once. The profile is required; a section that
-  fails to load is shown empty.
-- `PortfolioUpdateListenerWidget` sits above the router for the whole app run and checks for
-  updates when the app starts and whenever it returns to the foreground. A tapped or received
-  "Portfolio updated" notification checks too (see the
+- `PortfolioModuleRoute.portfolio` (`/`) shows `PortfolioScreen`. It starts with the intro
+  section, followed by the other sections in an order that depends on the visitor's role
+  (developer, recruiter, or other and unknown). Empty sections are left out. A pinned header has
+  a tab per section on desktop, and a drawer and Settings button on mobile and tablet.
+- When an assistant is available, a floating button opens the remote assistant, or the
+  on-device assistant when only that one is available.
+- `GetPortfolioUseCase` reads the six sections concurrently. The profile is required; a section
+  that fails to load is shown empty.
+- `PortfolioUpdateListenerWidget` wraps the router's content in the app's `builder` for the whole
+  app run and checks for updates when the app starts and whenever it returns to the foreground. A
+  tapped or received "Portfolio updated" notification checks too (see the
   [`notification`](../notification/README.md) feature).
 - `UpdatePortfolioUseCase` reads when each section of the app's language last changed and
   refreshes only the sections that changed after the change they were last refreshed for. Each
   refresh loads the section first and then replaces its cache, so a section that fails to load
-  keeps its cache and is tried again on the next check. Checks run one after another.
+  keeps its cache and is tried again on the next check. The use case is a singleton, so checks
+  run one after another.
 - `WatchRefreshedPortfolioSectionsUseCase` reports the sections each check refreshed. The
   portfolio screen reloads in place, and keeps what it shows when reloading fails.
 
-Staging builds show the bundled portfolio, so they never check for updates.
+Staging builds show the bundled portfolio, so their checks read no change times and refresh
+nothing.
 
 ## Configuration
 
@@ -35,9 +43,9 @@ The [functions](../../../../../../tool/functions/README.md) write the change tim
 | `services`     | timestamp | When the services last changed     |
 | `testimonials` | timestamp | When the testimonials last changed |
 
-A field is missing until its section first changes, and the app then keeps its cache. The change
-time each section was last refreshed for is stored on the device in `portfolio_update_cache`, keyed
-by `<language>/<section>`.
+A missing document or field means that section has not changed, and the app keeps its cache.
+`PortfolioUpdateCache` stores on the device, under the `portfolio_update_cache` key, the change
+time each section was last refreshed for, keyed by `<language>/<section>`.
 
 ## Testing
 
