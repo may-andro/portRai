@@ -4,8 +4,8 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/connectivity/connectivity.dart';
-import 'package:portrai/src/feature/splash/presentation/bloc/splash_event.dart';
-import 'package:portrai/src/feature/splash/presentation/bloc/splash_state.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/bloc/splash_event.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/bloc/splash_state.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {

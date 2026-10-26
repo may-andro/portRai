@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/bloc/_bloc.dart';
 
 /// Shows the logo at the size and position the native splash draws it, so
 /// the hand over from the native splash doesn't move the logo. Once set up

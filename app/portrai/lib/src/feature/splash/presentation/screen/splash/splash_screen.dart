@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/connectivity/connectivity.dart';
-import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
-import 'package:portrai/src/feature/splash/presentation/widget/_widget.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/bloc/_bloc.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/widget/_widget.dart';
 
 /// Takes over from the native splash, which stays on screen until this
 /// screen can draw the logo.

@@ -3,10 +3,10 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:module_injector/module_injector.dart';
-import 'package:portrai/src/feature/splash/presentation/bloc/_bloc.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
-import '../../../../../mock/feature/connectivity/domain/use_case/mock_check_internet_connection_use_case.dart';
+import '../../../../../../../mock/feature/connectivity/domain/use_case/mock_check_internet_connection_use_case.dart';
 
 class _NoOpModuleConfigurator extends ModuleConfigurator {
   @override

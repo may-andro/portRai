@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portrai/src/feature/splash/presentation/widget/setup_failure_widget.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/widget/setup_failure_widget.dart';
 
-import '../../../../../util/test_wrapper_widget.dart';
+import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   group('SetupFailureWidget', () {
