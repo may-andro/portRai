@@ -27,10 +27,17 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
     : super(const _TrackingArea(), trackingReporter);
 
   void trackTabItemSelection(String sectionName) {
-    trackEvent(Tracking(name: 'header_tab', action: ClickAction(label: sectionName)));
+    trackEvent(
+      Tracking(
+        name: 'header_tab',
+        action: ClickAction(label: sectionName),
+      ),
+    );
   }
 }
 ```
+
+(`app/portrai/lib/src/feature/experience/presentation/screen/experience/tracking/experience_tracking_delegate.dart`)
 
 - `TrackingArea` is a private (`_`-prefixed) const subclass naming the
   screen/area (snake or lower-case words, e.g. `'experience'`,
@@ -55,9 +62,12 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
 
 The bloc owns the delegate and calls its methods from the relevant event
 handlers (e.g. `trackTabItemSelection` on a `HeaderTabClickEvent`). Screen views
-and view events go through `ScreenTrackingBlocMixin`:
+and view events go through `ScreenTrackingBlocMixin`
+(`app/portrai/lib/src/utility/screen_tracking_bloc_mixin.dart`): the bloc
+overrides `screenTrackingDelegate` to return its delegate and registers
 `trackScreenViewOn<ScreenVisibleEvent>()` and
-`trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId)` (see
+`trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId)` in its
+constructor, as `ExperienceBloc` does (see
 `flutter-architecture-conventions`). Don't call tracking
 methods from widgets directly — widgets only dispatch bloc events (see
 `flutter-architecture-conventions`).
