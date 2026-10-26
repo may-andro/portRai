@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_edge_ai_litertlm/flutter_edge_ai_litertlm.dart';
+import 'package:log_reporter/log_reporter.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/data/cache/_cache.dart';
@@ -14,11 +15,14 @@ import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/repository/_repository.dart';
 
+const String _logTag = 'FlutterEdgeAiLocalAssistantRepository';
+
 @RegisterSingleton(as: LocalAssistantRepository, disposeMethodName: 'dispose')
 class FlutterEdgeAiLocalAssistantRepository
     implements LocalAssistantRepository {
   FlutterEdgeAiLocalAssistantRepository(
-    this._enabledCache, {
+    this._enabledCache,
+    LogReporter this._logReporter, {
     required IsFeatureEnabledUseCase this._isFeatureEnabled,
   }) : _modelDownload = LocalAssistantModelDownload.process;
 
@@ -27,6 +31,7 @@ class FlutterEdgeAiLocalAssistantRepository
     this._modelLoader, {
     LocalAssistantEnabledCache? enabledCache,
     this._isFeatureEnabled,
+    this._logReporter,
     LocalAssistantModelDownload? modelDownload,
   }) : _enabledCache = enabledCache ?? LocalAssistantEnabledCache(),
        _modelDownload = modelDownload ?? LocalAssistantModelDownload();
@@ -34,6 +39,7 @@ class FlutterEdgeAiLocalAssistantRepository
   final LocalAssistantEnabledCache _enabledCache;
   final LocalAssistantModelDownload _modelDownload;
   final IsFeatureEnabledUseCase? _isFeatureEnabled;
+  final LogReporter? _logReporter;
   // Answers started before a change of this value are discarded.
   int _generation = 0;
   // Models loaded before a change of this value are discarded. Clearing the
@@ -346,20 +352,19 @@ class FlutterEdgeAiLocalAssistantRepository
         selectedContext,
       );
       final isDegenerate = _isDegenerate(answer);
-      if (kDebugMode) {
-        // How often answers loop, and how, decides whether the sampling or
-        // the fact budget needs tuning.
-        final outcome = !isDegenerate
-            ? 'accepted'
-            : '${_repeatedRun.hasMatch(answer) ? 'repeated a character' : 'repeated a phrase'}, '
-                  '${index < attempts.length - 1 ? 'retrying' : 'giving up'}';
-        debugPrint(
-          '[Assistant] Q: $question\n[Assistant] A: $answer\n'
-          '[Assistant] Attempt ${index + 1} of ${attempts.length} '
-          '(temperature $temperature, '
-          '${utf8.encode(selectedContext).length} bytes of facts): $outcome',
-        );
-      }
+      // How often answers loop, and how, shows whether the sampling or the
+      // fact budget needs tuning. The question and answer are never logged:
+      // they stay on the device.
+      final outcome = !isDegenerate
+          ? 'accepted'
+          : '${_repeatedRun.hasMatch(answer) ? 'repeated a character' : 'repeated a phrase'}, '
+                '${index < attempts.length - 1 ? 'retrying' : 'giving up'}';
+      _logReporter?.debug(
+        tag: _logTag,
+        'Attempt ${index + 1} of ${attempts.length} '
+        '(temperature $temperature, '
+        '${utf8.encode(selectedContext).length} bytes of facts): $outcome',
+      );
       if (!isDegenerate) break;
     }
     if (answer.isEmpty || _isDegenerate(answer)) {

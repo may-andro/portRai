@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:log_reporter/log_reporter.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/flutter_edge_ai_local_assistant_repository.dart';
 import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 
 import '../../../../../mock/feature/local_assistant/data/repository/mock_inference_chat.dart';
 import '../../../../../mock/feature/local_assistant/data/repository/mock_inference_model.dart';
+import '../../../../../mock/utility/mock_log_reporter.dart';
 
 void main() {
   setUpAll(() {
@@ -244,7 +245,7 @@ void main() {
         MockInferenceChat chat,
       })
     >
-    prepareRepository() async {
+    prepareRepository({LogReporter? logReporter}) async {
       final model = MockInferenceModel();
       final chat = MockInferenceChat();
       when(
@@ -264,6 +265,7 @@ void main() {
       when(() => model.close()).thenAnswer((_) async {});
       final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader(
         (_) async => model,
+        logReporter: logReporter,
       );
       addTearDown(repository.dispose);
       await repository.prepareModel(onProgress: (_) {});
@@ -518,16 +520,15 @@ void main() {
     });
 
     test('should log each attempt and why it was retried', () async {
-      final (:repository, :chat) = await prepareRepository();
+      final logReporter = MockLogReporter();
+      final (:repository, :chat) = await prepareRepository(
+        logReporter: logReporter,
+      );
       final answers = [
         'Mayank Rai Mayank Rai Mayank Rai Mayank Rai Mayank Rai',
         'He is a Flutter developer.',
       ];
       chat.stubStreamedAnswer(() => [answers.removeAt(0)]);
-      final logs = <String>[];
-      final originalDebugPrint = debugPrint;
-      debugPrint = (message, {wrapWidth}) => logs.add(message ?? '');
-      addTearDown(() => debugPrint = originalDebugPrint);
 
       await repository.answer(
         question: 'Who is he?',
@@ -536,7 +537,12 @@ void main() {
         }),
       );
 
+      final logs = verify(
+        () => logReporter.debug(captureAny(), tag: any(named: 'tag')),
+      ).captured.cast<String>();
       expect(logs, hasLength(2));
+      expect(logs.join(), isNot(contains('Who is he?')));
+      expect(logs.join(), isNot(contains('Flutter developer')));
       expect(logs.first, contains('Attempt 1 of 2 (temperature 0.2, '));
       expect(logs.first, endsWith('repeated a phrase, retrying'));
       expect(logs.last, contains('Attempt 2 of 2 (temperature 0.7, '));
