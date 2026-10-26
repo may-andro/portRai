@@ -70,8 +70,9 @@ service cloud.firestore {
         allow read: if isSignedInAs(userId);
       }
 
-      // Registered while the user is signed in on a device, removed when they
-      // sign out. Only functions read the list to send notifications.
+      // Registered while the user is signed in on a device. Signing out
+      // replaces the device token; the functions delete a registration whose
+      // token is no longer registered. Only functions read the list.
       match /devices/{token} {
         allow get, delete: if isSignedInAs(userId);
         allow create, update: if isSignedInAs(userId)
