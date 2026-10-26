@@ -123,6 +123,12 @@ class LocalAssistantBloc
     final revision = _controlRevision;
     await _initialize(emit, revision);
     if (emit.isDone || revision != _controlRevision) return;
+    // An installed model is marked ready without being loaded. Loading it
+    // while the chat is open keeps that wait off the first answer; a question
+    // asked meanwhile joins the same load.
+    if (state.isReady && state.isModelDownloaded) {
+      unawaited(Future.value(_prepareLocalAssistantModelUseCase((_) {})));
+    }
     emit(state.copyWith(isLoadingContext: true));
     final result = await _getAssistantContextUseCase();
     if (emit.isDone || revision != _controlRevision) return;

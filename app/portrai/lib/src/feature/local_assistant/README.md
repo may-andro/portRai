@@ -60,8 +60,8 @@ stateDiagram-v2
 - After a download the model is loaded and must reply to `Reply with the word Ready.` with
   non-empty text (16 output tokens at most) before the status becomes ready.
 - At launch, an enabled assistant whose model is installed is marked ready without loading the
-  model; the first question that needs the model loads it. An enabled assistant whose model is
-  missing resumes the download.
+  model. Opening the chat starts loading it in the background, and a question asked meanwhile
+  waits for the same load. An enabled assistant whose model is missing resumes the download.
 
 ### Answering a question
 
@@ -155,8 +155,10 @@ factBudget     = min(availableBytes, 10000)
   `AskLocalPortfolioQuestionBusyFailure`.
 - **No native cancellation.** Clear chat and turning the assistant off discard pending output and
   the follow-up context, but the native generation runs until it finishes.
-- **First question latency.** An installed model is loaded on the first question that needs it,
-  so that answer takes longer.
+- **First question latency.** An installed model starts loading when the chat opens. A question
+  the model has to answer before the load finishes waits for it.
+- **Memory while the chat is open.** Opening the chat loads the model even when every question is
+  answered directly. It stays loaded until the assistant is turned off or the app restarts.
 - **Storage and memory.** The model file stays on the device until the user deletes it when
   turning the assistant off. A loaded model is unloaded when the assistant is turned off.
 - **One download per process.** An in-app restart disposes the repository but not the download;

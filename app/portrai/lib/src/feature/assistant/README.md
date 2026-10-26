@@ -231,8 +231,8 @@ The full design, token budget and caveats are in the
   progress reached so far. If the assistant is enabled and the model is missing at launch, the
   download resumes.
 - After a download the model is loaded and must answer a short readiness prompt before the chat
-  becomes ready. An installed model is marked ready at launch and loaded on the first question
-  the model has to answer.
+  becomes ready. An installed model is marked ready at launch and starts loading in the
+  background when the chat opens.
 - Each question uses a freshly built portfolio context. `LocalAssistantDirectAnswerer` answers
   greetings, contact details and social links, salary (with the hourly rate), personal topics,
   projects by store or technology, the service list, time per place, company or technology,
