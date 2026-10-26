@@ -86,7 +86,7 @@ See [`.github/skills/feature-flag-conventions/SKILL.md`](skills/feature-flag-con
 See [`.github/skills/tracking-event-conventions/SKILL.md`](skills/tracking-event-conventions/SKILL.md).
 
 - Each screen owns one `@register`ed `<Screen>TrackingDelegate extends ScreenTrackingDelegate`, injected into its bloc.
-- Widgets/blocs never call `EventTracker`/`TrackingReporter` directly — only through the screen's delegate methods.
+- Widgets/blocs never call `TrackingReporter` directly — only through the screen's delegate methods.
 
 ## Error & Exception Handling
 See [`.github/skills/error-handling-conventions/SKILL.md`](skills/error-handling-conventions/SKILL.md).

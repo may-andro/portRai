@@ -1,104 +1,160 @@
 # Module Injector
 
-A Flutter package that provides a modular dependency injection system with
-**code generation**, lifecycle management, and status tracking. Built on top of
-GetIt, it enables organised dependency registration through configurable
-modules and compile-time annotations.
+Dependency injection for the workspace. Modules register their dependencies
+through `ModuleConfigurator` classes, and a build_runner generator turns
+annotated classes into registration code. Registration is backed by GetIt.
 
 ## Features
 
-- **Code Generation** — Annotate classes with `@register` /
-  `@registerSingleton` and let the generator wire everything up
-- **Modular Architecture** — Organise dependencies into separate modules using
-  `ModuleConfigurator`
-- **Lifecycle Management** — Three-phase dependency setup
-  (pre-registration, registration, post-registration)
-- **Decorator / Chain Support** — Use `@Inject(ConcreteType)` to wire complex
-  repository chains with multiple implementations of the same interface
-- **Abstract Type Registration** — Use `@Register(as: AbstractType)` to expose
-  a concrete class under its interface
-- **Override Support** — Use `shouldOverride: true` to replace an existing
-  registration (useful in tests)
-- **Dispose Callbacks** — Use `disposeMethodName` on `@RegisterSingleton` to
-  auto-generate cleanup code
-- **Status Tracking** — Real-time injection status updates through streams
-- **Service Locator Pattern** — Abstract service locator with GetIt
-  implementation
-- **Type Safety** — Full type safety for dependency registration and retrieval
+- `ModuleInjectorController` that runs every configurator through three
+  phases (pre-setup, registration, post-setup) and reports progress as a
+  stream of `InjectionStatus`
+- `ServiceLocator` abstraction with factory and lazy singleton registration,
+  optional dispose callbacks and override support
+- Annotations (`@register`, `@registerSingleton`, `@Inject`,
+  `@generateConfigurator`) and a generator that emits a
+  `$register<Module>Dependencies` function per module
+- `SimpleModuleConfigurator` base class with no-op pre- and post-setup phases
+- Typed exceptions (`PreInjectionException`, `RegisterInjectionException`,
+  `PostInjectionException`) for configurators to report setup failures
 
 ## Getting Started
 
 ### Installation
 
-Add this package to your `pubspec.yaml`:
+The package is a member of the workspace. Add it, and `build_runner` for code
+generation, to a module's `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  module_injector:
-    path: layer/module_injector
+  module_injector: any
 
 dev_dependencies:
   build_runner: ^2.5.4
 ```
 
+The generator is declared in this package's `build.yaml` with
+`auto_apply: dependents`, so it runs in every package that depends on
+`module_injector`. Generate code from the package directory:
+
+```bash
+dart run build_runner build
+```
+
+`melos run gen` runs the same command in every package that depends on
+`build_runner`.
+
+### Module Configuration
+
+Each module has one configurator. Annotate it with `@generateConfigurator`
+and call the generated function from `registerDependencies`. The generator
+writes a standalone library next to the configurator, named
+`<configurator file>.di.g.dart`, which the configurator imports.
+
+```dart
+import 'package:example/src/items/items_module_configurator.di.g.dart';
+import 'package:module_injector/module_injector.dart';
+
+@generateConfigurator
+class ItemsModuleConfigurator extends SimpleModuleConfigurator {
+  @override
+  void registerDependencies(ServiceLocator sl) =>
+      $registerItemsDependencies(sl);
+}
+```
+
+The function name is `$register` + the class name without
+`ModuleConfigurator` + `Dependencies`.
+
 ## Usage
 
-### Setting Up the DI Graph
+### Setting up the dependency graph
 
 ```dart
 final controller = ModuleInjectorController();
 
-final stream = controller.setUpDIGraph(
+await for (final status in controller.setUpDIGraph(
   configurators: [
-    AppModuleConfigurator(buildConfig),
-    FirebaseModuleConfigurator(...),
-    ProfileModuleConfigurator(),
-    ExperienceModuleConfigurator(),
+    ItemsModuleConfigurator(),
+    SettingsModuleConfigurator(),
   ],
-);
-
-await for (final status in stream) {
+)) {
   if (status == InjectionStatus.finished) {
-    // All dependencies are ready
+    // All dependencies are registered.
+  }
+}
+
+final repository = controller.serviceLocator.get<ItemRepository>();
+```
+
+`setUpDIGraph` first resets the service locator, then calls
+`preDependenciesSetup` on every configurator in list order, then
+`registerDependencies` on every configurator, then `postDependenciesSetup` on
+every configurator. A configurator can resolve dependencies registered by
+configurators earlier in the list.
+
+`ModuleInjectorController()` always returns a controller backed by the same
+GetIt instance, so `ModuleInjectorController().serviceLocator` resolves the
+same registrations anywhere in the app.
+
+### Registering a class
+
+```dart
+@register
+class GetItemsUseCase {
+  GetItemsUseCase(this._repository);
+
+  final ItemRepository _repository;
+}
+```
+
+Generates:
+
+```dart
+sl.registerFactory<GetItemsUseCase>(
+  () => GetItemsUseCase(sl.get<ItemRepository>()),
+);
+```
+
+### Manual registration
+
+Register by hand, in `registerDependencies` or `postDependenciesSetup`, what
+the generator cannot build from a constructor: runtime values, static
+instances, and third-party classes that cannot be annotated.
+
+```dart
+@override
+void registerDependencies(ServiceLocator sl) {
+  $registerItemsDependencies(sl);
+  sl.registerSingleton<ItemsConfig>(() => config);
+}
+```
+
+### Error handling
+
+`setUpDIGraph` does not catch errors. An exception thrown by a configurator
+ends the stream with that error. Configurators throw the typed exceptions to
+signal which phase failed:
+
+```dart
+@override
+Future<void> postDependenciesSetup(ServiceLocator sl) async {
+  final loaded = await sl.get<LoadSettingsUseCase>().call();
+  if (!loaded) {
+    throw PostInjectionException('Settings could not be loaded', null);
   }
 }
 ```
 
-### Generator Scoping Rules
-
-The generator follows these rules when scanning for annotated classes:
-
-1. **Feature directory scope** — Globs every `.dart` file under the same
-   directory as the configurator file (recursive). No import-following needed —
-   simply place annotated classes in the same feature folder.
-2. **Deterministic output** — Files are processed in alphabetical path order so
-   the generated file is stable across machines and runs.
-3. **Skips private classes** — Classes starting with `_` are ignored.
-4. **Skips generated files** — Files ending in `.g.dart` or `.di.g.dart` are
-   never scanned.
-
-### When to Use Manual Registration
-
-Use annotations for classes with normal constructors where all dependencies come
-from DI. Keep manual registration for:
-
-- **Runtime values** — `sl.registerSingleton(() => buildConfig)`
-- **Static accessors** — `sl.registerSingleton(() => FirebaseAuth.instance)`
-- **Third-party classes** you don't own and can't annotate
-
-### Error Handling
-
 ```dart
 try {
-  await for (final status in controller.setUpDIGraph(configurators: modules)) {
-    // Handle status updates
+  await for (final status in controller.setUpDIGraph(
+    configurators: configurators,
+  )) {
+    // Handle status updates.
   }
-} on PreInjectionException catch (e) {
-  // Handle pre-setup errors
-} on RegisterInjectionException catch (e) {
-  // Handle registration errors
-} on PostInjectionException catch (e) {
-  // Handle post-setup errors
+} on InjectionException catch (e) {
+  // e.message, e.cause
 }
 ```
 
@@ -108,322 +164,283 @@ try {
 
 #### `@register`
 
-Marks a class for automatic **factory** registration. The generator reads the
-unnamed constructor and emits
-`sl.registerFactory<T>(() => T(sl.get(), ...))`.
-
-```dart
-@register
-class GetProfileUseCase {
-  GetProfileUseCase(this._repository);
-
-  final ProfileRepository _repository;
-}
-```
-
-Generates:
-
-```dart
-sl.registerFactory<GetProfileUseCase>(
-  () => GetProfileUseCase(sl.get<ProfileRepository>()),
-);
-```
+Shorthand for `Register()`. Marks a class for factory registration under its
+own type. The generator reads the unnamed constructor and resolves each
+parameter with `sl.get<DeclaredType>()`; named parameters are passed by name.
 
 #### `@registerSingleton`
 
-Same as `@register`, but emits `sl.registerSingleton` instead — a single
-lazily-created instance.
-
-```dart
-@registerSingleton
-class ProfileCache extends DBCache<ProfileModel> {
-  ProfileCache();
-}
-```
-
-Generates:
-
-```dart
-sl.registerSingleton<ProfileCache>(
-  () => ProfileCache(),
-);
-```
+Shorthand for `RegisterSingleton()`. Same as `@register`, but emits
+`sl.registerSingleton`, which creates one instance on first use.
 
 #### `@Register(as: AbstractType)` / `@RegisterSingleton(as: AbstractType)`
 
-Registers a concrete class under an abstract type. Only one class should use
-`as:` for a given abstract type.
+Registers the class under `AbstractType` instead of its own type. Only one
+class should use `as:` for a given abstract type.
 
 ```dart
-@Register(as: ExperienceRepository)
-class BuildConfigExperienceRepositoryImpl implements ExperienceRepository {
-  BuildConfigExperienceRepositoryImpl(this._buildConfig, ...);
+@Register(as: ItemRepository)
+class RemoteItemRepository implements ItemRepository {
+  RemoteItemRepository(this._client);
+
+  final ApiClient _client;
 }
 ```
 
 Generates:
 
 ```dart
-sl.registerFactory<ExperienceRepository>(
-  () => BuildConfigExperienceRepositoryImpl(
-    sl.get<BuildConfig>(),
-    ...
-  ),
+sl.registerFactory<ItemRepository>(
+  () => RemoteItemRepository(sl.get<ApiClient>()),
 );
 ```
 
 #### `shouldOverride`
 
-Both `@Register` and `@RegisterSingleton` accept `shouldOverride: true`, which
-passes `shouldOverride: true` to the underlying `ServiceLocator` call. Use this
-when a binding may be legitimately replaced (e.g. in test modules or
-multi-module setups).
+`Register` and `RegisterSingleton` accept `shouldOverride` (default `false`).
+When `true`, the generated call passes `shouldOverride: true`, and the service
+locator unregisters an existing registration of the same type before
+registering the new one. Use it only where a binding is meant to be replaced,
+such as a fake in a test module.
 
 ```dart
-@Register(as: ProfileRepository, shouldOverride: true)
-class FakeProfileRepository implements ProfileRepository {
-  ...
+@Register(as: ItemRepository, shouldOverride: true)
+class FakeItemRepository implements ItemRepository {
+  FakeItemRepository();
 }
 ```
 
 Generates:
 
 ```dart
-sl.registerFactory<ProfileRepository>
-(
-() => FakeProfileRepository(),
-shouldOverride: true,
+sl.registerFactory<ItemRepository>(
+  () => FakeItemRepository(),
+  shouldOverride: true,
 );
 ```
 
 #### `disposeMethodName` (singletons only)
 
-`@RegisterSingleton` accepts a `disposeMethodName` string. When set, the
-generator emits a `dispose:` callback that calls that method on the instance
-when it is unregistered.
+`RegisterSingleton` accepts `disposeMethodName`. When set, the generated call
+includes a `dispose:` callback that calls that method when the singleton is
+unregistered or the locator is reset.
 
 ```dart
 @RegisterSingleton(disposeMethodName: 'close')
 class DatabaseConnection {
-  void close() {
-    ...
-  }
+  DatabaseConnection();
+
+  void close() {}
 }
 ```
 
 Generates:
 
 ```dart
-sl.registerSingleton<DatabaseConnection>
-(
-() => DatabaseConnection(),
-dispose: (it) => it.close(),
+sl.registerSingleton<DatabaseConnection>(
+  () => DatabaseConnection(),
+  dispose: (it) => it.close(),
 );
 ```
 
 #### `@Inject(ConcreteType)`
 
-Overrides the resolved type for a **constructor parameter**. Use this when a
-parameter is typed as an abstract interface but you need a specific concrete
-implementation injected.
-
-This is essential for **decorator / chain patterns** where multiple classes
-implement the same interface.
+Placed on a constructor parameter, resolves `ConcreteType` instead of the
+declared parameter type. Needed when several classes implement the same
+interface, as in a delegation chain.
 
 ```dart
 @register
-class RemoteExperienceRepositoryImpl implements ExperienceRepository {
-  RemoteExperienceRepositoryImpl(this._firestoreController,
-      this._appLocale,
-      @Inject(CacheExperienceRepositoryImpl) this._cacheDelegateRepository,
-      this._mapper,
-      this._logReporter,);
+class RemoteItemRepository implements ItemRepository {
+  RemoteItemRepository(
+    this._client,
+    @Inject(CacheItemRepository) this._cacheDelegate,
+  );
 
-  final ExperienceRepository _cacheDelegateRepository; // typed as abstract
+  final ApiClient _client;
+  final ItemRepository _cacheDelegate;
 }
 ```
 
 Generates:
 
 ```dart
-sl.registerFactory<RemoteExperienceRepositoryImpl>(
-  () => RemoteExperienceRepositoryImpl(
-    sl.get<FbFirestoreController>(),
-    sl.get<AppLocale>(),
-    sl.get<CacheExperienceRepositoryImpl>(), // ← resolved by @Inject
-    sl.get<ExperienceMapper>(),
-    sl.get<LogReporter>(),
+sl.registerFactory<RemoteItemRepository>(
+  () => RemoteItemRepository(
+    sl.get<ApiClient>(),
+    sl.get<CacheItemRepository>(),
   ),
 );
 ```
 
 #### `@generateConfigurator`
 
-Marks a `SimpleModuleConfigurator` subclass for code generation. The generator
-globs every `.dart` file in the same directory as the configurator
-(recursively), scans for `@register` / `@registerSingleton` classes, and
-produces a `$register<Module>Dependencies(ServiceLocator sl)` function.
+Shorthand for `GenerateConfigurator()`. Marks the module's configurator class
+for generation.
+
+### Generator rules
+
+- Scans every `.dart` file under the configurator's directory, including
+  subdirectories, for `@register` and `@registerSingleton` classes. Annotated
+  classes only need to live in that directory tree; the configurator does not
+  have to import them.
+- Processes files in path order, so the output is stable.
+- Skips private (`_`-prefixed) classes, the configurator file itself, and files
+  ending in `.g.dart` or `.di.g.dart`.
+- Fails the build if an annotated class has no unnamed constructor.
+- Uses the first `@generateConfigurator` class in a file.
+- Emits an empty function when no annotated classes are found.
+- Adds imports for parameter types that are classes; for other parameter
+  types, such as function types, it logs a warning and adds no import.
+
+### Repository chain pattern
+
+Several implementations of one interface can form a delegation chain. Each
+link is registered under its own concrete type and receives the next link
+through `@Inject`; only the selector is registered under the interface.
 
 ```dart
-part 'profile_module_configurator.g.dart';
-
-@generateConfigurator
-class ProfileModuleConfigurator extends SimpleModuleConfigurator {
-  @override
-  void registerDependencies(ServiceLocator sl) =>
-      $registerProfileDependencies(sl);
-}
-```
-
-### Repository Chain Pattern
-
-A common pattern where multiple repository implementations form a delegation
-chain (cache → asset/remote → build-config selector):
-
-```dart
-// 1. Cache layer — registered under its own concrete type
 @register
-class CacheProfileRepository implements ProfileRepository {
-  CacheProfileRepository(this._cache, this._mapper, this._appLocale);
+class CacheItemRepository implements ItemRepository {
+  CacheItemRepository(this._cache);
+
+  final ItemCache _cache;
 }
 
-// 2. Asset/demo layer — delegates to cache via @Inject
 @register
-class DemoProfileRepository implements ProfileRepository {
-  DemoProfileRepository(this._appLocale,
-      @Inject(CacheProfileRepository) this._cacheDelegateRepository,
-      this._mapper,
-      this._logReporter,);
+class RemoteItemRepository implements ItemRepository {
+  RemoteItemRepository(
+    this._client,
+    @Inject(CacheItemRepository) this._cacheDelegate,
+  );
+
+  final ApiClient _client;
+  final ItemRepository _cacheDelegate;
 }
 
-// 3. Remote layer — also delegates to cache via @Inject
-@register
-class RemoteProfileRepository implements ProfileRepository {
-  RemoteProfileRepository(this._firestoreController,
-      this._appLocale,
-      @Inject(CacheProfileRepository) this._cacheDelegateRepository,
-      this._mapper,
-      this._logReporter,);
-}
+@Register(as: ItemRepository)
+class SelectingItemRepository implements ItemRepository {
+  SelectingItemRepository(
+    this._config,
+    @Inject(RemoteItemRepository) this._remoteDelegate,
+    @Inject(CacheItemRepository) this._cacheDelegate,
+  );
 
-// 4. Build-config selector — exposed as the abstract type
-@Register(as: ProfileRepository)
-class BuildConfigProfileRepository implements ProfileRepository {
-  BuildConfigProfileRepository(this._buildConfig,
-      @Inject(RemoteProfileRepository) this._remoteDelegateRepository,
-      @Inject(DemoProfileRepository) this._demoDelegateRepository,);
+  final ItemsConfig _config;
+  final ItemRepository _remoteDelegate;
+  final ItemRepository _cacheDelegate;
 }
 ```
 
-The generator produces all four registrations automatically. The rest of the
-app resolves `sl.get<ProfileRepository>()` and gets the
-`BuildConfigProfileRepository` which delegates to the correct chain based on
-build environment.
+Consumers call `sl.get<ItemRepository>()` and receive
+`SelectingItemRepository`.
 
-### Core Concepts
-
-#### ModuleConfigurator
-
-Abstract base class for defining dependency modules with three lifecycle
-phases:
-
-- `preDependenciesSetup` — Setup before dependency registration (e.g.,
-  initialise Firebase)
-- `registerDependencies` — Register your dependencies
-- `postDependenciesSetup` — Additional setup after registration (e.g., register
-  routes, restore cached state)
-
-#### SimpleModuleConfigurator
-
-A convenience base class with no-op default implementations for
-`preDependenciesSetup` and `postDependenciesSetup`. Use this when your module
-only needs `registerDependencies`.
-
-#### ServiceLocator
-
-Abstraction layer for dependency registration and retrieval:
+### ModuleConfigurator
 
 ```dart
-// Factory — new instance each time
-sl.registerFactory<ApiClient>(() => ApiClient());
+abstract class ModuleConfigurator {
+  FutureOr<void> preDependenciesSetup(ServiceLocator serviceLocator);
 
-// Singleton — single lazily-created instance
-sl.registerSingleton<Database>(
-() => Database(),
-dispose: (db) => db.close(),
-);
+  FutureOr<void> registerDependencies(ServiceLocator serviceLocator);
 
-// Retrieve
-final client = sl.get<ApiClient>();
-
-// Check
-if (sl.isRegistered<ApiClient>()) { ... }
-
-// Cleanup
-await sl.unregister<ApiClient>();
-await sl.reset();
+  FutureOr<void> postDependenciesSetup(ServiceLocator serviceLocator);
+}
 ```
 
-##### Shorthand Extensions
+- `preDependenciesSetup`: work needed before any registration, such as
+  initializing an SDK.
+- `registerDependencies`: register the module's dependencies.
+- `postDependenciesSetup`: work that needs registered dependencies, such as
+  registering routes or loading cached state.
+
+`SimpleModuleConfigurator` implements `ModuleConfigurator` with no-op
+`preDependenciesSetup` and `postDependenciesSetup`.
+
+### ServiceLocator
 
 ```dart
-// Instead of sl.registerFactory<T>(...)
-sl.factory<T>(() => MyClass());
+abstract class ServiceLocator {
+  T get<T extends Object>();
 
-// Instead of sl.registerSingleton<T>(...)
-sl.singleton<T>(() => MyClass());
+  void registerFactory<T extends Object>(
+    T Function() factory, {
+    bool shouldOverride,
+  });
+
+  void registerSingleton<T extends Object>(
+    T Function() factory, {
+    FutureOr<void> Function(T param)? dispose,
+    bool shouldOverride,
+  });
+
+  bool isRegistered<T extends Object>();
+
+  Future<void> unregister<T extends Object>();
+
+  Future<void> reset();
+}
 ```
 
-#### InjectionStatus
+`registerFactory` creates a new instance on every `get`. `registerSingleton`
+creates one instance on the first `get` (a GetIt lazy singleton).
 
-Enum tracking the dependency injection process:
+The `ServiceLocatorX` extension adds shorthands with the same parameters:
+`factory<T>(create, {shouldOverride})` for `registerFactory` and
+`singleton<T>(create, {dispose, shouldOverride})` for `registerSingleton`. The
+type is inferred from `create` unless given explicitly.
 
-- `start` — Injection process initiated
-- `register` — Dependencies being registered
-- `postRegister` — Post-registration setup in progress
-- `finished` — All dependencies successfully registered
+```dart
+sl.factory(() => GetItemsUseCase(sl.get()));
+sl.singleton<ItemRepository>(() => RemoteItemRepository(sl.get(), sl.get()));
+```
 
-## Architecture
+### InjectionStatus
 
-- **Controller Layer** — `ModuleInjectorController` orchestrates the injection
-  process
-- **Annotation Layer** — `@register`, `@registerSingleton`, `@Inject`,
-  `@generateConfigurator`
-- **Generator Layer** — `ModuleInjectorBuilder` produces registration code at
-  build time via glob-based discovery
-- **Abstraction Layer** — `ServiceLocator` provides a clean interface for DI
-  operations
-- **Implementation Layer** — `GetItServiceLocator` implements the actual DI
-  logic using GetIt
-- **Configuration Layer** — `ModuleConfigurator` / `SimpleModuleConfigurator`
-  for modular organisation
+Values emitted by `setUpDIGraph`, in order:
+
+- `start`: the locator was reset; pre-setup is about to run.
+- `register`: pre-setup finished; registration is about to run.
+- `postRegister`: registration finished; post-setup is about to run.
+- `finished`: every configurator completed all three phases.
+
+### InjectionException
+
+Sealed base class with `message` and `cause`. Subclasses:
+`PreInjectionException`, `RegisterInjectionException` and
+`PostInjectionException`, each constructed as `(message, cause)`.
 
 ## Dependencies
 
 | Package | Purpose |
 |---------|---------|
-| `get_it` | Underlying service locator implementation |
-| `build` | Build system integration for code generation |
-| `source_gen` | Generates registration code from annotations |
-| `analyzer` | Inspects annotated Dart code during generation |
-| `glob` | Finds in-scope Dart files for configurator-based scanning |
+| `get_it` | Backing service locator |
+| `meta` | `@internal` annotation on the GetIt implementation |
+| `build` | Builder API for the generator |
+| `source_gen` | Annotation lookup in the generator |
+| `analyzer` | Reads classes and constructors during generation |
+| `glob` | Finds the Dart files under a configurator's directory |
 
 ## Testing
 
-### Run Tests
+```bash
+melos run test --scope=module_injector
+```
+
+Or from `layer/module_injector`:
 
 ```bash
 flutter test
 ```
 
-Mock configurators can be easily created for testing:
+The package exports no test helpers. A test module can
+replace bindings with `shouldOverride: true`:
 
 ```dart
-class TestModule extends SimpleModuleConfigurator {
+class TestItemsModuleConfigurator extends SimpleModuleConfigurator {
   @override
   void registerDependencies(ServiceLocator sl) {
-    sl.registerFactory<ProfileRepository>(
-          () => MockProfileRepository(),
+    sl.registerFactory<ItemRepository>(
+      () => FakeItemRepository(),
       shouldOverride: true,
     );
   }

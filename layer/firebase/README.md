@@ -1,109 +1,81 @@
-# Firebase Module
+# Firebase
 
-A comprehensive Firebase integration layer for Flutter applications, providing centralized access
-to all Firebase services with proper initialization and configuration.
+Initializes Firebase, activates App Check, and registers Firebase SDK instances and wrapper controllers in the module injector. The controllers validate input and map SDK errors to typed exceptions that implement `AppException` from [core](../core/README.md).
 
 ## Features
 
-- **Complete Firebase Suite**: Integration with all major Firebase services
-- **Centralized Configuration**: Single initialization point for all Firebase services
-- **Type-Safe Access**: Strongly typed service instances
-- **Dependency Injection**: Seamless integration with the module injector system
-- **Cross-Platform**: Support for Android, iOS, macOS, and Web platforms
-- **Firebase AI Logic**: Configurable Gemini text generation and streaming, plus single-image generation (`FbAiController.createImageModel`), with typed errors
-- **Cloud Messaging**: Notification permission, device tokens, topics and opened messages through `FbMessagingController`, with typed errors
+- `FirebaseModuleConfigurator` that initializes Firebase, activates App Check before other services, and registers every service below
+- App Check with debug providers in debug builds and Play Integrity, App Attest with DeviceCheck fallback, or reCAPTCHA Enterprise otherwise
+- `FbAuthController`: email and password accounts, sign-in, password reset
+- `FbFirestoreController`: collection queries, document reads and writes, merges and batch updates
+- `FbFunctionController`: authenticated callable functions
+- `FbStorageController`: upload, download and delete files in Cloud Storage
+- `FbRemoteConfigController`, `FbAnalyticsController`, `FbCrashlyticsController`
+- `FbMessagingController`: notification permission, device tokens, topics, foreground and opened messages
+- `FbAiController`: Firebase AI Logic text models (single response or streamed) and single-image models
 
 ## Getting Started
 
 ### Installation
 
-This module is part of the workspace and can be imported directly:
+Add the workspace package as a dependency:
 
 ```yaml
 dependencies:
-  firebase:
-    path: layer/firebase
+  firebase: any
 ```
 
 ```dart
 import 'package:firebase/firebase.dart';
 ```
 
-> **Note**: As a workspace module, `firebase` is automatically available to all other modules
-> without manual dependency configuration.
+The barrel also re-exports `cloud_firestore`, `firebase_analytics`, `firebase_core`, `firebase_remote_config`, `User` from `firebase_auth`, and these `firebase_ai` types: `Content`, `GenerationConfig`, `HarmBlockMethod`, `HarmBlockThreshold`, `HarmCategory`, `InlineDataPart`, `SafetySetting`, `Schema`, `TextPart`, `ThinkingConfig`, `ThinkingLevel`.
 
 ### Module Configuration
 
-1. **Add Firebase configuration files**:
-   - **Android**: `android/app/google-services.json`
-   - **iOS**: `ios/Runner/GoogleService-Info.plist`
-   - **macOS**: `macos/Runner/GoogleService-Info.plist`
-   - **Web**: Update `web/index.html` with Firebase config
-
-2. **Configure the module** in your application's module configurator list:
+The app supplies the platform configuration files (`android/app/google-services.json`, `ios/Runner/GoogleService-Info.plist`) and the FlutterFire-generated `DefaultFirebaseOptions`. Add the configurator to the list passed to `ModuleInjectorController.setUpDIGraph`:
 
 ```dart
-import 'package:firebase/firebase.dart';
-final configurator = FirebaseModuleConfigurator(
+FirebaseModuleConfigurator(
   isFirebaseEnabled: buildConfig.buildEnvironment.isFirebaseEnabled,
   firebaseOptions: DefaultFirebaseOptions.currentPlatform,
   appCheckWebSiteKey: const String.fromEnvironment(
     'FIREBASE_APP_CHECK_WEB_SITE_KEY',
   ),
   storageBucketUrl: '',
-);
+)
 ```
 
-Pass this configurator to `ModuleInjectorController.setUpDIGraph`. Its
-`preDependenciesSetup` initializes Firebase. After dependency registration,
-`postDependenciesSetup` resolves the App Check controller through DI and awaits
-activation before initializing the other Firebase services. Dependency registration
-and earlier module hooks must not issue protected Firebase requests. Do not initialize
-Firebase separately in an Apple `AppDelegate`, as this can bypass provider selection.
+| Parameter | Default | Purpose |
+| --- | --- | --- |
+| `isFirebaseEnabled` | required | Enables Analytics and Crashlytics collection |
+| `firebaseOptions` | required | Passed to `Firebase.initializeApp` |
+| `appCheckWebSiteKey` | required | reCAPTCHA Enterprise site key for web profile and release builds |
+| `storageBucketUrl` | required | Bucket URL that `FbStorageController` uploads to and deletes from |
+| `aiBackend` | `FbAiBackend.googleAI` | `googleAI` (Gemini Developer API) or `agentPlatform` |
+| `aiLocation` | `'global'` | Location for `FbAiBackend.agentPlatform`; ignored by `googleAI` |
+| `aiUseLimitedUseAppCheckTokens` | `true` | Sends a fresh limited-use App Check token with every AI request |
 
-`isFirebaseEnabled` controls Analytics and Crashlytics collection, not Firebase
-initialization or App Check. Both staging and production activate App Check.
-It also does not gate AI requests: the owning app feature must enforce its rollout
-flag, user preference, and cloud-processing consent before calling the AI controller.
+Setup order:
 
-`aiUseLimitedUseAppCheckTokens` (default `true`) enables App Check replay protection
-for Firebase AI Logic: every AI request carries a fresh limited-use token instead of the
-cached one. Each request therefore costs one attestation (Play Integrity, App Attest or
-reCAPTCHA Enterprise call), which counts against those providers' quotas. The backend
-only rejects missing or replayed tokens once App Check enforcement is on for Firebase AI Logic.
+1. `preDependenciesSetup` calls `Firebase.initializeApp`.
+2. `registerDependencies` registers the SDK instances (`FirebaseAppCheck`, `FirebaseAuth`, `FirebaseCrashlytics`, `FirebaseRemoteConfig`, `FirebaseAnalytics`, `FirebaseFirestore`, `FirebaseStorage`, `FirebaseFunctions`, `FirebaseMessaging`, `FirebaseAI`) as singletons, and `FirebaseAnalyticsObserver` and the `Fb*Controller` classes as factories.
+3. `postDependenciesSetup` activates App Check and waits for it, then enables Crashlytics collection and logs `App Started`, initializes Remote Config with empty defaults, and enables Analytics collection.
+
+Dependency registration and module hooks that run before this `postDependenciesSetup` must not issue App Check protected Firebase requests. Do not initialize Firebase separately in an Apple `AppDelegate`, as this can bypass provider selection.
+
+`isFirebaseEnabled` controls Analytics and Crashlytics collection only. It does not affect Firebase initialization, App Check activation, or AI requests; callers decide when to send AI requests.
+
+With `aiUseLimitedUseAppCheckTokens` on, every AI request carries a fresh limited-use token instead of the cached one. Each request therefore costs one attestation (Play Integrity, App Attest or reCAPTCHA Enterprise call), which counts against those providers' quotas. The backend rejects missing or replayed tokens only once App Check enforcement is on for Firebase AI Logic.
 
 ### Firebase AI Logic Setup
 
-1. Open **Firebase Console > Firebase AI Logic** in the existing Firebase project
-   and complete the guided setup for the chosen Gemini API provider. Enable the
-   required APIs through that workflow. The default module backend is the
-   **Gemini Developer API** (`FbAiBackend.googleAI`). Alternatively configure
-   `aiBackend: FbAiBackend.agentPlatform` and an appropriate `aiLocation`
-   (default `global`) for the Agent Platform Gemini API, formerly Vertex AI.
-   Changing that location does not relocate other Firebase services.
-2. Choose an available text-capable model for that provider and pass its name
-   when creating a text model. Model availability, supported settings, quotas,
-   pricing, and regional support must be checked in the provider documentation.
-   The layer deliberately does not hardcode a model or portfolio prompt.
-3. Register the app's production attestation providers as described below and
-   verify **App Check > APIs > Firebase AI Logic** is **Enforced** before exposing
-   cloud AI to public clients. New AI Logic setup may enable enforcement automatically;
-   verify existing projects rather than assuming enforcement is on. Activating App
-   Check in Flutter is not the same as enforcing it in the console. Register debug
-   tokens for local development; never distribute those tokens.
-4. Keep the Gemini API key managed by Firebase's proxy, not in client code,
-   assets, Remote Config, or compile-time definitions. The existing Firebase app
-   configuration is still required; its public Firebase API key is not a Gemini
-   service credential.
-5. Review billing for the actual project and selected model. Firebase AI Logic
-   has no separate usage fee, but model calls can be billable. The Gemini
-   Developer API free tier depends on project billing status and model eligibility;
-   do not assume a Blaze project's low-volume requests are free. Configure
-   provider quotas, AI Logic request limits, budget alerts, and available spend
-   caps. Budget alerts alone do not stop spending.
-6. Keep the app's remote feature disabled until consent, request-size limits,
-   timeout handling, and production App Check verification are implemented.
-   Registering `FbAiController` and creating a model issue no generation requests.
+1. Open **Firebase Console > Firebase AI Logic** in the Firebase project and complete the guided setup for the chosen Gemini API provider, which enables the required APIs. The default backend is the **Gemini Developer API** (`FbAiBackend.googleAI`). For the Agent Platform Gemini API (formerly Vertex AI), set `aiBackend: FbAiBackend.agentPlatform` and an `aiLocation`. Changing that location does not relocate other Firebase services.
+2. Choose a model for that provider and pass its name to `createTextModel` or `createImageModel`. The layer does not hardcode a model or prompt. Check model availability, supported settings, quotas, pricing and regional support in the provider documentation.
+3. Register the production attestation providers as described in [App Check Setup](#app-check-setup) and verify **App Check > APIs > Firebase AI Logic** is **Enforced** before exposing AI requests to public clients. New AI Logic setups may enable enforcement automatically; verify existing projects. Activating App Check in Flutter is not the same as enforcing it in the console. Register debug tokens for local development and never distribute them.
+4. Keep the Gemini API key managed by Firebase's proxy, not in client code, assets, Remote Config or compile-time definitions. The Firebase app configuration is still required; its public Firebase API key is not a Gemini credential.
+5. Review billing for the project and selected model. Firebase AI Logic has no separate usage fee, but model calls can be billable. The Gemini Developer API free tier depends on project billing status and model eligibility. Configure provider quotas, AI Logic request limits, budget alerts and available spend caps; budget alerts alone do not stop spending.
+6. Registering `FbAiController` and creating a model send no generation requests.
 
 See [AI Logic setup](https://firebase.google.com/docs/ai-logic/get-started),
 [App Check enforcement](https://firebase.google.com/docs/ai-logic/app-check),
@@ -113,104 +85,51 @@ See [AI Logic setup](https://firebase.google.com/docs/ai-logic/get-started),
 
 ### App Check Setup
 
-Debug builds use the SDK debug providers on Android, Apple platforms, and web.
-Profile and release builds use Play Integrity, App Attest with DeviceCheck fallback,
-and reCAPTCHA Enterprise respectively. Public previews use real attestation.
+The internal `FbAppCheckController.initialiseAppCheck` selects providers with `useDebugProviders`, which defaults to `kDebugMode`:
 
-Before deploying, register all clients under **Firebase Console > Security > App Check > Apps**,
-leaving service enforcement disabled:
+| Platform | Debug builds | Profile and release builds |
+| --- | --- | --- |
+| Android | `AndroidDebugProvider` | `AndroidPlayIntegrityProvider` |
+| iOS, macOS | `AppleDebugProvider` | `AppleAppAttestWithDeviceCheckFallbackProvider` |
+| Web | `WebDebugProvider` | `ReCaptchaEnterpriseProvider(appCheckWebSiteKey)` |
 
-1. **Android:** link the Play Integrity API to the existing Firebase project and
-   register the signing certificate SHA-256 fingerprints, including Play App Signing.
-   Configure app recognition, licensing, and device integrity requirements for both
-   Play Store and Firebase App Distribution installations. Defaults requiring
-   `PLAY_RECOGNIZED` do not suit apps distributed exclusively outside Google Play.
-2. **iOS:** register App Attest with the Apple team and bundle ID. Configure DeviceCheck
-   credentials as well for the fallback. Enable the App Attest capability in the Apple
-   developer account and regenerate development and distribution provisioning profiles,
-   including the Ad Hoc profile used by previews. Portrai's Runner entitlement uses
-   the `production` App Attest environment for Firebase.
-3. **Web:** create a reCAPTCHA Enterprise score-based website key in the same Google
-   Cloud project, enable the API, configure permitted production and actual preview
-   hostnames, and register that key for the Firebase web app. Review quotas, billing,
-   and privacy requirements. Do not authorize `localhost` on a production key;
-   use the debug provider for local development.
+Token auto-refresh is enabled after activation. On web profile and release builds an empty `appCheckWebSiteKey` throws. Activation failures are rethrown as `AppCheckException`. Native builds need no web key.
 
-For Portrai CI, set the repository Actions **variable**
-`FIREBASE_APP_CHECK_WEB_SITE_KEY` to the public Enterprise site key. Both preview
-and production workflows pass it to the reusable web build. Firebase web builds
-fail before compilation if it is missing; the application also rejects missing
-keys during non-debug web startup. No web key is needed by native builds.
+Before deploying, register all clients under **Firebase Console > Security > App Check > Apps**, leaving service enforcement disabled:
 
-For local production configuration, put your public Enterprise site key in
-the ignored `app/portrai/.env.production` file:
+1. **Android:** link the Play Integrity API to the Firebase project and register the signing certificate SHA-256 fingerprints, including Play App Signing. Configure app recognition, licensing and device integrity requirements for both Play Store and Firebase App Distribution installations. Defaults requiring `PLAY_RECOGNIZED` do not suit apps distributed only outside Google Play.
+2. **iOS:** register App Attest with the Apple team and bundle ID, and DeviceCheck credentials for the fallback. Enable the App Attest capability in the Apple developer account and regenerate the development, distribution and Ad Hoc provisioning profiles. Set the App Attest environment in the Runner entitlements.
+3. **Web:** create a reCAPTCHA Enterprise score-based website key in the same Google Cloud project, enable the API, list the permitted production and preview hostnames, and register that key for the Firebase web app. Review quotas, billing and privacy requirements. Do not authorize `localhost` on a production key; use the debug provider for local development.
 
-```dotenv
-FIREBASE_APP_CHECK_WEB_SITE_KEY=YOUR_PUBLIC_ENTERPRISE_SITE_KEY
-```
-
-Keep this file separate from the debug-token `.env`. To build and deploy to
-Hosting, run from the workspace root:
-
-```bash
-melos run deploy_portrai
-```
-
-The script loads the trusted local `.env.production` file automatically if
-the site key is not already supplied through the environment. An exported key
-takes precedence. The file is sourced as shell configuration; use only simple
-assignments and comments, and never source configuration from untrusted sources.
-The Melos script requires the public site key before cleaning or building,
-passes it to the production release build, and deploys to `hosting:portrai`.
-It does not load the debug-token `.env` file.
+Pass the public site key to web builds as the `FIREBASE_APP_CHECK_WEB_SITE_KEY` compile-time define, as in the configurator example above.
 
 ### Local Development
 
-Run `flutter run` normally in debug mode. On first Firebase access, copy the
-SDK-generated App Check debug token from the device log or browser console and
-register it under the matching Firebase app's **Manage debug tokens** menu.
-The web debug provider sets the SDK debug configuration itself; no edit to
-`web/index.html` is required. Restart after registration if requests still fail.
+Run the app in debug mode. On first Firebase access, copy the SDK-generated App Check debug token from the device log or browser console and register it under the matching Firebase app's **Manage debug tokens** menu. The web debug provider sets the SDK debug configuration itself; no edit to `web/index.html` is required. Restart after registration if requests still fail.
 
-To reuse tokens across reinstalls or devices, copy `app/portrai/.env.example` to
-`app/portrai/.env` and enter each platform's registered debug token. The local
-`.env` is git-ignored and is not bundled as an asset. Empty values let the SDK
-generate a token as usual.
+To reuse tokens across reinstalls or devices, pass registered debug tokens as compile-time defines. Empty values let the SDK generate a token.
+
+| Define | Platform |
+| --- | --- |
+| `FIREBASE_APP_CHECK_ANDROID_DEBUG_TOKEN` | Android |
+| `FIREBASE_APP_CHECK_APPLE_DEBUG_TOKEN` | iOS, macOS |
+| `FIREBASE_APP_CHECK_WEB_DEBUG_TOKEN` | Web |
+
+Keep them in a git-ignored file and pass it at run time:
 
 ```bash
-cd app/portrai
 flutter run --dart-define-from-file=.env
 ```
 
-In Android Studio, add `--dart-define-from-file=.env` to the Flutter run
-configuration's additional arguments (relative to the app working directory).
-After changing tokens, stop and rerun the app; hot reload does not update
-compile-time environment values.
+After changing tokens, stop and rerun the app; hot reload does not update compile-time values. Profile and release builds use real providers even if debug tokens are supplied, but never pass the file to distributed builds: compile-time definitions are not secret storage.
 
-Only use this file for debug runs. Profile/release builds select real providers
-even if debug-token values are supplied, but never pass this file to distributed
-builds: compile-time definitions are not a secret-storage mechanism.
-
-Debug tokens bypass attestation: do not commit them, log them in shared CI output,
-or include them in public artifacts. Give each developer a separate token and
-revoke unused tokens. Mocked unit tests and ordinary builds need no registered
-token. Trusted live-Firebase integration tests require separately managed debug
-tokens; the release workflows do not inject any.
+Debug tokens bypass attestation: do not commit them, log them in shared CI output, or include them in public artifacts. Give each developer a separate token and revoke unused ones. Unit tests with mocks need no registered token.
 
 ### Enforcement Rollout
 
-Deploy clients with App Check active while enforcement remains off. Verify token
-validity and Firebase reads on real devices, App Distribution builds, and production
-and preview web hostnames. Monitor valid, invalid, and missing-token traffic before
-enforcing **Cloud Firestore**, which serves Portrai's portfolio and app configuration.
-Account for older mobile clients and cached web clients; enforcement rejects their
-unverified requests too.
+Deploy clients with App Check active while enforcement remains off. Verify token validity and Firebase reads on real devices, App Distribution builds, and production and preview web hostnames. Monitor valid, invalid and missing-token traffic before enforcing a service such as **Cloud Firestore**. Account for older mobile clients and cached web clients; enforcement rejects their unverified requests too.
 
-Inventory other active Firebase clients before enforcing additional supported
-services. Keep Firestore Security Rules and IAM protections: App Check supplements
-them and does not protect Hosting pages. Roll back by disabling the affected
-service's enforcement in Firebase Console. Do not use Remote Config to gate
-activation because it is itself fetched during startup.
+Inventory other active Firebase clients before enforcing additional services. Keep Firestore Security Rules and IAM protections: App Check supplements them and does not protect Hosting pages. Roll back by disabling the affected service's enforcement in Firebase Console. Do not use Remote Config to gate activation, because it is itself fetched during startup.
 
 See the official [Flutter setup](https://firebase.google.com/docs/app-check/flutter/default-providers),
 [Play Integrity settings](https://firebase.google.com/docs/app-check/android/play-integrity-provider),
@@ -218,22 +137,26 @@ and [enforcement guide](https://firebase.google.com/docs/app-check/enable-enforc
 
 ## Usage
 
-### Firebase AI Logic
-
-Inject `FbAiController` from the module's service locator into the app feature's
-repository. Create a text model only after Firebase initialization and App Check
-activation; do not generate from registration or earlier module hooks.
+Resolve controllers from the `ServiceLocator` in another module's `registerDependencies`:
 
 ```dart
-import 'package:firebase/firebase.dart';
+serviceLocator.registerFactory<ItemRepository>(
+  () => ItemRepositoryImpl(serviceLocator.get<FbFirestoreController>()),
+);
+```
 
+### Firebase AI Logic
+
+Create a model only after App Check activation, not from dependency registration.
+
+```dart
 Future<String> generateAnswer(
   FbAiController controller, {
-  required String configuredModelName,
+  required String modelName,
   required String prompt,
 }) async {
   final model = controller.createTextModel(
-    model: configuredModelName,
+    model: modelName,
     generationConfig: GenerationConfig(
       maxOutputTokens: 1024,
       temperature: 0.2,
@@ -248,48 +171,35 @@ Future<String> generateAnswer(
 }
 ```
 
-For incremental output, use `model.generateTextStream(contents)`, which emits
-**deltas**, including whitespace, rather than accumulated text. Commit an answer
-only after the stream completes normally. On an error after partial output,
-discard that partial answer and show the owning feature's failure state. The
-wrapper rejects blocked output, empty/whitespace-only answers, token-limit
-truncation, and streams that end without a normal stop reason.
+`createTextModel` throws `AiInvalidInputException` for an empty model name, a missing or non-positive `maxOutputTokens`, or a `candidateCount` other than 1.
 
-The model owns its HTTP client. Stop active subscriptions and call `close()` when
-the owning feature disposes or replaces it. Closing is idempotent; requests on a
-closed model fail explicitly. Cancelling a subscription stops local consumption;
-neither cancellation nor closing guarantees that backend generation or billing
-stops. There are no automatic retries or local/cloud fallbacks.
+`generateTextStream(contents)` emits text deltas, including whitespace, not accumulated text. Treat the answer as complete only when the stream completes normally; on an error after partial output, discard the partial text. Both methods reject empty prompts, blocked output, empty or whitespace-only answers, and responses that end without a `stop` finish reason (including token-limit truncation).
 
-The caller supplies history explicitly as `Content` items. The Firebase layer
-does not keep a chat session, read portfolio data, grant consent, render UI, or
-execute generated actions. `GenerationConfig` supports structured text/JSON
-settings for a later generative UI feature; that feature must validate the result
-and resolve references against authoritative app data.
+`createImageModel(model:, systemInstruction:, safetySettings:)` returns an `FbAiImageModel` that requests one candidate with text and image modalities. `generateImage(contents)` returns the first image part as an `FbAiImage` with `bytes` and `mimeType`. It rejects empty prompts, blocked responses, finish reasons other than `stop`, and responses without image data.
 
-`AiException` subclasses preserve the cause and stack trace.
-`FirebaseAIException.message` details are also retained in the optional `serviceMessage`
-for request/configuration/quota/location errors, allowing callers to display actionable
-service errors. `toString()` remains generic and sanitized: neither those details nor the
-raw cause are printed. SDK parsing messages, HTTP client URI/body details, arbitrary errors,
-and blocked/empty/incomplete responses never populate `serviceMessage`.
-Concrete SDK
-exceptions map to configuration, quota, location, server, or SDK errors; typed
-HTTP client and timeout exceptions map to network and timeout errors. Generic
-server exceptions remain server errors rather than guessing their meaning from
-message text. Unexpected programming errors propagate unchanged. The owning
-app use cases should map these exceptions to their domain `Failure` types.
+Each model owns its HTTP client. Cancel active subscriptions and call `close()` when the model is no longer needed. `close()` is idempotent and later requests throw `StateError`. Neither cancelling a subscription nor closing stops backend generation or billing. There are no automatic retries.
+
+Models keep no chat history: pass prior turns as `Content` items.
+
+Errors are thrown as `AiException` subclasses, which keep the `cause` and `stackTrace`:
+
+| SDK error | Exception |
+| --- | --- |
+| `InvalidApiKey`, `ServiceApiNotEnabled` | `AiConfigurationException` |
+| `QuotaExceeded` | `AiQuotaExceededException` |
+| `UnsupportedUserLocation` | `AiUnsupportedLocationException` |
+| other `FirebaseAIException` | `AiServerException` |
+| `FirebaseAISdkException` | `AiSdkException` |
+| `http` `ClientException` | `AiNetworkException` |
+| `TimeoutException` | `AiTimeoutException` |
+
+`AiInvalidInputException`, `AiBlockedResponseException`, `AiEmptyResponseException` and `AiIncompleteResponseException` come from the layer's own checks. For `FirebaseAIException`-based errors, `serviceMessage` holds the SDK's `message` for display; it is null for every other error. `toString()` prints only the generic `message`, never `serviceMessage` or the cause. Other error types propagate unchanged.
 
 ### Firebase Auth
 
-Inject `FbAuthController` into the app feature's repository. It wraps email and
-password sign-in and throws the typed `AuthException` subclasses from
-`auth_exception.dart`. The barrel exports Firebase's `User`, the type returned
-by `currentUser` and `authStateChanges`.
+`FbAuthController` exposes `currentUser`, `isSignedIn`, `authStateChanges`, `createAccount`, `signIn`, `signOut`, `deleteAccount`, `updatePassword`, `resetPassword`, `confirmPasswordReset`, `verifyPasswordResetCode`, and the static `extractResetCodeFromUrl`. Failures are thrown as `AuthException` subclasses, whose `message` is user-readable.
 
 ```dart
-import 'package:firebase/firebase.dart';
-
 Future<String?> signInAndGetUserId(
   FbAuthController controller, {
   required String email,
@@ -305,19 +215,14 @@ Future<String?> signInAndGetUserId(
 
 ### Cloud Firestore
 
-App features inject `FbFirestoreController`, which validates paths and throws the
-typed `FirestoreException` subclasses from `firestore_exception.dart`. Collection
-paths may point at subcollections, such as `parents/{parentId}/children`.
+`FbFirestoreController` throws `ArgumentError` (wrapped as a `FirestoreException`) for empty paths or data, and `FirestoreException` subclasses for SDK errors. Collection paths may point at subcollections, such as `parents/{parentId}/children`.
 
-- `getCollectionQuerySnapshot(path, documentIdField: 'id')` adds each document's
-  ID to its map under the given key, for data that does not store its own ID.
-- `mergeDocumentInCollection` creates the document or merges fields into it,
-  keeping fields that are not written, nested maps included.
-  `addDocumentToCollection` replaces the whole document instead.
+- `getCollectionQuerySnapshot(path, documentIdField: 'id')` adds each document's ID to its map under the given key. It also accepts one `field` with `isEqualTo`, `isLessThan`, `isGreaterThan`, `isGreaterThanOrEqualTo` or `isNotEqualTo` filters, plus `orderBy`, `descending`, `limit` and `startAfterDocumentId`.
+- `getDocumentFromCollection` throws `FirestoreDocumentNotFoundException` when the document is missing.
+- `addToCollection` adds a document with a generated ID. `addDocumentToCollection` replaces the whole document. `mergeDocumentInCollection` creates the document or merges fields into it, keeping fields that are not written, nested maps included.
+- `updateDocumentFromCollection`, `deleteDocumentFromCollection` and `batchUpdateDocuments` throw `FirestoreDocumentNotFoundException` if a target document does not exist. Each `batchUpdateDocuments` entry is `{'documentPath': String, 'data': Map<String, dynamic>}`.
 
 ```dart
-import 'package:firebase/firebase.dart';
-
 Future<List<Map<String, dynamic>>> getChildren(
   FbFirestoreController controller, {
   required String parentId,
@@ -342,265 +247,122 @@ Future<void> setPreference(
 );
 ```
 
-Direct `FirebaseFirestore` access, for code outside the app features:
+### Cloud Functions
+
+`FbFunctionController.callFunction(name, parameters: {...})` calls an HTTPS callable function in the `europe-west3` region and returns its `data`. It throws `FunctionAuthenticationException` when no user is signed in, `FunctionEmptyResponseException` when the function returns null, and other `FunctionException` subclasses mapped from `FirebaseFunctionsException.code`.
 
 ```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:module_injector/module_injector.dart';
-
-class FirestoreService {
-  final FirebaseFirestore _firestore = serviceLocator<FirebaseFirestore>();
-
-  Future<List<Project>> getProjects() async {
-    final snapshot = await _firestore.collection('projects').get();
-    return snapshot.docs.map((doc) => Project.fromJson(doc.data())).toList();
-  }
-
-  Future<void> addProject(Project project) async {
-    await _firestore.collection('projects').doc(project.id).set(project.toJson());
-  }
-
-  Stream<List<Project>> projectsStream() {
-    return _firestore.collection('projects').snapshots().map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => Project.fromJson(doc.data())).toList(),
-        );
-  }
-}
-```
-
-### Firebase Analytics
-
-```dart
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:module_injector/module_injector.dart';
-
-class AnalyticsService {
-  final FirebaseAnalytics _analytics = serviceLocator<FirebaseAnalytics>();
-
-  Future<void> logEvent(String name, Map<String, dynamic> parameters) async {
-    await _analytics.logEvent(
-      name: name,
-      parameters: parameters,
-    );
-  }
-
-  Future<void> setUserProperty(String name, String value) async {
-    await _analytics.setUserProperty(
-      name: name,
-      value: value,
-    );
-  }
-}
-```
-
-### Firebase Crashlytics
-
-```dart
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:module_injector/module_injector.dart';
-
-class CrashlyticsService {
-  final FirebaseCrashlytics _crashlytics = serviceLocator<FirebaseCrashlytics>();
-
-  Future<void> recordError(
-    dynamic exception,
-    StackTrace? stack, {
-    String? reason,
-    bool fatal = false,
-  }) async {
-    await _crashlytics.recordError(
-      exception,
-      stack,
-      reason: reason,
-      fatal: fatal,
-    );
-  }
-
-  Future<void> setUserIdentifier(String userId) async {
-    await _crashlytics.setUserIdentifier(userId);
-  }
-
-  Future<void> log(String message) async {
-    await _crashlytics.log(message);
-  }
-}
-```
-
-### Remote Config
-
-```dart
-import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:module_injector/module_injector.dart';
-
-class RemoteConfigService {
-  final FirebaseRemoteConfig _remoteConfig = serviceLocator<FirebaseRemoteConfig>();
-
-  Future<void> initialize() async {
-    await _remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: const Duration(hours: 1),
-      ),
-    );
-
-    await _remoteConfig.fetchAndActivate();
-  }
-
-  bool getBool(String key) => _remoteConfig.getBool(key);
-  int getInt(String key) => _remoteConfig.getInt(key);
-  String getString(String key) => _remoteConfig.getString(key);
-}
+Future<dynamic> runTask(FbFunctionController controller, String itemId) =>
+    controller.callFunction('runTask', parameters: {'itemId': itemId});
 ```
 
 ### Cloud Storage
 
+`FbStorageController` methods return the download URL after upload and throw `FireStorageException` subclasses on failure.
+
+- `uploadRawDocument(fileName, Uint8List data)`, `uploadStringUrlDocument(fileName, dataUrl)` and `uploadFileDocument(fileName, File file)` upload under `storageBucketUrl`.
+- `deleteFileDocument(fileName)` deletes under `storageBucketUrl`.
+- `downloadFileDocument(fileName:, storageFolder:)` writes `storageFolder/fileName` to the app documents directory and returns the `File`. It throws `StorageDownloadErrorException` on web.
+
+### Remote Config
+
+`postDependenciesSetup` already calls `initialiseRemoteConfig(defaultConfigsMap: const {})`, with a 5 second fetch timeout and a 12 hour minimum fetch interval. On the first launch it waits for `fetchAndActivate`; afterwards it activates the values fetched earlier and fetches in the background, so new values apply on the next launch.
+
 ```dart
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:module_injector/module_injector.dart';
+final controller = serviceLocator.get<FbRemoteConfigController>();
+final bool isEnabled = controller.getValueForKey('enabled_key').asBool();
+final Map<String, RemoteConfigValue> all = controller.getAllConfigsValue();
+```
 
-class StorageService {
-  final FirebaseStorage _storage = serviceLocator<FirebaseStorage>();
+### Analytics and Crashlytics
 
-  Future<String> uploadFile(File file, String path) async {
-    final ref = _storage.ref().child(path);
-    await ref.putFile(file);
-    return await ref.getDownloadURL();
-  }
+```dart
+final analytics = serviceLocator.get<FbAnalyticsController>();
+await analytics.sendLogEvent('item_opened', parameters: {'id': 'item-1'});
+await analytics.sendUserEvent('user-1', additionalProps: {'plan': 'free'});
 
-  Future<void> deleteFile(String path) async {
-    await _storage.ref().child(path).delete();
-  }
+final crashlytics = serviceLocator.get<FbCrashlyticsController>();
+await crashlytics.logMessage('Item opened');
+try {
+  await openItem();
+} catch (error, stackTrace) {
+  await crashlytics.reportError(error, stackTrace);
 }
 ```
 
+`FbCrashlyticsController` also provides `isCrashlyticsEnabled`, `setCrashlyticsEnabled`, `setUser`, `reportFlutterError` and `forceCrash`. Its calls do nothing unless the platform is Android or iOS and collection is enabled.
+
 ### Cloud Messaging
 
-`FbMessagingController` wraps Firebase Cloud Messaging. Its methods throw `MessagingException`
-subtypes that keep the original cause and stack trace.
+`FbMessagingController` throws `MessagingException` subclasses (`MessagingPermissionException`, `MessagingTokenException`, `MessagingTopicException`) that keep the original cause and stack trace.
 
 ```dart
-final messaging = serviceLocator<FbMessagingController>();
+final messaging = serviceLocator.get<FbMessagingController>();
 
-// Ask once, for example when the user turns notifications on.
 if (await messaging.requestPermission()) {
-  // On iOS this waits for the APNs token before asking for the device token.
   final token = await messaging.getToken();
   await messaging.subscribeToTopic('updates');
 }
 
-// The system does not show notifications while the app is in the foreground.
+// The system does not display notifications while the app is in the foreground.
 messaging.foregroundMessages.listen((message) => showBanner(message.title));
 
-// A tapped notification, from the background or from a terminated app.
+// A notification tapped while the app was in the background.
 messaging.openedMessages.listen((message) => openRoute(message.data['route']));
-final initialMessage = await messaging.getInitialMessage();
+
+// The notification that opened the app from a terminated state, if any.
+final FbPushMessage? initialMessage = await messaging.getInitialMessage();
 ```
 
-Messages arrive as `FbPushMessage`: the notification's `title` and `body`, and its `data` as a
-map of strings. `onTokenRefresh` emits new tokens, and `deleteToken` stops delivery to the
-current one.
+- Messages arrive as `FbPushMessage` with the notification's `title` and `body`, and its `data` as `Map<String, String>`.
+- `requestPermission` and `isPermissionGranted` return true for authorized and provisional permission.
+- On iOS and macOS, `getToken` first waits for the APNs token, checking `apnsTokenAttempts` times (default 5) every `apnsTokenRetryDelay` (default 1 second), and throws `MessagingTokenException` if none arrives.
+- `onTokenRefresh` emits new tokens; `deleteToken` invalidates the current one.
 
-Topics are not supported on the web. iOS needs an APNs key uploaded to the Firebase project and
-the Push Notifications capability; Android 13 and later needs the `POST_NOTIFICATIONS`
-permission, which `requestPermission` asks for.
-
-### App Check
-
-```dart
-import 'package:firebase_app_check/firebase_app_check.dart';
-
-Future<void> initializeAppCheck() async {
-  await FirebaseAppCheck.instance.activate(
-    // For debug builds
-    androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.debug,
-  );
-}
-```
-
-## Services
-
-This module provides access to the following Firebase services:
-
-| Service | Description |
-|---------|-------------|
-| **Firebase Core** | Core Firebase SDK initialization |
-| **Firebase Auth** | User authentication and management |
-| **Cloud Firestore** | NoSQL cloud database |
-| **Cloud Functions** | Serverless cloud functions |
-| **Firebase Analytics** | User behavior analytics and reporting |
-| **Firebase Crashlytics** | Crash reporting and analysis |
-| **Remote Config** | Feature flags and remote configuration |
-| **Firebase Storage** | Cloud file storage |
-| **App Check** | App attestation and security |
-| **Firebase AI Logic** | Gemini text generation and streamed responses |
-| **Cloud Messaging** | Push notifications, device tokens and topics |
-
-## Best Practices
-
-1. **Initialize Early**: Call `Firebase.initializeApp()` before accessing any Firebase service
-2. **Single Instance**: Firebase services are singletons; use the service locator to access them
-3. **Error Handling**: Always wrap Firebase operations in try-catch blocks
-4. **Offline Support**: Firestore supports offline persistence; enable it for better UX
-5. **Security Rules**: Configure proper security rules in Firebase Console
-6. **Cost Management**: Monitor usage and set up budget alerts in Firebase Console
-
-## Security
-
-- Store Firebase configuration files securely
-- Never commit service account keys to version control
-- Use Firebase Security Rules to protect data
-- Enable App Check for production apps
-- Regularly rotate authentication tokens and API keys
+iOS needs an APNs key uploaded to the Firebase project and the Push Notifications capability. Android 13 and later needs the `POST_NOTIFICATIONS` permission declared in the app manifest; `requestPermission` asks the user for it.
 
 ## Platform Support
 
-| Platform | Supported |
-|----------|-----------|
-| Android  | Yes |
-| iOS      | Yes |
-| macOS    | Yes |
-| Web      | Yes |
+Platform-specific behavior in this layer:
+
+| Area | Behavior |
+| --- | --- |
+| App Check | Providers per platform as listed in [App Check Setup](#app-check-setup); web release builds require `appCheckWebSiteKey` |
+| Crashlytics | Android and iOS only; other platforms are no-ops and `isCrashlyticsEnabled` is false |
+| Messaging | `getToken` waits for the APNs token on iOS and macOS; topics are not supported on web |
+| Storage | `downloadFileDocument` is not supported on web |
 
 ## Dependencies
 
 | Package | Purpose |
-|---------|---------|
-| `firebase_core` | Core Firebase SDK |
-| `firebase_auth` | Authentication |
-| `cloud_firestore` | NoSQL database |
-| `cloud_functions` | Cloud functions |
-| `firebase_analytics` | Analytics |
-| `firebase_crashlytics` | Crash reporting |
-| `firebase_remote_config` | Remote configuration |
-| `firebase_storage` | File storage |
-| `firebase_app_check` | App security |
-| `firebase_ai` | Firebase AI Logic SDK |
-| `firebase_messaging` | Cloud Messaging |
-| `http` | Owned AI transport and typed network failures |
-| `module_injector` | Dependency injection |
-| `core` | Core utilities |
+| --- | --- |
+| `firebase_core` | Firebase initialization |
+| `firebase_app_check` | App Check providers |
+| `firebase_auth` | `FbAuthController` |
+| `cloud_firestore` | `FbFirestoreController` |
+| `cloud_functions` | `FbFunctionController` |
+| `firebase_storage` | `FbStorageController` |
+| `path_provider` | Download location for `downloadFileDocument` |
+| `firebase_remote_config` | `FbRemoteConfigController` |
+| `firebase_analytics` | `FbAnalyticsController`, `FirebaseAnalyticsObserver` |
+| `firebase_crashlytics` | `FbCrashlyticsController` |
+| `firebase_messaging` | `FbMessagingController` |
+| `firebase_ai` | `FbAiController` and models |
+| `http` | HTTP client owned by each AI model; `ClientException` mapping |
+| `equatable` | Value equality for `FbPushMessage` |
+| `core` | `AppException` base type |
+| `module_injector` | `ModuleConfigurator` and `ServiceLocator` |
 
 ## Testing
+
+```bash
+melos run test --scope=firebase
+```
+
+Or from `layer/firebase`:
 
 ```bash
 flutter test
 ```
 
-AI tests use mocked SDK boundaries and a mock HTTP transport with the real SDK
-serializer/parser. They require no live project, API key, App Check debug token,
-or billable request. A separate trusted live smoke test on configured clients is
-required before enabling the remote feature; unit tests do not verify console
-enforcement, model availability, or billing settings.
-
-For testing Firebase functionality, use mocking or Firebase Emulator Suite:
-
-```dart
-// Example with mocking
-import 'package:mocktail/mocktail.dart';
-
-class MockFirebaseAuth extends Mock implements FirebaseAuth {}
-```
-
-Part of the Port-Rai modular architecture.
+Tests use `mocktail` mocks of the SDK classes and `fake_cloud_firestore` for Firestore. AI tests run the real `firebase_ai` request and response handling against an `http` `MockClient`, so they need no Firebase project, API key, App Check debug token or billable request. They do not verify console enforcement, model availability or billing settings. The layer exports no test helpers.

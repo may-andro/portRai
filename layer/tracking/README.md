@@ -1,25 +1,27 @@
 # Tracking
 
-A comprehensive analytics and event tracking solution for Flutter applications
-with automatic screen tracking, custom event logging, and Firebase Analytics
-integration.
+Analytics event reporting for Flutter modules. Screens describe events as
+`Tracking` objects and send them through a `TrackingReporter`, which forwards
+them to Firebase Analytics and, optionally, keeps them in memory for inspection.
 
 ## Features
 
-- **Screen Tracking**: Automatic screen view tracking with visibility detection
-- **Custom Event Tracking**: Flexible event tracking with custom parameters
-- **Firebase Analytics Integration**: Built-in Firebase Analytics support
-- **Type-Safe Events**: JSON-serializable event models for consistent tracking
-- **Dependency Injection**: Seamless integration with the module injection
-  system
-- **Automatic Tracking**: Widget-based automatic screen tracking
-- **Cross-Platform**: Works on Android, iOS, macOS, and Web platforms
+- `Tracking` event model with an area, a name and an optional action, flattened
+  into string parameters for the analytics backend
+- Predefined events for screen views, view impressions, clicks, app start and
+  app initialization
+- `ScreenTrackingDelegate` base class that groups the tracking of one screen
+  under a `TrackingArea`
+- `TrackingImpressionDetectorWidget` that reports a view impression once per ID
+  when the child becomes at least 10% visible
+- `TrackingModuleConfigurator` that registers a single `TrackingReporter` and
+  sends an app start event once all modules are set up
 
 ## Getting Started
 
 ### Installation
 
-This module is part of the workspace and can be imported directly:
+The package is a member of the workspace. Add it to a module's `pubspec.yaml`:
 
 ```yaml
 dependencies:
@@ -30,449 +32,164 @@ dependencies:
 import 'package:tracking/tracking.dart';
 ```
 
-> **Note**: As a workspace module, `tracking` is automatically available to all
-> other modules without manual dependency configuration.
-
 ### Module Configuration
 
-Configure the tracking module in your application:
+Add `TrackingModuleConfigurator` to the list passed to
+`ModuleInjectorController.setUpDIGraph`. Its `registerDependencies` resolves
+`FbAnalyticsController`, so the firebase layer's `FirebaseModuleConfigurator`
+must come before it in the list.
 
 ```dart
-import 'package:tracking/tracking.dart';
-
-// Add to your module configurators
-final configurator = TrackingModuleConfigurator();
+final configurators = <ModuleConfigurator>[
+  FirebaseModuleConfigurator(/* ... */),
+  TrackingModuleConfigurator(isFirebaseEnabled),
+  // other modules
+];
 ```
+
+| Parameter | Default | Effect |
+|-----------|---------|--------|
+| `isFirebaseEnabled` (positional) | required | When `true`, events are sent to Firebase Analytics through `FbAnalyticsController.sendLogEvent`. |
+| `keepsSentEvents` | `kDebugMode` | When `true`, the last 200 events are kept in memory and exposed by `TrackingReporter.sentTrackingEvents`. |
+
+The configurator registers `TrackingReporter` as a singleton and, in
+`postDependenciesSetup`, sends an `AppStartTracking` event.
 
 ## Usage
 
-### Basic Event Tracking
+### Screen tracking delegate
+
+Subclass `ScreenTrackingDelegate` once per screen, with a `TrackingArea` that
+names the screen. Expose one method per trackable action.
 
 ```dart
-import 'package:tracking/tracking.dart';
 import 'package:module_injector/module_injector.dart';
-
-class UserService {
-  final EventTracker _tracker = serviceLocator<EventTracker>();
-
-  Future<void> login(String userId) async {
-    // Perform login
-    await performLogin(userId);
-
-    // Track login event
-    await _tracker.track(
-      LoginEvent(
-        userId: userId,
-        method: 'email',
-        timestamp: DateTime.now(),
-      ),
-    );
-  }
-
-  Future<void> purchaseItem(String itemId, double price) async {
-    // Process purchase
-    await processPurchase(itemId);
-
-    // Track purchase event
-    await _tracker.track(
-      PurchaseEvent(
-        itemId: itemId,
-        price: price,
-        currency: 'USD',
-        timestamp: DateTime.now(),
-      ),
-    );
-  }
-}
-```
-
-### Automatic Screen Tracking
-
-Use the `ScreenTrackerWidget` to automatically track screen views:
-
-```dart
 import 'package:tracking/tracking.dart';
 
-class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ScreenTrackerWidget(
-      screenName: 'profile_screen',
-      additionalParams: {
-        'user_id': currentUserId,
-        'tab': 'overview',
-      },
-      child: Scaffold(
-        appBar: AppBar(title: Text('Profile')),
-        body: ProfileContent(),
-      ),
-    );
+class _TrackingArea extends TrackingArea {
+  const _TrackingArea() : super('example_screen');
+}
+
+@register
+class ExampleTrackingDelegate extends ScreenTrackingDelegate {
+  ExampleTrackingDelegate(TrackingReporter trackingReporter)
+    : super(const _TrackingArea(), trackingReporter);
+
+  void trackItemClick(String itemId) {
+    trackEvent(Tracking(name: 'item', action: ClickAction(label: itemId)));
   }
 }
 ```
 
-The `ScreenTrackerWidget` uses `VisibilityDetector` to automatically track when
-the screen becomes visible and logs the screen view event.
+`ScreenTrackingDelegate` provides:
 
-### Custom Events
+- `trackScreenView()` sends a `ScreenViewTracking` for the delegate's area and
+  makes that area the current one.
+- `trackViewEvent(label)` sends a `ViewTracking` with the given label.
+- `trackEvent(tracking)` sends any `Tracking`.
 
-Define custom event classes with JSON serialization:
+### View impressions
+
+Wrap a widget in `TrackingImpressionDetectorWidget` to call `onImpression` the
+first time at least 10% of it is visible. Each `impressionId` fires once until
+the current area changes.
 
 ```dart
-import 'package:json_annotation/json_annotation.dart';
-
-part 'custom_events.g.dart';
-
-@JsonSerializable()
-class ButtonTapEvent {
-  ButtonTapEvent({
-    required this.buttonId,
-    required this.screenName,
-    this.additionalData,
-  });
-
-  final String buttonId;
-  final String screenName;
-  final Map<String, dynamic>? additionalData;
-
-  factory ButtonTapEvent.fromJson(Map<String, dynamic> json) =>
-      _$ButtonTapEventFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ButtonTapEventToJson(this);
-}
-
-@JsonSerializable()
-class SearchEvent {
-  SearchEvent({
-    required this.query,
-    required this.resultsCount,
-    required this.timestamp,
-  });
-
-  final String query;
-  final int resultsCount;
-  final DateTime timestamp;
-
-  factory SearchEvent.fromJson(Map<String, dynamic> json) =>
-      _$SearchEventFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SearchEventToJson(this);
-}
+TrackingImpressionDetectorWidget(
+  impressionId: 'items_section',
+  onImpression: () => delegate.trackViewEvent('items_section'),
+  child: const ItemsSection(),
+)
 ```
 
-Track custom events:
+### Inspecting sent events
+
+When `keepsSentEvents` is `true`, `sentTrackingEvents` returns an unmodifiable
+map of send time to event, oldest first. It returns `null` otherwise.
 
 ```dart
-// Track button tap
-await _tracker.track(
-  ButtonTapEvent(
-    buttonId: 'submit_button',
-    screenName: 'profile_screen',
-    additionalData: {'form_valid': true},
-  ),
-);
-
-// Track search
-await _tracker.track(
-  SearchEvent(
-    query: 'flutter development',
-    resultsCount: 42,
-    timestamp: DateTime.now(),
-  ),
-);
-```
-
-### User Properties
-
-Set user properties for analytics segmentation:
-
-```dart
-import 'package:firebase_analytics/firebase_analytics.dart';
-
-class AnalyticsService {
-  final FirebaseAnalytics _analytics = serviceLocator<FirebaseAnalytics>();
-
-  Future<void> setUserProperties({
-    required String userId,
-    required String userType,
-    String? subscriptionTier,
-  }) async {
-    await _analytics.setUserId(id: userId);
-    await _analytics.setUserProperty(
-      name: 'user_type',
-      value: userType,
-    );
-    if (subscriptionTier != null) {
-      await _analytics.setUserProperty(
-        name: 'subscription_tier',
-        value: subscriptionTier,
-      );
-    }
-  }
-}
+final events = ModuleInjectorController().serviceLocator
+    .get<TrackingReporter>()
+    .sentTrackingEvents;
 ```
 
 ## API Reference
 
-### EventTracker
-
-Abstract interface for event tracking:
+### TrackingReporter
 
 ```dart
-abstract class EventTracker {
-  /// Track a custom event
-  Future<void> track(dynamic event);
+abstract interface class TrackingReporter {
+  void sendTrackingEvent(Tracking tracking);
 
-  /// Track a screen view
-  Future<void> trackScreen(String screenName, {Map<String, dynamic>? params});
+  Map<DateTime, Tracking>? get sentTrackingEvents;
 }
 ```
 
-### ScreenTrackerWidget
+The registered implementation sends each event to every enabled backend:
+Firebase Analytics (event name `tracking.name`, parameters
+`tracking.parameters`) and the in-memory store.
 
-Widget that automatically tracks screen views using visibility detection:
-
-```dart
-ScreenTrackerWidget({
-  required String screenName,
-  Map<String, dynamic>? additionalParams,
-  required Widget child,
-})
-```
-
-**Parameters:**
-- `screenName`: Unique identifier for the screen
-- `additionalParams`: Optional parameters to include with screen view event
-- `child`: The screen content widget
-
-### ScreenTrackingDelegate
-
-Base class for the tracking of one screen. Subclass it with a `TrackingArea`
-naming the screen; it reports through the injected `TrackingReporter`.
+### Tracking
 
 ```dart
-class _CatalogArea extends TrackingArea {
-  const _CatalogArea() : super('catalog');
-}
-
-class CatalogTrackingDelegate extends ScreenTrackingDelegate {
-  CatalogTrackingDelegate(TrackingReporter trackingReporter)
-    : super(const _CatalogArea(), trackingReporter);
-}
+Tracking({required String name, required TrackingAction? action})
 ```
 
-- `trackScreenView()` sends a `ScreenViewTracking` for the area.
-- `trackViewEvent(label)` sends a `ViewTracking` with the given label.
-- `trackEvent(tracking)` sends any other `Tracking`.
+`area` is read from the current tracking area when the event is created.
+`parameters` contains `event` (the name), `area`, `action` (the action type,
+when present) and the action's own fields, with every value converted to a
+string.
 
-### Firebase Analytics Integration
+| Class | `name` | Action |
+|-------|--------|--------|
+| `ScreenViewTracking({required TrackingArea area})` | `screen_view` | none; sets the current area to `area` |
+| `ViewTracking({required String label})` | `view_impression` | `ViewAction` |
+| `ClickTracking({required String label, String? value})` | `click` | `ClickAction` |
+| `AppStartTracking()` | `app_started` | `SetupAction('uninitialised')`; sets the current area to `SplashArea` |
+| `AppInitializationFinishedTracking({bool isSuccessful = true})` | `app_initialization` | `SetupAction('Initialized')` or `SetupAction('Initialization Failed')` |
 
-The module automatically integrates with Firebase Analytics when configured:
+### TrackingAction
 
-```dart
-// Get Firebase Analytics instance
-final analytics = serviceLocator<FirebaseAnalytics>();
+Abstract base with an `action` type string and a `toJson()` used to build
+parameters.
 
-// Log custom events directly
-await analytics.logEvent(
-  name: 'custom_event',
-  parameters: {
-    'param1': 'value1',
-    'param2': 42,
-  },
-);
-```
+| Class | `action` | Fields |
+|-------|----------|--------|
+| `ClickAction({required String label, String? value})` | `click` | `label`, `value` |
+| `ViewAction({String? label})` | `view` | `label` |
+| `SetupAction(String status)` | `setup` | `status` |
 
-## Common Event Types
+### TrackingArea
 
-### User Events
+Abstract base holding a `name`. `SplashArea` (`splash`) and `UnknownArea`
+(`unknown`, the initial area) are provided. Changing the current area clears
+the set of fired impression IDs (`triggeredImpressions`).
 
-```dart
-// User signup
-await _tracker.track(SignupEvent(
-  method: 'google',
-  timestamp: DateTime.now(),
-));
+### TrackingDelegate
 
-// User login
-await _tracker.track(LoginEvent(
-  userId: user.id,
-  method: 'email',
-  timestamp: DateTime.now(),
-));
-```
-
-### Navigation Events
-
-```dart
-// Screen view (automatic with ScreenTrackerWidget)
-await _tracker.trackScreen('home_screen', params: {
-  'referrer': 'splash_screen',
-});
-
-// Tab switch
-await _tracker.track(TabSwitchEvent(
-  fromTab: 'home',
-  toTab: 'profile',
-  timestamp: DateTime.now(),
-));
-```
-
-### User Interaction Events
-
-```dart
-// Button tap
-await _tracker.track(ButtonTapEvent(
-  buttonId: 'subscribe_button',
-  screenName: 'subscription_screen',
-));
-
-// Content view
-await _tracker.track(ContentViewEvent(
-  contentType: 'article',
-  contentId: '12345',
-  title: 'Flutter Best Practices',
-));
-```
-
-### E-commerce Events
-
-```dart
-// Product view
-await _tracker.track(ProductViewEvent(
-  productId: 'SKU123',
-  productName: 'Premium Plan',
-  price: 9.99,
-));
-
-// Add to cart
-await _tracker.track(AddToCartEvent(
-  productId: 'SKU123',
-  quantity: 1,
-  price: 9.99,
-));
-
-// Purchase
-await _tracker.track(PurchaseEvent(
-  transactionId: 'TXN789',
-  value: 9.99,
-  currency: 'USD',
-  items: ['SKU123'],
-));
-```
-
-## Best Practices
-
-1. **Event Naming**:
-   - Use descriptive, consistent names (e.g., `user_signup`, `product_view`)
-   - Use snake_case for event names and parameters
-   - Keep names under 40 characters for Firebase compatibility
-
-2. **Event Parameters**:
-   - Limit to 25 custom parameters per event
-   - Use consistent parameter names across events
-   - Include timestamp for time-based analysis
-
-3. **Screen Tracking**:
-   - Use unique, descriptive screen names
-   - Include relevant context in `additionalParams`
-   - Track screen transitions consistently
-
-4. **User Privacy**:
-   - Never track personally identifiable information (PII)
-   - Anonymize or hash sensitive data
-   - Respect user privacy preferences and consent
-
-5. **Testing**:
-   - Test tracking in debug mode before production
-   - Verify events appear in Firebase Analytics DebugView
-   - Mock the `EventTracker` in unit tests
-
-6. **Performance**:
-   - Batch events when possible
-   - Avoid tracking in performance-critical code paths
-   - Use `VisibilityDetector` for automatic tracking to reduce manual calls
-
-## Debugging
-
-### Firebase Analytics DebugView
-
-Enable debug mode to see events in real-time:
-
-**Android:**
-
-```bash
-adb shell setprop debug.firebase.analytics.app <package_name>
-```
-
-**iOS:**
-
-```bash
-# Add to Xcode scheme: -FIRAnalyticsDebugEnabled
-```
-
-**Web:**
-
-```dart
-// Enable analytics debug mode in main.dart
-FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
-```
-
-### Logging Events
-
-All tracked events are automatically logged in debug mode for verification.
-
-## Platform Support
-
-| Platform | Event Tracking | Screen Tracking | Firebase Analytics |
-|----------|----------------|-----------------|-------------------|
-| Android  | Yes            | Yes             | Yes               |
-| iOS      | Yes            | Yes             | Yes               |
-| macOS    | Yes            | Yes             | Yes               |
-| Web      | Yes            | Yes             | Yes               |
-
----
-
-Part of the Port-Rai modular architecture.
+Base of `ScreenTrackingDelegate`. Holds the `TrackingReporter` and provides
+`trackEvent(tracking)`, for tracking that is not tied to one screen.
 
 ## Dependencies
 
 | Package | Purpose |
 |---------|---------|
-| `firebase` | Firebase Analytics integration |
-| `visibility_detector` | Automatic screen view tracking |
-| `json_annotation` | JSON serialization for events |
-| `module_injector` | Dependency injection |
+| `firebase` | `FbAnalyticsController`, which sends events to Firebase Analytics |
+| `module_injector` | `ModuleConfigurator` and `ServiceLocator` for registration |
+| `visibility_detector` | Visibility detection in `TrackingImpressionDetectorWidget` |
+| `json_annotation` | Serialization of `TrackingAction` fields (code generated with `json_serializable`) |
 
 ## Testing
+
+```bash
+melos run test --scope=tracking
+```
+
+Or from `layer/tracking`:
 
 ```bash
 flutter test
 ```
 
-### Mock Event Tracker for Testing
-
-```dart
-import 'package:tracking/tracking.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockEventTracker extends Mock implements EventTracker {}
-
-void main() {
-  late MockEventTracker mockTracker;
-  late MyService service;
-
-  setUp(() {
-    mockTracker = MockEventTracker();
-    service = MyService(mockTracker);
-  });
-
-  test('should track login event on successful login', () async {
-    when(() => mockTracker.track(any())).thenAnswer((_) async => {});
-
-    await service.login('user123');
-
-    verify(() => mockTracker.track(any<LoginEvent>())).called(1);
-  });
-}
-```
+The package exports no test helpers; mock
+`TrackingReporter` in consumer tests, for example with `mocktail`.

@@ -4,21 +4,17 @@ description: 'Structure, style and content conventions for README.md files in th
 
 # README Conventions
 
-Existing READMEs under `layer/*` and `app/*` currently drift in heading style, emoji use, and
-section order (compare `layer/core/README.md` vs `layer/feature_flag/README.md` vs
-`app/portrai/README.md`). Use the templates below for **new** READMEs, and nudge existing ones
-toward this shape when you're already editing them for another reason — don't do a drive-by
-rewrite of an unrelated README.
+Every `layer/*` README follows the layer template below. Use the templates for **new** READMEs,
+and nudge other existing ones toward this shape when you're already editing them for another
+reason — don't do a drive-by rewrite of an unrelated README.
 
 ## General style rules
 - Describe implemented behavior, configuration, and limitations as factual reference material.
   Do not include implementation progress, PR sequencing, or promises about future work;
   keep those in plans and PR descriptions.
 - Plain ATX headings, **no emoji** in headings or bullet points (e.g. `## Features`, not
-  `## ✨ Features`). Most existing READMEs (`core`, `cache`, `log_reporter`, `use_case`,
-  `tracking`, `error_reporter`, `remote`, `design_system`, `firebase`, `module_injector`) already
-  follow this — `feature_flag`, the root `README.md`, and `app/portrai/README.md` are the
-  emoji-heavy outliers; don't copy their style for new docs.
+  `## ✨ Features`). `tool/firestore_export_import/README.md` still uses emoji; don't copy its
+  style for new docs.
 - Sentence case for headings (`## Getting started` or `## Getting Started` — match whichever the
   sibling READMEs in the same folder use; don't introduce a third variant).
 - Fenced code blocks always specify a language (` ```dart `, ` ```bash `, ` ```yaml `).

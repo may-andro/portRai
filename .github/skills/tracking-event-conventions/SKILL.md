@@ -1,14 +1,12 @@
 ---
-description: Use when adding analytics/tracking to a screen or user action in this Flutter workspace, to follow the ScreenTrackingDelegate + TrackingArea pattern instead of calling EventTracker directly from blocs or widgets.
+description: Use when adding analytics/tracking to a screen or user action in this Flutter workspace, to follow the ScreenTrackingDelegate + TrackingArea pattern instead of calling TrackingReporter directly from blocs or widgets.
 ---
 
 # Tracking Event Conventions
 
 Reference: `layer/tracking/README.md` for the underlying primitives
-(`EventTracker`, `TrackingReporter`, `ScreenTrackingDelegate`, event types).
-The README's own usage examples are generic/illustrative — the pattern
-below is what the app actually does; follow the app's real pattern, not the
-README's sample snippets.
+(`TrackingReporter`, `ScreenTrackingDelegate`, `Tracking` and its event types).
+The README describes the layer's API; the pattern below is how the app uses it.
 
 ## Per-screen tracking delegate
 
@@ -66,7 +64,7 @@ methods from widgets directly — widgets only dispatch bloc events (see
 
 ## Don't invent
 
-Don't call `serviceLocator<EventTracker>()`/`TrackingReporter` directly
+Don't call `TrackingReporter.sendTrackingEvent` directly
 from a bloc or widget — always go through a screen-owned
 `ScreenTrackingDelegate` subclass, even for a single event, so all of a
 screen's tracking surface lives in one discoverable file.
