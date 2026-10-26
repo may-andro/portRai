@@ -1,2 +1,1 @@
-export 'bloc/splash_bloc.dart';
-export 'splash_screen.dart';
+export 'screen/_screen.dart';

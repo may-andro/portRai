@@ -6,11 +6,10 @@ import 'package:portrai/src/feature/user/data/repository/_repository.dart';
 import 'package:portrai/src/feature/user/domain/_domain.dart';
 
 import '../../../../../mock/feature/user/data/cache/mock_guest_user_cache.dart';
-
-class _FakeGuestUserModel extends Fake implements GuestUserModel {}
+import '../../../../../mock/feature/user/data/model/fake_guest_user_model.dart';
 
 void main() {
-  setUpAll(() => registerFallbackValue(_FakeGuestUserModel()));
+  setUpAll(() => registerFallbackValue(FakeGuestUserModel()));
 
   group('GuestUserRepositoryImpl', () {
     late MockGuestUserCache cache;

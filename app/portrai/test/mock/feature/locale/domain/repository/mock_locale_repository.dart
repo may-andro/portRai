@@ -13,6 +13,10 @@ extension MockLocaleRepositoryStub on MockLocaleRepository {
     when(() => appLocale).thenThrow(error);
   }
 
+  void stubCurrentAppLocale(AppLocale locale) {
+    when(() => currentAppLocale).thenReturn(locale);
+  }
+
   void stubAppLocaleStream(Stream<AppLocale> stream) {
     when(() => appLocaleStream).thenAnswer((_) => stream);
   }

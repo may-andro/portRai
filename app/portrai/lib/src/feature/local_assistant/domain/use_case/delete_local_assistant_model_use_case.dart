@@ -2,14 +2,30 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/repository/_repository.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/is_local_assistant_supported_use_case.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
+
+sealed class DeleteLocalAssistantModelFailure extends BasicFailure {
+  const DeleteLocalAssistantModelFailure({super.cause});
+}
+
+@Localizable('assistantError')
+class DeleteLocalAssistantModelUnknownFailure
+    extends DeleteLocalAssistantModelFailure {
+  const DeleteLocalAssistantModelUnknownFailure({super.cause});
+}
+
+@Localizable('errorLocalAssistantUnavailable')
+class DeleteLocalAssistantModelUnavailableFailure
+    extends DeleteLocalAssistantModelFailure {
+  const DeleteLocalAssistantModelUnavailableFailure({super.cause});
+}
 
 @register
 class DeleteLocalAssistantModelUseCase
-    extends BaseNoParamUseCase<void, LocalAssistantFailure> {
+    extends BaseNoParamUseCase<void, DeleteLocalAssistantModelFailure> {
   DeleteLocalAssistantModelUseCase(
     this._repository,
     this._isLocalAssistantSupportedUseCase,
@@ -20,10 +36,10 @@ class DeleteLocalAssistantModelUseCase
 
   @protected
   @override
-  FutureOr<Either<LocalAssistantFailure, void>> execute() async {
+  FutureOr<Either<DeleteLocalAssistantModelFailure, void>> execute() async {
     final support = await _isLocalAssistantSupportedUseCase();
     if (support.isLeft || !support.right) {
-      return const Left(UnavailableLocalAssistantFailure());
+      return const Left(DeleteLocalAssistantModelUnavailableFailure());
     }
     await _repository.deleteModel();
     return const Right(null);
@@ -31,6 +47,11 @@ class DeleteLocalAssistantModelUseCase
 
   @protected
   @override
-  LocalAssistantFailure mapErrorToFailure(Object e, StackTrace st) =>
-      e.toLocalAssistantFailure;
+  DeleteLocalAssistantModelFailure mapErrorToFailure(Object e, StackTrace st) =>
+      switch (e) {
+        LocalAssistantUnavailableException() ||
+        LocalAssistantCancelledException() =>
+          DeleteLocalAssistantModelUnavailableFailure(cause: e),
+        _ => DeleteLocalAssistantModelUnknownFailure(cause: e),
+      };
 }

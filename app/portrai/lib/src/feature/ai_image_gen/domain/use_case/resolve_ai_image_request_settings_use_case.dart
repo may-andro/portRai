@@ -12,17 +12,17 @@ import 'package:use_case/use_case.dart';
 class ResolveAiImageRequestSettingsUseCase
     extends BaseNoParamUseCase<AiImageRequestSettings, NoFailure> {
   ResolveAiImageRequestSettingsUseCase(
-    this._getSettingsUseCase,
+    this._getAiImageSettingsUseCase,
     this._appConfig,
   );
 
-  final GetAiImageSettingsUseCase _getSettingsUseCase;
+  final GetAiImageSettingsUseCase _getAiImageSettingsUseCase;
   final PortraiAppConfigEntity _appConfig;
 
   @protected
   @override
   FutureOr<Either<NoFailure, AiImageRequestSettings>> execute() async {
-    final settings = (await _getSettingsUseCase()).right;
+    final settings = (await _getAiImageSettingsUseCase()).right;
     final config = _appConfig.aiImage;
     return Right(
       AiImageRequestSettings(

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
+import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 import 'package:portrai/src/feature/job_opening/presentation/screen/job_opening/bloc/_bloc.dart';
@@ -311,7 +311,8 @@ void main() {
     test('should show the failure when the insights cannot be '
         'generated', () async {
       when(() => askRemotePortfolioQuestionUseCase(any())).thenAnswer(
-        (_) => Future.value(const Left(RemoteAssistantQuotaFailure())),
+        (_) =>
+            Future.value(const Left(AskRemotePortfolioQuestionQuotaFailure())),
       );
       final bloc = buildBloc()
         ..emit(
@@ -330,7 +331,10 @@ void main() {
         (state) => state.insightsStatus == JobOpeningInsightsStatus.failed,
       );
 
-      expect(bloc.state.insightsFailure, const RemoteAssistantQuotaFailure());
+      expect(
+        bloc.state.insightsFailure,
+        const AskRemotePortfolioQuestionQuotaFailure(),
+      );
       expect(bloc.state.insightsController, isNull);
       expect(bloc.state.insightsSurfaceIds, isEmpty);
     });
@@ -357,7 +361,7 @@ void main() {
 
       expect(
         bloc.state.insightsFailure,
-        const RemoteAssistantIncompleteFailure(),
+        const AskRemotePortfolioQuestionIncompleteFailure(),
       );
     });
 
@@ -365,7 +369,7 @@ void main() {
         'read', () async {
       when(
         () => getAssistantContextUseCase(),
-      ).thenAnswer((_) => const Left(UnknownAssistantFailure()));
+      ).thenAnswer((_) => const Left(GetAssistantContextUnknownFailure()));
       final bloc = buildBloc()
         ..emit(
           JobOpeningState(
@@ -383,12 +387,16 @@ void main() {
         (state) => state.insightsStatus == JobOpeningInsightsStatus.failed,
       );
 
-      expect(bloc.state.insightsFailure, const UnknownAssistantFailure());
+      expect(
+        bloc.state.insightsFailure,
+        const GetAssistantContextUnknownFailure(),
+      );
       verifyNever(() => askRemotePortfolioQuestionUseCase(any()));
     });
 
     test('should cancel the request when closed while generating', () async {
-      final answer = Completer<Either<RemoteAssistantFailure, void>>();
+      final answer =
+          Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
       when(
         () => askRemotePortfolioQuestionUseCase(any()),
       ).thenAnswer((_) => answer.future);

@@ -281,7 +281,10 @@ Portfolio summary.
       bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
       await waitFor(bloc, (state) => state.failure != null);
 
-      expect(bloc.state.failure, isA<RemoteAssistantIncompleteFailure>());
+      expect(
+        bloc.state.failure,
+        isA<AskRemotePortfolioQuestionIncompleteFailure>(),
+      );
       expect(bloc.state.messages, isEmpty);
       expect(bloc.state.genuiSurfaces, isEmpty);
       expect(bloc.state.partialAnswer, isEmpty);
@@ -298,14 +301,17 @@ Portfolio summary.
             invocation.positionalArguments.single
                 as AskRemotePortfolioQuestionParams;
         params.onDelta(genuiResponse);
-        return const Left<RemoteAssistantFailure, void>(
-          RemoteAssistantNetworkFailure(),
+        return const Left<AskRemotePortfolioQuestionFailure, void>(
+          AskRemotePortfolioQuestionNetworkFailure(),
         );
       });
       bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
       await waitFor(bloc, (state) => state.failure != null);
 
-      expect(bloc.state.failure, isA<RemoteAssistantNetworkFailure>());
+      expect(
+        bloc.state.failure,
+        isA<AskRemotePortfolioQuestionNetworkFailure>(),
+      );
       expect(bloc.state.messages, isEmpty);
       expect(bloc.state.genuiSurfaces, isEmpty);
       expect(bloc.state.partialAnswer, isEmpty);
@@ -317,7 +323,8 @@ Portfolio summary.
     () async {
       final bloc = createBloc();
       await start(bloc);
-      final pending = Completer<Either<RemoteAssistantFailure, void>>();
+      final pending =
+          Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
       when(() => askQuestion(any())).thenAnswer((_) => pending.future);
       bloc
         ..add(const SendRemoteAssistantQuestionClickEvent('First'))
@@ -335,7 +342,8 @@ Portfolio summary.
       () async {
         final bloc = createBloc();
         await start(bloc);
-        final pending = Completer<Either<RemoteAssistantFailure, void>>();
+        final pending =
+            Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
         late AskRemotePortfolioQuestionParams request;
         when(() => askQuestion(any())).thenAnswer((invocation) {
           request =
@@ -464,8 +472,8 @@ Portfolio summary.
           invocation.positionalArguments.single
               as AskRemotePortfolioQuestionParams;
       params.onDelta('Incomplete answer');
-      return const Left<RemoteAssistantFailure, void>(
-        RemoteAssistantIncompleteFailure(),
+      return const Left<AskRemotePortfolioQuestionFailure, void>(
+        AskRemotePortfolioQuestionIncompleteFailure(),
       );
     });
     bloc.add(const SendRemoteAssistantQuestionClickEvent('Question'));
@@ -480,7 +488,8 @@ Portfolio summary.
     () async {
       final bloc = createBloc(generativeUi: true);
       await start(bloc);
-      final pending = Completer<Either<RemoteAssistantFailure, void>>();
+      final pending =
+          Completer<Either<AskRemotePortfolioQuestionFailure, void>>();
       when(() => askQuestion(any())).thenAnswer((invocation) {
         final params =
             invocation.positionalArguments.single

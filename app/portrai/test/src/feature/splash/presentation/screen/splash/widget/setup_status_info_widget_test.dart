@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:module_injector/module_injector.dart';
-import 'package:portrai/src/feature/splash/presentation/widget/setup_status_info_widget.dart';
+import 'package:portrai/src/feature/splash/presentation/screen/splash/widget/setup_status_info_widget.dart';
 
-import '../../../../../util/test_wrapper_widget.dart';
+import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   group('SetupStatusInfoWidget', () {

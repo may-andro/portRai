@@ -11,6 +11,7 @@ import 'package:use_case/use_case.dart';
 
 import '../../../mock/feature/feature_flag/domain/registry/mock_app_feature_flag_definition_registry.dart';
 import '../../../mock/feature/onboarding/domain/use_case/mock_should_show_onboarding_use_case.dart';
+import '../../../mock/utility/fake_build_context.dart';
 import '../../../mock/utility/mock_module_route_controller.dart';
 import '../../../mock/utility/mock_service_locator.dart';
 
@@ -72,7 +73,7 @@ void main() {
         shouldShowOnboardingUseCase.stubCall(const Right(true));
 
         final redirectPath = await redirect(
-          _FakeBuildContext(),
+          FakeBuildContext(),
           Uri.parse(PortfolioModuleRoute.portfolio.path),
         );
 
@@ -86,7 +87,7 @@ void main() {
         shouldShowOnboardingUseCase.stubCall(const Right(false));
 
         final redirectPath = await redirect(
-          _FakeBuildContext(),
+          FakeBuildContext(),
           Uri.parse(PortfolioModuleRoute.portfolio.path),
         );
 
@@ -98,7 +99,7 @@ void main() {
       shouldShowOnboardingUseCase.stubCall(const Right(true));
 
       final redirectPath = await redirect(
-        _FakeBuildContext(),
+        FakeBuildContext(),
         Uri.parse('/experiences'),
       );
 
@@ -111,7 +112,7 @@ void main() {
       );
 
       final redirectPath = await redirect(
-        _FakeBuildContext(),
+        FakeBuildContext(),
         Uri.parse(PortfolioModuleRoute.portfolio.path),
       );
 
@@ -119,7 +120,5 @@ void main() {
     });
   });
 }
-
-class _FakeBuildContext extends Fake implements BuildContext {}
 
 FutureOr<String?> _noRedirect(BuildContext context, Uri requestedUri) => null;

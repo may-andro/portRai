@@ -31,7 +31,7 @@ class GetPortfolioUseCase
     extends BaseNoParamUseCase<PortfolioEntity, GetPortfolioFailure> {
   GetPortfolioUseCase(
     this._getProfileUseCase,
-    this._allExpertiseUseCase,
+    this._getAllExpertiseUseCase,
     this._getProjectsUseCase,
     this._getServicesUseCase,
     this._getExperiencesUseCase,
@@ -42,7 +42,7 @@ class GetPortfolioUseCase
   static const _tag = 'GetPortfolioUseCase';
 
   final GetProfileUseCase _getProfileUseCase;
-  final GetAllExpertiseUseCase _allExpertiseUseCase;
+  final GetAllExpertiseUseCase _getAllExpertiseUseCase;
   final GetProjectsUseCase _getProjectsUseCase;
   final GetServicesUseCase _getServicesUseCase;
   final GetExperiencesUseCase _getExperiencesUseCase;
@@ -62,7 +62,7 @@ class GetPortfolioUseCase
       testimonialsResult,
     ) = await (
       Future.value(_getProfileUseCase()),
-      Future.value(_allExpertiseUseCase()),
+      Future.value(_getAllExpertiseUseCase()),
       Future.value(_getProjectsUseCase()),
       Future.value(_getServicesUseCase()),
       Future.value(_getExperiencesUseCase()),

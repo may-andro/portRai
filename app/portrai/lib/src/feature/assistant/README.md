@@ -12,7 +12,8 @@ imports the other. The `job_opening` feature also uses `AssistantGenuiController
 - `AssistantMessageEntity` (`content`, `isUser`) and the sealed `AssistantResponseEntity`, whose
   only subtype is `AssistantTextResponseEntity` (`text`).
 - `GetAssistantContextUseCase` builds the portfolio context as one JSON string from
-  `GetPortfolioUseCase`. A portfolio that fails to load returns `UnknownAssistantFailure`.
+  `GetPortfolioUseCase`. A portfolio that fails to load returns
+  `GetAssistantContextUnknownFailure`.
 - `AssistantConversationWidget` renders a conversation without owning a provider or lifecycle:
   starter suggestions before the first message, message bubbles, a loading indicator while a
   question is sent, an optional header and error text, and the text input. The caller supplies
@@ -173,7 +174,8 @@ that fits the data, and put each A2UI message in its own `json` code block. It a
 suggestion and map instructions only for the components that are registered. When the guest user
 has a saved role, it adds a fixed instruction: developers get projects, technologies and
 architecture first; recruiters get availability, experience, career history and contact first.
-A turn that ends with no text and no surface returns `RemoteAssistantIncompleteFailure`.
+A turn that ends with no text and no surface returns
+`AskRemotePortfolioQuestionIncompleteFailure`.
 
 ```mermaid
 flowchart LR
@@ -246,7 +248,7 @@ flowchart LR
   facts.
 - Clear chat and turning the assistant off invalidate pending output and clear follow-up context;
   native generation is not cancelled. A question asked while an earlier generation is still
-  running returns `BusyLocalAssistantFailure`.
+  running returns `AskLocalPortfolioQuestionBusyFailure`.
 - The chat toolbar has a clear-chat button and an information dialog about on-device processing.
 
 ### Remote assistant

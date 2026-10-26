@@ -1,5 +1,4 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/prepare_local_assistant_model_use_case.dart';
 import 'package:use_case/use_case.dart';
 
@@ -8,7 +7,7 @@ class MockPrepareLocalAssistantModelUseCase extends Mock
 
 extension MockPrepareLocalAssistantModelUseCaseStub
     on MockPrepareLocalAssistantModelUseCase {
-  void stubCall(Either<LocalAssistantFailure, void> result) {
+  void stubCall(Either<PrepareLocalAssistantModelFailure, void> result) {
     when(() => this(any())).thenAnswer((_) => result);
   }
 }

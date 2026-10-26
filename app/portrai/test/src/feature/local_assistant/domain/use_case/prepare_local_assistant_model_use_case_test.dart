@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/prepare_local_assistant_model_use_case.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:use_case/use_case.dart';
@@ -24,7 +23,7 @@ void main() {
         MockGetPermissionStatusUseCase(),
       )((_) {});
 
-      expect(result.left, isA<UnavailableLocalAssistantFailure>());
+      expect(result.left, isA<PrepareLocalAssistantModelUnavailableFailure>());
       verifyNever(
         () => repository.prepareModel(onProgress: any(named: 'onProgress')),
       );

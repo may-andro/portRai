@@ -8,6 +8,6 @@ class MockCheckInternetConnectionUseCase extends Mock
 extension MockCheckInternetConnectionUseCaseStub
     on MockCheckInternetConnectionUseCase {
   void stubCall(Either<CheckInternetConnectionFailure, bool> result) {
-    when(() => this()).thenAnswer((_) => result);
+    when(call).thenAnswer((_) => result);
   }
 }

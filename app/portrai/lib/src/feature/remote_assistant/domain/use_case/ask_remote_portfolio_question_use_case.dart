@@ -1,14 +1,103 @@
 import 'dart:async';
 
+import 'package:firebase/firebase.dart';
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
 import 'package:portrai/src/feature/ai_rate_limit/ai_rate_limit.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/extension/_extension.dart';
+import 'package:portrai/src/feature/remote_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/repository/_repository.dart';
 import 'package:portrai/src/feature/remote_assistant/domain/use_case/is_remote_assistant_supported_use_case.dart';
-import 'package:portrai/src/feature/remote_assistant/domain/use_case/remote_assistant_failure.dart';
 import 'package:use_case/use_case.dart';
+
+sealed class AskRemotePortfolioQuestionFailure extends BasicFailure {
+  const AskRemotePortfolioQuestionFailure({super.cause, this.serviceMessage});
+
+  /// Optional backend error details supplement, never replace, localization.
+  /// Excluded from inherited failure logging and equality properties.
+  final String? serviceMessage;
+}
+
+@Localizable('errorRemoteAssistantUnavailable')
+class AskRemotePortfolioQuestionUnavailableFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionUnavailableFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantNetwork')
+class AskRemotePortfolioQuestionNetworkFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionNetworkFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantTimeout')
+class AskRemotePortfolioQuestionTimeoutFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionTimeoutFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantQuota')
+class AskRemotePortfolioQuestionQuotaFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionQuotaFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantConfiguration')
+class AskRemotePortfolioQuestionConfigurationFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionConfigurationFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantBlocked')
+class AskRemotePortfolioQuestionBlockedFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionBlockedFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantInvalidInput')
+class AskRemotePortfolioQuestionInvalidInputFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionInvalidInputFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantIncomplete')
+class AskRemotePortfolioQuestionIncompleteFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionIncompleteFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
+
+@Localizable('errorRemoteAssistantUnknown')
+class AskRemotePortfolioQuestionUnknownFailure
+    extends AskRemotePortfolioQuestionFailure {
+  const AskRemotePortfolioQuestionUnknownFailure({
+    super.cause,
+    super.serviceMessage,
+  });
+}
 
 class AskRemotePortfolioQuestionParams {
   const AskRemotePortfolioQuestionParams({
@@ -58,7 +147,7 @@ class AskRemotePortfolioQuestionUseCase
         BaseUseCase<
           void,
           AskRemotePortfolioQuestionParams,
-          RemoteAssistantFailure
+          AskRemotePortfolioQuestionFailure
         > {
   AskRemotePortfolioQuestionUseCase(
     this._repository,
@@ -72,15 +161,15 @@ class AskRemotePortfolioQuestionUseCase
 
   @protected
   @override
-  Future<Either<RemoteAssistantFailure, void>> execute(
+  Future<Either<AskRemotePortfolioQuestionFailure, void>> execute(
     AskRemotePortfolioQuestionParams params,
   ) async {
     final platformSupport = await _isRemoteAssistantSupportedUseCase();
     if (platformSupport.isLeft || !platformSupport.right) {
-      return const Left(RemoteAssistantUnavailableFailure());
+      return const Left(AskRemotePortfolioQuestionUnavailableFailure());
     }
     if (!_isValid(params)) {
-      return const Left(RemoteAssistantInvalidInputFailure());
+      return const Left(AskRemotePortfolioQuestionInvalidInputFailure());
     }
     final consumeAiRequestQuotaEither = await _consumeAiRequestQuotaUseCase();
     // Only a used-up budget blocks the question; an unreadable request log
@@ -88,7 +177,9 @@ class AskRemotePortfolioQuestionUseCase
     if (consumeAiRequestQuotaEither.isLeft &&
         consumeAiRequestQuotaEither.left is AiRequestQuotaExceededFailure) {
       return Left(
-        RemoteAssistantQuotaFailure(cause: consumeAiRequestQuotaEither.left),
+        AskRemotePortfolioQuestionQuotaFailure(
+          cause: consumeAiRequestQuotaEither.left,
+        ),
       );
     }
     await _repository.answer(
@@ -131,8 +222,60 @@ class AskRemotePortfolioQuestionUseCase
 
   @protected
   @override
-  RemoteAssistantFailure mapErrorToFailure(
+  AskRemotePortfolioQuestionFailure mapErrorToFailure(
     Object error,
     StackTrace stackTrace,
-  ) => error.toRemoteAssistantFailure();
+  ) => switch (error) {
+    RemoteAssistantUnavailableException() ||
+    RemoteAssistantCancelledException() ||
+    RemoteAssistantClosedException() ||
+    RemoteAssistantConcurrentRequestException() =>
+      const AskRemotePortfolioQuestionUnavailableFailure(),
+    AiNetworkException(:final serviceMessage) =>
+      AskRemotePortfolioQuestionNetworkFailure(
+        cause: error,
+        serviceMessage: serviceMessage,
+      ),
+    AiServerException(:final serviceMessage) =>
+      AskRemotePortfolioQuestionUnknownFailure(
+        cause: error,
+        serviceMessage: serviceMessage,
+      ),
+    AiTimeoutException() => AskRemotePortfolioQuestionTimeoutFailure(
+      cause: error,
+    ),
+    RemoteAssistantTimeoutException() =>
+      const AskRemotePortfolioQuestionTimeoutFailure(),
+    AiQuotaExceededException(:final serviceMessage) =>
+      AskRemotePortfolioQuestionQuotaFailure(
+        cause: error,
+        serviceMessage: serviceMessage,
+      ),
+    AiConfigurationException(:final serviceMessage) ||
+    AiUnsupportedLocationException(
+      :final serviceMessage,
+    ) => AskRemotePortfolioQuestionConfigurationFailure(
+      cause: error,
+      serviceMessage: serviceMessage,
+    ),
+    RemoteAssistantFlagException() =>
+      const AskRemotePortfolioQuestionConfigurationFailure(),
+    AiBlockedResponseException() => AskRemotePortfolioQuestionBlockedFailure(
+      cause: error,
+    ),
+    AiInvalidInputException() => AskRemotePortfolioQuestionInvalidInputFailure(
+      cause: error,
+    ),
+    RemoteAssistantInvalidInputException() =>
+      const AskRemotePortfolioQuestionInvalidInputFailure(),
+    AiEmptyResponseException() || AiIncompleteResponseException() =>
+      AskRemotePortfolioQuestionIncompleteFailure(cause: error),
+    RemoteAssistantIncompleteException() ||
+    RemoteAssistantResponseLimitException() =>
+      const AskRemotePortfolioQuestionIncompleteFailure(),
+    RemoteAssistantCallbackException() =>
+      const AskRemotePortfolioQuestionUnknownFailure(),
+    AiSdkException() => AskRemotePortfolioQuestionUnknownFailure(cause: error),
+    _ => const AskRemotePortfolioQuestionUnknownFailure(),
+  };
 }

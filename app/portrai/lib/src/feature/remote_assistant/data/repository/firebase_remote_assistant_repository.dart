@@ -14,7 +14,7 @@ import 'package:portrai/src/feature/remote_assistant/domain/use_case/ask_remote_
 class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
   FirebaseRemoteAssistantRepository(
     this._aiController,
-    this._isFeatureEnabled,
+    this._isFeatureEnabledUseCase,
     this._appConfig,
   );
 
@@ -28,7 +28,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
       'say so without guessing. Keep answers direct and concise.';
 
   final FbAiController _aiController;
-  final IsFeatureEnabledUseCase _isFeatureEnabled;
+  final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final PortraiAppConfigEntity _appConfig;
 
   FbAiTextModel? _model;
@@ -104,7 +104,7 @@ class FirebaseRemoteAssistantRepository implements RemoteAssistantRepository {
     required int generation,
     required String? systemPrompt,
   }) async {
-    final flagResult = await _isFeatureEnabled(
+    final flagResult = await _isFeatureEnabledUseCase(
       RemoteAssistantFeatureFlags.remoteAssistant,
     );
     if (flagResult.isLeft) {

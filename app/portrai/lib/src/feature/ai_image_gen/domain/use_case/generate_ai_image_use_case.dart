@@ -65,13 +65,14 @@ class GenerateAiImageUseCase
   GenerateAiImageUseCase(
     this._isFeatureEnabledUseCase,
     this._repository,
-    this._resolveRequestSettingsUseCase,
+    this._resolveAiImageRequestSettingsUseCase,
     this._consumeAiRequestQuotaUseCase,
   );
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final AiImageRepository _repository;
-  final ResolveAiImageRequestSettingsUseCase _resolveRequestSettingsUseCase;
+  final ResolveAiImageRequestSettingsUseCase
+  _resolveAiImageRequestSettingsUseCase;
   final ConsumeAiRequestQuotaUseCase _consumeAiRequestQuotaUseCase;
 
   @protected
@@ -91,7 +92,8 @@ class GenerateAiImageUseCase
       return const Left(AiImageFeatureDisabledFailure());
     }
 
-    final requestSettings = (await _resolveRequestSettingsUseCase()).right;
+    final requestSettings =
+        (await _resolveAiImageRequestSettingsUseCase()).right;
     final cachedImage = await _repository.getCachedAiImage(
       sourceImageUrl: param.sourceImageUrl,
       prompt: requestSettings.prompt,

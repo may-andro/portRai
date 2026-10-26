@@ -17,13 +17,13 @@ class LocalAssistantBloc
     extends Bloc<LocalAssistantEvent, LocalAssistantState> {
   LocalAssistantBloc(
     this._getAssistantContextUseCase,
-    this._prepareAssistantModelUseCase,
-    this._getAssistantEnabledUseCase,
-    this._updateAssistantEnabledUseCase,
+    this._prepareLocalAssistantModelUseCase,
+    this._getLocalAssistantEnabledUseCase,
+    this._updateLocalAssistantEnabledUseCase,
     this._cancelAssistantPreparationUseCase,
-    this._deleteAssistantModelUseCase,
+    this._deleteLocalAssistantModelUseCase,
     this._isAssistantModelDownloadedUseCase,
-    this._askPortfolioQuestionUseCase,
+    this._askLocalPortfolioQuestionUseCase,
     this._trackingDelegate,
     this._isFeatureEnabledUseCase, {
     required this._isLocalAssistantSupportedUseCase,
@@ -48,15 +48,15 @@ class LocalAssistantBloc
   }
 
   final GetAssistantContextUseCase _getAssistantContextUseCase;
-  final PrepareLocalAssistantModelUseCase _prepareAssistantModelUseCase;
-  final GetLocalAssistantEnabledUseCase _getAssistantEnabledUseCase;
-  final UpdateLocalAssistantEnabledUseCase _updateAssistantEnabledUseCase;
+  final PrepareLocalAssistantModelUseCase _prepareLocalAssistantModelUseCase;
+  final GetLocalAssistantEnabledUseCase _getLocalAssistantEnabledUseCase;
+  final UpdateLocalAssistantEnabledUseCase _updateLocalAssistantEnabledUseCase;
   final CancelLocalAssistantPreparationUseCase
   _cancelAssistantPreparationUseCase;
-  final DeleteLocalAssistantModelUseCase _deleteAssistantModelUseCase;
+  final DeleteLocalAssistantModelUseCase _deleteLocalAssistantModelUseCase;
   final IsLocalAssistantModelDownloadedUseCase
   _isAssistantModelDownloadedUseCase;
-  final AskLocalPortfolioQuestionUseCase _askPortfolioQuestionUseCase;
+  final AskLocalPortfolioQuestionUseCase _askLocalPortfolioQuestionUseCase;
   final LocalAssistantTrackingDelegate _trackingDelegate;
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
@@ -171,7 +171,7 @@ class LocalAssistantBloc
       _hasInitialized = false;
       return;
     }
-    final result = await _getAssistantEnabledUseCase();
+    final result = await _getLocalAssistantEnabledUseCase();
     if (emit.isDone || revision != _controlRevision) return;
     if (result.isLeft) {
       emit(state.copyWith(hasError: true, failure: result.left));
@@ -207,7 +207,7 @@ class LocalAssistantBloc
       await _requestPermissionUseCase(AppPermission.notifications);
       if (emit.isDone || revision != _controlRevision) return;
     }
-    final result = await _updateAssistantEnabledUseCase(true);
+    final result = await _updateLocalAssistantEnabledUseCase(true);
     if (emit.isDone || revision != _controlRevision) return;
     if (result.isLeft) {
       emit(
@@ -239,7 +239,7 @@ class LocalAssistantBloc
         clearFailure: true,
       ),
     );
-    final result = await _updateAssistantEnabledUseCase(false);
+    final result = await _updateLocalAssistantEnabledUseCase(false);
     if (emit.isDone || revision != _controlRevision) return;
     if (result.isLeft) {
       emit(state.copyWith(hasError: true, failure: result.left));
@@ -251,7 +251,7 @@ class LocalAssistantBloc
         emit(state.copyWith(hasError: true, failure: cancelled.left));
       }
     } else if (event.deleteModel) {
-      final deleted = await _deleteAssistantModelUseCase();
+      final deleted = await _deleteLocalAssistantModelUseCase();
       if (!emit.isDone && revision == _controlRevision && deleted.isLeft) {
         emit(state.copyWith(hasError: true, failure: deleted.left));
       }
@@ -284,7 +284,7 @@ class LocalAssistantBloc
         hasError: false,
       ),
     );
-    final result = await _prepareAssistantModelUseCase((progress) {
+    final result = await _prepareLocalAssistantModelUseCase((progress) {
       if (!emit.isDone && revision == _controlRevision && state.isDownloading) {
         emit(state.copyWith(status: LocalAssistantDownloading(progress)));
       }
@@ -350,7 +350,7 @@ class LocalAssistantBloc
     // loaded context remains the fallback.
     final freshContextEither = await _getAssistantContextUseCase();
     if (emit.isDone || revision != _requestRevision) return;
-    final result = await _askPortfolioQuestionUseCase(
+    final result = await _askLocalPortfolioQuestionUseCase(
       AskLocalPortfolioQuestionParams(
         question: question,
         portfolioContext: freshContextEither.isRight

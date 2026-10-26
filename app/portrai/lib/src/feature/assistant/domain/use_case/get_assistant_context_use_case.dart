@@ -3,25 +3,32 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:module_injector/module_injector.dart';
-import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
 import 'package:portrai/src/feature/project/project.dart';
 import 'package:use_case/use_case.dart';
 
+sealed class GetAssistantContextFailure extends BasicFailure {
+  const GetAssistantContextFailure({super.cause});
+}
+
+class GetAssistantContextUnknownFailure extends GetAssistantContextFailure {
+  const GetAssistantContextUnknownFailure({super.cause});
+}
+
 @register
 class GetAssistantContextUseCase
-    extends BaseNoParamUseCase<String, AssistantFailure> {
+    extends BaseNoParamUseCase<String, GetAssistantContextFailure> {
   GetAssistantContextUseCase(this._getPortfolioUseCase);
 
   final GetPortfolioUseCase _getPortfolioUseCase;
 
   @protected
   @override
-  FutureOr<Either<AssistantFailure, String>> execute() async {
+  FutureOr<Either<GetAssistantContextFailure, String>> execute() async {
     final result = await _getPortfolioUseCase();
     if (result.isLeft) {
-      return Left(UnknownAssistantFailure(cause: result.left));
+      return Left(GetAssistantContextUnknownFailure(cause: result.left));
     }
 
     final portfolio = result.right;
@@ -701,6 +708,6 @@ class GetAssistantContextUseCase
 
   @protected
   @override
-  AssistantFailure mapErrorToFailure(Object e, StackTrace st) =>
-      UnknownAssistantFailure(cause: e);
+  GetAssistantContextFailure mapErrorToFailure(Object e, StackTrace st) =>
+      GetAssistantContextUnknownFailure(cause: e);
 }

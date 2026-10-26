@@ -330,7 +330,7 @@ class RemoteAssistantBloc
             requestHistory.length - RemoteAssistantLimits.maxHistoryMessages,
           );
     final AssistantGenuiController? genuiController;
-    final Either<RemoteAssistantFailure, void> result;
+    final Either<AskRemotePortfolioQuestionFailure, void> result;
     if (state.isGenerativeUiEnabled) {
       final allowedContent = _allowedContentOf(state.portfolioContext!);
       final controller = AssistantGenuiController(
@@ -490,7 +490,7 @@ class RemoteAssistantBloc
         clearGenuiSurfaces: true,
         partialAnswer: '',
         isSendingQuestion: false,
-        failure: const RemoteAssistantIncompleteFailure(),
+        failure: const AskRemotePortfolioQuestionIncompleteFailure(),
       ),
     );
     _disposeGenuiControllers();

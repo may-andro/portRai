@@ -338,7 +338,7 @@ void main() {
       tester,
       insightsState(
         JobOpeningInsightsStatus.failed,
-        insightsFailure: const RemoteAssistantQuotaFailure(),
+        insightsFailure: const AskRemotePortfolioQuestionQuotaFailure(),
       ),
     );
 
