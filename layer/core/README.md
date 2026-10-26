@@ -1,95 +1,142 @@
 # Core
 
-A foundational Flutter package providing essential utilities, extensions, and models for the Port-Rai application. As a workspace module, it is part of the Port-Rai modular architecture and is automatically available to other workspace packages.
+Shared extensions, mapper interfaces, models and exception types used by the other workspace packages. It also re-exports `package:collection` and `package:intl`.
 
 ## Features
 
-- **DateTime Extensions**: Date formatting, week numbers, month/year extraction
-- **Duration Extensions**: Intuitive duration creation (`5.seconds`, `30.minutes`)
-- **String Extensions**: Capitalization, null-safe operations, longest string finder
-- **Mapper Abstractions**: Generic and bidirectional data mapping
-- **Core Models**: App configuration, localization, build environment
+- `DateTime` formatting getters, ISO week number, and `String` to `DateTime` parsing
+- `num` to `Duration` getters (`5.seconds`, `30.minutes`)
+- `String` and `String?` helpers for capitalization, blank and null checks
+- Dot-separated version string comparison
+- `Mapper` and `BiMapper` interfaces for data mapping
+- `AppConfig`, `AppLocale`, `BuildConfig` and `BuildEnvironment` models
+- `AppException` base type with `NullException` and `FatalException`
 
 ## Getting Started
 
 ### Installation
 
-This module is part of the workspace and can be added as a workspace dependency:
+Add the workspace package as a dependency:
 
 ```yaml
 dependencies:
   core: any
 ```
 
-Import in any workspace module:
-
 ```dart
 import 'package:core/core.dart';
 ```
 
-> **Note**: As a workspace module, `core` is automatically available to all other modules without manual dependency configuration.
+### Module Configuration
+
+This layer has no `ModuleConfigurator`; import it and use its types directly.
 
 ## Usage
 
-### DateTime & Duration
+### Dates and Durations
 
 ```dart
-// Date formatting
-DateTime.now().toFormattedDate;        // "2025-10-07"
-DateTime.now().toMonthAndYear;         // "October, 2025"
+final date = DateTime(2025, 10, 7);
+date.toFormattedDate; // "2025-10-07"
+date.toMonthAndYear; // "October, 2025"
+date.weekNumber; // 41
 
-// Duration creation
+'2025-10-07'.toFormattedDate; // DateTime(2025, 10, 7)
+
 final timeout = 30.seconds;
-await Future.delayed(2.minutes);
+await Future<void>.delayed(2.minutes);
 ```
 
-### String Operations
+### Strings
 
 ```dart
-"john".capitalize;                     // "John"
-"  ".isBlank;                         // true
-["short", "longer"].longestString;     // "longer"
+'john'.capitalize; // "John"
+'  '.isBlank; // true
+
+String? value;
+value.isNullOrBlank; // true
+value.orEmpty(); // ""
+
+['short', 'longer'].longestString; // "longer"
+```
+
+### Versions
+
+```dart
+'1.2'.compareVersion('1.2.0'); // 0
+'1.9.0'.isLowerVersionThan('1.10.0'); // true
 ```
 
 ### Data Mapping
 
 ```dart
-class UserMapper extends Mapper<UserDto, User> {
+class ItemMapper implements Mapper<ItemDto, Item> {
   @override
-  User map(UserDto dto) => User(id: dto.id, name: dto.name);
+  Item map(ItemDto from) => Item(id: from.id, name: from.name);
+}
+
+class ItemBiMapper implements BiMapper<ItemDto, Item> {
+  @override
+  Item to(ItemDto from) => Item(id: from.id, name: from.name);
+
+  @override
+  ItemDto from(Item from) => ItemDto(id: from.id, name: from.name);
 }
 ```
 
-## Key Concepts
+### Build Environment
 
-### DateTime Extensions
+```dart
+final environment = BuildEnvironment.buildEnvironment;
+final config = BuildConfig(buildEnvironment: environment);
+```
 
-Date formatting, week numbers, month/year extraction
+## API Reference
 
-### Duration Extensions
+### Extensions
 
-Intuitive duration creation (`5.seconds`, `30.minutes`)
+| Extension | On | Members |
+| --- | --- | --- |
+| `DateTimeFormatting` | `DateTime` | `toFormattedDate` (`yyyy-MM-dd`), `toFormattedDateTime` (`dd MMM yyyy, hh:mm a`), `toFullDateTime` (`EEEE, MMMM d, yyyy H:m`), `toFullDateWithoutTime` (`EEEE, MMMM d, yyyy`), `toMonthAndYear` (`MMMM, yyyy`), `toYear`, `year`, `month` (`MM`), `weekNumber` (ISO 8601) |
+| `StringDateFormatting` | `String` | `toFormattedDate`, `toMonthAndYear`, `toFormattedDateTime`, `toFullDateTime`: parse the matching `DateTimeFormatting` format back into a `DateTime` |
+| `NumDurationExtensions` | `num` | `microseconds`, `milliseconds`, `seconds`, `minutes`, `hours`, `days` |
+| `StringMapper` | `String` | `capitalize`, `isBlank`, `isNotBlank` |
+| `NullableStringIsNullOrEmptyExtension` | `String?` | `isNull`, `isNonNull`, `isNullOrEmpty`, `isNotNullOrEmpty`, `isNullOrBlank`, `isNotNullOrBlank`, `orEmpty()` |
+| `StringsExtension` | `List<String>` | `longestString` (first longest entry, `''` for an empty list) |
+| `VersionComparisonExtension` | `String` | `compareVersion(String other)`, `isLowerVersionThan(String other)`. Missing segments count as `0`; non-numeric suffixes on a segment are ignored. |
+| `AppLocaleExtension` | `AppLocale` | `locale` (Flutter `Locale`) |
+| `LocaleExtension` | `Locale` | `appLocale` |
 
-### String Extensions
+### Mappers
 
-Capitalization, null-safe operations, longest string finder
+- `Mapper<From, To>`: `To map(From from)`
+- `BiMapper<From, To>`: `To to(From from)` and `From from(To from)`
 
-### Mapper Abstractions
+### Models
 
-Generic and bidirectional data mapping
+- `AppConfig`: abstract `const` base class with no fields; each app defines a subclass with its own fields.
+- `AppLocale(String languageCode)`: value equality on `languageCode`, `AppLocale.fallback()` (`en`), `AppLocale.fromJson` and `toJson` using the `languageCode` key.
+- `BuildEnvironment`: `staging` or `prod`. `BuildEnvironment.buildEnvironment` reads the `build_env` compile-time define (`--dart-define=build_env=staging`) and falls back to `prod` when it is missing or unknown. Flags: `isFirebaseEnabled` (prod), `isFeatureFlagCached`, `isRemoteLoggingEnabled`, `isSplashDescriptive`, `isDevMenuEnabled`, `debugShowCheckedModeBanner` (staging).
+- `BuildConfig({required BuildEnvironment buildEnvironment})`
 
-### Core Models
+### Exceptions
 
-App configuration, localization, build environment
+- `AppException`: base `Exception` type that custom exceptions implement.
+- `NullException` and `FatalException`: implement `AppException`.
 
 ## Dependencies
 
-- Flutter SDK ^3.9.2
-- `collection`: Collection utilities used by shared helpers and models
-- `equatable`: Value equality support for shared model types
-- `intl`: Date and localization formatting utilities
+- `collection`: `firstWhereOrNull` in `BuildEnvironment`; re-exported
+- `equatable`: declared in `pubspec.yaml`; not imported by `lib/`
+- `intl`: `DateFormat` in the date extensions; re-exported
 
 ## Testing
+
+```bash
+melos run test --scope=core
+```
+
+Or from `layer/core`:
 
 ```bash
 flutter test
