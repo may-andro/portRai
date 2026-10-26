@@ -185,8 +185,9 @@ Running `build_runner` (`melos run gen`) scans `lib/**.dart` and writes
 - `static String getFallbackMessage(Failure failure)` returns a readable name derived from the
   class name (for example `Item Not Found`), without needing a `BuildContext`.
 
-The consuming package must provide `context.localizations` with an `errorGeneric` entry and one
-entry per annotation key. No file is written when no annotated failures are found.
+The generated file imports `package:flutter/material.dart` and `package:<package>/l10n/l10n.dart`.
+That library must expose `context.localizations` with an `errorGeneric` entry and one entry per
+annotation key. No file is written when no annotated failures are found.
 
 ## API Reference
 
