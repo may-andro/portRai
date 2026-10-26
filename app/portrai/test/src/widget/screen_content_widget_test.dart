@@ -279,6 +279,32 @@ void main() {
       },
     );
 
+    testWidgets('should make the text selectable when the content scrolls', (
+      tester,
+    ) async {
+      await pumpWithFooter(
+        tester,
+        const ScreenLoadedContent.slivers([
+          SliverToBoxAdapter(child: Text('loaded content')),
+        ]),
+      );
+
+      expect(
+        find.ancestor(
+          of: find.text('loaded content'),
+          matching: find.byType(SelectionArea),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.ancestor(
+          of: find.text('footer', skipOffstage: false),
+          matching: find.byType(SelectionArea),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('should not add the footer when the content is full screen', (
       tester,
     ) async {

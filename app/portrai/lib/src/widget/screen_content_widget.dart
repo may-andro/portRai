@@ -229,7 +229,8 @@ class ScreenFooterProviderWidget extends InheritedWidget {
 }
 
 /// Scrolls [slivers] followed by the provided screen footer, which sits at the
-/// bottom of the screen when the content is shorter than it.
+/// bottom of the screen when the content is shorter than it. Its text can be
+/// selected and copied.
 class _ScrollableContentWidget extends StatelessWidget {
   const _ScrollableContentWidget({
     required this.slivers,
@@ -242,33 +243,38 @@ class _ScrollableContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final footer = ScreenFooterProviderWidget.maybeFooterOf(context);
-    return CustomScrollView(
-      controller: scrollController,
-      scrollBehavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(scrollbars: false, overscroll: false),
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        ...slivers,
-        if (footer != null)
-          // Fills the space left below the content, so a short screen keeps
-          // the footer at the bottom and a long one has it right after the
-          // content.
-          SliverLayoutBuilder(
-            builder: (context, constraints) => SliverToBoxAdapter(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: max(
-                    0,
-                    constraints.viewportMainAxisExtent -
-                        constraints.precedingScrollExtent,
+    return SelectionArea(
+      child: CustomScrollView(
+        controller: scrollController,
+        scrollBehavior: ScrollConfiguration.of(
+          context,
+        ).copyWith(scrollbars: false, overscroll: false),
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          ...slivers,
+          if (footer != null)
+            // Fills the space left below the content, so a short screen keeps
+            // the footer at the bottom and a long one has it right after the
+            // content.
+            SliverLayoutBuilder(
+              builder: (context, constraints) => SliverToBoxAdapter(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: max(
+                      0,
+                      constraints.viewportMainAxisExtent -
+                          constraints.precedingScrollExtent,
+                    ),
+                  ),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: footer,
                   ),
                 ),
-                child: Align(alignment: Alignment.bottomCenter, child: footer),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
