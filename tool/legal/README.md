@@ -1,111 +1,100 @@
-# Legal Pages – Firebase Hosting
+# Legal Pages
 
-Static HTML pages hosting the **PortRai** app's required legal documents, served via Firebase Hosting. These URLs are referenced in the Google Play Store and Apple App Store listings.
+Static HTML pages with the PortRai app's Privacy Policy and Terms & Conditions, served by
+Firebase Hosting from the `portrai-legal` site.
 
-| Page | Live URL |
-|---|---|
-| Privacy Policy | https://portrai-legal.web.app/privacy-policy |
-| Terms & Conditions | https://portrai-legal.web.app/terms |
+| Page | Source | URL |
+|---|---|---|
+| Privacy Policy | `public/privacy-policy/index.html` | https://portrai-legal.web.app/privacy-policy |
+| Terms & Conditions | `public/terms/index.html` | https://portrai-legal.web.app/terms |
 
----
+## Features
+- Plain HTML and inline CSS with no build step; `firebase.json` serves `public/` with
+  `cleanUrls`, so pages load without the `.html` suffix.
+- Every response carries the `X-Frame-Options: SAMEORIGIN` and `X-Content-Type-Options: nosniff`
+  headers.
+- Each page has a `<meta name="version">` tag and a footer version that hold a `{{VERSION}}`
+  placeholder, stamped at release time.
+- The footers link the two pages to each other.
 
 ## Structure
 
-```
+```text
 tool/legal/
-├── firebase.json               # Firebase Hosting config (target: "legal")
-├── .firebaserc                 # Firebase project: portrai-96f2b
-├── README.md
+├── firebase.json        # Hosting config: target "legal", public dir, clean URLs, headers
+├── .firebaserc          # Default project portrai-96f2b; maps target "legal" to site portrai-legal
 └── public/
-    ├── favicon.png             # Copied from app/portrai/web/favicon.png
+    ├── favicon.png
     ├── icons/
-    │   ├── Icon-192.png        # Copied from app/portrai/web/icons/
+    │   ├── Icon-192.png # Apple touch icon
     │   └── Icon-512.png
     ├── privacy-policy/
-    │   └── index.html          # {{VERSION}} placeholder stamped at deploy time
+    │   └── index.html
     └── terms/
-        └── index.html          # {{VERSION}} placeholder stamped at deploy time
+        └── index.html
 ```
 
----
+## Getting Started
 
-## First-Time Setup
+### Prerequisites
+- A Firebase Hosting site named `portrai-legal` in the `portrai-96f2b` project. The name must
+  match the target mapping in `.firebaserc`.
+- The Firebase CLI, signed in to an account with Hosting deploy access:
 
-> Only needed once. Skip if the Firebase site already exists.
+  ```bash
+  npm install -g firebase-tools
+  firebase login
+  ```
 
-1. Open the [Firebase Console](https://console.firebase.google.com/project/portrai-96f2b/hosting) → **Hosting** → **Add another site**.
-2. Create a site named exactly **`portrai-legal`** (must match `.firebaserc`).
-3. Add the following secret to the GitHub repository (Settings → Secrets → Actions):
+### CI Secrets
+The release workflow reads these GitHub Actions secrets:
 
-   | Secret | Value |
-   |---|---|
-   | `FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT` | Firebase service account JSON with Hosting deploy permissions |
-   | `FIREBASE_PROJECT_ID` | `portrai-96f2b` |
-
-4. Install the Firebase CLI for local work:
-   ```bash
-   npm install -g firebase-tools
-   firebase login
-   ```
-
----
-
-## Release
-
-Legal pages are versioned independently from the app using the tag format:
-
-```
-legal-<major>.<minor>.<patch>
-```
-
-### When to release
-
-| Change type | Version bump |
+| Secret | Value |
 |---|---|
-| Typo fix, minor wording | `patch` — e.g. `1.0.1` |
-| New clause, added section | `minor` — e.g. `1.1.0` |
-| Complete rewrite, new data practices | `major` — e.g. `2.0.0` |
+| `FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT` | Base64-encoded service account JSON with Hosting deploy permissions |
+| `FIREBASE_PROJECT_ID` | `portrai-96f2b` |
 
-### How to release
+## Usage
+
+### Editing Content
+Edit the HTML files in `public/` directly. Keep `{{VERSION}}` as a placeholder in source. When
+changing a policy, also update:
+
+- The **Effective date** and **Last updated** values at the top of the page.
+- The data table in Privacy Policy section 2, Data We Collect.
+- The third-party services lists: Privacy Policy section 4 and Terms & Conditions section 5.
+
+### Release
+Pushing a tag that matches `legal-*` runs
+[`legal_production.yaml`](../../.github/workflows/legal_production.yaml):
 
 ```bash
-# 1. Make your changes to public/privacy-policy/index.html or public/terms/index.html
-# 2. Commit and push to main
-git add tool/legal/
-git commit -m "legal: update privacy policy data retention section"
-git push
-
-# 3. Tag the release
 git tag legal-1.1.0
 git push origin legal-1.1.0
 ```
 
-The [`legal_production.yaml`](../../.github/workflows/legal_production.yaml) CI workflow triggers automatically and:
+The workflow:
 
-1. Extracts the version from the tag (`legal-1.1.0` → `1.1.0`)
-2. Stamps `{{VERSION}}` into the `<meta name="version">` tag and footer of every HTML page
-3. Deploys to Firebase Hosting (`live` channel, `legal` target)
-4. Creates a GitHub Release with a changelog scoped to `tool/legal/` commits
+1. Takes the version from the tag (`legal-1.1.0` becomes `1.1.0`).
+2. Replaces `{{VERSION}}` in every HTML file under `public/`.
+3. Deploys `tool/legal` to the `live` channel of the `legal` hosting target.
+4. Creates a GitHub Release whose changelog lists commits touching `tool/legal/` since the
+   previous `legal-*` tag.
 
-### Local deploy (without CI)
+### Local Deploy
+The `deploy_legal` Melos script deploys the `legal` target from this folder:
 
 ```bash
-# Replace {{VERSION}} manually first
-VERSION="1.1.0"
-find tool/legal/public -name "*.html" -exec sed -i "s/{{VERSION}}/${VERSION}/g" {} +
-
-cd tool/legal
-firebase deploy --only hosting:legal
+melos run deploy_legal
 ```
 
-> ⚠️ Don't commit the stamped HTML files — `{{VERSION}}` should stay as a placeholder in source.
+It does not stamp the version, so the pages show `{{VERSION}}`. To deploy a stamped build,
+replace the placeholder first (GNU `sed` syntax, as in the workflow; on macOS use `sed -i ''`),
+then restore the sources after deploying:
 
----
-
-## Editing Content
-
-Edit the HTML files in `public/` directly — no build step required. Key things to keep in sync when updating the policies:
-
-- **Effective date** and **Last updated** fields at the top of each page
-- The **data table** in the Privacy Policy (Section 2) if new Firebase services are added
-- The **third-party services list** in both pages
+```bash
+VERSION="1.1.0"
+find tool/legal/public -name "*.html" -exec sed -i "s/{{VERSION}}/${VERSION}/g" {} +
+melos run deploy_legal
+git checkout -- tool/legal/public
+```
