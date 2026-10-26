@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
-import 'package:portrai/src/feature/asset_source/domain/use_case/asset_source_failure.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
 import 'package:use_case/use_case.dart';
 
@@ -77,7 +76,7 @@ void main() {
     blocTest<DeveloperMenuBloc, DeveloperMenuState>(
       'should not emit a state change when updating the asset source fails',
       setUp: () => updateAssetSourceUseCase.stubCall(
-        const Left(UnknownAssetSourceFailure()),
+        const Left(UpdateAssetSourceUnknownFailure()),
       ),
       build: buildBloc,
       act: (bloc) =>
