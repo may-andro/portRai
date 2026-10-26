@@ -49,9 +49,9 @@ search turned on.
   512 MiB of memory.
 - Derives search terms, such as Flutter or Android, from the portfolio's roles.
 - Reads the public Greenhouse, Lever and Ashby job boards of a list of companies, searches
-  Himalayas and Jobicy for the terms, reads the latest jobs from Remotive, Remote OK and
-  Arbeitnow, and lets Gemini read the roles out of matching posts in Hacker News "Who is
-  hiring?" threads.
+  Himalayas, Jobicy and Freelancer.com for the terms, reads the latest jobs from Remotive,
+  Remote OK and Arbeitnow, and lets Gemini read the roles out of matching posts in Hacker News
+  "Who is hiring?" threads.
 - Maps every job to one shape, turns HTML descriptions into plain text and removes duplicates
   across feeds.
 - Drops jobs posted more than 30 days ago, jobs their source has already expired, jobs limited
@@ -103,16 +103,23 @@ and no roles, it stops before reading them.
 | [Jobicy](https://jobicy.com/jobs-rss-feed)                          | `GET /api/v2/remote-jobs?count=50&tag={term}` per term                                                                                                 | Every job                                                                                                                    | Credit Jobicy with a link to the source, and send apply buttons to the original job URL                                                                          |
 | [Hacker News](https://hn.algolia.com/api)                           | `GET /api/v1/search_by_date?tags=story,author_whoishiring&hitsPerPage=10`, then `GET /api/v1/items/{thread}` for the latest 2 "Who is hiring?" threads | Remote roles Gemini reads out of posts from the last 30 days that mention a term and remote work                             | Public API; every opening links to its post on Hacker News                                                                                                       |
 | [Arbeitnow](https://www.arbeitnow.com/blog/job-board-api)           | `GET /api/job-board-api?page=1..5`                                                                                                                     | Jobs with `remote: true`                                                                                                     | Don't abuse the free API, link back to the site                                                                                                                  |
+| [Freelancer.com](https://developers.freelancer.com)                 | `GET /api/projects/0.1/projects/active/?query={term}&limit=100&job_details=true&full_description=true` per term                                        | Remote projects with a budget of at least $1,000, or $30 an hour                                                             | Refresh cached data at least every 24 hours; openings expire when bidding closes                                                                                 |
 
 Every stored opening keeps the source's job `url` and `sourceName`, which the app must show
 with the job. Earlier feeds in the table win when two list the same job. A request whose
 connection fails, or that is answered with `429` or a `5xx` status, is tried once more after two
 seconds; each request times out after 30 seconds.
 
-Himalayas and Jobicy search two terms at a time. Himalayas reads up to three pages per term and
-Arbeitnow up to five pages; when a later page fails, they keep the pages read before it. A
-Himalayas term or Arbeitnow fails only when its first page fails, and a Jobicy term fails on its
-one request. Himalayas and Jobicy fail only when every term fails.
+Himalayas, Jobicy and Freelancer.com search two terms at a time. Himalayas reads up to three
+pages per term and Arbeitnow up to five pages; when a later page fails, they keep the pages read
+before it. A Himalayas term or Arbeitnow fails only when its first page fails, and a Jobicy or
+Freelancer.com term fails on its one request. Himalayas, Jobicy and Freelancer.com fail only
+when every term fails.
+
+Freelancer.com budgets are compared in US dollars, by the exchange rate each project lists, using
+the top of the budget range: fixed-price projects need $1,000 and hourly projects $30 an hour.
+On-site projects are dropped. Projects do not name their client, so the company is
+`Freelancer.com client`, and every project is a contract job, kept wherever the client is.
 
 Feeds that know a job's date, title and location apply the same freshness, region and role
 filters while reading, so Greenhouse details are fetched only for postings that pass them and
@@ -264,25 +271,25 @@ timestamp `updatedAt` set to now.
 Each opening is stored at `users/{uid}/job_openings/{dedupeKey}`. The key is a hash of the
 normalized company and title, so the same job keeps one document across feeds and weeks.
 
-| Field           | Type           | Description                                                                                                |
-| --------------- | -------------- | ---------------------------------------------------------------------------------------------------------- |
-| `source`        | string         | `greenhouse`, `lever`, `ashby`, `himalayas`, `remotive`, `remoteok`, `jobicy`, `hackernews` or `arbeitnow` |
-| `sourceName`    | string         | The feed's name, or the company's name for a company board, for attribution                                |
-| `sourceId`      | string         | The job's id at the source                                                                                 |
-| `title`         | string         | Job title                                                                                                  |
-| `company`       | string         | Company name                                                                                               |
-| `url`           | string         | Job page at the source                                                                                     |
-| `location`      | string or null | Location or region restriction                                                                             |
-| `tags`          | string[]       | Tags from the source                                                                                       |
-| `jobTypes`      | string[]       | Employment types from the source                                                                           |
-| `description`   | string         | Plain text, cut at 5,000 characters                                                                        |
-| `matchedSkills` | string[]       | Portfolio skills the job needs                                                                             |
-| `score`         | number         | Gemini's fit score, 60 to 100                                                                              |
-| `missingSkills` | string[]       | Skills the job asks for that are missing                                                                   |
-| `reasons`       | string[]       | Gemini's short explanation of the score                                                                    |
-| `publishedAt`   | timestamp      | When the source published the job                                                                          |
-| `fetchedAt`     | timestamp      | When this run stored it                                                                                    |
-| `expiresAt`     | timestamp      | `fetchedAt` plus 14 days, or the source's expiry when that is earlier                                      |
+| Field           | Type           | Description                                                                                                              |
+| --------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `source`        | string         | `greenhouse`, `lever`, `ashby`, `himalayas`, `remotive`, `remoteok`, `jobicy`, `hackernews`, `arbeitnow` or `freelancer` |
+| `sourceName`    | string         | The feed's name, or the company's name for a company board, for attribution                                              |
+| `sourceId`      | string         | The job's id at the source                                                                                               |
+| `title`         | string         | Job title                                                                                                                |
+| `company`       | string         | Company name                                                                                                             |
+| `url`           | string         | Job page at the source                                                                                                   |
+| `location`      | string or null | Location or region restriction                                                                                           |
+| `tags`          | string[]       | Tags from the source                                                                                                     |
+| `jobTypes`      | string[]       | Employment types from the source                                                                                         |
+| `description`   | string         | Plain text, cut at 5,000 characters                                                                                      |
+| `matchedSkills` | string[]       | Portfolio skills the job needs                                                                                           |
+| `score`         | number         | Gemini's fit score, 60 to 100                                                                                            |
+| `missingSkills` | string[]       | Skills the job asks for that are missing                                                                                 |
+| `reasons`       | string[]       | Gemini's short explanation of the score                                                                                  |
+| `publishedAt`   | timestamp      | When the source published the job                                                                                        |
+| `fetchedAt`     | timestamp      | When this run stored it                                                                                                  |
+| `expiresAt`     | timestamp      | `fetchedAt` plus 14 days, or the source's expiry when that is earlier                                                    |
 
 A job found again replaces its document, which also moves `expiresAt` back.
 

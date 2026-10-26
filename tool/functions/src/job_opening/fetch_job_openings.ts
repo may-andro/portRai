@@ -18,6 +18,7 @@ import {
   type BoardErrorHandler,
   companyBoardsLoader,
 } from './feed/company_board.js';
+import { FreelancerFeed } from './feed/freelancer_feed.js';
 import { GreenhouseFeed } from './feed/greenhouse_feed.js';
 import { HackerNewsFeed } from './feed/hacker_news_feed.js';
 import { HimalayasFeed } from './feed/himalayas_feed.js';
@@ -87,6 +88,7 @@ export const fetchJobOpenings = onSchedule(
         new JobicyFeed(fetchJson),
         new HackerNewsFeed(fetchJson, new GeminiJobPostExtractor(generateJson)),
         new ArbeitnowFeed(fetchJson),
+        new FreelancerFeed(fetchJson),
       ],
       listUserIds: () => listJobSearchUserIds(db),
       loadProfile: () => loadPortfolioProfile(readDocument),
