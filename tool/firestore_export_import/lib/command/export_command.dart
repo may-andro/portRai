@@ -31,7 +31,7 @@ class ExportCommand extends Command<dynamic> {
   final description = 'Export data to the firestore collection';
 
   @override
-  void run() {
+  Future<void> run() async {
     final collectionName = argResults?['collection'] as String?;
     final credentialsFilePath = argResults?['secrets'] as String?;
     final dataFilePath = argResults?['path'] as String?;
@@ -52,6 +52,10 @@ class ExportCommand extends Command<dynamic> {
       logger.e('File path to upload not found');
       return;
     }
-    _uploadUseCase.execute(collectionName, credentialsFilePath, dataFilePath);
+    await _uploadUseCase.execute(
+      collectionName,
+      credentialsFilePath,
+      dataFilePath,
+    );
   }
 }

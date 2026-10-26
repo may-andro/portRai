@@ -63,9 +63,7 @@ class _Visitor extends SimpleAstVisitor<void> {
     if (importedPackage == null) return;
     if (!_isInternalImport(importedUri)) return;
 
-    var currentPackage = _packageNameOf(
-      context.libraryElement?.uri.toString(),
-    );
+    var currentPackage = _packageNameOf(context.libraryElement?.uri.toString());
     // Allow a package to import its own 'src' files (e.g. from its 'test'
     // directory), and don't report when the current library's package can't
     // be determined.
