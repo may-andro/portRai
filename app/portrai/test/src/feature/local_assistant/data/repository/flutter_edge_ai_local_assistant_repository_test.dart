@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/local_assistant/data/repository/flutter_edge_ai_local_assistant_repository.dart';
+import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 
 import '../../../../../mock/feature/local_assistant/data/repository/mock_inference_chat.dart';
 import '../../../../../mock/feature/local_assistant/data/repository/mock_inference_model.dart';
@@ -42,6 +44,38 @@ void main() {
       verify(() => chat.close()).called(1);
     },
   );
+
+  test('should keep a model that loads while the session resets', () async {
+    final model = MockInferenceModel();
+    final chat = MockInferenceChat();
+    final loaded = Completer<InferenceModel>();
+    var loads = 0;
+    when(
+      () => model.createChat(temperature: 0.2, maxOutputTokens: 16),
+    ).thenAnswer((_) async => chat);
+    when(() => chat.addQueryChunk(any())).thenAnswer((_) async {});
+    chat.stubReply('Ready');
+    when(() => chat.close()).thenAnswer((_) async {});
+    when(() => model.close()).thenAnswer((_) async {});
+    final repository = FlutterEdgeAiLocalAssistantRepository.withModelLoader((
+      _,
+    ) {
+      loads++;
+      return loaded.future;
+    });
+    addTearDown(repository.dispose);
+
+    final preparation = repository.prepareModel(onProgress: (_) {});
+    await pumpEventQueue();
+    expect(loads, 1);
+    await repository.resetSession();
+    loaded.complete(model);
+    await preparation;
+    await repository.prepareModel(onProgress: (_) {});
+
+    expect(loads, 1);
+    verifyNever(() => model.close());
+  });
 
   test(
     'should close the failed model and allow retry when engine loading fails',
@@ -386,6 +420,54 @@ void main() {
 
       expect(partialAnswers, ['He', 'He builds', 'He builds apps.']);
       expect(answer, 'He builds apps.');
+    });
+
+    test('should stop the answer being generated on reset', () async {
+      final (:repository, :chat) = await prepareRepository();
+      final tokens = StreamController<ModelResponse>();
+      addTearDown(tokens.close);
+      when(chat.generateChatResponseAsync).thenAnswer((_) => tokens.stream);
+      when(chat.stopGeneration).thenAnswer((_) async {});
+      final firstToken = Completer<void>();
+
+      final answer = repository.answer(
+        question: 'What does he build?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'Stuart'},
+          ],
+        }),
+        onPartialAnswer: (_) {
+          if (!firstToken.isCompleted) firstToken.complete();
+        },
+      );
+      tokens.add(const TextResponse('He'));
+      await firstToken.future;
+      await repository.resetSession();
+      tokens.add(const TextResponse(' builds'));
+
+      await expectLater(
+        answer,
+        throwsA(isA<LocalAssistantCancelledException>()),
+      );
+      verify(chat.stopGeneration).called(1);
+    });
+
+    test('should not stop generation on reset without an answer', () async {
+      final (:repository, :chat) = await prepareRepository();
+      chat.stubStreamedAnswer(() => ['He builds apps.']);
+      await repository.answer(
+        question: 'What does he build?',
+        portfolioContext: jsonEncode({
+          'projects': [
+            {'title': 'Stuart'},
+          ],
+        }),
+      );
+
+      await repository.resetSession();
+
+      verifyNever(chat.stopGeneration);
     });
 
     test('should withdraw a looping answer before the retry', () async {

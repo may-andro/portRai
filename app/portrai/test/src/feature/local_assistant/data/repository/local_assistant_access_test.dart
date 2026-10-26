@@ -123,7 +123,7 @@ void main() {
   );
 
   test(
-    'should discard obsolete output and reject overlapping work when reset occurs during native preparation',
+    'should discard obsolete output, keep the model and reject overlapping work when reset occurs during native preparation',
     () async {
       final model = MockInferenceModel();
       final chat = MockInferenceChat();
@@ -157,7 +157,7 @@ void main() {
       );
       response.complete(const TextResponse('Ready'));
       await assertion;
-      verify(() => model.close()).called(1);
+      verifyNever(() => model.close());
     },
   );
 }

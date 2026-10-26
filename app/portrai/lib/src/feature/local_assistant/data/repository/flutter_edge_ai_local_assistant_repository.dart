@@ -34,7 +34,11 @@ class FlutterEdgeAiLocalAssistantRepository
   final LocalAssistantEnabledCache _enabledCache;
   final LocalAssistantModelDownload _modelDownload;
   final IsFeatureEnabledUseCase? _isFeatureEnabled;
+  // Answers started before a change of this value are discarded.
   int _generation = 0;
+  // Models loaded before a change of this value are discarded. Clearing the
+  // chat leaves it unchanged, so a load in progress is kept.
+  int _modelGeneration = 0;
   bool _requestActive = false;
   bool _disabled = false;
   int _preferenceRevision = 0;
@@ -52,6 +56,12 @@ class FlutterEdgeAiLocalAssistantRepository
 
   void _ensureCurrent(int generation) {
     if (generation != _generation || _disabled) {
+      throw const LocalAssistantCancelledException();
+    }
+  }
+
+  void _ensureModelCurrent(int modelGeneration) {
+    if (modelGeneration != _modelGeneration || _disabled) {
       throw const LocalAssistantCancelledException();
     }
   }
@@ -94,6 +104,8 @@ class FlutterEdgeAiLocalAssistantRepository
   Future<InferenceModel> Function(void Function(int))? _modelLoader;
   InferenceModel? _model;
   InferenceChat? _chat;
+  // Whether [_chat] is streaming an answer.
+  bool _isGenerating = false;
   String? _previousQuestion;
   // The last decoded portfolio context and its source. Questions about the
   // same portfolio reuse it instead of decoding the JSON again.
@@ -109,6 +121,7 @@ class FlutterEdgeAiLocalAssistantRepository
     if (!enabled) {
       _disabled = true;
       _generation++;
+      _modelGeneration++;
     }
     final previous = _preferenceMutation;
     final completion = Completer<void>();
@@ -143,7 +156,7 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   Future<InferenceModel> _loadModel(void Function(int) onProgress) async {
-    final generation = _generation;
+    final modelGeneration = _modelGeneration;
     await _initialize();
     // Joins a download another instance of this process already started.
     // With notifications allowed, it shows its progress in a notification
@@ -170,7 +183,7 @@ class FlutterEdgeAiLocalAssistantRepository
     onProgress(100);
     // A repository disposed meanwhile must not load a second copy of the
     // model into memory.
-    _ensureCurrent(generation);
+    _ensureModelCurrent(modelGeneration);
 
     return await FlutterEdgeAi.getActiveModel(
       maxTokens: _maxTokens,
@@ -179,7 +192,7 @@ class FlutterEdgeAiLocalAssistantRepository
   }
 
   Future<void> _prepareModel(void Function(int) onProgress) async {
-    final generation = _generation;
+    final modelGeneration = _modelGeneration;
     InferenceModel? candidate;
     InferenceChat? probe;
     try {
@@ -196,7 +209,7 @@ class FlutterEdgeAiLocalAssistantRepository
       }
       await probe.close();
       probe = null;
-      _ensureCurrent(generation);
+      _ensureModelCurrent(modelGeneration);
       _model = candidate;
     } finally {
       try {
@@ -371,13 +384,18 @@ class FlutterEdgeAiLocalAssistantRepository
     // Tokens are shown as they arrive. A run that starts looping is cut
     // short, so the retry does not wait for the full output limit.
     final generated = StringBuffer();
-    await for (final response in chat.generateChatResponseAsync()) {
-      _ensureCurrent(generation);
-      if (response is! TextResponse) continue;
-      generated.write(response.token);
-      final partialAnswer = generated.toString();
-      if (_isDegenerate(partialAnswer)) break;
-      onPartialAnswer?.call(_cleanAnswer(partialAnswer));
+    _isGenerating = true;
+    try {
+      await for (final response in chat.generateChatResponseAsync()) {
+        _ensureCurrent(generation);
+        if (response is! TextResponse) continue;
+        generated.write(response.token);
+        final partialAnswer = generated.toString();
+        if (_isDegenerate(partialAnswer)) break;
+        onPartialAnswer?.call(_cleanAnswer(partialAnswer));
+      }
+    } finally {
+      _isGenerating = false;
     }
     _ensureCurrent(generation);
     return generated.toString().trim();
@@ -475,13 +493,25 @@ class FlutterEdgeAiLocalAssistantRepository
 
   Future<void> _unloadModel() async {
     _generation++;
+    _modelGeneration++;
     final chat = _chat;
     final model = _model;
     _chat = null;
     _model = null;
     _previousQuestion = null;
-    await chat?.close();
+    await _closeChat(chat);
     await model?.close();
+  }
+
+  // Closing a chat stops its decoding only on some engines, so an answer it
+  // is still generating is stopped first.
+  Future<void> _closeChat(InferenceChat? chat) async {
+    if (chat == null) return;
+    try {
+      if (_isGenerating) await chat.stopGeneration();
+    } finally {
+      await chat.close();
+    }
   }
 
   @override
@@ -490,7 +520,7 @@ class FlutterEdgeAiLocalAssistantRepository
     _previousQuestion = null;
     final chat = _chat;
     _chat = null;
-    await chat?.close();
+    await _closeChat(chat);
   }
 
   @override
@@ -498,7 +528,8 @@ class FlutterEdgeAiLocalAssistantRepository
     // A running download is left to finish: an in-app restart disposes this
     // instance, and the next one joins the download instead of restarting it.
     _generation++;
-    await _chat?.close();
+    _modelGeneration++;
+    await _closeChat(_chat);
     await _model?.close();
   }
 
