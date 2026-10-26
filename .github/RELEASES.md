@@ -1,444 +1,342 @@
-# Release Guide
+# Releases
 
-Complete guide for releasing Portrai app and Storybook using Git tags.
+Pushing a git tag releases the Portrai app, Storybook or the legal pages. Cloud Functions deploy
+on pushes to `develop` instead. Every release workflow lives in [`workflows/`](workflows/).
 
----
+## Release triggers
 
-## 📌 Quick Reference
+| Trigger | Example | Workflow | Releases |
+|---------|---------|----------|----------|
+| Tag `*+*-review` | `1.1.4+202530-review` | [`portrai_preview.yaml`](workflows/portrai_preview.yaml) | Portrai preview builds for Android, iOS and web |
+| Tag `*+*-prod` | `1.1.4+202530-prod` | [`portrai_production.yaml`](workflows/portrai_production.yaml) | Portrai production builds for Android, iOS and web |
+| Tag `*+*-review-storybook` | `2.0.0+50-review-storybook` | [`storybook_review.yaml`](workflows/storybook_review.yaml) | Storybook to the `review` Hosting channel |
+| Tag `*+*-prod-storybook` | `2.0.0+50-prod-storybook` | [`storybook_production.yaml`](workflows/storybook_production.yaml) | Storybook to the `live` Hosting channel |
+| Tag `legal-*` | `legal-1.1.0` | [`legal_production.yaml`](workflows/legal_production.yaml) | Legal pages to the `live` Hosting channel |
+| Push to `develop` changing `tool/functions/**` | | [`functions_production.yaml`](workflows/functions_production.yaml) | The `portrai` Cloud Functions codebase |
+| Pull request changing `app/storybook/**` or `layer/design_system/**` | | [`storybook_pr.yaml`](workflows/storybook_pr.yaml) | Storybook to the `preview` Hosting channel |
 
-### Prepare the Next Portrai Release
+The workflow filters escape the literal `+` (`'*\+*-prod'`); tag names contain no backslash. The
+tag-triggered workflows cancel an in-progress run for the same tag. `functions_production.yaml`
+lets a running deploy finish before the next one starts.
 
-From a clean working tree, run:
+## Tag format
+
+```text
+<version>+<build_number>-<type>[-storybook]
+```
+
+| Part | Meaning |
+|------|---------|
+| `version` | Semantic version, such as `1.1.4`, passed to `--build-name` |
+| `build_number` | Integer passed to `--build-number`; Android and App Store Connect reject a build number that was already uploaded |
+| `type` | `review` or `prod` |
+| `-storybook` | Selects the Storybook workflows |
+
+[`extract-version-build`](actions/extract-version-build/action.yaml) removes the last `-<suffix>`
+from the tag and splits the rest at `+`. Only the Portrai workflows use it; Storybook builds take
+their version from `app/storybook/pubspec.yaml`, and the legal workflow reads the text after
+`legal-`.
+
+## Preparing a Portrai release
+
+From a clean working tree:
 
 ```bash
 melos run prepare_portrai_release
 ```
 
-This fetches tags from `origin`, switches to `develop`, pulls with
-`--ff-only`, and reads `app/portrai/pubspec.yaml` without modifying it. It keeps the app's
-semantic version and increments the highest build number from the current
-pubspec and Portrai review/production tags, ignoring Storybook and legal tags.
-Build numbers are compared numerically, not by tag creation date.
+[`tool/release/prepare_portrai_release.sh`](../tool/release/prepare_portrai_release.sh) fetches
+tags from `origin`, switches to `develop` and pulls with `--ff-only`. It reads the semantic version
+from `app/portrai/pubspec.yaml` and prints `<version>+<build>-prod`, where `<build>` is one more
+than the highest build number in the pubspec and in the `<x.y.z>+<n>-review` and `<x.y.z>+<n>-prod`
+tags, compared numerically. Storybook and legal tags are ignored. The script does not modify files,
+commit, tag or push.
 
-The command prints the proposed production tag but does not modify files,
-commit, create a tag, or push. CI injects the version and build number from
-the tag using `--build-name` and `--build-number`; the local pubspec build
-number does not need to match.
-
-### Tag Format
-```
-VERSION+BUILD_NUMBER-TYPE[-suffix]
-```
-
-### Examples
-
-**Portrai App:**
-```bash
-# Review build
-git tag 1.0.0+100-review && git push origin 1.0.0+100-review
-
-# Production build
-git tag 1.0.0+100-prod && git push origin 1.0.0+100-prod
-```
-
-**Storybook:**
-```bash
-# Review build
-git tag 2.0.0+50-review-storybook && git push origin 2.0.0+50-review-storybook
-
-# Production build
-git tag 2.0.0+50-prod-storybook && git push origin 2.0.0+50-prod-storybook
-```
-
-### What Happens
-1. **Extract** - Version & build number extracted from tag
-2. **Quality** - Format checks, analysis, tests
-3. **Build** - All platforms with version/build injected
-4. **Deploy** - Firebase App Distribution + Hosting
-5. **Release** *(prod only)* - GitHub release with changelog
-
----
-
-## 🎯 Release Patterns
-
-### Portrai App
-
-#### Review Builds (`*+*-review`)
-**Example:** `1.1.4+202530-review`
-
-Builds debug versions for testing:
-- **Android**: Debug APK
-- **iOS**: Debug IPA (no codesign)
-- **Web**: Profile build
-- **Deploy**: Firebase App Distribution (testers) + Hosting (preview channel)
-- **Version**: Auto-injected from tag
-
-**What runs:**
-1. Extract version (1.1.4) and build (202530)
-2. Quality checks (format, analyze, test)
-3. Build Android APK with `--build-name=1.1.4 --build-number=202530`
-4. Build iOS IPA with `--build-name=1.1.4 --build-number=202530`
-5. Build Web with `--dart-define=VERSION=1.1.4 --dart-define=BUILD_NUMBER=202530`
-6. Deploy to Firebase (testers group + preview channel)
-
-#### Production Builds (`*+*-prod`)
-**Example:** `1.1.4+202530-prod`
-
-Builds release versions for production:
-- **Android**: Release AAB (Play Store)
-- **iOS**: Release IPA (requires codesign)
-- **Web**: Release build
-- **Deploy**: Firebase App Distribution (production) + Hosting (live channel)
-- **Release**: GitHub release with changelog
-- **Version**: Auto-injected from tag
-
-**What runs:**
-1. Extract version (1.1.4) and build (202530)
-2. Quality checks (format, analyze, test)
-3. Build Android AAB with version/build
-4. Build iOS IPA with version/build (requires code signing)
-5. Build Web with version/build
-6. Deploy to Firebase (production + live channel)
-7. Create GitHub release with auto-generated changelog
-
-### Storybook
-
-#### Review Builds (`*+*-review-storybook`)
-**Example:** `2.0.0+100-review-storybook`
-
-- **Build**: Web release
-- **Deploy**: Firebase Hosting (review channel)
-
-#### Production Builds (`*+*-prod-storybook`)
-**Example:** `2.0.0+100-prod-storybook`
-
-- **Build**: Web release
-- **Deploy**: Firebase Hosting (live channel)
-- **Release**: GitHub release with changelog
-
----
-
-## 🏗️ Tag Format Details
-
-### Components
-
-```
-VERSION + BUILD_NUMBER - TYPE [ -suffix ]
-   ↓          ↓           ↓        ↓
- 1.1.4   +  202530    -  prod  -storybook
-```
-
-- **VERSION**: Semantic versioning (MAJOR.MINOR.PATCH)
-  - `1.0.0` - Major release
-  - `1.1.0` - Minor release (new features)
-  - `1.1.1` - Patch release (bug fixes)
-
-- **BUILD_NUMBER**: Unique integer
-  - Must be unique for every release
-  - Never reuse a build number
-  - Options:
-    - Simple incrementing: `100, 101, 102...`
-    - Date-based: `260825` (YYMMDD format)
-    - Timestamp: `26082501, 26082502...`
-
-- **TYPE**: Release type
-  - `review` - Testing/preview builds
-  - `prod` - Production releases
-
-- **SUFFIX** (optional):
-  - `-storybook` for Storybook releases
-
-### Valid Examples
-```bash
-1.0.0+100-review           # Portrai review
-1.0.0+100-prod             # Portrai production
-1.2.3+150-review           # Portrai review (v1.2.3)
-2.0.0+200-prod             # Portrai production (v2.0.0)
-2.0.0+50-review-storybook  # Storybook review
-2.1.0+55-prod-storybook    # Storybook production
-```
-
----
-
-## 🔧 Version Injection
-
-Version and build numbers from your tag are automatically injected into builds:
-
-### Android
-- **Command**: `flutter build --build-name=1.0.0 --build-number=100`
-- **Result**: 
-  - `versionName` in AndroidManifest.xml
-  - `versionCode` in AndroidManifest.xml
-
-### iOS
-- **Command**: `flutter build --build-name=1.0.0 --build-number=100`
-- **Result**:
-  - `CFBundleShortVersionString` (display version)
-  - `CFBundleVersion` (build number)
-
-### Web
-- **Command**: `flutter build web --dart-define=VERSION=1.0.0 --dart-define=BUILD_NUMBER=100`
-- **Access**: Via `String.fromEnvironment()` in code
-
-### In Your Code
-```dart
-// Access version and build number anywhere in your Flutter code
-const version = String.fromEnvironment('VERSION', defaultValue: 'unknown');
-const buildNumber = String.fromEnvironment('BUILD_NUMBER', defaultValue: '0');
-
-// Display in UI
-Text('Version: $version ($buildNumber)')
-```
-
----
-
-## 🚀 Workflow Structure
-
-### Portrai Workflows
-
-**Main Orchestrators:**
-- `portrai_preview.yaml` - Coordinates review releases
-- `portrai_production.yaml` - Coordinates production releases
-
-**Build Workflows:**
-- `_build_android.yaml` - Android APK/AAB builds
-- `_build_ios.yaml` - iOS IPA builds
-- `_build_web.yaml` - Web builds
-- `_deploy_firebase.yaml` - Firebase App Distribution & Hosting deployment
-- `_deploy_playstore.yaml` - Google Play Store deployment
-- `_deploy_appstore.yaml` - Apple App Store / TestFlight deployment
-
-**Composite Actions:**
-- `setup-flutter-module/` - Flutter setup with caching (used by all apps and packages)
-- `extract-version-build/` - Version extraction from tag
-
-### Workflow Pipeline
-
-```
-Git Tag Push (1.0.0+100-prod)
-  ↓
-Extract Version Job
-  ├─ VERSION = 1.0.0
-  └─ BUILD_NUMBER = 100
-  ↓
-Quality Checks (portrai.yaml workflow)
-  ├─ Format check
-  ├─ Analysis
-  └─ Tests
-  ↓
-Build Jobs (parallel)
-  ├─→ Android ─→ AAB with version
-  ├─→ iOS ─────→ IPA with version
-  └─→ Web ─────→ Build with version
-  ↓
-Deploy Jobs (parallel)
-  ├─→ Android ─→ Firebase App Distribution
-  ├─→ Android ─→ Google Play Store (internal track)
-  ├─→ iOS ─────→ Firebase App Distribution
-  ├─→ iOS ─────→ App Store Connect (TestFlight)
-  └─→ Web ─────→ Firebase Hosting
-  ↓
-[Production Only] Create GitHub Release
-```
-
----
-
-## 🔐 Required Setup
-
-For detailed setup guides, see the dedicated READMEs:
-
-| What | Guide |
-|------|-------|
-| Android signing | `app/portrai/android/.signing/README.md` |
-| Google Play Store | `app/portrai/android/.playstore/README.md` |
-| iOS code signing | `app/portrai/ios/.signing/README.md` |
-| App Store Connect / TestFlight | `app/portrai/ios/.appstore/README.md` |
-| Firebase App Distribution (mobile) | `app/portrai/.firebase_distribution/README.md` |
-| Firebase Hosting (web) | `app/portrai/web/.deploy/README.md` |
-
-### GitHub Secrets — Quick Reference
-
-| Secret | Used for |
-|--------|----------|
-| `PORTRAI_ANDROID_KEYSTORE_BASE64` | Android signing |
-| `PORTRAI_ANDROID_KEYSTORE_PASSWORD` | Android signing |
-| `PORTRAI_ANDROID_KEY_ALIAS` | Android signing |
-| `PORTRAI_ANDROID_KEY_PASSWORD` | Android signing |
-| `PORTRAI_GOOGLE_SERVICES_JSON` | Firebase config for Android (`google-services.json`) |
-| `PORTRAI_GOOGLE_SERVICES_PLIST` | Firebase config for iOS (`GoogleService-Info.plist`) |
-| `PORTRAI_PLAY_STORE_SERVICE_ACCOUNT_JSON` | Play Store deployment |
-| `PORTRAI_PLAY_STORE_PACKAGE_NAME` | Play Store deployment |
-| `PORTRAI_FIREBASE_APP_ID_ANDROID` | Firebase App Distribution (Android) |
-| `PORTRAI_FIREBASE_APP_ID_IOS` | Firebase App Distribution (iOS) |
-| `PORTRAI_FIREBASE_SERVICE_ACCOUNT` | Firebase App Distribution (mobile) |
-| `FIREBASE_PROJECT_ID` | Firebase project ID (all Firebase deployments) |
-| `FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT` | Firebase Hosting (web + storybook) |
-| `PORTRAI_APP_STORE_CONNECT_API_KEY_ID` | App Store / TestFlight |
-| `PORTRAI_APP_STORE_CONNECT_API_ISSUER_ID` | App Store / TestFlight |
-| `PORTRAI_APP_STORE_CONNECT_API_KEY` | App Store / TestFlight |
-| `PORTRAI_APP_STORE_BUNDLE_ID` | App Store / TestFlight |
-| `PORTRAI_IOS_CERTIFICATE_BASE64` | iOS production code signing *(future)* |
-| `PORTRAI_IOS_CERTIFICATE_PASSWORD` | iOS production code signing *(future)* |
-| `PORTRAI_IOS_PROVISIONING_PROFILE_BASE64` | iOS production code signing *(future)* |
-
----
-
-## 💡 Best Practices
-
-### Testing Workflow
-1. ✅ Always test with **review** builds first
-2. ✅ Verify Firebase deployments work
-3. ✅ Test on actual devices from Firebase App Distribution
-4. ✅ Only create **prod** tags after successful review testing
-
-### Version Management
-1. ✅ Follow semantic versioning
-2. ✅ Increment build number for EVERY release
-3. ✅ Never reuse build numbers (even across review/prod)
-4. ✅ Keep build numbers strictly incrementing
-
-### Tag Management
-1. ✅ Tags are immutable - don't delete/recreate unless absolutely necessary
-2. ✅ Double-check tag format before pushing
-3. ✅ Monitor GitHub Actions after pushing tags
-4. ✅ Review workflow logs for any issues
-
----
-
-## 🧪 Testing Store Deployments
-
-Use a low version tag to test end-to-end before a real release:
+The pubspec build number does not need to match the tag; CI takes both values from the tag.
+Semantic version changes are made in `pubspec.yaml`. Create and push the tag on the release
+commit:
 
 ```bash
-git tag 0.0.1+1-prod
-git push origin 0.0.1+1-prod
+git tag 1.1.4+202530-prod
+git push origin 1.1.4+202530-prod
 ```
 
-Then verify:
-- **Play Store** → Play Console → Testing → Internal testing
-- **App Store** → App Store Connect → TestFlight (appears within ~10 minutes)
-- **Firebase** → Firebase Console → App Distribution
-- **Web** → Firebase Hosting → your preview/live channel
+## Portrai releases
 
----
+### Job order
 
-## 🔍 Working with Tags
+Both Portrai workflows run:
 
-### List Tags
+1. `extract-version`: reads the version and build number from the tag and generates the
+   App Distribution release notes.
+2. `quality`: calls [`portrai.yaml`](workflows/portrai.yaml), which writes
+   `lib/firebase_options.dart`, generates code, then checks formatting, runs
+   `dart analyze --fatal-infos` and runs the tests with coverage.
+3. `build-android`, `build-ios` and `build-web`, in parallel, through
+   [`_build_android.yaml`](workflows/_build_android.yaml),
+   [`_build_ios.yaml`](workflows/_build_ios.yaml) and
+   [`_build_web.yaml`](workflows/_build_web.yaml).
+4. Deploy jobs, each starting when its build finishes, through
+   [`_deploy_firebase.yaml`](workflows/_deploy_firebase.yaml),
+   [`_deploy_playstore.yaml`](workflows/_deploy_playstore.yaml) and
+   [`_deploy_appstore.yaml`](workflows/_deploy_appstore.yaml).
+5. Production only: `create-release`, after every deploy job succeeds.
+
+### Builds
+
+Every build passes the tag's version and build number to `--build-name` and `--build-number`.
+
+| Platform | Preview (`-review`) | Production (`-prod`) |
+|----------|---------------------|----------------------|
+| Android | `flutter build apk --release`, `build_env=staging`, signed with the upload key | `flutter build appbundle --release`, `build_env=prod`, signed with the upload key |
+| iOS | `flutter build ipa --release --no-codesign`, `build_env=staging`, exported with the Ad Hoc profile (method `release-testing`) as `portrai-debug.ipa` | Same build with `build_env=prod`, exported with the App Store profile (method `app-store-connect`) as `portrai-release.ipa` |
+| Web | `flutter build web --profile`, `build_env=staging`, `ENVIRONMENT=preview` | `flutter build web --release`, `build_env=prod`, `ENVIRONMENT=production` |
+
+Android and iOS builds run on `ubuntu-latest` and `macos-latest`. The Android build recreates
+`android/.signing` from secrets and deletes it afterwards. The iOS build imports the Apple
+Distribution certificate into a temporary keychain, installs the profile, signs during
+`xcodebuild -exportArchive`, and removes the keychain, profile and decoded files afterwards. The
+web build requires the `FIREBASE_APP_CHECK_WEB_SITE_KEY` variable, generates the SQLite web assets
+and replaces the `MAPS_API_KEY` placeholder in `build/web/index.html`.
+
+### Distribution
+
+| Build | Preview | Production |
+|-------|---------|------------|
+| Android APK | Firebase App Distribution, group `testers` | |
+| Android AAB | | Google Play `internal` track, and Firebase App Distribution group `production-testers` |
+| iOS IPA | Firebase App Distribution, group `testers` | App Store Connect |
+| Web | Firebase Hosting, `portrai` target, channel `preview` | Firebase Hosting, `portrai` target, channel `live` |
+
+- The Play deploy uploads the AAB with `r0adkll/upload-google-play@v1`, status `completed`,
+  in-app update priority `2` and the R8 `mapping.txt`. It does not upload release notes or store
+  listing content.
+- The App Store deploy uploads `portrai-release.ipa` with `xcrun altool --upload-app`. It does not
+  assign TestFlight testers, submit for App Review or release the build; those steps are done in
+  App Store Connect after Apple processes the build.
+- Production iOS builds are not sent to Firebase App Distribution.
+- Ad Hoc preview IPAs install only on devices registered in the Ad Hoc profile.
+
+### Release notes
+
+`extract-version` builds the release notes that Firebase App Distribution shows testers:
+
+- A header `Version <version> (Build <build>)`, followed by `Preview Build - For Testing Only` or
+  `Production Release`.
+- The commit subjects since the previous tag of the same kind (`*+*-review` or `*+*-prod`, newest
+  by committer date). Without a previous tag, the last 10 (preview) or 20 (production) commits.
+- The actor who pushed the tag and the short commit SHA.
+
+### GitHub release
+
+`create-release` in `portrai_production.yaml` creates a GitHub release named `Portrai <tag>` with
+`softprops/action-gh-release@v2`. Its body lists `* <subject> (<author>)` for each commit since the
+previous `*+*-prod` tag, or every commit reachable from the tag when there is none. Preview tags do
+not create a GitHub release.
+
+## Storybook releases
+
+`storybook_review.yaml`, `storybook_production.yaml` and `storybook_pr.yaml` run:
+
+1. `quality`: [`_storybook_quality.yaml`](workflows/_storybook_quality.yaml) runs the format check,
+   `flutter analyze` and the unit tests (excluding `golden` tags) as parallel jobs.
+2. `build`: `_build_web.yaml` with `force-release`, so every Storybook build is
+   `flutter build web --release`. Review and PR builds use `build_env=staging`, production builds
+   `build_env=prod`. The version comes from `app/storybook/pubspec.yaml`.
+3. `deploy`: `_deploy_firebase.yaml` to the `storybook` Hosting target, channel `review`
+   (review tag), `live` (production tag) or `preview` (pull request).
+
+`storybook_production.yaml` also runs
+[`_storybook_release_notes.yaml`](workflows/_storybook_release_notes.yaml) after `quality`, in
+parallel with the build and deploy. It creates a GitHub release named `Storybook <tag>` listing the
+commit subjects since the previous `*+*-prod-storybook` tag, and uploads the changelog as an
+artifact kept for 30 days.
+
+## Legal pages releases
+
+`legal_production.yaml` takes the version from the `legal-<version>` tag, replaces `{{VERSION}}`
+in every HTML file under `tool/legal/public`, deploys `tool/legal` to the `live` channel of the
+`legal` Hosting target, then creates a GitHub release named `Legal Pages v<version>` listing the
+commits that touched `tool/legal/` since the previous `legal-*` tag. It has no quality or build
+job. See the [legal pages README](../tool/legal/README.md#release).
+
+## Cloud Functions deploys
+
+`functions_production.yaml` runs on pushes to `develop` that change `tool/functions/**` or the
+workflow itself. It calls [`functions.yaml`](workflows/functions.yaml) as the quality gate, then
+runs `firebase deploy --only functions:portrai --force` with `firebase-tools@15.34.1`. It has no
+tag, build or GitHub release. See the
+[functions README](../tool/functions/README.md#deploying-from-github-actions).
+
+## Build artifacts
+
+Each build uploads a GitHub Actions artifact named `<app>-<platform>-<build-type>-<commit sha>`:
+
+| Platform | Preview | Production |
+|----------|---------|------------|
+| Android | `app-release.apk`, 7 days | `app-release.aab` and `mapping.txt`, 30 days |
+| iOS | `portrai-debug.ipa`, 7 days | `portrai-release.ipa`, 30 days |
+| Web | `build/web/`, 7 days | `build/web/`, 30 days |
+
+Storybook web artifacts follow the web row for their build type.
+
+## Secrets and variables
+
+Repository secrets unless marked as a variable. `GITHUB_TOKEN` is provided by GitHub Actions.
+
+| Name | Value | Read by |
+|------|-------|---------|
+| `PORTRAI_FIREBASE_OPTIONS` | Contents of `app/portrai/lib/firebase_options.dart`, not encoded | `portrai.yaml`, all Portrai builds |
+| `PORTRAI_ANDROID_KEYSTORE_BASE64` | Base64 of the upload keystore (`portrai-release-key.jks`) | Android builds |
+| `PORTRAI_ANDROID_KEYSTORE_PASSWORD` | Keystore password | Android builds |
+| `PORTRAI_ANDROID_KEY_ALIAS` | Key alias | Android builds |
+| `PORTRAI_ANDROID_KEY_PASSWORD` | Key password | Android builds |
+| `PORTRAI_GOOGLE_SERVICES_JSON` | Base64 of `android/app/google-services.json` | Android builds |
+| `MAPS_API_KEY_ANDROID` | Google Maps API key | Android builds (optional) |
+| `PORTRAI_GOOGLE_SERVICES_PLIST` | Base64 of `ios/Runner/GoogleService-Info.plist` | iOS builds |
+| `MAPS_API_KEY_IOS` | Google Maps API key | iOS builds (optional) |
+| `PORTRAI_IOS_CERTIFICATE_BASE64` | Base64 of the Apple Distribution certificate and private key (`.p12`) | iOS builds |
+| `PORTRAI_IOS_CERTIFICATE_PASSWORD` | Password of the `.p12` | iOS builds |
+| `PORTRAI_IOS_PROVISIONING_PROFILE_BASE64` | Base64 of the App Store Connect provisioning profile | Production iOS build |
+| `PORTRAI_IOS_ADHOC_PROVISIONING_PROFILE_BASE64` | Base64 of the Ad Hoc provisioning profile | Preview iOS build |
+| `MAPS_API_KEY_WEB` | Google Maps JavaScript API key | Portrai web builds (optional) |
+| `FIREBASE_APP_CHECK_WEB_SITE_KEY` (variable) | Public reCAPTCHA Enterprise site key | Portrai web builds |
+| `PORTRAI_FIREBASE_SERVICE_ACCOUNT` | Base64 of a service account JSON with App Distribution access | App Distribution deploys |
+| `PORTRAI_FIREBASE_APP_ID_ANDROID` | Android Firebase app ID | Android App Distribution deploys |
+| `PORTRAI_FIREBASE_APP_ID_IOS` | iOS Firebase app ID | Preview iOS App Distribution deploy |
+| `FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT` | Base64 of a service account JSON with Hosting deploy access | Portrai web, Storybook and legal deploys |
+| `FIREBASE_PROJECT_ID` | Firebase project ID | Hosting deploys and the functions deploy; also passed to App Distribution deploys, which do not use it |
+| `PORTRAI_PLAY_STORE_SERVICE_ACCOUNT_JSON` | Base64 of a service account JSON with Play Console release access | Play deploy |
+| `PORTRAI_PLAY_STORE_PACKAGE_NAME` | Android package name | Play deploy |
+| `PORTRAI_APP_STORE_CONNECT_API_KEY` | Base64 of the App Store Connect API key (`.p8`) | App Store deploy |
+| `PORTRAI_APP_STORE_CONNECT_API_KEY_ID` | Key ID of the API key | App Store deploy |
+| `PORTRAI_APP_STORE_CONNECT_API_ISSUER_ID` | Issuer ID of the API key | App Store deploy |
+| `PORTRAI_APP_STORE_BUNDLE_ID` | iOS bundle ID; required by the workflow, while the upload reads the bundle ID from the IPA | App Store deploy |
+| `FUNCTIONS_DEPLOY_SERVICE_ACCOUNT` | Base64 of a service account JSON with functions deploy access | Functions deploy |
+
+[`prepare-service-account`](actions/prepare-service-account/action.yaml) decodes every service
+account secret, fails unless it is a service account JSON with a private key, masks its values and
+writes it to a temporary file that the job deletes afterwards.
+
+## One-time setup
+
+Run these commands yourself. `gh secret set` without `--body` prompts for the value.
+
+### Android signing
+
+Create an upload keystore, then store it and its passwords:
+
 ```bash
-# All tags
-git tag
-
-# Portrai production tags
-git tag -l "*+*-prod"
-
-# Storybook tags
-git tag -l "*+*-storybook"
-
-# All review tags
-git tag -l "*+*-review*"
-
-# Tags for specific version
-git tag -l "1.0.0+*"
+keytool -genkey -v -keystore portrai-release-key.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 -alias portrai-release
+base64 -i portrai-release-key.jks | gh secret set PORTRAI_ANDROID_KEYSTORE_BASE64
+gh secret set PORTRAI_ANDROID_KEYSTORE_PASSWORD
+gh secret set PORTRAI_ANDROID_KEY_ALIAS
+gh secret set PORTRAI_ANDROID_KEY_PASSWORD
 ```
 
-### Delete Tags (if needed)
+Locally, `app/build.gradle.kts` signs release builds with `android/.signing/portrai-release-key.jks`
+and `android/.signing/key.properties` when both exist, and with the debug key otherwise.
+
+### Firebase config files
+
 ```bash
-# Delete locally
-git tag -d 1.0.0+100-review
-
-# Delete from remote
-git push origin --delete 1.0.0+100-review
+gh secret set PORTRAI_FIREBASE_OPTIONS < app/portrai/lib/firebase_options.dart
+base64 -i app/portrai/android/app/google-services.json | gh secret set PORTRAI_GOOGLE_SERVICES_JSON
+base64 -i app/portrai/ios/Runner/GoogleService-Info.plist | gh secret set PORTRAI_GOOGLE_SERVICES_PLIST
+gh variable set FIREBASE_APP_CHECK_WEB_SITE_KEY
 ```
 
----
+### iOS signing
 
-## 📊 Platform-Specific Notes
+1. Enable Push Notifications and App Attest on the App ID, matching `Runner/Runner.entitlements`.
+2. Create an Apple Distribution certificate and export it with its private key as a
+   password-protected `.p12`.
+3. Create an App Store Connect profile and an Ad Hoc profile (with the tester devices) for the
+   App ID and certificate. Save them as `portrai-appstore.mobileprovision` and
+   `portrai_adhoc.mobileprovision` in `app/portrai/ios/.signing`.
 
-### Android
-- **Review**: Debug APK (unsigned) → Firebase only
-- **Production**: 
-  - Release AAB for Google Play Store (internal track)
-  - Also deployed to Firebase App Distribution
-- **Signing**: Configure in `app/portrai/android/app/build.gradle` for production
-- **Play Store**: Builds go to internal track first (can promote later)
+```bash
+base64 -i certificate.p12 | gh secret set PORTRAI_IOS_CERTIFICATE_BASE64
+gh secret set PORTRAI_IOS_CERTIFICATE_PASSWORD
+melos run set_ios_profile_secrets
+```
 
-### iOS
-- **Review**: Debug IPA (no code signing required) → Firebase only
-- **Production**: 
-  - Release IPA → TestFlight (App Store Connect)
-  - Also deployed to Firebase App Distribution
-- **Signing**: Requires Apple Developer account + code signing setup
-- **TestFlight**: Available for testing, submit to App Store manually
-- **⚠️ Note**: Production iOS builds need certificates/provisioning profiles
+`set_ios_profile_secrets` fails if either profile is missing or lacks the `aps-environment`
+entitlement, then sets `PORTRAI_IOS_PROVISIONING_PROFILE_BASE64` and
+`PORTRAI_IOS_ADHOC_PROVISIONING_PROFILE_BASE64`. Regenerate the Ad Hoc profile and run it again
+after registering new devices.
 
-### Web
-- **Review**: Profile build → Firebase Hosting preview channel
-- **Production**: Release build → Firebase Hosting live channel
-- **Access**: Via custom Firebase Hosting domain
+### App Store Connect
 
----
+Create a team API key with a role that can upload builds, such as App Manager, and note its Key ID
+and Issuer ID:
 
-## 📦 Artifacts
+```bash
+base64 -i AuthKey.p8 | gh secret set PORTRAI_APP_STORE_CONNECT_API_KEY
+gh secret set PORTRAI_APP_STORE_CONNECT_API_KEY_ID
+gh secret set PORTRAI_APP_STORE_CONNECT_API_ISSUER_ID
+gh secret set PORTRAI_APP_STORE_BUNDLE_ID
+```
 
-Build artifacts are available in GitHub Actions:
+### Google Play
 
-| Platform | Review Build | Production Build | Retention |
-|----------|--------------|------------------|-----------|
-| Android | APK | AAB | 7 days (review), 30 days (prod) |
-| iOS | IPA | IPA | 7 days (review), 30 days (prod) |
-| Web | build/ | build/ | 7 days (review), 30 days (prod) |
+1. Create a Google Cloud service account with a JSON key, and enable the Google Play Android
+   Developer API (`androidpublisher.googleapis.com`) in its project.
+2. Invite the service account email in Play Console **Users and permissions** with permission to
+   release to testing tracks.
+3. Link the Firebase project to Google Play (**Project settings > Integrations > Google Play**);
+   App Distribution accepts AABs only from a linked project.
 
-Download from: Actions → Workflow run → Artifacts section
+```bash
+base64 -i service-account.json | gh secret set PORTRAI_PLAY_STORE_SERVICE_ACCOUNT_JSON
+gh secret set PORTRAI_PLAY_STORE_PACKAGE_NAME
+```
 
----
+### Firebase App Distribution
 
-## 🐛 Troubleshooting
+Create the tester groups with the aliases `testers` and `production-testers`, and a service
+account with the Firebase App Distribution Admin role. The app IDs are the `appId` values under
+`flutter.platforms` in `app/portrai/firebase.json`.
 
-### Workflow Not Triggering
-- ✅ Check tag format exactly matches pattern
-- ✅ Verify tag was pushed to remote: `git push origin <tag>`
-- ✅ Check GitHub Actions tab for any runs
+```bash
+base64 -i service-account.json | gh secret set PORTRAI_FIREBASE_SERVICE_ACCOUNT
+gh secret set PORTRAI_FIREBASE_APP_ID_ANDROID
+gh secret set PORTRAI_FIREBASE_APP_ID_IOS
+```
 
-### Build Failures
-- ✅ Verify Flutter version (3.47.1)
-- ✅ Check dependencies are up to date
-- ✅ Review build logs in GitHub Actions
-- ✅ Run locally: `flutter build` commands
+### Firebase Hosting
 
-### Deployment Failures
-- ✅ Verify all Firebase secrets are configured
-- ✅ Check Firebase project permissions
-- ✅ Ensure Firebase services are enabled
-- ✅ Review Firebase console for errors
+Create a service account with the Firebase Hosting Admin role. The Hosting targets map to sites in
+each folder's `.firebaserc`: `portrai` in `app/portrai`, `storybook` in `app/storybook` and `legal`
+in `tool/legal`.
 
-### iOS Code Signing
-- ✅ Production builds require proper setup
-- ✅ Review builds work without signing
-- ✅ Consider using Fastlane for complex setups
-- ✅ See Flutter iOS deployment guide
+```bash
+base64 -i service-account.json | gh secret set FIREBASE_WEB_HOSTING_SERVICE_ACCOUNT
+gh secret set FIREBASE_PROJECT_ID
+```
 
----
+### Maps API keys
 
-## 📋 Tag Pattern Summary
+```bash
+gh secret set MAPS_API_KEY_ANDROID
+gh secret set MAPS_API_KEY_IOS
+gh secret set MAPS_API_KEY_WEB
+```
 
-| Pattern | Example | App | Build Type | Deploy Target |
-|---------|---------|-----|------------|---------------|
-| `*+*-review` | `1.0.0+100-review` | Portrai | Debug/Profile | Firebase (testers/preview) |
-| `*+*-prod` | `1.0.0+100-prod` | Portrai | Release | Firebase (production/live) + GitHub Release |
-| `*+*-review-storybook` | `2.0.0+50-review-storybook` | Storybook | Release | Firebase Hosting (review) |
-| `*+*-prod-storybook` | `2.0.0+50-prod-storybook` | Storybook | Release | Firebase Hosting (live) + GitHub Release |
+The functions deploy secret is described in the
+[functions README](../tool/functions/README.md#deploying-from-github-actions).
 
----
+## Working with tags
 
-## 🎉 You're Ready!
+`git tag -l` uses shell globs, so `+` needs no escaping:
 
-Your CI/CD pipeline is fully configured. To release:
+```bash
+git tag -l '*+*-prod'            # Portrai production
+git tag -l '*+*-review'          # Portrai preview
+git tag -l '*+*-storybook'       # Storybook
+git tag -l 'legal-*'             # Legal pages
+```
 
-1. **Create a tag**: `git tag 1.0.0+100-review`
-2. **Push it**: `git push origin 1.0.0+100-review`
-3. **Monitor**: Check GitHub Actions tab
-4. **Test**: Download from Firebase App Distribution
-5. **Production**: When ready, tag with `-prod`
-
-For questions or issues, check the workflow files in `.github/workflows/`.
+A failed job can be rerun from the workflow run in GitHub Actions without a new tag. A new upload
+to Google Play or App Store Connect needs a new tag with a higher build number.
