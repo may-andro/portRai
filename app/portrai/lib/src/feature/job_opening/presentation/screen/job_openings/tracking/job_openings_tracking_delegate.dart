@@ -19,11 +19,20 @@ class JobOpeningsTrackingDelegate extends ScreenTrackingDelegate {
     );
   }
 
-  void trackJobSearchToggle({required bool isEnabled}) {
+  void trackFilterSelection(String filterName) {
     trackEvent(
       Tracking(
-        name: 'job_search',
-        action: ClickAction(label: isEnabled ? 'enable' : 'disable'),
+        name: 'filter',
+        action: ClickAction(label: filterName),
+      ),
+    );
+  }
+
+  void trackClearFiltersClick() {
+    trackEvent(
+      Tracking(
+        name: 'clear_filters',
+        action: const ClickAction(label: 'submit'),
       ),
     );
   }

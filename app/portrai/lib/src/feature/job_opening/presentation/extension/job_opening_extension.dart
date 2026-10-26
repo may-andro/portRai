@@ -14,6 +14,13 @@ final _freelancePattern = RegExp(r'\bfreelanc(e|er|ers|ing)\b');
 // "Smart contract" names a blockchain skill, not the kind of engagement.
 final _contractPattern = RegExp(r'(?<!smart )\bcontract(or|ors|ing)?\b');
 
+/// The mobile platform a job is built on.
+enum JobOpeningPlatform { flutter, android, ios }
+
+final _flutterPattern = RegExp(r'\bflutter\b');
+final _androidPattern = RegExp(r'\b(android|jetpack compose)\b');
+final _iosPattern = RegExp(r'\b(ios|swiftui|swift)\b');
+
 extension JobOpeningExtension on JobOpeningEntity {
   String formattedPublishedAt(BuildContext context) => DateFormat.yMMMd(
     Localizations.localeOf(context).toString(),
@@ -41,6 +48,17 @@ extension JobOpeningExtension on JobOpeningEntity {
     if (_freelancePattern.hasMatch(text)) return JobOpeningEngagement.freelance;
     if (_contractPattern.hasMatch(text)) return JobOpeningEngagement.contract;
     return null;
+  }
+
+  /// The mobile platforms named in the title, tags or matched skills, with
+  /// Flutter first: a Flutter job often names the native platforms too.
+  List<JobOpeningPlatform> get platforms {
+    final text = [title, ...tags, ...matchedSkills].join(' ').toLowerCase();
+    return [
+      if (_flutterPattern.hasMatch(text)) JobOpeningPlatform.flutter,
+      if (_androidPattern.hasMatch(text)) JobOpeningPlatform.android,
+      if (_iosPattern.hasMatch(text)) JobOpeningPlatform.ios,
+    ];
   }
 
   /// The job to tailor a CV for.

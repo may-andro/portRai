@@ -29,30 +29,4 @@ extension MockJobOpeningRepositoryStub on MockJobOpeningRepository {
       ),
     ).thenThrow(error);
   }
-
-  void stubIsJobSearchEnabled(bool isEnabled) {
-    when(() => isJobSearchEnabled(any())).thenAnswer((_) async => isEnabled);
-  }
-
-  void stubIsJobSearchEnabledThrows(Object error) {
-    when(() => isJobSearchEnabled(any())).thenThrow(error);
-  }
-
-  void stubSetJobSearchEnabled() {
-    when(
-      () => setJobSearchEnabled(
-        userId: any(named: 'userId'),
-        isEnabled: any(named: 'isEnabled'),
-      ),
-    ).thenAnswer((_) async {});
-  }
-
-  void stubSetJobSearchEnabledThrows(Object error) {
-    when(
-      () => setJobSearchEnabled(
-        userId: any(named: 'userId'),
-        isEnabled: any(named: 'isEnabled'),
-      ),
-    ).thenThrow(error);
-  }
 }

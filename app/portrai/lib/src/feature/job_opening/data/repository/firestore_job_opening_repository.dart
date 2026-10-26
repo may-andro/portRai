@@ -6,7 +6,7 @@ import 'package:portrai/src/feature/job_opening/data/model/_model.dart';
 import 'package:portrai/src/feature/job_opening/domain/_domain.dart';
 
 /// Reads the openings the weekly Cloud Function writes to
-/// `users/{uid}/job_openings`, and the `jobSearch` settings on `users/{uid}`.
+/// `users/{uid}/job_openings`.
 /// There is no cache or bundled fallback: the data is private to the user.
 @Register(as: JobOpeningRepository)
 class FirestoreJobOpeningRepository implements JobOpeningRepository {
@@ -23,7 +23,6 @@ class FirestoreJobOpeningRepository implements JobOpeningRepository {
   static const _tag = 'FirestoreJobOpeningRepository';
   static const _usersCollection = 'users';
   static const _idField = 'id';
-  static const _jobSearchField = 'jobSearch';
 
   static String _jobOpeningsCollection(String userId) =>
       '$_usersCollection/$userId/job_openings';
@@ -78,51 +77,6 @@ class FirestoreJobOpeningRepository implements JobOpeningRepository {
       return _mapper.map(JobOpeningModel.fromJson({...document, _idField: id}));
     } catch (error, stackTrace) {
       throw JobOpeningParsingException(cause: error, stackTrace: stackTrace);
-    }
-  }
-
-  @override
-  Future<bool> isJobSearchEnabled(String userId) async {
-    final Map<String, dynamic>? user;
-    try {
-      user = await _firestoreController.getDocumentFromCollection(
-        _usersCollection,
-        userId,
-      );
-    } on FirestoreDocumentNotFoundException {
-      return false;
-    } catch (error, stackTrace) {
-      throw _toJobOpeningException(error, stackTrace);
-    }
-
-    final jobSearch = user?[_jobSearchField];
-    if (jobSearch is! Map<String, dynamic>) return false;
-    try {
-      return JobSearchModel.fromJson(jobSearch).enabled;
-    } catch (error, stackTrace) {
-      throw JobOpeningParsingException(cause: error, stackTrace: stackTrace);
-    }
-  }
-
-  @override
-  Future<void> setJobSearchEnabled({
-    required String userId,
-    required bool isEnabled,
-  }) async {
-    try {
-      await _firestoreController.mergeDocumentInCollection(
-        collectionPath: _usersCollection,
-        documentPath: userId,
-        data: {
-          _jobSearchField: {
-            ...JobSearchModel(enabled: isEnabled).toJson(),
-            // Set by Firestore, so a wrong device clock cannot change it.
-            'updatedAt': FieldValue.serverTimestamp(),
-          },
-        },
-      );
-    } catch (error, stackTrace) {
-      throw _toJobOpeningException(error, stackTrace);
     }
   }
 

@@ -32,10 +32,18 @@ enum JobFitTier {
 
 /// A ring that fills to [score] percent, with the score in the middle.
 class JobFitScoreWidget extends StatelessWidget {
-  const JobFitScoreWidget({super.key, required this.score, this.size = 56});
+  const JobFitScoreWidget({
+    super.key,
+    required this.score,
+    this.size = 56,
+    this.isAnimated = true,
+  });
 
   final int score;
   final double size;
+
+  /// Whether the ring and the number count up from zero when shown.
+  final bool isAnimated;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +54,7 @@ class JobFitScoreWidget extends StatelessWidget {
     return Semantics(
       label: context.localizations.jobOpeningScore(score),
       child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: score / 100),
+        tween: Tween(begin: isAnimated ? 0 : score / 100, end: score / 100),
         duration: const Duration(milliseconds: 900),
         curve: Curves.easeOutCubic,
         builder: (context, progress, _) {

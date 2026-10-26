@@ -1463,14 +1463,6 @@
   "@jobOpeningsDescription": {
     "description": "Explanation at the top of the job openings list screen"
   },
-  "jobSearchToggleTitle": "Weekly job search",
-  "@jobSearchToggleTitle": {
-    "description": "Title of the switch that turns the weekly job search on or off"
-  },
-  "jobSearchToggleDescription": "Look for new matching jobs every Monday",
-  "@jobSearchToggleDescription": {
-    "description": "Description of the weekly job search switch"
-  },
   "jobOpeningsEmpty": "No matching jobs right now. New ones are found every Monday.",
   "@jobOpeningsEmpty": {
     "description": "Shown when the job openings list is empty"
@@ -1535,22 +1527,6 @@
   "@errorJobOpeningNotFound": {
     "description": "Error shown when a job opening expired or does not exist"
   },
-  "errorJobSearchUnavailable": "Can't read your job search setting",
-  "@errorJobSearchUnavailable": {
-    "description": "Error for when the weekly job search setting cannot be read"
-  },
-  "errorJobSearchPermissionDenied": "You can't change this job search setting",
-  "@errorJobSearchPermissionDenied": {
-    "description": "Error shown when Firestore rules refuse to save the job search setting"
-  },
-  "errorJobSearchNetwork": "Can't update job search. Check your internet connection",
-  "@errorJobSearchNetwork": {
-    "description": "Error shown when saving the job search setting fails because of the network"
-  },
-  "errorJobSearchUnknown": "Can't update job search. Please try again",
-  "@errorJobSearchUnknown": {
-    "description": "Error shown for unexpected problems saving the job search setting"
-  },
   "jobOpeningsMatchCount": "{count, plural, =1{1 match} other{{count} matches}}",
   "@jobOpeningsMatchCount": {
     "description": "Number of job openings in the list",
@@ -1614,14 +1590,6 @@
         "example": "Remotive"
       }
     }
-  },
-  "jobSearchStatusActive": "Active · Next search on Monday",
-  "@jobSearchStatusActive": {
-    "description": "Status of the weekly job search when it is on"
-  },
-  "jobSearchStatusPaused": "Paused · No new searches",
-  "@jobSearchStatusPaused": {
-    "description": "Status of the weekly job search when it is off"
   },
   "jobOpeningsMatchesTitle": "Your matches",
   "@jobOpeningsMatchesTitle": {
@@ -1862,5 +1830,41 @@
   "themeTaglineXmas": "Snowfall and warm winter lights",
   "@themeTaglineXmas": {
     "description": "Short description of the Christmas theme"
+  },
+  "jobOpeningsSearchHint": "Search by title, company or skill",
+  "@jobOpeningsSearchHint": {
+    "description": "Hint in the search field above the job list"
+  },
+  "jobOpeningsFilterFlutter": "Flutter",
+  "@jobOpeningsFilterFlutter": {
+    "description": "Filter chip for Flutter jobs"
+  },
+  "jobOpeningsFilterAndroid": "Android",
+  "@jobOpeningsFilterAndroid": {
+    "description": "Filter chip for Android jobs"
+  },
+  "jobOpeningsFilterIos": "iOS",
+  "@jobOpeningsFilterIos": {
+    "description": "Filter chip for iOS jobs"
+  },
+  "jobOpeningsFilterRecent": "New",
+  "@jobOpeningsFilterRecent": {
+    "description": "Filter chip for jobs posted in the last few days"
+  },
+  "jobOpeningsNoResults": "No jobs match your search and filters.",
+  "@jobOpeningsNoResults": {
+    "description": "Shown when the search and filters leave no jobs"
+  },
+  "jobOpeningsClearFilters": "Clear filters",
+  "@jobOpeningsClearFilters": {
+    "description": "Button that clears the search and every filter"
+  },
+  "jobOpeningsShowingCount": "Showing {visible} of {total}",
+  "@jobOpeningsShowingCount": {
+    "description": "How many jobs the search and filters leave, out of all of them",
+    "placeholders": {
+      "visible": { "type": "int", "example": "5" },
+      "total": { "type": "int", "example": "23" }
+    }
   }
 }
