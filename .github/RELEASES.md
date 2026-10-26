@@ -13,7 +13,7 @@ on pushes to `develop` instead. Every release workflow lives in [`workflows/`](w
 | Tag `*+*-prod-storybook` | `2.0.0+50-prod-storybook` | [`storybook_production.yaml`](workflows/storybook_production.yaml) | Storybook to the `live` Hosting channel |
 | Tag `legal-*` | `legal-1.1.0` | [`legal_production.yaml`](workflows/legal_production.yaml) | Legal pages to the `live` Hosting channel |
 | Push to `develop` changing `tool/functions/**` | | [`functions_production.yaml`](workflows/functions_production.yaml) | The `portrai` Cloud Functions codebase |
-| Pull request changing `app/storybook/**` or `layer/design_system/**` | | [`storybook_pr.yaml`](workflows/storybook_pr.yaml) | Storybook to the `preview` Hosting channel |
+| Pull request changing `app/storybook/**` or `layer/design_system/**` | | [`storybook.yaml`](workflows/storybook.yaml) | Storybook to the `preview` Hosting channel |
 
 The workflow filters escape the literal `+` (`'*\+*-prod'`); tag names contain no backslash. The
 tag-triggered workflows cancel an in-progress run for the same tag. `functions_production.yaml`
@@ -136,7 +136,7 @@ not create a GitHub release.
 
 ## Storybook releases
 
-`storybook_review.yaml`, `storybook_production.yaml` and `storybook_pr.yaml` run:
+`storybook_review.yaml`, `storybook_production.yaml` and `storybook.yaml` run:
 
 1. `quality`: [`_storybook_quality.yaml`](workflows/_storybook_quality.yaml) runs the format check,
    `flutter analyze` and the unit tests (excluding `golden` tags) as parallel jobs.

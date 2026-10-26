@@ -195,8 +195,6 @@ Supporting types exported with `DBCache`:
 - `DBNotInitialisedException`: thrown by any `DBCache` call when the database fails to open;
   `cause` holds the original error, and the next call retries opening it
 
-## Key Concepts
-
 ### Time-to-Live
 
 Each cache overrides `Duration get timeToLive`. The default, `Duration.zero`, means entries never

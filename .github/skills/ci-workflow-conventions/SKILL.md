@@ -112,7 +112,7 @@ Release/deploy pipelines are separate, tag-triggered workflows (`portrai_preview
 
 The other pipelines are shorter:
 - **Storybook** (`storybook_review.yaml`, `storybook_production.yaml`, and the PR-triggered
-  `storybook_pr.yaml`): `quality` calls `_storybook_quality.yaml`, `build` calls `_build_web.yaml`
+  `storybook.yaml`): `quality` calls `_storybook_quality.yaml`, `build` calls `_build_web.yaml`
   (version from `app/storybook/pubspec.yaml`, no `extract-version` job), `deploy` calls
   `_deploy_firebase.yaml`. `storybook_production.yaml` also calls `_storybook_release_notes.yaml`.
 - **Legal pages** (`legal_production.yaml`): `extract-version` (text after `legal-`) → `deploy`

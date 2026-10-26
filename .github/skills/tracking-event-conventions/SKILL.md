@@ -14,7 +14,11 @@ Every screen/feature that tracks events owns one
 `<Screen>TrackingDelegate extends ScreenTrackingDelegate`, in
 `presentation/screen/<screen_name>/tracking/<screen_name>_tracking_delegate.dart`
 (exported from that screen's `tracking/_tracking.dart` barrel — see
-`flutter-architecture-conventions` for the folder layout).
+`flutter-architecture-conventions` for the folder layout). A tracked widget
+that isn't a screen keeps its delegate in its own folder's `tracking/`
+sub-folder, following the same non-screen exception as the folder layout
+(e.g. `profile/presentation/widget/footer/tracking/`,
+`force_update/presentation/tracking/`).
 
 ```dart
 class _TrackingArea extends TrackingArea {
