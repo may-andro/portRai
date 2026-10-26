@@ -378,7 +378,9 @@ Flags are read from Firebase Remote Config. Each feature defines its own flags i
 
 The Settings and footer version labels read installed package metadata. Release workflows pass
 the tag's version and build number through `--build-name` and `--build-number` on every platform,
-including web's generated `version.json`. Local builds use the `pubspec.yaml` version.
+including web's generated `version.json`. Local builds use the `pubspec.yaml` version. The
+[release guide](../../.github/RELEASES.md) covers the release workflows, signing and the secrets
+they need.
 
 ### Web
 Set `FIREBASE_APP_CHECK_WEB_SITE_KEY` and `MAPS_API_KEY_WEB` in the ignored
@@ -389,25 +391,18 @@ melos run deploy_portrai
 ```
 
 The script builds the prod web app, generates the SQLite web assets, injects the Maps key into
-`index.html` and deploys to the `portrai` Firebase Hosting site. It loads `.env.production` only
-when a key is not already set, and never loads `.env`. See the
-[web deploy README](web/.deploy/README.md).
+`index.html` and deploys to the `portrai` Hosting target. It loads `.env.production` only when a
+key is not already set, and never loads `.env`.
 
 ### Android
 ```bash
 flutter build appbundle --release
 ```
 
-See the [Play Store README](android/.playstore/README.md) and the
-[signing README](android/.signing/README.md).
-
 ### iOS
 ```bash
 flutter build ipa --release
 ```
-
-See the [App Store README](ios/.appstore/README.md) and the
-[signing README](ios/.signing/README.md).
 
 ## Contributing
 
