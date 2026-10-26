@@ -1,29 +1,21 @@
 # Error Reporter
 
-A comprehensive error reporting and handling solution for Flutter applications
-that provides multiple error handling strategies with blacklisting and fatal
-error management.
+Reports errors to Firebase Crashlytics or to the log, decides which errors are fatal, and lets
+the app register handlers that skip reporting for some errors or react to fatal ones.
 
 ## Features
-
-- **Error Reporting Interface**: Abstract error reporting interface for flexible
-  backend implementation
-- **Blacklist Error Filtering**: Automatically filter out unwanted errors from
-  being reported
-- **Fatal Error Handling**: Special handling for critical application errors
-  with custom handlers
-- **Global Error Handler**: Centralized error handling for the entire
-  application
-- **Type Safety**: Generic error reporting that maintains type safety with
-  AppException types
-- **Module Configuration**: Easy integration with dependency injection systems
-- **Automatic Initialization**: Built-in setup and configuration management
+- `ErrorReporter` interface with `init()`, `reportError()` and a `globalErrorHandler` for
+  uncaught errors.
+- `init()` sets `FlutterError.onError` so framework errors go through the reporter.
+- Two implementations, selected by the module configurator: one records errors in Crashlytics
+  through the `firebase` layer, the other writes them to `LogReporter`.
+- `BlacklistErrorController` collects `BlacklistErrorHandler`s; an error any handler matches is
+  not recorded in Crashlytics.
+- `FatalErrorController` classifies errors as fatal and runs every registered
+  `FatalErrorHandler` when a fatal error is handled.
 
 ## Getting Started
-
 ### Installation
-
-This module is part of the workspace and can be imported directly:
 
 ```yaml
 dependencies:
@@ -35,170 +27,88 @@ import 'package:error_reporter/error_reporter.dart';
 ```
 
 ### Module Configuration
-
-The error reporter module automatically configures all dependencies:
+`ErrorReporterModuleConfigurator` takes one positional `bool isFirebaseEnabled`.
 
 ```dart
-import 'package:error_reporter/error_reporter.dart';
-
-// Add to your module configurators
-final configurator = ErrorReporterModuleConfigurator(
-  isFirebaseEnabled: true, // Enable backend error reporting integration
-);
+final configurators = <ModuleConfigurator>[
+  FirebaseModuleConfigurator(/* ... */),
+  LogReporterModuleConfigurator(),
+  ErrorReporterModuleConfigurator(true),
+];
 ```
+
+`registerDependencies` registers `BlacklistErrorController`, `FatalErrorController` and
+`ErrorReporter` as singletons. It reads `LogReporter` (from
+[log_reporter](../log_reporter/README.md)) and, when `isFirebaseEnabled` is `true`,
+`FbCrashlyticsController` (from [firebase](../firebase/README.md)) while registering, so those
+configurators must come earlier in the list. `postDependenciesSetup` calls
+`ErrorReporter.init()`.
+
+| `isFirebaseEnabled` | Registered `ErrorReporter` |
+|---------------------|----------------------------|
+| `true`              | Records errors in Crashlytics, honours the blacklist, logs `reportError` calls |
+| `false`             | Writes errors to `LogReporter` only; the blacklist is not consulted |
 
 ## Usage
 
-### Basic Setup
-
-Configure the error reporter module in your application:
-
-```dart
-import 'package:error_reporter/error_reporter.dart';
-
-// Configure the module with Firebase support
-final configurator = ErrorReporterModuleConfigurator(
-  isFirebaseEnabled: true, // Set to false if Firebase is not available
-);
-
-// Register with your service locator
-await configurator.registerDependencies(serviceLocator);
-await configurator.postDependenciesSetup(serviceLocator);
-```
-
-### Error Reporting
+### Reporting a caught exception
+`reportError` accepts any `AppException` from the `core` layer.
 
 ```dart
-// Get the error reporter instance
 final errorReporter = serviceLocator.get<ErrorReporter>();
 
-// Report application exceptions
 try {
-  // Your code that might throw an exception
-  await someRiskyOperation();
-} catch (exception, stackTrace) {
+  await loadItems();
+} on AppException catch (exception, stackTrace) {
   await errorReporter.reportError(
     exception: exception,
     stackTrace: stackTrace,
-    tag: 'user_action', // Optional tag for categorization
+    tag: 'items',
   );
 }
-
-// Report with custom tags for better categorization
-await errorReporter.reportError(
-  exception: NetworkException('Connection failed'),
-  stackTrace: StackTrace.current,
-  tag: 'network_error',
-);
 ```
 
-### Blacklist Error Handling
-
-Filter out specific errors that shouldn't be reported:
-
-```dart
-// Create a custom blacklist handler
-class NetworkTimeoutBlacklistHandler extends BlacklistErrorHandler {
-  @override
-  bool isBlacklistError(Object error) {
-    // Ignore network timeout errors
-    return error.toString().contains('timeout') ||
-           error.toString().contains('connection refused');
-  }
-}
-
-class DevelopmentBlacklistHandler extends BlacklistErrorHandler {
-  @override
-  bool isBlacklistError(Object error) {
-    // Ignore debug-only errors in development
-    return error is AssertionError && kDebugMode;
-  }
-}
-
-// Register the handlers
-final blacklistController = serviceLocator.get<BlacklistErrorController>();
-blacklistController.register(NetworkTimeoutBlacklistHandler());
-blacklistController.register(DevelopmentBlacklistHandler());
-
-// Check if an error should be blacklisted
-if (blacklistController.isBlacklistedError(someError)) {
-  // Error will be ignored
-}
-```
-
-### Fatal Error Handling
-
-Handle critical application errors with custom recovery strategies:
+### Handling uncaught errors
+`init()` already covers `FlutterError.onError`. Route errors outside the framework to
+`globalErrorHandler`:
 
 ```dart
-// Create a custom fatal error handler
-class CrashRecoveryHandler extends FatalErrorHandler {
-  @override
-  Future<void> onFatalError(Object error) async {
-    // Show crash screen to user
-    await showCrashDialog();
-
-    // Save current state
-    await saveApplicationState();
-
-    // Send critical error report
-    await sendCriticalErrorReport(error);
-  }
-}
-
-class StateRecoveryHandler extends FatalErrorHandler {
-  @override
-  Future<void> onFatalError(Object error) async {
-    // Attempt to recover application state
-    await clearCorruptedData();
-    await resetToSafeState();
-  }
-}
-
-// Register the handlers
-final fatalController = serviceLocator.get<FatalErrorController>();
-fatalController.register(CrashRecoveryHandler());
-fatalController.register(StateRecoveryHandler());
-
-// Check if an error is fatal
-if (fatalController.isFatalError(someError)) {
-  await fatalController.onFatalError(someError);
-}
-```
-
-### Global Error Handler
-
-Set up comprehensive global error handling for your application:
-
-```dart
-final errorReporter = serviceLocator.get<ErrorReporter>();
-
-// Initialize the error reporter
-await errorReporter.init();
-
-// Set up global error handling for Flutter errors
-FlutterError.onError = errorReporter.globalErrorHandler;
-
-// Set up global error handling for async errors
 PlatformDispatcher.instance.onError = (error, stack) {
   errorReporter.globalErrorHandler(error, stack);
   return true;
 };
-
-// Set up error handling for specific zones
-runZonedGuarded(
-  () => runApp(MyApp()),
-  errorReporter.globalErrorHandler,
-);
 ```
 
-## Key Concepts
+### Skipping errors with a blacklist handler
 
-### Public API
+```dart
+class CancelledRequestBlacklistHandler implements BlacklistErrorHandler {
+  @override
+  bool isBlacklistError(Object error) => error is CancelledRequestException;
+}
 
-#### ErrorReporter
+serviceLocator
+    .get<BlacklistErrorController>()
+    .register(CancelledRequestBlacklistHandler());
+```
 
-Abstract interface for error reporting implementations.
+### Reacting to fatal errors
+
+```dart
+class ExitFatalErrorHandler implements FatalErrorHandler {
+  @override
+  FutureOr<void> onFatalError(Object error) => exit(1);
+}
+
+serviceLocator.get<FatalErrorController>().register(ExitFatalErrorHandler());
+```
+
+Register handlers once, for example in an app-level `postDependenciesSetup`. Registering the
+same handler instance twice throws an `AppException` (`HandlerRegisteredException`).
+
+## API Reference
+
+### ErrorReporter
 
 ```dart
 abstract class ErrorReporter {
@@ -214,9 +124,22 @@ abstract class ErrorReporter {
 }
 ```
 
-#### BlacklistErrorController
+Behaviour of the Crashlytics implementation (`isFirebaseEnabled: true`):
 
-Controller for managing blacklist error handlers.
+- Fatal error: recorded in Crashlytics with `isFatal: true` unless blacklisted, then
+  `FatalErrorController.onFatalError` runs.
+- Non-fatal error: skipped if blacklisted; otherwise recorded with `reportFlutterError` when it
+  came from `FlutterError.onError`, or `reportError` otherwise.
+- `reportError` goes through the same steps, then logs the exception with `LogReporter.error`
+  and the given `tag`.
+
+Behaviour of the log implementation (`isFirebaseEnabled: false`):
+
+- `reportError` logs the exception with `LogReporter.error` and the given `tag`.
+- `globalErrorHandler` and `FlutterError.onError` log the error and stack trace; for a fatal
+  error they then run `FatalErrorController.onFatalError`.
+
+### BlacklistErrorController
 
 ```dart
 class BlacklistErrorController {
@@ -224,21 +147,15 @@ class BlacklistErrorController {
   List<BlacklistErrorHandler> get registeredHandlers;
   bool isBlacklistedError(Object error);
 }
-```
 
-#### BlacklistErrorHandler
-
-Abstract handler for implementing custom blacklist logic.
-
-```dart
 abstract class BlacklistErrorHandler {
   bool isBlacklistError(Object error);
 }
 ```
 
-#### FatalErrorController
+`isBlacklistedError` returns `true` when any registered handler returns `true`.
 
-Controller for managing fatal error handlers.
+### FatalErrorController
 
 ```dart
 class FatalErrorController {
@@ -247,119 +164,34 @@ class FatalErrorController {
   bool isFatalError(Object error);
   Future<void> onFatalError(Object error);
 }
-```
 
-#### FatalErrorHandler
-
-Abstract handler for implementing custom fatal error handling.
-
-```dart
 abstract class FatalErrorHandler {
-  Future<void> onFatalError(Object error);
+  FutureOr<void> onFatalError(Object error);
 }
 ```
 
-#### ErrorReporterModuleConfigurator
-
-Module configurator for dependency injection setup.
-
-```dart
-class ErrorReporterModuleConfigurator implements ModuleConfigurator {
-  ErrorReporterModuleConfigurator(bool isFirebaseEnabled);
-
-  Future<void> registerDependencies(ServiceLocator serviceLocator);
-  Future<void> postDependenciesSetup(ServiceLocator serviceLocator);
-}
-```
-
-### Error Classification
-
-The system automatically classifies errors into different categories:
-
-- **AppException**: Application-specific exceptions that extend the base
-  AppException type
-- **Fatal Errors**: Critical errors that require immediate attention (Error
-  types, FatalException)
-- **Blacklisted Errors**: Errors that should be filtered out (development
-  errors, known issues)
-- **Regular Errors**: Standard exceptions that should be reported
-
-### Error Filtering
-
-- Blacklisted errors are automatically detected and prevented from being
-  reported
-- Custom blacklist handlers allow fine-grained control over error filtering
-- Multiple blacklist handlers can be registered for different error types
-
-### Error Reporting Flow
-
-1. Error occurs in application
-2. Check if error is blacklisted -> Skip if blacklisted
-3. Check if error is fatal -> Handle through fatal error controllers
-4. Report error through configured error reporter
-5. Apply optional tags for categorization
-
-## Handler Types
-
-| Handler Type | Purpose | Use Case |
-|--------------|---------|----------|
-| BlacklistErrorHandler | Filter unwanted errors | Development errors, known issues |
-| FatalErrorHandler | Handle critical errors | App crashes, data corruption |
-| ErrorReporter | Report errors to backend | External error reporting services |
-
-## Platform Support
-
-| Platform | Error Reporting | Fatal Handling | Blacklisting |
-|----------|----------------|----------------|--------------|
-| Android  | Yes            | Yes            | Yes          |
-| iOS      | Yes            | Yes            | Yes          |
-| macOS    | Yes            | Yes            | Yes          |
-| Web      | Yes            | Yes            | Yes          |
-
-## Best Practices
-
-1. **Implement Custom Handlers**:
-   - Create specific BlacklistErrorHandler implementations for your error types
-   - Implement FatalErrorHandler for graceful error recovery
-   - Use the ErrorReporter interface through dependency injection
-
-2. **Configure Error Classification**:
-   - Use specific AppException types for better categorization
-   - Apply meaningful tags to error reports
-   - Handle fatal errors with appropriate recovery strategies
-
-3. **Configure Blacklisting Wisely**:
-   - Filter out development-only errors
-   - Blacklist known issues that don't require immediate attention
-   - Avoid over-filtering important error information
-
-4. **Handle Fatal Errors Gracefully**:
-   - Implement user-friendly crash recovery
-   - Save critical application state
-   - Provide clear communication to users
-
-5. **Error Handling Hierarchy**:
-   - Set up global error handlers as safety nets
-   - Use zone-based error handling for specific app sections
-   - Implement try-catch blocks for expected error scenarios
-
-## Contributing
-
-This module follows the workspace development patterns. Ensure all changes
-include appropriate tests and maintain backward compatibility.
+`isFatalError` returns `true` for any `Error` or `FatalException` (from `core`), except a
+`FlutterError` whose message contains `RenderFlex`. `onFatalError` calls each registered
+handler in registration order and waits for each one.
 
 ## Dependencies
-
-- `core`: Core application utilities and exceptions
-- `firebase`: Firebase integration for backend error reporting
-- `log_reporter`: Local logging functionality
-- `module_injector`: Dependency injection framework
-- `meta`: Metadata annotations for better code analysis
+- `core`: `AppException` and `FatalException`.
+- `firebase`: `FbCrashlyticsController` for recording errors in Crashlytics.
+- `log_reporter`: `LogReporter` for writing errors to the log.
+- `module_injector`: `ModuleConfigurator` and `ServiceLocator`.
+- `meta`: `@internal` on the reporter implementations.
 
 ## Testing
 
-The module includes comprehensive test coverage:
+```bash
+melos run test --scope=error_reporter
+```
+
+Or, from `layer/error_reporter`:
 
 ```bash
 flutter test
 ```
+
+The tests cover both controllers and both reporter implementations, using `mocktail`. The
+package exports no test fakes.
