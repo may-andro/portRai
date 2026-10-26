@@ -12,7 +12,8 @@ imports the other. The `job_opening` feature also uses `AssistantGenuiController
 - `AssistantMessageEntity` (`content`, `isUser`) and the sealed `AssistantResponseEntity`, whose
   only subtype is `AssistantTextResponseEntity` (`text`).
 - `GetAssistantContextUseCase` builds the portfolio context as one JSON string from
-  `GetPortfolioUseCase`. A portfolio that fails to load returns `UnknownAssistantFailure`.
+  `GetPortfolioUseCase`. A portfolio that fails to load returns
+  `GetAssistantContextUnknownFailure`.
 - `AssistantConversationWidget` renders a conversation without owning a provider or lifecycle:
   starter suggestions before the first message, message bubbles, a loading indicator while a
   question is sent, an optional header and error text, and the text input. The caller supplies

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:portrai/src/feature/assistant/domain/use_case/assistant_failure.dart';
 import 'package:portrai/src/feature/assistant/domain/use_case/get_assistant_context_use_case.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
@@ -546,7 +545,7 @@ void main() {
 
         final result = await useCase();
 
-        expect(result.left, isA<UnknownAssistantFailure>());
+        expect(result.left, isA<GetAssistantContextUnknownFailure>());
         expect(result.left.cause, isA<GetPortfolioNotFoundFailure>());
       },
     );
