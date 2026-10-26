@@ -1,164 +1,145 @@
-# Firestore Export/Import CLI Tool
+# Firestore Export Import
 
-A powerful command-line tool for seamlessly importing and exporting data between JSON files and Firestore collections. Perfect for data migrations, backups, and development workflows.
+A Dart command-line tool that copies a Firestore collection to a JSON file and writes documents
+from a JSON file to a Firestore collection, through the Firestore REST API.
 
-## 🚀 Quick Start
+## Features
+
+- `import` downloads the documents of a collection and saves the response as a JSON file.
+- `export` reads documents from a JSON file and writes them to a collection in one batch write.
+- Authenticates with a service account key file.
+
+The command names are from the point of view of the local files: `import` reads from Firestore,
+`export` writes to it.
+
+## Getting Started
 
 ### Prerequisites
-- Dart SDK installed
-- Google Cloud service account with Firestore access permissions
-- Service account JSON credentials file
+
+- Dart SDK `^3.11.0`, as set in `pubspec.yaml`.
+- A service account JSON key file for the Firebase project, with a role that can read and write
+  Firestore documents.
 
 ### Installation
-1. Navigate to the tool directory:
-   ```bash
-   cd tool/firestore_export_import
-   ```
 
-2. Install dependencies:
-   ```bash
-   dart pub get
-   ```
+```bash
+cd tool/firestore_export_import
+dart pub get
+```
 
-## 📖 Usage
+## Usage
 
-The tool provides two main commands: `import` and `export`.
+Run the commands from `tool/firestore_export_import`.
 
-### Import Data from Firestore
+### Import
 
-Download data from a Firestore collection and save it to a JSON file:
+Downloads the documents of a collection and writes them to a file:
 
 ```bash
 dart run bin/firestore_export_import.dart import \
-  --collection your_collection_name \
+  --collection items \
   --secrets path/to/service_account.json \
-  --output path/to/output.json
+  --output path/to/items.json
 ```
 
-**Example:**
-```bash
-dart run bin/firestore_export_import.dart import \
-  --collection app_config \
-  --secrets .data/service_account.json \
-  --output .data/app_config_backup.json
-```
+| Option         | Abbreviation | Required | Description                          |
+| -------------- | ------------ | -------- | ------------------------------------ |
+| `--collection` | `-c`         | Yes      | Collection to download               |
+| `--secrets`    | `-s`         | Yes      | Path to the service account key file |
+| `--output`     | `-o`         | Yes      | Path of the file to write            |
 
-### Export Data to Firestore
+### Export
 
-Upload data from a JSON file to a Firestore collection:
+Writes the documents in a file to a collection:
 
 ```bash
 dart run bin/firestore_export_import.dart export \
-  --collection your_collection_name \
+  --collection items \
   --secrets path/to/service_account.json \
-  --path path/to/input.json
+  --path path/to/items.json
 ```
 
-**Example:**
+| Option         | Abbreviation | Required | Description                          |
+| -------------- | ------------ | -------- | ------------------------------------ |
+| `--collection` | `-c`         | Yes      | Collection to write to               |
+| `--secrets`    | `-s`         | Yes      | Path to the service account key file |
+| `--path`       | `-p`         | Yes      | Path of the JSON file to upload      |
+
+None of the options have defaults. If one is missing, the command logs an error and exits
+without contacting Firestore.
+
+### Help
+
 ```bash
-dart run bin/firestore_export_import.dart export \
-  --collection user_settings \
-  --secrets .data/service_account.json \
-  --path .data/user_settings.json
-```
-
-## 🔧 Command Options
-
-### Import Command
-| Option | Short | Required | Description |
-|--------|-------|----------|-------------|
-| `--collection` | `-c` | ✅ | Name of the Firestore collection to download from |
-| `--secrets` | `-s` | ✅ | Path to your service account JSON credentials file |
-| `--output` | `-o` | ✅ | Path where the downloaded data will be saved |
-
-### Export Command
-| Option | Short | Required | Description |
-|--------|-------|----------|-------------|
-| `--collection` | `-c` | ✅ | Name of the Firestore collection to upload to |
-| `--secrets` | `-s` | ✅ | Path to your service account JSON credentials file |
-| `--path` | `-p` | ✅ | Path to the JSON file containing data to upload |
-
-## 🔐 Setting Up Service Account
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Select your project
-3. Navigate to **IAM & Admin** > **Service Accounts**
-4. Create a new service account or select an existing one
-5. Assign the following roles:
-   - `Cloud Datastore User` or
-   - `Firebase Admin SDK Administrator Service Agent`
-6. Generate and download the JSON key file
-7. Keep this file secure and reference it in the `--secrets` parameter
-
-## 📝 Common Use Cases
-
-### Backup Collections
-```bash
-# Backup all app configuration
-dart run bin/firestore_export_import.dart import \
-  --collection app_config \
-  --secrets .secrets/service_account.json \
-  --output backups/app_config_$(date +%Y%m%d).json
-```
-
-### Environment Migration
-```bash
-# Export from staging
-dart run bin/firestore_export_import.dart import \
-  --collection products \
-  --secrets .secrets/staging_account.json \
-  --output staging_products.json
-
-# Import to production
-dart run bin/firestore_export_import.dart export \
-  --collection products \
-  --secrets .secrets/prod_account.json \
-  --path staging_products.json
-```
-
-### Development Setup
-```bash
-# Load test data into development environment
-dart run bin/firestore_export_import.dart export \
-  --collection test_users \
-  --secrets .secrets/dev_account.json \
-  --path test_data/sample_users.json
-```
-
-## ⚠️ Troubleshooting
-
-### Permission Denied (403 Error)
-- Verify your service account has the correct IAM roles
-- Ensure the service account JSON file is valid and not expired
-- Check that Firestore is enabled for your project
-
-### No Output or Logs
-- Confirm all required parameters are provided
-- Verify file paths exist and are accessible
-- Check that the collection name is correct
-
-### Connection Issues
-- Ensure you have internet connectivity
-- Verify your Google Cloud project ID is correct
-- Check if there are any firewall restrictions
-
-## 🔍 Getting Help
-
-Run the tool without arguments to see available commands:
-```bash
-dart run bin/firestore_export_import.dart
-```
-
-Get help for a specific command:
-```bash
+dart run bin/firestore_export_import.dart --help
 dart run bin/firestore_export_import.dart import --help
 dart run bin/firestore_export_import.dart export --help
 ```
 
-## 📄 JSON File Format
+### Melos scripts
 
-The tool works with standard JSON format. Exported files will contain an array of documents with their field data preserved according to Firestore's data types.
+From the workspace root, `melos run firestore_import` and `melos run firestore_export` run the
+two commands for each portfolio content collection, with the key file at
+`.data/service_account.json` and one JSON file per collection in `.data/`. The `.data` folder is
+git-ignored.
 
----
+## File Formats
 
-**Note:** Always test with non-production data first and ensure you have proper backups before performing bulk operations.
+### Import output
+
+The output file is the unmodified body of one Firestore REST `documents.list` response for the
+collection: a `documents` array whose entries hold the full document `name`, typed `fields`,
+`createTime` and `updateTime`. The tool does not follow `nextPageToken`, so it saves only the
+first page of results. This format is not accepted by `export` as is.
+
+### Export input
+
+The file must be a JSON object in one of two shapes:
+
+```json
+{
+  "documents": [
+    { "docId": "first", "fields": { "title": "First", "order": 1 } }
+  ]
+}
+```
+
+```json
+{
+  "first": { "title": "First", "order": 1 },
+  "second": { "title": "Second", "order": 2 }
+}
+```
+
+Each document is sent as a full `update` write, so it is created if missing and replaces all
+fields of an existing document. Field values convert as follows:
+
+| JSON value                                                                                                     | Firestore value                    |
+| -------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| String                                                                                                         | `stringValue`                      |
+| Integer                                                                                                        | `integerValue`                     |
+| Decimal number                                                                                                 | `doubleValue`                      |
+| Boolean                                                                                                        | `booleanValue`                     |
+| Array                                                                                                          | `arrayValue`                       |
+| Object with an `integerValue`, `doubleValue`, `stringValue`, `booleanValue`, `geoPointValue` or `mapValue` key | Passed through as that typed value |
+| Any other object                                                                                               | `mapValue`                         |
+
+A `null` field is skipped, and a `null` inside an array stops the export with an error.
+
+## Configuration
+
+The Firebase project ID is set in code, in `lib/use_case/download_use_case.dart` and
+`lib/use_case/upload_use_case.dart`; it is not read from the service account key file. The
+access token is requested with the `https://www.googleapis.com/auth/cloud-platform` scope.
+
+## Testing
+
+```bash
+cd tool/firestore_export_import
+dart test
+```
+
+The tests mock the HTTP client and never call Firestore. The
+[`firestore_export_import` workflow](../../.github/workflows/firestore_export_import.yaml) runs
+`dart format --set-exit-if-changed .`, `dart analyze --fatal-infos .` and
+`dart test --coverage=coverage` on pull requests that change this tool.
