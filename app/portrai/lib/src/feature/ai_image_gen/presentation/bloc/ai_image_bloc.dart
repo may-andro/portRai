@@ -8,13 +8,15 @@ import 'package:portrai/src/feature/ai_image_gen/presentation/bloc/ai_image_stat
 
 @register
 class AiImageBloc extends Bloc<AiImageEvent, AiImageState> {
-  AiImageBloc(this._generateAiImageUseCase, this._removeBackgroundUseCase)
-    : super(const LoadingState()) {
+  AiImageBloc(
+    this._generateAiImageUseCase,
+    this._removeAiImageBackgroundUseCase,
+  ) : super(const LoadingState()) {
     on<LoadImageEvent>(_mapLoadImageEventToState);
   }
 
   final GenerateAiImageUseCase _generateAiImageUseCase;
-  final RemoveAiImageBackgroundUseCase _removeBackgroundUseCase;
+  final RemoveAiImageBackgroundUseCase _removeAiImageBackgroundUseCase;
 
   FutureOr<void> _mapLoadImageEventToState(
     LoadImageEvent event,
@@ -32,7 +34,7 @@ class AiImageBloc extends Bloc<AiImageEvent, AiImageState> {
       emit(LoadedState(image: generated));
       return;
     }
-    final processed = await _removeBackgroundUseCase(generated);
+    final processed = await _removeAiImageBackgroundUseCase(generated);
     // An opaque image is better than no image when processing fails.
     emit(
       LoadedState(image: processed.fold((_) => generated, (image) => image)),
