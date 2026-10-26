@@ -134,8 +134,8 @@ and the `*.template.json` files.
 the foreground, and a "Portfolio updated" notification checks too. `UpdatePortfolioUseCase`
 compares when each section last changed, from `portfolio_versions/{locale}`, with the change it
 was last refreshed for, and refreshes only the sections that changed. An open portfolio screen
-then reloads in place. Staging builds never check. See the
-[portfolio README](lib/src/feature/portfolio/README.md).
+then reloads in place. In staging builds a check reads no change times, so nothing is refreshed.
+See the [portfolio README](lib/src/feature/portfolio/README.md).
 
 ### Assistant Modules
 
@@ -150,8 +150,8 @@ The entry point follows the rollout flags:
 
 - With `feature_remote_assistant` on, the portfolio opens the remote chat at `/remote-assistant`.
   It takes priority over the local assistant.
-- With only `feature_ai_assistant` on, Settings offers the on-device model and the portfolio opens
-  the local chat at `/assistant` once the model is ready.
+- With only `feature_ai_assistant` on, on a supported platform, Settings offers the on-device
+  model and the portfolio opens `/assistant`, which shows the setup until the model is ready.
 - With neither flag on, the entry and the assistant settings are hidden.
 
 There is no fallback or history transfer between the two. Flags are rechecked when a screen
@@ -163,8 +163,9 @@ The on-device assistant is off by default and runs on Android and iOS. The AI
 section in Settings explains that it runs on the device and downloads the model only after the
 user agrees, showing progress and a cancel button. The model is the revision-pinned
 `litert-community/gemma-4-E2B-it-litert-lm` LiteRT-LM bundle. Cancelling deletes the partial
-download, and turning the assistant off asks whether to delete or keep the model. The model counts
-as ready only after a successful local inference. Questions and portfolio context stay on the
+download, and turning the assistant off asks whether to delete or keep the model. A new download
+becomes ready after a successful local inference; an installed model is ready at launch and runs
+the same check on its first question. Questions and portfolio context stay on the
 device. The preference is stored under `assistant_enabled_cache`.
 
 ### Remote Assistant
