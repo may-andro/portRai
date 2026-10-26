@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
+import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
@@ -193,7 +193,9 @@ void main() {
         fixture.start();
         await pumpEventQueue();
         final completion =
-            Completer<Either<LocalAssistantFailure, AssistantResponseEntity>>();
+            Completer<
+              Either<AskLocalPortfolioQuestionFailure, AssistantResponseEntity>
+            >();
         when(
           () => fixture.askLocal(any()),
         ).thenAnswer((_) => completion.future);
@@ -231,7 +233,9 @@ void main() {
       fixture.start();
       await pumpEventQueue();
       final completion =
-          Completer<Either<LocalAssistantFailure, AssistantResponseEntity>>();
+          Completer<
+            Either<AskLocalPortfolioQuestionFailure, AssistantResponseEntity>
+          >();
       when(() => fixture.askLocal(any())).thenAnswer((_) => completion.future);
       fixture.local
         ..add(const SendLocalAssistantQuestionClickEvent('Question'))

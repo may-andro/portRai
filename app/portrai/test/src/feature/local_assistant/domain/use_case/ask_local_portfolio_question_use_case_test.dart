@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/local_assistant/domain/exception/_exception.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 
 import '../../../../../mock/feature/local_assistant/domain/repository/mock_local_assistant_repository.dart';
 import '../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
@@ -89,7 +88,7 @@ void main() {
     )(params);
 
     expect(result.isLeft, isTrue);
-    expect(result.left, isA<UnknownLocalAssistantFailure>());
+    expect(result.left, isA<AskLocalPortfolioQuestionUnknownFailure>());
     expect(result.left.cause, same(error));
   });
 
@@ -107,7 +106,7 @@ void main() {
         repository,
         supportedCase(),
       )(params);
-      expect(result.left, isA<UnavailableLocalAssistantFailure>());
+      expect(result.left, isA<AskLocalPortfolioQuestionUnavailableFailure>());
     },
   );
 
@@ -124,7 +123,7 @@ void main() {
         repository,
         supportedCase(),
       )(params);
-      expect(result.left, isA<BusyLocalAssistantFailure>());
+      expect(result.left, isA<AskLocalPortfolioQuestionBusyFailure>());
     },
   );
 
@@ -139,7 +138,7 @@ void main() {
         support,
       )(params);
 
-      expect(result.left, isA<UnavailableLocalAssistantFailure>());
+      expect(result.left, isA<AskLocalPortfolioQuestionUnavailableFailure>());
       verifyNever(
         () => repository.answer(
           question: params.question,

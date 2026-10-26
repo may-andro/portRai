@@ -6,7 +6,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/assistant/assistant.dart';
 import 'package:portrai/src/feature/local_assistant/domain/feature_flag/_feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/ask_local_portfolio_question_use_case.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
+import 'package:portrai/src/feature/local_assistant/domain/use_case/prepare_local_assistant_model_use_case.dart';
+import 'package:portrai/src/feature/local_assistant/domain/use_case/reset_local_assistant_session_use_case.dart';
 import 'package:portrai/src/feature/local_assistant/presentation/screen/local_assistant/bloc/_bloc.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:use_case/use_case.dart';
@@ -268,7 +269,7 @@ void main() {
           question: 'Question',
           portfolioContext: 'Context',
         ),
-        result: const Left(UnknownLocalAssistantFailure()),
+        result: const Left(AskLocalPortfolioQuestionUnknownFailure()),
       );
       return bloc;
     },
@@ -297,7 +298,7 @@ void main() {
         portfolioContext: 'Context',
         isLoadingContext: false,
         hasError: true,
-        failure: UnknownLocalAssistantFailure(),
+        failure: AskLocalPortfolioQuestionUnknownFailure(),
       ),
     ],
   );
@@ -344,7 +345,9 @@ void main() {
     'should expose a reset failure when clearing the conversation fails',
     build: () {
       final bloc = createBloc();
-      resetSession.stubCall(const Left(UnknownLocalAssistantFailure()));
+      resetSession.stubCall(
+        const Left(ResetLocalAssistantSessionUnknownFailure()),
+      );
       return bloc;
     },
     seed: () => const LocalAssistantState(
@@ -370,7 +373,7 @@ void main() {
         portfolioContext: 'Context',
         isLoadingContext: false,
         hasError: true,
-        failure: UnknownLocalAssistantFailure(),
+        failure: ResetLocalAssistantSessionUnknownFailure(),
       ),
     ],
     verify: (_) => verify(() => resetSession()).called(1),
@@ -384,7 +387,9 @@ void main() {
         definition: LocalAssistantFeatureFlags.aiAssistant,
         result: const Right(false),
       );
-      resetSession.stubCall(const Left(UnknownLocalAssistantFailure()));
+      resetSession.stubCall(
+        const Left(ResetLocalAssistantSessionUnknownFailure()),
+      );
       return bloc;
     },
     act: (bloc) => bloc.add(const LocalAssistantInitializedEvent()),
@@ -397,7 +402,7 @@ void main() {
         status: LocalAssistantUnavailable(),
         isLoadingContext: false,
         hasError: true,
-        failure: UnknownLocalAssistantFailure(),
+        failure: ResetLocalAssistantSessionUnknownFailure(),
       ),
     ],
     verify: (_) {
@@ -512,9 +517,9 @@ void main() {
     'should fail when enabled and the model cannot be prepared',
     build: () {
       final bloc = createBloc();
-      when(
-        () => prepare(any()),
-      ).thenAnswer((_) => const Left(UnknownLocalAssistantFailure()));
+      when(() => prepare(any())).thenAnswer(
+        (_) => const Left(PrepareLocalAssistantModelUnknownFailure()),
+      );
       return bloc;
     },
     act: (bloc) => bloc.add(const EnableLocalAssistantClickEvent()),
@@ -522,7 +527,7 @@ void main() {
       const LocalAssistantState(status: LocalAssistantDownloading()),
       const LocalAssistantState(
         status: LocalAssistantFailed(),
-        failure: UnknownLocalAssistantFailure(),
+        failure: PrepareLocalAssistantModelUnknownFailure(),
       ),
     ],
   );
@@ -558,7 +563,8 @@ void main() {
     () async {
       final bloc = createBloc();
       addTearDown(bloc.close);
-      final download = Completer<Either<LocalAssistantFailure, void>>();
+      final download =
+          Completer<Either<PrepareLocalAssistantModelFailure, void>>();
       when(() => prepare(any())).thenAnswer((_) => download.future);
       bloc.add(const EnableLocalAssistantClickEvent());
       await pumpEventQueue();
@@ -566,7 +572,7 @@ void main() {
 
       bloc.add(const DisableLocalAssistantClickEvent(deleteModel: false));
       await pumpEventQueue();
-      download.complete(const Left(UnknownLocalAssistantFailure()));
+      download.complete(const Left(PrepareLocalAssistantModelUnknownFailure()));
       await pumpEventQueue();
 
       verify(() => cancel()).called(1);

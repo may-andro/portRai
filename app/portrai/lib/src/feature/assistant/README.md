@@ -247,7 +247,7 @@ flowchart LR
   facts.
 - Clear chat and turning the assistant off invalidate pending output and clear follow-up context;
   native generation is not cancelled. A question asked while an earlier generation is still
-  running returns `BusyLocalAssistantFailure`.
+  running returns `AskLocalPortfolioQuestionBusyFailure`.
 - The chat toolbar has a clear-chat button and an information dialog about on-device processing.
 
 ### Remote assistant

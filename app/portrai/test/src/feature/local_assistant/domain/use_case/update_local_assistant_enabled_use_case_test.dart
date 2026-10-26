@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/local_assistant/domain/use_case/local_assistant_failure.dart';
 import 'package:portrai/src/feature/local_assistant/domain/use_case/update_local_assistant_enabled_use_case.dart';
 
 import '../../../../../mock/feature/local_assistant/domain/repository/mock_local_assistant_repository.dart';
@@ -18,7 +17,7 @@ void main() {
         support,
       )(true);
 
-      expect(result.left, isA<UnavailableLocalAssistantFailure>());
+      expect(result.left, isA<UpdateLocalAssistantEnabledUnavailableFailure>());
       verifyNever(() => repository.setEnabled(enabled: true));
     },
   );
