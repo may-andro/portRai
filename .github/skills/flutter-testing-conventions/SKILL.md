@@ -33,7 +33,7 @@ lib/src/utility/log_use_case_interceptor.dart (consumer)
 test/mock/utility/mock_log_reporter.dart
 ```
 
-`test/src/feature/<feature>/...` and `test/mock/feature/<feature>/...` must mirror the exact `lib/src/` path of the feature under test, including any `screen/<screen_name>/` segment (see the architecture conventions skill for feature folder structure).
+`test/src/feature/<feature>/...` and `test/mock/feature/<feature>/...` must mirror the exact `lib/src/` path of the feature under test, including any `screen/<screen_name>/` segment (see `flutter-architecture-conventions` for feature folder structure).
 
 Import only the mock files you need:
 ```dart
@@ -56,7 +56,7 @@ extension MockGetAppStoreUrlUseCaseStub on MockGetAppStoreUrlUseCase {
 `Fake` classes needed only to `registerFallbackValue` for `any()` matching also belong in `test/mock/` (e.g. `fake_open_external_url_param.dart`), not inline in the test file.
 
 ## Widget tests: shared wrapper
-Use `test/util/test_wrapper_widget.dart`'s `TestWidgetWrapper` to pump any widget that relies on `context.localizations` or the design system's `context.colorPalette`/`context.typography`. It wraps the child in a `MaterialApp` with the app's localization delegates plus `DSThemeBuilderWidget`:
+Use `app/portrai/test/util/test_wrapper_widget.dart`'s `TestWidgetWrapper` to pump any widget that relies on `context.localizations` or the design system's `context.colorPalette`/`context.typography`. It wraps the child in a `MaterialApp` (or `MaterialApp.router` when `routerConfig` is passed) with the app's localization delegates plus `DSThemeBuilderWidget` (light, `DesignSystem.beltane`):
 
 ```dart
 await tester.pumpWidget(
