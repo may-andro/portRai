@@ -9,8 +9,8 @@ Every domain use case must extend `BaseUseCase`/`BaseNoParamUseCase` (from the `
 A use case that returns a `Stream` always extends `BaseStreamUseCase`/`BaseNoParamStreamUseCase`, which emits an `Either` for every value and turns a stream error into a `Left` instead of ending the stream. Name it `Watch<Subject>UseCase` (for example `WatchLocaleUseCase`, `WatchInternetConnectionUseCase`), never `Get<Subject>StreamUseCase`. Listeners skip a `Left` and keep listening.
 Use cases belong to the owning feature's `domain/use_case/`, never the app's `utility/` folder.
 Name injected use case fields after their full type in lower camel case, preserving the
-`UseCase` suffix and subject (for example `_getLocalAssistantAvailabilityUseCase`, not
-`_getLocalAvailability`).
+`UseCase` suffix and subject (for example `_isLocalAssistantSupportedUseCase`, not
+`_isSupported`).
 
 ```dart
 // ✅ Correct
@@ -64,16 +64,22 @@ A use case's public result is always an `Either`; callers must never need a `try
   `mapErrorToFailure`.
 
 ```dart
-// ✅ Correct
-final isEnabledEither = await _isFeatureEnabledUseCase(flag);
-if (isEnabledEither.isLeft) {
-  return Left(AiImageUnavailableFailure(cause: isEnabledEither.left));
+// ✅ Correct (generate_ai_image_use_case.dart)
+final isFeatureEnabledEither = await _isFeatureEnabledUseCase(
+  AiImageGenFeatureFlags.aiImageGeneration,
+);
+if (isFeatureEnabledEither.isLeft) {
+  return Left(AiImageUnavailableFailure(cause: isFeatureEnabledEither.left));
 }
-if (!isEnabledEither.right) return const Left(AiImageFeatureDisabledFailure());
+if (!isFeatureEnabledEither.right) {
+  return const Left(AiImageFeatureDisabledFailure());
+}
 
 // ❌ Wrong
-if (isEnabledEither.isLeft) throw AiImageUnavailableException(cause: isEnabledEither.left);
-if (!isEnabledEither.right) throw const AiImageFeatureDisabledException();
+if (isFeatureEnabledEither.isLeft) {
+  throw AiImageUnavailableException(cause: isFeatureEnabledEither.left);
+}
+if (!isFeatureEnabledEither.right) throw const AiImageFeatureDisabledException();
 ```
 
 ## Don't duplicate logging
@@ -118,8 +124,8 @@ service locator. Add the start event in `onCreate` and the visibility event in `
 pass one-off effects (snackbars, navigation) as `listenWhen`/`listener`. Retained singleton
 sessions use `isRetained: true`, so navigating away does not close the shared session. A screen
 shown in a dialog passes `hasScaffold: false`. Widgets passed as `appBar`, `drawer` or
-`floatingActionButton` that need the bloc read it in their own build (e.g. a screen's
-`AppBarWidget`), because the screen's own context is above the provider. Wrappers that don't need
+`floatingActionButton` that need the bloc read it in their own build (e.g. the
+`BlocBuilder` that `PortfolioScreen` passes as `floatingActionButton`), because the screen's own context is above the provider. Wrappers that don't need
 the bloc, such as `LocalAssistantVisibilityWidget`, go around it.
 
 ```dart
@@ -169,7 +175,9 @@ return ScreenContentWidget<ExperiencesBloc, ExperiencesState>(
     ErrorState(:final failure) => ScreenErrorContent(failure),
     LoadedState(:final experiences) => ScreenLoadedContent.slivers([
       PageAppBarWidget(title: context.localizations.experiencesTitle),
-      SliverToBoxAdapter(child: ExperienceListWidget(experiences: experiences)),
+      SliverToBoxAdapter(
+        child: ExperienceListWidget(experiences: experiences, isVisible: true),
+      ),
     ]),
   },
   onContentVisible: (content) =>
@@ -217,7 +225,7 @@ Each feature under `lib/src/feature/<feature>/` follows `data/`, `domain/`, `pre
 
 ```
 presentation/
-  _presentation.dart          // exports 'route/_route.dart' + 'screen/_screen.dart'
+  _presentation.dart          // exports 'route/_route.dart' + 'screen/_screen.dart' (+ 'extension/_extension.dart', 'widget/_widget.dart' when present)
   route/
     _route.dart
     <feature>_module_route.dart
@@ -233,7 +241,7 @@ presentation/
 
 Only skip the `screen/` nesting for features with no real screen (e.g. a bottom sheet or other non-screen widget, like `force_update`). A feature with a `*_screen.dart`/`Screen` widget must use `screen/<screen_name>/`.
 
-`test/src/feature/<feature>/...` and `test/mock/feature/<feature>/...` must mirror this exact `lib/src/` path, including the `screen/<screen_name>/` segment (see the testing conventions skill).
+`test/src/feature/<feature>/...` and `test/mock/feature/<feature>/...` must mirror this exact `lib/src/` path, including the `screen/<screen_name>/` segment (see the `flutter-testing-conventions` skill).
 
 ## Widget file splitting with `part`
 When a screen's `content_widget.dart` has sub-widgets used *only* by that content tree (not shared/exported elsewhere), split them into `part` files rather than separate imported libraries:

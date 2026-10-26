@@ -10,7 +10,7 @@ files directly is not allowed, even though it may compile.
 
 ## Rule 1: Never import another package's `lib/src/**`
 
-Each workspace package (`layer/cache`, `layer/core`, `use_case`, etc.) exposes its public API via
+Each workspace package (`layer/cache`, `layer/core`, `layer/use_case`, etc.) exposes its public API via
 one or more top-level files directly under `lib/` (e.g. `layer/cache/lib/cache.dart`). Everything
 under that package's `lib/src/` is a private implementation detail.
 
@@ -29,8 +29,9 @@ fine — the rule only applies across package boundaries.
 
 Within `app/portrai`, each feature under `lib/src/feature/<feature_name>/` organizes its internal
 files using barrel files whose name starts with an underscore (`_bloc.dart`, `_widget.dart`,
-`_domain.dart`, `_data.dart`, `_presentation.dart`, `_screen.dart`, `_use_case.dart`, etc. — see
-the [architecture-conventions skill](../flutter-architecture-conventions/SKILL.md) for the full
+`_domain.dart`, `_data.dart`, `_presentation.dart`, `_screen.dart`, `_use_case.dart`,
+`_repository.dart`, etc. — see
+the [flutter-architecture-conventions skill](../flutter-architecture-conventions/SKILL.md) for the full
 feature folder layout). These underscore barrels are private to that feature. A feature exposes
 its public API through its own top-level, non-underscore barrel, e.g.
 `lib/src/feature/experience/experience.dart`.
@@ -40,7 +41,7 @@ its public API through its own top-level, non-underscore barrel, e.g.
 import 'package:portrai/src/feature/experience/experience.dart';
 
 // ❌ Wrong — reaches into another feature's private barrel
-import 'package:portrai/src/feature/experience/presentation/bloc/_bloc.dart';
+import 'package:portrai/src/feature/experience/presentation/screen/experiences/bloc/_bloc.dart';
 ```
 
 Importing (or exporting) a private barrel from **within the same feature** is exactly how that
@@ -65,16 +66,17 @@ export from the appropriate public barrel instead of importing around it.
 ## Tooling status
 These two rules are implemented as custom analyzer lint rules in
 `tool/portrai_analyzer` (`no_cross_module_internal_imports` and
-`no_cross_feature_private_imports` — see `tool/portrai_analyzer/lib/src/rules/`) and **are wired
-into the root `analysis_options.yaml`** via a `plugins:` section, so `dart analyze`/`flutter
-analyze` flag violations automatically (as `info`-level diagnostics — they don't fail
-`flutter analyze`/CI on their own, but should still be fixed when seen). If a plugin analyzer
-error like "An error occurred while executing an analyzer plugin" shows up instead of the
-expected lints, the plugin's pinned `analysis_server_plugin`/`analyzer`/`analyzer_plugin`
-versions in `tool/portrai_analyzer/pubspec.yaml` are likely out of sync with the Dart SDK's
-plugin loader requirement — bump them to versions that resolve together (`dart pub get` inside
-`tool/portrai_analyzer` will report the exact required range) rather than disabling the plugin.
+`no_cross_feature_private_imports` — see `tool/portrai_analyzer/lib/src/rules/`), registered as
+warning rules in `tool/portrai_analyzer/lib/src/portrai_analyzer_plugin.dart` and wired into the
+root `analysis_options.yaml` via a `plugins:` section, so `dart analyze`/`flutter analyze` flag
+violations automatically. CI runs `dart analyze --fatal-infos .`, so a violation fails the
+quality checks. If a plugin analyzer error like "An error occurred while executing an analyzer
+plugin" shows up instead of the expected lints, the plugin's `analysis_server_plugin`/`analyzer`/
+`analyzer_plugin` versions in `tool/portrai_analyzer/pubspec.yaml` are likely out of sync with the
+Dart SDK's plugin loader requirement — bump them to versions that resolve together (`dart pub get`
+inside `tool/portrai_analyzer` will report the exact required range) rather than disabling the
+plugin.
 
-Note the built-in Dart lint `implementation_imports` is also set to `error` in the root
+The built-in Dart lint `implementation_imports` is also enabled and raised to `error` in the root
 `analysis_options.yaml`, which independently catches basic `package:x/src/...` imports (a subset
 of Rule 1) even without the custom plugin enabled.

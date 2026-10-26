@@ -11,8 +11,9 @@ Reference: `layer/feature_flag/README.md` (generic layer API) and
 
 - `layer/feature_flag` only knows a generic
   `FeatureFlagDefinition(key:, defaultValue:)` and a `FeatureFlagController`
-  that resolves each key's value (Firebase Remote Config with a local
-  fallback/override system for staging).
+  that resolves each key's value (Firebase Remote Config, falling back to
+  `defaultValue`, with a SQLite cache and developer overrides in staging
+  builds).
 - The app wraps this in its own
   `AppFeatureFlagDefinition(key:, defaultValue:, displayName:, description:)`
   (`app/portrai/lib/src/feature/feature_flag/domain/entity/app_feature_flag_definition.dart`),
@@ -34,10 +35,12 @@ abstract final class CvExportFeatureFlags {
     key: 'feature_tailored_cv',
     defaultValue: false,
     displayName: 'Tailored CV',
-    description: 'Lets a CV be tailored for a job',
+    description:
+        'Lets a CV be tailored for a job: a rewritten summary with the most '
+        'relevant projects and skills first',
   );
 
-  static const all = [tailoredCv, /* ...other flags */];
+  static const all = [tailoredCv];
 }
 ```
 
@@ -51,11 +54,14 @@ abstract final class CvExportFeatureFlags {
 
 Register every definition from the owning module's
 `postDependenciesSetup` (mirrors how `ModuleRouteController` aggregates
-routes — see `creating-new-modules`):
+routes — see `creating-new-modules`), as
+`app/portrai/lib/src/feature/cv_export/cv_export_module_configurator.dart`
+does:
 
 ```dart
 @override
-Future<void> postDependenciesSetup(ServiceLocator sl) async {
+void postDependenciesSetup(ServiceLocator sl) {
+  sl.get<ModuleRouteController>().register(CvExportModuleRoute.cvExport);
   final registry = sl.get<AppFeatureFlagDefinitionRegistry>();
   for (final definition in CvExportFeatureFlags.all) {
     registry.register(definition);
@@ -63,9 +69,11 @@ Future<void> postDependenciesSetup(ServiceLocator sl) async {
 }
 ```
 
-`AppFeatureFlagDefinitionRegistry` (`@registerSingleton`) is only consumed
-by the dev-tools screen, opened well after every module finishes
-registering, so registration order between configurators doesn't matter.
+`AppFeatureFlagDefinitionRegistry` (`@registerSingleton`, in
+`app/portrai/lib/src/feature/feature_flag/domain/registry/`) is read once
+every configurator's `postDependenciesSetup` has run — by the
+`initFeatureFlags` call at startup and by the dev-tools screen — so
+registration order between configurators doesn't matter.
 Registering the same `key` twice logs an error and is a no-op for the
 second registration — treat that as a bug (duplicate/typo'd key), not a
 supported override mechanism.
@@ -85,8 +93,9 @@ the standard `BaseUseCase`/`Failure` pattern from
 per host app. It does **not** auto-call `initFeatureFlags` — the host app
 must explicitly call
 `FeatureFlagController.initFeatureFlags([...])` once every feature module
-has contributed its definitions (see the layer README's "Getting Started"
-for the exact call site/order).
+has contributed its definitions. In this app that call is `_initFeatureFlags()`
+in `app/portrai/lib/src/app/run_app_initialization.dart`, which passes
+every registered definition's `.layerDefinition`.
 
 ## Don't invent
 

@@ -7,12 +7,16 @@ description: Use when cutting a release, tagging a build, or bumping the app ver
 Releases are triggered purely by **pushing a git tag** matching one of the
 patterns below — there is no manual "run deploy" workflow trigger. See
 `ci-workflow-conventions` for the full pipeline chain each of these tags
-kicks off (`extract-version → quality → build → deploy`).
+kicks off (`extract-version → quality → build → deploy` for Portrai), and
+[`.github/RELEASES.md`](../../RELEASES.md) for each workflow's builds,
+destinations and secrets.
 
 ## Tag format
 
-`<version>+<build_number>-<suffix>`, e.g. `1.1.4+202530-prod`, parsed by
-`.github/actions/extract-version-build/action.yaml`:
+`<version>+<build_number>-<suffix>`, e.g. `1.1.4+202530-prod`. The Portrai
+workflows parse it with `.github/actions/extract-version-build/action.yaml`;
+the Storybook workflows take the version from `app/storybook/pubspec.yaml`,
+and the legal workflow reads the text after `legal-`:
 
 | Suffix              | Workflow                                | Purpose                          |
 |----------------------|------------------------------------------|-----------------------------------|
@@ -34,7 +38,8 @@ single-quoted YAML. Actual tag names contain no backslash (e.g. `1.0.0+1-prod`).
 
 ## Before tagging
 
-For Portrai, `melos run prepare_portrai_release` automates preparation from a
+For Portrai, `melos run prepare_portrai_release`
+(`tool/release/prepare_portrai_release.sh`) automates preparation from a
 clean working tree: fetch tags, switch to `develop`, pull with `--ff-only`,
 and increment the highest build number from the pubspec and app
 review/production tags. It preserves the pubspec's semantic version,

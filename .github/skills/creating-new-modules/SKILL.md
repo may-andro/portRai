@@ -15,8 +15,8 @@ functionality is an app feature, not a new layer.
   `tracking`, `log_reporter`, `use_case`). Ask before creating one if unsure — most work is an
   app feature.
 - **New app feature** (`app/portrai/lib/src/feature/<name>`): the default for product
-  functionality (screens, feature-specific domain/data logic). See the architecture-conventions
-  skill for the internal `data/domain/presentation` layout.
+  functionality (screens, feature-specific domain/data logic). See the
+  `flutter-architecture-conventions` skill for the internal `data/domain/presentation` layout.
 
 Layers are feature-independent. Their API names, doc comments, README examples and tests never
 mention an app feature or its data (collections, fields, business terms); use neutral
@@ -61,7 +61,7 @@ keep the feature-specific usage in the feature. See the content rules in `readme
    implementing `ModuleConfigurator` (from `module_injector`) with
    `registerDependencies`/`preDependenciesSetup`/`postDependenciesSetup`. See
    `layer/log_reporter/lib/src/log_reporter_module_configurator.dart` as the reference example.
-6. Run `melos bootstrap` (or `melos get`) so the new package resolves in the workspace.
+6. Run `melos bootstrap` (or `melos run get`) so the new package resolves in the workspace.
 7. Write a `layer/my_layer/README.md` following the pattern of existing layer READMEs (e.g.
    `layer/log_reporter/README.md`, `layer/use_case/README.md`): purpose, public API, usage
    example.
@@ -76,7 +76,8 @@ App features live under `app/portrai/lib/src/feature/<feature_name>/` and are **
 packages — no `pubspec.yaml`, they're part of the `portrai` app package.
 
 1. Create the folder skeleton (adapt based on whether the feature has a screen — see the
-   architecture-conventions skill for the full `presentation/screen/<name>/` layout rules):
+   `flutter-architecture-conventions` skill for the full `presentation/screen/<name>/` layout
+   rules):
    ```
    feature/<feature_name>/
      data/
@@ -85,13 +86,19 @@ packages — no `pubspec.yaml`, they're part of the `portrai` app package.
          _repository.dart
          <feature>_repository_impl.dart
      domain/
-       _domain.dart                     // exports repository/_repository.dart + use_case/_use_case.dart
+       _domain.dart                     // exports repository/ + use_case/ barrels (+ entity/, exception/ as needed)
+       entity/
+         _entity.dart
+         <feature>_entity.dart
+       exception/
+         _exception.dart
+         <feature>_exception.dart
        repository/
          _repository.dart
          <feature>_repository.dart       // abstract interface
        use_case/
          _use_case.dart
-         get_<feature>_use_case.dart      // extends BaseUseCase/BaseNoParamUseCase (see architecture skill)
+         get_<feature>_use_case.dart      // extends BaseUseCase/BaseNoParamUseCase (see flutter-architecture-conventions)
          watch_<feature>_use_case.dart    // streams: extends BaseStreamUseCase/BaseNoParamStreamUseCase
      presentation/
        _presentation.dart                // exports route/_route.dart (if any) + screen/_screen.dart
@@ -110,9 +117,11 @@ packages — no `pubspec.yaml`, they're part of the `portrai` app package.
              <screen_name>_event.dart
              <screen_name>_state.dart
            tracking/
+             _tracking.dart
              <screen_name>_tracking_delegate.dart
            widget/
-     <feature_name>.dart                  // top-level barrel: exports use_case/_use_case.dart + widget/route barrels
+             _widget.dart
+     <feature_name>.dart                  // top-level barrel: exports the module configurator plus the use cases, entities, routes, screens and widgets other code uses
      <feature_name>_module_configurator.dart
    ```
    For features with no real screen (e.g. a bottom sheet, like `force_update`), skip the
@@ -120,10 +129,12 @@ packages — no `pubspec.yaml`, they're part of the `portrai` app package.
    `presentation/`.
 
 2. Create `<feature_name>_module_configurator.dart` using the generated-configurator pattern
-   (uses `module_injector`'s code generation, run via `melos gen` / `build_runner`):
+   (uses `module_injector`'s code generation, run via `melos run gen` / `build_runner`):
    ```dart
    import 'package:module_injector/module_injector.dart';
    import 'package:portrai/src/feature/<feature_name>/<feature_name>_module_configurator.di.g.dart';
+   import 'package:portrai/src/feature/<feature_name>/presentation/_presentation.dart';
+   import 'package:portrai/src/route/core/module_route_controller.dart';
 
    @generateConfigurator
    class <FeatureName>ModuleConfigurator extends SimpleModuleConfigurator {
@@ -139,21 +150,24 @@ packages — no `pubspec.yaml`, they're part of the `portrai` app package.
      }
    }
    ```
-   Run `melos gen` (build_runner) to generate the `.di.g.dart` file with
-   `$register<FeatureName>Dependencies`.
+   Run `melos run gen` (build_runner) to generate
+   `<feature_name>_module_configurator.di.g.dart` with `$register<FeatureName>Dependencies`.
+   `app/portrai/lib/src/feature/experience/experience_module_configurator.dart` is a complete
+   example.
 
 3. If the feature has a screen, define its route(s) in
    `presentation/route/<feature_name>_module_route.dart` as a `ModuleRoute` subclass (see
-   `experience_module_route.dart` for the pattern with nested child routes).
+   `app/portrai/lib/src/feature/experience/presentation/route/experience_module_route.dart` for
+   the pattern with nested child routes).
 
 4. Register the feature in the app-wide DI graph: add the import and an entry to
    `getModuleConfigurators()` in
    `app/portrai/lib/src/module_configurator/module_configurators.dart`, appended after other
    feature configurators (foundational/core configurators stay first).
 
-5. Follow the architecture-conventions skill for use case, bloc, and widget-splitting rules
-   within the feature, and the testing-conventions skill for `test/src/feature/<feature_name>/...`
-   and `test/mock/feature/<feature_name>/...` mirroring.
+5. Follow the `flutter-architecture-conventions` skill for use case, bloc, and widget-splitting
+   rules within the feature, and the `flutter-testing-conventions` skill for
+   `test/src/feature/<feature_name>/...` and `test/mock/feature/<feature_name>/...` mirroring.
 
-6. Run `melos gen`, `melos analyze`, and `melos test` before opening a PR (see the
+6. Run `melos run gen`, `melos run analyze`, and `melos run test` before opening a PR (see the
    pr-and-branch-conventions skill for branch naming — new features typically use `app/<name>`).

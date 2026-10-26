@@ -4,8 +4,7 @@ description: 'Branch naming, PR title, and PR description conventions for this r
 
 # Branch & PR Conventions
 
-Derived from actual merged PR history (`gh pr list --state merged`), not assumption. Verify
-against recent merged PRs if these ever seem stale.
+Verify against merged PRs (`gh pr list --state merged`) if these ever seem stale.
 
 ## Base branch
 Branches are created off `develop` and PRs target `develop` (not `main`).
@@ -13,7 +12,7 @@ Branches are created off `develop` and PRs target `develop` (not `main`).
 ## Branch naming
 Pattern: `<type>/<kebab-case-description>` — short, descriptive, no issue numbers embedded.
 
-Types actually used, in order of frequency:
+Types, in order of frequency:
 
 - `app/<feature-name>` — a feature/module scoped to the `app` (e.g. `app/portfolio`, `app/settings-locale`, `app/feature-flags`).
 - `feature/<description>` — shared layer work, tooling, or cross-cutting features not tied to one app screen (e.g. `feature/layer-tracking`, `feature/force-update`, `feature/modernize-ci-cd-pipeline`).
@@ -37,13 +36,13 @@ Follow Conventional Commits: `<type>(<optional-scope>): <description>`
   tests`, `chore: update CI to Flutter 3.47.4`).
 - Description is lowercase, imperative mood, no trailing period.
 
-Examples from history:
+Examples:
 ```
 feat(app): add portfolio dashboard
 feat(layer): add use_case layer
 fix: add missing app infrastructure and external_app_handler module
 chore: update dependencies to latest versions
-docs: Add comprehensive README documentation for workspace, apps, and layers
+docs(layer): rewrite the layer READMEs to match the code
 ```
 
 The PR title becomes the squash-merge commit message, so it must stand alone as a good commit
@@ -52,8 +51,8 @@ subject line.
 ## PR description
 A checkbox-style template exists at
 [`.github/pull_request_template.md`](../../pull_request_template.md) and is auto-inserted by
-GitHub. In practice, recent merged PRs (#36, #38) do **not** fill in that checkbox template —
-they replace it with a lighter free-form structure:
+GitHub. PRs do **not** fill in that checkbox template — they replace it with a lighter
+free-form structure:
 
 ```markdown
 ## Summary

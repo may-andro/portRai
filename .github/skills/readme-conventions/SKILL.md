@@ -4,7 +4,8 @@ description: 'Structure, style and content conventions for README.md files in th
 
 # README Conventions
 
-Every `layer/*` README follows the layer template below. Use the templates for **new** READMEs,
+Every `layer/*` README follows the layer template below, and every `app/*` README follows the
+app template. Use the templates for **new** READMEs,
 and nudge other existing ones toward this shape when you're already editing them for another
 reason — don't do a drive-by rewrite of an unrelated README.
 
@@ -13,8 +14,7 @@ reason — don't do a drive-by rewrite of an unrelated README.
   Do not include implementation progress, PR sequencing, or promises about future work;
   keep those in plans and PR descriptions.
 - Plain ATX headings, **no emoji** in headings or bullet points (e.g. `## Features`, not
-  `## ✨ Features`). `tool/firestore_export_import/README.md` still uses emoji; don't copy its
-  style for new docs.
+  `## ✨ Features`).
 - Sentence case for headings (`## Getting started` or `## Getting Started` — match whichever the
   sibling READMEs in the same folder use; don't introduce a third variant).
 - Fenced code blocks always specify a language (` ```dart `, ` ```bash `, ` ```yaml `).

@@ -35,10 +35,13 @@ Every module (layer package or app feature) has one
 `<Module>ModuleConfigurator extends SimpleModuleConfigurator` annotated
 `@generateConfigurator`. The generator globs every `.dart` file in the same
 directory **recursively**, finds all `@register`/`@registerSingleton`
-classes, and emits `$register<Module>Dependencies(ServiceLocator sl)`.
+classes, and emits `$register<Module>Dependencies(ServiceLocator sl)` into a
+standalone `<configurator file>.di.g.dart` library next to the configurator,
+which the configurator imports.
 
 ```dart
-part 'profile_module_configurator.g.dart'; // only if part-based; app features use a sibling .di.g.dart import instead
+import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/profile/profile_module_configurator.di.g.dart';
 
 @generateConfigurator
 class ProfileModuleConfigurator extends SimpleModuleConfigurator {
@@ -48,48 +51,49 @@ class ProfileModuleConfigurator extends SimpleModuleConfigurator {
 }
 ```
 
-- Classes prefixed `_` (private) and files ending `.g.dart`/`.di.g.dart` are
-  skipped by the generator — never annotate a private class expecting it to
+- Classes prefixed `_` (private), the configurator file itself, and files
+  ending `.g.dart`/`.di.g.dart` are skipped by the generator — never annotate a private class expecting it to
   be picked up.
 - `postDependenciesSetup(ServiceLocator sl)` is the place to do registration
   that can't be expressed with annotations alone: registering a route with
   `ModuleRouteController`, or a feature flag definition with
   `AppFeatureFlagDefinitionRegistry` (see `feature-flag-conventions` skill).
-- After adding/changing annotated classes, regenerate with the workspace's
-  build_runner command (see root `README.md` / CI skill) — don't hand-edit
+- After adding/changing annotated classes, regenerate with `melos run gen`
+  (or `dart run build_runner build` in the package) — don't hand-edit
   `*.g.dart` files.
 
 ## Repository chain (decorator) pattern
 
-Used when a repository has multiple backing implementations (cache, demo,
+Used when a repository has multiple backing implementations (cache, asset,
 remote) selected at runtime by build config:
 
 ```dart
 // 1. Cache layer — registered under its own concrete type.
 @register
-class CacheProfileRepository implements ProfileRepository {
-  CacheProfileRepository(this._cache, this._mapper, this._appLocale);
+class CacheProfileRepositoryImpl implements ProfileRepository {
+  CacheProfileRepositoryImpl(this._profileCache, this._mapper, this._appLocale);
 }
 
 // 2. Remote layer — delegates to cache via @Inject.
 @register
-class RemoteProfileRepository implements ProfileRepository {
-  RemoteProfileRepository(
+class RemoteProfileRepositoryImpl implements ProfileRepository {
+  RemoteProfileRepositoryImpl(
     this._firestoreController,
     this._appLocale,
-    @Inject(CacheProfileRepository) this._cacheDelegateRepository,
+    @Inject(CacheProfileRepositoryImpl) this._cacheDelegateRepository,
     this._mapper,
     this._logReporter,
+    this._errorReporter,
   );
 }
 
 // 3. Build-config selector — the only one exposed as the abstract type.
 @Register(as: ProfileRepository)
-class BuildConfigProfileRepository implements ProfileRepository {
-  BuildConfigProfileRepository(
+class BuildConfigProfileRepositoryImpl implements ProfileRepository {
+  BuildConfigProfileRepositoryImpl(
     this._buildConfig,
-    @Inject(RemoteProfileRepository) this._remoteDelegateRepository,
-    @Inject(DemoProfileRepository) this._demoDelegateRepository,
+    @Inject(RemoteProfileRepositoryImpl) this._remoteDelegateRepository,
+    @Inject(AssetProfileRepositoryImpl) this._demoDelegateRepository,
   );
 }
 ```
