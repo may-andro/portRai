@@ -31,9 +31,12 @@ reference: `layer/module_injector/README.md`.
 
 ## `@generateConfigurator`
 
-Every module (layer package or app feature) has one
+Every app feature, plus the app's route and utility modules, has one
 `<Module>ModuleConfigurator extends SimpleModuleConfigurator` annotated
-`@generateConfigurator`. The generator globs every `.dart` file in the same
+`@generateConfigurator`. Layer packages and the app's `AppModuleConfigurator`
+implement `ModuleConfigurator` by hand, because what they register depends on
+runtime configuration (SDK instances, build environment switches) that the
+generator can't express. The generator globs every `.dart` file in the same
 directory **recursively**, finds all `@register`/`@registerSingleton`
 classes, and emits `$register<Module>Dependencies(ServiceLocator sl)` into a
 standalone `<configurator file>.di.g.dart` library next to the configurator,
