@@ -68,7 +68,7 @@ Foundation Layers (design_system, core, module_injector)
 
 ### Apps
 
-- **[portrai](app/portrai/README.md)**: Main portfolio application showcasing projects, skills, and experience
+- **[portrai](app/portrai/README.md)**: Portfolio app for Android, iOS, web and macOS
 - **[storybook](app/storybook/README.md)**: Component library and design system documentation
 
 ### Layers
@@ -394,20 +394,3 @@ branch/PR rules. Summary below.
 
 For the full app-feature scaffolding steps (as opposed to a shared layer), see the
 [creating-new-modules skill](.github/skills/creating-new-modules/SKILL.md).
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Built with [Flutter](https://flutter.dev)
-- Monorepo managed with [Melos](https://melos.invertase.dev)
-- Design system inspired by atomic design principles
-- Clean architecture patterns from Uncle Bob's Clean Architecture
-
----
-
-**Maintained by**: Raima  
-**Version**: 1.0.0  
-**Last Updated**: August 2026
