@@ -68,11 +68,13 @@ generator collects every annotated failure into
 failure type to `context.localizations.<arbKey>`. Call
 `FailureTranslator.translate(context, state.failure)` in the widget instead
 of hand-writing per-failure message strings. The ARB key referenced must
-exist in every locale ARB file (see `localization-conventions`) or
-`gen-l10n` fails.
+exist in every locale ARB file (see `localization-conventions`); a key
+missing from the template `app_en.arb` has no generated getter, so the
+generated translator does not compile.
 
-## `AppException`/reported errors (from `error_reporter`)
+## `AppException`/reported errors (from `core` and `error_reporter`)
 
+`AppException` (from `core`) is the base type custom exceptions implement.
 `ErrorReporter` deals with things that get sent to a backend (Firebase
 Crashlytics, etc.), independent of `Failure`/use cases. Two extension
 points, both implemented once at the app level in
@@ -80,16 +82,16 @@ points, both implemented once at the app level in
 
 - `BlacklistErrorHandler` — filters errors that should **not** be reported.
   This app's `AppBlacklistErrorHandler` blacklists a custom
-  `BlacklistException` marker type — throw/wrap in `BlacklistException` for
+  `BlacklistException` marker type (an `AppException`) — throw/wrap in `BlacklistException` for
   errors you intentionally want swallowed rather than reported (e.g.
   expected cancellations).
 - `FatalErrorHandler` — reacts to unrecoverable errors. This app's
-  `AppFatalErrorHandler.onFatalError` calls `exit(1)` — there is no crash
-  dialog/recovery flow, so treat "fatal" as genuinely unrecoverable, not a
+  `AppFatalErrorHandler.onFatalError` calls `exit(1)` (and does nothing on
+  web, where `exit` is unsupported) — there is no crash dialog/recovery flow, so treat "fatal" as genuinely unrecoverable, not a
   hook for regular error UI.
 
 Register custom handlers via `BlacklistErrorController`/`FatalErrorController`
-from the app's error-reporter module configurator
+from `AppModuleConfigurator.postDependenciesSetup`
 (`app/portrai/lib/src/module_configurator/app_module_configurator.dart`), not
 ad hoc at call sites.
 
@@ -100,7 +102,9 @@ ad hoc at call sites.
   use case before reaching presentation.
 - Don't call `ErrorReporter`/`FatalErrorController` directly from a bloc to
   report a `Failure` — logging/reporting of use case failures is already
-  handled by the `LogUseCaseInterceptor` (see `flutter-architecture-conventions`);
+  handled by the `LogUseCaseInterceptor`
+  (`app/portrai/lib/src/utility/log_use_case_interceptor.dart`, see
+  `flutter-architecture-conventions`);
   only reach for `error_reporter` primitives for errors outside the use-case
   flow (global Flutter errors, uncaught async errors).
 
