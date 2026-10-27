@@ -69,7 +69,14 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                     value: context
                         .localizations
                         .developerMenuFeatureFlagsDescription,
-                    onTap: () => FeatureFlagScreen.navigate(context),
+                    onTap: () {
+                      context.bloc.add(
+                        const DeveloperMenuEntryClickEvent(
+                          DeveloperMenuEntry.featureFlags,
+                        ),
+                      );
+                      FeatureFlagScreen.navigate(context);
+                    },
                   ),
                   DSHorizontalDividerWidget(
                     thickness: 1,
@@ -81,7 +88,14 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                     value: context
                         .localizations
                         .developerMenuTrackingViewerDescription,
-                    onTap: () => TrackingEventsScreen.navigate(context),
+                    onTap: () {
+                      context.bloc.add(
+                        const DeveloperMenuEntryClickEvent(
+                          DeveloperMenuEntry.trackingViewer,
+                        ),
+                      );
+                      TrackingEventsScreen.navigate(context);
+                    },
                   ),
                 ],
               ),

@@ -26,6 +26,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     on<ForceFatalCrashEvent>(_onForceFatalCrash);
     on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
     on<ForceBlacklistErrorEvent>(_onForceBlacklistError);
+    on<DeveloperMenuEntryClickEvent>(_onEntryClick);
     trackScreenViewOn<ScreenVisibleEvent>();
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
@@ -95,6 +96,14 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
       await restartApp();
     }
   }
+
+  void _onEntryClick(
+    DeveloperMenuEntryClickEvent event,
+    Emitter<DeveloperMenuState> emit,
+  ) => _trackingDelegate.trackEntryClick(switch (event.entry) {
+    DeveloperMenuEntry.featureFlags => 'feature_flags',
+    DeveloperMenuEntry.trackingViewer => 'tracking_viewer',
+  });
 
   void _onForceFatalCrash(
     ForceFatalCrashEvent event,

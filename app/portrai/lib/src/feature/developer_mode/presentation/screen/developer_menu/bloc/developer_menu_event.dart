@@ -54,6 +54,18 @@ class AiImageModelClickEvent extends DeveloperMenuEvent {
   List<Object?> get props => [model];
 }
 
+/// A developer menu entry that opens another screen.
+enum DeveloperMenuEntry { featureFlags, trackingViewer }
+
+class DeveloperMenuEntryClickEvent extends DeveloperMenuEvent {
+  const DeveloperMenuEntryClickEvent(this.entry);
+
+  final DeveloperMenuEntry entry;
+
+  @override
+  List<Object?> get props => [entry];
+}
+
 // Tracking Events
 final class ScreenVisibleEvent extends DeveloperMenuEvent {
   const ScreenVisibleEvent();
