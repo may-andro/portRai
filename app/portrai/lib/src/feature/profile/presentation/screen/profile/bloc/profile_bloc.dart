@@ -40,8 +40,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState>
   ) async {
     emit(const LoadingState());
 
-    final eitherProfileResult = await _getProfileUseCase();
-    final eitherProjectsResult = await _getProjectsUseCase();
+    final (eitherProfileResult, eitherProjectsResult) = await (
+      Future.value(_getProfileUseCase()),
+      Future.value(_getProjectsUseCase()),
+    ).wait;
     // Places are decorative, so a failed projects load must not fail the page.
     final workPlaces = eitherProjectsResult.fold(
       (_) => const <WorkPlaceEntity>[],

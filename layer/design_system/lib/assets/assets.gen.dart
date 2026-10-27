@@ -56,10 +56,6 @@ class $AssetsLottieGen {
   LottieGenImage get github =>
       const LottieGenImage('assets/lottie/github.json');
 
-  /// File path: assets/lottie/global_network.json
-  LottieGenImage get globalNetwork =>
-      const LottieGenImage('assets/lottie/global_network.json');
-
   /// File path: assets/lottie/globe.json
   LottieGenImage get globe => const LottieGenImage('assets/lottie/globe.json');
 
@@ -141,7 +137,6 @@ class $AssetsLottieGen {
     explorerRole,
     folder,
     github,
-    globalNetwork,
     globe,
     graduationHat,
     heroOrbs,

@@ -43,28 +43,7 @@ class _GlobalBandWidget extends StatelessWidget {
         end: Alignment.bottomRight,
         colors: [palette.brand.primary.color, palette.brand.secondary.color],
       ),
-      background: Stack(
-        fit: StackFit.expand,
-        children: [
-          const _BandDecorationWidget(),
-          // Tucked into the corner so the map never covers it.
-          Positioned(
-            right: context.space(factor: 2),
-            bottom: context.space(factor: 2),
-            width: min(context.width * 0.5, isDesktop ? 300 : 200),
-            child: const AspectRatio(
-              aspectRatio: 4 / 3,
-              child: DSLottieBackgroundWidget(
-                illustration: DSLottieIllustration.globalNetwork,
-                grayscale: true,
-                opacity: 0.22,
-                fit: BoxFit.contain,
-                alignment: Alignment.bottomRight,
-              ),
-            ),
-          ),
-        ],
-      ),
+      background: const _BandDecorationWidget(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: context.space(factor: 4),
@@ -348,6 +327,9 @@ class _WorkMapWidgetState extends State<_WorkMapWidget> {
             infoWindow: InfoWindow(title: place.country),
           ),
       },
+      // The map never moves, so Android draws it as a still image instead of
+      // a live view, which is far cheaper to create and to scroll past.
+      liteModeEnabled: true,
       scrollGesturesEnabled: false,
       zoomGesturesEnabled: false,
       rotateGesturesEnabled: false,

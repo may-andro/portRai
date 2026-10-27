@@ -105,6 +105,46 @@ void main() {
       },
     );
 
+    testWidgets(
+      'should build the bands below the screen only when scrolled to them',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final bloc = MockProfileBloc()
+          ..stubState(LoadedState(profile: createProfileEntity()));
+
+        await tester.pumpWidget(
+          TestWidgetWrapper(
+            child: BlocProvider<ProfileBloc>.value(
+              value: bloc,
+              child: const ContentWidget(),
+            ),
+          ),
+        );
+        await tester.pump(const Duration(seconds: 6));
+
+        expect(find.byType(TextField, skipOffstage: false), findsNothing);
+
+        await tester.scrollUntilVisible(
+          find.byType(TextField),
+          500,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.pump(const Duration(seconds: 2));
+
+        expect(find.byType(TextField), findsOneWidget);
+        // The test font is wider than the real one, so overflow is tolerated.
+        final error = tester.takeException();
+        expect(
+          error == null ||
+              error.toString().contains('overflowed') ||
+              error.toString().contains('Multiple exceptions'),
+          isTrue,
+        );
+      },
+    );
+
     for (final entry in {
       'mobile': const Size(390, 844),
       'desktop': const Size(1440, 900),
