@@ -5,13 +5,13 @@ class _DetailsWidget extends StatelessWidget {
     required this.profile,
     required this.isVisible,
     required this.isCentered,
-    required this.onViewProfile,
+    required this.onViewProfileClicked,
   });
 
   final ProfileEntity profile;
   final bool isVisible;
   final bool isCentered;
-  final VoidCallback? onViewProfile;
+  final VoidCallback onViewProfileClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -112,10 +112,7 @@ class _DetailsWidget extends StatelessWidget {
                       buttonColor: context.colorPalette.brand.primary,
                       size: context.buttonSize,
                       elevation: context.dimen.elevationLevel2,
-                      onPressed: () {
-                        onViewProfile?.call();
-                        ProfileScreen.navigate(context);
-                      },
+                      onPressed: onViewProfileClicked,
                     ),
                   ),
                 ),

@@ -2,7 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
-import 'package:portrai/src/feature/profile/presentation/screen/_screen.dart';
 
 part 'content_widget.dart';
 
@@ -17,22 +16,22 @@ class PersonalSummaryWidget extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isVisible,
-    this.onViewProfile,
+    required this.onViewProfileClicked,
   });
 
   final ProfileEntity profile;
   final bool isVisible;
 
-  /// Called when the full profile is opened, before it is shown, so the host
-  /// screen can track the tap.
-  final VoidCallback? onViewProfile;
+  /// Called when the view full profile button is tapped. The caller decides
+  /// what the tap does, such as opening the profile.
+  final VoidCallback onViewProfileClicked;
 
   @override
   Widget build(BuildContext context) {
     return _ContentWidget(
       profile: profile,
       isVisible: isVisible,
-      onViewProfile: onViewProfile,
+      onViewProfileClicked: onViewProfileClicked,
     );
   }
 }

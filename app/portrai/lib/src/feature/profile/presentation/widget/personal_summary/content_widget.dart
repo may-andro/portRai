@@ -4,12 +4,12 @@ class _ContentWidget extends StatelessWidget {
   const _ContentWidget({
     required this.profile,
     required this.isVisible,
-    required this.onViewProfile,
+    required this.onViewProfileClicked,
   });
 
   final ProfileEntity profile;
   final bool isVisible;
-  final VoidCallback? onViewProfile;
+  final VoidCallback onViewProfileClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class _ContentWidget extends StatelessWidget {
               profile: profile,
               isVisible: isVisible,
               isCentered: true,
-              onViewProfile: onViewProfile,
+              onViewProfileClicked: onViewProfileClicked,
             ),
           ),
         ],
@@ -106,7 +106,7 @@ class _ContentWidget extends StatelessWidget {
                         profile: profile,
                         isVisible: isVisible,
                         isCentered: false,
-                        onViewProfile: onViewProfile,
+                        onViewProfileClicked: onViewProfileClicked,
                       ),
                     ),
                   ),

@@ -28,6 +28,7 @@ void main() {
                     child: PersonalSummaryWidget(
                       profile: profile,
                       isVisible: false,
+                      onViewProfileClicked: () {},
                     ),
                   ),
                 ),
@@ -67,16 +68,16 @@ void main() {
     }
   }
 
-  testWidgets('should report the profile tap when the full profile button is '
+  testWidgets('should report the tap when the view full profile button is '
       'tapped', (tester) async {
-    var viewProfileCount = 0;
+    var clickCount = 0;
     await tester.pumpWidget(
       TestWidgetWrapper(
         child: SingleChildScrollView(
           child: PersonalSummaryWidget(
             profile: createProfileEntity(),
             isVisible: true,
-            onViewProfile: () => viewProfileCount++,
+            onViewProfileClicked: () => clickCount++,
           ),
         ),
       ),
@@ -85,8 +86,8 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.arrow_outward_rounded));
     await tester.pump();
-    tester.takeException();
 
-    expect(viewProfileCount, 1);
+    expect(clickCount, 1);
+    expect(tester.takeException(), isNull);
   });
 }

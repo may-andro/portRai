@@ -322,7 +322,10 @@ class AboutMeSectionWidget extends SectionWidget {
         return PersonalSummaryWidget(
           profile: portfolio.profile,
           isVisible: isVisible,
-          onViewProfile: () => context.bloc.add(const ProfileClickEvent()),
+          onViewProfileClicked: () {
+            context.bloc.add(const ProfileClickEvent());
+            ProfileScreen.navigate(context);
+          },
         );
       },
       visibilityKey: trackingId,
