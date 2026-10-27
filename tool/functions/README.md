@@ -494,6 +494,20 @@ firebase functions:secrets:set CALL_BOOKING_GMAIL_USER --project="$PROJECT_ID"
 firebase functions:secrets:set CALL_BOOKING_GMAIL_APP_PASSWORD --project="$PROJECT_ID"
 ```
 
+Then let the `call-booking` account read each secret. Every deploy makes sure the account a
+function runs as can read its secrets, and adds the access itself when the secret does not
+grant it. The deploy account may not change a secret's access, so a missing grant fails the
+deploy with "Permission 'secretmanager.secrets.setIamPolicy' denied". A project-wide role does
+not count; the grant must be on the secret:
+
+```bash
+for secret in CALL_BOOKING_GMAIL_USER CALL_BOOKING_GMAIL_APP_PASSWORD; do
+  gcloud secrets add-iam-policy-binding "$secret" \
+    --member="serviceAccount:call-booking@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role=roles/secretmanager.secretAccessor --project="$PROJECT_ID"
+done
+```
+
 ### Call booking expiry
 
 Firestore deletes requests and slots after `expiresAt` through TTL policies. Create them once:
@@ -582,20 +596,22 @@ gcloud services enable secretmanager.googleapis.com --project="$PROJECT_ID"
 gcloud iam service-accounts create call-booking \
   --display-name="Call booking functions" --project="$PROJECT_ID"
 for role in roles/datastore.user roles/firebasecloudmessaging.admin \
-  roles/secretmanager.secretAccessor roles/eventarc.eventReceiver roles/run.invoker; do
+  roles/eventarc.eventReceiver roles/run.invoker; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" \
     --member="serviceAccount:call-booking@${PROJECT_ID}.iam.gserviceaccount.com" \
     --role="$role"
 done
 ```
 
-| Role                                 | Console name                       | Needed for                                 |
-| ------------------------------------ | ---------------------------------- | ------------------------------------------ |
-| `roles/datastore.user`               | Cloud Datastore User               | Reading settings and saving requests       |
-| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Notifying the owner                        |
-| `roles/secretmanager.secretAccessor` | Secret Manager Secret Accessor     | Reading the Gmail address and app password |
-| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events             |
-| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the triggers        |
+| Role                                 | Console name                       | Needed for                           |
+| ------------------------------------ | ---------------------------------- | ------------------------------------ |
+| `roles/datastore.user`               | Cloud Datastore User               | Reading settings and saving requests |
+| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Notifying the owner                  |
+| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events       |
+| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the triggers  |
+
+It reads the email secrets through a grant on each secret, not a project role. See
+[Emails and notifications](#emails-and-notifications).
 
 Firestore triggers must run in the database's region, set by `firestoreTriggerRegion` in
 `src/shared/function_options.ts`. Check the location with:
@@ -726,6 +742,10 @@ missing, the deploy fails with the message below. Grant the roles, then re-run t
   ```
 
   `fetchJobOpenings` runs as `job-openings`, and `sendPortfolioUpdates` as `notifications`.
+
+- **A secret a function reads** fails with "Permission 'secretmanager.secrets.setIamPolicy'
+  denied" until the function's account may read it. Grant it on the secret, as in
+  [Emails and notifications](#emails-and-notifications).
 
 - **Each new callable function** fails with "Failed to set the IAM Policy on the Service" too,
   because anyone may call it and App Check, not IAM, checks the caller. Let everyone invoke its
