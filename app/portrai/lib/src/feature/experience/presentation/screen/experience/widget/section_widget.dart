@@ -377,6 +377,10 @@ class _LocationMapWidget extends StatelessWidget {
                       position: position,
                     ),
                   },
+                  // The map never moves, so Android draws it as a still image
+                  // instead of a live view, which is far cheaper to create and
+                  // to scroll past.
+                  liteModeEnabled: true,
                   zoomControlsEnabled: false,
                   mapToolbarEnabled: false,
                   myLocationButtonEnabled: false,
