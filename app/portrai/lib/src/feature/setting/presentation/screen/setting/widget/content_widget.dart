@@ -35,7 +35,11 @@ class ContentWidget extends StatelessWidget {
             SectionTitleWidget(
               title: context.localizations.settingThemeSection,
             ),
-            const DesignSystemCardWidget(),
+            DesignSystemCardWidget(
+              onOpen: () => context.bloc.add(
+                const SettingEntryClickEvent(SettingEntry.theme),
+              ),
+            ),
             if (state.userRole case final userRole?) ...[
               SectionTitleWidget(
                 title: context.localizations.settingRoleSection,
@@ -56,13 +60,22 @@ class ContentWidget extends StatelessWidget {
               SectionTitleWidget(
                 title: context.localizations.jobOpeningsSection,
               ),
-              const JobOpeningsCardWidget(),
+              JobOpeningsCardWidget(
+                onOpen: () => context.bloc.add(
+                  const SettingEntryClickEvent(SettingEntry.jobOpenings),
+                ),
+              ),
             ],
             if (state.isDevMenuEnabled) ...[
               const DSVerticalSpacerWidget(3),
               DSButtonWidget(
                 label: context.localizations.settingDeveloperMode,
-                onPressed: () => DeveloperMenuScreen.navigate(context),
+                onPressed: () {
+                  context.bloc.add(
+                    const SettingEntryClickEvent(SettingEntry.developerMenu),
+                  );
+                  DeveloperMenuScreen.navigate(context);
+                },
                 variant: DSButtonVariant.text,
                 size: DSButtonSize.small,
               ),

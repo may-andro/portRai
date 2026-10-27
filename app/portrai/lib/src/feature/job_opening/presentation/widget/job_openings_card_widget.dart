@@ -6,7 +6,11 @@ import 'package:portrai/src/route/route.dart';
 
 /// The Settings entry point. Opening it asks for sign-in first when needed.
 class JobOpeningsCardWidget extends StatelessWidget {
-  const JobOpeningsCardWidget({super.key});
+  const JobOpeningsCardWidget({super.key, this.onOpen});
+
+  /// Called when the job openings are opened, before they are shown, so the
+  /// host screen can track the tap.
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +48,10 @@ class JobOpeningsCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: palette.neutral.grey3.color,
         ),
-        onTap: () => context.pushScreen(JobOpeningModuleRoute.jobOpenings),
+        onTap: () {
+          onOpen?.call();
+          context.pushScreen(JobOpeningModuleRoute.jobOpenings);
+        },
       ),
     );
   }

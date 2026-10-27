@@ -6,14 +6,15 @@ import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
-  testWidgets('should open the job openings when the card is tapped', (
-    tester,
-  ) async {
+  testWidgets('should open the job openings and report it when the card is '
+      'tapped', (tester) async {
+    var openCount = 0;
     final router = GoRouter(
       routes: [
         GoRoute(
           path: '/',
-          builder: (_, _) => const Scaffold(body: JobOpeningsCardWidget()),
+          builder: (_, _) =>
+              Scaffold(body: JobOpeningsCardWidget(onOpen: () => openCount++)),
         ),
         GoRoute(
           name: 'job_openings',
@@ -32,5 +33,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Job openings screen'), findsOneWidget);
+    expect(openCount, 1);
   });
 }

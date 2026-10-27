@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
+import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
 import 'package:portrai/src/feature/user/user.dart';
 
+import '../../../../../../../mock/feature/setting/presentation/screen/setting/bloc/mock_setting_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -24,15 +27,19 @@ void main() {
       },
     );
 
-    testWidgets('should open the onboarding screen when tapped', (
-      tester,
-    ) async {
+    testWidgets('should track the tap and open the onboarding screen when '
+        'tapped', (tester) async {
+      final bloc = MockSettingBloc()..stubState(const SettingLoadingState());
       final router = GoRouter(
         routes: [
           GoRoute(
             path: '/',
-            builder: (_, _) =>
-                const Scaffold(body: RoleCardWidget(role: UserRole.developer)),
+            builder: (_, _) => BlocProvider<SettingBloc>.value(
+              value: bloc,
+              child: const Scaffold(
+                body: RoleCardWidget(role: UserRole.developer),
+              ),
+            ),
           ),
           GoRoute(
             path: OnboardingModuleRoute.onboarding.path,
@@ -51,6 +58,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('onboarding screen'), findsOneWidget);
+      verify(
+        () => bloc.add(const SettingEntryClickEvent(SettingEntry.role)),
+      ).called(1);
     });
   });
 }

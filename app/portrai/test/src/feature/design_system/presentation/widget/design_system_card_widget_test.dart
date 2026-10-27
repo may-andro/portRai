@@ -7,12 +7,13 @@ import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   group('DesignSystemCardWidget', () {
-    Future<void> pumpCard(WidgetTester tester) async {
+    Future<void> pumpCard(WidgetTester tester, {VoidCallback? onOpen}) async {
       final router = GoRouter(
         routes: [
           GoRoute(
             path: '/',
-            builder: (_, _) => const Scaffold(body: DesignSystemCardWidget()),
+            builder: (_, _) =>
+                Scaffold(body: DesignSystemCardWidget(onOpen: onOpen)),
           ),
           GoRoute(
             name: 'design_system_gallery',
@@ -35,15 +36,16 @@ void main() {
       expect(find.text('Beltane'), findsOneWidget);
     });
 
-    testWidgets('should open the theme gallery when the card is tapped', (
-      tester,
-    ) async {
-      await pumpCard(tester);
+    testWidgets('should open the theme gallery and report it when the card '
+        'is tapped', (tester) async {
+      var openCount = 0;
+      await pumpCard(tester, onOpen: () => openCount++);
 
       await tester.tap(find.text('App theme'));
       await tester.pumpAndSettle();
 
       expect(find.text('Theme gallery screen'), findsOneWidget);
+      expect(openCount, 1);
     });
   });
 }

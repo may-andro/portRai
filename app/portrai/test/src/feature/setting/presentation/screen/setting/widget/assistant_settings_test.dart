@@ -21,6 +21,7 @@ import 'package:use_case/use_case.dart';
 
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/permission/domain/use_case/mock_is_permission_supported_use_case.dart';
+import '../../../../../../../mock/feature/setting/presentation/screen/setting/tracking/mock_setting_tracking_delegate.dart';
 import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 import '../../../../../../../util/assistant_test_fixture.dart';
 import '../../../../../../../util/package_info_setup.dart';
@@ -60,6 +61,7 @@ void main() {
         MockGetGuestUserUseCase()..stubCall(null),
         MockIsPermissionSupportedUseCase()
           ..stubCall(AppPermission.notifications, isSupported: false),
+        MockSettingTrackingDelegate(),
       ),
     );
     final router = GoRouter(

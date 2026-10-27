@@ -7,7 +7,11 @@ import 'package:portrai/src/route/route.dart';
 
 /// The Settings entry point to the theme gallery, naming the theme in use.
 class DesignSystemCardWidget extends StatelessWidget {
-  const DesignSystemCardWidget({super.key});
+  const DesignSystemCardWidget({super.key, this.onOpen});
+
+  /// Called when the gallery is opened, before it is shown, so the host
+  /// screen can track the tap.
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +49,10 @@ class DesignSystemCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: palette.neutral.grey3.color,
         ),
-        onTap: () =>
-            context.pushScreen(DesignSystemModuleRoute.designSystemGallery),
+        onTap: () {
+          onOpen?.call();
+          context.pushScreen(DesignSystemModuleRoute.designSystemGallery);
+        },
       ),
     );
   }
