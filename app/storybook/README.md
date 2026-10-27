@@ -140,8 +140,8 @@ flutter test
 ## Configuration
 
 `firebase.json` serves `build/web` on the `storybook` hosting target, rewrites every path to
-`index.html`, caches JS and CSS files for a year as immutable, and sends `index.html` with
-`no-cache`. `.firebaserc` maps the target to the `portrai-storybook` site in the `portrai-96f2b`
+`index.html`, and sends `index.html` and the JS, CSS and WASM files with `no-cache`, since
+Flutter's build file names do not change between builds. `.firebaserc` maps the target to the `portrai-storybook` site in the `portrai-96f2b`
 project.
 
 `web/index.html` loads the Google Maps JavaScript API for the `DSMapWidget` use case with a
