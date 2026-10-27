@@ -99,7 +99,12 @@ void main() {
       await tester.pump();
 
       verify(
-        () => bloc.add(const ExpertiseClickEvent('Expertise 1')),
+        () => bloc.add(
+          const ExpertiseClickEvent(
+            label: 'expertise_card',
+            expertiseTitle: 'Expertise 1',
+          ),
+        ),
       ).called(1);
       // No router in the test wrapper, so opening the expertise throws.
       expect(tester.takeException(), isNotNull);

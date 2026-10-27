@@ -17,10 +17,19 @@ void main() {
       'should track the tapped item without changing the state when an item '
       'is tapped',
       build: buildBloc,
-      act: (bloc) => bloc.add(const ServiceClickEvent('App Development')),
+      act: (bloc) => bloc.add(
+        const ServiceClickEvent(
+          label: 'service_card',
+          serviceTitle: 'App Development',
+        ),
+      ),
       expect: () => const <ServiceListState>[],
-      verify: (_) =>
-          verify(() => tracking.trackServiceClick('App Development')).called(1),
+      verify: (_) => verify(
+        () => tracking.trackServiceClick(
+          label: 'service_card',
+          serviceTitle: 'App Development',
+        ),
+      ).called(1),
     );
   });
 }

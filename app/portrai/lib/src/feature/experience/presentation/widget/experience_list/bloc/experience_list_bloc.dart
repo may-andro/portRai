@@ -17,5 +17,8 @@ class ExperienceListBloc
   void _mapExperienceClickEventToState(
     ExperienceClickEvent event,
     Emitter<ExperienceListState> emit,
-  ) => _trackingDelegate.trackExperienceClick(event.experienceId);
+  ) => _trackingDelegate.trackExperienceClick(
+    label: event.label,
+    experienceId: event.experienceId,
+  );
 }

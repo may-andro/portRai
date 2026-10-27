@@ -43,7 +43,7 @@ class LanguageCardWidget extends StatelessWidget {
           color: context.colorPalette.neutral.grey3.color,
         ),
         onTap: () {
-          context.bloc.add(const SettingEntryClickEvent('language'));
+          context.bloc.add(const SettingEntryClickEvent('language_card'));
           LocaleSelectionScreen.navigate(context);
         },
       ),

@@ -54,7 +54,7 @@ void main() {
     });
 
     test('should send a resume click when the resume tap is tracked', () {
-      delegate.trackResumeClick();
+      delegate.trackResumeClick('social_resume_button');
 
       final tracking =
           verify(
@@ -64,7 +64,7 @@ void main() {
 
       expect(tracking.name, 'resume');
       expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'open');
+      expect(tracking.parameters['label'], 'social_resume_button');
     });
   });
 }

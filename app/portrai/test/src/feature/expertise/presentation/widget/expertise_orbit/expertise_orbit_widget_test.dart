@@ -58,10 +58,18 @@ void main() {
 
   tearDown(() => appServiceLocator.reset());
 
-  /// Checks the tap was tracked for [title]; opening it throws without a
-  /// router in the test wrapper.
-  void expectOpened(WidgetTester tester, String title) {
-    verify(() => bloc.add(ExpertiseOrbitClickEvent(title))).called(1);
+  /// Checks the tap on [label] was tracked for [title]; opening it throws
+  /// without a router in the test wrapper.
+  void expectOpened(
+    WidgetTester tester, {
+    required String label,
+    required String title,
+  }) {
+    verify(
+      () => bloc.add(
+        ExpertiseOrbitClickEvent(label: label, expertiseTitle: title),
+      ),
+    ).called(1);
     expect(tester.takeException(), isNotNull);
   }
 
@@ -108,7 +116,11 @@ void main() {
         );
         await settle(tester);
 
-        expectOpened(tester, 'Flutter Development');
+        expectOpened(
+          tester,
+          label: 'expertise_view_details_button',
+          title: 'Flutter Development',
+        );
       },
     );
   }
@@ -143,7 +155,12 @@ void main() {
 
     expect(find.text('Native Android'), findsOneWidget);
     verifyNever(
-      () => bloc.add(const ExpertiseOrbitClickEvent('Native Android')),
+      () => bloc.add(
+        const ExpertiseOrbitClickEvent(
+          label: 'expertise_orbit_node',
+          expertiseTitle: 'Native Android',
+        ),
+      ),
     );
   });
 
@@ -156,7 +173,11 @@ void main() {
       await tester.tap(dialNode('Flutter Development'));
       await settle(tester);
 
-      expectOpened(tester, 'Flutter Development');
+      expectOpened(
+        tester,
+        label: 'expertise_orbit_node',
+        title: 'Flutter Development',
+      );
     },
   );
 

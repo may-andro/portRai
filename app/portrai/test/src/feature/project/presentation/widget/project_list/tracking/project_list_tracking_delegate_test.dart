@@ -20,19 +20,26 @@ void main() {
       when(() => trackingReporter.sendTrackingEvent(any())).thenReturn(null);
     });
 
-    test('should send a project click with the item when an item tap is '
-        'tracked', () {
-      delegate.trackProjectClick('port-rai');
+    test(
+      'should send a project click with the element and item when an item tap is '
+      'tracked',
+      () {
+        delegate.trackProjectClick(
+          label: 'project_card',
+          projectId: 'port-rai',
+        );
 
-      final tracking =
-          verify(
-                () => trackingReporter.sendTrackingEvent(captureAny()),
-              ).captured.single
-              as Tracking;
+        final tracking =
+            verify(
+                  () => trackingReporter.sendTrackingEvent(captureAny()),
+                ).captured.single
+                as Tracking;
 
-      expect(tracking.name, 'project');
-      expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'port-rai');
-    });
+        expect(tracking.name, 'project');
+        expect(tracking.parameters['action'], 'click');
+        expect(tracking.parameters['label'], 'project_card');
+        expect(tracking.parameters['value'], 'port-rai');
+      },
+    );
   });
 }

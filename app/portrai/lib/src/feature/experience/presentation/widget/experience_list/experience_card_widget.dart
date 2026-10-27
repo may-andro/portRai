@@ -138,7 +138,9 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
               Material(
                 type: MaterialType.transparency,
                 child: InkWell(
-                  onTap: _compact ? () => _open(context) : _toggleExpand,
+                  onTap: _compact
+                      ? () => _open(context, label: 'experience_card')
+                      : _toggleExpand,
                   child: Padding(
                     padding: EdgeInsets.all(context.space(factor: 2.5)),
                     child: _content(context),
@@ -334,9 +336,12 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
     );
   }
 
-  void _open(BuildContext context) {
+  /// Tracks the tap on the [label] element and opens the experience.
+  void _open(BuildContext context, {required String label}) {
     final experience = widget.experience;
-    context.bloc.add(ExperienceClickEvent(experience.id));
+    context.bloc.add(
+      ExperienceClickEvent(label: label, experienceId: experience.id),
+    );
     ExperienceScreen.navigate(context, id: experience.id);
   }
 
@@ -358,7 +363,8 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
             child: IconButton.filled(
               tooltip: context.localizations.seeMore,
               icon: const Icon(Icons.arrow_outward_rounded),
-              onPressed: () => _open(context),
+              onPressed: () =>
+                  _open(context, label: 'experience_see_more_button'),
             ),
           ),
         ],

@@ -5,11 +5,14 @@ import 'package:tracking/tracking.dart';
 class ServiceListTrackingDelegate extends TrackingDelegate {
   ServiceListTrackingDelegate(super.trackingReporter);
 
-  void trackServiceClick(String serviceTitle) {
+  void trackServiceClick({
+    required String label,
+    required String serviceTitle,
+  }) {
     trackEvent(
       Tracking(
         name: 'service',
-        action: ClickAction(label: serviceTitle),
+        action: ClickAction(label: label, value: serviceTitle),
       ),
     );
   }

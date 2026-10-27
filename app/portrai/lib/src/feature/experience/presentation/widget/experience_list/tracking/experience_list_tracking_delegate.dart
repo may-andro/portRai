@@ -5,11 +5,14 @@ import 'package:tracking/tracking.dart';
 class ExperienceListTrackingDelegate extends TrackingDelegate {
   ExperienceListTrackingDelegate(super.trackingReporter);
 
-  void trackExperienceClick(String experienceId) {
+  void trackExperienceClick({
+    required String label,
+    required String experienceId,
+  }) {
     trackEvent(
       Tracking(
         name: 'experience',
-        action: ClickAction(label: experienceId),
+        action: ClickAction(label: label, value: experienceId),
       ),
     );
   }

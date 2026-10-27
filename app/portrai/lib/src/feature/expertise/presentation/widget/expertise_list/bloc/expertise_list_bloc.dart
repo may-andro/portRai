@@ -16,5 +16,8 @@ class ExpertiseListBloc extends Bloc<ExpertiseListEvent, ExpertiseListState> {
   void _mapExpertiseClickEventToState(
     ExpertiseClickEvent event,
     Emitter<ExpertiseListState> emit,
-  ) => _trackingDelegate.trackExpertiseClick(event.expertiseTitle);
+  ) => _trackingDelegate.trackExpertiseClick(
+    label: event.label,
+    expertiseTitle: event.expertiseTitle,
+  );
 }

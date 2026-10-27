@@ -36,7 +36,7 @@ void main() {
 
     test('should send a settings entry click with the entry when an entry '
         'tap is tracked', () {
-      delegate.trackEntryClick('language');
+      delegate.trackEntryClick('language_card');
 
       final tracking =
           verify(
@@ -46,7 +46,7 @@ void main() {
 
       expect(tracking.name, 'setting_entry');
       expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'language');
+      expect(tracking.parameters['label'], 'language_card');
     });
   });
 }

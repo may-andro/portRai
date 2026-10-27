@@ -39,7 +39,7 @@ class _SocialLinksWidget extends StatelessWidget {
           brand: DSBrandIcon.resume as DSBrandIcon?,
           image: '',
           onTap: () {
-            context.bloc.add(const ResumeClickEvent());
+            context.bloc.add(const ResumeClickEvent('social_resume_button'));
             CvExportScreen.navigate(context);
           },
         ),

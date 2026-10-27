@@ -20,19 +20,26 @@ void main() {
       when(() => trackingReporter.sendTrackingEvent(any())).thenReturn(null);
     });
 
-    test('should send a service click with the item when an item tap is '
-        'tracked', () {
-      delegate.trackServiceClick('App Development');
+    test(
+      'should send a service click with the element and item when an item tap is '
+      'tracked',
+      () {
+        delegate.trackServiceClick(
+          label: 'service_card',
+          serviceTitle: 'App Development',
+        );
 
-      final tracking =
-          verify(
-                () => trackingReporter.sendTrackingEvent(captureAny()),
-              ).captured.single
-              as Tracking;
+        final tracking =
+            verify(
+                  () => trackingReporter.sendTrackingEvent(captureAny()),
+                ).captured.single
+                as Tracking;
 
-      expect(tracking.name, 'service');
-      expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'App Development');
-    });
+        expect(tracking.name, 'service');
+        expect(tracking.parameters['action'], 'click');
+        expect(tracking.parameters['label'], 'service_card');
+        expect(tracking.parameters['value'], 'App Development');
+      },
+    );
   });
 }

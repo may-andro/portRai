@@ -15,7 +15,7 @@ class SettingButtonWidget extends StatelessWidget {
       iconColor: context.colorPalette.surface.onSurface,
       buttonColor: context.colorPalette.neutral.transparent,
       onPressed: () {
-        context.bloc.add(const SettingClickEvent());
+        context.bloc.add(const SettingClickEvent('setting_button'));
         SettingScreen.navigate(context);
       },
     );

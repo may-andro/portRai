@@ -39,14 +39,14 @@ void main() {
       (
         'theme',
         'App theme',
-        'theme',
+        'theme_card',
         DesignSystemModuleRoute.designSystemGallery.name,
         DesignSystemModuleRoute.designSystemGallery.path,
       ),
       (
         'job openings',
         'Job openings',
-        'job_openings',
+        'job_openings_card',
         JobOpeningModuleRoute.jobOpenings.name,
         JobOpeningModuleRoute.jobOpenings.path,
       ),

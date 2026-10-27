@@ -63,5 +63,5 @@ class ProfessionalSummaryBloc
   void _mapResumeClickEventToState(
     ResumeClickEvent event,
     Emitter<ProfessionalSummaryState> emit,
-  ) => _trackingDelegate.trackResumeClick();
+  ) => _trackingDelegate.trackResumeClick(event.label);
 }

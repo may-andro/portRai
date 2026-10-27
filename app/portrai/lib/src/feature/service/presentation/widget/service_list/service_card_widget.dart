@@ -23,7 +23,9 @@ class _ServiceCardWidget extends StatelessWidget {
       fillColor: textColor,
       padding: EdgeInsets.all(context.space(factor: 2)),
       onTap: () {
-        context.bloc.add(ServiceClickEvent(service.title));
+        context.bloc.add(
+          ServiceClickEvent(label: 'service_card', serviceTitle: service.title),
+        );
         ServiceScreen.navigate(context, service: service);
       },
       builder: (context, isHovering) {

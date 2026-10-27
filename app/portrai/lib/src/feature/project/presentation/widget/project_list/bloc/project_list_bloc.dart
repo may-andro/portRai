@@ -15,5 +15,8 @@ class ProjectListBloc extends Bloc<ProjectListEvent, ProjectListState> {
   void _mapProjectClickEventToState(
     ProjectClickEvent event,
     Emitter<ProjectListState> emit,
-  ) => _trackingDelegate.trackProjectClick(event.projectId);
+  ) => _trackingDelegate.trackProjectClick(
+    label: event.label,
+    projectId: event.projectId,
+  );
 }

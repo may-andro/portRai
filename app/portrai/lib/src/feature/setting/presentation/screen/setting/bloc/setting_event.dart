@@ -11,14 +11,14 @@ class LoadSettingsEvent extends SettingEvent {
   const LoadSettingsEvent();
 }
 
-/// A settings entry was tapped; [entryName] labels the click.
-class SettingEntryClickEvent extends SettingEvent {
-  const SettingEntryClickEvent(this.entryName);
+final class SettingEntryClickEvent extends SettingEvent {
+  const SettingEntryClickEvent(this.label);
 
-  final String entryName;
+  /// The tapped element, such as a button or card.
+  final String label;
 
   @override
-  List<Object?> get props => [entryName];
+  List<Object?> get props => [label];
 }
 
 // Tracking Events

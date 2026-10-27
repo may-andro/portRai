@@ -13,7 +13,9 @@ class _OrbitRingWidget extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onSelect;
   final bool isVisible;
-  final ValueChanged<ExpertiseEntity> onClicked;
+
+  /// Called with the expertise to open and the tapped element.
+  final void Function(ExpertiseEntity expertise, String label) onClicked;
 
   void _selectAt(_OrbitLayout layout, Offset position) {
     final index = layout.indexAt(position);
@@ -26,7 +28,7 @@ class _OrbitRingWidget extends StatelessWidget {
     final index = layout.indexAt(position);
     if (index == null) return;
     if (index == selected) {
-      onClicked(expertises[index]);
+      onClicked(expertises[index], 'expertise_orbit_node');
     } else {
       onSelect(index);
     }
@@ -108,7 +110,10 @@ class _OrbitRingWidget extends StatelessWidget {
             key: ValueKey(selected),
             expertise: expertises[selected],
             accent: accent,
-            onClicked: () => onClicked(expertises[selected]),
+            onClicked: () => onClicked(
+              expertises[selected],
+              'expertise_view_details_button',
+            ),
           ),
         ),
       ),

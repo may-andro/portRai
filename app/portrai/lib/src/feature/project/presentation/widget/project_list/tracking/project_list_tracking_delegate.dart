@@ -5,11 +5,11 @@ import 'package:tracking/tracking.dart';
 class ProjectListTrackingDelegate extends TrackingDelegate {
   ProjectListTrackingDelegate(super.trackingReporter);
 
-  void trackProjectClick(String projectId) {
+  void trackProjectClick({required String label, required String projectId}) {
     trackEvent(
       Tracking(
         name: 'project',
-        action: ClickAction(label: projectId),
+        action: ClickAction(label: label, value: projectId),
       ),
     );
   }

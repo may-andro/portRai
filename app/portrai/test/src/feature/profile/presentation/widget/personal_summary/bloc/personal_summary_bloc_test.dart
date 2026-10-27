@@ -17,9 +17,12 @@ void main() {
       'should track the view profile tap without changing the state when the '
       'view full profile button is tapped',
       build: buildBloc,
-      act: (bloc) => bloc.add(const ViewProfileClickEvent()),
+      act: (bloc) =>
+          bloc.add(const ViewProfileClickEvent('view_profile_button')),
       expect: () => const <PersonalSummaryState>[],
-      verify: (_) => verify(() => tracking.trackViewProfileClick()).called(1),
+      verify: (_) => verify(
+        () => tracking.trackViewProfileClick('view_profile_button'),
+      ).called(1),
     );
   });
 }

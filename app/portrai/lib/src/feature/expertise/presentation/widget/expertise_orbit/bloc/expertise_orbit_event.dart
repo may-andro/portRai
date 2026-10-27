@@ -10,10 +10,17 @@ sealed class ExpertiseOrbitEvent extends Equatable {
 }
 
 final class ExpertiseOrbitClickEvent extends ExpertiseOrbitEvent {
-  const ExpertiseOrbitClickEvent(this.expertiseTitle);
+  const ExpertiseOrbitClickEvent({
+    required this.label,
+    required this.expertiseTitle,
+  });
 
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  /// Title of the expertise that opens.
   final String expertiseTitle;
 
   @override
-  List<Object?> get props => [expertiseTitle];
+  List<Object?> get props => [label, expertiseTitle];
 }

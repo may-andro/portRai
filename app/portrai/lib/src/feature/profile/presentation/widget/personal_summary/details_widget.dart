@@ -111,7 +111,9 @@ class _DetailsWidget extends StatelessWidget {
                       size: context.buttonSize,
                       elevation: context.dimen.elevationLevel2,
                       onPressed: () {
-                        context.bloc.add(const ViewProfileClickEvent());
+                        context.bloc.add(
+                          const ViewProfileClickEvent('view_profile_button'),
+                        );
                         ProfileScreen.navigate(context);
                       },
                     ),

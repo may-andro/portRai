@@ -96,9 +96,11 @@ void main() {
       'should track the resume tap without changing the state when the '
       'resume is opened',
       build: buildBloc,
-      act: (bloc) => bloc.add(const ResumeClickEvent()),
+      act: (bloc) => bloc.add(const ResumeClickEvent('social_resume_button')),
       expect: () => const <ProfessionalSummaryState>[],
-      verify: (_) => verify(() => tracking.trackResumeClick()).called(1),
+      verify: (_) => verify(
+        () => tracking.trackResumeClick('social_resume_button'),
+      ).called(1),
     );
   });
 }

@@ -10,10 +10,14 @@ sealed class ServiceListEvent extends Equatable {
 }
 
 final class ServiceClickEvent extends ServiceListEvent {
-  const ServiceClickEvent(this.serviceTitle);
+  const ServiceClickEvent({required this.label, required this.serviceTitle});
 
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  /// Title of the service that opens.
   final String serviceTitle;
 
   @override
-  List<Object?> get props => [serviceTitle];
+  List<Object?> get props => [label, serviceTitle];
 }

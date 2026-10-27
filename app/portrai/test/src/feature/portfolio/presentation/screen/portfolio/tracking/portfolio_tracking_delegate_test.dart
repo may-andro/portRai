@@ -108,32 +108,38 @@ void main() {
       },
     );
 
-    for (final (description, track, name, label)
-        in <(String, void Function(), String, String)>[
-          (
-            'see all',
-            () => delegate.trackSeeAllClick('services'),
-            'see_all',
-            'services',
-          ),
-          ('setting', () => delegate.trackSettingClick(), 'setting', 'open'),
-        ]) {
-      test(
-        'should send a $name click when the $description tap is tracked',
-        () {
-          track();
-
-          final tracking =
-              verify(
-                    () => trackingReporter.sendTrackingEvent(captureAny()),
-                  ).captured.single
-                  as Tracking;
-
-          expect(tracking.name, name);
-          expect(tracking.parameters['action'], 'click');
-          expect(tracking.parameters['label'], label);
-        },
+    test('should send a see all click with the button and the section when a '
+        'see all tap is tracked', () {
+      delegate.trackSeeAllClick(
+        label: 'see_all_button',
+        sectionName: 'services',
       );
-    }
+
+      final tracking =
+          verify(
+                () => trackingReporter.sendTrackingEvent(captureAny()),
+              ).captured.single
+              as Tracking;
+
+      expect(tracking.name, 'see_all');
+      expect(tracking.parameters['action'], 'click');
+      expect(tracking.parameters['label'], 'see_all_button');
+      expect(tracking.parameters['value'], 'services');
+    });
+
+    test('should send a setting click with the button when a settings tap is '
+        'tracked', () {
+      delegate.trackSettingClick('setting_button');
+
+      final tracking =
+          verify(
+                () => trackingReporter.sendTrackingEvent(captureAny()),
+              ).captured.single
+              as Tracking;
+
+      expect(tracking.name, 'setting');
+      expect(tracking.parameters['action'], 'click');
+      expect(tracking.parameters['label'], 'setting_button');
+    });
   });
 }

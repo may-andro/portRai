@@ -119,7 +119,7 @@ void main() {
       },
     );
 
-    for (final label in ['feature_flags', 'tracking_viewer']) {
+    for (final label in ['feature_flags_row', 'tracking_viewer_row']) {
       blocTest<DeveloperMenuBloc, DeveloperMenuState>(
         'should track the $label entry without changing the state when it is '
         'tapped',

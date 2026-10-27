@@ -68,7 +68,11 @@ void main() {
       await tester.tap(find.text('🚀'));
       await tester.pump();
 
-      verify(() => bloc.add(ProjectClickEvent(project.id))).called(1);
+      verify(
+        () => bloc.add(
+          ProjectClickEvent(label: 'project_card', projectId: project.id),
+        ),
+      ).called(1);
       // No router in the test wrapper, so opening the project throws.
       expect(tester.takeException(), isNotNull);
 

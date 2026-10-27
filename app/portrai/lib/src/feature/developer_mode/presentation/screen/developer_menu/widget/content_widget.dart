@@ -71,7 +71,7 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                         .developerMenuFeatureFlagsDescription,
                     onTap: () {
                       context.bloc.add(
-                        const DeveloperMenuEntryClickEvent('feature_flags'),
+                        const DeveloperMenuEntryClickEvent('feature_flags_row'),
                       );
                       FeatureFlagScreen.navigate(context);
                     },
@@ -88,7 +88,9 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                         .developerMenuTrackingViewerDescription,
                     onTap: () {
                       context.bloc.add(
-                        const DeveloperMenuEntryClickEvent('tracking_viewer'),
+                        const DeveloperMenuEntryClickEvent(
+                          'tracking_viewer_row',
+                        ),
                       );
                       TrackingEventsScreen.navigate(context);
                     },

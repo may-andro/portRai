@@ -17,10 +17,18 @@ void main() {
       'should track the tapped item without changing the state when an item '
       'is tapped',
       build: buildBloc,
-      act: (bloc) => bloc.add(const ExpertiseClickEvent('Flutter Development')),
+      act: (bloc) => bloc.add(
+        const ExpertiseClickEvent(
+          label: 'expertise_card',
+          expertiseTitle: 'Flutter Development',
+        ),
+      ),
       expect: () => const <ExpertiseListState>[],
       verify: (_) => verify(
-        () => tracking.trackExpertiseClick('Flutter Development'),
+        () => tracking.trackExpertiseClick(
+          label: 'expertise_card',
+          expertiseTitle: 'Flutter Development',
+        ),
       ).called(1),
     );
   });

@@ -79,7 +79,9 @@ class _OrbitDialWidget extends StatefulWidget {
   final List<ExpertiseEntity> expertises;
   final ValueNotifier<int> selection;
   final bool isVisible;
-  final ValueChanged<ExpertiseEntity> onClicked;
+
+  /// Called with the expertise to open and the tapped element.
+  final void Function(ExpertiseEntity expertise, String label) onClicked;
 
   @override
   State<_OrbitDialWidget> createState() => _OrbitDialWidgetState();
@@ -179,14 +181,15 @@ class _OrbitDialWidgetState extends State<_OrbitDialWidget>
 
   void _onNodeTap(int index, _DialLayout layout) {
     if (index == widget.selection.value) {
-      _open(index);
+      _open(index, label: 'expertise_orbit_node');
       return;
     }
     final target = _position.value + layout.offsetOf(index, _position.value);
     _turnTo(target.round(), layout);
   }
 
-  void _open(int index) => widget.onClicked(widget.expertises[index]);
+  void _open(int index, {required String label}) =>
+      widget.onClicked(widget.expertises[index], label);
 
   @override
   Widget build(BuildContext context) {
@@ -398,7 +401,8 @@ class _OrbitDialWidgetState extends State<_OrbitDialWidget>
             iconColor: palette.brand.onPrimary,
             buttonColor: palette.brand.primary,
             size: DSIconButtonSize.large,
-            onPressed: () => _open(selected),
+            onPressed: () =>
+                _open(selected, label: 'expertise_view_details_button'),
           ),
         ),
         Tooltip(

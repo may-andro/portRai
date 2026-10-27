@@ -273,12 +273,24 @@ void main() {
       'state',
       build: buildBloc,
       act: (bloc) => bloc
-        ..add(const SeeAllClickEvent('services'))
-        ..add(const SettingClickEvent()),
+        ..add(
+          const SeeAllClickEvent(
+            label: 'see_all_button',
+            sectionName: 'services',
+          ),
+        )
+        ..add(const SettingClickEvent('setting_button')),
       expect: () => const <PortfolioState>[],
       verify: (_) {
-        verify(() => trackingDelegate.trackSeeAllClick('services')).called(1);
-        verify(() => trackingDelegate.trackSettingClick()).called(1);
+        verify(
+          () => trackingDelegate.trackSeeAllClick(
+            label: 'see_all_button',
+            sectionName: 'services',
+          ),
+        ).called(1);
+        verify(
+          () => trackingDelegate.trackSettingClick('setting_button'),
+        ).called(1);
       },
     );
 

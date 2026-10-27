@@ -10,11 +10,11 @@ class DeveloperMenuTrackingDelegate extends ScreenTrackingDelegate {
   DeveloperMenuTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackEntryClick(String entryName) {
+  void trackEntryClick(String label) {
     trackEvent(
       Tracking(
         name: 'developer_menu_entry',
-        action: ClickAction(label: entryName),
+        action: ClickAction(label: label),
       ),
     );
   }

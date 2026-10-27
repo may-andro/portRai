@@ -17,10 +17,16 @@ void main() {
       'should track the tapped item without changing the state when an item '
       'is tapped',
       build: buildBloc,
-      act: (bloc) => bloc.add(const ProjectClickEvent('port-rai')),
+      act: (bloc) => bloc.add(
+        const ProjectClickEvent(label: 'project_card', projectId: 'port-rai'),
+      ),
       expect: () => const <ProjectListState>[],
-      verify: (_) =>
-          verify(() => tracking.trackProjectClick('port-rai')).called(1),
+      verify: (_) => verify(
+        () => tracking.trackProjectClick(
+          label: 'project_card',
+          projectId: 'port-rai',
+        ),
+      ).called(1),
     );
   });
 }

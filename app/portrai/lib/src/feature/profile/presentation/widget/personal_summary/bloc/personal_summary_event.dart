@@ -10,5 +10,11 @@ sealed class PersonalSummaryEvent extends Equatable {
 }
 
 final class ViewProfileClickEvent extends PersonalSummaryEvent {
-  const ViewProfileClickEvent();
+  const ViewProfileClickEvent(this.label);
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  @override
+  List<Object?> get props => [label];
 }

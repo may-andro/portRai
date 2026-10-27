@@ -10,11 +10,11 @@ class SettingTrackingDelegate extends ScreenTrackingDelegate {
   SettingTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackEntryClick(String entryName) {
+  void trackEntryClick(String label) {
     trackEvent(
       Tracking(
         name: 'setting_entry',
-        action: ClickAction(label: entryName),
+        action: ClickAction(label: label),
       ),
     );
   }

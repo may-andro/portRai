@@ -17,10 +17,19 @@ void main() {
       'should track the tapped item without changing the state when an item '
       'is tapped',
       build: buildBloc,
-      act: (bloc) => bloc.add(const ExperienceClickEvent('id_0')),
+      act: (bloc) => bloc.add(
+        const ExperienceClickEvent(
+          label: 'experience_card',
+          experienceId: 'id_0',
+        ),
+      ),
       expect: () => const <ExperienceListState>[],
-      verify: (_) =>
-          verify(() => tracking.trackExperienceClick('id_0')).called(1),
+      verify: (_) => verify(
+        () => tracking.trackExperienceClick(
+          label: 'experience_card',
+          experienceId: 'id_0',
+        ),
+      ).called(1),
     );
   });
 }

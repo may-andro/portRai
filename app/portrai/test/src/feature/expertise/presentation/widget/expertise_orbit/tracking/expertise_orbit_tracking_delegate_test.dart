@@ -20,19 +20,26 @@ void main() {
       when(() => trackingReporter.sendTrackingEvent(any())).thenReturn(null);
     });
 
-    test('should send a expertise click with the item when an item tap is '
-        'tracked', () {
-      delegate.trackExpertiseClick('Flutter Development');
+    test(
+      'should send a expertise click with the element and item when an item tap is '
+      'tracked',
+      () {
+        delegate.trackExpertiseClick(
+          label: 'expertise_orbit_node',
+          expertiseTitle: 'Flutter Development',
+        );
 
-      final tracking =
-          verify(
-                () => trackingReporter.sendTrackingEvent(captureAny()),
-              ).captured.single
-              as Tracking;
+        final tracking =
+            verify(
+                  () => trackingReporter.sendTrackingEvent(captureAny()),
+                ).captured.single
+                as Tracking;
 
-      expect(tracking.name, 'expertise');
-      expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'Flutter Development');
-    });
+        expect(tracking.name, 'expertise');
+        expect(tracking.parameters['action'], 'click');
+        expect(tracking.parameters['label'], 'expertise_orbit_node');
+        expect(tracking.parameters['value'], 'Flutter Development');
+      },
+    );
   });
 }

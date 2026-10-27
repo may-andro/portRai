@@ -35,7 +35,7 @@ void main() {
 
     test('should send a developer menu entry click with the entry when an '
         'entry tap is tracked', () {
-      delegate.trackEntryClick('feature_flags');
+      delegate.trackEntryClick('feature_flags_row');
 
       final tracking =
           verify(
@@ -45,7 +45,7 @@ void main() {
 
       expect(tracking.name, 'developer_menu_entry');
       expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'feature_flags');
+      expect(tracking.parameters['label'], 'feature_flags_row');
     });
   });
 }

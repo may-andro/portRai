@@ -161,10 +161,19 @@ void main() {
     blocTest<JobOpeningsBloc, JobOpeningsState>(
       'should track the click when an opening is clicked',
       build: buildBloc,
-      act: (bloc) => bloc.add(const JobOpeningClickEvent()),
+      act: (bloc) => bloc.add(
+        const JobOpeningClickEvent(
+          label: 'job_opening_card',
+          jobOpeningId: 'job-1',
+        ),
+      ),
       expect: () => const <JobOpeningsState>[],
-      verify: (_) =>
-          verify(() => trackingDelegate.trackJobOpeningClick()).called(1),
+      verify: (_) => verify(
+        () => trackingDelegate.trackJobOpeningClick(
+          label: 'job_opening_card',
+          jobOpeningId: 'job-1',
+        ),
+      ).called(1),
     );
   });
 

@@ -74,5 +74,5 @@ class FooterBloc extends Bloc<FooterEvent, FooterState> {
   void _mapResumeClickEventToState(
     ResumeClickEvent event,
     Emitter<FooterState> emit,
-  ) => _trackingDelegate.trackResumeClick();
+  ) => _trackingDelegate.trackResumeClick(event.label);
 }

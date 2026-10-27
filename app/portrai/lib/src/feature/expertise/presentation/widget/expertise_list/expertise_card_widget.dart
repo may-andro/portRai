@@ -26,7 +26,12 @@ class _ExpertiseCardWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        context.bloc.add(ExpertiseClickEvent(expertise.title));
+        context.bloc.add(
+          ExpertiseClickEvent(
+            label: 'expertise_card',
+            expertiseTitle: expertise.title,
+          ),
+        );
         ExpertiseScreen.navigate(context, expertise: expertise);
       },
       child: DSHoverableContainerWidget(

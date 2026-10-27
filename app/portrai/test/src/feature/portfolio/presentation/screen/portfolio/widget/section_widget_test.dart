@@ -106,7 +106,7 @@ void main() {
     await tester.pump();
     tester.takeException();
 
-    verify(() => bloc.add(const SettingClickEvent())).called(1);
+    verify(() => bloc.add(const SettingClickEvent('setting_button'))).called(1);
   });
 
   testWidgets('should track the See all tap when the services See all is '
@@ -125,6 +125,13 @@ void main() {
     await tester.pump();
     tester.takeException();
 
-    verify(() => bloc.add(const SeeAllClickEvent('services'))).called(1);
+    verify(
+      () => bloc.add(
+        const SeeAllClickEvent(
+          label: 'see_all_button',
+          sectionName: 'services',
+        ),
+      ),
+    ).called(1);
   });
 }

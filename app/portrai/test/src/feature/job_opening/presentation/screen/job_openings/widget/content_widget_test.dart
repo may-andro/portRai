@@ -134,7 +134,14 @@ void main() {
     await tester.tap(find.text('Senior Flutter Developer'));
     await pumpAnimations(tester);
 
-    verify(() => bloc.add(const JobOpeningClickEvent())).called(1);
+    verify(
+      () => bloc.add(
+        const JobOpeningClickEvent(
+          label: 'job_opening_card',
+          jobOpeningId: 'job-7',
+        ),
+      ),
+    ).called(1);
     expect(find.text('Opening job-7'), findsOneWidget);
   });
 

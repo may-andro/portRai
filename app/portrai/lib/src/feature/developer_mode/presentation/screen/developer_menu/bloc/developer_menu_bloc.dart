@@ -100,7 +100,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
   void _mapDeveloperMenuEntryClickEventToState(
     DeveloperMenuEntryClickEvent event,
     Emitter<DeveloperMenuState> emit,
-  ) => _trackingDelegate.trackEntryClick(event.entryName);
+  ) => _trackingDelegate.trackEntryClick(event.label);
 
   void _mapForceFatalCrashEventToState(
     ForceFatalCrashEvent event,

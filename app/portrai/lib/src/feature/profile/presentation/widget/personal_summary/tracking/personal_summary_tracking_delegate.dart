@@ -5,11 +5,11 @@ import 'package:tracking/tracking.dart';
 class PersonalSummaryTrackingDelegate extends TrackingDelegate {
   PersonalSummaryTrackingDelegate(super.trackingReporter);
 
-  void trackViewProfileClick() {
+  void trackViewProfileClick(String label) {
     trackEvent(
       Tracking(
         name: 'profile',
-        action: const ClickAction(label: 'open'),
+        action: ClickAction(label: label),
       ),
     );
   }

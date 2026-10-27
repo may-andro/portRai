@@ -63,9 +63,12 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
     super.dispose();
   }
 
-  /// Tracks the tap and opens [expertise]; [context] is below the bloc.
-  void _open(BuildContext context, ExpertiseEntity expertise) {
-    context.bloc.add(ExpertiseOrbitClickEvent(expertise.title));
+  /// Tracks the tap on the [label] element and opens [expertise]; [context]
+  /// is below the bloc.
+  void _open(BuildContext context, ExpertiseEntity expertise, String label) {
+    context.bloc.add(
+      ExpertiseOrbitClickEvent(label: label, expertiseTitle: expertise.title),
+    );
     ExpertiseScreen.navigate(context, expertise: expertise);
   }
 
@@ -85,7 +88,7 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
         expertises: widget.expertises,
         selection: _selection,
         isVisible: widget.isVisible,
-        onClicked: (expertise) => _open(context, expertise),
+        onClicked: (expertise, label) => _open(context, expertise, label),
       );
     }
 
@@ -107,7 +110,8 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
                   selected: min(index, widget.expertises.length - 1),
                   onSelect: (value) => _selection.value = value,
                   isVisible: widget.isVisible,
-                  onClicked: (expertise) => _open(context, expertise),
+                  onClicked: (expertise, label) =>
+                      _open(context, expertise, label),
                 );
               },
             ),

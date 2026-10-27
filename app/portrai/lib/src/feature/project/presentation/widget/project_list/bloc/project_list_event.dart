@@ -10,10 +10,14 @@ sealed class ProjectListEvent extends Equatable {
 }
 
 final class ProjectClickEvent extends ProjectListEvent {
-  const ProjectClickEvent(this.projectId);
+  const ProjectClickEvent({required this.label, required this.projectId});
 
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  /// ID of the project that opens.
   final String projectId;
 
   @override
-  List<Object?> get props => [projectId];
+  List<Object?> get props => [label, projectId];
 }

@@ -138,7 +138,12 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       verify(
-        () => bloc.add(const ServiceClickEvent('App Development')),
+        () => bloc.add(
+          const ServiceClickEvent(
+            label: 'service_card',
+            serviceTitle: 'App Development',
+          ),
+        ),
       ).called(1);
       // No router in the test wrapper, so opening the service throws.
       expect(tester.takeException(), isNotNull);

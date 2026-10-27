@@ -5,11 +5,14 @@ import 'package:tracking/tracking.dart';
 class ExpertiseOrbitTrackingDelegate extends TrackingDelegate {
   ExpertiseOrbitTrackingDelegate(super.trackingReporter);
 
-  void trackExpertiseClick(String expertiseTitle) {
+  void trackExpertiseClick({
+    required String label,
+    required String expertiseTitle,
+  }) {
     trackEvent(
       Tracking(
         name: 'expertise',
-        action: ClickAction(label: expertiseTitle),
+        action: ClickAction(label: label, value: expertiseTitle),
       ),
     );
   }

@@ -101,7 +101,9 @@ void main() {
     await tester.tap(find.byIcon(Icons.arrow_outward_rounded));
     await tester.pump();
 
-    verify(() => bloc.add(const ViewProfileClickEvent())).called(1);
+    verify(
+      () => bloc.add(const ViewProfileClickEvent('view_profile_button')),
+    ).called(1);
     // No router in the test wrapper, so opening the profile throws.
     expect(tester.takeException(), isNotNull);
   });

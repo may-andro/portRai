@@ -55,20 +55,20 @@ class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
     );
   }
 
-  void trackSeeAllClick(String sectionName) {
+  void trackSeeAllClick({required String label, required String sectionName}) {
     trackEvent(
       Tracking(
         name: 'see_all',
-        action: ClickAction(label: sectionName),
+        action: ClickAction(label: label, value: sectionName),
       ),
     );
   }
 
-  void trackSettingClick() {
+  void trackSettingClick(String label) {
     trackEvent(
       Tracking(
         name: 'setting',
-        action: const ClickAction(label: 'open'),
+        action: ClickAction(label: label),
       ),
     );
   }

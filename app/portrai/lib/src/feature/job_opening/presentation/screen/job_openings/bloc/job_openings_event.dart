@@ -19,7 +19,16 @@ final class JobOpeningsRetryClickEvent extends JobOpeningsEvent {
 }
 
 final class JobOpeningClickEvent extends JobOpeningsEvent {
-  const JobOpeningClickEvent();
+  const JobOpeningClickEvent({required this.label, required this.jobOpeningId});
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  /// ID of the job opening that opens.
+  final String jobOpeningId;
+
+  @override
+  List<Object?> get props => [label, jobOpeningId];
 }
 
 final class JobOpeningsSearchChangedEvent extends JobOpeningsEvent {

@@ -118,7 +118,12 @@ class ExpertiseSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(const SeeAllClickEvent('expertises'));
+                context.bloc.add(
+                  const SeeAllClickEvent(
+                    label: 'see_all_button',
+                    sectionName: 'expertises',
+                  ),
+                );
                 ExpertisesScreen.navigate(context);
               },
             ),
@@ -238,7 +243,12 @@ class ServicesSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(const SeeAllClickEvent('services'));
+                context.bloc.add(
+                  const SeeAllClickEvent(
+                    label: 'see_all_button',
+                    sectionName: 'services',
+                  ),
+                );
                 ServicesScreen.navigate(context);
               },
             ),
@@ -274,7 +284,12 @@ class ExperienceSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(const SeeAllClickEvent('experiences'));
+                context.bloc.add(
+                  const SeeAllClickEvent(
+                    label: 'see_all_button',
+                    sectionName: 'experiences',
+                  ),
+                );
                 ExperiencesScreen.navigate(context);
               },
             ),
@@ -336,7 +351,12 @@ class TestimonialsSectionWidget extends SectionWidget {
           ? SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(const SeeAllClickEvent('testimonials'));
+                context.bloc.add(
+                  const SeeAllClickEvent(
+                    label: 'see_all_button',
+                    sectionName: 'testimonials',
+                  ),
+                );
                 TestimonialListWidget.showAll(context, portfolio.testimonials);
               },
             )

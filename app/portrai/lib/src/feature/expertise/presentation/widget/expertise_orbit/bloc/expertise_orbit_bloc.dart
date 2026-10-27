@@ -17,5 +17,8 @@ class ExpertiseOrbitBloc
   void _mapExpertiseOrbitClickEventToState(
     ExpertiseOrbitClickEvent event,
     Emitter<ExpertiseOrbitState> emit,
-  ) => _trackingDelegate.trackExpertiseClick(event.expertiseTitle);
+  ) => _trackingDelegate.trackExpertiseClick(
+    label: event.label,
+    expertiseTitle: event.expertiseTitle,
+  );
 }

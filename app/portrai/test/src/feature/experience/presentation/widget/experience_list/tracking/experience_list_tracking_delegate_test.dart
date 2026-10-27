@@ -20,19 +20,26 @@ void main() {
       when(() => trackingReporter.sendTrackingEvent(any())).thenReturn(null);
     });
 
-    test('should send a experience click with the item when an item tap is '
-        'tracked', () {
-      delegate.trackExperienceClick('id_0');
+    test(
+      'should send a experience click with the element and item when an item tap is '
+      'tracked',
+      () {
+        delegate.trackExperienceClick(
+          label: 'experience_card',
+          experienceId: 'id_0',
+        );
 
-      final tracking =
-          verify(
-                () => trackingReporter.sendTrackingEvent(captureAny()),
-              ).captured.single
-              as Tracking;
+        final tracking =
+            verify(
+                  () => trackingReporter.sendTrackingEvent(captureAny()),
+                ).captured.single
+                as Tracking;
 
-      expect(tracking.name, 'experience');
-      expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'id_0');
-    });
+        expect(tracking.name, 'experience');
+        expect(tracking.parameters['action'], 'click');
+        expect(tracking.parameters['label'], 'experience_card');
+        expect(tracking.parameters['value'], 'id_0');
+      },
+    );
   });
 }

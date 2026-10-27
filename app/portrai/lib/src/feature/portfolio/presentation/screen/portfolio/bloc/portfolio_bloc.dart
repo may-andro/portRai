@@ -135,12 +135,15 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
   void _mapSeeAllClickEventToState(
     SeeAllClickEvent event,
     Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackSeeAllClick(event.sectionName);
+  ) => _trackingDelegate.trackSeeAllClick(
+    label: event.label,
+    sectionName: event.sectionName,
+  );
 
   void _mapSettingClickEventToState(
     SettingClickEvent event,
     Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackSettingClick();
+  ) => _trackingDelegate.trackSettingClick(event.label);
 
   Future<void> _refreshAssistantAvailability(
     Emitter<PortfolioState> emit,

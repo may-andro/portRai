@@ -10,11 +10,14 @@ class JobOpeningsTrackingDelegate extends ScreenTrackingDelegate {
   JobOpeningsTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackJobOpeningClick() {
+  void trackJobOpeningClick({
+    required String label,
+    required String jobOpeningId,
+  }) {
     trackEvent(
       Tracking(
         name: 'job_opening',
-        action: const ClickAction(label: 'open'),
+        action: ClickAction(label: label, value: jobOpeningId),
       ),
     );
   }

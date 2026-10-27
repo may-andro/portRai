@@ -79,7 +79,9 @@ class _ProjectWidgetState extends State<_ProjectWidget> {
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
           onTap: () {
-            context.bloc.add(ProjectClickEvent(project.id));
+            context.bloc.add(
+              ProjectClickEvent(label: 'project_card', projectId: project.id),
+            );
             ProjectScreen.navigate(context, project: project);
           },
           child: AnimatedScale(

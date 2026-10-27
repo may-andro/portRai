@@ -23,7 +23,7 @@ void main() {
     test(
       'should send a profile click when the view profile tap is tracked',
       () {
-        delegate.trackViewProfileClick();
+        delegate.trackViewProfileClick('view_profile_button');
 
         final tracking =
             verify(
@@ -33,7 +33,7 @@ void main() {
 
         expect(tracking.name, 'profile');
         expect(tracking.parameters['action'], 'click');
-        expect(tracking.parameters['label'], 'open');
+        expect(tracking.parameters['label'], 'view_profile_button');
       },
     );
   });

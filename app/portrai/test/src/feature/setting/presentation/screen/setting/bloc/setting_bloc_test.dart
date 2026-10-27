@@ -319,11 +319,11 @@ void main() {
     );
 
     for (final label in [
-      'language',
-      'theme',
-      'role',
-      'job_openings',
-      'developer_menu',
+      'language_card',
+      'theme_card',
+      'role_card',
+      'job_openings_card',
+      'developer_menu_button',
     ]) {
       blocTest<SettingBloc, SettingState>(
         'should track the $label entry without changing the state when it is '

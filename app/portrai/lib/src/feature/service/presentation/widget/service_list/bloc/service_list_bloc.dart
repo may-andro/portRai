@@ -15,5 +15,8 @@ class ServiceListBloc extends Bloc<ServiceListEvent, ServiceListState> {
   void _mapServiceClickEventToState(
     ServiceClickEvent event,
     Emitter<ServiceListState> emit,
-  ) => _trackingDelegate.trackServiceClick(event.serviceTitle);
+  ) => _trackingDelegate.trackServiceClick(
+    label: event.label,
+    serviceTitle: event.serviceTitle,
+  );
 }

@@ -17,5 +17,5 @@ class PersonalSummaryBloc
   void _mapViewProfileClickEventToState(
     ViewProfileClickEvent event,
     Emitter<PersonalSummaryState> emit,
-  ) => _trackingDelegate.trackViewProfileClick();
+  ) => _trackingDelegate.trackViewProfileClick(event.label);
 }

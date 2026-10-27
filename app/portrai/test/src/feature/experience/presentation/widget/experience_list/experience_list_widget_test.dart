@@ -135,7 +135,14 @@ void main() {
         await tester.tap(find.text('Position 0'));
         await tester.pump();
 
-        verify(() => bloc.add(const ExperienceClickEvent('id_0'))).called(1);
+        verify(
+          () => bloc.add(
+            const ExperienceClickEvent(
+              label: 'experience_card',
+              experienceId: 'id_0',
+            ),
+          ),
+        ).called(1);
         expect(find.text('Description 0'), findsNothing);
         // No router in the test wrapper, so opening the experience throws.
         expect(tester.takeException(), isNotNull);
@@ -150,12 +157,26 @@ void main() {
     await tester.tap(find.text('Position 0'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
-    verifyNever(() => bloc.add(const ExperienceClickEvent('id_0')));
+    verifyNever(
+      () => bloc.add(
+        const ExperienceClickEvent(
+          label: 'experience_card',
+          experienceId: 'id_0',
+        ),
+      ),
+    );
 
     await tester.tap(find.byIcon(Icons.arrow_outward_rounded));
     await tester.pump();
 
-    verify(() => bloc.add(const ExperienceClickEvent('id_0'))).called(1);
+    verify(
+      () => bloc.add(
+        const ExperienceClickEvent(
+          label: 'experience_see_more_button',
+          experienceId: 'id_0',
+        ),
+      ),
+    ).called(1);
     expect(tester.takeException(), isNotNull);
   });
 
