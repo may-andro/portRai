@@ -28,7 +28,12 @@ class ContentWidget extends StatelessWidget {
               bottom: context.space(factor: 3),
             ),
             sliver: SliverToBoxAdapter(
-              child: ServiceListWidget(services: services, isVisible: true),
+              child: ServiceListWidget(
+                services: services,
+                isVisible: true,
+                onOpen: (service) =>
+                    context.bloc.add(ServiceClickEvent(service.title)),
+              ),
             ),
           ),
         ]),

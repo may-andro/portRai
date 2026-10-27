@@ -15,6 +15,7 @@ class ServicesBloc extends Bloc<ServicesEvent, ServicesState>
   ServicesBloc(this._getServicesUseCase, this._trackingDelegate)
     : super(const LoadingState()) {
     on<LoadServicesEvent>(_mapLoadServicesEventToState);
+    on<ServiceClickEvent>(_mapServiceClickEventToState);
     trackScreenViewOn<ScreenVisibleEvent>();
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
@@ -41,4 +42,9 @@ class ServicesBloc extends Bloc<ServicesEvent, ServicesState>
       },
     );
   }
+
+  void _mapServiceClickEventToState(
+    ServiceClickEvent event,
+    Emitter<ServicesState> emit,
+  ) => _trackingDelegate.trackServiceClick(event.serviceTitle);
 }

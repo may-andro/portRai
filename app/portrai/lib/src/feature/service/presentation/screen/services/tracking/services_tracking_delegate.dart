@@ -9,4 +9,13 @@ class _TrackingArea extends TrackingArea {
 class ServicesTrackingDelegate extends ScreenTrackingDelegate {
   ServicesTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
+
+  void trackServiceClick(String serviceTitle) {
+    trackEvent(
+      Tracking(
+        name: 'service',
+        action: ClickAction(label: serviceTitle),
+      ),
+    );
+  }
 }
