@@ -73,13 +73,13 @@ class _OrbitDialWidget extends StatefulWidget {
     required this.expertises,
     required this.selection,
     required this.isVisible,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final List<ExpertiseEntity> expertises;
   final ValueNotifier<int> selection;
   final bool isVisible;
-  final ValueChanged<ExpertiseEntity>? onOpen;
+  final ValueChanged<ExpertiseEntity> onClicked;
 
   @override
   State<_OrbitDialWidget> createState() => _OrbitDialWidgetState();
@@ -186,11 +186,7 @@ class _OrbitDialWidgetState extends State<_OrbitDialWidget>
     _turnTo(target.round(), layout);
   }
 
-  void _open(int index) {
-    final expertise = widget.expertises[index];
-    widget.onOpen?.call(expertise);
-    ExpertiseScreen.navigate(context, expertise: expertise);
-  }
+  void _open(int index) => widget.onClicked(widget.expertises[index]);
 
   @override
   Widget build(BuildContext context) {

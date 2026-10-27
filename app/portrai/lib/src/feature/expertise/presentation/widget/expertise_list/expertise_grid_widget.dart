@@ -7,12 +7,12 @@ class _GridWidget extends StatelessWidget {
   const _GridWidget({
     required this.expertises,
     required this.isVisible,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final List<ExpertiseEntity> expertises;
   final bool isVisible;
-  final ValueChanged<ExpertiseEntity>? onOpen;
+  final ValueChanged<ExpertiseEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class _GridWidget extends StatelessWidget {
     return _ExpertiseCardWidget(
           expertise: expertises[index],
           index: index,
-          onOpen: onOpen,
+          onClicked: onClicked,
         )
         .animate(target: isVisible ? 1 : 0)
         .slideY(

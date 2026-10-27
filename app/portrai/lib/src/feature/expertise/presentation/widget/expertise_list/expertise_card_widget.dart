@@ -7,12 +7,12 @@ class _ExpertiseCardWidget extends StatelessWidget {
   const _ExpertiseCardWidget({
     required this.expertise,
     required this.index,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final ExpertiseEntity expertise;
   final int index;
-  final ValueChanged<ExpertiseEntity>? onOpen;
+  final ValueChanged<ExpertiseEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +30,7 @@ class _ExpertiseCardWidget extends StatelessWidget {
     final artSize = context.space(factor: 20);
 
     return GestureDetector(
-      onTap: () {
-        onOpen?.call(expertise);
-        ExpertiseScreen.navigate(context, expertise: expertise);
-      },
+      onTap: () => onClicked(expertise),
       child: DSHoverableContainerWidget(
         builder: (context, isHovering) {
           return AnimatedContainer(

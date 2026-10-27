@@ -171,8 +171,10 @@ class _ExpertiseSectionBodyWidgetState
           expertises: widget.expertises,
           isVisible: isVisible,
           selection: _selection,
-          onOpen: (expertise) =>
-              context.bloc.add(ExpertiseClickEvent(expertise.title)),
+          onClicked: (expertise) {
+            context.bloc.add(ExpertiseClickEvent(expertise.title));
+            ExpertiseScreen.navigate(context, expertise: expertise);
+          },
         );
       },
       backgroundDetail: (context, isVisible) {

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
-import 'package:portrai/src/feature/expertise/presentation/screen/_screen.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/lottie/_lottie.dart';
 
 part 'expertise_orbit_backdrop_widget.dart';
@@ -45,16 +44,16 @@ class ExpertiseOrbitWidget extends StatefulWidget {
     required this.expertises,
     required this.isVisible,
     this.selection,
-    this.onOpen,
+    required this.onClicked,
   });
 
   final List<ExpertiseEntity> expertises;
   final bool isVisible;
   final ValueNotifier<int>? selection;
 
-  /// Called when an expertise is opened, before its screen is shown, so the
-  /// host screen can track the tap.
-  final ValueChanged<ExpertiseEntity>? onOpen;
+  /// Called with the expertise that is tapped to be opened. The caller decides
+  /// what the tap does, such as opening the expertise.
+  final ValueChanged<ExpertiseEntity> onClicked;
 
   @override
   State<ExpertiseOrbitWidget> createState() => _ExpertiseOrbitWidgetState();
@@ -80,7 +79,7 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
         expertises: widget.expertises,
         selection: _selection,
         isVisible: widget.isVisible,
-        onOpen: widget.onOpen,
+        onClicked: widget.onClicked,
       );
     }
 
@@ -102,7 +101,7 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
                   selected: min(index, widget.expertises.length - 1),
                   onSelect: (value) => _selection.value = value,
                   isVisible: widget.isVisible,
-                  onOpen: widget.onOpen,
+                  onClicked: widget.onClicked,
                 );
               },
             ),
