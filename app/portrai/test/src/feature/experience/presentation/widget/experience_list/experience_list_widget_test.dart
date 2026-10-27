@@ -2,12 +2,27 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
+import 'package:portrai/src/feature/experience/presentation/widget/experience_list/bloc/_bloc.dart';
 import 'package:portrai/src/feature/experience/presentation/widget/experience_list/experience_list.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import '../../../../../../mock/feature/experience/presentation/widget/experience_list/bloc/mock_experience_list_bloc.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
+  late MockExperienceListBloc bloc;
+
+  setUp(() async {
+    await appServiceLocator.reset();
+    bloc = MockExperienceListBloc()
+      ..stubState()
+      ..registerFactory();
+  });
+
+  tearDown(() => appServiceLocator.reset());
+
   ExperienceEntity experience(int index, {DateTime? endDate}) {
     return ExperienceEntity(
       company: 'Company $index',
@@ -112,18 +127,58 @@ void main() {
 
   for (final size in ['mobile', 'tablet']) {
     testWidgets(
-      'should navigate instead of expanding when a card is tapped on $size',
+      'should track the tap and open the experience instead of expanding '
+      'when a card is tapped on $size',
       (tester) async {
         await pumpList(tester, sizes[size]!);
 
         await tester.tap(find.text('Position 0'));
         await tester.pump();
 
+        verify(
+          () => bloc.add(
+            const ExperienceClickEvent(
+              label: 'experience_card',
+              experienceId: 'id_0',
+            ),
+          ),
+        ).called(1);
         expect(find.text('Description 0'), findsNothing);
+        // No router in the test wrapper, so opening the experience throws.
         expect(tester.takeException(), isNotNull);
       },
     );
   }
+
+  testWidgets('should track the tap and open the experience when See more '
+      'is tapped on an expanded card on desktop', (tester) async {
+    await pumpList(tester, sizes['desktop']!);
+
+    await tester.tap(find.text('Position 0'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    verifyNever(
+      () => bloc.add(
+        const ExperienceClickEvent(
+          label: 'experience_card',
+          experienceId: 'id_0',
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.arrow_outward_rounded));
+    await tester.pump();
+
+    verify(
+      () => bloc.add(
+        const ExperienceClickEvent(
+          label: 'experience_see_more_button',
+          experienceId: 'id_0',
+        ),
+      ),
+    ).called(1);
+    expect(tester.takeException(), isNotNull);
+  });
 
   testWidgets('should move only the spotlight when the pointer moves over a '
       'card', (tester) async {

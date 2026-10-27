@@ -32,5 +32,20 @@ void main() {
       expect(tracking.parameters['event'], 'screen_view');
       expect(tracking.parameters['area'], 'developer_menu');
     });
+
+    test('should send a developer menu entry click with the entry when an '
+        'entry tap is tracked', () {
+      delegate.trackEntryClick('feature_flags_row');
+
+      final tracking =
+          verify(
+                () => trackingReporter.sendTrackingEvent(captureAny()),
+              ).captured.single
+              as Tracking;
+
+      expect(tracking.name, 'developer_menu_entry');
+      expect(tracking.parameters['action'], 'click');
+      expect(tracking.parameters['label'], 'feature_flags_row');
+    });
   });
 }

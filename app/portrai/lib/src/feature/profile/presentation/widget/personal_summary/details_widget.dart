@@ -110,7 +110,12 @@ class _DetailsWidget extends StatelessWidget {
                       buttonColor: context.colorPalette.brand.primary,
                       size: context.buttonSize,
                       elevation: context.dimen.elevationLevel2,
-                      onPressed: () => ProfileScreen.navigate(context),
+                      onPressed: () {
+                        context.bloc.add(
+                          const ViewProfileClickEvent('view_profile_button'),
+                        );
+                        ProfileScreen.navigate(context);
+                      },
                     ),
                   ),
                 ),

@@ -52,5 +52,19 @@ void main() {
       expect(tracking.parameters['label'], 'mayank271993@gmail.com');
       expect(tracking.parameters['action'], 'click');
     });
+
+    test('should send a resume click when the resume tap is tracked', () {
+      delegate.trackResumeClick('social_resume_button');
+
+      final tracking =
+          verify(
+                () => trackingReporter.sendTrackingEvent(captureAny()),
+              ).captured.single
+              as Tracking;
+
+      expect(tracking.name, 'resume');
+      expect(tracking.parameters['action'], 'click');
+      expect(tracking.parameters['label'], 'social_resume_button');
+    });
   });
 }

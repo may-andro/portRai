@@ -37,3 +37,13 @@ final class OpenExternalUrlEvent extends ProfessionalSummaryEvent {
   @override
   List<Object> get props => [url, label];
 }
+
+final class ResumeClickEvent extends ProfessionalSummaryEvent {
+  const ResumeClickEvent(this.label);
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  @override
+  List<Object> get props => [label];
+}

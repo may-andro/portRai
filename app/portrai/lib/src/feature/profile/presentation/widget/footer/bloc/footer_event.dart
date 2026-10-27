@@ -38,3 +38,13 @@ final class OpenEmailClientEvent extends FooterEvent {
   @override
   List<Object?> get props => [email];
 }
+
+final class ResumeClickEvent extends FooterEvent {
+  const ResumeClickEvent(this.label);
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  @override
+  List<Object?> get props => [label];
+}

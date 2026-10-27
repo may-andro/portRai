@@ -118,5 +118,17 @@ void main() {
         ).called(1);
       },
     );
+
+    for (final label in ['feature_flags_row', 'tracking_viewer_row']) {
+      blocTest<DeveloperMenuBloc, DeveloperMenuState>(
+        'should track the $label entry without changing the state when it is '
+        'tapped',
+        build: buildBloc,
+        act: (bloc) => bloc.add(DeveloperMenuEntryClickEvent(label)),
+        expect: () => const <DeveloperMenuState>[],
+        verify: (_) =>
+            verify(() => trackingDelegate.trackEntryClick(label)).called(1),
+      );
+    }
   });
 }

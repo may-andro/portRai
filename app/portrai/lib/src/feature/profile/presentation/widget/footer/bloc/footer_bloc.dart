@@ -18,6 +18,7 @@ class FooterBloc extends Bloc<FooterEvent, FooterState> {
   ) : super(const LoadingState()) {
     on<LoadDataEvent>(_mapLoadDataEventToState);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
+    on<ResumeClickEvent>(_mapResumeClickEventToState);
     on<OpenEmailClientEvent>(_mapOpenEmailClientEventToState);
   }
 
@@ -69,4 +70,9 @@ class FooterBloc extends Bloc<FooterEvent, FooterState> {
       _trackingDelegate.trackEmailClick(event.email);
     });
   }
+
+  void _mapResumeClickEventToState(
+    ResumeClickEvent event,
+    Emitter<FooterState> emit,
+  ) => _trackingDelegate.trackResumeClick(event.label);
 }

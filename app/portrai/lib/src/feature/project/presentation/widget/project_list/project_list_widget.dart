@@ -1,7 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
-import 'package:portrai/src/feature/project/presentation/screen/_screen.dart';
+import 'package:portrai/src/feature/project/presentation/screen/project/project_screen.dart';
+import 'package:portrai/src/feature/project/presentation/widget/project_list/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 class ProjectListWidget extends StatelessWidget {
   const ProjectListWidget({
@@ -16,7 +18,7 @@ class ProjectListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Room for the hover scale/glow, which the section would otherwise clip.
-    return Padding(
+    final list = Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.space(),
         vertical: context.space(factor: 2),
@@ -39,6 +41,10 @@ class ProjectListWidget extends StatelessWidget {
               .fadeIn(delay: (80 + index * 70).ms, duration: 300.ms);
         },
       ),
+    );
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ProjectListBloc>(),
+      child: list,
     );
   }
 }
@@ -72,7 +78,12 @@ class _ProjectWidgetState extends State<_ProjectWidget> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-          onTap: () => ProjectScreen.navigate(context, project: project),
+          onTap: () {
+            context.bloc.add(
+              ProjectClickEvent(label: 'project_card', projectId: project.id),
+            );
+            ProjectScreen.navigate(context, project: project);
+          },
           child: AnimatedScale(
             scale: _hover ? 1.08 : 1,
             duration: 250.ms,

@@ -2,6 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/extension/l10n_extension.dart';
 import 'package:portrai/src/feature/locale/locale.dart';
+import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 
 class LanguageCardWidget extends StatelessWidget {
   const LanguageCardWidget({super.key});
@@ -41,7 +42,10 @@ class LanguageCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: context.colorPalette.neutral.grey3.color,
         ),
-        onTap: () => LocaleSelectionScreen.navigate(context),
+        onTap: () {
+          context.bloc.add(const SettingEntryClickEvent('language_card'));
+          LocaleSelectionScreen.navigate(context);
+        },
       ),
     );
   }

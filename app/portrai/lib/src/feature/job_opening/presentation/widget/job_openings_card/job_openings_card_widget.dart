@@ -2,11 +2,26 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/job_opening/presentation/route/_route.dart';
+import 'package:portrai/src/feature/job_opening/presentation/widget/job_openings_card/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 
 /// The Settings entry point. Opening it asks for sign-in first when needed.
 class JobOpeningsCardWidget extends StatelessWidget {
   const JobOpeningsCardWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<JobOpeningsCardBloc>(),
+      child: const _CardWidget(),
+    );
+  }
+}
+
+/// Tracks the tap and opens the job openings.
+class _CardWidget extends StatelessWidget {
+  const _CardWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +59,12 @@ class JobOpeningsCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: palette.neutral.grey3.color,
         ),
-        onTap: () => context.pushScreen(JobOpeningModuleRoute.jobOpenings),
+        onTap: () {
+          context.bloc.add(
+            const JobOpeningsCardClickEvent('job_openings_card'),
+          );
+          context.pushScreen(JobOpeningModuleRoute.jobOpenings);
+        },
       ),
     );
   }

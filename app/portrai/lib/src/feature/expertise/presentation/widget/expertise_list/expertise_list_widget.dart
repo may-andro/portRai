@@ -1,7 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
-import 'package:portrai/src/feature/expertise/presentation/screen/_screen.dart';
+import 'package:portrai/src/feature/expertise/presentation/screen/expertise/expertise_screen.dart';
+import 'package:portrai/src/feature/expertise/presentation/widget/expertise_list/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 part 'expertise_card_widget.dart';
 
@@ -27,11 +29,14 @@ class ExpertiseListWidget extends StatelessWidget {
 
     final count = visibleItemsCount;
 
-    return _GridWidget(
-      expertises: !context.isDesktop && count != null
-          ? allExpertise.take(count).toList()
-          : allExpertise,
-      isVisible: isVisible,
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ExpertiseListBloc>(),
+      child: _GridWidget(
+        expertises: !context.isDesktop && count != null
+            ? allExpertise.take(count).toList()
+            : allExpertise,
+        isVisible: isVisible,
+      ),
     );
   }
 }

@@ -20,7 +20,9 @@ class SettingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return LocalAssistantVisibilityWidget(
       child: ScreenScaffoldWidget<SettingBloc, SettingState>(
-        onResume: (bloc) => bloc.add(const LoadSettingsEvent()),
+        onResume: (bloc) => bloc
+          ..add(const ScreenVisibleEvent())
+          ..add(const LoadSettingsEvent()),
         body: ScreenContentWidget<SettingBloc, SettingState>(
           buildWhen: (previous, current) => previous != current,
           contentOf: (state) => switch (state) {

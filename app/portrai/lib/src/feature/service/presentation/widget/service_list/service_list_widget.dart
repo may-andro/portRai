@@ -2,6 +2,8 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/service_screen.dart';
+import 'package:portrai/src/feature/service/presentation/widget/service_list/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 part 'service_card_widget.dart';
 
@@ -23,9 +25,12 @@ class ServiceListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GridWidget(
-      services: services.take(visibleItemsCount ?? services.length).toList(),
-      isVisible: isVisible,
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ServiceListBloc>(),
+      child: _GridWidget(
+        services: services.take(visibleItemsCount ?? services.length).toList(),
+        isVisible: isVisible,
+      ),
     );
   }
 }

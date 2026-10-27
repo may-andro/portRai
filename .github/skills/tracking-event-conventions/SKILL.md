@@ -22,26 +22,26 @@ sub-folder, following the same non-screen exception as the folder layout
 
 ```dart
 class _TrackingArea extends TrackingArea {
-  const _TrackingArea() : super('experience');
+  const _TrackingArea() : super('portfolio');
 }
 
 @register
-class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
-  ExperienceTrackingDelegate(TrackingReporter trackingReporter)
+class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
+  PortfolioTrackingDelegate(TrackingReporter trackingReporter)
     : super(const _TrackingArea(), trackingReporter);
 
-  void trackTabItemSelection(String sectionName) {
+  void trackSeeAllClick({required String label, required String sectionName}) {
     trackEvent(
       Tracking(
-        name: 'header_tab',
-        action: ClickAction(label: sectionName),
+        name: 'see_all',
+        action: ClickAction(label: label, value: sectionName),
       ),
     );
   }
 }
 ```
 
-(`app/portrai/lib/src/feature/experience/presentation/screen/experience/tracking/experience_tracking_delegate.dart`)
+(`app/portrai/lib/src/feature/portfolio/presentation/screen/portfolio/tracking/portfolio_tracking_delegate.dart`)
 
 - `TrackingArea` is a private (`_`-prefixed) const subclass naming the
   screen/area (snake or lower-case words, e.g. `'experience'`,
@@ -57,10 +57,49 @@ class ExperienceTrackingDelegate extends ScreenTrackingDelegate {
   a generic `track(event)` passthrough — callers in the bloc should never
   construct raw `Tracking`/`ViewTracking` objects themselves.
 - Use `ViewTracking(label:)` for screen/section visibility events, and
-  `Tracking(name:, action: ClickAction(label:))` for discrete user actions
-  (taps, link clicks). Keep `name` values short/stable snake or lower-words
-  identifiers (`'external_link'`, `'header_tab'`) since they become
-  analytics event names.
+  `Tracking(name:, action: ClickAction(label:, value:))` for discrete user
+  actions (taps, link clicks). Keep `name` values short/stable snake or
+  lower-words identifiers (`'external_link'`, `'see_all'`) since they become
+  analytics event names. Fill `label` and `value` as described in
+  [Click labels](#click-labels).
+
+## Click labels
+
+A click says what was tapped and, separately, what it was about.
+
+- `ClickAction.label` names the tapped element in snake case as
+  `<thing>_<element>`: `service_card`, `see_all_button`,
+  `experience_see_more_button`, `feature_flags_row`. Never use a generic word
+  such as `open`, and never put the item itself in the label.
+- `ClickAction.value` carries the item the tap is about when there is one: its
+  ID, or its title when it has no ID, or the section (`services`). Leave it out
+  when the element stands alone, such as `setting_button`.
+- When one item has several tap targets, each gets its own label, so the card
+  and its See more button are `experience_card` and
+  `experience_see_more_button`.
+- The widget that handles the tap knows which element was tapped, so it passes
+  the label, and the item when there is one, in the click event. The bloc
+  forwards them to the delegate unchanged; don't map an enum to label strings
+  in the bloc.
+
+```dart
+// Widget
+context.bloc.add(
+  ServiceClickEvent(label: 'service_card', serviceTitle: service.title),
+);
+
+// Bloc
+void _mapServiceClickEventToState(
+  ServiceClickEvent event,
+  Emitter<ServiceListState> emit,
+) => _trackingDelegate.trackServiceClick(
+  label: event.label,
+  serviceTitle: event.serviceTitle,
+);
+```
+
+Delegate tests check the event `name`, the `click` action, the `label` and the
+`value`.
 
 ## Wiring into a bloc
 

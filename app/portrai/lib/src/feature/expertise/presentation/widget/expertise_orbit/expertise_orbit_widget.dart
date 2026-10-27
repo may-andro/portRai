@@ -7,19 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/expertise/domain/_domain.dart';
-import 'package:portrai/src/feature/expertise/presentation/screen/_screen.dart';
+import 'package:portrai/src/feature/expertise/presentation/screen/expertise/expertise_screen.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertise/lottie/_lottie.dart';
+import 'package:portrai/src/feature/expertise/presentation/widget/expertise_orbit/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 part 'expertise_orbit_backdrop_widget.dart';
-
 part 'expertise_orbit_dial_widget.dart';
-
 part 'expertise_orbit_node_widget.dart';
-
 part 'expertise_orbit_painter.dart';
-
 part 'expertise_orbit_ring_widget.dart';
-
 part 'expertise_orbit_spinner_widget.dart';
 
 const _maxOrbitSide = 720.0;
@@ -66,15 +63,32 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
     super.dispose();
   }
 
+  /// Tracks the tap on the [label] element and opens [expertise]; [context]
+  /// is below the bloc.
+  void _open(BuildContext context, ExpertiseEntity expertise, String label) {
+    context.bloc.add(
+      ExpertiseOrbitClickEvent(label: label, expertiseTitle: expertise.title),
+    );
+    ExpertiseScreen.navigate(context, expertise: expertise);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.expertises.isEmpty) return const SizedBox.shrink();
 
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ExpertiseOrbitBloc>(),
+      child: Builder(builder: _buildOrbit),
+    );
+  }
+
+  Widget _buildOrbit(BuildContext context) {
     if (context.isMobile) {
       return _OrbitDialWidget(
         expertises: widget.expertises,
         selection: _selection,
         isVisible: widget.isVisible,
+        onClicked: (expertise, label) => _open(context, expertise, label),
       );
     }
 
@@ -96,6 +110,8 @@ class _ExpertiseOrbitWidgetState extends State<ExpertiseOrbitWidget> {
                   selected: min(index, widget.expertises.length - 1),
                   onSelect: (value) => _selection.value = value,
                   isVisible: widget.isVisible,
+                  onClicked: (expertise, label) =>
+                      _open(context, expertise, label),
                 );
               },
             ),

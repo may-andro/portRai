@@ -269,6 +269,32 @@ void main() {
     );
 
     blocTest<PortfolioBloc, PortfolioState>(
+      'should track each tap that opens another screen without changing the '
+      'state',
+      build: buildBloc,
+      act: (bloc) => bloc
+        ..add(
+          const SeeAllClickEvent(
+            label: 'see_all_button',
+            sectionName: 'services',
+          ),
+        )
+        ..add(const SettingClickEvent('setting_button')),
+      expect: () => const <PortfolioState>[],
+      verify: (_) {
+        verify(
+          () => trackingDelegate.trackSeeAllClick(
+            label: 'see_all_button',
+            sectionName: 'services',
+          ),
+        ).called(1);
+        verify(
+          () => trackingDelegate.trackSettingClick('setting_button'),
+        ).called(1);
+      },
+    );
+
+    blocTest<PortfolioBloc, PortfolioState>(
       'should track screen views drawer changes and content impressions when visible events arrive',
       build: buildBloc,
       act: (bloc) {

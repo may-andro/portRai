@@ -16,6 +16,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/permission/domain/use_case/mock_is_permission_supported_use_case.dart';
+import '../../../../../../../mock/feature/setting/presentation/screen/setting/tracking/mock_setting_tracking_delegate.dart';
 import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
 
 void main() {
@@ -24,6 +25,7 @@ void main() {
     late MockIsLocalAssistantSupportedUseCase local;
     late MockGetGuestUserUseCase getGuestUserUseCase;
     late MockIsPermissionSupportedUseCase isPermissionSupported;
+    late MockSettingTrackingDelegate trackingDelegate;
 
     SettingBloc buildBloc() => SettingBloc(
       isFeatureEnabledUseCase,
@@ -31,9 +33,11 @@ void main() {
       local,
       getGuestUserUseCase,
       isPermissionSupported,
+      trackingDelegate,
     );
 
     setUp(() {
+      trackingDelegate = MockSettingTrackingDelegate();
       isPermissionSupported = MockIsPermissionSupportedUseCase()
         ..stubCall(AppPermission.notifications, isSupported: false);
       isFeatureEnabledUseCase = MockIsFeatureEnabledUseCase()
@@ -157,6 +161,7 @@ void main() {
         local,
         getGuestUserUseCase,
         isPermissionSupported,
+        trackingDelegate,
       ),
       act: (bloc) => bloc.add(const LoadSettingsEvent()),
       expect: () => const [
@@ -311,6 +316,30 @@ void main() {
         (bloc.state as SettingLoadedState).isNotificationSettingAvailable,
         isTrue,
       ),
+    );
+
+    for (final label in [
+      'language_card',
+      'role_card',
+      'developer_menu_button',
+    ]) {
+      blocTest<SettingBloc, SettingState>(
+        'should track the $label entry without changing the state when it is '
+        'tapped',
+        build: buildBloc,
+        act: (bloc) => bloc.add(SettingEntryClickEvent(label)),
+        expect: () => const <SettingState>[],
+        verify: (_) =>
+            verify(() => trackingDelegate.trackEntryClick(label)).called(1),
+      );
+    }
+
+    blocTest<SettingBloc, SettingState>(
+      'should track the screen view when the screen becomes visible',
+      build: buildBloc,
+      act: (bloc) => bloc.add(const ScreenVisibleEvent()),
+      expect: () => const <SettingState>[],
+      verify: (_) => verify(() => trackingDelegate.trackScreenView()).called(1),
     );
   });
 }

@@ -54,6 +54,16 @@ class AiImageModelClickEvent extends DeveloperMenuEvent {
   List<Object?> get props => [model];
 }
 
+final class DeveloperMenuEntryClickEvent extends DeveloperMenuEvent {
+  const DeveloperMenuEntryClickEvent(this.label);
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  @override
+  List<Object?> get props => [label];
+}
+
 // Tracking Events
 final class ScreenVisibleEvent extends DeveloperMenuEvent {
   const ScreenVisibleEvent();

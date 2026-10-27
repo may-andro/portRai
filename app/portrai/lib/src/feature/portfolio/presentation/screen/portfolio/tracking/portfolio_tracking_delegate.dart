@@ -54,4 +54,22 @@ class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
+
+  void trackSeeAllClick({required String label, required String sectionName}) {
+    trackEvent(
+      Tracking(
+        name: 'see_all',
+        action: ClickAction(label: label, value: sectionName),
+      ),
+    );
+  }
+
+  void trackSettingClick(String label) {
+    trackEvent(
+      Tracking(
+        name: 'setting',
+        action: ClickAction(label: label),
+      ),
+    );
+  }
 }

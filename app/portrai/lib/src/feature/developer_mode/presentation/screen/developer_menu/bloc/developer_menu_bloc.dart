@@ -19,13 +19,14 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     this._getAiImageSettingsUseCase,
     this._updateAiImageSettingsUseCase,
   ) : super(const DeveloperMenuInitialState()) {
-    on<LoadDeveloperMenuEvent>(_onLoad);
-    on<AssetSourceClickEvent>(_onAssetSourceClick);
-    on<AiImageStyleClickEvent>(_onAiImageStyleClick);
-    on<AiImageModelClickEvent>(_onAiImageModelClick);
-    on<ForceFatalCrashEvent>(_onForceFatalCrash);
-    on<ForceNonFatalCrashEvent>(_onForceNonFatalCrash);
-    on<ForceBlacklistErrorEvent>(_onForceBlacklistError);
+    on<LoadDeveloperMenuEvent>(_mapLoadDeveloperMenuEventToState);
+    on<AssetSourceClickEvent>(_mapAssetSourceClickEventToState);
+    on<AiImageStyleClickEvent>(_mapAiImageStyleClickEventToState);
+    on<AiImageModelClickEvent>(_mapAiImageModelClickEventToState);
+    on<ForceFatalCrashEvent>(_mapForceFatalCrashEventToState);
+    on<ForceNonFatalCrashEvent>(_mapForceNonFatalCrashEventToState);
+    on<ForceBlacklistErrorEvent>(_mapForceBlacklistErrorEventToState);
+    on<DeveloperMenuEntryClickEvent>(_mapDeveloperMenuEntryClickEventToState);
     trackScreenViewOn<ScreenVisibleEvent>();
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
@@ -44,7 +45,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     _ => const DeveloperMenuLoadedState(),
   };
 
-  Future<void> _onLoad(
+  Future<void> _mapLoadDeveloperMenuEventToState(
     LoadDeveloperMenuEvent event,
     Emitter<DeveloperMenuState> emit,
   ) async {
@@ -58,7 +59,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     );
   }
 
-  Future<void> _onAssetSourceClick(
+  Future<void> _mapAssetSourceClickEventToState(
     AssetSourceClickEvent event,
     Emitter<DeveloperMenuState> emit,
   ) async {
@@ -68,7 +69,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     }
   }
 
-  Future<void> _onAiImageStyleClick(
+  Future<void> _mapAiImageStyleClickEventToState(
     AiImageStyleClickEvent event,
     Emitter<DeveloperMenuState> emit,
   ) => _updateAiImageSettings(
@@ -76,7 +77,7 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     emit,
   );
 
-  Future<void> _onAiImageModelClick(
+  Future<void> _mapAiImageModelClickEventToState(
     AiImageModelClickEvent event,
     Emitter<DeveloperMenuState> emit,
   ) => _updateAiImageSettings(
@@ -96,21 +97,26 @@ class DeveloperMenuBloc extends Bloc<DeveloperMenuEvent, DeveloperMenuState>
     }
   }
 
-  void _onForceFatalCrash(
+  void _mapDeveloperMenuEntryClickEventToState(
+    DeveloperMenuEntryClickEvent event,
+    Emitter<DeveloperMenuState> emit,
+  ) => _trackingDelegate.trackEntryClick(event.label);
+
+  void _mapForceFatalCrashEventToState(
     ForceFatalCrashEvent event,
     Emitter<DeveloperMenuState> emit,
   ) {
     // Handle fatal crash
   }
 
-  void _onForceNonFatalCrash(
+  void _mapForceNonFatalCrashEventToState(
     ForceNonFatalCrashEvent event,
     Emitter<DeveloperMenuState> emit,
   ) {
     // Handle non-fatal crash
   }
 
-  void _onForceBlacklistError(
+  void _mapForceBlacklistErrorEventToState(
     ForceBlacklistErrorEvent event,
     Emitter<DeveloperMenuState> emit,
   ) {

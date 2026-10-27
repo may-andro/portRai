@@ -12,18 +12,25 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/setting/domain/_domain.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_event.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
+import 'package:portrai/src/feature/setting/presentation/screen/setting/tracking/_tracking.dart';
 import 'package:portrai/src/feature/user/user.dart';
+import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
+import 'package:tracking/tracking.dart';
 
 @register
-class SettingBloc extends Bloc<SettingEvent, SettingState> {
+class SettingBloc extends Bloc<SettingEvent, SettingState>
+    with ScreenTrackingBlocMixin<SettingEvent, SettingState> {
   SettingBloc(
     this._isFeatureEnabledUseCase,
     this._buildConfig,
     this._isLocalAssistantSupportedUseCase,
     this._getGuestUserUseCase,
     this._isPermissionSupportedUseCase,
+    this._trackingDelegate,
   ) : super(const SettingInitialState()) {
     on<LoadSettingsEvent>(_mapLoadSettingsEventToState);
+    on<SettingEntryClickEvent>(_mapSettingEntryClickEventToState);
+    trackScreenViewOn<ScreenVisibleEvent>();
   }
 
   final IsFeatureEnabledUseCase _isFeatureEnabledUseCase;
@@ -31,7 +38,16 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   final IsLocalAssistantSupportedUseCase _isLocalAssistantSupportedUseCase;
   final GetGuestUserUseCase _getGuestUserUseCase;
   final IsPermissionSupportedUseCase _isPermissionSupportedUseCase;
+  final SettingTrackingDelegate _trackingDelegate;
   int _loadRevision = 0;
+
+  @override
+  ScreenTrackingDelegate get screenTrackingDelegate => _trackingDelegate;
+
+  void _mapSettingEntryClickEventToState(
+    SettingEntryClickEvent event,
+    Emitter<SettingState> emit,
+  ) => _trackingDelegate.trackEntryClick(event.label);
 
   Future<void> _mapLoadSettingsEventToState(
     LoadSettingsEvent event,

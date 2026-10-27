@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/expertise_entity.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
-import 'package:portrai/src/feature/expertise/presentation/screen/expertise/expertise_screen.dart';
+import 'package:portrai/src/feature/expertise/presentation/widget/expertise_orbit/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/widget/expertise_orbit/expertise_orbit_widget.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../../../../mock/feature/expertise/presentation/widget/expertise_orbit/bloc/mock_expertise_orbit_bloc.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -45,6 +47,32 @@ void main() {
     }
   }
 
+  late MockExpertiseOrbitBloc bloc;
+
+  setUp(() async {
+    await appServiceLocator.reset();
+    bloc = MockExpertiseOrbitBloc()
+      ..stubState()
+      ..registerFactory();
+  });
+
+  tearDown(() => appServiceLocator.reset());
+
+  /// Checks the tap on [label] was tracked for [title]; opening it throws
+  /// without a router in the test wrapper.
+  void expectOpened(
+    WidgetTester tester, {
+    required String label,
+    required String title,
+  }) {
+    verify(
+      () => bloc.add(
+        ExpertiseOrbitClickEvent(label: label, expertiseTitle: title),
+      ),
+    ).called(1);
+    expect(tester.takeException(), isNotNull);
+  }
+
   Future<Size> pumpOrbit(WidgetTester tester, Size size) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = size;
@@ -58,26 +86,7 @@ void main() {
     final orbit = SingleChildScrollView(
       child: ExpertiseOrbitWidget(expertises: expertises, isVisible: true),
     );
-    await tester.pumpWidget(
-      TestWidgetWrapper(
-        routerConfig: GoRouter(
-          routes: [
-            GoRoute(
-              path: '/',
-              builder: (context, state) => Scaffold(body: orbit),
-            ),
-            GoRoute(
-              name: 'expertise',
-              path: '/expertise/:${ExpertiseScreen.routePathParameter}',
-              builder: (context, state) => Scaffold(
-                body: Text('Opened ${(state.extra! as ExpertiseEntity).title}'),
-              ),
-            ),
-          ],
-        ),
-        child: const SizedBox(),
-      ),
-    );
+    await tester.pumpWidget(TestWidgetWrapper(child: Scaffold(body: orbit)));
     await settle(tester);
     tester.takeException();
     return tester.getSize(find.byType(ExpertiseOrbitWidget));
@@ -94,7 +103,7 @@ void main() {
     });
 
     testWidgets(
-      'should open the selected expertise when view details is tapped on '
+      'should track and open the selected expertise when view details is tapped on '
       '${size.key}',
       (tester) async {
         await pumpOrbit(tester, size.value);
@@ -107,7 +116,11 @@ void main() {
         );
         await settle(tester);
 
-        expect(find.text('Opened Flutter Development'), findsOneWidget);
+        expectOpened(
+          tester,
+          label: 'expertise_view_details_button',
+          title: 'Flutter Development',
+        );
       },
     );
   }
@@ -141,18 +154,30 @@ void main() {
     await settle(tester);
 
     expect(find.text('Native Android'), findsOneWidget);
-    expect(find.text('Opened Native Android'), findsNothing);
+    verifyNever(
+      () => bloc.add(
+        const ExpertiseOrbitClickEvent(
+          label: 'expertise_orbit_node',
+          expertiseTitle: 'Native Android',
+        ),
+      ),
+    );
   });
 
   testWidgets(
-    'should open the expertise when its selected node on the dial is tapped',
+    'should track and open the expertise when its selected node on the dial is '
+    'tapped',
     (tester) async {
       await pumpOrbit(tester, mobileSize);
 
       await tester.tap(dialNode('Flutter Development'));
       await settle(tester);
 
-      expect(find.text('Opened Flutter Development'), findsOneWidget);
+      expectOpened(
+        tester,
+        label: 'expertise_orbit_node',
+        title: 'Flutter Development',
+      );
     },
   );
 

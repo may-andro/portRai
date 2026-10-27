@@ -1,12 +1,27 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
+import 'package:portrai/src/feature/service/presentation/widget/service_list/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/widget/service_list/service_list_widget.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import '../../../../../../mock/feature/service/presentation/widget/service_list/bloc/mock_service_list_bloc.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
+  late MockServiceListBloc bloc;
+
+  setUp(() async {
+    await appServiceLocator.reset();
+    bloc = MockServiceListBloc()
+      ..stubState()
+      ..registerFactory();
+  });
+
+  tearDown(() => appServiceLocator.reset());
+
   const service = ServiceEntity(
     image: 'service.png',
     title: 'App Development',
@@ -110,9 +125,8 @@ void main() {
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
     });
 
-    testWidgets('should navigate to the service screen when a card is tapped', (
-      tester,
-    ) async {
+    testWidgets('should track the tap and open the service when a card is '
+        'tapped', (tester) async {
       await tester.pumpWidget(
         const TestWidgetWrapper(
           child: ServiceListWidget(services: [service], isVisible: true),
@@ -123,7 +137,15 @@ void main() {
       await tester.tap(find.byType(DSSpotlightCardWidget));
       await tester.pump(const Duration(seconds: 1));
 
-      // No router in the test wrapper, so an attempted navigation throws.
+      verify(
+        () => bloc.add(
+          const ServiceClickEvent(
+            label: 'service_card',
+            serviceTitle: 'App Development',
+          ),
+        ),
+      ).called(1);
+      // No router in the test wrapper, so opening the service throws.
       expect(tester.takeException(), isNotNull);
     });
 

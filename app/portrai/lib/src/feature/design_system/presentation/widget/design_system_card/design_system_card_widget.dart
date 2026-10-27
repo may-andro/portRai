@@ -3,11 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/design_system/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/design_system/presentation/route/_route.dart';
+import 'package:portrai/src/feature/design_system/presentation/widget/design_system_card/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 
 /// The Settings entry point to the theme gallery, naming the theme in use.
 class DesignSystemCardWidget extends StatelessWidget {
   const DesignSystemCardWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<DesignSystemCardBloc>(),
+      child: const _CardWidget(),
+    );
+  }
+}
+
+/// Tracks the tap and opens the theme gallery.
+class _CardWidget extends StatelessWidget {
+  const _CardWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +60,10 @@ class DesignSystemCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: palette.neutral.grey3.color,
         ),
-        onTap: () =>
-            context.pushScreen(DesignSystemModuleRoute.designSystemGallery),
+        onTap: () {
+          context.bloc.add(const DesignSystemCardClickEvent('theme_card'));
+          context.pushScreen(DesignSystemModuleRoute.designSystemGallery);
+        },
       ),
     );
   }

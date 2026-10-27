@@ -107,5 +107,39 @@ void main() {
         expect(tracking.parameters['label'], 'portfolio_projects_section');
       },
     );
+
+    test('should send a see all click with the button and the section when a '
+        'see all tap is tracked', () {
+      delegate.trackSeeAllClick(
+        label: 'see_all_button',
+        sectionName: 'services',
+      );
+
+      final tracking =
+          verify(
+                () => trackingReporter.sendTrackingEvent(captureAny()),
+              ).captured.single
+              as Tracking;
+
+      expect(tracking.name, 'see_all');
+      expect(tracking.parameters['action'], 'click');
+      expect(tracking.parameters['label'], 'see_all_button');
+      expect(tracking.parameters['value'], 'services');
+    });
+
+    test('should send a setting click with the button when a settings tap is '
+        'tracked', () {
+      delegate.trackSettingClick('setting_button');
+
+      final tracking =
+          verify(
+                () => trackingReporter.sendTrackingEvent(captureAny()),
+              ).captured.single
+              as Tracking;
+
+      expect(tracking.name, 'setting');
+      expect(tracking.parameters['action'], 'click');
+      expect(tracking.parameters['label'], 'setting_button');
+    });
   });
 }

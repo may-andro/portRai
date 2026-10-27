@@ -82,12 +82,12 @@ class _OrbitSummaryWidget extends StatelessWidget {
     super.key,
     required this.expertise,
     required this.accent,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final ExpertiseEntity expertise;
   final Color accent;
-  final VoidCallback onOpen;
+  final VoidCallback onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +131,7 @@ class _OrbitSummaryWidget extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: DSButtonWidget(
             label: context.localizations.expertiseViewDetails,
-            onPressed: onOpen,
+            onPressed: onClicked,
             size: DSButtonSize.extraSmall,
             icon: Icons.arrow_forward_rounded,
             iconDirection: DSButtonIconDirection.right,

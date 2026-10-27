@@ -74,3 +74,26 @@ final class AssistantLaunchClickEvent extends PortfolioEvent {
   @override
   List<Object> get props => [isLocal];
 }
+
+final class SeeAllClickEvent extends PortfolioEvent {
+  const SeeAllClickEvent({required this.label, required this.sectionName});
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  /// The section whose full list opens.
+  final String sectionName;
+
+  @override
+  List<Object> get props => [label, sectionName];
+}
+
+final class SettingClickEvent extends PortfolioEvent {
+  const SettingClickEvent(this.label);
+
+  /// The tapped element, such as a button or card.
+  final String label;
+
+  @override
+  List<Object> get props => [label];
+}

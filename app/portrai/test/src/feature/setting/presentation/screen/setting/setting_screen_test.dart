@@ -12,6 +12,8 @@ import 'package:portrai/src/widget/screen_content_widget.dart';
 
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../mock/feature/design_system/presentation/widget/design_system_card/bloc/mock_design_system_card_bloc.dart';
+import '../../../../../../mock/feature/job_opening/presentation/widget/job_openings_card/bloc/mock_job_openings_card_bloc.dart';
 import '../../../../../../mock/feature/setting/presentation/screen/setting/bloc/mock_setting_bloc.dart';
 import '../../../../../../util/package_info_setup.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
@@ -21,6 +23,12 @@ void main() {
     setUp(() async {
       await appServiceLocator.reset();
       registerTestPackageInfo();
+      MockDesignSystemCardBloc()
+        ..stubState()
+        ..registerFactory();
+      MockJobOpeningsCardBloc()
+        ..stubState()
+        ..registerFactory();
     });
 
     tearDown(() async {

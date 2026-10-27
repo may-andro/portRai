@@ -47,7 +47,10 @@ class JobOpeningsBloc extends Bloc<JobOpeningsEvent, JobOpeningsState> {
     JobOpeningClickEvent event,
     Emitter<JobOpeningsState> emit,
   ) {
-    _trackingDelegate.trackJobOpeningClick();
+    _trackingDelegate.trackJobOpeningClick(
+      label: event.label,
+      jobOpeningId: event.jobOpeningId,
+    );
   }
 
   void _mapJobOpeningsSearchChangedEventToState(

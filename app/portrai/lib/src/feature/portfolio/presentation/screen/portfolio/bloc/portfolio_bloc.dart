@@ -35,6 +35,8 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
     trackViewEventOn<SectionVisibleEvent>((event) => event.trackingId);
     on<AssistantLaunchClickEvent>(_mapAssistantLaunchClickEventToState);
+    on<SeeAllClickEvent>(_mapSeeAllClickEventToState);
+    on<SettingClickEvent>(_mapSettingClickEventToState);
   }
 
   final GetPortfolioUseCase _getPortfolioUseCase;
@@ -129,6 +131,19 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     AssistantLaunchClickEvent event,
     Emitter<PortfolioState> emit,
   ) => _trackingDelegate.trackAssistantLaunch(isLocal: event.isLocal);
+
+  void _mapSeeAllClickEventToState(
+    SeeAllClickEvent event,
+    Emitter<PortfolioState> emit,
+  ) => _trackingDelegate.trackSeeAllClick(
+    label: event.label,
+    sectionName: event.sectionName,
+  );
+
+  void _mapSettingClickEventToState(
+    SettingClickEvent event,
+    Emitter<PortfolioState> emit,
+  ) => _trackingDelegate.trackSettingClick(event.label);
 
   Future<void> _refreshAssistantAvailability(
     Emitter<PortfolioState> emit,
