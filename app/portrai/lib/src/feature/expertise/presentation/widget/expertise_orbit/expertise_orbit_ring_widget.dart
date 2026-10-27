@@ -108,7 +108,7 @@ class _OrbitRingWidget extends StatelessWidget {
             key: ValueKey(selected),
             expertise: expertises[selected],
             accent: accent,
-            onOpen: () => onClicked(expertises[selected]),
+            onClicked: () => onClicked(expertises[selected]),
           ),
         ),
       ),
