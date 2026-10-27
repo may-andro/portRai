@@ -1,6 +1,5 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/screen/experience/bloc/_bloc.dart';
@@ -356,7 +355,6 @@ class _LocationMapWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final position = LatLng(experience.latitude!, experience.longitude!);
     final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
     return ClipRRect(
       borderRadius: radius,
@@ -365,26 +363,14 @@ class _LocationMapWidget extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: IgnorePointer(
-                child: GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: position,
-                    zoom: 11,
+              child: DSMapWidget(
+                places: [
+                  DSMapPlace(
+                    latitude: experience.latitude!,
+                    longitude: experience.longitude!,
                   ),
-                  markers: {
-                    Marker(
-                      markerId: const MarkerId('experience_location'),
-                      position: position,
-                    ),
-                  },
-                  // The map never moves, so Android draws it as a still image
-                  // instead of a live view, which is far cheaper to create and
-                  // to scroll past.
-                  liteModeEnabled: true,
-                  zoomControlsEnabled: false,
-                  mapToolbarEnabled: false,
-                  myLocationButtonEnabled: false,
-                ),
+                ],
+                maxZoom: 11,
               ),
             ),
             Positioned(
