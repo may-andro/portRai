@@ -5,13 +5,13 @@ class _CareerTimelineWidget extends StatelessWidget {
     required this.experiences,
     required this.isVisible,
     required this.isZigZag,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final List<ExperienceEntity> experiences;
   final bool isVisible;
   final bool isZigZag;
-  final ValueChanged<ExperienceEntity>? onOpen;
+  final ValueChanged<ExperienceEntity> onClicked;
 
   static double nodeSize(BuildContext context) => context.space(factor: 7);
 
@@ -81,7 +81,7 @@ class _CareerTimelineWidget extends StatelessWidget {
                     isVisible: isVisible,
                     isZigZag: isZigZag,
                     nodeSize: node,
-                    onOpen: onOpen,
+                    onClicked: onClicked,
                   ),
                 ),
             ],
@@ -99,7 +99,7 @@ class _TimelineRowWidget extends StatefulWidget {
     required this.isVisible,
     required this.isZigZag,
     required this.nodeSize,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final ExperienceEntity experience;
@@ -107,7 +107,7 @@ class _TimelineRowWidget extends StatefulWidget {
   final bool isVisible;
   final bool isZigZag;
   final double nodeSize;
-  final ValueChanged<ExperienceEntity>? onOpen;
+  final ValueChanged<ExperienceEntity> onClicked;
 
   @override
   State<_TimelineRowWidget> createState() => _TimelineRowWidgetState();
@@ -127,7 +127,7 @@ class _TimelineRowWidgetState extends State<_TimelineRowWidget> {
         _ExperienceCardWidget(
               experience: widget.experience,
               onHoverChange: (value) => setState(() => _isHovering = value),
-              onOpen: widget.onOpen,
+              onClicked: widget.onClicked,
             )
             .animate(target: widget.isVisible ? 1 : 0)
             .slide(

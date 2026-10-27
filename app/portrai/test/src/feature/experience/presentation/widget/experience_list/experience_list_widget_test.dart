@@ -38,7 +38,7 @@ void main() {
     WidgetTester tester,
     Size size, {
     int? visibleItemsCount,
-    ValueChanged<ExperienceEntity>? onOpen,
+    ValueChanged<ExperienceEntity>? onClicked,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -51,7 +51,7 @@ void main() {
             experiences: experiences,
             isVisible: true,
             visibleItemsCount: visibleItemsCount,
-            onOpen: onOpen,
+            onClicked: onClicked ?? (_) {},
           ),
         ),
       ),
@@ -112,32 +112,43 @@ void main() {
     expect(find.text('Flutter'), findsNothing);
   });
 
-  testWidgets('should report the opened experience when a card is tapped on '
-      'mobile', (tester) async {
-    final openedExperiences = <ExperienceEntity>[];
-    await pumpList(tester, sizes['mobile']!, onOpen: openedExperiences.add);
-
-    await tester.tap(find.text('Position 0'));
-    await tester.pump();
-    tester.takeException();
-
-    expect(openedExperiences, [experiences[0]]);
-  });
-
   for (final size in ['mobile', 'tablet']) {
     testWidgets(
-      'should navigate instead of expanding when a card is tapped on $size',
+      'should report the tapped experience instead of expanding when a card '
+      'is tapped on $size',
       (tester) async {
-        await pumpList(tester, sizes[size]!);
+        final clickedExperiences = <ExperienceEntity>[];
+        await pumpList(tester, sizes[size]!, onClicked: clickedExperiences.add);
 
         await tester.tap(find.text('Position 0'));
         await tester.pump();
 
+        expect(clickedExperiences, [experiences[0]]);
         expect(find.text('Description 0'), findsNothing);
-        expect(tester.takeException(), isNotNull);
+        expect(tester.takeException(), isNull);
       },
     );
   }
+
+  testWidgets('should report the experience when See more is tapped on an '
+      'expanded card on desktop', (tester) async {
+    final clickedExperiences = <ExperienceEntity>[];
+    await pumpList(
+      tester,
+      sizes['desktop']!,
+      onClicked: clickedExperiences.add,
+    );
+
+    await tester.tap(find.text('Position 0'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(clickedExperiences, isEmpty);
+
+    await tester.tap(find.byIcon(Icons.arrow_outward_rounded));
+    await tester.pump();
+
+    expect(clickedExperiences, [experiences[0]]);
+  });
 
   testWidgets('should move only the spotlight when the pointer moves over a '
       'card', (tester) async {

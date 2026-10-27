@@ -274,8 +274,10 @@ class ExperienceSectionWidget extends SectionWidget {
           experiences: portfolio.experiences,
           isVisible: isVisible,
           visibleItemsCount: context.allowedExperienceCount,
-          onOpen: (experience) =>
-              context.bloc.add(ExperienceClickEvent(experience.id)),
+          onClicked: (experience) {
+            context.bloc.add(ExperienceClickEvent(experience.id));
+            ExperienceScreen.navigate(context, id: experience.id);
+          },
         );
       },
       visibilityKey: trackingId,
