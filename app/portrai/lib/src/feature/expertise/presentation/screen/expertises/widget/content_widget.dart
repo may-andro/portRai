@@ -27,6 +27,8 @@ class ContentWidget extends StatelessWidget {
               child: ExpertiseListWidget(
                 allExpertise: expertises,
                 isVisible: true,
+                onOpen: (expertise) =>
+                    context.bloc.add(ExpertiseClickEvent(expertise.title)),
               ),
             ),
           ),

@@ -15,6 +15,7 @@ class ExpertisesBloc extends Bloc<ExpertisesEvent, ExpertisesState>
   ExpertisesBloc(this._getAllExpertiseUseCase, this._trackingDelegate)
     : super(const LoadingState()) {
     on<LoadExpertisesEvent>(_mapLoadExpertisesEventToState);
+    on<ExpertiseClickEvent>(_mapExpertiseClickEventToState);
     trackScreenViewOn<ScreenVisibleEvent>();
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
@@ -41,4 +42,9 @@ class ExpertisesBloc extends Bloc<ExpertisesEvent, ExpertisesState>
       },
     );
   }
+
+  void _mapExpertiseClickEventToState(
+    ExpertiseClickEvent event,
+    Emitter<ExpertisesState> emit,
+  ) => _trackingDelegate.trackExpertiseClick(event.expertiseTitle);
 }
