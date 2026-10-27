@@ -144,6 +144,13 @@ flutter test
 `no-cache`. `.firebaserc` maps the target to the `portrai-storybook` site in the `portrai-96f2b`
 project.
 
+`web/index.html` loads the Google Maps JavaScript API for the `DSMapWidget` use case with a
+`MAPS_API_KEY` placeholder. `_build_web.yaml` replaces it with the `MAPS_API_KEY_WEB` repository
+secret, and `melos deploy_widgetbook` with `MAPS_API_KEY_WEB` from the environment or the
+git-ignored `app/portrai/.env.production`. The key's website restrictions must include
+`https://portrai-storybook.web.app/*` and, for the preview and review channels,
+`https://portrai-storybook--*.web.app/*`. Without a key the map does not load.
+
 ## Deployment
 
 Three workflows build and deploy the storybook. Each runs `_storybook_quality.yaml` first (format
