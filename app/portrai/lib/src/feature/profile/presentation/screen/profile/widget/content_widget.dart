@@ -33,9 +33,7 @@ class ContentWidget extends StatelessWidget {
         ErrorState(:final failure) => ScreenErrorContent(failure),
         LoadedState(:final profile, :final workPlaces) =>
           ScreenLoadedContent.slivers([
-            SliverToBoxAdapter(
-              child: _BodyWidget(profile: profile, workPlaces: workPlaces),
-            ),
+            _BodyWidget(profile: profile, workPlaces: workPlaces),
           ]),
       },
       onContentVisible: (content) =>

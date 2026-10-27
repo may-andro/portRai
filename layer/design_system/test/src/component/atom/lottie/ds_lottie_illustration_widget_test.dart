@@ -20,14 +20,14 @@ void main() {
         designSystem: DesignSystem.values.first,
         child: const Center(
           child: DSLottieIllustrationWidget(
-            illustration: DSLottieIllustration.globalNetwork,
+            illustration: DSLottieIllustration.heroOrbs,
             width: 400,
           ),
         ),
       ),
     );
 
-    expect(tester.getSize(find.byType(LottieBuilder)), const Size(400, 300));
+    expect(tester.getSize(find.byType(LottieBuilder)), const Size(400, 225));
   });
 
   for (final illustration in [

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 /// Full-colour Lottie scenes, shown with their original colors. To add one,
 /// drop the file in `assets/lottie/`, regenerate the assets and add a value.
 enum DSLottieIllustration {
-  globalNetwork(800 / 600),
   contactUs(1),
   graduationHat(1),
   heroOrbs(16 / 9),
@@ -63,7 +62,6 @@ enum DSLottieIllustration {
         return [
           override(const ['**', 'Accent'], palette.brand.primary),
         ];
-      case DSLottieIllustration.globalNetwork:
       case DSLottieIllustration.contactUs:
       case DSLottieIllustration.heroOrbs:
       case DSLottieIllustration.heroOrbsMobile:
@@ -83,8 +81,6 @@ enum DSLottieIllustration {
 
   LottieGenImage get asset {
     switch (this) {
-      case DSLottieIllustration.globalNetwork:
-        return Assets.lottie.globalNetwork;
       case DSLottieIllustration.contactUs:
         return Assets.lottie.contactUs;
       case DSLottieIllustration.graduationHat:
