@@ -7,12 +7,12 @@ class _GridWidget extends StatelessWidget {
   const _GridWidget({
     required this.services,
     required this.isVisible,
-    required this.onOpen,
+    required this.onClicked,
   });
 
   final List<ServiceEntity> services;
   final bool isVisible;
-  final ValueChanged<ServiceEntity>? onOpen;
+  final ValueChanged<ServiceEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class _GridWidget extends StatelessWidget {
   Widget _cellAt(BuildContext context, int index) {
     if (index >= services.length) return const SizedBox.shrink();
 
-    return _ServiceCardWidget(service: services[index], onOpen: onOpen)
+    return _ServiceCardWidget(service: services[index], onClicked: onClicked)
         .animate(target: isVisible ? 1 : 0)
         .slideY(
           begin: 0.3,

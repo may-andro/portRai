@@ -1,22 +1,21 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
-import 'package:portrai/src/feature/project/presentation/screen/_screen.dart';
 
 class ProjectListWidget extends StatelessWidget {
   const ProjectListWidget({
     super.key,
     required this.projects,
     required this.isVisible,
-    this.onOpen,
+    required this.onClicked,
   });
 
   final List<ProjectEntity> projects;
   final bool isVisible;
 
-  /// Called when a project is opened, before its screen is shown, so the host
-  /// screen can track the tap.
-  final ValueChanged<ProjectEntity>? onOpen;
+  /// Called with the project that is tapped. The caller decides what the tap
+  /// does, such as opening the project.
+  final ValueChanged<ProjectEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class ProjectListWidget extends StatelessWidget {
         crossAxisSpacing: context.space(),
         mainAxisSpacing: context.space(),
         itemBuilder: (_, index) {
-          return _ProjectWidget(project: projects[index], onOpen: onOpen)
+          return _ProjectWidget(project: projects[index], onClicked: onClicked)
               .animate(target: isVisible ? 1 : 0)
               .scale(
                 begin: const Offset(0.6, 0.6),
@@ -49,10 +48,10 @@ class ProjectListWidget extends StatelessWidget {
 }
 
 class _ProjectWidget extends StatefulWidget {
-  const _ProjectWidget({required this.project, required this.onOpen});
+  const _ProjectWidget({required this.project, required this.onClicked});
 
   final ProjectEntity project;
-  final ValueChanged<ProjectEntity>? onOpen;
+  final ValueChanged<ProjectEntity> onClicked;
 
   @override
   State<_ProjectWidget> createState() => _ProjectWidgetState();
@@ -78,10 +77,7 @@ class _ProjectWidgetState extends State<_ProjectWidget> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-          onTap: () {
-            widget.onOpen?.call(project);
-            ProjectScreen.navigate(context, project: project);
-          },
+          onTap: () => widget.onClicked(project),
           child: AnimatedScale(
             scale: _hover ? 1.08 : 1,
             duration: 250.ms,

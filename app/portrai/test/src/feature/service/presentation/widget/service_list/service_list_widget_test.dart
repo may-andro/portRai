@@ -37,6 +37,7 @@ void main() {
                   child: const ServiceListWidget(
                     services: [service],
                     isVisible: true,
+                    onClicked: _ignoreClick,
                   ),
                 ),
               ),
@@ -100,7 +101,11 @@ void main() {
     testWidgets('should render the service summary when built', (tester) async {
       await tester.pumpWidget(
         const TestWidgetWrapper(
-          child: ServiceListWidget(services: [service], isVisible: true),
+          child: ServiceListWidget(
+            services: [service],
+            isVisible: true,
+            onClicked: _ignoreClick,
+          ),
         ),
       );
       await tester.pump(const Duration(seconds: 1));
@@ -110,33 +115,16 @@ void main() {
       expect(find.byType(DSNetworkImageWidget), findsOneWidget);
     });
 
-    testWidgets('should navigate to the service screen when a card is tapped', (
+    testWidgets('should report the tapped service when a card is tapped', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        const TestWidgetWrapper(
-          child: ServiceListWidget(services: [service], isVisible: true),
-        ),
-      );
-      await tester.pump(const Duration(seconds: 1));
-
-      await tester.tap(find.byType(DSSpotlightCardWidget));
-      await tester.pump(const Duration(seconds: 1));
-
-      // No router in the test wrapper, so an attempted navigation throws.
-      expect(tester.takeException(), isNotNull);
-    });
-
-    testWidgets('should report the opened service when a card is tapped', (
-      tester,
-    ) async {
-      final openedServices = <ServiceEntity>[];
+      final clickedServices = <ServiceEntity>[];
       await tester.pumpWidget(
         TestWidgetWrapper(
           child: ServiceListWidget(
             services: const [service],
             isVisible: true,
-            onOpen: openedServices.add,
+            onClicked: clickedServices.add,
           ),
         ),
       );
@@ -144,9 +132,9 @@ void main() {
 
       await tester.tap(find.byType(DSSpotlightCardWidget));
       await tester.pump(const Duration(seconds: 1));
-      tester.takeException();
 
-      expect(openedServices, [service]);
+      expect(clickedServices, [service]);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('should limit the cards when visibleItemsCount is set', (
@@ -158,6 +146,7 @@ void main() {
             services: [service, service, service],
             isVisible: true,
             visibleItemsCount: 2,
+            onClicked: _ignoreClick,
           ),
         ),
       );
@@ -167,3 +156,5 @@ void main() {
     });
   });
 }
+
+void _ignoreClick(Object _) {}

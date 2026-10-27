@@ -207,7 +207,10 @@ class ProjectsSectionWidget extends SectionWidget {
         return ProjectListWidget(
           projects: portfolio.projects,
           isVisible: isVisible,
-          onOpen: (project) => context.bloc.add(ProjectClickEvent(project.id)),
+          onClicked: (project) {
+            context.bloc.add(ProjectClickEvent(project.id));
+            ProjectScreen.navigate(context, project: project);
+          },
         );
       },
       visibilityKey: trackingId,
@@ -235,8 +238,10 @@ class ServicesSectionWidget extends SectionWidget {
           services: portfolio.services,
           isVisible: isVisible,
           visibleItemsCount: context.allowedServiceCount,
-          onOpen: (service) =>
-              context.bloc.add(ServiceClickEvent(service.title)),
+          onClicked: (service) {
+            context.bloc.add(ServiceClickEvent(service.title));
+            ServiceScreen.navigate(context, service: service);
+          },
         );
       },
       visibilityKey: trackingId,

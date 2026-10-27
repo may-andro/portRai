@@ -1,7 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
-import 'package:portrai/src/feature/service/presentation/screen/service/service_screen.dart';
 
 part 'service_card_widget.dart';
 
@@ -13,7 +12,7 @@ class ServiceListWidget extends StatelessWidget {
     required this.services,
     required this.isVisible,
     this.visibleItemsCount,
-    this.onOpen,
+    required this.onClicked,
   });
 
   final List<ServiceEntity> services;
@@ -22,16 +21,16 @@ class ServiceListWidget extends StatelessWidget {
   /// Limits how many services are shown; all of them when null.
   final int? visibleItemsCount;
 
-  /// Called when a service is opened, before its screen is shown, so the host
-  /// screen can track the tap.
-  final ValueChanged<ServiceEntity>? onOpen;
+  /// Called with the service whose card is tapped. The caller decides what
+  /// the tap does, such as opening the service.
+  final ValueChanged<ServiceEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
     return _GridWidget(
       services: services.take(visibleItemsCount ?? services.length).toList(),
       isVisible: isVisible,
-      onOpen: onOpen,
+      onClicked: onClicked,
     );
   }
 }

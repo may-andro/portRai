@@ -16,7 +16,11 @@ void main() {
           TestWidgetWrapper(
             child: TickerMode(
               enabled: false,
-              child: ProjectListWidget(projects: [project], isVisible: false),
+              child: ProjectListWidget(
+                projects: [project],
+                isVisible: false,
+                onClicked: _ignoreClick,
+              ),
             ),
           ),
         );
@@ -36,11 +40,11 @@ void main() {
       },
     );
 
-    testWidgets('should report the opened project when a project is tapped', (
+    testWidgets('should report the tapped project when a project is tapped', (
       tester,
     ) async {
       final project = createProjectEntity();
-      final openedProjects = <Object>[];
+      final clickedProjects = <Object>[];
 
       await tester.pumpWidget(
         TestWidgetWrapper(
@@ -49,7 +53,7 @@ void main() {
             child: ProjectListWidget(
               projects: [project],
               isVisible: false,
-              onOpen: openedProjects.add,
+              onClicked: clickedProjects.add,
             ),
           ),
         ),
@@ -58,9 +62,9 @@ void main() {
 
       await tester.tap(find.text('🚀'));
       await tester.pump();
-      tester.takeException();
 
-      expect(openedProjects, [project]);
+      expect(clickedProjects, [project]);
+      expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 1));
@@ -88,6 +92,7 @@ void main() {
                     createProjectEntity(id: 'c'),
                   ],
                   isVisible: true,
+                  onClicked: _ignoreClick,
                 ),
               ),
             ),
@@ -101,3 +106,5 @@ void main() {
     }
   });
 }
+
+void _ignoreClick(Object _) {}
