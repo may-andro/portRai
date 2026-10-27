@@ -19,7 +19,9 @@ import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/observer/route_observer_widget.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../../mock/feature/design_system/presentation/widget/design_system_card/bloc/mock_design_system_card_bloc.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
+import '../../../../../../../mock/feature/job_opening/presentation/widget/job_openings_card/bloc/mock_job_openings_card_bloc.dart';
 import '../../../../../../../mock/feature/permission/domain/use_case/mock_is_permission_supported_use_case.dart';
 import '../../../../../../../mock/feature/setting/presentation/screen/setting/tracking/mock_setting_tracking_delegate.dart';
 import '../../../../../../../mock/feature/user/domain/use_case/mock_get_guest_user_use_case.dart';
@@ -32,6 +34,12 @@ void main() {
   setUp(() async {
     await appServiceLocator.reset();
     registerTestPackageInfo();
+    MockDesignSystemCardBloc()
+      ..stubState()
+      ..registerFactory();
+    MockJobOpeningsCardBloc()
+      ..stubState()
+      ..registerFactory();
   });
   tearDown(() => appServiceLocator.reset());
 

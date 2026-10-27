@@ -320,9 +320,7 @@ void main() {
 
     for (final label in [
       'language_card',
-      'theme_card',
       'role_card',
-      'job_openings_card',
       'developer_menu_button',
     ]) {
       blocTest<SettingBloc, SettingState>(

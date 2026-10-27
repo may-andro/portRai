@@ -10,7 +10,6 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bl
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
-import 'package:portrai/src/route/route.dart';
 
 /// The settings form as a sliver.
 class ContentWidget extends StatelessWidget {
@@ -36,12 +35,7 @@ class ContentWidget extends StatelessWidget {
             SectionTitleWidget(
               title: context.localizations.settingThemeSection,
             ),
-            DesignSystemCardWidget(
-              onClicked: () {
-                context.bloc.add(const SettingEntryClickEvent('theme_card'));
-                context.pushScreen(DesignSystemModuleRoute.designSystemGallery);
-              },
-            ),
+            const DesignSystemCardWidget(),
             if (state.userRole case final userRole?) ...[
               SectionTitleWidget(
                 title: context.localizations.settingRoleSection,
@@ -62,14 +56,7 @@ class ContentWidget extends StatelessWidget {
               SectionTitleWidget(
                 title: context.localizations.jobOpeningsSection,
               ),
-              JobOpeningsCardWidget(
-                onClicked: () {
-                  context.bloc.add(
-                    const SettingEntryClickEvent('job_openings_card'),
-                  );
-                  context.pushScreen(JobOpeningModuleRoute.jobOpenings);
-                },
-              ),
+              const JobOpeningsCardWidget(),
             ],
             if (state.isDevMenuEnabled) ...[
               const DSVerticalSpacerWidget(3),

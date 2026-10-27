@@ -51,7 +51,7 @@ class _JobOpeningCardWidget extends StatelessWidget {
       ),
       padding: EdgeInsets.all(context.space(factor: 1.75)),
       onTap: () {
-          context.bloc.add(
+        context.bloc.add(
           JobOpeningClickEvent(
             label: 'job_opening_card',
             jobOpeningId: jobOpening.id,
