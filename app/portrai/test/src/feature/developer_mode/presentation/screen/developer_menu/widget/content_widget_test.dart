@@ -89,6 +89,7 @@ void main() {
         expect(find.text('Controls & Tools'), findsOneWidget);
         expect(find.text('Cache Playground'), findsOneWidget);
         expect(find.text('Feature Flags'), findsOneWidget);
+        expect(find.text('Tracking Viewer'), findsOneWidget);
         expect(find.text('Error Simulation'), findsOneWidget);
         expect(find.text('Design system'), findsNothing);
 

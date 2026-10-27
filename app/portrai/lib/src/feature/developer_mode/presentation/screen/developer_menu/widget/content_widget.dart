@@ -4,6 +4,7 @@ import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
 import 'package:portrai/src/feature/asset_source/asset_source.dart';
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/bloc/_bloc.dart';
+import 'package:portrai/src/feature/developer_mode/presentation/screen/tracking_events/tracking_events_screen.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
@@ -69,6 +70,18 @@ class _DeveloperMenuContentWidget extends StatelessWidget {
                         .localizations
                         .developerMenuFeatureFlagsDescription,
                     onTap: () => FeatureFlagScreen.navigate(context),
+                  ),
+                  DSHorizontalDividerWidget(
+                    thickness: 1,
+                    color: context.colorPalette.neutral.grey3,
+                  ),
+                  DSLabeledInfoRowWidget(
+                    icon: Icons.analytics_outlined,
+                    label: context.localizations.developerMenuTrackingViewer,
+                    value: context
+                        .localizations
+                        .developerMenuTrackingViewerDescription,
+                    onTap: () => TrackingEventsScreen.navigate(context),
                   ),
                 ],
               ),

@@ -11,6 +11,13 @@ void main() {
       expect(DeveloperMenuModuleRoute.developerMenu.path, '/developer-menu');
     });
 
+    test('should open the tracking viewer under the developer menu path', () {
+      expect(
+        DeveloperMenuModuleRoute.trackingEvents.path,
+        '/developer-menu/tracking-events',
+      );
+    });
+
     testWidgets(
       'should build the developer menu screen when the route builder is used',
       (tester) async {

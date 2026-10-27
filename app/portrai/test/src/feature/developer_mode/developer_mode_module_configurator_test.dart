@@ -14,6 +14,10 @@ void main() {
     late MockModuleRouteController routeController;
     late DeveloperModeModuleConfigurator configurator;
 
+    setUpAll(
+      () => registerFallbackValue(DeveloperMenuModuleRoute.developerMenu),
+    );
+
     setUp(() {
       serviceLocator = MockServiceLocator();
       routeController = MockModuleRouteController();
@@ -25,16 +29,18 @@ void main() {
       when(
         () => serviceLocator.get<ModuleRouteController>(),
       ).thenReturn(routeController);
-      when(
-        () => routeController.register(DeveloperMenuModuleRoute.developerMenu),
-      ).thenReturn(null);
+      when(() => routeController.register(any())).thenReturn(null);
     });
 
-    test('should register the developer menu route when post setup runs', () {
+    test('should register the developer menu and tracking viewer routes when '
+        'post setup runs', () {
       configurator.postDependenciesSetup(serviceLocator);
 
       verify(
         () => routeController.register(DeveloperMenuModuleRoute.developerMenu),
+      ).called(1);
+      verify(
+        () => routeController.register(DeveloperMenuModuleRoute.trackingEvents),
       ).called(1);
     });
 
@@ -45,9 +51,7 @@ void main() {
 
       configurator.postDependenciesSetup(serviceLocator);
 
-      verifyNever(
-        () => routeController.register(DeveloperMenuModuleRoute.developerMenu),
-      );
+      verifyNever(() => routeController.register(any()));
     });
   });
 }

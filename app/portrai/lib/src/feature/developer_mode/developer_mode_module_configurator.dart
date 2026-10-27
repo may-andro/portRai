@@ -13,9 +13,9 @@ class DeveloperModeModuleConfigurator extends SimpleModuleConfigurator {
   @override
   void postDependenciesSetup(ServiceLocator sl) {
     if (sl.get<BuildConfig>().buildEnvironment.isDevMenuEnabled) {
-      sl.get<ModuleRouteController>().register(
-        DeveloperMenuModuleRoute.developerMenu,
-      );
+      sl.get<ModuleRouteController>()
+        ..register(DeveloperMenuModuleRoute.developerMenu)
+        ..register(DeveloperMenuModuleRoute.trackingEvents);
     }
   }
 }

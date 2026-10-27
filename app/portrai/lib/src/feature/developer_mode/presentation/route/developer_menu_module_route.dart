@@ -1,4 +1,5 @@
 import 'package:portrai/src/feature/developer_mode/presentation/screen/developer_menu/developer_menu_screen.dart';
+import 'package:portrai/src/feature/developer_mode/presentation/screen/tracking_events/tracking_events_screen.dart';
 import 'package:portrai/src/route/route.dart';
 
 class DeveloperMenuModuleRoute extends ModuleRoute {
@@ -13,5 +14,12 @@ class DeveloperMenuModuleRoute extends ModuleRoute {
         name: 'developer_menu',
         path: '/developer-menu',
         builder: (_, _, _) => const DeveloperMenuScreen(),
+      );
+
+  static final DeveloperMenuModuleRoute trackingEvents =
+      DeveloperMenuModuleRoute._(
+        name: 'tracking_events',
+        path: '/developer-menu/tracking-events',
+        builder: (_, _, _) => const TrackingEventsScreen(),
       );
 }
