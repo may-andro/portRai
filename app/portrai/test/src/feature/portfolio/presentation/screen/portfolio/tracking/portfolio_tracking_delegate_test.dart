@@ -117,30 +117,6 @@ void main() {
             'services',
           ),
           ('setting', () => delegate.trackSettingClick(), 'setting', 'open'),
-          (
-            'experience',
-            () => delegate.trackExperienceClick('experience_1'),
-            'experience',
-            'experience_1',
-          ),
-          (
-            'expertise',
-            () => delegate.trackExpertiseClick('Flutter Development'),
-            'expertise',
-            'Flutter Development',
-          ),
-          (
-            'service',
-            () => delegate.trackServiceClick('App Development'),
-            'service',
-            'App Development',
-          ),
-          (
-            'project',
-            () => delegate.trackProjectClick('port-rai'),
-            'project',
-            'port-rai',
-          ),
         ]) {
       test(
         'should send a $name click when the $description tap is tracked',

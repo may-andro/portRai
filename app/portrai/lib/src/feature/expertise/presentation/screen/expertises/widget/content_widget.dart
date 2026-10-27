@@ -1,7 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/expertise/presentation/screen/expertise/expertise_screen.dart';
 import 'package:portrai/src/feature/expertise/presentation/screen/expertises/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/widget/_widget.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
@@ -28,10 +27,6 @@ class ContentWidget extends StatelessWidget {
               child: ExpertiseListWidget(
                 allExpertise: expertises,
                 isVisible: true,
-                onClicked: (expertise) {
-                  context.bloc.add(ExpertiseClickEvent(expertise.title));
-                  ExpertiseScreen.navigate(context, expertise: expertise);
-                },
               ),
             ),
           ),

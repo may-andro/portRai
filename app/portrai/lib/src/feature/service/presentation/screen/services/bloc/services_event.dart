@@ -13,15 +13,6 @@ final class LoadServicesEvent extends ServicesEvent {
   const LoadServicesEvent();
 }
 
-final class ServiceClickEvent extends ServicesEvent {
-  const ServiceClickEvent(this.serviceTitle);
-
-  final String serviceTitle;
-
-  @override
-  List<Object?> get props => [serviceTitle];
-}
-
 // Tracking Events
 final class ScreenVisibleEvent extends ServicesEvent {
   const ScreenVisibleEvent();

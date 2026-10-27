@@ -274,25 +274,11 @@ void main() {
       build: buildBloc,
       act: (bloc) => bloc
         ..add(const SeeAllClickEvent('services'))
-        ..add(const SettingClickEvent())
-        ..add(const ExperienceClickEvent('experience_1'))
-        ..add(const ExpertiseClickEvent('Flutter Development'))
-        ..add(const ServiceClickEvent('App Development'))
-        ..add(const ProjectClickEvent('port-rai')),
+        ..add(const SettingClickEvent()),
       expect: () => const <PortfolioState>[],
       verify: (_) {
         verify(() => trackingDelegate.trackSeeAllClick('services')).called(1);
         verify(() => trackingDelegate.trackSettingClick()).called(1);
-        verify(
-          () => trackingDelegate.trackExperienceClick('experience_1'),
-        ).called(1);
-        verify(
-          () => trackingDelegate.trackExpertiseClick('Flutter Development'),
-        ).called(1);
-        verify(
-          () => trackingDelegate.trackServiceClick('App Development'),
-        ).called(1);
-        verify(() => trackingDelegate.trackProjectClick('port-rai')).called(1);
       },
     );
 

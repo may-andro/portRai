@@ -13,15 +13,6 @@ final class LoadExperiencesEvent extends ExperiencesEvent {
   const LoadExperiencesEvent();
 }
 
-final class ExperienceClickEvent extends ExperiencesEvent {
-  const ExperienceClickEvent(this.experienceId);
-
-  final String experienceId;
-
-  @override
-  List<Object?> get props => [experienceId];
-}
-
 // Tracking Events
 final class ScreenVisibleEvent extends ExperiencesEvent {
   const ScreenVisibleEvent();

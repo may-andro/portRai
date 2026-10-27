@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:portrai/src/feature/expertise/presentation/screen/expertises/tracking/_tracking.dart';
+import 'package:portrai/src/feature/experience/presentation/widget/experience_list/tracking/_tracking.dart';
 import 'package:tracking/tracking.dart';
 
 import '../../../../../../../mock/utility/mock_tracking_reporter.dart';
@@ -10,19 +10,19 @@ void main() {
     registerFallbackValue(ViewTracking(label: 'fallback'));
   });
 
-  group('ExpertisesTrackingDelegate', () {
+  group('ExperienceListTrackingDelegate', () {
     late MockTrackingReporter trackingReporter;
-    late ExpertisesTrackingDelegate delegate;
+    late ExperienceListTrackingDelegate delegate;
 
     setUp(() {
       trackingReporter = MockTrackingReporter();
-      delegate = ExpertisesTrackingDelegate(trackingReporter);
+      delegate = ExperienceListTrackingDelegate(trackingReporter);
       when(() => trackingReporter.sendTrackingEvent(any())).thenReturn(null);
     });
 
-    test('should send a expertise click with the item when an item tap is '
+    test('should send a experience click with the item when an item tap is '
         'tracked', () {
-      delegate.trackExpertiseClick('Flutter Development');
+      delegate.trackExperienceClick('id_0');
 
       final tracking =
           verify(
@@ -30,9 +30,9 @@ void main() {
               ).captured.single
               as Tracking;
 
-      expect(tracking.name, 'expertise');
+      expect(tracking.name, 'experience');
       expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'Flutter Development');
+      expect(tracking.parameters['label'], 'id_0');
     });
   });
 }

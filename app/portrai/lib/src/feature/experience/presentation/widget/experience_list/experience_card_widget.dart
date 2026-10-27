@@ -4,12 +4,10 @@ class _ExperienceCardWidget extends StatefulWidget {
   const _ExperienceCardWidget({
     required this.experience,
     required this.onHoverChange,
-    required this.onClicked,
   });
 
   final ExperienceEntity experience;
   final ValueChanged<bool> onHoverChange;
-  final ValueChanged<ExperienceEntity> onClicked;
 
   @override
   State<_ExperienceCardWidget> createState() => _ExperienceCardWidgetState();
@@ -140,9 +138,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
               Material(
                 type: MaterialType.transparency,
                 child: InkWell(
-                  onTap: _compact
-                      ? () => widget.onClicked(widget.experience)
-                      : _toggleExpand,
+                  onTap: _compact ? () => _open(context) : _toggleExpand,
                   child: Padding(
                     padding: EdgeInsets.all(context.space(factor: 2.5)),
                     child: _content(context),
@@ -338,6 +334,12 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
     );
   }
 
+  void _open(BuildContext context) {
+    final experience = widget.experience;
+    context.bloc.add(ExperienceClickEvent(experience.id));
+    ExperienceScreen.navigate(context, id: experience.id);
+  }
+
   Widget _expandedContent(BuildContext context) {
     final experience = widget.experience;
 
@@ -356,7 +358,7 @@ class _ExperienceCardWidgetState extends State<_ExperienceCardWidget>
             child: IconButton.filled(
               tooltip: context.localizations.seeMore,
               icon: const Icon(Icons.arrow_outward_rounded),
-              onPressed: () => widget.onClicked(experience),
+              onPressed: () => _open(context),
             ),
           ),
         ],

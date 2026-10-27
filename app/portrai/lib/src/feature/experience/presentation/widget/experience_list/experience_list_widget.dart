@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/experience/domain/_domain.dart';
 import 'package:portrai/src/feature/experience/presentation/extension/experience_date_range_extension.dart';
+import 'package:portrai/src/feature/experience/presentation/screen/experience/experience_screen.dart';
+import 'package:portrai/src/feature/experience/presentation/widget/experience_list/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'career_timeline_widget.dart';
@@ -21,28 +24,25 @@ class ExperienceListWidget extends StatelessWidget {
     required this.experiences,
     required this.isVisible,
     this.visibleItemsCount,
-    required this.onClicked,
   });
 
   final List<ExperienceEntity> experiences;
   final bool isVisible;
   final int? visibleItemsCount;
 
-  /// Called with the experience whose card or See more button is tapped. The
-  /// caller decides what the tap does, such as opening the experience.
-  final ValueChanged<ExperienceEntity> onClicked;
-
   @override
   Widget build(BuildContext context) {
     final isDesktop = context.isDesktop;
     final count = visibleItemsCount;
-    return _CareerTimelineWidget(
-      experiences: !isDesktop && count != null
-          ? experiences.take(count).toList()
-          : experiences,
-      isVisible: isVisible,
-      isZigZag: isDesktop,
-      onClicked: onClicked,
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ExperienceListBloc>(),
+      child: _CareerTimelineWidget(
+        experiences: !isDesktop && count != null
+            ? experiences.take(count).toList()
+            : experiences,
+        isVisible: isVisible,
+        isZigZag: isDesktop,
+      ),
     );
   }
 }

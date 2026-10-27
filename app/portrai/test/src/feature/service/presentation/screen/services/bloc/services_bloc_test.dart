@@ -80,15 +80,5 @@ void main() {
         verify(() => tracking.trackViewEvent('loaded_content_view')).called(1);
       },
     );
-
-    blocTest<ServicesBloc, ServicesState>(
-      'should track the opened item without changing the state when an item '
-      'is tapped',
-      build: buildBloc,
-      act: (bloc) => bloc.add(const ServiceClickEvent('App Development')),
-      expect: () => const <ServicesState>[],
-      verify: (_) =>
-          verify(() => tracking.trackServiceClick('App Development')).called(1),
-    );
   });
 }

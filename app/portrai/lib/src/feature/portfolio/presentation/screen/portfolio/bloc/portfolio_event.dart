@@ -88,39 +88,3 @@ final class SeeAllClickEvent extends PortfolioEvent {
 final class SettingClickEvent extends PortfolioEvent {
   const SettingClickEvent();
 }
-
-final class ExperienceClickEvent extends PortfolioEvent {
-  const ExperienceClickEvent(this.experienceId);
-
-  final String experienceId;
-
-  @override
-  List<Object> get props => [experienceId];
-}
-
-final class ExpertiseClickEvent extends PortfolioEvent {
-  const ExpertiseClickEvent(this.expertiseTitle);
-
-  final String expertiseTitle;
-
-  @override
-  List<Object> get props => [expertiseTitle];
-}
-
-final class ServiceClickEvent extends PortfolioEvent {
-  const ServiceClickEvent(this.serviceTitle);
-
-  final String serviceTitle;
-
-  @override
-  List<Object> get props => [serviceTitle];
-}
-
-final class ProjectClickEvent extends PortfolioEvent {
-  const ProjectClickEvent(this.projectId);
-
-  final String projectId;
-
-  @override
-  List<Object> get props => [projectId];
-}

@@ -87,15 +87,5 @@ void main() {
         verify(() => tracking.trackViewEvent('loaded_content_view')).called(1);
       },
     );
-
-    blocTest<ExperiencesBloc, ExperiencesState>(
-      'should track the opened item without changing the state when an item '
-      'is tapped',
-      build: buildBloc,
-      act: (bloc) => bloc.add(const ExperienceClickEvent('experience_1')),
-      expect: () => const <ExperiencesState>[],
-      verify: (_) =>
-          verify(() => tracking.trackExperienceClick('experience_1')).called(1),
-    );
   });
 }

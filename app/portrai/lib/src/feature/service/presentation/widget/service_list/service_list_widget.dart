@@ -1,6 +1,9 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
+import 'package:portrai/src/feature/service/presentation/screen/service/service_screen.dart';
+import 'package:portrai/src/feature/service/presentation/widget/service_list/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 part 'service_card_widget.dart';
 
@@ -12,7 +15,6 @@ class ServiceListWidget extends StatelessWidget {
     required this.services,
     required this.isVisible,
     this.visibleItemsCount,
-    required this.onClicked,
   });
 
   final List<ServiceEntity> services;
@@ -21,16 +23,14 @@ class ServiceListWidget extends StatelessWidget {
   /// Limits how many services are shown; all of them when null.
   final int? visibleItemsCount;
 
-  /// Called with the service whose card is tapped. The caller decides what
-  /// the tap does, such as opening the service.
-  final ValueChanged<ServiceEntity> onClicked;
-
   @override
   Widget build(BuildContext context) {
-    return _GridWidget(
-      services: services.take(visibleItemsCount ?? services.length).toList(),
-      isVisible: isVisible,
-      onClicked: onClicked,
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ServiceListBloc>(),
+      child: _GridWidget(
+        services: services.take(visibleItemsCount ?? services.length).toList(),
+        isVisible: isVisible,
+      ),
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/service/presentation/screen/service/service_screen.dart';
 import 'package:portrai/src/feature/service/presentation/screen/services/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/widget/_widget.dart';
 import 'package:portrai/src/widget/page_app_bar_widget.dart';
@@ -29,14 +28,7 @@ class ContentWidget extends StatelessWidget {
               bottom: context.space(factor: 3),
             ),
             sliver: SliverToBoxAdapter(
-              child: ServiceListWidget(
-                services: services,
-                isVisible: true,
-                onClicked: (service) {
-                  context.bloc.add(ServiceClickEvent(service.title));
-                  ServiceScreen.navigate(context, service: service);
-                },
-              ),
+              child: ServiceListWidget(services: services, isVisible: true),
             ),
           ),
         ]),

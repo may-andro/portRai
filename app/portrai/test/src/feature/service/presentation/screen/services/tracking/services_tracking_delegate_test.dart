@@ -32,20 +32,5 @@ void main() {
       expect(tracking.parameters['event'], 'screen_view');
       expect(tracking.parameters['area'], 'services');
     });
-
-    test('should send a service click with the item when an item tap is '
-        'tracked', () {
-      delegate.trackServiceClick('App Development');
-
-      final tracking =
-          verify(
-                () => trackingReporter.sendTrackingEvent(captureAny()),
-              ).captured.single
-              as Tracking;
-
-      expect(tracking.name, 'service');
-      expect(tracking.parameters['action'], 'click');
-      expect(tracking.parameters['label'], 'App Development');
-    });
   });
 }

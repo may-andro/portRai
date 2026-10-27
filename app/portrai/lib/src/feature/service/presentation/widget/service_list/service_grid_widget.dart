@@ -4,15 +4,10 @@ part of 'service_list_widget.dart';
 const _hoverLift = 8.0;
 
 class _GridWidget extends StatelessWidget {
-  const _GridWidget({
-    required this.services,
-    required this.isVisible,
-    required this.onClicked,
-  });
+  const _GridWidget({required this.services, required this.isVisible});
 
   final List<ServiceEntity> services;
   final bool isVisible;
-  final ValueChanged<ServiceEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +48,7 @@ class _GridWidget extends StatelessWidget {
   Widget _cellAt(BuildContext context, int index) {
     if (index >= services.length) return const SizedBox.shrink();
 
-    return _ServiceCardWidget(service: services[index], onClicked: onClicked)
+    return _ServiceCardWidget(service: services[index])
         .animate(target: isVisible ? 1 : 0)
         .slideY(
           begin: 0.3,

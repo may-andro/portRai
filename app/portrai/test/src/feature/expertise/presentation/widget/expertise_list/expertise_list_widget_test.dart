@@ -1,13 +1,28 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/expertise_entity.dart';
 import 'package:portrai/src/feature/expertise/domain/entity/skill_entity.dart';
+import 'package:portrai/src/feature/expertise/presentation/widget/expertise_list/bloc/_bloc.dart';
 import 'package:portrai/src/feature/expertise/presentation/widget/expertise_list/expertise_list_widget.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import '../../../../../../mock/feature/expertise/presentation/widget/expertise_list/bloc/mock_expertise_list_bloc.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
+  late MockExpertiseListBloc bloc;
+
+  setUp(() async {
+    await appServiceLocator.reset();
+    bloc = MockExpertiseListBloc()
+      ..stubState()
+      ..registerFactory();
+  });
+
+  tearDown(() => appServiceLocator.reset());
+
   List<ExpertiseEntity> createExpertiseList(int count) {
     return List.generate(
       count,
@@ -24,7 +39,6 @@ void main() {
     required List<ExpertiseEntity> expertise,
     required Size size,
     Duration settleDuration = const Duration(seconds: 2),
-    ValueChanged<ExpertiseEntity>? onClicked,
   }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = size;
@@ -38,11 +52,7 @@ void main() {
     await tester.pumpWidget(
       TestWidgetWrapper(
         child: SingleChildScrollView(
-          child: ExpertiseListWidget(
-            allExpertise: expertise,
-            isVisible: true,
-            onClicked: onClicked ?? (_) {},
-          ),
+          child: ExpertiseListWidget(allExpertise: expertise, isVisible: true),
         ),
       ),
     );
@@ -77,22 +87,22 @@ void main() {
       expect(find.text('Skill 0'), findsOneWidget);
     });
 
-    testWidgets('should report the tapped expertise when a card is tapped', (
-      tester,
-    ) async {
-      final expertise = createExpertiseList(2);
-      final openedExpertise = <ExpertiseEntity>[];
+    testWidgets('should track the tap and open the expertise when a card is '
+        'tapped', (tester) async {
       await pumpExpertiseListWidget(
         tester,
-        expertise: expertise,
+        expertise: createExpertiseList(2),
         size: const Size(1440, 1024),
-        onClicked: openedExpertise.add,
       );
 
       await tester.tap(find.text('Expertise 1'));
       await tester.pump();
 
-      expect(openedExpertise, [expertise[1]]);
+      verify(
+        () => bloc.add(const ExpertiseClickEvent('Expertise 1')),
+      ).called(1);
+      // No router in the test wrapper, so opening the expertise throws.
+      expect(tester.takeException(), isNotNull);
     });
 
     testWidgets(

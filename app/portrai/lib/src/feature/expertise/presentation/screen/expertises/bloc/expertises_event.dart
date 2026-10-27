@@ -13,15 +13,6 @@ final class LoadExpertisesEvent extends ExpertisesEvent {
   const LoadExpertisesEvent();
 }
 
-final class ExpertiseClickEvent extends ExpertisesEvent {
-  const ExpertiseClickEvent(this.expertiseTitle);
-
-  final String expertiseTitle;
-
-  @override
-  List<Object?> get props => [expertiseTitle];
-}
-
 // Tracking Events
 final class ScreenVisibleEvent extends ExpertisesEvent {
   const ScreenVisibleEvent();

@@ -1,26 +1,24 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
+import 'package:portrai/src/feature/project/presentation/screen/project/project_screen.dart';
+import 'package:portrai/src/feature/project/presentation/widget/project_list/bloc/_bloc.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 
 class ProjectListWidget extends StatelessWidget {
   const ProjectListWidget({
     super.key,
     required this.projects,
     required this.isVisible,
-    required this.onClicked,
   });
 
   final List<ProjectEntity> projects;
   final bool isVisible;
 
-  /// Called with the project that is tapped. The caller decides what the tap
-  /// does, such as opening the project.
-  final ValueChanged<ProjectEntity> onClicked;
-
   @override
   Widget build(BuildContext context) {
     // Room for the hover scale/glow, which the section would otherwise clip.
-    return Padding(
+    final list = Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.space(),
         vertical: context.space(factor: 2),
@@ -31,7 +29,7 @@ class ProjectListWidget extends StatelessWidget {
         crossAxisSpacing: context.space(),
         mainAxisSpacing: context.space(),
         itemBuilder: (_, index) {
-          return _ProjectWidget(project: projects[index], onClicked: onClicked)
+          return _ProjectWidget(project: projects[index])
               .animate(target: isVisible ? 1 : 0)
               .scale(
                 begin: const Offset(0.6, 0.6),
@@ -44,14 +42,17 @@ class ProjectListWidget extends StatelessWidget {
         },
       ),
     );
+    return BlocProvider(
+      create: (_) => appServiceLocator.get<ProjectListBloc>(),
+      child: list,
+    );
   }
 }
 
 class _ProjectWidget extends StatefulWidget {
-  const _ProjectWidget({required this.project, required this.onClicked});
+  const _ProjectWidget({required this.project});
 
   final ProjectEntity project;
-  final ValueChanged<ProjectEntity> onClicked;
 
   @override
   State<_ProjectWidget> createState() => _ProjectWidgetState();
@@ -77,7 +78,10 @@ class _ProjectWidgetState extends State<_ProjectWidget> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-          onTap: () => widget.onClicked(project),
+          onTap: () {
+            context.bloc.add(ProjectClickEvent(project.id));
+            ProjectScreen.navigate(context, project: project);
+          },
           child: AnimatedScale(
             scale: _hover ? 1.08 : 1,
             duration: 250.ms,

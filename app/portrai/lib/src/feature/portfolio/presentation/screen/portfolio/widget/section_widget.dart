@@ -169,10 +169,6 @@ class _ExpertiseSectionBodyWidgetState
           expertises: widget.expertises,
           isVisible: isVisible,
           selection: _selection,
-          onClicked: (expertise) {
-            context.bloc.add(ExpertiseClickEvent(expertise.title));
-            ExpertiseScreen.navigate(context, expertise: expertise);
-          },
         );
       },
       backgroundDetail: (context, isVisible) {
@@ -205,10 +201,6 @@ class ProjectsSectionWidget extends SectionWidget {
         return ProjectListWidget(
           projects: portfolio.projects,
           isVisible: isVisible,
-          onClicked: (project) {
-            context.bloc.add(ProjectClickEvent(project.id));
-            ProjectScreen.navigate(context, project: project);
-          },
         );
       },
       visibilityKey: trackingId,
@@ -236,10 +228,6 @@ class ServicesSectionWidget extends SectionWidget {
           services: portfolio.services,
           isVisible: isVisible,
           visibleItemsCount: context.allowedServiceCount,
-          onClicked: (service) {
-            context.bloc.add(ServiceClickEvent(service.title));
-            ServiceScreen.navigate(context, service: service);
-          },
         );
       },
       visibilityKey: trackingId,
@@ -277,10 +265,6 @@ class ExperienceSectionWidget extends SectionWidget {
           experiences: portfolio.experiences,
           isVisible: isVisible,
           visibleItemsCount: context.allowedExperienceCount,
-          onClicked: (experience) {
-            context.bloc.add(ExperienceClickEvent(experience.id));
-            ExperienceScreen.navigate(context, id: experience.id);
-          },
         );
       },
       visibilityKey: trackingId,

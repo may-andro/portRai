@@ -4,15 +4,10 @@ const _maxSkills = 8;
 const _white = DSColor(0xFFFFFFFF);
 
 class _ExpertiseCardWidget extends StatelessWidget {
-  const _ExpertiseCardWidget({
-    required this.expertise,
-    required this.index,
-    required this.onClicked,
-  });
+  const _ExpertiseCardWidget({required this.expertise, required this.index});
 
   final ExpertiseEntity expertise;
   final int index;
-  final ValueChanged<ExpertiseEntity> onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +25,10 @@ class _ExpertiseCardWidget extends StatelessWidget {
     final artSize = context.space(factor: 20);
 
     return GestureDetector(
-      onTap: () => onClicked(expertise),
+      onTap: () {
+        context.bloc.add(ExpertiseClickEvent(expertise.title));
+        ExpertiseScreen.navigate(context, expertise: expertise);
+      },
       child: DSHoverableContainerWidget(
         builder: (context, isHovering) {
           return AnimatedContainer(

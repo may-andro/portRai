@@ -37,10 +37,6 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     on<AssistantLaunchClickEvent>(_mapAssistantLaunchClickEventToState);
     on<SeeAllClickEvent>(_mapSeeAllClickEventToState);
     on<SettingClickEvent>(_mapSettingClickEventToState);
-    on<ExperienceClickEvent>(_mapExperienceClickEventToState);
-    on<ExpertiseClickEvent>(_mapExpertiseClickEventToState);
-    on<ServiceClickEvent>(_mapServiceClickEventToState);
-    on<ProjectClickEvent>(_mapProjectClickEventToState);
   }
 
   final GetPortfolioUseCase _getPortfolioUseCase;
@@ -145,26 +141,6 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     SettingClickEvent event,
     Emitter<PortfolioState> emit,
   ) => _trackingDelegate.trackSettingClick();
-
-  void _mapExperienceClickEventToState(
-    ExperienceClickEvent event,
-    Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackExperienceClick(event.experienceId);
-
-  void _mapExpertiseClickEventToState(
-    ExpertiseClickEvent event,
-    Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackExpertiseClick(event.expertiseTitle);
-
-  void _mapServiceClickEventToState(
-    ServiceClickEvent event,
-    Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackServiceClick(event.serviceTitle);
-
-  void _mapProjectClickEventToState(
-    ProjectClickEvent event,
-    Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackProjectClick(event.projectId);
 
   Future<void> _refreshAssistantAvailability(
     Emitter<PortfolioState> emit,
