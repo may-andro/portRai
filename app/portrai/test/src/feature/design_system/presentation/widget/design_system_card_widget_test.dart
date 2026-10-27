@@ -1,30 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
   group('DesignSystemCardWidget', () {
-    Future<void> pumpCard(WidgetTester tester, {VoidCallback? onOpen}) async {
-      final router = GoRouter(
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (_, _) =>
-                Scaffold(body: DesignSystemCardWidget(onOpen: onOpen)),
-          ),
-          GoRoute(
-            name: 'design_system_gallery',
-            path: '/themes',
-            builder: (_, _) => const Text('Theme gallery screen'),
-          ),
-        ],
-      );
-      addTearDown(router.dispose);
+    Future<void> pumpCard(
+      WidgetTester tester, {
+      VoidCallback? onClicked,
+    }) async {
       await tester.pumpWidget(
-        TestWidgetWrapper(routerConfig: router, child: const SizedBox()),
+        TestWidgetWrapper(
+          child: Scaffold(
+            body: DesignSystemCardWidget(onClicked: onClicked ?? () {}),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
     }
@@ -36,16 +27,17 @@ void main() {
       expect(find.text('Beltane'), findsOneWidget);
     });
 
-    testWidgets('should open the theme gallery and report it when the card '
-        'is tapped', (tester) async {
-      var openCount = 0;
-      await pumpCard(tester, onOpen: () => openCount++);
+    testWidgets('should report the tap when the card is tapped', (
+      tester,
+    ) async {
+      var clickCount = 0;
+      await pumpCard(tester, onClicked: () => clickCount++);
 
       await tester.tap(find.text('App theme'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Theme gallery screen'), findsOneWidget);
-      expect(openCount, 1);
+      expect(clickCount, 1);
+      expect(tester.takeException(), isNull);
     });
   });
 }

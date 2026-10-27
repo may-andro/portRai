@@ -1,38 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
 
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
-  testWidgets('should open the job openings and report it when the card is '
-      'tapped', (tester) async {
-    var openCount = 0;
-    final router = GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (_, _) =>
-              Scaffold(body: JobOpeningsCardWidget(onOpen: () => openCount++)),
-        ),
-        GoRoute(
-          name: 'job_openings',
-          path: '/job-openings',
-          builder: (_, _) => const Text('Job openings screen'),
-        ),
-      ],
-    );
-    addTearDown(router.dispose);
+  testWidgets('should report the tap when the card is tapped', (tester) async {
+    var clickCount = 0;
     await tester.pumpWidget(
-      TestWidgetWrapper(routerConfig: router, child: const SizedBox()),
+      TestWidgetWrapper(
+        child: Scaffold(
+          body: JobOpeningsCardWidget(onClicked: () => clickCount++),
+        ),
+      ),
     );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Job openings'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Job openings screen'), findsOneWidget);
-    expect(openCount, 1);
+    expect(clickCount, 1);
+    expect(tester.takeException(), isNull);
   });
 }

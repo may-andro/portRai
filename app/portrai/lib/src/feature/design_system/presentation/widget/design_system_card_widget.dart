@@ -2,16 +2,14 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/design_system/presentation/extension/_extension.dart';
-import 'package:portrai/src/feature/design_system/presentation/route/_route.dart';
-import 'package:portrai/src/route/route.dart';
 
 /// The Settings entry point to the theme gallery, naming the theme in use.
 class DesignSystemCardWidget extends StatelessWidget {
-  const DesignSystemCardWidget({super.key, this.onOpen});
+  const DesignSystemCardWidget({super.key, required this.onClicked});
 
-  /// Called when the gallery is opened, before it is shown, so the host
-  /// screen can track the tap.
-  final VoidCallback? onOpen;
+  /// Called when the card is tapped. The caller decides what the tap does,
+  /// such as opening the theme gallery.
+  final VoidCallback onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +47,7 @@ class DesignSystemCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: palette.neutral.grey3.color,
         ),
-        onTap: () {
-          onOpen?.call();
-          context.pushScreen(DesignSystemModuleRoute.designSystemGallery);
-        },
+        onTap: onClicked,
       ),
     );
   }

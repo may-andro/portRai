@@ -10,6 +10,7 @@ import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bl
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/section_title_widget.dart';
+import 'package:portrai/src/route/route.dart';
 
 /// The settings form as a sliver.
 class ContentWidget extends StatelessWidget {
@@ -36,9 +37,12 @@ class ContentWidget extends StatelessWidget {
               title: context.localizations.settingThemeSection,
             ),
             DesignSystemCardWidget(
-              onOpen: () => context.bloc.add(
-                const SettingEntryClickEvent(SettingEntry.theme),
-              ),
+              onClicked: () {
+                context.bloc.add(
+                  const SettingEntryClickEvent(SettingEntry.theme),
+                );
+                context.pushScreen(DesignSystemModuleRoute.designSystemGallery);
+              },
             ),
             if (state.userRole case final userRole?) ...[
               SectionTitleWidget(
@@ -61,9 +65,12 @@ class ContentWidget extends StatelessWidget {
                 title: context.localizations.jobOpeningsSection,
               ),
               JobOpeningsCardWidget(
-                onOpen: () => context.bloc.add(
-                  const SettingEntryClickEvent(SettingEntry.jobOpenings),
-                ),
+                onClicked: () {
+                  context.bloc.add(
+                    const SettingEntryClickEvent(SettingEntry.jobOpenings),
+                  );
+                  context.pushScreen(JobOpeningModuleRoute.jobOpenings);
+                },
               ),
             ],
             if (state.isDevMenuEnabled) ...[

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
-import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
+import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
+import '../../../../../../../mock/feature/setting/presentation/screen/setting/bloc/mock_setting_bloc.dart';
 import '../../../../../../../util/assistant_test_fixture.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -32,6 +35,66 @@ void main() {
   }
 
   group('Setting ContentWidget', () {
+    for (final (label, cardTitle, entry, routeName, routePath) in [
+      (
+        'theme',
+        'App theme',
+        SettingEntry.theme,
+        DesignSystemModuleRoute.designSystemGallery.name,
+        DesignSystemModuleRoute.designSystemGallery.path,
+      ),
+      (
+        'job openings',
+        'Job openings',
+        SettingEntry.jobOpenings,
+        JobOpeningModuleRoute.jobOpenings.name,
+        JobOpeningModuleRoute.jobOpenings.path,
+      ),
+    ]) {
+      testWidgets('should track the tap and open the screen when the $label '
+          'card is tapped', (tester) async {
+        final bloc = MockSettingBloc()..stubState(const SettingLoadingState());
+        final router = GoRouter(
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (_, _) => BlocProvider<SettingBloc>.value(
+                value: bloc,
+                child: const Scaffold(
+                  body: CustomScrollView(
+                    slivers: [
+                      ContentWidget(
+                        state: SettingLoadedState(
+                          isLanguageSelectorEnabled: false,
+                          isJobOpeningsEnabled: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            GoRoute(
+              name: routeName,
+              path: routePath,
+              builder: (_, _) => const Text('Opened screen'),
+            ),
+          ],
+        );
+        addTearDown(router.dispose);
+        await tester.pumpWidget(
+          TestWidgetWrapper(routerConfig: router, child: const SizedBox()),
+        );
+        await tester.pump();
+
+        await tester.tap(find.text(cardTitle));
+        await tester.pumpAndSettle();
+
+        verify(() => bloc.add(SettingEntryClickEvent(entry))).called(1);
+        expect(find.text('Opened screen'), findsOneWidget);
+      });
+    }
+
     testWidgets('should always show the theme section', (tester) async {
       await pumpContent(
         tester,

@@ -1,16 +1,14 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/job_opening/presentation/route/_route.dart';
-import 'package:portrai/src/route/route.dart';
 
 /// The Settings entry point. Opening it asks for sign-in first when needed.
 class JobOpeningsCardWidget extends StatelessWidget {
-  const JobOpeningsCardWidget({super.key, this.onOpen});
+  const JobOpeningsCardWidget({super.key, required this.onClicked});
 
-  /// Called when the job openings are opened, before they are shown, so the
-  /// host screen can track the tap.
-  final VoidCallback? onOpen;
+  /// Called when the card is tapped. The caller decides what the tap does,
+  /// such as opening the job openings.
+  final VoidCallback onClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +46,7 @@ class JobOpeningsCardWidget extends StatelessWidget {
           size: context.iconSize,
           color: palette.neutral.grey3.color,
         ),
-        onTap: () {
-          onOpen?.call();
-          context.pushScreen(JobOpeningModuleRoute.jobOpenings);
-        },
+        onTap: onClicked,
       ),
     );
   }
