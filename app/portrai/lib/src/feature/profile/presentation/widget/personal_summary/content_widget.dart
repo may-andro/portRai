@@ -1,10 +1,15 @@
 part of 'personal_summary_widget.dart';
 
 class _ContentWidget extends StatelessWidget {
-  const _ContentWidget({required this.profile, required this.isVisible});
+  const _ContentWidget({
+    required this.profile,
+    required this.isVisible,
+    required this.onViewProfile,
+  });
 
   final ProfileEntity profile;
   final bool isVisible;
+  final VoidCallback? onViewProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +56,7 @@ class _ContentWidget extends StatelessWidget {
               profile: profile,
               isVisible: isVisible,
               isCentered: true,
+              onViewProfile: onViewProfile,
             ),
           ),
         ],
@@ -100,6 +106,7 @@ class _ContentWidget extends StatelessWidget {
                         profile: profile,
                         isVisible: isVisible,
                         isCentered: false,
+                        onViewProfile: onViewProfile,
                       ),
                     ),
                   ),

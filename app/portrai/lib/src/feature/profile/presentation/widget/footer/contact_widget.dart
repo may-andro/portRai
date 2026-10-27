@@ -29,7 +29,10 @@ class _ContactWidget extends StatelessWidget {
           children: [
             DSButtonWidget(
               label: context.localizations.downloadResume,
-              onPressed: () => CvExportScreen.navigate(context),
+              onPressed: () {
+                context.bloc.add(const ResumeClickEvent());
+                CvExportScreen.navigate(context);
+              },
               icon: Icons.file_present_rounded,
               iconDirection: DSButtonIconDirection.right,
               size: _buttonSize,

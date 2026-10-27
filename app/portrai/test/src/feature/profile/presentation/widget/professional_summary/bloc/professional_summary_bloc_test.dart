@@ -91,5 +91,14 @@ void main() {
         verifyNever(() => openEmail(any()));
       },
     );
+
+    blocTest<ProfessionalSummaryBloc, ProfessionalSummaryState>(
+      'should track the resume tap without changing the state when the '
+      'resume is opened',
+      build: buildBloc,
+      act: (bloc) => bloc.add(const ResumeClickEvent()),
+      expect: () => const <ProfessionalSummaryState>[],
+      verify: (_) => verify(() => tracking.trackResumeClick()).called(1),
+    );
   });
 }

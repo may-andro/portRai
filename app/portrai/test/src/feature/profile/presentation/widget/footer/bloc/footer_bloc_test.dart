@@ -121,5 +121,14 @@ void main() {
         verifyNever(() => openEmail(any()));
       },
     );
+
+    blocTest<FooterBloc, FooterState>(
+      'should track the resume tap without changing the state when the '
+      'resume is opened',
+      build: buildBloc,
+      act: (bloc) => bloc.add(const ResumeClickEvent()),
+      expect: () => const <FooterState>[],
+      verify: (_) => verify(() => tracking.trackResumeClick()).called(1),
+    );
   });
 }

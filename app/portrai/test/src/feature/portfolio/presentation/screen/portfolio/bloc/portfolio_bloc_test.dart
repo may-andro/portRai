@@ -278,7 +278,8 @@ void main() {
         ..add(const ExperienceClickEvent('experience_1'))
         ..add(const ExpertiseClickEvent('Flutter Development'))
         ..add(const ServiceClickEvent('App Development'))
-        ..add(const ProjectClickEvent('port-rai')),
+        ..add(const ProjectClickEvent('port-rai'))
+        ..add(const ProfileClickEvent()),
       expect: () => const <PortfolioState>[],
       verify: (_) {
         verify(() => trackingDelegate.trackSeeAllClick('services')).called(1);
@@ -293,6 +294,7 @@ void main() {
           () => trackingDelegate.trackServiceClick('App Development'),
         ).called(1);
         verify(() => trackingDelegate.trackProjectClick('port-rai')).called(1);
+        verify(() => trackingDelegate.trackProfileClick()).called(1);
       },
     );
 

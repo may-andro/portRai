@@ -37,3 +37,7 @@ final class OpenExternalUrlEvent extends ProfessionalSummaryEvent {
   @override
   List<Object> get props => [url, label];
 }
+
+final class ResumeClickEvent extends ProfessionalSummaryEvent {
+  const ResumeClickEvent();
+}

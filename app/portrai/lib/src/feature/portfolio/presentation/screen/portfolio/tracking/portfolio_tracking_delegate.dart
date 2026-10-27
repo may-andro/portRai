@@ -108,4 +108,13 @@ class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
+
+  void trackProfileClick() {
+    trackEvent(
+      Tracking(
+        name: 'profile',
+        action: const ClickAction(label: 'open'),
+      ),
+    );
+  }
 }

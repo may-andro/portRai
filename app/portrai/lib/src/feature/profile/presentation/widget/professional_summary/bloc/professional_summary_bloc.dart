@@ -18,6 +18,7 @@ class ProfessionalSummaryBloc
     on<LoadDataEvent>(_mapLoadDataEventToState);
     on<OpenEmailClientEvent>(_mapOpenEmailClientEventToState);
     on<OpenExternalUrlEvent>(_mapOpenExternalUrlEventToState);
+    on<ResumeClickEvent>(_mapResumeClickEventToState);
   }
 
   final OpenEmailUseCase _openEmailUseCase;
@@ -58,4 +59,9 @@ class ProfessionalSummaryBloc
       _trackingDelegate.trackExternalLinkClick(event.label);
     });
   }
+
+  void _mapResumeClickEventToState(
+    ResumeClickEvent event,
+    Emitter<ProfessionalSummaryState> emit,
+  ) => _trackingDelegate.trackResumeClick();
 }

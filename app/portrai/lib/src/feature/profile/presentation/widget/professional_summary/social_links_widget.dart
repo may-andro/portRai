@@ -38,7 +38,10 @@ class _SocialLinksWidget extends StatelessWidget {
           name: context.localizations.downloadResume,
           brand: DSBrandIcon.resume as DSBrandIcon?,
           image: '',
-          onTap: () => CvExportScreen.navigate(context),
+          onTap: () {
+            context.bloc.add(const ResumeClickEvent());
+            CvExportScreen.navigate(context);
+          },
         ),
     ];
     if (buttons.isEmpty) return const SizedBox.shrink();

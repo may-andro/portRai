@@ -66,4 +66,27 @@ void main() {
       );
     }
   }
+
+  testWidgets('should report the profile tap when the full profile button is '
+      'tapped', (tester) async {
+    var viewProfileCount = 0;
+    await tester.pumpWidget(
+      TestWidgetWrapper(
+        child: SingleChildScrollView(
+          child: PersonalSummaryWidget(
+            profile: createProfileEntity(),
+            isVisible: true,
+            onViewProfile: () => viewProfileCount++,
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 2));
+
+    await tester.tap(find.byIcon(Icons.arrow_outward_rounded));
+    await tester.pump();
+    tester.takeException();
+
+    expect(viewProfileCount, 1);
+  });
 }

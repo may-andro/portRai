@@ -22,4 +22,13 @@ class FooterTrackingDelegate extends TrackingDelegate {
       ),
     );
   }
+
+  void trackResumeClick() {
+    trackEvent(
+      Tracking(
+        name: 'resume',
+        action: const ClickAction(label: 'open'),
+      ),
+    );
+  }
 }

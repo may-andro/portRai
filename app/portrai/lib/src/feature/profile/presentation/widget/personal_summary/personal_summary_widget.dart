@@ -17,13 +17,22 @@ class PersonalSummaryWidget extends StatelessWidget {
     super.key,
     required this.profile,
     required this.isVisible,
+    this.onViewProfile,
   });
 
   final ProfileEntity profile;
   final bool isVisible;
 
+  /// Called when the full profile is opened, before it is shown, so the host
+  /// screen can track the tap.
+  final VoidCallback? onViewProfile;
+
   @override
   Widget build(BuildContext context) {
-    return _ContentWidget(profile: profile, isVisible: isVisible);
+    return _ContentWidget(
+      profile: profile,
+      isVisible: isVisible,
+      onViewProfile: onViewProfile,
+    );
   }
 }

@@ -38,3 +38,7 @@ final class OpenEmailClientEvent extends FooterEvent {
   @override
   List<Object?> get props => [email];
 }
+
+final class ResumeClickEvent extends FooterEvent {
+  const ResumeClickEvent();
+}
