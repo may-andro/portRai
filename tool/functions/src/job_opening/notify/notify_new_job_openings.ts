@@ -1,17 +1,10 @@
-import type { PushNotification, PushSender } from '../../shared/messaging.js';
+import type { PushNotification } from '../../shared/messaging.js';
+import {
+  type UserDeviceNotifier,
+  notifyUserDevices,
+} from '../../shared/user_devices.js';
 
-/** A device of a user that receives their notifications. */
-export interface UserDevice {
-  token: string;
-  /** The app's language on the device, such as `es`. */
-  locale: string;
-}
-
-export interface NewJobOpeningsNotifier {
-  listDevices(userId: string): Promise<UserDevice[]>;
-  deleteDevices(userId: string, tokens: string[]): Promise<void>;
-  sender: PushSender;
-}
+export type NewJobOpeningsNotifier = UserDeviceNotifier;
 
 /** Tells the app what a tapped notification is about. */
 export const newJobOpeningsKind = 'job_openings';
@@ -56,26 +49,12 @@ export function newJobOpeningsNotification(
  * [userId], in each device's language, and deletes the devices whose token is
  * no longer registered. Returns whether the user has any device.
  */
-export async function notifyNewJobOpenings(
-  { listDevices, deleteDevices, sender }: NewJobOpeningsNotifier,
+export function notifyNewJobOpenings(
+  notifier: NewJobOpeningsNotifier,
   userId: string,
   count: number,
 ): Promise<boolean> {
-  const devices = await listDevices(userId);
-  const tokensByLocale = new Map<string, string[]>();
-  for (const { token, locale } of devices) {
-    const key = locale in texts ? locale : 'en';
-    tokensByLocale.set(key, [...(tokensByLocale.get(key) ?? []), token]);
-  }
-  const unregistered: string[] = [];
-  for (const [locale, tokens] of tokensByLocale) {
-    unregistered.push(
-      ...(await sender.sendToTokens(
-        tokens,
-        newJobOpeningsNotification(locale, count),
-      )),
-    );
-  }
-  if (unregistered.length > 0) await deleteDevices(userId, unregistered);
-  return devices.length > 0;
+  return notifyUserDevices(notifier, userId, Object.keys(texts), (language) =>
+    newJobOpeningsNotification(language, count),
+  );
 }

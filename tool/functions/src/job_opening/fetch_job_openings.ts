@@ -11,6 +11,7 @@ import {
 } from '../shared/function_options.js';
 import { createGeminiGenerateJson } from '../shared/gemini.js';
 import { cloudMessagingSender } from '../shared/messaging.js';
+import { firestoreUserDevices } from '../shared/user_devices.js';
 import { GeminiJobPostExtractor } from './extract/job_post_extractor.js';
 import { ArbeitnowFeed } from './feed/arbeitnow_feed.js';
 import { AshbyFeed } from './feed/ashby_feed.js';
@@ -31,10 +32,8 @@ import { notifyNewJobOpenings } from './notify/notify_new_job_openings.js';
 import { loadPortfolioProfile } from './profile/portfolio_profile.js';
 import { GeminiJobScorer } from './score/job_scorer.js';
 import {
-  deleteUserDevices,
   firestoreReadDocument,
   listJobSearchUserIds,
-  listUserDevices,
   loadJobFits,
   saveJobFits,
   writeJobOpenings,
@@ -101,9 +100,7 @@ export const fetchJobOpenings = onSchedule(
       notifyNewJobOpenings: (userId, count) =>
         notifyNewJobOpenings(
           {
-            listDevices: (deviceUserId) => listUserDevices(db, deviceUserId),
-            deleteDevices: (deviceUserId, tokens) =>
-              deleteUserDevices(db, deviceUserId, tokens),
+            ...firestoreUserDevices(db),
             sender,
           },
           userId,

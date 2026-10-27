@@ -10,6 +10,10 @@ codebase.
 | `fetchJobOpenings`              | Schedule, every Monday 06:00 Europe/Amsterdam                             | `europe-west3` | [Job openings](#job-openings)           |
 | `portfolioUpdates-<collection>` | A write to `<collection>/{locale}`, one function per portfolio collection | `us-central1`  | [Portfolio updates](#portfolio-updates) |
 | `sendPortfolioUpdates`          | Schedule, every 5 minutes                                                 | `europe-west3` | [Portfolio updates](#portfolio-updates) |
+| `getCallSlots`                  | Callable from the app                                                     | `europe-west3` | [Call booking](#call-booking)           |
+| `requestCall`                   | Callable from the app                                                     | `europe-west3` | [Call booking](#call-booking)           |
+| `callRequestCreated`            | A new document in `users/{uid}/call_requests`                             | `us-central1`  | [Call booking](#call-booking)           |
+| `callRequestDecided`            | A change to a document in `users/{uid}/call_requests`                     | `us-central1`  | [Call booking](#call-booking)           |
 
 None of the functions retries a failed run.
 
@@ -19,8 +23,9 @@ None of the functions retries a failed run.
 src/
   index.ts          # initializes Firebase Admin and exports every function
   shared/           # code any feature can use: JSON over HTTP, JSON value parsing, the Gemini
-                    # client, push messaging, concurrency and time-limit helpers, regions and
-                    # service account emails
+                    # client, push messaging and user devices, email, concurrency and
+                    # time-limit helpers, regions and service account emails
+  call_booking/     # getCallSlots, requestCall and the call request triggers, in call_booking.ts
   job_opening/      # fetchJobOpenings, in fetch_job_openings.ts
   portfolio_update/ # portfolioUpdates and sendPortfolioUpdates, in portfolio_updates.ts
 test/               # mirrors src/
@@ -382,6 +387,124 @@ function for each portfolio collection: `profile`, `experiences`, `expertise`, `
 The functions run as the `notifications` service account (see
 [Service account](#service-account)).
 
+## Call booking
+
+Visitors book a call with the portfolio owner in the app. They pick a free slot, the owner
+accepts or declines it, and both get emails with a calendar invite.
+
+- `getCallSlots` returns the free slots: `{ slots, slotMinutes, timeZone }`, where `slots` are
+  start times in UTC as ISO strings, earliest first, and `timeZone` is the owner's.
+- `requestCall` books one of them. It takes `slotStart`, `name`, `email`, `topic`, an optional
+  `message`, the app's `locale` and the visitor's IANA `timeZone`, and returns `{ requestId }`.
+- `callRequestCreated` sends a notification to the owner's devices and emails the visitor that
+  the request is in.
+- `callRequestDecided` runs when the owner answers. On accept, it emails the visitor and the
+  owner the meeting link with a calendar invite. On decline, it frees the slot and emails the
+  visitor.
+
+Both callables enforce App Check, so only the app can call them, and `requestCall` consumes the
+token, so a captured call cannot be replayed. The app calls `requestCall` with a limited-use
+token. Visitors do not sign in.
+
+### Slots
+
+The slots come from the settings at `call_booking/settings`, which only the functions read:
+
+```jsonc
+// call_booking/settings
+{
+  "ownerId": "<uid>", // the user whose devices are notified and who answers the requests
+  "timeZone": "Europe/Madrid", // the owner's IANA time zone
+  "weeklyHours": {
+    "monday": [{ "start": "09:00", "end": "12:30" }], // local times; a day may have several ranges
+    "tuesday": [],
+  },
+  "slotMinutes": 30, // optional, 15 to 120
+  "minNoticeHours": 24, // optional, 0 to 336
+  "horizonDays": 14, // optional, 1 to 60, today included
+  "meetingLink": "https://...", // sent with an accepted request
+}
+```
+
+A day missing from `weeklyHours`, or an invalid range, has no slots. A slot is offered when it
+fits within a range, starts at least `minNoticeHours` from now and falls within `horizonDays`.
+Local times that a daylight saving change skips are left out. Without an owner, a valid time
+zone or an `https` meeting link, both callables fail with `failed-precondition`.
+
+The owner's name and email come from the `en` portfolio profile (`profile/en`), so the emails
+use the same name as the app.
+
+### Requests
+
+`requestCall` checks the request and answers with an `HttpsError` whose `details.reason` says
+why it was refused:
+
+| Code                  | `reason`                 | When                                                     |
+| --------------------- | ------------------------ | -------------------------------------------------------- |
+| `invalid-argument`    | `invalid`                | A field is missing or too long; `details.field` names it |
+| `failed-precondition` | `not_set_up`             | The settings are missing or invalid                      |
+| `failed-precondition` | `slot_not_offered`       | The start is not one of the slots                        |
+| `failed-precondition` | `slot_taken`             | Another visitor booked the slot first                    |
+| `resource-exhausted`  | `too_many_open_requests` | The email address already has 2 requests waiting         |
+| `resource-exhausted`  | `daily_limit`            | 20 requests came in over the last 24 hours               |
+
+The texts may hold up to 100 characters for `name`, 254 for `email`, 120 for `topic` and 2,000
+for `message`. The email address is stored in lowercase. A `locale` other than `en`, `es` or
+`nl` becomes `en`, and an unknown time zone is left out.
+
+In one transaction, a booking takes the slot at `call_slots/{slotStart}`, which holds the
+`requestId` and `start`, and saves the request at `users/{ownerId}/call_requests/{requestId}`:
+
+| Field       | Type           | Description                                      |
+| ----------- | -------------- | ------------------------------------------------ |
+| `slotStart` | timestamp      | When the call starts                             |
+| `slotEnd`   | timestamp      | `slotStart` plus `slotMinutes`                   |
+| `name`      | string         | The visitor's name                               |
+| `email`     | string         | The visitor's email address, in lowercase        |
+| `topic`     | string         | What the call is about                           |
+| `message`   | string         | The visitor's message, or empty                  |
+| `locale`    | string         | The language of the visitor's emails             |
+| `timeZone`  | string or null | The visitor's time zone, for the times in emails |
+| `status`    | string         | `requested`, then `accepted` or `declined`       |
+| `createdAt` | timestamp      | When the request came in                         |
+| `decidedAt` | timestamp      | When the owner answered, set by the app          |
+| `expiresAt` | timestamp      | `slotEnd` plus 30 days                           |
+
+A slot stays taken while its request waits, so no one else can book it. Firestore rules let the
+owner read their requests and change only `status`, from `requested` to `accepted` or
+`declined`, with `decidedAt` set to the server time. Clients cannot read or write the settings
+or the slots.
+
+The function logs only the outcome of each request, never the visitor's details.
+
+### Emails and notifications
+
+The emails go out from a Gmail account, with replies going to the owner (or, for the owner's
+copy, to the visitor). The visitor's emails are in their language, with the time in their time
+zone, or the owner's when the app sent none. The owner's copy is in English. The notification to
+the owner's devices names the visitor and the time in the owner's time zone, in each device's
+language. Its data holds `kind: call_request` and the `requestId`.
+
+Every step runs even when another fails, and a failed step is logged with the request ID and not
+retried. Before the first deploy, store the account's address and an
+[app password](https://support.google.com/accounts/answer/185833) as secrets:
+
+```bash
+firebase functions:secrets:set CALL_BOOKING_GMAIL_USER --project="$PROJECT_ID"
+firebase functions:secrets:set CALL_BOOKING_GMAIL_APP_PASSWORD --project="$PROJECT_ID"
+```
+
+### Call booking expiry
+
+Firestore deletes requests and slots after `expiresAt` through TTL policies. Create them once:
+
+```bash
+for group in call_requests call_slots; do
+  gcloud firestore fields ttls update expiresAt \
+    --collection-group="$group" --enable-ttl --project="$PROJECT_ID"
+done
+```
+
 ## Getting Started
 
 The commands below read the project ID from `PROJECT_ID`. Set it first:
@@ -398,6 +521,8 @@ export PROJECT_ID=<your-firebase-project-id>
 - The Agent Platform API (`aiplatform.googleapis.com`) on, and the `job-openings` service
   account with its roles. See [Service account](#service-account).
 - The Eventarc API on, and the `notifications` service account with its roles.
+- The Secret Manager API on, the `call-booking` service account with its roles, and the email
+  secrets. See [Emails and notifications](#emails-and-notifications).
 - A Cloud Firestore database in `us-central1`, where the Firestore triggers run.
 - The Firebase CLI, signed in to an account that can deploy to the project.
 
@@ -447,6 +572,30 @@ done
 | `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Sending notifications                                    |
 | `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events                           |
 | `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc and Cloud Scheduler start the functions |
+
+The call booking functions run as the `call-booking` service account, which may only read and
+write Firestore, send notifications, read the email secrets and receive the Firestore events
+that start the triggers:
+
+```bash
+gcloud services enable secretmanager.googleapis.com --project="$PROJECT_ID"
+gcloud iam service-accounts create call-booking \
+  --display-name="Call booking functions" --project="$PROJECT_ID"
+for role in roles/datastore.user roles/firebasecloudmessaging.admin \
+  roles/secretmanager.secretAccessor roles/eventarc.eventReceiver roles/run.invoker; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:call-booking@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="$role"
+done
+```
+
+| Role                                 | Console name                       | Needed for                                 |
+| ------------------------------------ | ---------------------------------- | ------------------------------------------ |
+| `roles/datastore.user`               | Cloud Datastore User               | Reading settings and saving requests       |
+| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Notifying the owner                        |
+| `roles/secretmanager.secretAccessor` | Secret Manager Secret Accessor     | Reading the Gmail address and app password |
+| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events             |
+| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the triggers        |
 
 Firestore triggers must run in the database's region, set by `firestoreTriggerRegion` in
 `src/shared/function_options.ts`. Check the location with:
@@ -513,12 +662,14 @@ gcloud iam service-accounts create github-actions-functions \
   --display-name="GitHub Actions functions deploy" --project="$PROJECT_ID"
 DEPLOYER="serviceAccount:github-actions-functions@${PROJECT_ID}.iam.gserviceaccount.com"
 for role in roles/cloudfunctions.developer roles/cloudscheduler.admin \
-  roles/artifactregistry.admin roles/serviceusage.serviceUsageConsumer roles/firebase.viewer; do
+  roles/artifactregistry.admin roles/serviceusage.serviceUsageConsumer roles/firebase.viewer \
+  roles/secretmanager.viewer; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="$DEPLOYER" --role="$role"
 done
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
 for account in "job-openings@${PROJECT_ID}.iam.gserviceaccount.com" \
   "notifications@${PROJECT_ID}.iam.gserviceaccount.com" \
+  "call-booking@${PROJECT_ID}.iam.gserviceaccount.com" \
   "${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
   "${PROJECT_ID}@appspot.gserviceaccount.com"; do
   gcloud iam service-accounts add-iam-policy-binding "$account" \
@@ -530,14 +681,15 @@ base64 < key.json | gh secret set FUNCTIONS_DEPLOY_SERVICE_ACCOUNT
 rm key.json
 ```
 
-| Role                                      | Needed for                                                                                                                                                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `roles/cloudfunctions.developer`          | Creating and updating functions                                                                                                                                                                               |
-| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                                                                                                                                                 |
-| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                                                                                                                                               |
-| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                                                                                                                                                |
-| `roles/firebase.viewer`                   | Reading the Firebase project                                                                                                                                                                                  |
-| `roles/iam.serviceAccountUser`            | Running functions as `job-openings` and `notifications`, building them as the default compute account and deploying scheduled functions, which the Firebase CLI checks against the App Engine default account |
+| Role                                      | Needed for                                                                                                                                                                                                                    |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `roles/cloudfunctions.developer`          | Creating and updating functions                                                                                                                                                                                               |
+| `roles/cloudscheduler.admin`              | Creating and updating the jobs that start scheduled functions                                                                                                                                                                 |
+| `roles/artifactregistry.admin`            | Setting the cleanup policy on the repository of function images                                                                                                                                                               |
+| `roles/serviceusage.serviceUsageConsumer` | Checking that the APIs the deploy needs are on                                                                                                                                                                                |
+| `roles/secretmanager.viewer`              | Checking that the secrets the functions use exist and who may read them                                                                                                                                                       |
+| `roles/firebase.viewer`                   | Reading the Firebase project                                                                                                                                                                                                  |
+| `roles/iam.serviceAccountUser`            | Running functions as `job-openings`, `notifications` and `call-booking`, building them as the default compute account and deploying scheduled functions, which the Firebase CLI checks against the App Engine default account |
 
 #### Owner-only setup
 
@@ -574,6 +726,18 @@ missing, the deploy fails with the message below. Grant the roles, then re-run t
   ```
 
   `fetchJobOpenings` runs as `job-openings`, and `sendPortfolioUpdates` as `notifications`.
+
+- **Each new callable function** fails with "Failed to set the IAM Policy on the Service" too,
+  because anyone may call it and App Check, not IAM, checks the caller. Let everyone invoke its
+  Cloud Run service, then re-run the deploy:
+
+  ```bash
+  for service in getcallslots requestcall; do
+    gcloud run services add-iam-policy-binding "$service" \
+      --region=europe-west3 --project="$PROJECT_ID" \
+      --member=allUsers --role=roles/run.invoker
+  done
+  ```
 
 ## Testing
 

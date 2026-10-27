@@ -1,7 +1,6 @@
 import type { Firestore } from 'firebase-admin/firestore';
 
 import type { JobFit, ScoredJobOpening } from '../job_opening.js';
-import type { UserDevice } from '../notify/notify_new_job_openings.js';
 import type { ReadDocument } from '../skill/portfolio_skills.js';
 import { fromJobFitDocument, toJobFitDocument } from './job_fit_document.js';
 import { toJobOpeningDocument } from './job_opening_document.js';
@@ -58,36 +57,6 @@ export async function writeJobOpenings(
   });
   await writer.close();
   return openings.length - existingCount;
-}
-
-/** The devices at `users/{uid}/devices/{token}` that receive notifications. */
-export async function listUserDevices(
-  db: Firestore,
-  userId: string,
-): Promise<UserDevice[]> {
-  const snapshot = await db
-    .collection('users')
-    .doc(userId)
-    .collection('devices')
-    .get();
-  return snapshot.docs.map((document) => {
-    const locale = document.get('locale');
-    return {
-      token: document.id,
-      locale: typeof locale === 'string' ? locale : 'en',
-    };
-  });
-}
-
-export async function deleteUserDevices(
-  db: Firestore,
-  userId: string,
-  tokens: string[],
-): Promise<void> {
-  const collection = db.collection('users').doc(userId).collection('devices');
-  const writer = db.bulkWriter();
-  for (const token of tokens) void writer.delete(collection.doc(token));
-  await writer.close();
 }
 
 /** The stored fits for [fitKeys], by key. Keys without a fit are left out. */

@@ -15,6 +15,7 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
+  updateDoc,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
@@ -56,6 +57,15 @@ beforeEach(async () => {
       locale: 'en',
       platform: 'android',
       updatedAt: Timestamp.now(),
+    });
+    await setDoc(doc(db, 'users/owner/call_requests/request-1'), {
+      name: 'Visitor',
+      email: 'visitor@example.com',
+      status: 'requested',
+    });
+    await setDoc(doc(db, 'call_booking/settings'), { ownerId: 'owner' });
+    await setDoc(doc(db, 'call_slots/2026-11-03T08:00:00.000Z'), {
+      requestId: 'request-1',
     });
     await setDoc(doc(db, 'other/document'), { value: 1 });
   });
@@ -257,6 +267,116 @@ describe('users/{userId}/devices', () => {
         updatedAt: serverTimestamp(),
       }),
     );
+  });
+});
+
+describe('users/{userId}/call_requests', () => {
+  const request = (context: ReturnType<typeof owner>) =>
+    doc(context, 'users/owner/call_requests/request-1');
+
+  it('should let the user list and read their own requests', async () => {
+    await assertSucceeds(
+      getDocs(collection(owner(), 'users/owner/call_requests')),
+    );
+    await assertSucceeds(getDoc(request(owner())));
+  });
+
+  it("should not let anyone read another user's requests", async () => {
+    await assertFails(
+      getDocs(collection(stranger(), 'users/owner/call_requests')),
+    );
+    await assertFails(getDoc(request(guest())));
+  });
+
+  for (const status of ['accepted', 'declined']) {
+    it(`should let the user mark a waiting request ${status} with the server time`, async () => {
+      await assertSucceeds(
+        updateDoc(request(owner()), { status, decidedAt: serverTimestamp() }),
+      );
+    });
+  }
+
+  it('should not accept a client-chosen time for decidedAt', async () => {
+    await assertFails(
+      updateDoc(request(owner()), {
+        status: 'accepted',
+        decidedAt: Timestamp.fromDate(new Date('2020-01-01')),
+      }),
+    );
+  });
+
+  it('should not let the user change a request that was already answered', async () => {
+    await assertSucceeds(
+      updateDoc(request(owner()), {
+        status: 'accepted',
+        decidedAt: serverTimestamp(),
+      }),
+    );
+
+    await assertFails(
+      updateDoc(request(owner()), {
+        status: 'declined',
+        decidedAt: serverTimestamp(),
+      }),
+    );
+  });
+
+  it('should not accept another status or other changed fields', async () => {
+    await assertFails(
+      updateDoc(request(owner()), {
+        status: 'maybe',
+        decidedAt: serverTimestamp(),
+      }),
+    );
+    await assertFails(
+      updateDoc(request(owner()), {
+        status: 'accepted',
+        decidedAt: serverTimestamp(),
+        email: 'changed@example.com',
+      }),
+    );
+  });
+
+  it("should not let anyone else answer the owner's requests", async () => {
+    for (const context of [stranger(), guest()]) {
+      await assertFails(
+        updateDoc(request(context), {
+          status: 'accepted',
+          decidedAt: serverTimestamp(),
+        }),
+      );
+    }
+  });
+
+  it('should not let anyone create or delete a request', async () => {
+    await assertFails(
+      setDoc(doc(guest(), 'users/owner/call_requests/request-2'), {
+        status: 'requested',
+      }),
+    );
+    await assertFails(
+      setDoc(doc(owner(), 'users/owner/call_requests/request-2'), {
+        status: 'requested',
+      }),
+    );
+    await assertFails(deleteDoc(request(owner())));
+  });
+});
+
+describe('call booking settings and slots', () => {
+  it('should not let anyone read or write them', async () => {
+    for (const context of [owner(), guest()]) {
+      await assertFails(getDoc(doc(context, 'call_booking/settings')));
+      await assertFails(
+        setDoc(doc(context, 'call_booking/settings'), { ownerId: 'x' }),
+      );
+      await assertFails(getDocs(collection(context, 'call_slots')));
+      await assertFails(
+        setDoc(doc(context, 'call_slots/2026-11-03T09:00:00.000Z'), {
+          requestId: 'x',
+        }),
+      );
+    }
   });
 });
 
