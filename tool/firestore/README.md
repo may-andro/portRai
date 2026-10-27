@@ -14,15 +14,16 @@ Firestore emulator.
 
 The rules live in [`firestore.rules`](firestore.rules).
 
-| Path                                                                                      | Client access                                                                           |
-| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `profile`, `experiences`, `expertise`, `projects`, `services`, `testimonials` `/{locale}` | Anyone can read a document by ID. Listing and writing are refused                       |
-| `app_config/{configId}`                                                                   | Anyone can read a document by ID. Listing and writing are refused                       |
-| `portfolio_versions/{locale}`                                                             | Anyone can read a document by ID. Listing and writing are refused                       |
-| `users/{userId}`                                                                          | The signed-in user can read it and create or update only its `jobSearch` map            |
-| `users/{userId}/job_openings/{jobOpeningId}`                                              | The signed-in user can list and read them. Writing is refused                           |
-| `users/{userId}/devices/{token}`                                                          | The signed-in user can create, update, read and delete one by token. Listing is refused |
-| Any other path                                                                            | Refused                                                                                 |
+| Path                                                                                      | Client access                                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `profile`, `experiences`, `expertise`, `projects`, `services`, `testimonials` `/{locale}` | Anyone can read a document by ID. Listing and writing are refused                                                                                                                           |
+| `app_config/{configId}`                                                                   | Anyone can read a document by ID. Listing and writing are refused                                                                                                                           |
+| `portfolio_versions/{locale}`                                                             | Anyone can read a document by ID. Listing and writing are refused                                                                                                                           |
+| `users/{userId}`                                                                          | The signed-in user can read it and create or update only its `jobSearch` map                                                                                                                |
+| `users/{userId}/job_openings/{jobOpeningId}`                                              | The signed-in user can list and read them. Writing is refused                                                                                                                               |
+| `users/{userId}/call_requests/{requestId}`                                                | The signed-in user can list and read them, and change only `status` from `requested` to `accepted` or `declined` with `decidedAt` set to the server time. Creating and deleting are refused |
+| `users/{userId}/devices/{token}`                                                          | The signed-in user can create, update, read and delete one by token. Listing is refused                                                                                                     |
+| Any other path                                                                            | Refused                                                                                                                                                                                     |
 
 `jobSearch` may hold only a boolean `enabled` and an `updatedAt` equal to the server time of the
 write, which `FieldValue.serverTimestamp()` produces. Users cannot delete their document.

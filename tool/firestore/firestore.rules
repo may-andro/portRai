@@ -27,6 +27,17 @@ service cloud.firestore {
         && device.updatedAt == request.time;
     }
 
+    // The owner's answer to a call request: `status` goes from `requested`
+    // to `accepted` or `declined`, and `decidedAt` must be the server time.
+    // Nothing else may change.
+    function isCallRequestDecision() {
+      return resource.data.status == 'requested'
+        && request.resource.data.status in ['accepted', 'declined']
+        && request.resource.data.decidedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'decidedAt']);
+    }
+
     // Portfolio content, one document per locale. Public, read-only.
     match /profile/{locale} {
       allow get: if true;
@@ -68,6 +79,13 @@ service cloud.firestore {
       // Written by the job openings function only.
       match /job_openings/{jobOpeningId} {
         allow read: if isSignedInAs(userId);
+      }
+
+      // Saved by the call booking function only, which also keeps the booking
+      // settings and taken slots out of every client's reach.
+      match /call_requests/{requestId} {
+        allow read: if isSignedInAs(userId);
+        allow update: if isSignedInAs(userId) && isCallRequestDecision();
       }
 
       // Registered while the user is signed in on a device. Signing out
