@@ -145,14 +145,8 @@ flutter test
 project.
 
 `web/index.html` loads the Google Maps JavaScript API for the `DSMapWidget` use case with a
-`MAPS_API_KEY` placeholder. `_build_web.yaml` replaces it with the `MAPS_API_KEY_WEB` repository
-secret, and `melos deploy_widgetbook` with `MAPS_API_KEY_WEB` from the environment or the
-git-ignored `app/portrai/.env.production`. The key's website restrictions must list
-`https://portrai-storybook.web.app/*` and each channel URL, such as
-`https://portrai-storybook--preview-4x8bbjws.web.app/*`; Google allows a wildcard only at the
-start of the host, so channels cannot be matched by one pattern. A channel that expires and is
-created again can get a new URL; `firebase hosting:channel:list --site portrai-storybook` lists
-them. Without an allowed key the map does not load.
+`MAPS_API_KEY` placeholder, which `_build_web.yaml` and `melos deploy_widgetbook` replace with
+`MAPS_API_KEY_WEB`.
 
 ## Deployment
 
