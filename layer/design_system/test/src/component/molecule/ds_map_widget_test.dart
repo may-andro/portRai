@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +15,11 @@ void main() {
   Widget buildSubject(
     DSMapWidget map, {
     Brightness brightness = Brightness.light,
+    DesignSystem? designSystem,
     Size size = const Size(400, 300),
   }) => TestWidgetWrapper(
     brightness: brightness,
-    designSystem: DesignSystem.values.first,
+    designSystem: designSystem ?? DesignSystem.values.first,
     child: Center(
       child: SizedBox.fromSize(size: size, child: map),
     ),
@@ -84,37 +87,90 @@ void main() {
       expect(camera.zoom, 11);
     });
 
-    testWidgets('should keep the platform map style when standard', (
+    List<Map<String, dynamic>> styleRulesOf(WidgetTester tester) =>
+        (jsonDecode(mapOf(tester).style!) as List).cast<Map<String, dynamic>>();
+
+    String? colorOf(
+      List<Map<String, dynamic>> rules, {
+      String? feature,
+      required String element,
+    }) {
+      final rule = rules.lastWhere(
+        (rule) =>
+            rule['featureType'] == feature && rule['elementType'] == element,
+      );
+      final stylers = (rule['stylers'] as List).cast<Map<String, dynamic>>();
+      return stylers.first['color'] as String?;
+    }
+
+    String hexOf(DSColor color) =>
+        '#${(color.color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+
+    for (final designSystem in DesignSystem.values) {
+      for (final brightness in Brightness.values) {
+        testWidgets('should color the map from the ${designSystem.name} '
+            '${brightness.name} palette', (tester) async {
+          final palette = DSTheme(
+            brightness: brightness,
+            designSystem: designSystem,
+          ).colorPalette;
+          await tester.pumpWidget(
+            buildSubject(
+              const DSMapWidget(places: [berlin]),
+              brightness: brightness,
+              designSystem: designSystem,
+            ),
+          );
+
+          final rules = styleRulesOf(tester);
+          expect(
+            colorOf(rules, element: 'geometry'),
+            hexOf(palette.surface.surfaceContainerLow),
+          );
+          expect(
+            colorOf(rules, feature: 'water', element: 'geometry'),
+            hexOf(palette.brand.primaryContainer),
+          );
+          expect(
+            colorOf(
+              rules,
+              feature: 'administrative.country',
+              element: 'geometry.stroke',
+            ),
+            hexOf(palette.outline.outline),
+          );
+        });
+      }
+    }
+
+    testWidgets('should hide roads and points of interest when minimal', (
       tester,
     ) async {
+      bool hidesFeature(List<Map<String, dynamic>> rules, String feature) =>
+          rules.any(
+            (rule) =>
+                rule['featureType'] == feature &&
+                (rule['stylers'] as List).any(
+                  (styler) => (styler as Map)['visibility'] == 'off',
+                ),
+          );
+
       await tester.pumpWidget(
         buildSubject(const DSMapWidget(places: [berlin])),
       );
+      final standardRules = styleRulesOf(tester);
 
-      expect(mapOf(tester).style, isNull);
-    });
-
-    testWidgets('should use a different minimal style in light and dark', (
-      tester,
-    ) async {
       await tester.pumpWidget(
         buildSubject(
           const DSMapWidget(places: [berlin], style: DSMapStyle.minimal),
         ),
       );
-      final lightStyle = mapOf(tester).style;
+      final minimalRules = styleRulesOf(tester);
 
-      await tester.pumpWidget(
-        buildSubject(
-          const DSMapWidget(places: [berlin], style: DSMapStyle.minimal),
-          brightness: Brightness.dark,
-        ),
-      );
-      final darkStyle = mapOf(tester).style;
-
-      expect(lightStyle, isNotNull);
-      expect(darkStyle, isNotNull);
-      expect(darkStyle, isNot(lightStyle));
+      for (final feature in ['road', 'poi', 'transit']) {
+        expect(hidesFeature(standardRules, feature), isFalse);
+        expect(hidesFeature(minimalRules, feature), isTrue);
+      }
     });
 
     testWidgets('should replace the default pin once the brand pin is drawn', (

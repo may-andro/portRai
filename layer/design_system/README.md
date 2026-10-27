@@ -146,7 +146,7 @@ Each component level has a barrel file (`atom.dart`, `molecule.dart`, `organism.
 | `DSIconInfoTileWidget` | Gradient tile with an icon badge, a label and a value |
 | `DSInfoChipWidget` | Icon and label pill in the secondary container colors |
 | `DSLabeledInfoRowWidget` | Icon in a circle, label and value, with a chevron when tappable |
-| `DSMapWidget` | Google Map marking `DSMapPlace`s, framed to fit them; still and cheap to scroll past unless `isInteractive`, with `brand` markers and a `minimal` style |
+| `DSMapWidget` | Google Map marking `DSMapPlace`s, framed to fit them and colored from the theme; still and cheap to scroll past unless `isInteractive`, with `brand` markers and a `minimal` style without roads |
 | `DSNetworkImageWidget` | Cached network image, decoded at its displayed size, that retries after the device reconnects |
 | `DSPositionIndicatorWidget` | Row of dots marking the current index |
 | `DSQuoteTextWidget` | Quote glyph followed by text capped at `maxLines` |

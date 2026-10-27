@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:design_system/src/component/atom/lottie/lottie.dart';
 import 'package:design_system/src/extension/build_context_extension.dart';
+import 'package:design_system/src/foundation/color/color.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -36,11 +38,13 @@ enum DSMapMarker {
   brand,
 }
 
+/// Both styles color the map from the active theme, in light and dark.
 enum DSMapStyle {
-  /// The platform's default map.
+  /// Land, water, roads, parks and labels.
   standard,
 
-  /// Hides roads and points of interest and follows the theme brightness.
+  /// Hides roads, points of interest and transit, leaving land, water,
+  /// borders and place names.
   minimal,
 }
 
@@ -231,15 +235,76 @@ class _DSMapWidgetState extends State<DSMapWidget> {
     );
   }
 
-  String? _mapStyle(BuildContext context) {
-    switch (widget.style) {
-      case DSMapStyle.standard:
-        return null;
-      case DSMapStyle.minimal:
-        return context.theme.brightness == Brightness.dark
-            ? _minimalDarkStyle
-            : _minimalLightStyle;
-    }
+  String _mapStyle(BuildContext context) {
+    final palette = context.colorPalette;
+    final surface = palette.surface;
+    final isMinimal = widget.style == DSMapStyle.minimal;
+    Map<String, Object> rule({
+      String? feature,
+      String? element,
+      DSColor? color,
+      bool hidden = false,
+    }) => {
+      'featureType': ?feature,
+      'elementType': ?element,
+      'stylers': [
+        if (color != null) {'color': _hexOf(color)},
+        if (hidden) {'visibility': 'off'},
+      ],
+    };
+
+    return jsonEncode([
+      rule(element: 'geometry', color: surface.surfaceContainerLow),
+      rule(element: 'labels.text.fill', color: surface.onSurfaceVariant),
+      rule(element: 'labels.text.stroke', color: surface.surface),
+      rule(element: 'labels.icon', hidden: isMinimal),
+      rule(
+        feature: 'water',
+        element: 'geometry',
+        color: palette.brand.primaryContainer,
+      ),
+      rule(
+        feature: 'water',
+        element: 'labels.text.fill',
+        color: palette.brand.onPrimaryContainer,
+      ),
+      rule(
+        feature: 'administrative.country',
+        element: 'geometry.stroke',
+        color: palette.outline.outline,
+      ),
+      rule(
+        feature: 'administrative.province',
+        element: 'geometry.stroke',
+        color: palette.outline.outlineVariant,
+      ),
+      if (isMinimal) ...[
+        rule(feature: 'road', hidden: true),
+        rule(feature: 'poi', hidden: true),
+        rule(feature: 'transit', hidden: true),
+      ] else ...[
+        rule(
+          feature: 'road',
+          element: 'geometry',
+          color: surface.surfaceContainerHighest,
+        ),
+        rule(
+          feature: 'poi',
+          element: 'geometry',
+          color: surface.surfaceContainer,
+        ),
+        rule(
+          feature: 'poi.park',
+          element: 'geometry',
+          color: palette.brand.tertiaryContainer,
+        ),
+        rule(
+          feature: 'transit',
+          element: 'geometry',
+          color: surface.surfaceContainerHigh,
+        ),
+      ],
+    ]);
   }
 }
 
@@ -357,19 +422,8 @@ Future<BitmapDescriptor> _buildBrandMarker(
   );
 }
 
-const _minimalLightStyle =
-    '[{"featureType":"road","stylers":[{"visibility":"off"}]},'
-    '{"featureType":"poi","stylers":[{"visibility":"off"}]},'
-    '{"featureType":"water","elementType":"geometry",'
-    '"stylers":[{"color":"#cfe3f5"}]}]';
-
-const _minimalDarkStyle =
-    '[{"elementType":"geometry","stylers":[{"color":"#1d2c4d"}]},'
-    '{"elementType":"labels.text.fill","stylers":[{"color":"#8ec3b9"}]},'
-    '{"elementType":"labels.text.stroke","stylers":[{"color":"#1a3646"}]},'
-    '{"featureType":"water","elementType":"geometry",'
-    '"stylers":[{"color":"#0e1626"}]},'
-    '{"featureType":"road","stylers":[{"visibility":"off"}]},'
-    '{"featureType":"poi","stylers":[{"visibility":"off"}]},'
-    '{"featureType":"administrative.country","elementType":"geometry.stroke",'
-    '"stylers":[{"color":"#4b6878"}]}]';
+/// `#rrggbb`; map styles take no alpha.
+String _hexOf(DSColor color) {
+  final rgb = color.color.toARGB32() & 0xFFFFFF;
+  return '#${rgb.toRadixString(16).padLeft(6, '0')}';
+}
