@@ -124,7 +124,3 @@ final class ProjectClickEvent extends PortfolioEvent {
   @override
   List<Object> get props => [projectId];
 }
-
-final class ProfileClickEvent extends PortfolioEvent {
-  const ProfileClickEvent();
-}

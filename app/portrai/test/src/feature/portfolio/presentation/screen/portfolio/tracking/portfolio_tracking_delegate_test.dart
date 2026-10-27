@@ -141,7 +141,6 @@ void main() {
             'project',
             'port-rai',
           ),
-          ('profile', () => delegate.trackProfileClick(), 'profile', 'open'),
         ]) {
       test(
         'should send a $name click when the $description tap is tracked',
