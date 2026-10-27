@@ -38,9 +38,7 @@ class ContentWidget extends StatelessWidget {
             ),
             DesignSystemCardWidget(
               onClicked: () {
-                context.bloc.add(
-                  const SettingEntryClickEvent(SettingEntry.theme),
-                );
+                context.bloc.add(const SettingEntryClickEvent('theme'));
                 context.pushScreen(DesignSystemModuleRoute.designSystemGallery);
               },
             ),
@@ -67,7 +65,7 @@ class ContentWidget extends StatelessWidget {
               JobOpeningsCardWidget(
                 onClicked: () {
                   context.bloc.add(
-                    const SettingEntryClickEvent(SettingEntry.jobOpenings),
+                    const SettingEntryClickEvent('job_openings'),
                   );
                   context.pushScreen(JobOpeningModuleRoute.jobOpenings);
                 },
@@ -79,7 +77,7 @@ class ContentWidget extends StatelessWidget {
                 label: context.localizations.settingDeveloperMode,
                 onPressed: () {
                   context.bloc.add(
-                    const SettingEntryClickEvent(SettingEntry.developerMenu),
+                    const SettingEntryClickEvent('developer_menu'),
                   );
                   DeveloperMenuScreen.navigate(context);
                 },

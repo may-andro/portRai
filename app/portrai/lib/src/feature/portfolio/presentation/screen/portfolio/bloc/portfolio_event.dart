@@ -75,16 +75,14 @@ final class AssistantLaunchClickEvent extends PortfolioEvent {
   List<Object> get props => [isLocal];
 }
 
-/// A section whose full list opens from its See all button.
-enum SeeAllSection { expertises, services, experiences, testimonials }
-
+/// A section's See All button was tapped; [sectionName] labels the click.
 final class SeeAllClickEvent extends PortfolioEvent {
-  const SeeAllClickEvent(this.section);
+  const SeeAllClickEvent(this.sectionName);
 
-  final SeeAllSection section;
+  final String sectionName;
 
   @override
-  List<Object> get props => [section];
+  List<Object> get props => [sectionName];
 }
 
 final class SettingClickEvent extends PortfolioEvent {

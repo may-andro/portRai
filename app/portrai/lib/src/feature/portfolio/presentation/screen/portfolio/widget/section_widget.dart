@@ -118,9 +118,7 @@ class ExpertiseSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(
-                  const SeeAllClickEvent(SeeAllSection.expertises),
-                );
+                context.bloc.add(const SeeAllClickEvent('expertises'));
                 ExpertisesScreen.navigate(context);
               },
             ),
@@ -252,9 +250,7 @@ class ServicesSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(
-                  const SeeAllClickEvent(SeeAllSection.services),
-                );
+                context.bloc.add(const SeeAllClickEvent('services'));
                 ServicesScreen.navigate(context);
               },
             ),
@@ -294,9 +290,7 @@ class ExperienceSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(
-                  const SeeAllClickEvent(SeeAllSection.experiences),
-                );
+                context.bloc.add(const SeeAllClickEvent('experiences'));
                 ExperiencesScreen.navigate(context);
               },
             ),
@@ -362,9 +356,7 @@ class TestimonialsSectionWidget extends SectionWidget {
           ? SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
-                context.bloc.add(
-                  const SeeAllClickEvent(SeeAllSection.testimonials),
-                );
+                context.bloc.add(const SeeAllClickEvent('testimonials'));
                 TestimonialListWidget.showAll(context, portfolio.testimonials);
               },
             )

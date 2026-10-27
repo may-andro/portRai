@@ -11,16 +11,14 @@ class LoadSettingsEvent extends SettingEvent {
   const LoadSettingsEvent();
 }
 
-/// A settings entry that opens another screen.
-enum SettingEntry { language, theme, role, jobOpenings, developerMenu }
-
+/// A settings entry was tapped; [entryName] labels the click.
 class SettingEntryClickEvent extends SettingEvent {
-  const SettingEntryClickEvent(this.entry);
+  const SettingEntryClickEvent(this.entryName);
 
-  final SettingEntry entry;
+  final String entryName;
 
   @override
-  List<Object?> get props => [entry];
+  List<Object?> get props => [entryName];
 }
 
 // Tracking Events

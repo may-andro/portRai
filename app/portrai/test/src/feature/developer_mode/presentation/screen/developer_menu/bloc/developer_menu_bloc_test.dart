@@ -119,15 +119,12 @@ void main() {
       },
     );
 
-    for (final (entry, label) in [
-      (DeveloperMenuEntry.featureFlags, 'feature_flags'),
-      (DeveloperMenuEntry.trackingViewer, 'tracking_viewer'),
-    ]) {
+    for (final label in ['feature_flags', 'tracking_viewer']) {
       blocTest<DeveloperMenuBloc, DeveloperMenuState>(
         'should track the $label entry without changing the state when it is '
         'tapped',
         build: buildBloc,
-        act: (bloc) => bloc.add(DeveloperMenuEntryClickEvent(entry)),
+        act: (bloc) => bloc.add(DeveloperMenuEntryClickEvent(label)),
         expect: () => const <DeveloperMenuState>[],
         verify: (_) =>
             verify(() => trackingDelegate.trackEntryClick(label)).called(1),

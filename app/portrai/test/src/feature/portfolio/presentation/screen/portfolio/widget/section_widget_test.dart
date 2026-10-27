@@ -125,8 +125,6 @@ void main() {
     await tester.pump();
     tester.takeException();
 
-    verify(
-      () => bloc.add(const SeeAllClickEvent(SeeAllSection.services)),
-    ).called(1);
+    verify(() => bloc.add(const SeeAllClickEvent('services'))).called(1);
   });
 }

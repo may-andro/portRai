@@ -47,7 +47,7 @@ class RoleCardWidget extends StatelessWidget {
           color: context.colorPalette.neutral.grey3.color,
         ),
         onTap: () {
-          context.bloc.add(const SettingEntryClickEvent(SettingEntry.role));
+          context.bloc.add(const SettingEntryClickEvent('role'));
           context.goScreen(OnboardingModuleRoute.onboarding);
         },
       ),

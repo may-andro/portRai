@@ -318,18 +318,18 @@ void main() {
       ),
     );
 
-    for (final (entry, label) in [
-      (SettingEntry.language, 'language'),
-      (SettingEntry.theme, 'theme'),
-      (SettingEntry.role, 'role'),
-      (SettingEntry.jobOpenings, 'job_openings'),
-      (SettingEntry.developerMenu, 'developer_menu'),
+    for (final label in [
+      'language',
+      'theme',
+      'role',
+      'job_openings',
+      'developer_menu',
     ]) {
       blocTest<SettingBloc, SettingState>(
         'should track the $label entry without changing the state when it is '
         'tapped',
         build: buildBloc,
-        act: (bloc) => bloc.add(SettingEntryClickEvent(entry)),
+        act: (bloc) => bloc.add(SettingEntryClickEvent(label)),
         expect: () => const <SettingState>[],
         verify: (_) =>
             verify(() => trackingDelegate.trackEntryClick(label)).called(1),

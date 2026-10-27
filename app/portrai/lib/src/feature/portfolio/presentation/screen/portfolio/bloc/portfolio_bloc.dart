@@ -140,7 +140,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
   void _mapSeeAllClickEventToState(
     SeeAllClickEvent event,
     Emitter<PortfolioState> emit,
-  ) => _trackingDelegate.trackSeeAllClick(event.section.name);
+  ) => _trackingDelegate.trackSeeAllClick(event.sectionName);
 
   void _mapSettingClickEventToState(
     SettingClickEvent event,

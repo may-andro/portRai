@@ -58,9 +58,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('onboarding screen'), findsOneWidget);
-      verify(
-        () => bloc.add(const SettingEntryClickEvent(SettingEntry.role)),
-      ).called(1);
+      verify(() => bloc.add(const SettingEntryClickEvent('role'))).called(1);
     });
   });
 }

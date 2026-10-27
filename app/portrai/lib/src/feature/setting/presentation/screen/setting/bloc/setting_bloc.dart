@@ -47,13 +47,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>
   void _mapSettingEntryClickEventToState(
     SettingEntryClickEvent event,
     Emitter<SettingState> emit,
-  ) => _trackingDelegate.trackEntryClick(switch (event.entry) {
-    SettingEntry.language => 'language',
-    SettingEntry.theme => 'theme',
-    SettingEntry.role => 'role',
-    SettingEntry.jobOpenings => 'job_openings',
-    SettingEntry.developerMenu => 'developer_menu',
-  });
+  ) => _trackingDelegate.trackEntryClick(event.entryName);
 
   Future<void> _mapLoadSettingsEventToState(
     LoadSettingsEvent event,

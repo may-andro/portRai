@@ -273,7 +273,7 @@ void main() {
       'state',
       build: buildBloc,
       act: (bloc) => bloc
-        ..add(const SeeAllClickEvent(SeeAllSection.services))
+        ..add(const SeeAllClickEvent('services'))
         ..add(const SettingClickEvent())
         ..add(const ExperienceClickEvent('experience_1'))
         ..add(const ExpertiseClickEvent('Flutter Development'))

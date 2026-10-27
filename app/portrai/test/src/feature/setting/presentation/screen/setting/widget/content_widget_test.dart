@@ -35,18 +35,18 @@ void main() {
   }
 
   group('Setting ContentWidget', () {
-    for (final (label, cardTitle, entry, routeName, routePath) in [
+    for (final (label, cardTitle, entryName, routeName, routePath) in [
       (
         'theme',
         'App theme',
-        SettingEntry.theme,
+        'theme',
         DesignSystemModuleRoute.designSystemGallery.name,
         DesignSystemModuleRoute.designSystemGallery.path,
       ),
       (
         'job openings',
         'Job openings',
-        SettingEntry.jobOpenings,
+        'job_openings',
         JobOpeningModuleRoute.jobOpenings.name,
         JobOpeningModuleRoute.jobOpenings.path,
       ),
@@ -90,7 +90,7 @@ void main() {
         await tester.tap(find.text(cardTitle));
         await tester.pumpAndSettle();
 
-        verify(() => bloc.add(SettingEntryClickEvent(entry))).called(1);
+        verify(() => bloc.add(SettingEntryClickEvent(entryName))).called(1);
         expect(find.text('Opened screen'), findsOneWidget);
       });
     }
