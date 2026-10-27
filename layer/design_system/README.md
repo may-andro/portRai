@@ -146,6 +146,7 @@ Each component level has a barrel file (`atom.dart`, `molecule.dart`, `organism.
 | `DSIconInfoTileWidget` | Gradient tile with an icon badge, a label and a value |
 | `DSInfoChipWidget` | Icon and label pill in the secondary container colors |
 | `DSLabeledInfoRowWidget` | Icon in a circle, label and value, with a chevron when tappable |
+| `DSMapWidget` | Google Map marking `DSMapPlace`s, framed to fit them and colored from the theme; still and cheap to scroll past unless `isInteractive`, with `brand` markers and a `minimal` style without roads |
 | `DSNetworkImageWidget` | Cached network image, decoded at its displayed size, that retries after the device reconnects |
 | `DSPositionIndicatorWidget` | Row of dots marking the current index |
 | `DSQuoteTextWidget` | Quote glyph followed by text capped at `maxLines` |
@@ -240,6 +241,7 @@ To add a brand icon: put the Lottie JSON in `assets/lottie/`, regenerate the ass
 | `connectivity_plus` | Reconnect detection for `DSNetworkImageWidget` |
 | `carousel_slider` | `DSCarousalWidget` |
 | `flutter_staggered_grid_view` | `DSStaggeredGridWidget` |
+| `google_maps_flutter` | `DSMapWidget`; each app supplies its own Maps API keys |
 | `alchemist` | Golden tests |
 
 `flutter_gen_runner` and `build_runner` (dev dependencies) generate the asset accessors.

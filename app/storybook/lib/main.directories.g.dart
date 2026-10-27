@@ -43,6 +43,8 @@ import 'package:storybook/src/component/molecule/info_chip_use_case.dart'
     as _storybook_src_component_molecule_info_chip_use_case;
 import 'package:storybook/src/component/molecule/labeled_info_row_use_case.dart'
     as _storybook_src_component_molecule_labeled_info_row_use_case;
+import 'package:storybook/src/component/molecule/map_use_case.dart'
+    as _storybook_src_component_molecule_map_use_case;
 import 'package:storybook/src/component/molecule/quote_text_use_case.dart'
     as _storybook_src_component_molecule_quote_text_use_case;
 import 'package:storybook/src/component/molecule/skill_card_use_case.dart'
@@ -302,6 +304,16 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _storybook_src_component_molecule_labeled_info_row_use_case
                         .buildLabeledInfoRow,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'DSMapWidget',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Map',
+                builder:
+                    _storybook_src_component_molecule_map_use_case.buildMap,
               ),
             ],
           ),

@@ -240,6 +240,10 @@ melos:
       description: Deploy and host flutter web page
     deploy_widgetbook:
       run: |
+        set -e
+        if [ -z "${MAPS_API_KEY_WEB:-}" ] && [ -f app/portrai/.env.production ]; then
+          . ./app/portrai/.env.production
+        fi
         cd app/storybook
         echo "Clean existing repository"
         flutter clean
@@ -247,6 +251,13 @@ melos:
         flutter pub get 
         echo "Building web with Flutter"
         flutter build web --release
+        if [ -n "${MAPS_API_KEY_WEB:-}" ]; then
+          echo "Injecting Google Maps API key"
+          sed -i.bak "s/key=MAPS_API_KEY\"/key=$MAPS_API_KEY_WEB\"/" build/web/index.html
+          rm build/web/index.html.bak
+        else
+          echo "MAPS_API_KEY_WEB is not set, so the map use case will not load." >&2
+        fi
         echo "Deploying to Firebase"
         firebase deploy --only hosting:storybook
       description: Host flutter web page

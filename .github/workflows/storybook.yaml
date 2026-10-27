@@ -36,6 +36,8 @@ jobs:
       build-type: preview
       force-release: true
       run-codegen: true
+    secrets:
+      MAPS_API_KEY: ${{ secrets.MAPS_API_KEY_WEB }}
 
   # Deploy preview after build is complete.
   deploy:

@@ -1,7 +1,6 @@
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:portrai/src/feature/project/domain/_domain.dart';
 import 'package:portrai/src/widget/page_band_widget.dart';
 import 'package:portrai/src/widget/page_technology_chip_widget.dart';
@@ -135,43 +134,22 @@ class ProjectMarketsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
-    final positions = [
-      for (final market in markets) LatLng(market.latitude, market.longitude),
-    ];
-    final radius = BorderRadius.circular(context.dimen.radiusLevel3.value);
     return Column(
       spacing: context.space(factor: 2),
       children: [
-        ClipRRect(
-          borderRadius: radius,
-          child: SizedBox(
-            height: context.isDesktop ? 420 : 280,
-            width: double.infinity,
-            child: IgnorePointer(
-              child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: positions.first,
-                  zoom: positions.length > 1 ? 3 : 5,
+        SizedBox(
+          height: context.isDesktop ? 420 : 280,
+          width: double.infinity,
+          child: DSMapWidget(
+            places: [
+              for (final market in markets)
+                DSMapPlace(
+                  latitude: market.latitude,
+                  longitude: market.longitude,
+                  label: market.country,
                 ),
-                onMapCreated: (controller) {
-                  if (positions.length < 2) return;
-                  controller.moveCamera(
-                    CameraUpdate.newLatLngBounds(_boundsOf(positions), 56),
-                  );
-                },
-                markers: {
-                  for (final market in markets)
-                    Marker(
-                      markerId: MarkerId(market.country),
-                      position: LatLng(market.latitude, market.longitude),
-                      infoWindow: InfoWindow(title: market.country),
-                    ),
-                },
-                zoomControlsEnabled: false,
-                mapToolbarEnabled: false,
-                myLocationButtonEnabled: false,
-              ),
-            ),
+            ],
+            maxZoom: 5,
           ),
         ),
         Wrap(
@@ -212,21 +190,6 @@ class ProjectMarketsWidget extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-
-  LatLngBounds _boundsOf(List<LatLng> positions) {
-    final latitudes = positions.map((position) => position.latitude);
-    final longitudes = positions.map((position) => position.longitude);
-    return LatLngBounds(
-      southwest: LatLng(
-        latitudes.reduce((first, second) => first < second ? first : second),
-        longitudes.reduce((first, second) => first < second ? first : second),
-      ),
-      northeast: LatLng(
-        latitudes.reduce((first, second) => first > second ? first : second),
-        longitudes.reduce((first, second) => first > second ? first : second),
-      ),
     );
   }
 }

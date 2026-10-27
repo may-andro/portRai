@@ -1,10 +1,7 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/screen/profile/bloc/_bloc.dart';
