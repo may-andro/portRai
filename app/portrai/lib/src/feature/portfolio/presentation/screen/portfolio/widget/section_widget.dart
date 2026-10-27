@@ -118,6 +118,9 @@ class ExpertiseSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
+                context.bloc.add(
+                  const SeeAllClickEvent(SeeAllSection.expertises),
+                );
                 ExpertisesScreen.navigate(context);
               },
             ),
@@ -168,6 +171,8 @@ class _ExpertiseSectionBodyWidgetState
           expertises: widget.expertises,
           isVisible: isVisible,
           selection: _selection,
+          onOpen: (expertise) =>
+              context.bloc.add(ExpertiseClickEvent(expertise.title)),
         );
       },
       backgroundDetail: (context, isVisible) {
@@ -200,6 +205,7 @@ class ProjectsSectionWidget extends SectionWidget {
         return ProjectListWidget(
           projects: portfolio.projects,
           isVisible: isVisible,
+          onOpen: (project) => context.bloc.add(ProjectClickEvent(project.id)),
         );
       },
       visibilityKey: trackingId,
@@ -227,6 +233,8 @@ class ServicesSectionWidget extends SectionWidget {
           services: portfolio.services,
           isVisible: isVisible,
           visibleItemsCount: context.allowedServiceCount,
+          onOpen: (service) =>
+              context.bloc.add(ServiceClickEvent(service.title)),
         );
       },
       visibilityKey: trackingId,
@@ -237,6 +245,9 @@ class ServicesSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
+                context.bloc.add(
+                  const SeeAllClickEvent(SeeAllSection.services),
+                );
                 ServicesScreen.navigate(context);
               },
             ),
@@ -263,6 +274,8 @@ class ExperienceSectionWidget extends SectionWidget {
           experiences: portfolio.experiences,
           isVisible: isVisible,
           visibleItemsCount: context.allowedExperienceCount,
+          onOpen: (experience) =>
+              context.bloc.add(ExperienceClickEvent(experience.id)),
         );
       },
       visibilityKey: trackingId,
@@ -272,6 +285,9 @@ class ExperienceSectionWidget extends SectionWidget {
           : SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
+                context.bloc.add(
+                  const SeeAllClickEvent(SeeAllSection.experiences),
+                );
                 ExperiencesScreen.navigate(context);
               },
             ),
@@ -333,6 +349,9 @@ class TestimonialsSectionWidget extends SectionWidget {
           ? SectionAction(
               label: context.localizations.portfolioSectionSeeAll,
               onPressed: () {
+                context.bloc.add(
+                  const SeeAllClickEvent(SeeAllSection.testimonials),
+                );
                 TestimonialListWidget.showAll(context, portfolio.testimonials);
               },
             )

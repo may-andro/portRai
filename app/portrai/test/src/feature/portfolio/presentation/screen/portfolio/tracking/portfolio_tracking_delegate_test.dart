@@ -107,5 +107,57 @@ void main() {
         expect(tracking.parameters['label'], 'portfolio_projects_section');
       },
     );
+
+    for (final (description, track, name, label)
+        in <(String, void Function(), String, String)>[
+          (
+            'see all',
+            () => delegate.trackSeeAllClick('services'),
+            'see_all',
+            'services',
+          ),
+          ('setting', () => delegate.trackSettingClick(), 'setting', 'open'),
+          (
+            'experience',
+            () => delegate.trackExperienceClick('experience_1'),
+            'experience',
+            'experience_1',
+          ),
+          (
+            'expertise',
+            () => delegate.trackExpertiseClick('Flutter Development'),
+            'expertise',
+            'Flutter Development',
+          ),
+          (
+            'service',
+            () => delegate.trackServiceClick('App Development'),
+            'service',
+            'App Development',
+          ),
+          (
+            'project',
+            () => delegate.trackProjectClick('port-rai'),
+            'project',
+            'port-rai',
+          ),
+        ]) {
+      test(
+        'should send a $name click when the $description tap is tracked',
+        () {
+          track();
+
+          final tracking =
+              verify(
+                    () => trackingReporter.sendTrackingEvent(captureAny()),
+                  ).captured.single
+                  as Tracking;
+
+          expect(tracking.name, name);
+          expect(tracking.parameters['action'], 'click');
+          expect(tracking.parameters['label'], label);
+        },
+      );
+    }
   });
 }

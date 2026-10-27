@@ -54,4 +54,58 @@ class PortfolioTrackingDelegate extends ScreenTrackingDelegate {
       ),
     );
   }
+
+  void trackSeeAllClick(String sectionName) {
+    trackEvent(
+      Tracking(
+        name: 'see_all',
+        action: ClickAction(label: sectionName),
+      ),
+    );
+  }
+
+  void trackSettingClick() {
+    trackEvent(
+      Tracking(
+        name: 'setting',
+        action: const ClickAction(label: 'open'),
+      ),
+    );
+  }
+
+  void trackExperienceClick(String experienceId) {
+    trackEvent(
+      Tracking(
+        name: 'experience',
+        action: ClickAction(label: experienceId),
+      ),
+    );
+  }
+
+  void trackExpertiseClick(String expertiseTitle) {
+    trackEvent(
+      Tracking(
+        name: 'expertise',
+        action: ClickAction(label: expertiseTitle),
+      ),
+    );
+  }
+
+  void trackServiceClick(String serviceTitle) {
+    trackEvent(
+      Tracking(
+        name: 'service',
+        action: ClickAction(label: serviceTitle),
+      ),
+    );
+  }
+
+  void trackProjectClick(String projectId) {
+    trackEvent(
+      Tracking(
+        name: 'project',
+        action: ClickAction(label: projectId),
+      ),
+    );
+  }
 }
