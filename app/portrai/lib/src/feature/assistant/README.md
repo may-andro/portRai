@@ -286,7 +286,7 @@ Known gaps in the portfolio data are listed in [DATA_GAPS.md](DATA_GAPS.md).
 
 ### Maps API Key
 
-`DSMap` uses `google_maps_flutter`, which needs one Google Maps API key per platform. Keys are not committed. Create each key in Google Cloud Console under APIs & Services, Credentials, Create credentials, API key, in a project with billing enabled.
+`DSMap` shows the design system's `DSMapWidget`, which uses `google_maps_flutter` and needs one Google Maps API key per platform. Keys are not committed. Create each key in Google Cloud Console under APIs & Services, Credentials, Create credentials, API key, in a project with billing enabled.
 
 | Platform | API restriction (enable the API first under Library) | Application restriction | Where the key goes |
 |---|---|---|---|
