@@ -99,7 +99,7 @@ for the conventions each feature module follows.
 | `connectivity`         | Internet reachability                                                  |
 | `cv_export`            | PDF CV generation and tailoring                                        |
 | `design_system`        | Theme selection and the theme gallery                                  |
-| `developer_mode`       | Developer menu in staging builds                                       |
+| `developer_mode`       | Developer menu and tracking event viewer in staging builds             |
 | `experience`           | Work experience                                                        |
 | `expertise`            | Areas of expertise                                                     |
 | `external_app_handler` | Opening email and external links                                       |
@@ -345,6 +345,7 @@ defaults to `prod`. Both environments use the same Firebase project.
 | Remote request logging              | On        | Off       |
 | Feature flag caching                | On        | Off       |
 | Developer menu and debug banner     | On        | Off       |
+| Sent tracking events kept in memory | On        | Off       |
 | Descriptive splash screen           | On        | Off       |
 
 Release workflows build staging for previews and prod for production.

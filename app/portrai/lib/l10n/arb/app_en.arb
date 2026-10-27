@@ -1866,5 +1866,117 @@
       "visible": { "type": "int", "example": "5" },
       "total": { "type": "int", "example": "23" }
     }
+  },
+  "developerMenuTrackingViewer": "Tracking Viewer",
+  "@developerMenuTrackingViewer": {
+    "description": "Developer menu entry that opens the list of tracking events sent in this session"
+  },
+  "developerMenuTrackingViewerDescription": "Inspect the analytics events sent in this session",
+  "@developerMenuTrackingViewerDescription": {
+    "description": "Description of the tracking viewer entry in the developer menu"
+  },
+  "trackingEventsTitle": "Tracking Viewer",
+  "@trackingEventsTitle": {
+    "description": "Title of the screen listing the tracking events sent in this session"
+  },
+  "trackingEventsSearchHint": "Search events and parameters",
+  "@trackingEventsSearchHint": {
+    "description": "Hint of the search field on the tracking events screen"
+  },
+  "trackingEventsAllAreas": "All areas",
+  "@trackingEventsAllAreas": {
+    "description": "Area filter option that shows the events of every area"
+  },
+  "trackingEventsAreaFilterLabel": "Area",
+  "@trackingEventsAreaFilterLabel": {
+    "description": "Label of the area filter on the tracking events screen"
+  },
+  "trackingEventsCount": "{count, plural, =1{1 event} other{{count} events}}",
+  "@trackingEventsCount": {
+    "description": "Number of tracking events sent in this session",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "trackingEventsShowingCount": "Showing {visible} of {total}",
+  "@trackingEventsShowingCount": {
+    "description": "How many tracking events the search and filters leave, out of all of them",
+    "placeholders": {
+      "visible": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "trackingEventsClearFilters": "Clear filters",
+  "@trackingEventsClearFilters": {
+    "description": "Button that clears the search and filters on the tracking events screen"
+  },
+  "trackingEventsEmptyTitle": "No events yet",
+  "@trackingEventsEmptyTitle": {
+    "description": "Title shown when no tracking event was sent yet"
+  },
+  "trackingEventsEmptyMessage": "Events show up here as soon as the app sends them",
+  "@trackingEventsEmptyMessage": {
+    "description": "Message shown when no tracking event was sent yet"
+  },
+  "trackingEventsNoResultsTitle": "No matching events",
+  "@trackingEventsNoResultsTitle": {
+    "description": "Title shown when no tracking event matches the search and filters"
+  },
+  "trackingEventsNoResultsMessage": "Try another search or clear the filters",
+  "@trackingEventsNoResultsMessage": {
+    "description": "Message shown when no tracking event matches the search and filters"
+  },
+  "trackingEventPayload": "Payload",
+  "@trackingEventPayload": {
+    "description": "Title of the JSON of the parameters sent with a tracking event"
+  },
+  "trackingEventCopyPayload": "Copy",
+  "@trackingEventCopyPayload": {
+    "description": "Button that copies a tracking event's JSON to the clipboard"
+  },
+  "trackingEventPayloadCopied": "Payload copied",
+  "@trackingEventPayloadCopied": {
+    "description": "Snack bar message shown after a tracking event's JSON is copied"
+  },
+  "errorTrackingEventsNotKept": "This build doesn't keep the events it sends",
+  "@errorTrackingEventsNotKept": {
+    "description": "Error when this build does not keep the tracking events it sends"
+  },
+  "errorTrackingEventsUnknown": "Couldn't load the events. Please try again",
+  "@errorTrackingEventsUnknown": {
+    "description": "Error when the tracking events cannot be loaded"
+  },
+  "trackingEventsElapsedMilliseconds": "+{milliseconds} ms",
+  "@trackingEventsElapsedMilliseconds": {
+    "description": "Time since the previous tracking event, under a second",
+    "placeholders": {
+      "milliseconds": {
+        "type": "int",
+        "example": "340"
+      }
+    }
+  },
+  "trackingEventsElapsedSeconds": "+{seconds} s",
+  "@trackingEventsElapsedSeconds": {
+    "description": "Time since the previous tracking event, in seconds with one decimal",
+    "placeholders": {
+      "seconds": {
+        "type": "String",
+        "example": "7.4"
+      }
+    }
+  },
+  "trackingEventsSelectHint": "Select an event to see what was sent",
+  "@trackingEventsSelectHint": {
+    "description": "Shown in the side panel of the tracking viewer before an event is selected"
   }
 }

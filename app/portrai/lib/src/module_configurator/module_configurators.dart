@@ -52,7 +52,11 @@ List<ModuleConfigurator> getModuleConfigurators(BuildConfig buildConfig) => [
     ),
     storageBucketUrl: '',
   ),
-  TrackingModuleConfigurator(buildConfig.buildEnvironment.isFirebaseEnabled),
+  TrackingModuleConfigurator(
+    buildConfig.buildEnvironment.isFirebaseEnabled,
+    // The developer menu's tracking viewer lists the kept events.
+    keepsSentEvents: buildConfig.buildEnvironment.isDevMenuEnabled,
+  ),
   LogReporterModuleConfigurator(),
   AppConfigModuleConfigurator(),
   RouteModuleConfigurator(),

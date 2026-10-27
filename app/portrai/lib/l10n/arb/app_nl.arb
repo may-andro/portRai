@@ -775,5 +775,117 @@
       "visible": { "type": "int", "example": "5" },
       "total": { "type": "int", "example": "23" }
     }
+  },
+  "developerMenuTrackingViewer": "Gebeurtenissen bekijken",
+  "@developerMenuTrackingViewer": {
+    "description": "Developer menu entry that opens the list of tracking events sent in this session"
+  },
+  "developerMenuTrackingViewerDescription": "Bekijk de analytics-gebeurtenissen die in deze sessie zijn verstuurd",
+  "@developerMenuTrackingViewerDescription": {
+    "description": "Description of the tracking viewer entry in the developer menu"
+  },
+  "trackingEventsTitle": "Gebeurtenissen bekijken",
+  "@trackingEventsTitle": {
+    "description": "Title of the screen listing the tracking events sent in this session"
+  },
+  "trackingEventsSearchHint": "Zoek gebeurtenissen en parameters",
+  "@trackingEventsSearchHint": {
+    "description": "Hint of the search field on the tracking events screen"
+  },
+  "trackingEventsAllAreas": "Alle gebieden",
+  "@trackingEventsAllAreas": {
+    "description": "Area filter option that shows the events of every area"
+  },
+  "trackingEventsAreaFilterLabel": "Gebied",
+  "@trackingEventsAreaFilterLabel": {
+    "description": "Label of the area filter on the tracking events screen"
+  },
+  "trackingEventsCount": "{count, plural, =1{1 gebeurtenis} other{{count} gebeurtenissen}}",
+  "@trackingEventsCount": {
+    "description": "Number of tracking events sent in this session",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "trackingEventsShowingCount": "{visible} van {total} getoond",
+  "@trackingEventsShowingCount": {
+    "description": "How many tracking events the search and filters leave, out of all of them",
+    "placeholders": {
+      "visible": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "trackingEventsClearFilters": "Filters wissen",
+  "@trackingEventsClearFilters": {
+    "description": "Button that clears the search and filters on the tracking events screen"
+  },
+  "trackingEventsEmptyTitle": "Nog geen gebeurtenissen",
+  "@trackingEventsEmptyTitle": {
+    "description": "Title shown when no tracking event was sent yet"
+  },
+  "trackingEventsEmptyMessage": "Gebeurtenissen verschijnen hier zodra de app ze verstuurt",
+  "@trackingEventsEmptyMessage": {
+    "description": "Message shown when no tracking event was sent yet"
+  },
+  "trackingEventsNoResultsTitle": "Geen gebeurtenissen gevonden",
+  "@trackingEventsNoResultsTitle": {
+    "description": "Title shown when no tracking event matches the search and filters"
+  },
+  "trackingEventsNoResultsMessage": "Probeer een andere zoekopdracht of wis de filters",
+  "@trackingEventsNoResultsMessage": {
+    "description": "Message shown when no tracking event matches the search and filters"
+  },
+  "trackingEventPayload": "Inhoud",
+  "@trackingEventPayload": {
+    "description": "Title of the JSON of the parameters sent with a tracking event"
+  },
+  "trackingEventCopyPayload": "Kopiëren",
+  "@trackingEventCopyPayload": {
+    "description": "Button that copies a tracking event's JSON to the clipboard"
+  },
+  "trackingEventPayloadCopied": "Inhoud gekopieerd",
+  "@trackingEventPayloadCopied": {
+    "description": "Snack bar message shown after a tracking event's JSON is copied"
+  },
+  "errorTrackingEventsNotKept": "Deze versie bewaart de verstuurde gebeurtenissen niet",
+  "@errorTrackingEventsNotKept": {
+    "description": "Error when this build does not keep the tracking events it sends"
+  },
+  "errorTrackingEventsUnknown": "Kan de gebeurtenissen niet laden. Probeer het opnieuw",
+  "@errorTrackingEventsUnknown": {
+    "description": "Error when the tracking events cannot be loaded"
+  },
+  "trackingEventsElapsedMilliseconds": "+{milliseconds} ms",
+  "@trackingEventsElapsedMilliseconds": {
+    "description": "Time since the previous tracking event, under a second",
+    "placeholders": {
+      "milliseconds": {
+        "type": "int",
+        "example": "340"
+      }
+    }
+  },
+  "trackingEventsElapsedSeconds": "+{seconds} s",
+  "@trackingEventsElapsedSeconds": {
+    "description": "Time since the previous tracking event, in seconds with one decimal",
+    "placeholders": {
+      "seconds": {
+        "type": "String",
+        "example": "7.4"
+      }
+    }
+  },
+  "trackingEventsSelectHint": "Selecteer een gebeurtenis om te zien wat er is verstuurd",
+  "@trackingEventsSelectHint": {
+    "description": "Shown in the side panel of the tracking viewer before an event is selected"
   }
 }

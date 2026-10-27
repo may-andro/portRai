@@ -27,7 +27,7 @@ void main() {
       () {
         delegate.trackScreenView();
 
-        final event = reporter.sentTrackingEvents!.values.single;
+        final event = reporter.sentTrackingEvents!.single.tracking;
         expect(event, isA<ScreenViewTracking>());
       },
     );
@@ -37,7 +37,7 @@ void main() {
       () {
         delegate.trackViewEvent('loaded_content_view');
 
-        final event = reporter.sentTrackingEvents!.values.single;
+        final event = reporter.sentTrackingEvents!.single.tracking;
         expect(event, isA<ViewTracking>());
         expect(
           event.action,

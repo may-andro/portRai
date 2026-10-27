@@ -16,5 +16,5 @@ class FirebaseTrackingReporter implements TrackingReporter {
   }
 
   @override
-  Map<DateTime, Tracking>? get sentTrackingEvents => null;
+  List<SentTracking>? get sentTrackingEvents => null;
 }

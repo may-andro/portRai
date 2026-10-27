@@ -14,7 +14,7 @@ class CompositeTrackingReporter implements TrackingReporter {
   }
 
   @override
-  Map<DateTime, Tracking>? get sentTrackingEvents {
+  List<SentTracking>? get sentTrackingEvents {
     final reporter = reporters
         .where((reporter) => reporter.sentTrackingEvents != null)
         .firstOrNull;
