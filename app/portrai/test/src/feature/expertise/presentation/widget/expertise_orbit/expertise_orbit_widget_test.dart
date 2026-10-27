@@ -45,7 +45,11 @@ void main() {
     }
   }
 
-  Future<Size> pumpOrbit(WidgetTester tester, Size size) async {
+  Future<Size> pumpOrbit(
+    WidgetTester tester,
+    Size size, {
+    ValueChanged<ExpertiseEntity>? onOpen,
+  }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = size;
     addTearDown(tester.view.resetPhysicalSize);
@@ -56,7 +60,11 @@ void main() {
     });
 
     final orbit = SingleChildScrollView(
-      child: ExpertiseOrbitWidget(expertises: expertises, isVisible: true),
+      child: ExpertiseOrbitWidget(
+        expertises: expertises,
+        isVisible: true,
+        onOpen: onOpen,
+      ),
     );
     await tester.pumpWidget(
       TestWidgetWrapper(
@@ -145,14 +153,21 @@ void main() {
   });
 
   testWidgets(
-    'should open the expertise when its selected node on the dial is tapped',
+    'should open and report the expertise when its selected node on the dial '
+    'is tapped',
     (tester) async {
-      await pumpOrbit(tester, mobileSize);
+      final openedTitles = <String>[];
+      await pumpOrbit(
+        tester,
+        mobileSize,
+        onOpen: (expertise) => openedTitles.add(expertise.title),
+      );
 
       await tester.tap(dialNode('Flutter Development'));
       await settle(tester);
 
       expect(find.text('Opened Flutter Development'), findsOneWidget);
+      expect(openedTitles, ['Flutter Development']);
     },
   );
 

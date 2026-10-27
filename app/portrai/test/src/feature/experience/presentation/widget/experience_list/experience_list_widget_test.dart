@@ -38,6 +38,7 @@ void main() {
     WidgetTester tester,
     Size size, {
     int? visibleItemsCount,
+    ValueChanged<ExperienceEntity>? onOpen,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -50,6 +51,7 @@ void main() {
             experiences: experiences,
             isVisible: true,
             visibleItemsCount: visibleItemsCount,
+            onOpen: onOpen,
           ),
         ),
       ),
@@ -108,6 +110,18 @@ void main() {
     expect(description, findsOneWidget);
     expect(find.text('Lead the team'), findsNothing);
     expect(find.text('Flutter'), findsNothing);
+  });
+
+  testWidgets('should report the opened experience when a card is tapped on '
+      'mobile', (tester) async {
+    final openedExperiences = <ExperienceEntity>[];
+    await pumpList(tester, sizes['mobile']!, onOpen: openedExperiences.add);
+
+    await tester.tap(find.text('Position 0'));
+    await tester.pump();
+    tester.takeException();
+
+    expect(openedExperiences, [experiences[0]]);
   });
 
   for (final size in ['mobile', 'tablet']) {

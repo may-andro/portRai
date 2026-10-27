@@ -8,10 +8,15 @@ class ProjectListWidget extends StatelessWidget {
     super.key,
     required this.projects,
     required this.isVisible,
+    this.onOpen,
   });
 
   final List<ProjectEntity> projects;
   final bool isVisible;
+
+  /// Called when a project is opened, before its screen is shown, so the host
+  /// screen can track the tap.
+  final ValueChanged<ProjectEntity>? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +32,7 @@ class ProjectListWidget extends StatelessWidget {
         crossAxisSpacing: context.space(),
         mainAxisSpacing: context.space(),
         itemBuilder: (_, index) {
-          return _ProjectWidget(project: projects[index])
+          return _ProjectWidget(project: projects[index], onOpen: onOpen)
               .animate(target: isVisible ? 1 : 0)
               .scale(
                 begin: const Offset(0.6, 0.6),
@@ -44,9 +49,10 @@ class ProjectListWidget extends StatelessWidget {
 }
 
 class _ProjectWidget extends StatefulWidget {
-  const _ProjectWidget({required this.project});
+  const _ProjectWidget({required this.project, required this.onOpen});
 
   final ProjectEntity project;
+  final ValueChanged<ProjectEntity>? onOpen;
 
   @override
   State<_ProjectWidget> createState() => _ProjectWidgetState();
@@ -72,7 +78,10 @@ class _ProjectWidgetState extends State<_ProjectWidget> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-          onTap: () => ProjectScreen.navigate(context, project: project),
+          onTap: () {
+            widget.onOpen?.call(project);
+            ProjectScreen.navigate(context, project: project);
+          },
           child: AnimatedScale(
             scale: _hover ? 1.08 : 1,
             duration: 250.ms,

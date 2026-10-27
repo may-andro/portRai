@@ -127,6 +127,28 @@ void main() {
       expect(tester.takeException(), isNotNull);
     });
 
+    testWidgets('should report the opened service when a card is tapped', (
+      tester,
+    ) async {
+      final openedServices = <ServiceEntity>[];
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: ServiceListWidget(
+            services: const [service],
+            isVisible: true,
+            onOpen: openedServices.add,
+          ),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.byType(DSSpotlightCardWidget));
+      await tester.pump(const Duration(seconds: 1));
+      tester.takeException();
+
+      expect(openedServices, [service]);
+    });
+
     testWidgets('should limit the cards when visibleItemsCount is set', (
       tester,
     ) async {

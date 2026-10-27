@@ -13,6 +13,7 @@ class ServiceListWidget extends StatelessWidget {
     required this.services,
     required this.isVisible,
     this.visibleItemsCount,
+    this.onOpen,
   });
 
   final List<ServiceEntity> services;
@@ -21,11 +22,16 @@ class ServiceListWidget extends StatelessWidget {
   /// Limits how many services are shown; all of them when null.
   final int? visibleItemsCount;
 
+  /// Called when a service is opened, before its screen is shown, so the host
+  /// screen can track the tap.
+  final ValueChanged<ServiceEntity>? onOpen;
+
   @override
   Widget build(BuildContext context) {
     return _GridWidget(
       services: services.take(visibleItemsCount ?? services.length).toList(),
       isVisible: isVisible,
+      onOpen: onOpen,
     );
   }
 }

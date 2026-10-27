@@ -24,6 +24,7 @@ void main() {
     required List<ExpertiseEntity> expertise,
     required Size size,
     Duration settleDuration = const Duration(seconds: 2),
+    ValueChanged<ExpertiseEntity>? onOpen,
   }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = size;
@@ -37,7 +38,11 @@ void main() {
     await tester.pumpWidget(
       TestWidgetWrapper(
         child: SingleChildScrollView(
-          child: ExpertiseListWidget(allExpertise: expertise, isVisible: true),
+          child: ExpertiseListWidget(
+            allExpertise: expertise,
+            isVisible: true,
+            onOpen: onOpen,
+          ),
         ),
       ),
     );
@@ -70,6 +75,25 @@ void main() {
       );
 
       expect(find.text('Skill 0'), findsOneWidget);
+    });
+
+    testWidgets('should report the opened expertise when a card is tapped', (
+      tester,
+    ) async {
+      final expertise = createExpertiseList(2);
+      final openedExpertise = <ExpertiseEntity>[];
+      await pumpExpertiseListWidget(
+        tester,
+        expertise: expertise,
+        size: const Size(1440, 1024),
+        onOpen: openedExpertise.add,
+      );
+
+      await tester.tap(find.text('Expertise 1'));
+      await tester.pump();
+      tester.takeException();
+
+      expect(openedExpertise, [expertise[1]]);
     });
 
     testWidgets(

@@ -6,12 +6,19 @@ class _OrbitRingWidget extends StatelessWidget {
     required this.selected,
     required this.onSelect,
     required this.isVisible,
+    required this.onOpen,
   });
 
   final List<ExpertiseEntity> expertises;
   final int selected;
   final ValueChanged<int> onSelect;
   final bool isVisible;
+  final ValueChanged<ExpertiseEntity>? onOpen;
+
+  void _open(BuildContext context, ExpertiseEntity expertise) {
+    onOpen?.call(expertise);
+    ExpertiseScreen.navigate(context, expertise: expertise);
+  }
 
   void _selectAt(_OrbitLayout layout, Offset position) {
     final index = layout.indexAt(position);
@@ -24,7 +31,7 @@ class _OrbitRingWidget extends StatelessWidget {
     final index = layout.indexAt(position);
     if (index == null) return;
     if (index == selected) {
-      ExpertiseScreen.navigate(context, expertise: expertises[index]);
+      _open(context, expertises[index]);
     } else {
       onSelect(index);
     }
@@ -106,10 +113,7 @@ class _OrbitRingWidget extends StatelessWidget {
             key: ValueKey(selected),
             expertise: expertises[selected],
             accent: accent,
-            onOpen: () => ExpertiseScreen.navigate(
-              context,
-              expertise: expertises[selected],
-            ),
+            onOpen: () => _open(context, expertises[selected]),
           ),
         ),
       ),

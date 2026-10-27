@@ -36,6 +36,36 @@ void main() {
       },
     );
 
+    testWidgets('should report the opened project when a project is tapped', (
+      tester,
+    ) async {
+      final project = createProjectEntity();
+      final openedProjects = <Object>[];
+
+      await tester.pumpWidget(
+        TestWidgetWrapper(
+          child: TickerMode(
+            enabled: false,
+            child: ProjectListWidget(
+              projects: [project],
+              isVisible: false,
+              onOpen: openedProjects.add,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('🚀'));
+      await tester.pump();
+      tester.takeException();
+
+      expect(openedProjects, [project]);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 1));
+    });
+
     for (final entry in const {
       'mobile': Size(390, 844),
       'tablet': Size(820, 1180),

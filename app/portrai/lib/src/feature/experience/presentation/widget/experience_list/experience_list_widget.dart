@@ -22,11 +22,16 @@ class ExperienceListWidget extends StatelessWidget {
     required this.experiences,
     required this.isVisible,
     this.visibleItemsCount,
+    this.onOpen,
   });
 
   final List<ExperienceEntity> experiences;
   final bool isVisible;
   final int? visibleItemsCount;
+
+  /// Called when an experience is opened, before its screen is shown, so the
+  /// host screen can track the tap.
+  final ValueChanged<ExperienceEntity>? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +43,7 @@ class ExperienceListWidget extends StatelessWidget {
           : experiences,
       isVisible: isVisible,
       isZigZag: isDesktop,
+      onOpen: onOpen,
     );
   }
 }

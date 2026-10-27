@@ -4,10 +4,15 @@ part of 'expertise_list_widget.dart';
 const _hoverLift = 8.0;
 
 class _GridWidget extends StatelessWidget {
-  const _GridWidget({required this.expertises, required this.isVisible});
+  const _GridWidget({
+    required this.expertises,
+    required this.isVisible,
+    required this.onOpen,
+  });
 
   final List<ExpertiseEntity> expertises;
   final bool isVisible;
+  final ValueChanged<ExpertiseEntity>? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,11 @@ class _GridWidget extends StatelessWidget {
   Widget _cellAt(int index) {
     if (index >= expertises.length) return const SizedBox.shrink();
 
-    return _ExpertiseCardWidget(expertise: expertises[index], index: index)
+    return _ExpertiseCardWidget(
+          expertise: expertises[index],
+          index: index,
+          onOpen: onOpen,
+        )
         .animate(target: isVisible ? 1 : 0)
         .slideY(
           begin: 0.3,

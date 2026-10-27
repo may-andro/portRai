@@ -3,9 +3,10 @@ part of 'service_list_widget.dart';
 const _maxTechnologies = 4;
 
 class _ServiceCardWidget extends StatelessWidget {
-  const _ServiceCardWidget({required this.service});
+  const _ServiceCardWidget({required this.service, required this.onOpen});
 
   final ServiceEntity service;
+  final ValueChanged<ServiceEntity>? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,10 @@ class _ServiceCardWidget extends StatelessWidget {
       ),
       fillColor: textColor,
       padding: EdgeInsets.all(context.space(factor: 2)),
-      onTap: () => ServiceScreen.navigate(context, service: service),
+      onTap: () {
+        onOpen?.call(service);
+        ServiceScreen.navigate(context, service: service);
+      },
       builder: (context, isHovering) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
