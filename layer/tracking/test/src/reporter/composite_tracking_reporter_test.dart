@@ -47,13 +47,19 @@ void main() {
         'should return tracking events from first reporter with non-null stored values',
         () {
           final tracking = AppStartTracking();
-          final trackingMap = {DateTime.now(): tracking};
+          final sentTrackings = [
+            SentTracking(
+              sequenceNumber: 0,
+              sentAt: DateTime.now(),
+              tracking: tracking,
+            ),
+          ];
           when(() => mockTrackingReporter1.sentTrackingEvents).thenReturn(null);
           when(
             () => mockTrackingReporter2.sentTrackingEvents,
-          ).thenReturn(trackingMap);
+          ).thenReturn(sentTrackings);
 
-          expect(reporter.sentTrackingEvents, equals(trackingMap));
+          expect(reporter.sentTrackingEvents, equals(sentTrackings));
         },
       );
 

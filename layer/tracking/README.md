@@ -105,7 +105,8 @@ TrackingImpressionDetectorWidget(
 ### Inspecting sent events
 
 When `keepsSentEvents` is `true`, `sentTrackingEvents` returns an unmodifiable
-map of send time to event, oldest first. It returns `null` otherwise.
+list of `SentTracking` in the order the events were sent, oldest first. It
+returns `null` otherwise.
 
 ```dart
 final events = ModuleInjectorController().serviceLocator
@@ -121,7 +122,7 @@ final events = ModuleInjectorController().serviceLocator
 abstract interface class TrackingReporter {
   void sendTrackingEvent(Tracking tracking);
 
-  Map<DateTime, Tracking>? get sentTrackingEvents;
+  List<SentTracking>? get sentTrackingEvents;
 }
 ```
 
@@ -133,9 +134,16 @@ Firebase Analytics (event name `tracking.name`, parameters
 
 ```dart
 Tracking({required String name, required TrackingAction? action})
+Tracking.settingCurrentArea({
+  required String name,
+  required TrackingAction? action,
+  required TrackingArea area,
+})
 ```
 
 `area` is read from the current tracking area when the event is created.
+`Tracking.settingCurrentArea` first sets the current area to `area`, so the
+event and the ones after it are sent from that area.
 `parameters` contains `event` (the name), `area`, `action` (the action type,
 when present) and the action's own fields, with every value converted to a
 string.
@@ -158,6 +166,19 @@ parameters.
 | `ClickAction({required String label, String? value})` | `click` | `label`, `value` |
 | `ViewAction({String? label})` | `view` | `label` |
 | `SetupAction(String status)` | `setup` | `status` |
+
+### SentTracking
+
+```dart
+SentTracking({
+  required int sequenceNumber,
+  required DateTime sentAt,
+  required Tracking tracking,
+})
+```
+
+A kept event. `sequenceNumber` counts every event sent since the app started,
+from 0, so it is unique and orders events sent within the same clock tick.
 
 ### TrackingArea
 

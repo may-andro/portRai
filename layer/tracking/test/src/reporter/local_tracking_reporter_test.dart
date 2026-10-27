@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tracking/src/model/model.dart';
 import 'package:tracking/src/reporter/reporter.dart';
@@ -18,7 +16,7 @@ void main() {
         reporter.sendTrackingEvent(event);
 
         expect(reporter.sentTrackingEvents?.length, equals(1));
-        expect(reporter.sentTrackingEvents?.values.first, equals(event));
+        expect(reporter.sentTrackingEvents?.first.tracking, equals(event));
       });
     });
 
@@ -27,26 +25,42 @@ void main() {
         expect(reporter.sentTrackingEvents, isEmpty);
       });
 
-      test('should return all sent events', () {
-        reporter.sendTrackingEvent(AppStartTracking());
-        reporter.sendTrackingEvent(ScreenViewTracking(area: SplashArea()));
+      test('should keep every event in send order when events are sent at '
+          'the same time', () {
+        final events = [
+          for (var eventIndex = 0; eventIndex < 50; eventIndex++)
+            ClickTracking(label: '$eventIndex'),
+        ];
 
-        expect(reporter.sentTrackingEvents?.length, equals(2));
+        events.forEach(reporter.sendTrackingEvent);
+
+        expect(
+          reporter.sentTrackingEvents?.map((sent) => sent.tracking),
+          events,
+        );
+        expect(
+          reporter.sentTrackingEvents?.map((sent) => sent.sequenceNumber),
+          List.generate(events.length, (eventIndex) => eventIndex),
+        );
       });
 
-      test('should keep only the most recent events when over the limit', () {
+      test('should keep only the most recent events and their sequence '
+          'numbers when over the limit', () {
         final boundedReporter = LocalTrackingReporter(maxEvents: 2);
         final latestEvent = ScreenViewTracking(area: SplashArea());
 
         boundedReporter.sendTrackingEvent(AppStartTracking());
-        // Distinct timestamps, so no event replaces another.
-        sleep(const Duration(milliseconds: 1));
         boundedReporter.sendTrackingEvent(AppStartTracking());
-        sleep(const Duration(milliseconds: 1));
         boundedReporter.sendTrackingEvent(latestEvent);
 
         expect(boundedReporter.sentTrackingEvents?.length, equals(2));
-        expect(boundedReporter.sentTrackingEvents?.values.last, latestEvent);
+        expect(boundedReporter.sentTrackingEvents?.last.tracking, latestEvent);
+        expect(
+          boundedReporter.sentTrackingEvents?.map(
+            (sent) => sent.sequenceNumber,
+          ),
+          [1, 2],
+        );
       });
     });
   });

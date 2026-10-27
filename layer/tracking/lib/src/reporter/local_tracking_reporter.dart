@@ -1,8 +1,10 @@
+import 'dart:collection';
+
 import 'package:tracking/src/model/model.dart';
 import 'package:tracking/src/reporter/tracking_reporter.dart';
 
-/// Keeps the most recent sent events in memory so they can be inspected while
-/// debugging.
+/// Keeps the most recent sent events in memory, in the order they were sent,
+/// so they can be inspected while debugging.
 ///
 /// Only the last [maxEvents] events are kept; older ones are dropped.
 class LocalTrackingReporter implements TrackingReporter {
@@ -15,18 +17,24 @@ class LocalTrackingReporter implements TrackingReporter {
   /// Largest number of events kept at a time.
   final int maxEvents;
 
-  // Insertion ordered, so the first key is the oldest event.
-  final Map<DateTime, Tracking> _trackingMap = {};
+  final Queue<SentTracking> _sentTrackings = Queue();
+  int _nextSequenceNumber = 0;
 
   @override
   void sendTrackingEvent(Tracking tracking) {
-    _trackingMap[DateTime.now()] = tracking;
-    while (_trackingMap.length > maxEvents) {
-      _trackingMap.remove(_trackingMap.keys.first);
+    _sentTrackings.addLast(
+      SentTracking(
+        sequenceNumber: _nextSequenceNumber++,
+        sentAt: DateTime.now(),
+        tracking: tracking,
+      ),
+    );
+    while (_sentTrackings.length > maxEvents) {
+      _sentTrackings.removeFirst();
     }
   }
 
   @override
-  Map<DateTime, Tracking>? get sentTrackingEvents =>
-      Map.unmodifiable(_trackingMap);
+  List<SentTracking>? get sentTrackingEvents =>
+      List.unmodifiable(_sentTrackings);
 }
