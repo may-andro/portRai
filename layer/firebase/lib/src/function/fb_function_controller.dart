@@ -8,9 +8,19 @@ class FbFunctionController {
   final FirebaseFunctions _firebaseFunctions;
   final FbAuthController _authController;
 
+  /// Calls the HTTPS callable function [name] with [parameters] and returns
+  /// the data it responds with.
+  ///
+  /// With [requiresSignIn] off, anyone may call it, so the function itself
+  /// must check the caller, for example by enforcing App Check. With
+  /// [limitedUseAppCheckToken] on, the call carries a fresh single-use App
+  /// Check token, which a function that consumes its token can reject when
+  /// replayed. Each such call costs one attestation.
   Future<dynamic> callFunction(
     String name, {
     Map<String, dynamic>? parameters,
+    bool requiresSignIn = true,
+    bool limitedUseAppCheckToken = false,
   }) async {
     try {
       // Input validation
@@ -19,8 +29,7 @@ class FbFunctionController {
       }
 
       // Check authentication
-      final user = _authController.currentUser;
-      if (user == null) {
+      if (requiresSignIn && !_authController.isSignedIn) {
         throw FunctionAuthenticationException(
           Exception('User not signed in'),
           StackTrace.current,
@@ -31,7 +40,12 @@ class FbFunctionController {
       final validatedParameters = parameters ?? <String, dynamic>{};
 
       // Call the function
-      final callable = _firebaseFunctions.httpsCallable(name);
+      final callable = _firebaseFunctions.httpsCallable(
+        name,
+        options: HttpsCallableOptions(
+          limitedUseAppCheckToken: limitedUseAppCheckToken,
+        ),
+      );
       final response = await callable.call<dynamic>(validatedParameters);
 
       // Validate response

@@ -8,7 +8,7 @@ Initializes Firebase, activates App Check, and registers Firebase SDK instances 
 - App Check with debug providers in debug builds and Play Integrity, App Attest with DeviceCheck fallback, or reCAPTCHA Enterprise otherwise
 - `FbAuthController`: email and password accounts, sign-in, password reset
 - `FbFirestoreController`: collection queries, document reads and writes, merges and batch updates
-- `FbFunctionController`: authenticated callable functions
+- `FbFunctionController`: callable functions, for signed-in users or for anyone, optionally with a limited-use App Check token
 - `FbStorageController`: upload, download and delete files in Cloud Storage
 - `FbRemoteConfigController`, `FbAnalyticsController`, `FbCrashlyticsController`
 - `FbMessagingController`: notification permission, device tokens, topics, foreground and opened messages
@@ -255,6 +255,24 @@ Future<void> setPreference(
 Future<dynamic> runTask(FbFunctionController controller, String itemId) =>
     controller.callFunction('runTask', parameters: {'itemId': itemId});
 ```
+
+Two options change how a call is made:
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `requiresSignIn` | `true` | With `false`, the call goes ahead without a signed-in user. The function must then check its caller itself, for example by enforcing App Check |
+| `limitedUseAppCheckToken` | `false` | Sends a fresh limited-use App Check token instead of the cached one, so a function that consumes its token can reject a replayed call. Each call costs one attestation |
+
+```dart
+Future<dynamic> listItems(FbFunctionController controller) =>
+    controller.callFunction(
+      'listItems',
+      requiresSignIn: false,
+      limitedUseAppCheckToken: true,
+    );
+```
+
+App Check tokens reach a function only after `postDependenciesSetup` has activated App Check. A function rejects calls without a valid token only when it enforces App Check itself (`enforceAppCheck` in the Cloud Functions SDK); the console's App Check enforcement settings do not cover callable functions.
 
 ### Cloud Storage
 
