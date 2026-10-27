@@ -15,6 +15,7 @@ class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState>
   ExperiencesBloc(this._getExperiencesUseCase, this._trackingDelegate)
     : super(const LoadingState()) {
     on<LoadExperiencesEvent>(_mapLoadExperiencesEventToState);
+    on<ExperienceClickEvent>(_mapExperienceClickEventToState);
     trackScreenViewOn<ScreenVisibleEvent>();
     trackViewEventOn<ViewStateVisibleEvent>((event) => event.trackingId);
   }
@@ -41,4 +42,9 @@ class ExperiencesBloc extends Bloc<ExperiencesEvent, ExperiencesState>
       },
     );
   }
+
+  void _mapExperienceClickEventToState(
+    ExperienceClickEvent event,
+    Emitter<ExperiencesState> emit,
+  ) => _trackingDelegate.trackExperienceClick(event.experienceId);
 }

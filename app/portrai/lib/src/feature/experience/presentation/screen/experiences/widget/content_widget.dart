@@ -27,6 +27,8 @@ class ContentWidget extends StatelessWidget {
               child: ExperienceListWidget(
                 experiences: experiences,
                 isVisible: true,
+                onOpen: (experience) =>
+                    context.bloc.add(ExperienceClickEvent(experience.id)),
               ),
             ),
           ),
