@@ -141,7 +141,7 @@
 <main>
   <div class="meta">
     <strong>Effective date:</strong> 25 August 2026 &nbsp;·&nbsp;
-    <strong>Last updated:</strong> 25 August 2026
+    <strong>Last updated:</strong> 27 October 2026
   </div>
 
   <div class="intro">
@@ -191,7 +191,13 @@
           <td><strong>Portfolio content</strong></td>
           <td>Read-only portfolio data (projects, experience, profile)</td>
           <td>Cloud Firestore / Firebase Storage</td>
-          <td>Display app content — no user data is written</td>
+          <td>Display app content</td>
+        </tr>
+        <tr>
+          <td><strong>Call requests</strong></td>
+          <td>Your name, email address, what you would like to talk about, an optional message, the time you chose and the app's language</td>
+          <td>You, when you book a call in the Application</td>
+          <td>Arrange the call and email you about it</td>
         </tr>
       </tbody>
     </table>
@@ -207,6 +213,7 @@
       <li>To monitor performance, detect crashes, and fix bugs.</li>
       <li>To understand feature usage and prioritise improvements.</li>
       <li>To deliver the correct app configuration via Remote Config.</li>
+      <li>To arrange a call you book: to tell the owner about your request, and to email you that it arrived and whether it was accepted, with a calendar invite once it is.</li>
     </ul>
     <p>We do <strong>not</strong> sell your personal data or use it for advertising.</p>
   </section>
@@ -221,6 +228,8 @@
       <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Crashlytics</a></li>
       <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Cloud Firestore &amp; Firebase Storage</a></li>
       <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Remote Config &amp; App Check</a></li>
+      <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Cloud Functions for Firebase</a>, which handle call requests</li>
+      <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Gmail</a>, which sends the emails about a call request</li>
     </ul>
     <p>All Firebase services are provided by Google LLC and are covered by Google's <a href="https://cloud.google.com/terms/data-processing-addendum" target="_blank" rel="noopener noreferrer">Data Processing Addendum</a>.</p>
   </section>
@@ -240,7 +249,7 @@
   <!-- 6 -->
   <section>
     <h2>6. Data Retention</h2>
-    <p>The Application does not require an account and does not store any personally identifiable information on our servers. Analytics and crash-report data are retained for up to 14 months by default in Firebase, after which they are automatically deleted or anonymised.</p>
+    <p>The Application does not require an account. When you book a call, your request is stored until 30 days after the time of the call and is then deleted automatically. The emails about it remain in your inbox and the owner's. Analytics and crash-report data are retained for up to 14 months by default in Firebase, after which they are automatically deleted or anonymised.</p>
     <p>To request removal of any data associated with your device, contact us at <a href="mailto:mayank271993@gmail.com">mayank271993@gmail.com</a>. We will process the request within 30 days.</p>
   </section>
 
