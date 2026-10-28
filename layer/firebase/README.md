@@ -272,6 +272,8 @@ Future<dynamic> listItems(FbFunctionController controller) =>
     );
 ```
 
+Every `FunctionException` has a `details` getter with the details the function sent with its error, such as a map saying why it refused the call, or null when there are none.
+
 App Check tokens reach a function only after `postDependenciesSetup` has activated App Check. A function rejects calls without a valid token only when it enforces App Check itself (`enforceAppCheck` in the Cloud Functions SDK); the console's App Check enforcement settings do not cover callable functions.
 
 ### Cloud Storage
