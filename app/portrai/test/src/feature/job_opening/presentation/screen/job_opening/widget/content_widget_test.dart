@@ -18,6 +18,7 @@ import 'package:use_case/use_case.dart';
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
 import '../../../../../../../mock/feature/job_opening/presentation/screen/job_opening/bloc/mock_job_opening_bloc.dart';
 import '../../../../../../../util/animated_page_test_util.dart';
+import '../../../../../../../util/date_test_util.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -215,7 +216,7 @@ void main() {
 
   testWidgets('should show how long ago the opening was posted next to its '
       'date', (tester) async {
-    final posted = DateTime.now().subtract(const Duration(days: 3));
+    final posted = calendarDaysAgo(3);
     await pumpContent(
       tester,
       JobOpeningState(
