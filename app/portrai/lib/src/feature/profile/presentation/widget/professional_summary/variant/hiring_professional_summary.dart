@@ -1,7 +1,7 @@
 part of '../professional_summary_widget.dart';
 
 /// For recruiters: availability, logistics and the numbers up front, with the
-/// resume as the main action.
+/// resume as the main action and a call booking, while booking is on.
 class HiringProfessionalSummary extends ProfessionalSummaryVariant {
   const HiringProfessionalSummary();
 
@@ -35,6 +35,7 @@ class HiringProfessionalSummary extends ProfessionalSummaryVariant {
                 isVisible: scope.isVisible,
                 hasHorizontalPadding: false,
                 resumeFirst: true,
+                offerBookCall: true,
               ),
               _SocialLinksWidget(
                 names: const {'linkedin'},

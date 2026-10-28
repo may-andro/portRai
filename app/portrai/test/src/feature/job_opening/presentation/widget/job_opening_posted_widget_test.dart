@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/job_opening/presentation/widget/_widget.dart';
 
 import '../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
+import '../../../../../util/date_test_util.dart';
 import '../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -11,7 +12,7 @@ void main() {
       TestWidgetWrapper(
         child: JobOpeningPostedWidget(
           jobOpening: jobOpeningEntityFixture(
-            publishedAt: DateTime.now().subtract(Duration(days: daysAgo)),
+            publishedAt: calendarDaysAgo(daysAgo),
           ),
         ),
       ),

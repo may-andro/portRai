@@ -11,6 +11,7 @@ import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
 import 'package:portrai/src/feature/user/user.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../../mock/feature/call_booking/domain/use_case/mock_is_call_booking_available_use_case.dart';
 import '../../../../../../../mock/feature/feature_flag/domain/use_case/mock_is_feature_enabled_use_case.dart';
 import '../../../../../../../mock/feature/local_assistant/domain/use_case/mock_is_local_assistant_supported_use_case.dart';
 import '../../../../../../../mock/feature/portfolio/domain/use_case/mock_get_portfolio_use_case.dart';
@@ -30,6 +31,7 @@ void main() {
     late MockGetGuestUserUseCase getGuestUserUseCase;
     late MockWatchRefreshedPortfolioSectionsUseCase
     watchRefreshedPortfolioSectionsUseCase;
+    late MockIsCallBookingAvailableUseCase isCallBookingAvailableUseCase;
 
     PortfolioBloc buildBloc() => PortfolioBloc(
       getPortfolioUseCase,
@@ -38,6 +40,7 @@ void main() {
       local,
       getGuestUserUseCase,
       watchRefreshedPortfolioSectionsUseCase,
+      isCallBookingAvailableUseCase,
     );
 
     setUp(() {
@@ -57,6 +60,8 @@ void main() {
           result: const Right(false),
         );
       local = MockIsLocalAssistantSupportedUseCase()..stubCall(true);
+      isCallBookingAvailableUseCase = MockIsCallBookingAvailableUseCase()
+        ..stubCall(false);
     });
 
     for (final localEnabled in [false, true]) {
@@ -166,6 +171,22 @@ void main() {
       expect: () => [
         const LoadingState(),
         LoadedState(portfolio: portfolio, userRole: UserRole.developer),
+      ],
+    );
+
+    blocTest<PortfolioBloc, PortfolioState>(
+      'should load whether a call can be booked when loading the portfolio succeeds',
+      setUp: () {
+        getPortfolioUseCase.stubCall(
+          Right<GetPortfolioFailure, PortfolioEntity>(portfolio),
+        );
+        isCallBookingAvailableUseCase.stubCall(true);
+      },
+      build: buildBloc,
+      act: (bloc) => bloc.add(const LoadPortfolioEvent()),
+      expect: () => [
+        const LoadingState(),
+        LoadedState(portfolio: portfolio, isCallBookingAvailable: true),
       ],
     );
 

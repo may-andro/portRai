@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/call_booking/call_booking.dart';
 import 'package:portrai/src/feature/feature_flag/feature_flag.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
@@ -24,6 +25,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
     this._isLocalAssistantSupportedUseCase,
     this._getGuestUserUseCase,
     this._watchRefreshedPortfolioSectionsUseCase,
+    this._isCallBookingAvailableUseCase,
   ) : super(const LoadingState()) {
     on<LoadPortfolioEvent>(_mapLoadPortfolioEventToState);
     on<PortfolioSectionsRefreshedEvent>(
@@ -46,6 +48,7 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
   final GetGuestUserUseCase _getGuestUserUseCase;
   final WatchRefreshedPortfolioSectionsUseCase
   _watchRefreshedPortfolioSectionsUseCase;
+  final IsCallBookingAvailableUseCase _isCallBookingAvailableUseCase;
   StreamSubscription<Object?>? _refreshedSectionsSubscription;
   int _availabilityRevision = 0;
 
@@ -68,10 +71,13 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState>
       final result = await _getPortfolioUseCase();
       if (result.isRight) {
         final userEither = await _getGuestUserUseCase();
+        final callBookingEither = await _isCallBookingAvailableUseCase();
         emit(
           LoadedState(
             portfolio: result.right,
             userRole: userEither.isRight ? userEither.right?.role : null,
+            isCallBookingAvailable:
+                callBookingEither.isRight && callBookingEither.right,
           ),
         );
         await _refreshAssistantAvailability(emit);

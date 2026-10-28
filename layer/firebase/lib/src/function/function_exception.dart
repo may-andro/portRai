@@ -9,6 +9,13 @@ sealed class FunctionException implements AppException {
   final Object cause;
   final StackTrace stackTrace;
 
+  /// The details the function sent with its error, such as a map that says
+  /// why it refused the call, or null when it sent none.
+  Object? get details => switch (cause) {
+    final FirebaseFunctionsException error => error.details,
+    _ => null,
+  };
+
   @override
   String toString() => 'FunctionException: $message';
 }

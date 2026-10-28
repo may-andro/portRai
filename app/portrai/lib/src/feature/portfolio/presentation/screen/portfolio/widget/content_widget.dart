@@ -59,9 +59,14 @@ class _ContentWidgetState extends State<ContentWidget>
           contentOf: (state) => switch (state) {
             LoadingState() => const ScreenLoadingContent(),
             ErrorState(:final failure) => ScreenErrorContent(failure),
-            LoadedState(:final portfolio, :final userRole) => _loadedContent(
-              _sectionsFor(portfolio, userRole),
-            ),
+            LoadedState(
+              :final portfolio,
+              :final userRole,
+              :final isCallBookingAvailable,
+            ) =>
+              _loadedContent(
+                _sectionsFor(portfolio, userRole, isCallBookingAvailable),
+              ),
           },
           onContentVisible: (content) =>
               context.bloc.add(ViewStateVisibleEvent(content.trackingLabel)),
@@ -80,13 +85,18 @@ class _ContentWidgetState extends State<ContentWidget>
     ], scrollController: _scrollController);
   }
 
-  /// Keeps the sections and their tab controller while the portfolio and role
-  /// stay the same.
-  _Sections _sectionsFor(PortfolioEntity portfolio, UserRole? userRole) {
+  /// Keeps the sections and their tab controller while the portfolio, role
+  /// and call booking stay the same.
+  _Sections _sectionsFor(
+    PortfolioEntity portfolio,
+    UserRole? userRole,
+    bool isCallBookingAvailable,
+  ) {
     final current = _sections;
     if (current != null &&
         current.portfolio == portfolio &&
-        current.userRole == userRole) {
+        current.userRole == userRole &&
+        current.isCallBookingAvailable == isCallBookingAvailable) {
       return current;
     }
     if (current != null) {
@@ -94,10 +104,14 @@ class _ContentWidgetState extends State<ContentWidget>
         (_) => current.tabController.dispose(),
       );
     }
-    final widgets = portfolio.sectionsFor(userRole);
+    final widgets = portfolio.sectionsFor(
+      userRole,
+      isCallBookingAvailable: isCallBookingAvailable,
+    );
     return _sections = _Sections(
       portfolio: portfolio,
       userRole: userRole,
+      isCallBookingAvailable: isCallBookingAvailable,
       widgets: widgets,
       tabController: TabController(length: widgets.length, vsync: this),
     );
@@ -153,12 +167,14 @@ class _Sections {
   const _Sections({
     required this.portfolio,
     required this.userRole,
+    required this.isCallBookingAvailable,
     required this.widgets,
     required this.tabController,
   });
 
   final PortfolioEntity portfolio;
   final UserRole? userRole;
+  final bool isCallBookingAvailable;
   final List<SectionWidget> widgets;
   final TabController tabController;
 }

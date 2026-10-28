@@ -2,12 +2,14 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/section_widget.dart';
 import 'package:portrai/src/feature/portfolio/presentation/screen/portfolio/widget/setting_button_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../../mock/feature/ai_image_gen/presentation/bloc/mock_ai_image_bloc.dart';
+import '../../../../../../../mock/feature/call_booking/presentation/widget/book_call_entry/bloc/mock_book_call_entry_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/presentation/screen/portfolio/bloc/mock_portfolio_bloc.dart';
 import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_data.dart';
 import '../../../../../../../mock/feature/profile/presentation/widget/professional_summary/bloc/mock_professional_summary_bloc.dart';
@@ -133,5 +135,26 @@ void main() {
         ),
       ),
     ).called(1);
+  });
+
+  testWidgets('should invite a call with a catchy line when booking is on', (
+    tester,
+  ) async {
+    MockBookCallEntryBloc()
+      ..stubAvailable(true)
+      ..registerFactory();
+
+    await pumpSection(
+      tester,
+      1440,
+      BookCallSectionWidget(portfolio: createPortfolioEntity()),
+    );
+    final localizations = AppLocalizations.of(
+      tester.element(find.byType(BookCallSectionWidget)),
+    );
+
+    expect(find.text(localizations.bookCallBandTitle), findsOneWidget);
+    expect(find.text(localizations.bookCallBandDescription), findsOneWidget);
+    expect(find.text(localizations.bookCall), findsOneWidget);
   });
 }

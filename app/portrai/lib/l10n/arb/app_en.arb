@@ -1978,5 +1978,143 @@
   "trackingEventsSelectHint": "Select an event to see what was sent",
   "@trackingEventsSelectHint": {
     "description": "Shown in the side panel of the tracking viewer before an event is selected"
+  },
+  "bookCall": "Book a Call",
+  "@bookCall": {
+    "description": "Button that opens the screen for booking a call"
+  },
+  "bookCallTitle": "Book a Call",
+  "@bookCallTitle": {
+    "description": "Title of the screen for booking a call"
+  },
+  "bookCallHeroTitle": "Let's find a time to talk",
+  "@bookCallHeroTitle": {
+    "description": "Title in the header of the booking screen"
+  },
+  "bookCallDescription": "Pick a time that suits you. Times are shown in your time zone ({timeZone}).",
+  "@bookCallDescription": {
+    "description": "Intro on the booking screen; timeZone is the device's time zone abbreviation",
+    "placeholders": {
+      "timeZone": {
+        "type": "String",
+        "example": "CET"
+      }
+    }
+  },
+  "bookCallFreeTimesTitle": "Free times",
+  "@bookCallFreeTimesTitle": {
+    "description": "Label above the free times of the day picked in the calendar"
+  },
+  "bookCallDayLabel": "Day",
+  "@bookCallDayLabel": {
+    "description": "Label of the dropdown for picking the day of the call"
+  },
+  "bookCallDefaultTopic": "A quick chat",
+  "@bookCallDefaultTopic": {
+    "description": "What a call is about when the visitor did not come from a service, used in the emails"
+  },
+  "bookCallNoSlots": "No times are free right now. Please check back soon.",
+  "@bookCallNoSlots": {
+    "description": "Shown when no time is free to book"
+  },
+  "bookCallNameLabel": "Name",
+  "@bookCallNameLabel": {
+    "description": "Label of the name field"
+  },
+  "bookCallEmailLabel": "Email",
+  "@bookCallEmailLabel": {
+    "description": "Label of the email field"
+  },
+  "bookCallMessageLabel": "Message",
+  "@bookCallMessageLabel": {
+    "description": "Label of the optional message field"
+  },
+  "bookCallConsent": "I agree that my details are used to arrange this call.",
+  "@bookCallConsent": {
+    "description": "Text next to the checkbox agreeing to the use of the visitor's details"
+  },
+  "bookCallPrivacyPolicyLink": "Read the privacy policy",
+  "@bookCallPrivacyPolicyLink": {
+    "description": "Link that opens the privacy policy from the booking screen"
+  },
+  "bookCallSend": "Request this time",
+  "@bookCallSend": {
+    "description": "Button that sends the call request"
+  },
+  "bookCallSentTitle": "Request sent",
+  "@bookCallSentTitle": {
+    "description": "Title once the call request is sent"
+  },
+  "bookCallSentDescription": "Thanks! You'll get an email that your request is in, and another one with the invite once the time is confirmed.",
+  "@bookCallSentDescription": {
+    "description": "Explains what happens after the call request is sent"
+  },
+  "bookCallSentDone": "Done",
+  "@bookCallSentDone": {
+    "description": "Button that closes the booking screen after sending"
+  },
+  "bookCallServiceTitle": "Talk it through",
+  "@bookCallServiceTitle": {
+    "description": "Heading of the call booking band on a service's page"
+  },
+  "bookCallServiceDescription": "Book a call to talk about how this service fits your project.",
+  "@bookCallServiceDescription": {
+    "description": "Text of the call booking band on a service's page"
+  },
+  "bookCallServicesDescription": "Not sure which service fits? Book a call and we'll talk through your project.",
+  "@bookCallServicesDescription": {
+    "description": "Text of the call booking section on the services screen"
+  },
+  "portfolioSectionBookCall": "Let's Talk",
+  "@portfolioSectionBookCall": {
+    "description": "Title of the portfolio section for booking a call"
+  },
+  "bookCallBandTitle": "Got an idea or need some advice?",
+  "@bookCallBandTitle": {
+    "description": "Catchy line of the portfolio band for booking a call"
+  },
+  "bookCallBandDescription": "Let's talk it through on a quick call.",
+  "@bookCallBandDescription": {
+    "description": "Text under the catchy line of the portfolio band for booking a call"
+  },
+  "errorCallBookingUnavailable": "Booking a call isn't available right now. Please try again later.",
+  "@errorCallBookingUnavailable": {
+    "description": "Error when call booking is not available"
+  },
+  "errorCallBookingNetwork": "Couldn't connect. Check your connection and try again.",
+  "@errorCallBookingNetwork": {
+    "description": "Error when the booking request cannot reach the server"
+  },
+  "errorCallSlotsUnknown": "Couldn't load the free times. Please try again.",
+  "@errorCallSlotsUnknown": {
+    "description": "Error when the free times cannot be loaded"
+  },
+  "errorCallRequestMissingDetails": "Please fill in your name, email and message.",
+  "@errorCallRequestMissingDetails": {
+    "description": "Error when the name, email or topic is empty"
+  },
+  "errorCallRequestInvalidEmail": "Please enter a valid email address.",
+  "@errorCallRequestInvalidEmail": {
+    "description": "Error when the email address is not valid"
+  },
+  "errorCallRequestConsent": "Please agree to the use of your details to send the request.",
+  "@errorCallRequestConsent": {
+    "description": "Error when the visitor has not agreed to the use of their details"
+  },
+  "errorCallSlotUnavailable": "That time was just taken. Please pick another one.",
+  "@errorCallSlotUnavailable": {
+    "description": "Error when the chosen time was taken by someone else"
+  },
+  "errorCallRequestLimit": "You've reached the limit for call requests. Please try again later.",
+  "@errorCallRequestLimit": {
+    "description": "Error when the visitor has sent too many requests"
+  },
+  "errorCallRequestInvalid": "Some details look too long or invalid. Please check them and try again.",
+  "@errorCallRequestInvalid": {
+    "description": "Error when the server refuses one of the details"
+  },
+  "errorCallRequestUnknown": "Couldn't send your request. Please try again.",
+  "@errorCallRequestUnknown": {
+    "description": "Error when the call request cannot be sent"
   }
 }

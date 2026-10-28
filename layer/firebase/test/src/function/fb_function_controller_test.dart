@@ -104,6 +104,45 @@ void main() {
       );
     });
 
+    test('should keep the details the function sent with its error', () async {
+      authController.stubIsSignedIn(false);
+      callable.stubCall(
+        error: FirebaseFunctionsException(
+          code: 'failed-precondition',
+          message: 'refused',
+          details: const {'reason': 'not_ready'},
+        ),
+      );
+
+      await expectLater(
+        controller.callFunction('runTask', requiresSignIn: false),
+        throwsA(
+          isA<FunctionException>().having(
+            (exception) => exception.details,
+            'details',
+            {'reason': 'not_ready'},
+          ),
+        ),
+      );
+    });
+
+    test('should have no details when the error did not come from the '
+        'function', () async {
+      authController.stubIsSignedIn(true);
+      callable.stubCall();
+
+      await expectLater(
+        controller.callFunction('runTask'),
+        throwsA(
+          isA<FunctionException>().having(
+            (exception) => exception.details,
+            'details',
+            isNull,
+          ),
+        ),
+      );
+    });
+
     for (final (code, exceptionMatcher) in [
       ('unauthenticated', isA<FunctionAuthenticationException>()),
       ('permission-denied', isA<FunctionPermissionDeniedException>()),

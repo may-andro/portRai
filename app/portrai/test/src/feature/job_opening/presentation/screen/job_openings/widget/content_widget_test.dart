@@ -15,6 +15,7 @@ import 'package:portrai/src/widget/screen_content_widget.dart';
 import '../../../../../../../mock/feature/job_opening/domain/entity/job_opening_entity_fixture.dart';
 import '../../../../../../../mock/feature/job_opening/presentation/screen/job_openings/bloc/mock_job_openings_bloc.dart';
 import '../../../../../../../util/animated_page_test_util.dart';
+import '../../../../../../../util/date_test_util.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 
 void main() {
@@ -277,22 +278,25 @@ void main() {
   testWidgets('should show how long ago each opening was posted', (
     tester,
   ) async {
-    final now = DateTime.now();
     await pumpContent(
       tester,
       JobOpeningsState(
         status: JobOpeningsStatus.loaded,
         jobOpenings: [
-          jobOpeningEntityFixture(id: '1', title: 'First', publishedAt: now),
+          jobOpeningEntityFixture(
+            id: '1',
+            title: 'First',
+            publishedAt: calendarDaysAgo(0),
+          ),
           jobOpeningEntityFixture(
             id: '2',
             title: 'Second',
-            publishedAt: now.subtract(const Duration(days: 1)),
+            publishedAt: calendarDaysAgo(1),
           ),
           jobOpeningEntityFixture(
             id: '3',
             title: 'Third',
-            publishedAt: now.subtract(const Duration(days: 12)),
+            publishedAt: calendarDaysAgo(12),
           ),
         ],
       ),

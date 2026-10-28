@@ -9,6 +9,7 @@ import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../../../mock/feature/ai_image_gen/presentation/bloc/mock_ai_image_bloc.dart';
+import '../../../../../../mock/feature/call_booking/presentation/widget/book_call_entry/bloc/mock_book_call_entry_bloc.dart';
 import '../../../../../../mock/feature/profile/presentation/widget/professional_summary/bloc/mock_professional_summary_bloc.dart';
 import '../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
 import '../../../../../../util/test_wrapper_widget.dart';
@@ -30,6 +31,7 @@ void main() {
     DesignSystem designSystem = DesignSystem.beltane,
     ProfessionalSummaryVariant variant = const OverviewProfessionalSummary(),
     ProfileEntity? shownProfile,
+    bool isCallBookingAvailable = false,
   }) async {
     final profile = shownProfile ?? createProfileEntity();
     tester.view.physicalSize = size;
@@ -41,6 +43,9 @@ void main() {
       ..registerFactory();
     MockAiImageBloc()
       ..stubLoadingState()
+      ..registerFactory();
+    MockBookCallEntryBloc()
+      ..stubAvailable(isCallBookingAvailable)
       ..registerFactory();
 
     await tester.pumpWidget(
@@ -178,6 +183,48 @@ void main() {
       ),
       findsNothing,
     );
+  });
+
+  testWidgets(
+    'should offer a call in place of email when hiring and booking is on',
+    (tester) async {
+      await pumpWidget(
+        tester,
+        size: sizes['desktop']!,
+        variant: variants['hiring']!,
+        isCallBookingAvailable: true,
+      );
+
+      expect(find.text('Book a Call'), findsOneWidget);
+      expect(find.text('Work with Me'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('should offer email when hiring and booking is off', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      size: sizes['desktop']!,
+      variant: variants['hiring']!,
+    );
+
+    expect(find.text('Work with Me'), findsOneWidget);
+    expect(find.text('Book a Call'), findsNothing);
+  });
+
+  testWidgets('should keep email in the overview when booking is on', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      size: sizes['desktop']!,
+      isCallBookingAvailable: true,
+    );
+
+    expect(find.text('Work with Me'), findsOneWidget);
+    expect(find.text('Book a Call'), findsNothing);
   });
 
   testWidgets('should tint the animated buttons with the primary container', (
