@@ -167,7 +167,7 @@ Each component level has a barrel file (`atom.dart`, `molecule.dart`, `organism.
 | `DSDialogWidget` | Rounded dialog with an optional maximum width |
 | `DSErrorCardWidget` | Error icon, title, message and optional retry button; title and retry label can be replaced |
 | `DSSectionContainerWidget` | Section with a surface or inverse background, an optional animated title and action, entry animations on visibility and responsive padding |
-| `DSStaggeredGridWidget` | Masonry grid built on `flutter_staggered_grid_view` |
+| `DSStaggeredGridWidget` | Masonry grid built on `flutter_staggered_grid_view`; shows fewer columns when the width cannot fit their gaps |
 
 ### Theming
 
