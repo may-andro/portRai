@@ -22,11 +22,12 @@ and iOS; on the web the listener does nothing.
   updates again.
 - A tapped notification opens its screen, also when it started the app:
 
-  | `kind` in the message data | Opens                                         |
-  | -------------------------- | --------------------------------------------- |
-  | `job_openings`             | `/job-openings`, which asks for sign-in first |
-  | `portfolio_update`         | The portfolio (`/`)                           |
-  | anything else              | Nothing                                       |
+  | `kind` in the message data | Opens                                                 |
+  | -------------------------- | ----------------------------------------------------- |
+  | `job_openings`             | `/job-openings`, which asks for sign-in first         |
+  | `call_request`             | `/appointment-requests`, which asks for sign-in first |
+  | `portfolio_update`         | The portfolio (`/`)                                   |
+  | anything else              | Nothing                                               |
 
 - The system does not show notifications while the app is in the foreground, so the listener
   shows their title and text in a snackbar.

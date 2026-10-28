@@ -13,6 +13,7 @@ class PushMessageMapper
   PushMessageEntity map(firebase.FbPushMessage from) => PushMessageEntity(
     kind: switch (from.data['kind']) {
       'job_openings' => PushMessageKind.jobOpenings,
+      'call_request' => PushMessageKind.appointmentRequest,
       'portfolio_update' => PushMessageKind.portfolioUpdate,
       _ => PushMessageKind.unknown,
     },

@@ -67,6 +67,12 @@ void main() {
           path: '/job-openings',
           builder: (_, _, _) => const Scaffold(body: Text('Job openings')),
         ),
+        ModuleRoute(
+          name: 'appointment_requests',
+          path: '/appointment-requests',
+          builder: (_, _, _) =>
+              const Scaffold(body: Text('Appointment requests')),
+        ),
       ]);
       final router = GoRouterConfigurator(controller, const []).createRouter();
       addTearDown(router.dispose);
@@ -95,6 +101,18 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Job openings'), findsOneWidget);
+    });
+
+    testWidgets('should open the appointment requests when a request '
+        'notification is tapped', (tester) async {
+      await pumpApp(tester);
+
+      openedMessages.add(
+        const PushMessageEntity(kind: PushMessageKind.appointmentRequest),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Appointment requests'), findsOneWidget);
     });
 
     testWidgets('should go to the portfolio when its update notification is '

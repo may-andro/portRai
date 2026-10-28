@@ -11,5 +11,14 @@ abstract final class ScheduleAppointmentFeatureFlags {
         'time and request an appointment with the owner',
   );
 
-  static const all = [scheduleAppointment];
+  static const appointmentRequests = AppFeatureFlagDefinition(
+    key: 'feature_appointment_requests',
+    defaultValue: false,
+    displayName: 'Appointment Requests',
+    description:
+        'Shows the Appointment requests card in Settings, which opens the '
+        "signed-in owner's requests to accept or decline",
+  );
+
+  static const all = [scheduleAppointment, appointmentRequests];
 }
