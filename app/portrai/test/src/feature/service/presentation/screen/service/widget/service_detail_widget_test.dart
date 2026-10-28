@@ -6,7 +6,7 @@ import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bl
 import 'package:portrai/src/feature/service/presentation/screen/service/widget/_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
-import '../../../../../../../mock/feature/call_booking/presentation/widget/book_call_entry/bloc/mock_book_call_entry_bloc.dart';
+import '../../../../../../../mock/feature/schedule_appointment/presentation/widget/schedule_appointment_entry/bloc/mock_schedule_appointment_entry_bloc.dart';
 import '../../../../../../../mock/feature/service/presentation/screen/service/bloc/mock_service_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
@@ -14,7 +14,7 @@ import '../../../../../../../util/tracking_impression_test_util.dart';
 void main() {
   setUp(() {
     resetTrackingImpressions();
-    MockBookCallEntryBloc()
+    MockScheduleAppointmentEntryBloc()
       ..stubAvailable(false)
       ..registerFactory();
   });
@@ -57,25 +57,34 @@ void main() {
     return AppLocalizations.of(tester.element(find.byType(ContentWidget)));
   }
 
-  group('Book a call band', () {
-    testWidgets('should offer a call about the service when booking is on', (
+  group('Schedule an appointment band', () {
+    testWidgets(
+      'should offer an appointment about the service when scheduling is on',
+      (tester) async {
+        await appServiceLocator.reset();
+        MockScheduleAppointmentEntryBloc()
+          ..stubAvailable(true)
+          ..registerFactory();
+
+        final localizations = await pump(tester, full);
+
+        expect(
+          find.text(localizations.scheduleAppointmentServiceTitle),
+          findsOneWidget,
+        );
+        expect(find.text(localizations.scheduleAppointment), findsOneWidget);
+      },
+    );
+
+    testWidgets('should not offer an appointment when scheduling is off', (
       tester,
     ) async {
-      await appServiceLocator.reset();
-      MockBookCallEntryBloc()
-        ..stubAvailable(true)
-        ..registerFactory();
-
       final localizations = await pump(tester, full);
 
-      expect(find.text(localizations.bookCallServiceTitle), findsOneWidget);
-      expect(find.text(localizations.bookCall), findsOneWidget);
-    });
-
-    testWidgets('should not offer a call when booking is off', (tester) async {
-      final localizations = await pump(tester, full);
-
-      expect(find.text(localizations.bookCallServiceTitle), findsNothing);
+      expect(
+        find.text(localizations.scheduleAppointmentServiceTitle),
+        findsNothing,
+      );
     });
   });
 

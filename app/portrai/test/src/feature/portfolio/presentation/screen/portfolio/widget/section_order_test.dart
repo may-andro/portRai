@@ -9,11 +9,11 @@ void main() {
 
   List<Type> sectionTypes(
     UserRole? role, {
-    bool isCallBookingAvailable = false,
+    bool isScheduleAppointmentAvailable = false,
   }) => [
     for (final section in portfolio.sectionsFor(
       role,
-      isCallBookingAvailable: isCallBookingAvailable,
+      isScheduleAppointmentAvailable: isScheduleAppointmentAvailable,
     ))
       section.runtimeType,
   ];
@@ -52,47 +52,51 @@ void main() {
       };
 
       for (final role in [...UserRole.values, null]) {
-        for (final isCallBookingAvailable in [false, true]) {
+        for (final isScheduleAppointmentAvailable in [false, true]) {
           final isInverse = [
             for (final type in sectionTypes(
               role,
-              isCallBookingAvailable: isCallBookingAvailable,
+              isScheduleAppointmentAvailable: isScheduleAppointmentAvailable,
             ).skip(1))
-              if (type != BookCallSectionWidget) inverse.contains(type),
+              if (type != ScheduleAppointmentSectionWidget)
+                inverse.contains(type),
           ];
           for (var index = 0; index < isInverse.length; index++) {
             expect(
               isInverse[index],
               index.isEven,
-              reason: 'role $role, booking $isCallBookingAvailable',
+              reason: 'role $role, booking $isScheduleAppointmentAvailable',
             );
           }
         }
       }
     });
 
-    test('should offer booking a call after about for a recruiter when booking '
-        'is on', () {
-      final types = sectionTypes(
-        UserRole.recruiter,
-        isCallBookingAvailable: true,
-      );
+    test(
+      'should offer an appointment after about for a recruiter when scheduling '
+      'is on',
+      () {
+        final types = sectionTypes(
+          UserRole.recruiter,
+          isScheduleAppointmentAvailable: true,
+        );
 
-      expect(
-        types.indexOf(BookCallSectionWidget),
-        types.indexOf(AboutMeSectionWidget) + 1,
-      );
-      expect(
-        sectionTypes(UserRole.recruiter),
-        isNot(contains(BookCallSectionWidget)),
-      );
-    });
+        expect(
+          types.indexOf(ScheduleAppointmentSectionWidget),
+          types.indexOf(AboutMeSectionWidget) + 1,
+        );
+        expect(
+          sectionTypes(UserRole.recruiter),
+          isNot(contains(ScheduleAppointmentSectionWidget)),
+        );
+      },
+    );
 
-    test('should not offer booking a call to other roles', () {
+    test('should not offer an appointment to other roles', () {
       for (final role in [UserRole.developer, UserRole.other, null]) {
         expect(
-          sectionTypes(role, isCallBookingAvailable: true),
-          isNot(contains(BookCallSectionWidget)),
+          sectionTypes(role, isScheduleAppointmentAvailable: true),
+          isNot(contains(ScheduleAppointmentSectionWidget)),
           reason: 'role $role',
         );
       }

@@ -7,7 +7,7 @@ import 'package:portrai/src/feature/service/presentation/screen/service/widget/_
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
-import '../../../../../../../mock/feature/call_booking/presentation/widget/book_call_entry/bloc/mock_book_call_entry_bloc.dart';
+import '../../../../../../../mock/feature/schedule_appointment/presentation/widget/schedule_appointment_entry/bloc/mock_schedule_appointment_entry_bloc.dart';
 import '../../../../../../../mock/feature/service/presentation/screen/service/bloc/mock_service_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
@@ -15,7 +15,7 @@ import '../../../../../../../util/tracking_impression_test_util.dart';
 void main() {
   setUp(() {
     resetTrackingImpressions();
-    MockBookCallEntryBloc()
+    MockScheduleAppointmentEntryBloc()
       ..stubAvailable(false)
       ..registerFactory();
   });

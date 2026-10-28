@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
-import 'package:portrai/src/feature/call_booking/call_booking.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
 import 'package:portrai/src/widget/page_chrome_widget.dart';

@@ -8,8 +8,8 @@ services, experiences and testimonials features, and keeps their cached data up 
 - `PortfolioModuleRoute.portfolio` (`/`) shows `PortfolioScreen`. It starts with the intro
   section, followed by the other sections in an order that depends on the visitor's role
   (developer, recruiter, or other and unknown). Empty sections are left out. For a recruiter,
-  a section after About offers booking a call when the
-  [`call_booking`](../call_booking/README.md) feature is on, which is read once on loading. A
+  a section after About offers scheduling an appointment when the
+  [`schedule_appointment`](../schedule_appointment/README.md) feature is on, which is read once on loading. A
   pinned header has a tab per section on desktop, and a drawer and Settings button on mobile and
   tablet.
 - When an assistant is available, a floating button opens the remote assistant, or the

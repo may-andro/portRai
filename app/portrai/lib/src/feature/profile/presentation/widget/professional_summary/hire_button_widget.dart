@@ -6,7 +6,7 @@ class _HireButtonWidget extends StatelessWidget {
     required this.isVisible,
     this.showResume = true,
     this.resumeFirst = false,
-    this.offerBookCall = false,
+    this.offerScheduleAppointment = false,
   });
 
   final bool hasHorizontalPadding;
@@ -14,8 +14,8 @@ class _HireButtonWidget extends StatelessWidget {
   final bool showResume;
   final bool resumeFirst;
 
-  /// Shows Book a Call in place of the email button while booking is on.
-  final bool offerBookCall;
+  /// Shows Schedule an Appointment in place of the email button while scheduling is on.
+  final bool offerScheduleAppointment;
 
   @override
   Widget build(BuildContext context) {
@@ -42,15 +42,15 @@ class _HireButtonWidget extends StatelessWidget {
         size: DSButtonSize.small,
       ),
     );
-    final hireMe = offerBookCall
-        ? BookCallEntryWidget(
-            trackingLabel: 'hiring_book_call_button',
+    final hireMe = offerScheduleAppointment
+        ? ScheduleAppointmentEntryWidget(
+            trackingLabel: 'hiring_schedule_appointment_button',
             fallback: emailButton,
-            builder: (context, onBookCall) => _HoverScaleWidget(
+            builder: (context, onScheduleAppointment) => _HoverScaleWidget(
               child: DSButtonWidget(
-                label: context.localizations.bookCall,
+                label: context.localizations.scheduleAppointment,
                 icon: Icons.event_available_rounded,
-                onPressed: onBookCall,
+                onPressed: onScheduleAppointment,
                 iconDirection: DSButtonIconDirection.right,
                 variant: contactVariant,
                 border: DSButtonBorder.rounded,
