@@ -3,7 +3,6 @@ import 'package:design_system/src/design_system/design_system.dart';
 import 'package:design_system/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lottie/lottie.dart';
 import 'package:recase/recase.dart';
 
 /// A [TestCase] holds the description of the test, and the widget to be
@@ -73,7 +72,6 @@ void groupGolden(
         await tester.pump(const Duration(milliseconds: 100));
       },
       pumpWidget: (tester, widget) async {
-        await _loadLottieCompositions(tester, widget);
         await tester.pumpWidget(widget);
         await tester.pump(const Duration(milliseconds: 100));
       },
@@ -89,24 +87,6 @@ void groupGolden(
       ),
     );
   });
-}
-
-/// Lottie files load outside the test clock, so a first load would start the
-/// animations at a different frame than a cached one. Loading them all into
-/// the cache before [widget] is shown makes every test start from the cache.
-Future<void> _loadLottieCompositions(WidgetTester tester, Widget widget) async {
-  await tester.pumpWidget(widget);
-  bool hasPendingLottie() => tester
-      .widgetList<Lottie>(find.byType(Lottie))
-      .any((lottie) => lottie.composition == null);
-  for (var attempt = 0; attempt < 100 && hasPendingLottie(); attempt++) {
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 10)),
-    );
-    await tester.pump();
-  }
-  expect(hasPendingLottie(), isFalse, reason: 'A Lottie file did not load');
-  await tester.pumpWidget(const SizedBox());
 }
 
 /// The test case widget that renders the test description and the
