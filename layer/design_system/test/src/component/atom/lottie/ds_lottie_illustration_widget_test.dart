@@ -39,6 +39,9 @@ void main() {
     DSLottieIllustration.talentSearch,
     DSLottieIllustration.signIn,
     DSLottieIllustration.binoculars,
+    DSLottieIllustration.calendarBooking,
+    DSLottieIllustration.appointment,
+    DSLottieIllustration.confetti,
     DSLottieIllustration.logo,
   ]) {
     testWidgets('should size ${illustration.name} by its aspect ratio when '

@@ -23,6 +23,9 @@ enum DSLottieIllustration {
   talentSearch(1),
   signIn(1),
   binoculars(1),
+  calendarBooking(1640 / 1080),
+  appointment(1),
+  confetti(1920 / 1080),
   logo(1);
 
   const DSLottieIllustration(this.aspectRatio);
@@ -74,6 +77,9 @@ enum DSLottieIllustration {
       case DSLottieIllustration.talentSearch:
       case DSLottieIllustration.signIn:
       case DSLottieIllustration.binoculars:
+      case DSLottieIllustration.calendarBooking:
+      case DSLottieIllustration.appointment:
+      case DSLottieIllustration.confetti:
       case DSLottieIllustration.logo:
         return const [];
     }
@@ -113,6 +119,12 @@ enum DSLottieIllustration {
         return Assets.lottie.signIn;
       case DSLottieIllustration.binoculars:
         return Assets.lottie.binoculars;
+      case DSLottieIllustration.calendarBooking:
+        return Assets.lottie.calendarBooking;
+      case DSLottieIllustration.appointment:
+        return Assets.lottie.appointment;
+      case DSLottieIllustration.confetti:
+        return Assets.lottie.confetti;
       case DSLottieIllustration.logo:
         return Assets.lottie.logo;
     }
