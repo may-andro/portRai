@@ -201,14 +201,16 @@ class _ServiceDetailWidget extends StatelessWidget {
             backgroundAsset: section.backgroundAsset,
             child: section.child,
           ),
-        BookCallEntryWidget(
-          trackingLabel: 'service_book_call_button',
+        ScheduleAppointmentEntryWidget(
+          trackingLabel: 'service_schedule_appointment_button',
           topic: service.title,
-          builder: (context, onBookCall) => BookCallBandWidget(
-            title: localizations.bookCallServiceTitle,
-            description: localizations.bookCallServiceDescription,
-            onBookCall: onBookCall,
-          ),
+          builder: (context, onScheduleAppointment) =>
+              ScheduleAppointmentBandWidget(
+                title: localizations.scheduleAppointmentServiceTitle,
+                description:
+                    localizations.scheduleAppointmentServiceDescription,
+                onScheduleAppointment: onScheduleAppointment,
+              ),
         ),
       ],
     );

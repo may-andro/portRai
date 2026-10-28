@@ -34,7 +34,7 @@ final class LoadedState extends PortfolioState {
     this.isLocalAssistantAvailable = false,
     this.isRemoteAssistantAvailable = false,
     this.userRole,
-    this.isCallBookingAvailable = false,
+    this.isScheduleAppointmentAvailable = false,
   });
 
   final PortfolioEntity portfolio;
@@ -44,9 +44,9 @@ final class LoadedState extends PortfolioState {
   final bool isRemoteAssistantAvailable;
   final UserRole? userRole;
 
-  /// Whether visitors can book a call, read once when the portfolio loads so
+  /// Whether visitors can schedule an appointment, read once when the portfolio loads so
   /// the sections and their tabs stay put.
-  final bool isCallBookingAvailable;
+  final bool isScheduleAppointmentAvailable;
 
   @override
   List<Object?> get props => [
@@ -56,7 +56,7 @@ final class LoadedState extends PortfolioState {
     isLocalAssistantAvailable,
     isRemoteAssistantAvailable,
     userRole,
-    isCallBookingAvailable,
+    isScheduleAppointmentAvailable,
   ];
 
   LoadedState copyWith({
@@ -66,7 +66,7 @@ final class LoadedState extends PortfolioState {
     bool? isLocalAssistantAvailable,
     bool? isRemoteAssistantAvailable,
     UserRole? userRole,
-    bool? isCallBookingAvailable,
+    bool? isScheduleAppointmentAvailable,
   }) {
     return LoadedState(
       portfolio: portfolio ?? this.portfolio,
@@ -77,8 +77,8 @@ final class LoadedState extends PortfolioState {
       isRemoteAssistantAvailable:
           isRemoteAssistantAvailable ?? this.isRemoteAssistantAvailable,
       userRole: userRole ?? this.userRole,
-      isCallBookingAvailable:
-          isCallBookingAvailable ?? this.isCallBookingAvailable,
+      isScheduleAppointmentAvailable:
+          isScheduleAppointmentAvailable ?? this.isScheduleAppointmentAvailable,
     );
   }
 }

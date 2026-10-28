@@ -62,10 +62,14 @@ class _ContentWidgetState extends State<ContentWidget>
             LoadedState(
               :final portfolio,
               :final userRole,
-              :final isCallBookingAvailable,
+              :final isScheduleAppointmentAvailable,
             ) =>
               _loadedContent(
-                _sectionsFor(portfolio, userRole, isCallBookingAvailable),
+                _sectionsFor(
+                  portfolio,
+                  userRole,
+                  isScheduleAppointmentAvailable,
+                ),
               ),
           },
           onContentVisible: (content) =>
@@ -86,17 +90,18 @@ class _ContentWidgetState extends State<ContentWidget>
   }
 
   /// Keeps the sections and their tab controller while the portfolio, role
-  /// and call booking stay the same.
+  /// and appointment scheduling stay the same.
   _Sections _sectionsFor(
     PortfolioEntity portfolio,
     UserRole? userRole,
-    bool isCallBookingAvailable,
+    bool isScheduleAppointmentAvailable,
   ) {
     final current = _sections;
     if (current != null &&
         current.portfolio == portfolio &&
         current.userRole == userRole &&
-        current.isCallBookingAvailable == isCallBookingAvailable) {
+        current.isScheduleAppointmentAvailable ==
+            isScheduleAppointmentAvailable) {
       return current;
     }
     if (current != null) {
@@ -106,12 +111,12 @@ class _ContentWidgetState extends State<ContentWidget>
     }
     final widgets = portfolio.sectionsFor(
       userRole,
-      isCallBookingAvailable: isCallBookingAvailable,
+      isScheduleAppointmentAvailable: isScheduleAppointmentAvailable,
     );
     return _sections = _Sections(
       portfolio: portfolio,
       userRole: userRole,
-      isCallBookingAvailable: isCallBookingAvailable,
+      isScheduleAppointmentAvailable: isScheduleAppointmentAvailable,
       widgets: widgets,
       tabController: TabController(length: widgets.length, vsync: this),
     );
@@ -167,14 +172,14 @@ class _Sections {
   const _Sections({
     required this.portfolio,
     required this.userRole,
-    required this.isCallBookingAvailable,
+    required this.isScheduleAppointmentAvailable,
     required this.widgets,
     required this.tabController,
   });
 
   final PortfolioEntity portfolio;
   final UserRole? userRole;
-  final bool isCallBookingAvailable;
+  final bool isScheduleAppointmentAvailable;
   final List<SectionWidget> widgets;
   final TabController tabController;
 }

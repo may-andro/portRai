@@ -5,47 +5,30 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
-import 'package:portrai/src/feature/call_booking/call_booking.dart';
 import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/professional_summary/bloc/_bloc.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
-part 'social_links_widget.dart';
-
-part 'unique_proposition_widget.dart';
-
-part 'profile_image_widget.dart';
-
-part 'hire_button_widget.dart';
-
-part 'elevator_pitch_widget.dart';
-
-part 'mobile_content_widget.dart';
-
-part 'tablet_content_widget.dart';
-
-part 'desktop_content_widget.dart';
-
-part 'project_years_widget.dart';
-
-part 'project_backdrop_widget.dart';
-
-part 'identity_widget.dart';
-
-part 'variant/professional_summary_variant.dart';
-
-part 'variant/overview_professional_summary.dart';
-
-part 'variant/engineering_professional_summary.dart';
-
-part 'variant/hiring_professional_summary.dart';
-
-part 'component/code_card_widget.dart';
-
 part 'component/availability_card_widget.dart';
-
 part 'component/blueprint_grid_widget.dart';
+part 'component/code_card_widget.dart';
+part 'desktop_content_widget.dart';
+part 'elevator_pitch_widget.dart';
+part 'hire_button_widget.dart';
+part 'identity_widget.dart';
+part 'mobile_content_widget.dart';
+part 'profile_image_widget.dart';
+part 'project_backdrop_widget.dart';
+part 'project_years_widget.dart';
+part 'social_links_widget.dart';
+part 'tablet_content_widget.dart';
+part 'unique_proposition_widget.dart';
+part 'variant/engineering_professional_summary.dart';
+part 'variant/hiring_professional_summary.dart';
+part 'variant/overview_professional_summary.dart';
+part 'variant/professional_summary_variant.dart';
 
 class ProfessionalSummaryWidget extends StatelessWidget {
   const ProfessionalSummaryWidget({

@@ -1979,21 +1979,21 @@
   "@trackingEventsSelectHint": {
     "description": "Shown in the side panel of the tracking viewer before an event is selected"
   },
-  "bookCall": "Book a Call",
-  "@bookCall": {
-    "description": "Button that opens the screen for booking a call"
+  "scheduleAppointment": "Schedule an Appointment",
+  "@scheduleAppointment": {
+    "description": "Button that opens the screen for scheduling an appointment"
   },
-  "bookCallTitle": "Book a Call",
-  "@bookCallTitle": {
-    "description": "Title of the screen for booking a call"
+  "scheduleAppointmentTitle": "Schedule an Appointment",
+  "@scheduleAppointmentTitle": {
+    "description": "Title of the screen for scheduling an appointment"
   },
-  "bookCallHeroTitle": "Let's find a time to talk",
-  "@bookCallHeroTitle": {
-    "description": "Title in the header of the booking screen"
+  "scheduleAppointmentHeroTitle": "Let's find a time to talk",
+  "@scheduleAppointmentHeroTitle": {
+    "description": "Title in the header of the appointment screen"
   },
-  "bookCallDescription": "Pick a time that suits you. Times are shown in your time zone ({timeZone}).",
-  "@bookCallDescription": {
-    "description": "Intro on the booking screen; timeZone is the device's time zone abbreviation",
+  "scheduleAppointmentDescription": "Pick a time that suits you. Times are shown in your time zone ({timeZone}).",
+  "@scheduleAppointmentDescription": {
+    "description": "Intro on the appointment screen; timeZone is the device's time zone abbreviation",
     "placeholders": {
       "timeZone": {
         "type": "String",
@@ -2001,120 +2001,120 @@
       }
     }
   },
-  "bookCallFreeTimesTitle": "Free times",
-  "@bookCallFreeTimesTitle": {
+  "scheduleAppointmentFreeTimesTitle": "Free times",
+  "@scheduleAppointmentFreeTimesTitle": {
     "description": "Label above the free times of the day picked in the calendar"
   },
-  "bookCallDayLabel": "Day",
-  "@bookCallDayLabel": {
-    "description": "Label of the dropdown for picking the day of the call"
+  "scheduleAppointmentDayLabel": "Day",
+  "@scheduleAppointmentDayLabel": {
+    "description": "Label of the dropdown for picking the day of the appointment"
   },
-  "bookCallDefaultTopic": "A quick chat",
-  "@bookCallDefaultTopic": {
-    "description": "What a call is about when the visitor did not come from a service, used in the emails"
+  "scheduleAppointmentDefaultTopic": "A quick chat",
+  "@scheduleAppointmentDefaultTopic": {
+    "description": "What an appointment is about when the visitor did not come from a service, used in the emails"
   },
-  "bookCallNoSlots": "No times are free right now. Please check back soon.",
-  "@bookCallNoSlots": {
+  "scheduleAppointmentNoSlots": "No times are free right now. Please check back soon.",
+  "@scheduleAppointmentNoSlots": {
     "description": "Shown when no time is free to book"
   },
-  "bookCallNameLabel": "Name",
-  "@bookCallNameLabel": {
+  "scheduleAppointmentNameLabel": "Name",
+  "@scheduleAppointmentNameLabel": {
     "description": "Label of the name field"
   },
-  "bookCallEmailLabel": "Email",
-  "@bookCallEmailLabel": {
+  "scheduleAppointmentEmailLabel": "Email",
+  "@scheduleAppointmentEmailLabel": {
     "description": "Label of the email field"
   },
-  "bookCallMessageLabel": "Message",
-  "@bookCallMessageLabel": {
+  "scheduleAppointmentMessageLabel": "Message",
+  "@scheduleAppointmentMessageLabel": {
     "description": "Label of the optional message field"
   },
-  "bookCallConsent": "I agree that my details are used to arrange this call.",
-  "@bookCallConsent": {
+  "scheduleAppointmentConsent": "I agree that my details are used to arrange this appointment.",
+  "@scheduleAppointmentConsent": {
     "description": "Text next to the checkbox agreeing to the use of the visitor's details"
   },
-  "bookCallPrivacyPolicyLink": "Read the privacy policy",
-  "@bookCallPrivacyPolicyLink": {
-    "description": "Link that opens the privacy policy from the booking screen"
+  "scheduleAppointmentPrivacyPolicyLink": "Read the privacy policy",
+  "@scheduleAppointmentPrivacyPolicyLink": {
+    "description": "Link that opens the privacy policy from the appointment screen"
   },
-  "bookCallSend": "Request this time",
-  "@bookCallSend": {
-    "description": "Button that sends the call request"
+  "scheduleAppointmentSend": "Request this time",
+  "@scheduleAppointmentSend": {
+    "description": "Button that sends the appointment request"
   },
-  "bookCallSentTitle": "Request sent",
-  "@bookCallSentTitle": {
-    "description": "Title once the call request is sent"
+  "scheduleAppointmentSentTitle": "Request sent",
+  "@scheduleAppointmentSentTitle": {
+    "description": "Title once the appointment request is sent"
   },
-  "bookCallSentDescription": "Thanks! You'll get an email that your request is in, and another one with the invite once the time is confirmed.",
-  "@bookCallSentDescription": {
-    "description": "Explains what happens after the call request is sent"
+  "scheduleAppointmentSentDescription": "Thanks! You'll get an email that your request is in, and another one with the invite once the time is confirmed.",
+  "@scheduleAppointmentSentDescription": {
+    "description": "Explains what happens after the appointment request is sent"
   },
-  "bookCallSentDone": "Done",
-  "@bookCallSentDone": {
-    "description": "Button that closes the booking screen after sending"
+  "scheduleAppointmentSentDone": "Done",
+  "@scheduleAppointmentSentDone": {
+    "description": "Button that closes the appointment screen after sending"
   },
-  "bookCallServiceTitle": "Talk it through",
-  "@bookCallServiceTitle": {
-    "description": "Heading of the call booking band on a service's page"
+  "scheduleAppointmentServiceTitle": "Talk it through",
+  "@scheduleAppointmentServiceTitle": {
+    "description": "Heading of the appointment band on a service's page"
   },
-  "bookCallServiceDescription": "Book a call to talk about how this service fits your project.",
-  "@bookCallServiceDescription": {
-    "description": "Text of the call booking band on a service's page"
+  "scheduleAppointmentServiceDescription": "Schedule an appointment to talk about how this service fits your project.",
+  "@scheduleAppointmentServiceDescription": {
+    "description": "Text of the appointment band on a service's page"
   },
-  "bookCallServicesDescription": "Not sure which service fits? Book a call and we'll talk through your project.",
-  "@bookCallServicesDescription": {
-    "description": "Text of the call booking section on the services screen"
+  "scheduleAppointmentServicesDescription": "Not sure which service fits? Schedule an appointment and we'll talk through your project.",
+  "@scheduleAppointmentServicesDescription": {
+    "description": "Text of the appointment section on the services screen"
   },
-  "portfolioSectionBookCall": "Let's Talk",
-  "@portfolioSectionBookCall": {
-    "description": "Title of the portfolio section for booking a call"
+  "portfolioSectionScheduleAppointment": "Let's Talk",
+  "@portfolioSectionScheduleAppointment": {
+    "description": "Title of the portfolio section for scheduling an appointment"
   },
-  "bookCallBandTitle": "Got an idea or need some advice?",
-  "@bookCallBandTitle": {
-    "description": "Catchy line of the portfolio band for booking a call"
+  "scheduleAppointmentBandTitle": "Got an idea or need some advice?",
+  "@scheduleAppointmentBandTitle": {
+    "description": "Catchy line of the portfolio band for scheduling an appointment"
   },
-  "bookCallBandDescription": "Let's talk it through on a quick call.",
-  "@bookCallBandDescription": {
-    "description": "Text under the catchy line of the portfolio band for booking a call"
+  "scheduleAppointmentBandDescription": "Schedule an appointment and let's talk it through.",
+  "@scheduleAppointmentBandDescription": {
+    "description": "Text under the catchy line of the portfolio band for scheduling an appointment"
   },
-  "errorCallBookingUnavailable": "Booking a call isn't available right now. Please try again later.",
-  "@errorCallBookingUnavailable": {
-    "description": "Error when call booking is not available"
+  "errorScheduleAppointmentUnavailable": "Scheduling an appointment isn't available right now. Please try again later.",
+  "@errorScheduleAppointmentUnavailable": {
+    "description": "Error when scheduling an appointment is not available"
   },
-  "errorCallBookingNetwork": "Couldn't connect. Check your connection and try again.",
-  "@errorCallBookingNetwork": {
-    "description": "Error when the booking request cannot reach the server"
+  "errorScheduleAppointmentNetwork": "Couldn't connect. Check your connection and try again.",
+  "@errorScheduleAppointmentNetwork": {
+    "description": "Error when the appointment request cannot reach the server"
   },
-  "errorCallSlotsUnknown": "Couldn't load the free times. Please try again.",
-  "@errorCallSlotsUnknown": {
+  "errorAppointmentSlotsUnknown": "Couldn't load the free times. Please try again.",
+  "@errorAppointmentSlotsUnknown": {
     "description": "Error when the free times cannot be loaded"
   },
-  "errorCallRequestMissingDetails": "Please fill in your name, email and message.",
-  "@errorCallRequestMissingDetails": {
+  "errorAppointmentRequestMissingDetails": "Please fill in your name, email and message.",
+  "@errorAppointmentRequestMissingDetails": {
     "description": "Error when the name, email or topic is empty"
   },
-  "errorCallRequestInvalidEmail": "Please enter a valid email address.",
-  "@errorCallRequestInvalidEmail": {
+  "errorAppointmentRequestInvalidEmail": "Please enter a valid email address.",
+  "@errorAppointmentRequestInvalidEmail": {
     "description": "Error when the email address is not valid"
   },
-  "errorCallRequestConsent": "Please agree to the use of your details to send the request.",
-  "@errorCallRequestConsent": {
+  "errorAppointmentRequestConsent": "Please agree to the use of your details to send the request.",
+  "@errorAppointmentRequestConsent": {
     "description": "Error when the visitor has not agreed to the use of their details"
   },
-  "errorCallSlotUnavailable": "That time was just taken. Please pick another one.",
-  "@errorCallSlotUnavailable": {
+  "errorAppointmentSlotUnavailable": "That time was just taken. Please pick another one.",
+  "@errorAppointmentSlotUnavailable": {
     "description": "Error when the chosen time was taken by someone else"
   },
-  "errorCallRequestLimit": "You've reached the limit for call requests. Please try again later.",
-  "@errorCallRequestLimit": {
+  "errorAppointmentRequestLimit": "You've reached the limit for appointment requests. Please try again later.",
+  "@errorAppointmentRequestLimit": {
     "description": "Error when the visitor has sent too many requests"
   },
-  "errorCallRequestInvalid": "Some details look too long or invalid. Please check them and try again.",
-  "@errorCallRequestInvalid": {
+  "errorAppointmentRequestInvalid": "Some details look too long or invalid. Please check them and try again.",
+  "@errorAppointmentRequestInvalid": {
     "description": "Error when the server refuses one of the details"
   },
-  "errorCallRequestUnknown": "Couldn't send your request. Please try again.",
-  "@errorCallRequestUnknown": {
-    "description": "Error when the call request cannot be sent"
+  "errorAppointmentRequestUnknown": "Couldn't send your request. Please try again.",
+  "@errorAppointmentRequestUnknown": {
+    "description": "Error when the appointment request cannot be sent"
   }
 }
