@@ -12,6 +12,7 @@ import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/remote_assistant/presentation/screen/remote_assistant/bloc/remote_assistant_state.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/setting_screen.dart';
@@ -59,6 +60,10 @@ void main() {
       )
       ..stubCall(
         definition: JobOpeningFeatureFlags.jobOpenings,
+        result: const Right(false),
+      )
+      ..stubCall(
+        definition: ScheduleAppointmentFeatureFlags.appointmentRequests,
         result: const Right(false),
       );
     appServiceLocator.registerFactory<SettingBloc>(

@@ -43,3 +43,18 @@ class ScheduleAppointmentNetworkException extends ScheduleAppointmentException {
 class ScheduleAppointmentUnknownException extends ScheduleAppointmentException {
   const ScheduleAppointmentUnknownException({super.cause, super.stackTrace});
 }
+
+/// The request is gone, for example because its retention ended.
+class AppointmentRequestNotFoundException extends ScheduleAppointmentException {
+  const AppointmentRequestNotFoundException({super.cause, super.stackTrace});
+}
+
+/// Firestore rules refused the read or the answer, for example for a request
+/// that was already answered.
+class AppointmentRequestPermissionDeniedException
+    extends ScheduleAppointmentException {
+  const AppointmentRequestPermissionDeniedException({
+    super.cause,
+    super.stackTrace,
+  });
+}

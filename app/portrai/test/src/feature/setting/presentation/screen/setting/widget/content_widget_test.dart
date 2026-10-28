@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:portrai/src/feature/design_system/design_system.dart';
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/content_widget.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 
 import '../../../../../../../mock/feature/design_system/presentation/widget/design_system_card/bloc/mock_design_system_card_bloc.dart';
 import '../../../../../../../mock/feature/job_opening/presentation/widget/job_openings_card/bloc/mock_job_openings_card_bloc.dart';
+import '../../../../../../../mock/feature/schedule_appointment/presentation/widget/appointment_requests_card/bloc/mock_appointment_requests_card_bloc.dart';
 import '../../../../../../../util/assistant_test_fixture.dart';
 import '../../../../../../../util/package_info_setup.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
@@ -21,6 +23,9 @@ void main() {
       ..stubState()
       ..registerFactory();
     MockJobOpeningsCardBloc()
+      ..stubState()
+      ..registerFactory();
+    MockAppointmentRequestsCardBloc()
       ..stubState()
       ..registerFactory();
   });
@@ -64,6 +69,34 @@ void main() {
         expect(
           find.byType(JobOpeningsCardWidget),
           isJobOpeningsEnabled ? findsOneWidget : findsNothing,
+        );
+      });
+    }
+
+    for (final (isJobOpeningsEnabled, isAppointmentRequestsEnabled) in [
+      (false, true),
+      (true, true),
+      (false, false),
+    ]) {
+      testWidgets('should show the appointment requests card under one Career '
+          'title when its flag is $isAppointmentRequestsEnabled and the job '
+          'openings flag is $isJobOpeningsEnabled', (tester) async {
+        await pumpContent(
+          tester,
+          SettingLoadedState(
+            isLanguageSelectorEnabled: false,
+            isJobOpeningsEnabled: isJobOpeningsEnabled,
+            isAppointmentRequestsEnabled: isAppointmentRequestsEnabled,
+          ),
+        );
+
+        expect(
+          find.byType(AppointmentRequestsCardWidget),
+          isAppointmentRequestsEnabled ? findsOneWidget : findsNothing,
+        );
+        expect(
+          find.text('Career'),
+          isAppointmentRequestsEnabled ? findsOneWidget : findsNothing,
         );
       });
     }

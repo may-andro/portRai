@@ -7,6 +7,7 @@ void main() {
   group('PushMessageMapper', () {
     for (final (kind, expected) in [
       ('job_openings', PushMessageKind.jobOpenings),
+      ('call_request', PushMessageKind.appointmentRequest),
       ('portfolio_update', PushMessageKind.portfolioUpdate),
       ('something_else', PushMessageKind.unknown),
     ]) {

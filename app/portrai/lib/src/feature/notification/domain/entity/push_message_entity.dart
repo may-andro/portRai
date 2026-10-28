@@ -5,6 +5,9 @@ enum PushMessageKind {
   /// New job openings for the signed-in user.
   jobOpenings,
 
+  /// A visitor asked the signed-in owner for an appointment.
+  appointmentRequest,
+
   /// The portfolio content changed.
   portfolioUpdate,
 

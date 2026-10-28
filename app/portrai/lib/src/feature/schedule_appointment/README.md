@@ -34,19 +34,39 @@ visitor hears back by email. Visitors do not sign in.
   | A service's page, a band as its last section                                | The service title | Nothing                 |
 
 - Scheduling is off unless the `feature_call_booking` flag is on (`IsScheduleAppointmentAvailableUseCase`).
+- `AppointmentRequestsScreen` at `/appointment-requests` shows the requests sent to the signed-in
+  owner, and the route asks for sign-in first:
+  - A header over a gradient counts the requests waiting for an answer and the accepted ones
+    still to come, and names the next appointment.
+  - A week timeline shows each day's requests as time pills in their state's color, or dots on
+    phones. Arrows move a week at a time and a button returns to this week. It opens on the week
+    of the next request to answer, or this week when there is none. Picking a day narrows the
+    list to it; picking it again shows every day.
+  - A search field matches every word in the name, email, topic or message, and chips with counts
+    narrow the list to waiting, accepted, declined or unanswered requests. While the list is
+    narrowed, it says how many requests it shows and offers to clear the filters.
+  - The requests follow in sections: Waiting for your answer (earliest first, with Accept and
+    Decline buttons), Coming up (accepted, earliest first) and Earlier (latest first). Each card
+    has a calendar tile with the day, the time and how soon it is, the topic, the visitor's
+    initials, name and email, their message, which long messages cut to three lines until
+    expanded, and the day it was requested.
+  - A confirmation says that the visitor will get an email, and the request then moves to its new
+    section. A failed answer keeps the search and filters when the list loads again.
+- `AppointmentRequestsCardWidget` opens the screen from Settings, shown while the
+  `feature_appointment_requests` flag is on. Tapping a `call_request` notification also opens it.
 
 ## Configuration
 
 `FirebaseScheduleAppointmentRepository` calls two callable functions in the
-[functions](../../../../../../tool/functions/README.md#schedule-appointment) project without a signed-in
+[functions](../../../../../../tool/functions/README.md#call-booking) project without a signed-in
 user:
 
-| Function              | Sends                                                                          | Returns                                                       |
-| --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| `getAppointmentSlots` | Nothing                                                                        | The free slots in UTC, their length and the owner's time zone |
-| `requestAppointment`  | `slotStart` in UTC, `name`, `email`, `topic`, `message` and the app's `locale` | The request's ID                                              |
+| Function       | Sends                                                                          | Returns                                                       |
+| -------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| `getCallSlots` | Nothing                                                                        | The free slots in UTC, their length and the owner's time zone |
+| `requestCall`  | `slotStart` in UTC, `name`, `email`, `topic`, `message` and the app's `locale` | The request's ID                                              |
 
-Both functions accept only calls with a valid App Check token, and `requestAppointment` gets a fresh
+Both functions accept only calls with a valid App Check token, and `requestCall` gets a fresh
 limited-use token each time, so a captured call cannot be replayed. The reason a function sends
 with a refusal (`details.reason`) decides the message the visitor sees:
 
@@ -60,9 +80,22 @@ with a refusal (`details.reason`) decides the message the visitor sees:
 The app checks the name, email, message, topic and consent before sending, and the text fields allow as
 many characters as the function does.
 
+`FirestoreAppointmentRequestRepository` reads the owner's requests from Firestore without a cache
+and saves the answer:
+
+| Path                             | Access | Content                                                          |
+| -------------------------------- | ------ | ---------------------------------------------------------------- |
+| `users/{uid}/call_requests/{id}` | Read   | The requests the function saved                                  |
+| `users/{uid}/call_requests/{id}` | Update | `status` `accepted` or `declined`, and `decidedAt` (server time) |
+
+The Firestore rules allow only that answer, and only while the request waits for one. The
+function then emails the visitor. A request that is gone or already answered shows its message,
+and the list loads again.
+
 The visitor's details are never logged: `SendAppointmentRequestClickEvent`, `RequestAppointmentParam`,
-`AppointmentRequestEntity` and `AppointmentRequestModel` leave them out of their `toString`, and the screen's
-state holds none.
+`AppointmentRequestEntity`, `AppointmentRequestModel`, `ReceivedAppointmentRequestEntity` and
+`ReceivedAppointmentRequestModel` leave them out of their `toString`, and a request that does not
+parse is logged with its ID only. The scheduling screen's state holds none.
 
 ## Testing
 

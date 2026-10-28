@@ -26,6 +26,7 @@ class ScheduleAppointmentModuleConfigurator extends SimpleModuleConfigurator {
   void postDependenciesSetup(ServiceLocator sl) {
     sl.get<ModuleRouteController>()
       ..register(ScheduleAppointmentModuleRoute.scheduleAppointment)
+      ..register(ScheduleAppointmentModuleRoute.appointmentRequests)
       ..registerRedirect((_, requestedUri) => redirectFormerPath(requestedUri));
 
     final registry = sl.get<AppFeatureFlagDefinitionRegistry>();

@@ -6,6 +6,7 @@ import 'package:portrai/src/feature/developer_mode/presentation/screen/developer
 import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/language_card_widget.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/widget/role_card_widget.dart';
@@ -52,12 +53,14 @@ class ContentWidget extends StatelessWidget {
               SectionTitleWidget(title: context.localizations.assistantTitle),
               const LocalAssistantCardWidget(),
             ],
-            if (state.isJobOpeningsEnabled) ...[
+            if (state.isJobOpeningsEnabled ||
+                state.isAppointmentRequestsEnabled)
               SectionTitleWidget(
                 title: context.localizations.jobOpeningsSection,
               ),
-              const JobOpeningsCardWidget(),
-            ],
+            if (state.isJobOpeningsEnabled) const JobOpeningsCardWidget(),
+            if (state.isAppointmentRequestsEnabled)
+              const AppointmentRequestsCardWidget(),
             if (state.isDevMenuEnabled) ...[
               const DSVerticalSpacerWidget(3),
               DSButtonWidget(
