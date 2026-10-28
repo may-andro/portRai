@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/feature/setting/domain/feature_flag/setting_feature_flags.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/_bloc.dart';
 import 'package:portrai/src/feature/user/user.dart';
@@ -55,6 +56,10 @@ void main() {
         )
         ..stubCall(
           definition: JobOpeningFeatureFlags.jobOpenings,
+          result: const Right(false),
+        )
+        ..stubCall(
+          definition: ScheduleAppointmentFeatureFlags.appointmentRequests,
           result: const Right(false),
         );
       getGuestUserUseCase = MockGetGuestUserUseCase()..stubCall(null);
@@ -293,6 +298,33 @@ void main() {
           SettingLoadedState(
             isLanguageSelectorEnabled: false,
             isJobOpeningsEnabled: isJobOpeningsEnabled,
+          ),
+        ],
+      );
+    }
+
+    for (final isAppointmentRequestsEnabled in [false, true]) {
+      blocTest<SettingBloc, SettingState>(
+        'should show the appointment requests card only when its flag is on, '
+        'when the flag is $isAppointmentRequestsEnabled',
+        setUp: () {
+          isFeatureEnabledUseCase
+            ..stubCall(
+              definition: SettingFeatureFlags.languageSelector,
+              result: const Right(false),
+            )
+            ..stubCall(
+              definition: ScheduleAppointmentFeatureFlags.appointmentRequests,
+              result: Right(isAppointmentRequestsEnabled),
+            );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(const LoadSettingsEvent()),
+        expect: () => [
+          const SettingLoadingState(),
+          SettingLoadedState(
+            isLanguageSelectorEnabled: false,
+            isAppointmentRequestsEnabled: isAppointmentRequestsEnabled,
           ),
         ],
       );

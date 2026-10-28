@@ -23,6 +23,7 @@ class SettingLoadedState extends SettingState {
     this.isDevMenuEnabled = false,
     this.isLocalAssistantAvailable = false,
     this.isJobOpeningsEnabled = false,
+    this.isAppointmentRequestsEnabled = false,
     this.isNotificationSettingAvailable = false,
     this.userRole,
   });
@@ -31,6 +32,7 @@ class SettingLoadedState extends SettingState {
   final bool isDevMenuEnabled;
   final bool isLocalAssistantAvailable;
   final bool isJobOpeningsEnabled;
+  final bool isAppointmentRequestsEnabled;
 
   /// The platform has a notification permission for the app to show.
   final bool isNotificationSettingAvailable;
@@ -42,6 +44,7 @@ class SettingLoadedState extends SettingState {
     isDevMenuEnabled,
     isLocalAssistantAvailable,
     isJobOpeningsEnabled,
+    isAppointmentRequestsEnabled,
     isNotificationSettingAvailable,
     userRole,
   ];

@@ -2116,5 +2116,271 @@
   "errorAppointmentRequestUnknown": "Couldn't send your request. Please try again.",
   "@errorAppointmentRequestUnknown": {
     "description": "Error when the appointment request cannot be sent"
+  },
+  "appointmentRequestsCardTitle": "Appointment requests",
+  "@appointmentRequestsCardTitle": {
+    "description": "Title of the Settings card that opens the appointment requests"
+  },
+  "appointmentRequestsCardDescription": "Accept or decline the appointments visitors ask for",
+  "@appointmentRequestsCardDescription": {
+    "description": "Subtitle of the Settings card that opens the appointment requests"
+  },
+  "appointmentRequestsTitle": "Appointment requests",
+  "@appointmentRequestsTitle": {
+    "description": "Title of the appointment requests screen"
+  },
+  "appointmentRequestsOpenTitle": "Waiting for your answer",
+  "@appointmentRequestsOpenTitle": {
+    "description": "Title above the requests the owner can still accept or decline"
+  },
+  "appointmentRequestsClosedTitle": "Earlier",
+  "@appointmentRequestsClosedTitle": {
+    "description": "Title above the answered requests and those whose time has passed"
+  },
+  "appointmentRequestsEmpty": "You're all caught up. No request is waiting for your answer.",
+  "@appointmentRequestsEmpty": {
+    "description": "Shown when no appointment request waits for an answer"
+  },
+  "appointmentRequestStatusRequested": "Waiting",
+  "@appointmentRequestStatusRequested": {
+    "description": "Status of a request that waits for an answer"
+  },
+  "appointmentRequestStatusAccepted": "Accepted",
+  "@appointmentRequestStatusAccepted": {
+    "description": "Status of an accepted request"
+  },
+  "appointmentRequestStatusDeclined": "Declined",
+  "@appointmentRequestStatusDeclined": {
+    "description": "Status of a declined request"
+  },
+  "appointmentRequestStatusUnanswered": "Not answered",
+  "@appointmentRequestStatusUnanswered": {
+    "description": "Status of a request whose time passed without an answer"
+  },
+  "appointmentRequestAccept": "Accept",
+  "@appointmentRequestAccept": {
+    "description": "Button that accepts an appointment request"
+  },
+  "appointmentRequestDecline": "Decline",
+  "@appointmentRequestDecline": {
+    "description": "Button that declines an appointment request"
+  },
+  "appointmentRequestCancel": "Cancel",
+  "@appointmentRequestCancel": {
+    "description": "Button that closes the confirmation without answering"
+  },
+  "appointmentRequestAcceptTitle": "Accept this appointment?",
+  "@appointmentRequestAcceptTitle": {
+    "description": "Title of the confirmation before accepting a request"
+  },
+  "appointmentRequestAcceptDescription": "{name} will get an email with a calendar invite.",
+  "@appointmentRequestAcceptDescription": {
+    "description": "Confirmation text before accepting a request",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Alex"
+      }
+    }
+  },
+  "appointmentRequestDeclineTitle": "Decline this appointment?",
+  "@appointmentRequestDeclineTitle": {
+    "description": "Title of the confirmation before declining a request"
+  },
+  "appointmentRequestDeclineDescription": "{name} will get an email saying the time doesn't work.",
+  "@appointmentRequestDeclineDescription": {
+    "description": "Confirmation text before declining a request",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Alex"
+      }
+    }
+  },
+  "errorAppointmentRequestsSignedOut": "Sign in again to see your appointment requests.",
+  "@errorAppointmentRequestsSignedOut": {
+    "description": "Error when the session ended while viewing appointment requests"
+  },
+  "errorAppointmentRequestsPermissionDenied": "You don't have access to these appointment requests.",
+  "@errorAppointmentRequestsPermissionDenied": {
+    "description": "Error when the appointment requests may not be read"
+  },
+  "errorAppointmentRequestsNetwork": "Can't load appointment requests. Check your internet connection.",
+  "@errorAppointmentRequestsNetwork": {
+    "description": "Error when the appointment requests fail to load because of the network"
+  },
+  "errorAppointmentRequestsUnknown": "Can't load appointment requests. Please try again.",
+  "@errorAppointmentRequestsUnknown": {
+    "description": "Error for unexpected problems loading appointment requests"
+  },
+  "errorAppointmentRequestNotFound": "This request no longer exists.",
+  "@errorAppointmentRequestNotFound": {
+    "description": "Error when the answered request is gone"
+  },
+  "errorAppointmentRequestNotAnswerable": "This request can't be answered anymore. It may already have an answer.",
+  "@errorAppointmentRequestNotAnswerable": {
+    "description": "Error when the request may no longer be accepted or declined"
+  },
+  "errorAppointmentRequestDecisionNetwork": "Couldn't send your answer. Check your internet connection.",
+  "@errorAppointmentRequestDecisionNetwork": {
+    "description": "Error when the answer fails to save because of the network"
+  },
+  "errorAppointmentRequestDecisionUnknown": "Couldn't send your answer. Please try again.",
+  "@errorAppointmentRequestDecisionUnknown": {
+    "description": "Error for unexpected problems saving the answer"
+  },
+  "appointmentRequestsDescription": "Visitors pick a free time in your week. Accept or decline each request, and they hear back by email.",
+  "@appointmentRequestsDescription": {
+    "description": "Summary under the appointment requests title"
+  },
+  "appointmentRequestsWaitingCount": "{count, plural, =0{Nothing waiting} =1{1 waiting} other{{count} waiting}}",
+  "@appointmentRequestsWaitingCount": {
+    "description": "Number of requests that wait for an answer",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "appointmentRequestsUpcomingCount": "{count, plural, =0{None coming up} =1{1 coming up} other{{count} coming up}}",
+  "@appointmentRequestsUpcomingCount": {
+    "description": "Number of accepted appointments still to come",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "appointmentRequestsNext": "Next: {time}",
+  "@appointmentRequestsNext": {
+    "description": "The next accepted appointment",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "Tue 3 Nov · 15:00"
+      }
+    }
+  },
+  "appointmentRequestsUpcomingTitle": "Coming up",
+  "@appointmentRequestsUpcomingTitle": {
+    "description": "Title above the accepted appointments still to come"
+  },
+  "appointmentRequestsSearchHint": "Search by name, email, topic or message",
+  "@appointmentRequestsSearchHint": {
+    "description": "Hint of the appointment requests search field"
+  },
+  "appointmentRequestsShowingCount": "Showing {shown} of {total}",
+  "@appointmentRequestsShowingCount": {
+    "description": "How many requests the search and filters leave",
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "appointmentRequestsClearFilters": "Clear filters",
+  "@appointmentRequestsClearFilters": {
+    "description": "Button that clears the search, the filter and the picked day"
+  },
+  "appointmentRequestsNoResults": "No requests match your search.",
+  "@appointmentRequestsNoResults": {
+    "description": "Shown when the search and filters leave no requests"
+  },
+  "appointmentRequestsNoRequests": "No appointment requests yet. They show up here as soon as a visitor picks a time.",
+  "@appointmentRequestsNoRequests": {
+    "description": "Shown before any appointment request arrived"
+  },
+  "appointmentRequestsWeekTitle": "Your week",
+  "@appointmentRequestsWeekTitle": {
+    "description": "Title of the week timeline"
+  },
+  "appointmentRequestsWeekCount": "{count, plural, =0{no requests} =1{1 request} other{{count} requests}}",
+  "@appointmentRequestsWeekCount": {
+    "description": "Number of requests in the shown week",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "appointmentRequestsThisWeek": "This week",
+  "@appointmentRequestsThisWeek": {
+    "description": "Button that shows the current week"
+  },
+  "appointmentRequestsPreviousWeek": "Previous week",
+  "@appointmentRequestsPreviousWeek": {
+    "description": "Tooltip of the button that shows the week before"
+  },
+  "appointmentRequestsNextWeek": "Next week",
+  "@appointmentRequestsNextWeek": {
+    "description": "Tooltip of the button that shows the week after"
+  },
+  "appointmentRequestsMoreCount": "+{count}",
+  "@appointmentRequestsMoreCount": {
+    "description": "More requests on a day than the timeline shows",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "appointmentRequestTimeRange": "{start} – {end}",
+  "@appointmentRequestTimeRange": {
+    "description": "The start and end time of an appointment",
+    "placeholders": {
+      "start": {
+        "type": "String",
+        "example": "15:00"
+      },
+      "end": {
+        "type": "String",
+        "example": "15:30"
+      }
+    }
+  },
+  "appointmentRequestToday": "Today",
+  "@appointmentRequestToday": {
+    "description": "An appointment later today"
+  },
+  "appointmentRequestTomorrow": "Tomorrow",
+  "@appointmentRequestTomorrow": {
+    "description": "An appointment tomorrow"
+  },
+  "appointmentRequestInDays": "In {count} days",
+  "@appointmentRequestInDays": {
+    "description": "How many days until an appointment",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "appointmentRequestReceivedOn": "Requested on {date}",
+  "@appointmentRequestReceivedOn": {
+    "description": "When the visitor sent the request",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "28 Oct 2026"
+      }
+    }
+  },
+  "appointmentRequestShowMore": "Show more",
+  "@appointmentRequestShowMore": {
+    "description": "Button that shows the whole message"
+  },
+  "appointmentRequestShowLess": "Show less",
+  "@appointmentRequestShowLess": {
+    "description": "Button that shortens the message again"
   }
 }

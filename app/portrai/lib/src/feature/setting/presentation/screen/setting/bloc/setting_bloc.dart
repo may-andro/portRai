@@ -9,6 +9,7 @@ import 'package:portrai/src/feature/local_assistant/local_assistant.dart';
 import 'package:portrai/src/feature/onboarding/onboarding.dart';
 import 'package:portrai/src/feature/permission/permission.dart';
 import 'package:portrai/src/feature/remote_assistant/remote_assistant.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/feature/setting/domain/_domain.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_event.dart';
 import 'package:portrai/src/feature/setting/presentation/screen/setting/bloc/setting_state.dart';
@@ -86,6 +87,12 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>
     );
     final isJobOpeningsEnabled = jobOpenings.isRight && jobOpenings.right;
 
+    final appointmentRequests = await _isFeatureEnabledUseCase(
+      ScheduleAppointmentFeatureFlags.appointmentRequests,
+    );
+    final isAppointmentRequestsEnabled =
+        appointmentRequests.isRight && appointmentRequests.right;
+
     UserRole? userRole;
     final onboarding = await _isFeatureEnabledUseCase(
       OnboardingFeatureFlags.roleOnboarding,
@@ -104,6 +111,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState>
         isDevMenuEnabled: _buildConfig.buildEnvironment.isDevMenuEnabled,
         isLocalAssistantAvailable: isLocalAssistantAvailable,
         isJobOpeningsEnabled: isJobOpeningsEnabled,
+        isAppointmentRequestsEnabled: isAppointmentRequestsEnabled,
         isNotificationSettingAvailable:
             notificationSupported.isRight && notificationSupported.right,
         userRole: userRole,

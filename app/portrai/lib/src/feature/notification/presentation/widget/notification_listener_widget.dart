@@ -8,6 +8,7 @@ import 'package:portrai/src/feature/job_opening/job_opening.dart';
 import 'package:portrai/src/feature/notification/domain/_domain.dart';
 import 'package:portrai/src/feature/notification/presentation/bloc/_bloc.dart';
 import 'package:portrai/src/feature/portfolio/portfolio.dart';
+import 'package:portrai/src/feature/schedule_appointment/schedule_appointment.dart';
 import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/route/route.dart';
 
@@ -86,6 +87,10 @@ class _NotificationListenerWidgetState extends State<NotificationListenerWidget>
       case PushMessageKind.jobOpenings:
         // The route asks for sign-in first when nobody is signed in.
         navigatorContext.pushScreen(JobOpeningModuleRoute.jobOpenings);
+      case PushMessageKind.appointmentRequest:
+        navigatorContext.pushScreen(
+          ScheduleAppointmentModuleRoute.appointmentRequests,
+        );
       case PushMessageKind.portfolioUpdate:
         navigatorContext.goScreen(PortfolioModuleRoute.portfolio);
       case PushMessageKind.unknown:
