@@ -6,12 +6,16 @@ class _HireButtonWidget extends StatelessWidget {
     required this.isVisible,
     this.showResume = true,
     this.resumeFirst = false,
+    this.offerBookCall = false,
   });
 
   final bool hasHorizontalPadding;
   final bool isVisible;
   final bool showResume;
   final bool resumeFirst;
+
+  /// Shows Book a Call in place of the email button while booking is on.
+  final bool offerBookCall;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,10 @@ class _HireButtonWidget extends StatelessWidget {
     }
 
     final hasResume = showResume && state.profile.resume.url.isNotEmpty;
-    final hireMe = _HoverScaleWidget(
+    final contactVariant = hasResume && resumeFirst
+        ? DSButtonVariant.secondary
+        : DSButtonVariant.primary;
+    final emailButton = _HoverScaleWidget(
       child: DSButtonWidget(
         label: context.localizations.hireMe,
         icon: Icons.arrow_forward_rounded,
@@ -30,13 +37,28 @@ class _HireButtonWidget extends StatelessWidget {
           context.bloc.add(OpenEmailClientEvent(state.profile.email));
         },
         iconDirection: DSButtonIconDirection.right,
-        variant: hasResume && resumeFirst
-            ? DSButtonVariant.secondary
-            : DSButtonVariant.primary,
+        variant: contactVariant,
         border: DSButtonBorder.rounded,
         size: DSButtonSize.small,
       ),
     );
+    final hireMe = offerBookCall
+        ? BookCallEntryWidget(
+            trackingLabel: 'hiring_book_call_button',
+            fallback: emailButton,
+            builder: (context, onBookCall) => _HoverScaleWidget(
+              child: DSButtonWidget(
+                label: context.localizations.bookCall,
+                icon: Icons.event_available_rounded,
+                onPressed: onBookCall,
+                iconDirection: DSButtonIconDirection.right,
+                variant: contactVariant,
+                border: DSButtonBorder.rounded,
+                size: DSButtonSize.small,
+              ),
+            ),
+          )
+        : emailButton;
     final resume = hasResume
         ? _HoverScaleWidget(
             child: DSButtonWidget(

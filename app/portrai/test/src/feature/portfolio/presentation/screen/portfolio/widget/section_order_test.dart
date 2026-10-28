@@ -7,8 +7,15 @@ import '../../../../../../../mock/feature/portfolio/test_data/portfolio_test_dat
 void main() {
   final portfolio = createPortfolioEntity();
 
-  List<Type> sectionTypes(UserRole? role) => [
-    for (final section in portfolio.sectionsFor(role)) section.runtimeType,
+  List<Type> sectionTypes(
+    UserRole? role, {
+    bool isCallBookingAvailable = false,
+  }) => [
+    for (final section in portfolio.sectionsFor(
+      role,
+      isCallBookingAvailable: isCallBookingAvailable,
+    ))
+      section.runtimeType,
   ];
 
   group('PortfolioExtension.sectionsFor', () {
@@ -45,12 +52,49 @@ void main() {
       };
 
       for (final role in [...UserRole.values, null]) {
-        final isInverse = [
-          for (final type in sectionTypes(role).skip(1)) inverse.contains(type),
-        ];
-        for (var index = 0; index < isInverse.length; index++) {
-          expect(isInverse[index], index.isEven, reason: 'role $role');
+        for (final isCallBookingAvailable in [false, true]) {
+          final isInverse = [
+            for (final type in sectionTypes(
+              role,
+              isCallBookingAvailable: isCallBookingAvailable,
+            ).skip(1))
+              if (type != BookCallSectionWidget) inverse.contains(type),
+          ];
+          for (var index = 0; index < isInverse.length; index++) {
+            expect(
+              isInverse[index],
+              index.isEven,
+              reason: 'role $role, booking $isCallBookingAvailable',
+            );
+          }
         }
+      }
+    });
+
+    test('should offer booking a call after about for a recruiter when booking '
+        'is on', () {
+      final types = sectionTypes(
+        UserRole.recruiter,
+        isCallBookingAvailable: true,
+      );
+
+      expect(
+        types.indexOf(BookCallSectionWidget),
+        types.indexOf(AboutMeSectionWidget) + 1,
+      );
+      expect(
+        sectionTypes(UserRole.recruiter),
+        isNot(contains(BookCallSectionWidget)),
+      );
+    });
+
+    test('should not offer booking a call to other roles', () {
+      for (final role in [UserRole.developer, UserRole.other, null]) {
+        expect(
+          sectionTypes(role, isCallBookingAvailable: true),
+          isNot(contains(BookCallSectionWidget)),
+          reason: 'role $role',
+        );
       }
     });
 

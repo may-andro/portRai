@@ -4,6 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
+import 'package:portrai/src/feature/call_booking/call_booking.dart';
 import 'package:portrai/src/feature/experience/experience.dart';
 import 'package:portrai/src/feature/expertise/expertise.dart';
 import 'package:portrai/src/feature/portfolio/domain/_domain.dart';
@@ -371,6 +372,30 @@ class TestimonialsSectionWidget extends SectionWidget {
   }
 }
 
+// 8. Book a Call Section - Invites recruiters to book a call
+class BookCallSectionWidget extends SectionWidget {
+  BookCallSectionWidget({super.key, required super.portfolio})
+    : super(trackingId: 'portfolio_book_call_section');
+
+  @override
+  @protected
+  Widget buildContent(BuildContext context) {
+    return BookCallEntryWidget(
+      trackingLabel: 'portfolio_book_call_button',
+      builder: (context, onBookCall) => BookCallBandWidget(
+        title: context.localizations.bookCallBandTitle,
+        description: context.localizations.bookCallBandDescription,
+        onBookCall: onBookCall,
+      ),
+    );
+  }
+
+  @override
+  String getTitle(BuildContext context) {
+    return context.localizations.portfolioSectionBookCall;
+  }
+}
+
 extension PortfolioExtension on PortfolioEntity {
   List<SectionWidget> get scrollableSections => sectionsFor(null);
 
@@ -378,8 +403,13 @@ extension PortfolioExtension on PortfolioEntity {
   /// sections are ordered by what the role cares about. Expertise, services and
   /// about use the inverse background and the others the surface one, so every
   /// order must alternate between the two groups, starting with an inverse
-  /// section. Empty sections are skipped.
-  List<SectionWidget> sectionsFor(UserRole? userRole) {
+  /// section. Empty sections are skipped. The book a call section has its own
+  /// gradient, so it sits between the two groups without breaking the rhythm,
+  /// and shows only when [isCallBookingAvailable].
+  List<SectionWidget> sectionsFor(
+    UserRole? userRole, {
+    bool isCallBookingAvailable = false,
+  }) {
     final order = switch (userRole) {
       UserRole.developer => _SectionKind.developerOrder,
       UserRole.recruiter => _SectionKind.recruiterOrder,
@@ -388,11 +418,16 @@ extension PortfolioExtension on PortfolioEntity {
     return [
       IntroSectionWidget(portfolio: this, userRole: userRole),
       for (final kind in order)
-        if (_buildSection(kind) case final SectionWidget section) section,
+        if (_buildSection(kind, isCallBookingAvailable)
+            case final SectionWidget section)
+          section,
     ];
   }
 
-  SectionWidget? _buildSection(_SectionKind kind) => switch (kind) {
+  SectionWidget? _buildSection(
+    _SectionKind kind,
+    bool isCallBookingAvailable,
+  ) => switch (kind) {
     _SectionKind.expertise when expertises.isNotEmpty => ExpertiseSectionWidget(
       portfolio: this,
     ),
@@ -407,6 +442,9 @@ extension PortfolioExtension on PortfolioEntity {
     _SectionKind.about => AboutMeSectionWidget(portfolio: this),
     _SectionKind.testimonials when testimonials.isNotEmpty =>
       TestimonialsSectionWidget(portfolio: this),
+    _SectionKind.bookCall when isCallBookingAvailable => BookCallSectionWidget(
+      portfolio: this,
+    ),
     _ => null,
   };
 }
@@ -417,7 +455,8 @@ enum _SectionKind {
   services,
   experience,
   about,
-  testimonials;
+  testimonials,
+  bookCall;
 
   static const defaultOrder = [
     expertise,
@@ -441,6 +480,7 @@ enum _SectionKind {
     expertise,
     experience,
     about,
+    bookCall,
     projects,
     services,
     testimonials,

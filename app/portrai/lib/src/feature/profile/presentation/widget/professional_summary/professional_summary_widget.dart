@@ -5,6 +5,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/ai_image_gen/ai_image_gen.dart';
+import 'package:portrai/src/feature/call_booking/call_booking.dart';
 import 'package:portrai/src/feature/cv_export/cv_export.dart';
 import 'package:portrai/src/feature/profile/domain/_domain.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/professional_summary/bloc/_bloc.dart';

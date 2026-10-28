@@ -4,14 +4,23 @@ import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:portrai/src/feature/service/domain/_domain.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/bloc/_bloc.dart';
 import 'package:portrai/src/feature/service/presentation/screen/service/widget/_widget.dart';
+import 'package:portrai/src/module_configurator/service_locator.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
+import '../../../../../../../mock/feature/call_booking/presentation/widget/book_call_entry/bloc/mock_book_call_entry_bloc.dart';
 import '../../../../../../../mock/feature/service/presentation/screen/service/bloc/mock_service_bloc.dart';
 import '../../../../../../../util/test_wrapper_widget.dart';
 import '../../../../../../../util/tracking_impression_test_util.dart';
 
 void main() {
-  setUp(resetTrackingImpressions);
+  setUp(() {
+    resetTrackingImpressions();
+    MockBookCallEntryBloc()
+      ..stubAvailable(false)
+      ..registerFactory();
+  });
+
+  tearDown(appServiceLocator.reset);
 
   const service = ServiceEntity(
     image: 'service.png',
