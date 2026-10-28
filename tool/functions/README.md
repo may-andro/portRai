@@ -404,7 +404,9 @@ accepts or declines it, and both get emails with a calendar invite.
 
 Both callables enforce App Check, so only the app can call them, and `requestCall` consumes the
 token, so a captured call cannot be replayed. The app calls `requestCall` with a limited-use
-token. Visitors do not sign in.
+token. Visitors do not sign in. Consuming a token needs the Firebase App Check Token Verifier
+role on the account the function runs as; without it, every request is refused as
+unauthenticated (see [Service account](#service-account)).
 
 ### Slots
 
@@ -588,27 +590,28 @@ done
 | `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc and Cloud Scheduler start the functions |
 
 The call booking functions run as the `call-booking` service account, which may only read and
-write Firestore, send notifications, read the email secrets and receive the Firestore events
-that start the triggers:
+write Firestore, send notifications, read the email secrets, use up App Check tokens and receive
+the Firestore events that start the triggers:
 
 ```bash
 gcloud services enable secretmanager.googleapis.com --project="$PROJECT_ID"
 gcloud iam service-accounts create call-booking \
   --display-name="Call booking functions" --project="$PROJECT_ID"
 for role in roles/datastore.user roles/firebasecloudmessaging.admin \
-  roles/eventarc.eventReceiver roles/run.invoker; do
+  roles/eventarc.eventReceiver roles/run.invoker roles/firebaseappcheck.tokenVerifier; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" \
     --member="serviceAccount:call-booking@${PROJECT_ID}.iam.gserviceaccount.com" \
     --role="$role"
 done
 ```
 
-| Role                                 | Console name                       | Needed for                           |
-| ------------------------------------ | ---------------------------------- | ------------------------------------ |
-| `roles/datastore.user`               | Cloud Datastore User               | Reading settings and saving requests |
-| `roles/firebasecloudmessaging.admin` | Firebase Cloud Messaging API Admin | Notifying the owner                  |
-| `roles/eventarc.eventReceiver`       | Eventarc Event Receiver            | Receiving the Firestore events       |
-| `roles/run.invoker`                  | Cloud Run Invoker                  | Letting Eventarc start the triggers  |
+| Role                                   | Console name                       | Needed for                                                 |
+| -------------------------------------- | ---------------------------------- | ---------------------------------------------------------- |
+| `roles/datastore.user`                 | Cloud Datastore User               | Reading settings and saving requests                       |
+| `roles/firebasecloudmessaging.admin`   | Firebase Cloud Messaging API Admin | Notifying the owner                                        |
+| `roles/eventarc.eventReceiver`         | Eventarc Event Receiver            | Receiving the Firestore events                             |
+| `roles/run.invoker`                    | Cloud Run Invoker                  | Letting Eventarc start the triggers                        |
+| `roles/firebaseappcheck.tokenVerifier` | Firebase App Check Token Verifier  | Using up the token `requestCall` gets, which stops replays |
 
 It reads the email secrets through a grant on each secret, not a project role. See
 [Emails and notifications](#emails-and-notifications).
