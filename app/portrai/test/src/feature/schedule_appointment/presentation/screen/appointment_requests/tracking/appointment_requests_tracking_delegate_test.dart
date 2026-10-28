@@ -35,5 +35,41 @@ void main() {
       expect(tracking.parameters['label'], 'accept');
       expect(tracking.parameters['value'], 'request-1');
     });
+
+    Tracking capturedTracking() =>
+        verify(
+              () => trackingReporter.sendTrackingEvent(captureAny()),
+            ).captured.single
+            as Tracking;
+
+    test('should send a filter click with the filter name', () {
+      delegate.trackFilterSelection('accepted');
+
+      final tracking = capturedTracking();
+      expect(tracking.name, 'filter');
+      expect(tracking.parameters['label'], 'accepted');
+    });
+
+    test('should send a week click with the tapped button', () {
+      delegate.trackWeekClick('next_week');
+
+      final tracking = capturedTracking();
+      expect(tracking.name, 'week');
+      expect(tracking.parameters['label'], 'next_week');
+    });
+
+    test('should send a day click with the date only', () {
+      delegate.trackDayClick(DateTime(2026, 11, 3));
+
+      final tracking = capturedTracking();
+      expect(tracking.name, 'day');
+      expect(tracking.parameters['value'], '2026-11-03');
+    });
+
+    test('should send a clear filters click', () {
+      delegate.trackClearFiltersClick();
+
+      expect(capturedTracking().name, 'clear_filters');
+    });
   });
 }

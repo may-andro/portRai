@@ -1,18 +1,24 @@
+import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:portrai/l10n/l10n.dart';
 import 'package:portrai/src/feature/schedule_appointment/domain/_domain.dart';
 import 'package:portrai/src/feature/schedule_appointment/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/schedule_appointment/presentation/screen/appointment_requests/bloc/_bloc.dart';
-import 'package:portrai/src/widget/page_app_bar_widget.dart';
+import 'package:portrai/src/widget/page_chrome_widget.dart';
 import 'package:portrai/src/widget/screen_content_widget.dart';
 
 part 'decision_dialog_widget.dart';
 part 'empty_widget.dart';
+part 'filter_widget.dart';
+part 'hero_widget.dart';
 part 'request_card_widget.dart';
+part 'request_tone.dart';
+part 'section_widget.dart';
+part 'week_timeline_widget.dart';
 
-/// Widest the list grows, so cards stay readable on desktop.
-const _maxContentWidth = 760.0;
+/// Widest the page content grows, so cards stay readable on desktop.
+const _maxContentWidth = 960.0;
 
 class ContentWidget extends StatelessWidget {
   const ContentWidget({super.key});
@@ -23,7 +29,8 @@ class ContentWidget extends StatelessWidget {
       AppointmentRequestsBloc,
       AppointmentRequestsState
     >(
-      // An answer replaces one loaded state with another.
+      // Searching, filtering and answering replace one loaded state with
+      // another.
       buildWhen: (previous, current) => previous != current,
       contentOf: (state) => switch (state) {
         LoadingState() => const ScreenLoadingContent(),
@@ -33,84 +40,119 @@ class ContentWidget extends StatelessWidget {
               context.bloc.add(const AppointmentRequestsRetryClickEvent()),
         ),
         final LoadedState state => ScreenLoadedContent.slivers([
-          PageAppBarWidget(
-            title: context.localizations.appointmentRequestsTitle,
+          SliverToBoxAdapter(child: _HeroWidget(state: state)),
+          SliverToBoxAdapter(
+            child: _PageColumnWidget(
+              verticalPadding: context.space(factor: 3),
+              child: _BodyWidget(state: state),
+            ),
           ),
-          SliverToBoxAdapter(child: _ListWidget(state: state)),
         ]),
       },
     );
   }
 }
 
-/// The requests waiting for an answer, then the earlier ones.
-class _ListWidget extends StatelessWidget {
-  const _ListWidget({required this.state});
+/// Centers [child] in the page column with the page's side padding.
+class _PageColumnWidget extends StatelessWidget {
+  const _PageColumnWidget({required this.child, this.verticalPadding = 0});
 
-  final LoadedState state;
+  final Widget child;
+  final double verticalPadding;
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.localizations;
-    final now = DateTime.now();
-    final openRequests = state.openRequests(now);
-    final closedRequests = state.closedRequests(now);
-
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.screenHorizontalPadding.left,
-        vertical: context.space(factor: 3),
+        vertical: verticalPadding,
       ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: _maxContentWidth),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: context.space(factor: 2),
-            children: [
-              _SectionTitleWidget(localizations.appointmentRequestsOpenTitle),
-              if (openRequests.isEmpty)
-                const _EmptyWidget()
-              else
-                for (final request in openRequests)
-                  _RequestCardWidget(
-                    key: ValueKey(request.id),
-                    request: request,
-                    isAnswerable: true,
-                    isDeciding: state.decidingRequestId == request.id,
-                  ),
-              if (closedRequests.isNotEmpty) ...[
-                SizedBox(height: context.space()),
-                _SectionTitleWidget(
-                  localizations.appointmentRequestsClosedTitle,
-                ),
-                for (final request in closedRequests)
-                  _RequestCardWidget(
-                    key: ValueKey(request.id),
-                    request: request,
-                    isAnswerable: false,
-                    isDeciding: false,
-                  ),
-              ],
-            ],
-          ),
+          child: child,
         ),
       ),
     );
   }
 }
 
-class _SectionTitleWidget extends StatelessWidget {
-  const _SectionTitleWidget(this.title);
+/// The week, the search and filters, then the requests in their sections.
+class _BodyWidget extends StatelessWidget {
+  const _BodyWidget({required this.state});
 
-  final String title;
+  final LoadedState state;
 
   @override
   Widget build(BuildContext context) {
-    return DSTextWidget(
-      title,
-      style: context.typography.emphasizedTitleLarge,
-      color: context.colorPalette.neutral.grey10,
+    if (state.requests.isEmpty) return const _NoRequestsWidget();
+
+    final localizations = context.localizations;
+    final now = DateTime.now();
+    final waiting = state.waitingRequests(now);
+    final upcoming = state.upcomingRequests(now);
+    final earlier = state.earlierRequests(now);
+    final isEmpty = waiting.isEmpty && upcoming.isEmpty && earlier.isEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: context.space(factor: 3),
+      children: [
+        _WeekTimelineWidget(state: state, now: now),
+        _FilterWidget(key: const ValueKey('filter'), state: state, now: now),
+        if (isEmpty)
+          const _NoResultsWidget()
+        else ...[
+          if (waiting.isNotEmpty || !state.isNarrowed)
+            _SectionWidget(
+              title: localizations.appointmentRequestsOpenTitle,
+              icon: Icons.mark_email_unread_outlined,
+              count: waiting.length,
+              tone: _RequestTone.waiting(context),
+              emptyChild: const _CaughtUpWidget(),
+              children: [
+                for (final request in waiting)
+                  _RequestCardWidget(
+                    key: ValueKey(request.id),
+                    request: request,
+                    now: now,
+                    isAnswerable: true,
+                    isDeciding: state.decidingRequestId == request.id,
+                  ),
+              ],
+            ),
+          if (upcoming.isNotEmpty)
+            _SectionWidget(
+              title: localizations.appointmentRequestsUpcomingTitle,
+              icon: Icons.event_available_outlined,
+              count: upcoming.length,
+              tone: _RequestTone.accepted(context),
+              children: [
+                for (final request in upcoming)
+                  _RequestCardWidget(
+                    key: ValueKey(request.id),
+                    request: request,
+                    now: now,
+                  ),
+              ],
+            ),
+          if (earlier.isNotEmpty)
+            _SectionWidget(
+              title: localizations.appointmentRequestsClosedTitle,
+              icon: Icons.history_rounded,
+              count: earlier.length,
+              tone: _RequestTone.unanswered(context),
+              children: [
+                for (final request in earlier)
+                  _RequestCardWidget(
+                    key: ValueKey(request.id),
+                    request: request,
+                    now: now,
+                  ),
+              ],
+            ),
+        ],
+      ],
     );
   }
 }

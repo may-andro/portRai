@@ -34,11 +34,24 @@ visitor hears back by email. Visitors do not sign in.
   | A service's page, a band as its last section                                | The service title | Nothing                 |
 
 - Scheduling is off unless the `feature_call_booking` flag is on (`IsScheduleAppointmentAvailableUseCase`).
-- `AppointmentRequestsScreen` at `/appointment-requests` lists the requests sent to the signed-in
-  owner, and the route asks for sign-in first. Requests that wait for an answer come first,
-  earliest first, each with Accept and Decline buttons. A confirmation says that the visitor will
-  get an email, and the request then shows its new status. Answered requests, and requests whose
-  time came without an answer, follow under Earlier, latest first.
+- `AppointmentRequestsScreen` at `/appointment-requests` shows the requests sent to the signed-in
+  owner, and the route asks for sign-in first:
+  - A header over a gradient counts the requests waiting for an answer and the accepted ones
+    still to come, and names the next appointment.
+  - A week timeline shows each day's requests as time pills in their state's color, or dots on
+    phones. Arrows move a week at a time and a button returns to this week. It opens on the week
+    of the next request to answer, or this week when there is none. Picking a day narrows the
+    list to it; picking it again shows every day.
+  - A search field matches every word in the name, email, topic or message, and chips with counts
+    narrow the list to waiting, accepted, declined or unanswered requests. While the list is
+    narrowed, it says how many requests it shows and offers to clear the filters.
+  - The requests follow in sections: Waiting for your answer (earliest first, with Accept and
+    Decline buttons), Coming up (accepted, earliest first) and Earlier (latest first). Each card
+    has a calendar tile with the day, the time and how soon it is, the topic, the visitor's
+    initials, name and email, their message, which long messages cut to three lines until
+    expanded, and the day it was requested.
+  - A confirmation says that the visitor will get an email, and the request then moves to its new
+    section. A failed answer keeps the search and filters when the list loads again.
 - `AppointmentRequestsCardWidget` opens the screen from Settings, shown while the
   `feature_appointment_requests` flag is on. Tapping a `call_request` notification also opens it.
 

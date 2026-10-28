@@ -22,6 +22,21 @@ class AppointmentRequestsBloc
     on<AppointmentRequestDecisionClickEvent>(
       _mapAppointmentRequestDecisionClickEventToState,
     );
+    on<AppointmentRequestsSearchChangedEvent>(
+      _mapAppointmentRequestsSearchChangedEventToState,
+    );
+    on<AppointmentRequestsFilterClickEvent>(
+      _mapAppointmentRequestsFilterClickEventToState,
+    );
+    on<AppointmentRequestsWeekClickEvent>(
+      _mapAppointmentRequestsWeekClickEventToState,
+    );
+    on<AppointmentRequestsDayClickEvent>(
+      _mapAppointmentRequestsDayClickEventToState,
+    );
+    on<AppointmentRequestsClearFiltersClickEvent>(
+      _mapAppointmentRequestsClearFiltersClickEventToState,
+    );
   }
 
   final GetAppointmentRequestsUseCase _getAppointmentRequestsUseCase;
@@ -57,9 +72,9 @@ class AppointmentRequestsBloc
       requestId: event.requestId,
     );
     emit(
-      LoadedState(
-        requests: loadedState.requests,
+      loadedState.copyWith(
         decidingRequestId: event.requestId,
+        clearActionFailure: true,
       ),
     );
 
@@ -71,7 +86,7 @@ class AppointmentRequestsBloc
     );
     if (decideEither.isLeft) {
       final failure = decideEither.left;
-      emit(LoadedState(requests: loadedState.requests, actionFailure: failure));
+      emit(loadedState.copyWith(actionFailure: failure));
       // The request changed or is gone, so show it as it is now.
       if (failure is DecideAppointmentRequestNotFoundFailure ||
           failure is DecideAppointmentRequestPermissionDeniedFailure) {
@@ -81,7 +96,8 @@ class AppointmentRequestsBloc
     }
 
     emit(
-      LoadedState(
+      loadedState.copyWith(
+        clearActionFailure: true,
         requests: [
           for (final request in loadedState.requests)
             if (request.id == event.requestId)
@@ -93,13 +109,120 @@ class AppointmentRequestsBloc
     );
   }
 
+  void _mapAppointmentRequestsSearchChangedEventToState(
+    AppointmentRequestsSearchChangedEvent event,
+    Emitter<AppointmentRequestsState> emit,
+  ) {
+    final loadedState = state;
+    if (loadedState is! LoadedState) return;
+    emit(
+      loadedState.copyWith(
+        searchQuery: event.searchQuery,
+        clearActionFailure: true,
+      ),
+    );
+  }
+
+  void _mapAppointmentRequestsFilterClickEventToState(
+    AppointmentRequestsFilterClickEvent event,
+    Emitter<AppointmentRequestsState> emit,
+  ) {
+    final loadedState = state;
+    if (loadedState is! LoadedState) return;
+    final isSelected = loadedState.filter != event.filter;
+    if (isSelected) _trackingDelegate.trackFilterSelection(event.filter.name);
+    emit(
+      loadedState.copyWith(
+        filter: event.filter,
+        clearFilter: !isSelected,
+        clearActionFailure: true,
+      ),
+    );
+  }
+
+  void _mapAppointmentRequestsWeekClickEventToState(
+    AppointmentRequestsWeekClickEvent event,
+    Emitter<AppointmentRequestsState> emit,
+  ) {
+    final loadedState = state;
+    if (loadedState is! LoadedState) return;
+    _trackingDelegate.trackWeekClick(event.label);
+    emit(
+      loadedState.copyWith(
+        weekStart: appointmentWeekStartOf(event.weekStart),
+        clearSelectedDay: true,
+        clearActionFailure: true,
+      ),
+    );
+  }
+
+  void _mapAppointmentRequestsDayClickEventToState(
+    AppointmentRequestsDayClickEvent event,
+    Emitter<AppointmentRequestsState> emit,
+  ) {
+    final loadedState = state;
+    if (loadedState is! LoadedState) return;
+    final day = appointmentDayOf(event.day);
+    final isSelected = loadedState.selectedDay != day;
+    if (isSelected) _trackingDelegate.trackDayClick(day);
+    emit(
+      loadedState.copyWith(
+        selectedDay: day,
+        clearSelectedDay: !isSelected,
+        clearActionFailure: true,
+      ),
+    );
+  }
+
+  void _mapAppointmentRequestsClearFiltersClickEventToState(
+    AppointmentRequestsClearFiltersClickEvent event,
+    Emitter<AppointmentRequestsState> emit,
+  ) {
+    final loadedState = state;
+    if (loadedState is! LoadedState) return;
+    _trackingDelegate.trackClearFiltersClick();
+    emit(
+      loadedState.copyWith(
+        searchQuery: '',
+        clearFilter: true,
+        clearSelectedDay: true,
+        clearActionFailure: true,
+      ),
+    );
+  }
+
+  /// Keeps the search, the filter and the week of a list shown before.
   Future<void> _loadRequests(Emitter<AppointmentRequestsState> emit) async {
+    final previousState = state;
     emit(const LoadingState());
     final requestsEither = await _getAppointmentRequestsUseCase();
     if (requestsEither.isLeft) {
       emit(ErrorState(requestsEither.left));
       return;
     }
-    emit(LoadedState(requests: requestsEither.right));
+
+    final requests = requestsEither.right;
+    if (previousState is LoadedState) {
+      emit(
+        previousState.copyWith(
+          requests: requests,
+          clearDecidingRequestId: true,
+          clearActionFailure: true,
+        ),
+      );
+      return;
+    }
+
+    // Opens on the week of the next request to answer, or else this week.
+    final now = DateTime.now();
+    final nextOpenRequest = requests
+        .where((request) => request.isAnswerableAt(now))
+        .firstOrNull;
+    emit(
+      LoadedState(
+        requests: requests,
+        weekStart: appointmentWeekStartOf(nextOpenRequest?.slotStart ?? now),
+      ),
+    );
   }
 }
