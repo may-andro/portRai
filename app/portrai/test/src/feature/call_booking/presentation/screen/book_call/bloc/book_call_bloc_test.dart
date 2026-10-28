@@ -5,9 +5,9 @@ import 'package:portrai/src/feature/call_booking/domain/_domain.dart';
 import 'package:portrai/src/feature/call_booking/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/call_booking/presentation/screen/book_call/bloc/_bloc.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
-import 'package:portrai/src/utility/legal_urls.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../../mock/feature/app_config/domain/use_case/mock_get_privacy_policy_url_use_case.dart';
 import '../../../../../../../mock/feature/call_booking/domain/use_case/mock_get_call_slots_use_case.dart';
 import '../../../../../../../mock/feature/call_booking/domain/use_case/mock_request_call_use_case.dart';
 import '../../../../../../../mock/feature/call_booking/presentation/screen/book_call/tracking/mock_book_call_tracking_delegate.dart';
@@ -16,6 +16,9 @@ import '../../../../../../../mock/feature/external_app_handler/domain/use_case/f
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 
 void main() {
+  final privacyPolicyUrl = Uri.parse(
+    'https://legal.example.com/privacy-policy',
+  );
   final callSlots = createCallSlotsEntity();
   final days = callSlots.slotsByLocalDay.keys.toList();
   final firstSlot = callSlotStarts.first.toLocal();
@@ -47,10 +50,16 @@ void main() {
     late MockGetCallSlotsUseCase getCallSlots;
     late MockRequestCallUseCase requestCall;
     late MockOpenExternalUrlUseCase openUrl;
+    late MockGetPrivacyPolicyUrlUseCase getPrivacyPolicyUrl;
     late MockBookCallTrackingDelegate tracking;
 
-    BookCallBloc buildBloc() =>
-        BookCallBloc(getCallSlots, requestCall, openUrl, tracking);
+    BookCallBloc buildBloc() => BookCallBloc(
+      getCallSlots,
+      requestCall,
+      openUrl,
+      getPrivacyPolicyUrl,
+      tracking,
+    );
 
     final choosing = BookCallState(
       status: BookCallStatus.choosing,
@@ -63,6 +72,7 @@ void main() {
       getCallSlots = MockGetCallSlotsUseCase();
       requestCall = MockRequestCallUseCase();
       openUrl = MockOpenExternalUrlUseCase();
+      getPrivacyPolicyUrl = MockGetPrivacyPolicyUrlUseCase();
       tracking = MockBookCallTrackingDelegate();
     });
 
@@ -204,7 +214,10 @@ void main() {
 
     blocTest<BookCallBloc, BookCallState>(
       'should open and track the privacy policy',
-      setUp: () => openUrl.stubCall(const Right(true)),
+      setUp: () {
+        openUrl.stubCall(const Right(true));
+        getPrivacyPolicyUrl.stubCall(Right(privacyPolicyUrl));
+      },
       build: buildBloc,
       act: (bloc) =>
           bloc.add(const PrivacyPolicyClickEvent('privacy_policy_link')),

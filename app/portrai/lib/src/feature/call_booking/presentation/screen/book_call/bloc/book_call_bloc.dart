@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:module_injector/module_injector.dart';
+import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/call_booking/domain/_domain.dart';
 import 'package:portrai/src/feature/call_booking/presentation/extension/_extension.dart';
 import 'package:portrai/src/feature/call_booking/presentation/screen/book_call/bloc/book_call_event.dart';
 import 'package:portrai/src/feature/call_booking/presentation/screen/book_call/bloc/book_call_state.dart';
 import 'package:portrai/src/feature/call_booking/presentation/screen/book_call/tracking/_tracking.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
-import 'package:portrai/src/utility/legal_urls.dart';
 import 'package:portrai/src/utility/screen_tracking_bloc_mixin.dart';
 import 'package:tracking/tracking.dart';
 
@@ -17,6 +17,7 @@ class BookCallBloc extends Bloc<BookCallEvent, BookCallState>
     this._getCallSlotsUseCase,
     this._requestCallUseCase,
     this._openExternalUrlUseCase,
+    this._getPrivacyPolicyUrlUseCase,
     this._trackingDelegate,
   ) : super(const BookCallState()) {
     trackScreenViewOn<ScreenVisibleEvent>();
@@ -31,6 +32,7 @@ class BookCallBloc extends Bloc<BookCallEvent, BookCallState>
   final GetCallSlotsUseCase _getCallSlotsUseCase;
   final RequestCallUseCase _requestCallUseCase;
   final OpenExternalUrlUseCase _openExternalUrlUseCase;
+  final GetPrivacyPolicyUrlUseCase _getPrivacyPolicyUrlUseCase;
   final BookCallTrackingDelegate _trackingDelegate;
 
   @override
@@ -97,7 +99,9 @@ class BookCallBloc extends Bloc<BookCallEvent, BookCallState>
     Emitter<BookCallState> emit,
   ) async {
     _trackingDelegate.trackPrivacyPolicyClick(event.label);
-    await _openExternalUrlUseCase(OpenExternalUrlParam(privacyPolicyUrl));
+    final urlEither = await _getPrivacyPolicyUrlUseCase();
+    if (urlEither.isLeft) return;
+    await _openExternalUrlUseCase(OpenExternalUrlParam(urlEither.right));
   }
 
   Future<void> _mapSendCallRequestClickEventToState(

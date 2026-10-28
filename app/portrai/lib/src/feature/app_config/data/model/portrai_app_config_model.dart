@@ -11,6 +11,8 @@ class PortraiAppConfigModel {
     this.aiImage,
     this.aiAssistantModel,
     this.aiRateLimit,
+    this.termsUrl,
+    this.privacyPolicyUrl,
   });
 
   factory PortraiAppConfigModel.fromJson(Map<String, dynamic> json) =>
@@ -20,6 +22,8 @@ class PortraiAppConfigModel {
   final AiImageAppConfigModel? aiImage;
   final String? aiAssistantModel;
   final AiRateLimitAppConfigModel? aiRateLimit;
+  final String? termsUrl;
+  final String? privacyPolicyUrl;
 
   Map<String, dynamic> toJson() => _$PortraiAppConfigModelToJson(this);
 }

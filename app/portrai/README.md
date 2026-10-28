@@ -379,6 +379,19 @@ Flags are read from Firebase Remote Config. Each feature defines its own flags i
 | `feature_language_selector`              | Language selector on the portfolio                             |
 | `feature_role_onboarding`                | Role question for first-time visitors                          |
 
+### Legal Links
+The footer's Terms and Conditions and Privacy Policy links, and the privacy policy link on the
+booking screen, come from the `app_config` document. `GetTermsUrlUseCase` and
+`GetPrivacyPolicyUrlUseCase` read them.
+
+| Field              | Default                                        |
+| ------------------ | ---------------------------------------------- |
+| `termsUrl`         | `https://portrai-legal.web.app/terms`          |
+| `privacyPolicyUrl` | `https://portrai-legal.web.app/privacy-policy` |
+
+A missing value, or one that is not an `http` or `https` address, uses the default. Like the rest
+of the app config, a change applies from the next start.
+
 ## Deployment
 
 The Settings and footer version labels read installed package metadata. Release workflows pass

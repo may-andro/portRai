@@ -75,6 +75,8 @@ void main() {
           maxRequestsPerMinute: 3,
           maxRequestsPerDay: 30,
         ),
+        termsUrl: 'https://legal.example.com/terms',
+        privacyPolicyUrl: 'https://legal.example.com/privacy',
       );
 
       expect(mapper.to(mapper.from(entity)), entity);
