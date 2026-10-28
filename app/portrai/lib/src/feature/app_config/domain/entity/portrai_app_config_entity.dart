@@ -8,6 +8,8 @@ class PortraiAppConfigEntity extends AppConfig {
     this.aiImage = const AiImageAppConfig(),
     this.aiAssistantModel,
     this.aiRateLimit = const AiRateLimitAppConfig(),
+    this.termsUrl,
+    this.privacyPolicyUrl,
   });
 
   final String minimumRequiredAppVersion;
@@ -18,6 +20,10 @@ class PortraiAppConfigEntity extends AppConfig {
 
   final AiRateLimitAppConfig aiRateLimit;
 
+  /// Addresses of the legal pages; null means the hosted page.
+  final String? termsUrl;
+  final String? privacyPolicyUrl;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -26,7 +32,9 @@ class PortraiAppConfigEntity extends AppConfig {
           minimumRequiredAppVersion == other.minimumRequiredAppVersion &&
           aiImage == other.aiImage &&
           aiAssistantModel == other.aiAssistantModel &&
-          aiRateLimit == other.aiRateLimit;
+          aiRateLimit == other.aiRateLimit &&
+          termsUrl == other.termsUrl &&
+          privacyPolicyUrl == other.privacyPolicyUrl;
 
   @override
   int get hashCode => Object.hash(
@@ -34,11 +42,14 @@ class PortraiAppConfigEntity extends AppConfig {
     aiImage,
     aiAssistantModel,
     aiRateLimit,
+    termsUrl,
+    privacyPolicyUrl,
   );
 
   @override
   String toString() =>
       'PortraiAppConfigEntity(minimumRequiredAppVersion: '
       '$minimumRequiredAppVersion, aiImage: $aiImage, '
-      'aiAssistantModel: $aiAssistantModel, aiRateLimit: $aiRateLimit)';
+      'aiAssistantModel: $aiAssistantModel, aiRateLimit: $aiRateLimit, '
+      'termsUrl: $termsUrl, privacyPolicyUrl: $privacyPolicyUrl)';
 }

@@ -1,11 +1,14 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:portrai/src/feature/app_config/app_config.dart';
 import 'package:portrai/src/feature/external_app_handler/external_app_handler.dart';
 import 'package:portrai/src/feature/profile/presentation/widget/footer/bloc/_bloc.dart';
 import 'package:portrai/src/feature/profile/profile.dart';
 import 'package:use_case/use_case.dart';
 
+import '../../../../../../../mock/feature/app_config/domain/use_case/mock_get_privacy_policy_url_use_case.dart';
+import '../../../../../../../mock/feature/app_config/domain/use_case/mock_get_terms_url_use_case.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/fake_open_external_url_param.dart';
 import '../../../../../../../mock/feature/external_app_handler/domain/use_case/mock_open_external_url_use_case.dart';
 import '../../../../../../../mock/feature/profile/domain/use_case/mock_get_profile_use_case.dart';
@@ -14,6 +17,10 @@ import '../../../../../../../mock/feature/profile/presentation/widget/footer/tra
 import '../../../../../../../mock/feature/profile/test_data/profile_test_data.dart';
 
 void main() {
+  final termsUrl = Uri.parse('https://legal.example.com/terms');
+  final privacyPolicyUrl = Uri.parse(
+    'https://legal.example.com/privacy-policy',
+  );
   final profile = createProfileEntity();
 
   setUpAll(() => registerFallbackValue(FakeOpenExternalUrlParam()));
@@ -22,15 +29,27 @@ void main() {
     late MockGetProfileUseCase getProfile;
     late MockOpenExternalUrlUseCase openUrl;
     late MockOpenEmailUseCase openEmail;
+    late MockGetTermsUrlUseCase getTermsUrl;
+    late MockGetPrivacyPolicyUrlUseCase getPrivacyPolicyUrl;
     late MockFooterTrackingDelegate tracking;
 
-    FooterBloc buildBloc() =>
-        FooterBloc(getProfile, openUrl, openEmail, tracking);
+    FooterBloc buildBloc() => FooterBloc(
+      getProfile,
+      openUrl,
+      openEmail,
+      getTermsUrl,
+      getPrivacyPolicyUrl,
+      tracking,
+    );
 
     setUp(() {
       getProfile = MockGetProfileUseCase();
       openUrl = MockOpenExternalUrlUseCase();
       openEmail = MockOpenEmailUseCase();
+      getTermsUrl = MockGetTermsUrlUseCase()
+        ..stubCall(Right<GetTermsUrlFailure, Uri>(termsUrl));
+      getPrivacyPolicyUrl = MockGetPrivacyPolicyUrlUseCase()
+        ..stubCall(Right<GetPrivacyPolicyUrlFailure, Uri>(privacyPolicyUrl));
       tracking = MockFooterTrackingDelegate();
     });
 
@@ -38,8 +57,26 @@ void main() {
       'should emit loaded when load data is added',
       build: buildBloc,
       act: (bloc) => bloc.add(LoadDataEvent(profile: profile)),
-      expect: () => [LoadedState(profile: profile)],
+      expect: () => [
+        LoadedState(
+          profile: profile,
+          termsUrl: termsUrl,
+          privacyPolicyUrl: privacyPolicyUrl,
+        ),
+      ],
       verify: (_) => verifyNever(() => getProfile()),
+    );
+
+    blocTest<FooterBloc, FooterState>(
+      'should load without a legal link that cannot be read',
+      setUp: () => getTermsUrl.stubCall(
+        const Left<GetTermsUrlFailure, Uri>(GetTermsUrlUnknownFailure()),
+      ),
+      build: buildBloc,
+      act: (bloc) => bloc.add(LoadDataEvent(profile: profile)),
+      expect: () => [
+        LoadedState(profile: profile, privacyPolicyUrl: privacyPolicyUrl),
+      ],
     );
 
     blocTest<FooterBloc, FooterState>(
@@ -48,7 +85,13 @@ void main() {
           getProfile.stubCall(Right<GetProfileFailure, ProfileEntity>(profile)),
       build: buildBloc,
       act: (bloc) => bloc.add(const LoadDataEvent()),
-      expect: () => [LoadedState(profile: profile)],
+      expect: () => [
+        LoadedState(
+          profile: profile,
+          termsUrl: termsUrl,
+          privacyPolicyUrl: privacyPolicyUrl,
+        ),
+      ],
     );
 
     blocTest<FooterBloc, FooterState>(

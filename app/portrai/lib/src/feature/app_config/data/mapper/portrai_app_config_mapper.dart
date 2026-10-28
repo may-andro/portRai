@@ -26,6 +26,8 @@ class PortraiAppConfigMapper
       aiRateLimit: aiRateLimit == null
           ? const AiRateLimitAppConfig()
           : _aiRateLimitMapper.to(aiRateLimit),
+      termsUrl: from.termsUrl,
+      privacyPolicyUrl: from.privacyPolicyUrl,
     );
   }
 
@@ -36,5 +38,7 @@ class PortraiAppConfigMapper
         aiImage: _aiImageMapper.from(to.aiImage),
         aiAssistantModel: to.aiAssistantModel,
         aiRateLimit: _aiRateLimitMapper.from(to.aiRateLimit),
+        termsUrl: to.termsUrl,
+        privacyPolicyUrl: to.privacyPolicyUrl,
       );
 }

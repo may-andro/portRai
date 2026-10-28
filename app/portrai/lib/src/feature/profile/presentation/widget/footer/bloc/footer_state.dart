@@ -18,10 +18,18 @@ final class UnavailableState extends FooterState {
 }
 
 final class LoadedState extends FooterState {
-  const LoadedState({required this.profile});
+  const LoadedState({
+    required this.profile,
+    this.termsUrl,
+    this.privacyPolicyUrl,
+  });
 
   final ProfileEntity profile;
 
+  /// The legal pages; null when one could not be read.
+  final Uri? termsUrl;
+  final Uri? privacyPolicyUrl;
+
   @override
-  List<Object> get props => [profile];
+  List<Object> get props => [profile, ?termsUrl, ?privacyPolicyUrl];
 }

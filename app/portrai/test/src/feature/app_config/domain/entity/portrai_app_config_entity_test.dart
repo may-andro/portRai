@@ -39,6 +39,15 @@ void main() {
           ),
         ),
       );
+      expect(
+        first,
+        isNot(
+          const PortraiAppConfigEntity(
+            minimumRequiredAppVersion: '1.0.0',
+            privacyPolicyUrl: 'https://legal.example.com/privacy',
+          ),
+        ),
+      );
     });
 
     test('toString should include the minimumRequiredAppVersion', () {
@@ -51,7 +60,8 @@ void main() {
         'PortraiAppConfigEntity(minimumRequiredAppVersion: 1.0.0, '
         'aiImage: AiImageAppConfig(null, null), '
         'aiAssistantModel: null, '
-        'aiRateLimit: AiRateLimitAppConfig(null, null))',
+        'aiRateLimit: AiRateLimitAppConfig(null, null), '
+        'termsUrl: null, privacyPolicyUrl: null)',
       );
     });
   });

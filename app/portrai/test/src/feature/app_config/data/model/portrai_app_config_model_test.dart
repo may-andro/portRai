@@ -22,6 +22,17 @@ void main() {
       expect(model.aiImage, isNull);
     });
 
+    test('fromJson should parse the legal links', () {
+      final model = PortraiAppConfigModel.fromJson(const {
+        'minimumRequiredAppVersion': '1.2.3',
+        'termsUrl': 'https://legal.example.com/terms',
+        'privacyPolicyUrl': 'https://legal.example.com/privacy',
+      });
+
+      expect(model.termsUrl, 'https://legal.example.com/terms');
+      expect(model.privacyPolicyUrl, 'https://legal.example.com/privacy');
+    });
+
     test('toJson should omit null values', () {
       const model = PortraiAppConfigModel(minimumRequiredAppVersion: '1.2.3');
 

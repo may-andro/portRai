@@ -10,9 +10,11 @@ class _HelpWidget extends StatelessWidget {
     if (state is! LoadedState) {
       return const SizedBox.shrink();
     }
-
-    final termsAndConditionsUrl = state.profile.resume.url;
-    final privacyPolicyUrl = state.profile.resume.url;
+    final termsUrl = state.termsUrl;
+    final privacyPolicyUrl = state.privacyPolicyUrl;
+    if (termsUrl == null && privacyPolicyUrl == null) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -24,26 +26,26 @@ class _HelpWidget extends StatelessWidget {
           color: context.colorPalette.onInverseSurface,
           style: context.typography.emphasizedTitleMedium,
         ),
-        if (termsAndConditionsUrl.isNotNullOrEmpty)
+        if (termsUrl != null)
           _LinkWidget(
             label: context.localizations.termsAndConditions,
             onTap: () {
               context.bloc.add(
                 OpenExternalUrlEvent(
                   label: 'Terms and Conditions',
-                  url: termsAndConditionsUrl,
+                  url: termsUrl.toString(),
                 ),
               );
             },
           ),
-        if (privacyPolicyUrl.isNotNullOrEmpty)
+        if (privacyPolicyUrl != null)
           _LinkWidget(
             label: context.localizations.privacyPolicy,
             onTap: () {
               context.bloc.add(
                 OpenExternalUrlEvent(
                   label: 'Privacy Policy',
-                  url: privacyPolicyUrl,
+                  url: privacyPolicyUrl.toString(),
                 ),
               );
             },
